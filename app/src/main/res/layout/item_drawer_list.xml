@@ -18,7 +18,6 @@
         android:layout_gravity="center_vertical"
         android:paddingLeft="?attr/listPreferredItemPaddingLeft"/>
 
-
     <ImageView
         android:id="@+id/iv_option"
         app:srcCompat="@drawable/ic_more_vert_black_24dp"

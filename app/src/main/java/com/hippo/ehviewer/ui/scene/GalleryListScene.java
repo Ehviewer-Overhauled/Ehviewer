@@ -197,11 +197,11 @@ public final class GalleryListScene extends BaseScene
     @Nullable
     private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
         }
 
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             if (dy >= mHideActionFabSlop) {
                 hideActionFab();
             } else if (dy <= -mHideActionFabSlop / 2) {
@@ -387,7 +387,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
@@ -512,7 +512,7 @@ public final class GalleryListScene extends BaseScene
         mNavCheckedId = checkedItemId;
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
                               @Nullable Bundle savedInstanceState) {
@@ -680,14 +680,11 @@ public final class GalleryListScene extends BaseScene
         final CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(
                 context, getString(R.string.add_quick_search_tip), getString(R.string.get_it), false);
         builder.setTitle(R.string.readme);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (builder.isChecked()) {
-                    Settings.putQuickSearchTip(false);
-                }
-                showAddQuickSearchDialog(adapter, recyclerView, tip);
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            if (builder.isChecked()) {
+                Settings.putQuickSearchTip(false);
             }
+            showAddQuickSearchDialog(adapter, recyclerView, tip);
         }).show();
     }
 
@@ -719,40 +716,37 @@ public final class GalleryListScene extends BaseScene
         builder.setTitle(R.string.add_quick_search_dialog_title);
         builder.setPositiveButton(android.R.string.ok, null);
         final AlertDialog dialog = builder.show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = builder.getText().trim();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String text = builder.getText().trim();
 
-                // Check name empty
-                if (TextUtils.isEmpty(text)) {
-                    builder.setError(getString(R.string.name_is_empty));
+            // Check name empty
+            if (TextUtils.isEmpty(text)) {
+                builder.setError(getString(R.string.name_is_empty));
+                return;
+            }
+
+            // Check name duplicate
+            for (QuickSearch q : mQuickSearchList) {
+                if (text.equals(q.name)) {
+                    builder.setError(getString(R.string.duplicate_name));
                     return;
                 }
+            }
 
-                // Check name duplicate
-                for (QuickSearch q : mQuickSearchList) {
-                    if (text.equals(q.name)) {
-                        builder.setError(getString(R.string.duplicate_name));
-                        return;
-                    }
-                }
+            builder.setError(null);
+            dialog.dismiss();
+            QuickSearch quickSearch = urlBuilder.toQuickSearch();
+            quickSearch.name = text;
+            EhDB.insertQuickSearch(quickSearch);
+            mQuickSearchList.add(quickSearch);
+            adapter.notifyDataSetChanged();
 
-                builder.setError(null);
-                dialog.dismiss();
-                QuickSearch quickSearch = urlBuilder.toQuickSearch();
-                quickSearch.name = text;
-                EhDB.insertQuickSearch(quickSearch);
-                mQuickSearchList.add(quickSearch);
-                adapter.notifyDataSetChanged();
-
-                if (0 == mQuickSearchList.size()) {
-                    tip.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                } else {
-                    tip.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
+            if (0 == mQuickSearchList.size()) {
+                tip.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                tip.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -787,14 +781,12 @@ public final class GalleryListScene extends BaseScene
         toolbar.inflateMenu(R.menu.drawer_gallery_list);
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-            switch (id) {
-                case R.id.action_add:
-                    if (Settings.getQuickSearchTip()) {
-                        showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
-                    } else {
-                        showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
-                    }
-                    break;
+            if (id == R.id.action_add) {
+                if (Settings.getQuickSearchTip()) {
+                    showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
+                } else {
+                    showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
+                }
             }
             return true;
         });
@@ -913,31 +905,28 @@ public final class GalleryListScene extends BaseScene
         final AlertDialog dialog = builder.setTitle(R.string.go_to)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null == mHelper) {
-                    dialog.dismiss();
-                    return;
-                }
-
-                String text = builder.getText().trim();
-                int goTo;
-                try {
-                    goTo = Integer.parseInt(text) - 1;
-                } catch (NumberFormatException e) {
-                    builder.setError(getString(R.string.error_invalid_number));
-                    return;
-                }
-                if (goTo < 0 || goTo >= pages) {
-                    builder.setError(getString(R.string.error_out_of_range));
-                    return;
-                }
-                builder.setError(null);
-                mHelper.goTo(goTo);
-                AppHelper.hideSoftInput(dialog);
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (null == mHelper) {
                 dialog.dismiss();
+                return;
             }
+
+            String text = builder.getText().trim();
+            int goTo;
+            try {
+                goTo = Integer.parseInt(text) - 1;
+            } catch (NumberFormatException e) {
+                builder.setError(getString(R.string.error_invalid_number));
+                return;
+            }
+            if (goTo < 0 || goTo >= pages) {
+                builder.setError(getString(R.string.error_out_of_range));
+                return;
+            }
+            builder.setError(null);
+            mHelper.goTo(goTo);
+            AppHelper.hideSoftInput(dialog);
+            dialog.dismiss();
         });
     }
 
@@ -1501,7 +1490,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    private class QsDrawerHolder extends AbstractDraggableItemViewHolder {
+    private static class QsDrawerHolder extends AbstractDraggableItemViewHolder {
 
         private final TextView key;
         private final ImageView option;
@@ -1525,7 +1514,7 @@ public final class GalleryListScene extends BaseScene
         @NonNull
         @Override
         public QsDrawerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new QsDrawerHolder(mInflater.inflate(R.layout.item_quicksearch_list, parent, false));
+            return new QsDrawerHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false));
         }
 
         @Override
@@ -1584,7 +1573,7 @@ public final class GalleryListScene extends BaseScene
         }
 
         @Override
-        public ItemDraggableRange onGetItemDraggableRange(QsDrawerHolder holder, int position) {
+        public ItemDraggableRange onGetItemDraggableRange(@NonNull QsDrawerHolder holder, int position) {
             return null;
         }
 
