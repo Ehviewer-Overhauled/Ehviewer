@@ -715,4 +715,5 @@
     <string name="black_dark_theme">纯黑深色主题</string>
     <string name="download_filter">过滤</string>
     <string name="download_all">全部</string>
+    <string name="download_start_all_reversed">全部开始（倒序）</string>
 </resources>

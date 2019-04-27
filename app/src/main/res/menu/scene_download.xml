@@ -39,5 +39,9 @@
         android:id="@+id/action_reset_reading_progress"
         android:title="@string/download_reset_reading_progress"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_start_all_reversed"
+        android:title="@string/download_start_all_reversed"
+        app:showAsAction="never" />
 
 </menu>

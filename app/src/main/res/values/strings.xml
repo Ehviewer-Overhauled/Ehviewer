@@ -779,4 +779,5 @@
     <string name="black_dark_theme">Black dark theme</string>
     <string name="download_filter">Filter</string>
     <string name="download_all">All</string>
+    <string name="download_start_all_reversed">Start all (reversed)</string>
 </resources>

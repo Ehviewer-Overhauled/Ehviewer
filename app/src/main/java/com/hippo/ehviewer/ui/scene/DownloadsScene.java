@@ -551,6 +551,24 @@ public class DownloadsScene extends ToolbarScene
                         }).show();
                 return true;
             }
+            case R.id.action_start_all_reversed: {
+                List<DownloadInfo> list = mList;
+                if (list == null) {
+                    return true;
+                }
+                LongList gidList = new LongList();
+                for (int i = list.size() - 1; i > -1; i--) {
+                    DownloadInfo info = list.get(i);
+                    if(info.state!=DownloadInfo.STATE_FINISH){
+                        gidList.add(info.gid);
+                    }
+                }
+                Intent intent = new Intent(activity, DownloadService.class);
+                intent.setAction(DownloadService.ACTION_START_RANGE);
+                intent.putExtra(DownloadService.KEY_GID_LIST, gidList);
+                activity.startService(intent);
+                return true;
+            }
         }
         return false;
     }
