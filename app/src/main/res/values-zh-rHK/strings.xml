@@ -463,8 +463,8 @@
     <string name="settings_eh_show_gallery_pages_summary">在畫廊列表中顯示頁數</string>
     <string name="settings_eh_show_tag_translations">顯示標籤翻譯</string>
     <string name="settings_eh_show_tag_translations_summary">顯示翻譯後的標籤而非原始文字（需花費時間來下載數據文件）</string>
-    <string name="settings_eh_tag_translations_source">補充翻譯（由 EhTagTranslator 提供）</string>
-    <string name="settings_eh_tag_translations_source_url">https://github.com/Mapaler/EhTagTranslator/wiki</string>
+    <string name="settings_eh_tag_translations_source">補充翻譯（由 EhTagTranslation 提供）</string>
+    <string name="settings_eh_tag_translations_source_url">https://github.com/EhTagTranslation/Editor/wiki</string>
     <string name="settings_eh_filter">屏蔽畫廊</string>
     <string name="settings_eh_filter_summary">根據標題、上傳者、標籤屏蔽畫廊</string>
     <string name="settings_eh_cellular_network_warning">移動網絡警告</string>
