@@ -16,7 +16,7 @@
         app:summaryOn="@string/settings_privacy_secure_summary"
         app:summaryOff="@string/settings_privacy_secure_summary"
         android:defaultValue="false"/>
-
+<!--
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         android:key="enable_analytics"
@@ -29,5 +29,5 @@
         app:iconSpaceReserved="false"
         app:dialogMessage="@string/analytics_explain"
         app:dialogMessageHtml="true"
-        app:dialogMessageLinkify="true"/>
+        app:dialogMessageLinkify="true"/>-->
 </PreferenceScreen>

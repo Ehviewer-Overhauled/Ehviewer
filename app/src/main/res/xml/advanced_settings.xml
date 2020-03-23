@@ -51,7 +51,6 @@
         app:iconSpaceReserved="false" />
 
     <SimpleMenuPreference
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:key="read_cache_size"
         android:title="@string/settings_advanced_read_cache_size"
         android:summary="%s"
@@ -82,7 +81,6 @@
         app:iconSpaceReserved="false" />
 
     <com.hippo.preference.ActivityPreference
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:key="custom_hosts"
         android:title="@string/settings_advanced_custom_hosts_title"
         android:summary="@string/settings_advanced_custom_hosts_summary"

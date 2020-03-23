@@ -156,12 +156,6 @@
             android:theme="@style/AppTheme.Toolbar" />
 
         <activity
-            android:name="com.hippo.ehviewer.ui.DirPickerActivity"
-            android:configChanges="screenSize|uiMode"
-            android:label="@string/dir_picker"
-            android:theme="@style/AppTheme.Toolbar" />
-
-        <activity
             android:name="com.hippo.ehviewer.ui.FilterActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/filter"
