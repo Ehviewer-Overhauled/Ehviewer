@@ -21,6 +21,17 @@ import android.os.Parcelable;
 
 public class GalleryComment implements Parcelable {
 
+    public static final Creator<GalleryComment> CREATOR = new Creator<GalleryComment>() {
+        @Override
+        public GalleryComment createFromParcel(Parcel source) {
+            return new GalleryComment(source);
+        }
+
+        @Override
+        public GalleryComment[] newArray(int size) {
+            return new GalleryComment[size];
+        }
+    };
     // 0 for uploader comment. can't vote
     public long id;
     public int score;
@@ -34,6 +45,24 @@ public class GalleryComment implements Parcelable {
     public String user;
     public String comment;
     public long lastEdited;
+
+    public GalleryComment() {
+    }
+
+    protected GalleryComment(Parcel in) {
+        this.id = in.readLong();
+        this.score = in.readInt();
+        this.editable = in.readByte() != 0;
+        this.voteUpAble = in.readByte() != 0;
+        this.voteUpEd = in.readByte() != 0;
+        this.voteDownAble = in.readByte() != 0;
+        this.voteDownEd = in.readByte() != 0;
+        this.voteState = in.readString();
+        this.time = in.readLong();
+        this.user = in.readString();
+        this.comment = in.readString();
+        this.lastEdited = in.readLong();
+    }
 
     @Override
     public int describeContents() {
@@ -55,34 +84,4 @@ public class GalleryComment implements Parcelable {
         dest.writeString(this.comment);
         dest.writeLong(this.lastEdited);
     }
-
-    public GalleryComment() {
-    }
-
-    protected GalleryComment(Parcel in) {
-        this.id = in.readLong();
-        this.score = in.readInt();
-        this.editable = in.readByte() != 0;
-        this.voteUpAble = in.readByte() != 0;
-        this.voteUpEd = in.readByte() != 0;
-        this.voteDownAble = in.readByte() != 0;
-        this.voteDownEd = in.readByte() != 0;
-        this.voteState = in.readString();
-        this.time = in.readLong();
-        this.user = in.readString();
-        this.comment = in.readString();
-        this.lastEdited = in.readLong();
-    }
-
-    public static final Creator<GalleryComment> CREATOR = new Creator<GalleryComment>() {
-        @Override
-        public GalleryComment createFromParcel(Parcel source) {
-            return new GalleryComment(source);
-        }
-
-        @Override
-        public GalleryComment[] newArray(int size) {
-            return new GalleryComment[size];
-        }
-    };
 }

@@ -25,7 +25,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhProxySelector;
@@ -71,20 +73,20 @@ public class ProxyPreference extends DialogPreference implements View.OnClickLis
 
     private void updateSummary(int type, String ip, int port) {
         if ((type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS)
-                && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port)) ) {
+                && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))) {
             type = EhProxySelector.TYPE_SYSTEM;
         }
 
         if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
             Context context = getContext();
             setSummary(context.getString(R.string.settings_advanced_proxy_summary_1,
-                getProxyTypeText(context, type),
-                ip,
-                port));
+                    getProxyTypeText(context, type),
+                    ip,
+                    port));
         } else {
             Context context = getContext();
             setSummary(context.getString(R.string.settings_advanced_proxy_summary_2,
-                getProxyTypeText(context, type)));
+                    getProxyTypeText(context, type)));
         }
     }
 

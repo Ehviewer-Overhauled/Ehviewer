@@ -27,7 +27,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -38,6 +40,7 @@ import com.hippo.widget.lockpattern.LockPatternView;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.util.List;
 
 public class SecurityScene extends SolidScene implements
@@ -62,6 +65,13 @@ public class SecurityScene extends SolidScene implements
     private CancellationSignal mFingerprintCancellationSignal;
 
     private int mRetryTimes;
+    private Runnable mResetFingerprintRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mFingerprintIcon != null)
+                mFingerprintIcon.setImageResource(R.drawable.ic_fp_40px);
+        }
+    };
 
     @Override
     public boolean needShowLeftDrawer() {
@@ -165,7 +175,7 @@ public class SecurityScene extends SolidScene implements
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_security, container, false);
 
         mPatternView = (LockPatternView) ViewUtils.$$(view, R.id.pattern_view);
@@ -187,13 +197,16 @@ public class SecurityScene extends SolidScene implements
     }
 
     @Override
-    public void onPatternStart() {}
+    public void onPatternStart() {
+    }
 
     @Override
-    public void onPatternCleared() {}
+    public void onPatternCleared() {
+    }
 
     @Override
-    public void onPatternCellAdded(List<LockPatternView.Cell> pattern) {}
+    public void onPatternCellAdded(List<LockPatternView.Cell> pattern) {
+    }
 
     @Override
     public void onPatternDetected(List<LockPatternView.Cell> pattern) {
@@ -238,14 +251,6 @@ public class SecurityScene extends SolidScene implements
                 && mFingerprintManager != null
                 && SetSecurityActivity.hasEnrolledFingerprints(mFingerprintManager);
     }
-
-    private Runnable mResetFingerprintRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (mFingerprintIcon != null)
-                mFingerprintIcon.setImageResource(R.drawable.ic_fp_40px);
-        }
-    };
 
     private void fingerprintError(boolean unrecoverable) {
         // Do not decrease mRetryTimes here since Android system will handle it :)

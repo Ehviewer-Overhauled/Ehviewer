@@ -17,8 +17,10 @@
 package com.hippo.ehviewer.client.parser;
 
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.yorozuya.NumberUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

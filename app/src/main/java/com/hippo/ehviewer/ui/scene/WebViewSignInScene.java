@@ -27,15 +27,19 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.yorozuya.AssertUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
@@ -57,7 +61,7 @@ public class WebViewSignInScene extends SolidScene {
     @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     public View onCreateView2(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Context context = getContext2();
         AssertUtils.assertNotNull(context);
 
@@ -103,7 +107,7 @@ public class WebViewSignInScene extends SolidScene {
 
             List<Cookie> cookies = null;
             String[] pieces = cookieStrings.split(";");
-            for (String piece: pieces) {
+            for (String piece : pieces) {
                 Cookie cookie = Cookie.parse(url, piece);
                 if (cookie == null) {
                     continue;
@@ -114,7 +118,7 @@ public class WebViewSignInScene extends SolidScene {
                 cookies.add(cookie);
             }
 
-            return cookies != null ? cookies : Collections.<Cookie>emptyList();
+            return cookies != null ? cookies : Collections.emptyList();
         }
 
         private void addCookie(Context context, String domain, Cookie cookie) {
@@ -136,7 +140,7 @@ public class WebViewSignInScene extends SolidScene {
             List<Cookie> cookies = parseCookies(httpUrl, cookieString);
             boolean getId = false;
             boolean getHash = false;
-            for (Cookie cookie: cookies) {
+            for (Cookie cookie : cookies) {
                 if (EhCookieStore.KEY_IPD_MEMBER_ID.equals(cookie.name())) {
                     getId = true;
                 } else if (EhCookieStore.KEY_IPD_PASS_HASH.equals(cookie.name())) {

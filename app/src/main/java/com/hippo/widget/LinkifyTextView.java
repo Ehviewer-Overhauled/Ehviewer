@@ -22,6 +22,7 @@ import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
 import androidx.annotation.NonNull;
 
 public class LinkifyTextView extends ObservedTextView {
@@ -75,7 +76,7 @@ public class LinkifyTextView extends ObservedTextView {
                     int line = layout.getLineForVertical(y);
                     int off = layout.getOffsetForHorizontal(line, x);
 
-                    ClickableSpan[] spans = ((Spanned)getText()).getSpans(off, off, ClickableSpan.class);
+                    ClickableSpan[] spans = ((Spanned) getText()).getSpans(off, off, ClickableSpan.class);
 
                     if (spans.length > 0) {
                         mCurrentSpan = spans[0];

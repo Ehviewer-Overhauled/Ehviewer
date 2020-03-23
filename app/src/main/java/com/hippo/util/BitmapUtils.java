@@ -20,15 +20,19 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.yorozuya.MathUtils;
+
 import java.io.IOException;
 
 public final class BitmapUtils {
-    private BitmapUtils() {}
-
     public static Context sContext;
+
+    private BitmapUtils() {
+    }
 
     public static void initialize(Context context) {
         sContext = context.getApplicationContext();
@@ -46,7 +50,7 @@ public final class BitmapUtils {
     }
 
     public static Bitmap decodeStream(@NonNull InputStreamPipe isp, int maxWidth, int maxHeight,
-            int pixels, boolean checkMemory, boolean justCalc, int[] sampleSize) {
+                                      int pixels, boolean checkMemory, boolean justCalc, int[] sampleSize) {
         try {
             isp.obtain();
 

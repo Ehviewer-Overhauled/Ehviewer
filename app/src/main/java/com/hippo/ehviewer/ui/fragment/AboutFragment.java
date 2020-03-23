@@ -22,28 +22,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.util.Base64;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.util.AppHelper;
-import java.io.UnsupportedEncodingException;
+import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class AboutFragment extends PreferenceFragment
+import java.nio.charset.StandardCharsets;
+
+public class AboutFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener {
 
     private static final String KEY_AUTHOR = "author";
     private static final String KEY_DONATE = "donate";
     private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
 
+    private static String base64Decode(String encoded) {
+        byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.about_settings);
 
         Preference author = findPreference(KEY_AUTHOR);
@@ -86,15 +94,6 @@ public class AboutFragment extends PreferenceFragment
         paypalText.setText(paypalStr);
         dialog.findViewById(R.id.paypal_open).setOnClickListener(v -> openUrl(paypalStr));
         dialog.findViewById(R.id.paypal_copy).setOnClickListener(v -> copyToClipboard(paypalStr));
-    }
-
-    private static String base64Decode(String encoded) {
-        byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     private void copyToClipboard(String text) {

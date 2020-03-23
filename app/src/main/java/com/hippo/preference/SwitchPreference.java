@@ -23,9 +23,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.CompoundButton;
+
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.SwitchCompat;
+
 import com.hippo.ehviewer.R;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -43,25 +46,10 @@ public class SwitchPreference extends TwoStatePreference {
         }
     }
 
+    private final Listener mListener = new Listener();
     // Switch text for on and off states
     private CharSequence mSwitchOn;
     private CharSequence mSwitchOff;
-
-    private final Listener mListener = new Listener();
-
-    private class Listener implements CompoundButton.OnCheckedChangeListener {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (!callChangeListener(isChecked)) {
-                // Listener didn't like it, change it back.
-                // CompoundButton will make sure we don't recurse.
-                buttonView.setChecked(!isChecked);
-                return;
-            }
-
-            SwitchPreference.this.setChecked(isChecked);
-        }
-    }
 
     public SwitchPreference(Context context) {
         super(context);
@@ -122,6 +110,12 @@ public class SwitchPreference extends TwoStatePreference {
         }
     }
 
+    /**
+     * @return The text that will be displayed on the switch widget in the on state
+     */
+    public CharSequence getSwitchTextOn() {
+        return mSwitchOn;
+    }
 
     /**
      * Set the text displayed on the switch widget in the on state.
@@ -131,17 +125,6 @@ public class SwitchPreference extends TwoStatePreference {
      */
     public void setSwitchTextOn(CharSequence onText) {
         mSwitchOn = onText;
-        notifyChanged();
-    }
-
-    /**
-     * Set the text displayed on the switch widget in the off state.
-     * This should be a very short string; one word if possible.
-     *
-     * @param offText Text to display in the off state
-     */
-    public void setSwitchTextOff(CharSequence offText) {
-        mSwitchOff = offText;
         notifyChanged();
     }
 
@@ -156,6 +139,24 @@ public class SwitchPreference extends TwoStatePreference {
     }
 
     /**
+     * @return The text that will be displayed on the switch widget in the off state
+     */
+    public CharSequence getSwitchTextOff() {
+        return mSwitchOff;
+    }
+
+    /**
+     * Set the text displayed on the switch widget in the off state.
+     * This should be a very short string; one word if possible.
+     *
+     * @param offText Text to display in the off state
+     */
+    public void setSwitchTextOff(CharSequence offText) {
+        mSwitchOff = offText;
+        notifyChanged();
+    }
+
+    /**
      * Set the text displayed on the switch widget in the off state.
      * This should be a very short string; one word if possible.
      *
@@ -165,17 +166,17 @@ public class SwitchPreference extends TwoStatePreference {
         setSwitchTextOff(getContext().getString(resId));
     }
 
-    /**
-     * @return The text that will be displayed on the switch widget in the on state
-     */
-    public CharSequence getSwitchTextOn() {
-        return mSwitchOn;
-    }
+    private class Listener implements CompoundButton.OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (!callChangeListener(isChecked)) {
+                // Listener didn't like it, change it back.
+                // CompoundButton will make sure we don't recurse.
+                buttonView.setChecked(!isChecked);
+                return;
+            }
 
-    /**
-     * @return The text that will be displayed on the switch widget in the off state
-     */
-    public CharSequence getSwitchTextOff() {
-        return mSwitchOff;
+            SwitchPreference.this.setChecked(isChecked);
+        }
     }
 }

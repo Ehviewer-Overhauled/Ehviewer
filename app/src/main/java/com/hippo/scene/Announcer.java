@@ -34,13 +34,13 @@ public final class Announcer {
         return clazz;
     }
 
+    public Bundle getArgs() {
+        return args;
+    }
+
     public Announcer setArgs(Bundle args) {
         this.args = args;
         return this;
-    }
-
-    public Bundle getArgs() {
-        return args;
     }
 
     public Announcer setTranHelper(TransitionHelper tranHelper) {

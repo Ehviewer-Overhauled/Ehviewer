@@ -18,33 +18,57 @@ package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.R;
 import com.hippo.util.LogCat;
 import com.hippo.util.ReadableTime;
+import com.takisoft.preferencex.PreferenceFragmentCompat;
+
 import java.io.File;
 import java.util.Arrays;
 
-public class AdvancedFragment extends PreferenceFragment
-    implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+public class AdvancedFragment extends PreferenceFragmentCompat
+        implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
     private static final String KEY_DUMP_LOGCAT = "dump_logcat";
     private static final String KEY_CLEAR_MEMORY_CACHE = "clear_memory_cache";
     private static final String KEY_APP_LANGUAGE = "app_language";
     private static final String KEY_IMPORT_DATA = "import_data";
 
+    private static void importData(final Context context) {
+        final File dir = AppConfig.getExternalDataDir();
+        if (null == dir) {
+            Toast.makeText(context, R.string.cant_get_data_dir, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final String[] files = dir.list();
+        if (null == files || files.length <= 0) {
+            Toast.makeText(context, R.string.cant_find_any_data, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Arrays.sort(files);
+        new AlertDialog.Builder(context).setItems(files, (dialog, which) -> {
+            File file = new File(dir, files[which]);
+            String error = EhDB.importDB(context, file);
+            if (null == error) {
+                error = context.getString(R.string.settings_advanced_import_data_successfully);
+            }
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+        }).show();
+    }
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.advanced_settings);
 
         Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);
@@ -91,31 +115,6 @@ public class AdvancedFragment extends PreferenceFragment
             return true;
         }
         return false;
-    }
-
-    private static void importData(final Context context) {
-        final File dir = AppConfig.getExternalDataDir();
-        if (null == dir) {
-            Toast.makeText(context, R.string.cant_get_data_dir, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        final String[] files = dir.list();
-        if (null == files || files.length <= 0) {
-            Toast.makeText(context, R.string.cant_find_any_data, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Arrays.sort(files);
-        new AlertDialog.Builder(context).setItems(files, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                File file = new File(dir, files[which]);
-                String error = EhDB.importDB(context, file);
-                if (null == error) {
-                    error = context.getString(R.string.settings_advanced_import_data_successfully);
-                }
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-            }
-        }).show();
     }
 
     @Override

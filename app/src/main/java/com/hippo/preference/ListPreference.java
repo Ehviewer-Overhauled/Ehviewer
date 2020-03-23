@@ -23,8 +23,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+
 import androidx.annotation.ArrayRes;
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
 
 public class ListPreference extends DialogPreference {
@@ -68,6 +70,15 @@ public class ListPreference extends DialogPreference {
     }
 
     /**
+     * The list of entries to be shown in the list in subsequent dialogs.
+     *
+     * @return The list as an array.
+     */
+    public CharSequence[] getEntries() {
+        return mEntries;
+    }
+
+    /**
      * Sets the human-readable entries to be shown in the list. This will be
      * shown in subsequent dialogs.
      * <p>
@@ -82,20 +93,20 @@ public class ListPreference extends DialogPreference {
     }
 
     /**
-     * @see #setEntries(CharSequence[])
      * @param entriesResId The entries array as a resource.
+     * @see #setEntries(CharSequence[])
      */
     public void setEntries(@ArrayRes int entriesResId) {
         setEntries(getContext().getResources().getTextArray(entriesResId));
     }
 
     /**
-     * The list of entries to be shown in the list in subsequent dialogs.
+     * Returns the array of values to be saved for the preference.
      *
-     * @return The list as an array.
+     * @return The array of values.
      */
-    public CharSequence[] getEntries() {
-        return mEntries;
+    public CharSequence[] getEntryValues() {
+        return mEntryValues;
     }
 
     /**
@@ -110,39 +121,11 @@ public class ListPreference extends DialogPreference {
     }
 
     /**
-     * @see #setEntryValues(CharSequence[])
      * @param entryValuesResId The entry values array as a resource.
+     * @see #setEntryValues(CharSequence[])
      */
     public void setEntryValues(@ArrayRes int entryValuesResId) {
         setEntryValues(getContext().getResources().getTextArray(entryValuesResId));
-    }
-
-    /**
-     * Returns the array of values to be saved for the preference.
-     *
-     * @return The array of values.
-     */
-    public CharSequence[] getEntryValues() {
-        return mEntryValues;
-    }
-
-    /**
-     * Sets the value of the key. This should be one of the entries in
-     * {@link #getEntryValues()}.
-     *
-     * @param value The value to set for the key.
-     */
-    public void setValue(String value) {
-        // Always persist/notify the first time.
-        final boolean changed = !TextUtils.equals(mValue, value);
-        if (changed || !mValueSet) {
-            mValue = value;
-            mValueSet = true;
-            persistString(value);
-            if (changed) {
-                notifyChanged();
-            }
-        }
     }
 
     /**
@@ -183,17 +166,6 @@ public class ListPreference extends DialogPreference {
     }
 
     /**
-     * Sets the value to the given index from the entry values.
-     *
-     * @param index The index of the value to set.
-     */
-    public void setValueIndex(int index) {
-        if (mEntryValues != null) {
-            setValue(mEntryValues[index].toString());
-        }
-    }
-
-    /**
      * Returns the value of the key. This should be one of the entries in
      * {@link #getEntryValues()}.
      *
@@ -201,6 +173,25 @@ public class ListPreference extends DialogPreference {
      */
     public String getValue() {
         return mValue;
+    }
+
+    /**
+     * Sets the value of the key. This should be one of the entries in
+     * {@link #getEntryValues()}.
+     *
+     * @param value The value to set for the key.
+     */
+    public void setValue(String value) {
+        // Always persist/notify the first time.
+        final boolean changed = !TextUtils.equals(mValue, value);
+        if (changed || !mValueSet) {
+            mValue = value;
+            mValueSet = true;
+            persistString(value);
+            if (changed) {
+                notifyChanged();
+            }
+        }
     }
 
     /**
@@ -232,6 +223,17 @@ public class ListPreference extends DialogPreference {
 
     private int getValueIndex() {
         return findIndexOfValue(mValue);
+    }
+
+    /**
+     * Sets the value to the given index from the entry values.
+     *
+     * @param index The index of the value to set.
+     */
+    public void setValueIndex(int index) {
+        if (mEntryValues != null) {
+            setValue(mEntryValues[index].toString());
+        }
     }
 
     @Override
@@ -309,23 +311,6 @@ public class ListPreference extends DialogPreference {
     }
 
     private static class SavedState extends BaseSavedState {
-        String value;
-
-        public SavedState(Parcel source) {
-            super(source);
-            value = source.readString();
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeString(value);
-        }
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
                     @Override
@@ -338,6 +323,22 @@ public class ListPreference extends DialogPreference {
                         return new SavedState[size];
                     }
                 };
+        String value;
+
+        public SavedState(Parcel source) {
+            super(source);
+            value = source.readString();
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(value);
+        }
     }
 
 }

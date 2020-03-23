@@ -18,10 +18,22 @@ package com.hippo.ehviewer.client.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 
 public class GalleryApiInfo implements Parcelable {
 
+    public static final Parcelable.Creator<GalleryApiInfo> CREATOR = new Parcelable.Creator<GalleryApiInfo>() {
+        @Override
+        public GalleryApiInfo createFromParcel(Parcel source) {
+            return new GalleryApiInfo(source);
+        }
+
+        @Override
+        public GalleryApiInfo[] newArray(int size) {
+            return new GalleryApiInfo[size];
+        }
+    };
     public long gid;
     public String token;
     public String archiverKey;
@@ -38,6 +50,27 @@ public class GalleryApiInfo implements Parcelable {
     public int torrentcount;
     @Nullable
     public String[] tags;
+
+    public GalleryApiInfo() {
+    }
+
+    protected GalleryApiInfo(Parcel in) {
+        this.gid = in.readLong();
+        this.token = in.readString();
+        this.archiverKey = in.readString();
+        this.title = in.readString();
+        this.titleJpn = in.readString();
+        this.category = in.readInt();
+        this.thumb = in.readString();
+        this.uploader = in.readString();
+        this.posted = in.readLong();
+        this.filecount = in.readInt();
+        this.filesize = in.readLong();
+        this.expunged = in.readByte() != 0;
+        this.rating = in.readFloat();
+        this.torrentcount = in.readInt();
+        this.tags = in.createStringArray();
+    }
 
     @Override
     public int describeContents() {
@@ -62,37 +95,4 @@ public class GalleryApiInfo implements Parcelable {
         dest.writeInt(this.torrentcount);
         dest.writeStringArray(this.tags);
     }
-
-    public GalleryApiInfo() {
-    }
-
-    protected GalleryApiInfo(Parcel in) {
-        this.gid = in.readLong();
-        this.token = in.readString();
-        this.archiverKey = in.readString();
-        this.title = in.readString();
-        this.titleJpn = in.readString();
-        this.category = in.readInt();
-        this.thumb = in.readString();
-        this.uploader = in.readString();
-        this.posted = in.readLong();
-        this.filecount = in.readInt();
-        this.filesize = in.readLong();
-        this.expunged = in.readByte() != 0;
-        this.rating = in.readFloat();
-        this.torrentcount = in.readInt();
-        this.tags = in.createStringArray();
-    }
-
-    public static final Parcelable.Creator<GalleryApiInfo> CREATOR = new Parcelable.Creator<GalleryApiInfo>() {
-        @Override
-        public GalleryApiInfo createFromParcel(Parcel source) {
-            return new GalleryApiInfo(source);
-        }
-
-        @Override
-        public GalleryApiInfo[] newArray(int size) {
-            return new GalleryApiInfo[size];
-        }
-    };
 }

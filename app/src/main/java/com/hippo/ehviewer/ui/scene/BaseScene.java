@@ -26,14 +26,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
-import com.hippo.drawerlayout.DrawerLayout;
-import com.hippo.ehviewer.Analytics;
+
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -44,7 +45,7 @@ public abstract class BaseScene extends SceneFragment {
     public static final int LENGTH_LONG = 1;
 
     public static final String KEY_DRAWER_VIEW_STATE =
-        "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE";
+            "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE";
 
     private Context mThemeContext;
 
@@ -111,29 +112,12 @@ public abstract class BaseScene extends SceneFragment {
         }
     }
 
-    public void setDrawerGestureBlocker(DrawerLayout.GestureBlocker gestureBlocker) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).setDrawerGestureBlocker(gestureBlocker);
-        }
-    }
-
     public boolean isDrawersVisible() {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             return ((MainActivity) activity).isDrawersVisible();
         } else {
             return false;
-        }
-    }
-
-    /**
-     * @param resId 0 for clear
-     */
-    public void setNavCheckedItem(@IdRes int resId) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).setNavCheckedItem(resId);
         }
     }
 
@@ -159,8 +143,18 @@ public abstract class BaseScene extends SceneFragment {
         return 0;
     }
 
+    /**
+     * @param resId 0 for clear
+     */
+    public void setNavCheckedItem(@IdRes int resId) {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            ((MainActivity) activity).setNavCheckedItem(resId);
+        }
+    }
+
     public final View createDrawerView(LayoutInflater inflater,
-        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                       @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         drawerView = onCreateDrawerView(inflater, container, savedInstanceState);
 
         if (drawerView != null) {
@@ -177,7 +171,7 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public View onCreateDrawerView(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return null;
     }
 
@@ -198,13 +192,13 @@ public abstract class BaseScene extends SceneFragment {
     @Nullable
     @Override
     public final View onCreateView(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return onCreateView2(LayoutInflater.from(getContext2()), container, savedInstanceState);
     }
 
     @Nullable
     public View onCreateView2(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return null;
     }
 
@@ -276,12 +270,6 @@ public abstract class BaseScene extends SceneFragment {
         if (null != activity && null != view) {
             AppHelper.showSoftInput(activity, view);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Analytics.onSceneView(this);
     }
 
     @Override

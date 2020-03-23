@@ -16,14 +16,14 @@
 
 package com.hippo.ehviewer.ui;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
-import androidx.annotation.StringRes;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.fragment.AboutFragment;
@@ -32,10 +32,10 @@ import com.hippo.ehviewer.ui.fragment.DownloadFragment;
 import com.hippo.ehviewer.ui.fragment.EhFragment;
 import com.hippo.ehviewer.ui.fragment.PrivacyFragment;
 import com.hippo.ehviewer.ui.fragment.ReadFragment;
+import com.hippo.ehviewer.ui.fragment.SettingsFragment;
 import com.hippo.util.DrawableManager;
-import java.util.List;
 
-public final class SettingsActivity extends EhPreferenceActivity {
+public final class SettingsActivity extends EhActivity {
 
     private static final int REQUEST_CODE_FRAGMENT = 0;
 
@@ -50,15 +50,15 @@ public final class SettingsActivity extends EhPreferenceActivity {
 
     @Override
     protected int getThemeResId(int theme) {
-      switch (theme) {
-        case Settings.THEME_LIGHT:
-        default:
-          return R.style.AppTheme_Settings;
-        case Settings.THEME_DARK:
-          return R.style.AppTheme_Settings_Dark;
-        case Settings.THEME_BLACK:
-          return R.style.AppTheme_Settings_Black;
-      }
+        switch (theme) {
+            case Settings.THEME_LIGHT:
+            default:
+                return R.style.AppTheme_Settings;
+            case Settings.THEME_DARK:
+                return R.style.AppTheme_Settings_Dark;
+            case Settings.THEME_BLACK:
+                return R.style.AppTheme_Settings_Black;
+        }
     }
 
     private void setActionBarUpIndicator(Drawable drawable) {
@@ -73,10 +73,20 @@ public final class SettingsActivity extends EhPreferenceActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_preference);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment, new SettingsFragment())
+                    .commitAllowingStateLoss();
+        }
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
         setActionBarUpIndicator(DrawableManager.getVectorDrawable(this, R.drawable.v_arrow_left_dark_x24));
     }
 
@@ -89,33 +99,6 @@ public final class SettingsActivity extends EhPreferenceActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.settings_headers, target);
-    }
-
-    @Override
-    public void startWithFragment(String fragmentName, Bundle args,
-            Fragment resultTo, int resultRequestCode, @StringRes int titleRes,
-            @StringRes int shortTitleRes) {
-        Intent intent = onBuildStartFragmentIntent(fragmentName, args, titleRes, shortTitleRes);
-        if (resultTo == null) {
-            startActivityForResult(intent, REQUEST_CODE_FRAGMENT);
-        } else {
-            resultTo.startActivityForResult(intent, resultRequestCode);
-        }
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        for (String fragment : ENTRY_FRAGMENTS) {
-            if (fragment.equals(fragmentName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

@@ -30,11 +30,14 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.animation.PathInterpolatorCompat;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.util.ArrayList;
 
 // Base on android.graphics.drawable.MaterialProgressDrawable in L preview
@@ -256,6 +259,10 @@ public class ProgressView extends View {
         invalidate();
     }
 
+    public boolean isIndeterminate() {
+        return mIndeterminate;
+    }
+
     public void setIndeterminate(boolean indeterminate) {
         if (mIndeterminate != indeterminate) {
             mIndeterminate = indeterminate;
@@ -267,10 +274,6 @@ public class ProgressView extends View {
                 stopAnimation();
             }
         }
-    }
-
-    public boolean isIndeterminate() {
-        return mIndeterminate;
     }
 
     public void setProgress(float progress) {

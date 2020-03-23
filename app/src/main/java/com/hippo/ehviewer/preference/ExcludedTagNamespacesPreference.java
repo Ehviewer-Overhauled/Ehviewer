@@ -20,7 +20,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.preference.DialogPreference;
@@ -28,8 +30,6 @@ import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 public class ExcludedTagNamespacesPreference extends DialogPreference {
-
-    private View mTableLayout;
 
     private static final int[] EXCLUDED_TAG_GROUP_RES_ID = {
             R.id.tag_group_reclass,
@@ -41,7 +41,6 @@ public class ExcludedTagNamespacesPreference extends DialogPreference {
             R.id.tag_group_male,
             R.id.tag_group_female,
     };
-
     private static final int[] EXCLUDED_TAG_GROUP_ID = {
             0x1,
             0x2,
@@ -52,6 +51,7 @@ public class ExcludedTagNamespacesPreference extends DialogPreference {
             0x40,
             0x80
     };
+    private View mTableLayout;
 
     public ExcludedTagNamespacesPreference(Context context) {
         super(context);

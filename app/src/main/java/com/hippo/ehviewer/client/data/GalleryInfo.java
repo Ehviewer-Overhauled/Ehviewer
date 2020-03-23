@@ -18,7 +18,9 @@ package com.hippo.ehviewer.client.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
+
 import java.util.regex.Pattern;
 
 public class GalleryInfo implements Parcelable {
@@ -79,23 +81,34 @@ public class GalleryInfo implements Parcelable {
     };
 
     public static final String[] S_LANG_TAGS = {
-        "language:english",
-        "language:chinese",
-        "language:spanish",
-        "language:korean",
-        "language:russian",
-        "language:french",
-        "language:portuguese",
-        "language:thai",
-        "language:german",
-        "language:italian",
-        "language:vietnamese",
-        "language:polish",
-        "language:hungarian",
-        "language:dutch",
+            "language:english",
+            "language:chinese",
+            "language:spanish",
+            "language:korean",
+            "language:russian",
+            "language:french",
+            "language:portuguese",
+            "language:thai",
+            "language:german",
+            "language:italian",
+            "language:vietnamese",
+            "language:polish",
+            "language:hungarian",
+            "language:dutch",
     };
+    public static final Parcelable.Creator<GalleryInfo> CREATOR = new Parcelable.Creator<GalleryInfo>() {
 
-    public long gid ;
+        @Override
+        public GalleryInfo createFromParcel(Parcel source) {
+            return new GalleryInfo(source);
+        }
+
+        @Override
+        public GalleryInfo[] newArray(int size) {
+            return new GalleryInfo[size];
+        }
+    };
+    public long gid;
     public String token;
     public String title;
     public String titleJpn;
@@ -108,21 +121,42 @@ public class GalleryInfo implements Parcelable {
     @Nullable
     public String[] simpleTags;
     public int pages;
-
     public int thumbWidth;
     public int thumbHeight;
-
     public int spanSize;
     public int spanIndex;
     public int spanGroupIndex;
-
     /**
      * language from title
      */
     public String simpleLanguage;
-
     public int favoriteSlot = -2;
     public String favoriteName;
+
+    public GalleryInfo() {
+    }
+
+    protected GalleryInfo(Parcel in) {
+        this.gid = in.readLong();
+        this.token = in.readString();
+        this.title = in.readString();
+        this.titleJpn = in.readString();
+        this.thumb = in.readString();
+        this.category = in.readInt();
+        this.posted = in.readString();
+        this.uploader = in.readString();
+        this.rating = in.readFloat();
+        this.rated = in.readByte() != 0;
+        this.simpleLanguage = in.readString();
+        this.simpleTags = in.createStringArray();
+        this.thumbWidth = in.readInt();
+        this.thumbHeight = in.readInt();
+        this.spanSize = in.readInt();
+        this.spanIndex = in.readInt();
+        this.spanGroupIndex = in.readInt();
+        this.favoriteSlot = in.readInt();
+        this.favoriteName = in.readString();
+    }
 
     public final void generateSLang() {
         if (simpleTags != null) {
@@ -181,41 +215,4 @@ public class GalleryInfo implements Parcelable {
         dest.writeInt(this.favoriteSlot);
         dest.writeString(this.favoriteName);
     }
-
-    public GalleryInfo() {}
-
-    protected GalleryInfo(Parcel in) {
-        this.gid = in.readLong();
-        this.token = in.readString();
-        this.title = in.readString();
-        this.titleJpn = in.readString();
-        this.thumb = in.readString();
-        this.category = in.readInt();
-        this.posted = in.readString();
-        this.uploader = in.readString();
-        this.rating = in.readFloat();
-        this.rated = in.readByte() != 0;
-        this.simpleLanguage = in.readString();
-        this.simpleTags = in.createStringArray();
-        this.thumbWidth = in.readInt();
-        this.thumbHeight = in.readInt();
-        this.spanSize = in.readInt();
-        this.spanIndex = in.readInt();
-        this.spanGroupIndex = in.readInt();
-        this.favoriteSlot = in.readInt();
-        this.favoriteName = in.readString();
-    }
-
-    public static final Parcelable.Creator<GalleryInfo> CREATOR = new Parcelable.Creator<GalleryInfo>() {
-
-        @Override
-        public GalleryInfo createFromParcel(Parcel source) {
-            return new GalleryInfo(source);
-        }
-
-        @Override
-        public GalleryInfo[] newArray(int size) {
-            return new GalleryInfo[size];
-        }
-    };
 }

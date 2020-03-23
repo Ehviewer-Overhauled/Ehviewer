@@ -43,14 +43,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
@@ -60,7 +63,6 @@ import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.conaco.DataContainer;
 import com.hippo.conaco.ProgressNotifier;
-import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -97,6 +99,7 @@ import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.LongList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -110,15 +113,11 @@ public class DownloadsScene extends ToolbarScene
         EasyRecyclerView.OnItemLongClickListener,
         FabLayout.OnClickFabListener, FastScroller.OnDragHandlerListener {
 
-    private static final String TAG = DownloadsScene.class.getSimpleName();
-
     public static final String KEY_GID = "gid";
-
     public static final String KEY_ACTION = "action";
-    private static final String KEY_LABEL = "label";
-
     public static final String ACTION_CLEAR_DOWNLOAD_SERVICE = "clear_download_service";
-
+    private static final String TAG = DownloadsScene.class.getSimpleName();
+    private static final String KEY_LABEL = "label";
     /*---------------
      Whole life cycle
      ---------------*/
@@ -146,6 +145,20 @@ public class DownloadsScene extends ToolbarScene
     private ShowcaseView mShowcaseView;
 
     private int mInitPosition = -1;
+
+    private static void deleteFileAsync(UniFile... files) {
+        new AsyncTask<UniFile, Void, Void>() {
+            @Override
+            protected Void doInBackground(UniFile... params) {
+                for (UniFile file : params) {
+                    if (file != null) {
+                        file.delete();
+                    }
+                }
+                return null;
+            }
+        }.executeOnExecutor(IoThreadPoolExecutor.getInstance(), files);
+    }
 
     @Override
     public int getNavCheckedItem() {
@@ -276,7 +289,7 @@ public class DownloadsScene extends ToolbarScene
     @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_download, container, false);
 
         View content = ViewUtils.$$(view, R.id.content);
@@ -515,7 +528,7 @@ public class DownloadsScene extends ToolbarScene
 
     @Override
     public View onCreateDrawerView(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.drawer_list, container, false);
 
         final Context context = getContext2();
@@ -574,7 +587,7 @@ public class DownloadsScene extends ToolbarScene
         final List<String> labels = new ArrayList<>(list.size() + 1);
         // Add default label name
         labels.add(getString(R.string.default_download_label_name));
-        for (DownloadLabel raw: list) {
+        for (DownloadLabel raw : list) {
             labels.add(raw.getLabel());
         }
 
@@ -926,20 +939,6 @@ public class DownloadsScene extends ToolbarScene
         holder.speed.setText(FileUtils.humanReadableByteCount(speed, false) + "/S");
     }
 
-    private static void deleteFileAsync(UniFile... files) {
-        new AsyncTask<UniFile, Void, Void>() {
-            @Override
-            protected Void doInBackground(UniFile... params) {
-                for (UniFile file: params) {
-                    if (file != null) {
-                        file.delete();
-                    }
-                }
-                return null;
-            }
-        }.executeOnExecutor(IoThreadPoolExecutor.getInstance(), files);
-    }
-
     private class DeleteDialogHelper implements DialogInterface.OnClickListener {
 
         private final GalleryInfo mGalleryInfo;
@@ -981,7 +980,7 @@ public class DownloadsScene extends ToolbarScene
         private final CheckBoxDialogBuilder mBuilder;
 
         public DeleteRangeDialogHelper(List<DownloadInfo> downloadInfoList,
-                LongList gidList, CheckBoxDialogBuilder builder) {
+                                       LongList gidList, CheckBoxDialogBuilder builder) {
             mDownloadInfoList = downloadInfoList;
             mGidList = gidList;
             mBuilder = builder;
@@ -1009,7 +1008,7 @@ public class DownloadsScene extends ToolbarScene
             if (checked) {
                 UniFile[] files = new UniFile[mDownloadInfoList.size()];
                 int i = 0;
-                for (DownloadInfo info: mDownloadInfoList) {
+                for (DownloadInfo info : mDownloadInfoList) {
                     // Remove download path
                     EhDB.removeDownloadDirname(info.gid);
                     // Put file
@@ -1197,7 +1196,7 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
-    private class DownloadChoiceListener implements  EasyRecyclerView.CustomChoiceListener {
+    private class DownloadChoiceListener implements EasyRecyclerView.CustomChoiceListener {
 
         @Override
         public void onIntoCustomChoice(EasyRecyclerView view) {
@@ -1260,7 +1259,8 @@ public class DownloadsScene extends ToolbarScene
         }
 
         @Override
-        public void onUrlMoved(String requestUrl, String responseUrl) {}
+        public void onUrlMoved(String requestUrl, String responseUrl) {
+        }
 
         @Override
         public boolean save(InputStream is, long length, String mediaType, ProgressNotifier notify) {

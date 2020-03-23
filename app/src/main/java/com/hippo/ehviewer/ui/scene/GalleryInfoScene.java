@@ -27,10 +27,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
@@ -44,6 +46,7 @@ import com.hippo.ripple.Ripple;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.util.ArrayList;
 
 public final class GalleryInfoScene extends ToolbarScene implements EasyRecyclerView.OnItemClickListener {
@@ -159,7 +162,7 @@ public final class GalleryInfoScene extends ToolbarScene implements EasyRecycler
     @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_info, container, false);
 
         Context context = getContext2();

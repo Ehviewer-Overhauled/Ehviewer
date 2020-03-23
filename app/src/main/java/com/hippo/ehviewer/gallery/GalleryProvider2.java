@@ -18,6 +18,7 @@ package com.hippo.ehviewer.gallery;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hippo.glgallery.GalleryProvider;
 import com.hippo.unifile.UniFile;
 
@@ -35,7 +36,8 @@ public abstract class GalleryProvider2 extends GalleryProvider {
         return 0;
     }
 
-    public void putStartPage(int page) {}
+    public void putStartPage(int page) {
+    }
 
     /**
      * @return without extension

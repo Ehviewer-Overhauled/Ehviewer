@@ -24,15 +24,16 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.ListView;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.R;
 
 public class IndicatingListView extends ListView {
 
-    private int mIndicatorHeight;
-
     private final Paint mPaint = new Paint();
     private final Rect mTemp = new Rect();
+    private int mIndicatorHeight;
 
     public IndicatingListView(Context context) {
         super(context);

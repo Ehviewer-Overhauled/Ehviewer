@@ -23,12 +23,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.hippo.drawable.TriangleDrawable;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -41,35 +43,30 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.widget.TileThumb;
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
-    @IntDef({TYPE_LIST, TYPE_GRID})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Type {}
-
     public static final int TYPE_INVALID = -1;
     public static final int TYPE_LIST = 0;
     public static final int TYPE_GRID = 1;
-
     private final LayoutInflater mInflater;
     private final Resources mResources;
     private final RecyclerView mRecyclerView;
     private final AutoStaggeredGridLayoutManager mLayoutManager;
     private final int mPaddingTopSB;
-    private MarginItemDecoration mListDecoration;
-    private MarginItemDecoration mGirdDecoration;
     private final int mListThumbWidth;
     private final int mListThumbHeight;
+    private MarginItemDecoration mListDecoration;
+    private MarginItemDecoration mGirdDecoration;
     private int mType = TYPE_INVALID;
     private boolean mShowFavourited;
-
     private DownloadManager mDownloadManager;
 
     public GalleryAdapter(@NonNull LayoutInflater inflater, @NonNull Resources resources,
-            @NonNull RecyclerView recyclerView, int type, boolean showFavourited) {
+                          @NonNull RecyclerView recyclerView, int type, boolean showFavourited) {
         mInflater = inflater;
         mResources = resources;
         mRecyclerView = recyclerView;
@@ -208,7 +205,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                     holder.pages.setText(null);
                     holder.pages.setVisibility(View.GONE);
                 } else {
-                    holder.pages.setText(Integer.toString(gi.pages) + "P");
+                    holder.pages.setText(gi.pages + "P");
                     holder.pages.setVisibility(View.VISIBLE);
                 }
                 if (TextUtils.isEmpty(gi.simpleLanguage)) {
@@ -241,5 +238,10 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
         // Update transition name
         ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gi.gid));
+    }
+
+    @IntDef({TYPE_LIST, TYPE_GRID})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Type {
     }
 }

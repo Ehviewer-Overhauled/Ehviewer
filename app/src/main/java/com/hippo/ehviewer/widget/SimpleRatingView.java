@@ -97,6 +97,10 @@ public class SimpleRatingView extends View {
         canvas.restoreToCount(saved);
     }
 
+    public float getRating() {
+        return mRating;
+    }
+
     public void setRating(float rating) {
         if (mRating != rating) {
             mRating = rating;
@@ -106,9 +110,5 @@ public class SimpleRatingView extends View {
                 invalidate();
             }
         }
-    }
-
-    public float getRating() {
-        return mRating;
     }
 }

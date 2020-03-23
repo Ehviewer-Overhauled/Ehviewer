@@ -19,19 +19,21 @@ package com.hippo.ehviewer.ui.fragment;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
+
+import androidx.annotation.Nullable;
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
+import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class EhFragment extends PreferenceFragment
+public class EhFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceChangeListener {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.eh_settings);
 
         Preference theme = findPreference(Settings.KEY_THEME);

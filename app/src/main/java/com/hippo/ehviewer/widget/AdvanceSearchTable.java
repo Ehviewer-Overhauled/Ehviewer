@@ -27,16 +27,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.NumberUtils;
 
 public class AdvanceSearchTable extends LinearLayout {
-
-    private static final String STATE_KEY_SUPER = "super";
-    private static final String STATE_KEY_ADVANCE_SEARCH = "advance_search";
-    private static final String STATE_KEY_MIN_RATING = "min_rating";
-    private static final String STATE_KEY_PAGE_FROM = "page_from";
-    private static final String STATE_KEY_PAGE_TO = "page_to";
 
     public static final int SNAME = 0x1;
     public static final int STAGS = 0x2;
@@ -49,7 +44,11 @@ public class AdvanceSearchTable extends LinearLayout {
     public static final int SFL = 0x100;
     public static final int SFU = 0x200;
     public static final int SFT = 0x400;
-
+    private static final String STATE_KEY_SUPER = "super";
+    private static final String STATE_KEY_ADVANCE_SEARCH = "advance_search";
+    private static final String STATE_KEY_MIN_RATING = "min_rating";
+    private static final String STATE_KEY_PAGE_FROM = "page_from";
+    private static final String STATE_KEY_PAGE_TO = "page_to";
     private CheckBox mSname;
     private CheckBox mStags;
     private CheckBox mSdesc;
@@ -139,29 +138,6 @@ public class AdvanceSearchTable extends LinearLayout {
         return advanceSearch;
     }
 
-    public int getMinRating() {
-        int position = mMinRating.getSelectedItemPosition();
-        if (mSr.isChecked() && position >= 0) {
-            return position + 2;
-        } else {
-            return -1;
-        }
-    }
-
-    public int getPageFrom() {
-        if (mSp.isChecked()) {
-            return NumberUtils.parseIntSafely(mSpf.getText().toString(), -1);
-        }
-        return -1;
-    }
-
-    public int getPageTo() {
-        if (mSp.isChecked()) {
-            return NumberUtils.parseIntSafely(mSpt.getText().toString(), -1);
-        }
-        return -1;
-    }
-
     public void setAdvanceSearch(int advanceSearch) {
         mSname.setChecked(NumberUtils.int2boolean(advanceSearch & SNAME));
         mStags.setChecked(NumberUtils.int2boolean(advanceSearch & STAGS));
@@ -176,6 +152,15 @@ public class AdvanceSearchTable extends LinearLayout {
         mSft.setChecked(NumberUtils.int2boolean(advanceSearch & SFT));
     }
 
+    public int getMinRating() {
+        int position = mMinRating.getSelectedItemPosition();
+        if (mSr.isChecked() && position >= 0) {
+            return position + 2;
+        } else {
+            return -1;
+        }
+    }
+
     public void setMinRating(int minRating) {
         if (minRating >= 2 && minRating <= 5) {
             mSr.setChecked(true);
@@ -183,6 +168,13 @@ public class AdvanceSearchTable extends LinearLayout {
         } else {
             mSr.setChecked(false);
         }
+    }
+
+    public int getPageFrom() {
+        if (mSp.isChecked()) {
+            return NumberUtils.parseIntSafely(mSpf.getText().toString(), -1);
+        }
+        return -1;
     }
 
     public void setPageFrom(int pageFrom) {
@@ -193,6 +185,13 @@ public class AdvanceSearchTable extends LinearLayout {
             mSp.setChecked(false);
             mSpf.setText(null);
         }
+    }
+
+    public int getPageTo() {
+        if (mSp.isChecked()) {
+            return NumberUtils.parseIntSafely(mSpt.getText().toString(), -1);
+        }
+        return -1;
     }
 
     public void setPageTo(int pageTo) {

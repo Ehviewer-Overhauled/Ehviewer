@@ -17,10 +17,13 @@
 package com.hippo.ehviewer.client;
 
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.Settings;
 import com.hippo.network.UrlBuilder;
+
 import java.util.List;
 import java.util.ListIterator;
+
 import okhttp3.HttpUrl;
 
 public class EhUrl {
@@ -207,7 +210,7 @@ public class EhUrl {
     public static String getThumbUrlPrefix() {
         switch (Settings.getGallerySite()) {
             default:
-            //case SITE_E:
+                //case SITE_E:
                 return URL_PREFIX_THUMB_E;
             //case SITE_EX:
             //    return URL_PREFIX_THUMB_EX;

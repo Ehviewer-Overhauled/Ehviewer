@@ -27,9 +27,32 @@ import java.util.ArrayList;
 
 public class LargePreviewSet extends PreviewSet {
 
+    public static final Parcelable.Creator<LargePreviewSet> CREATOR = new Parcelable.Creator<LargePreviewSet>() {
+        @Override
+        public LargePreviewSet createFromParcel(Parcel source) {
+            return new LargePreviewSet(source);
+        }
+
+        @Override
+        public LargePreviewSet[] newArray(int size) {
+            return new LargePreviewSet[size];
+        }
+    };
     private final IntList mPositionList;
     private final ArrayList<String> mImageUrlList;
     private final ArrayList<String> mPageUrlList;
+
+    public LargePreviewSet() {
+        mPositionList = new IntList();
+        mImageUrlList = new ArrayList<>();
+        mPageUrlList = new ArrayList<>();
+    }
+
+    protected LargePreviewSet(Parcel in) {
+        this.mPositionList = in.readParcelable(IntList.class.getClassLoader());
+        this.mImageUrlList = in.createStringArrayList();
+        this.mPageUrlList = in.createStringArrayList();
+    }
 
     public void addItem(int index, String imageUrl, String pageUrl) {
         mPositionList.add(index);
@@ -80,28 +103,4 @@ public class LargePreviewSet extends PreviewSet {
         dest.writeStringList(this.mImageUrlList);
         dest.writeStringList(this.mPageUrlList);
     }
-
-    public LargePreviewSet() {
-        mPositionList = new IntList();
-        mImageUrlList = new ArrayList<>();
-        mPageUrlList = new ArrayList<>();
-    }
-
-    protected LargePreviewSet(Parcel in) {
-        this.mPositionList = in.readParcelable(IntList.class.getClassLoader());
-        this.mImageUrlList = in.createStringArrayList();
-        this.mPageUrlList = in.createStringArrayList();
-    }
-
-    public static final Parcelable.Creator<LargePreviewSet> CREATOR = new Parcelable.Creator<LargePreviewSet>() {
-        @Override
-        public LargePreviewSet createFromParcel(Parcel source) {
-            return new LargePreviewSet(source);
-        }
-
-        @Override
-        public LargePreviewSet[] newArray(int size) {
-            return new LargePreviewSet[size];
-        }
-    };
 }

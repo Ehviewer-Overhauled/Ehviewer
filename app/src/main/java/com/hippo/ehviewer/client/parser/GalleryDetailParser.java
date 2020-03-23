@@ -18,6 +18,7 @@ package com.hippo.ehviewer.client.parser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
@@ -37,6 +38,15 @@ import com.hippo.util.JsoupUtils;
 import com.hippo.util.MutableBoolean;
 import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.StringUtils;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,13 +57,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.select.Elements;
-import org.jsoup.select.NodeTraversor;
-import org.jsoup.select.NodeVisitor;
 
 public class GalleryDetailParser {
 
@@ -74,15 +77,14 @@ public class GalleryDetailParser {
     private static final GalleryCommentList EMPTY_GALLERY_COMMENT_ARRAY = new GalleryCommentList(new GalleryComment[0], false);
 
     private static final DateFormat WEB_COMMENT_DATE_FORMAT = new SimpleDateFormat("dd MMMMM yyyy, HH:mm z", Locale.US);
-
-    static {
-        WEB_COMMENT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
     private static final String OFFENSIVE_STRING =
             "<p>(And if you choose to ignore this warning, you lose all rights to complain about it in the future.)</p>";
     private static final String PINING_STRING =
             "<p>This gallery is pining for the fjords.</p>";
+
+    static {
+        WEB_COMMENT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     public static GalleryDetail parse(String body) throws EhException {
         if (body.contains(OFFENSIVE_STRING)) {
@@ -491,7 +493,8 @@ public class GalleryDetailParser {
                 }
 
                 @Override
-                public void tail(Node node, int depth) { }
+                public void tail(Node node, int depth) {
+                }
             }, chd);
 
             return new GalleryCommentList(list.toArray(new GalleryComment[list.size()]), hasMore.value);
@@ -663,8 +666,8 @@ public class GalleryDetailParser {
                 continue;
             }
             String imageUrl = ParserUtils.trim(m.group(3));
-            int xOffset =  ParserUtils.parseInt(m.group(4), 0);
-            int yOffset =  0;
+            int xOffset = ParserUtils.parseInt(m.group(4), 0);
+            int yOffset = 0;
             int width = ParserUtils.parseInt(m.group(1), 0);
             if (width <= 0) {
                 continue;

@@ -18,8 +18,10 @@ package com.hippo.ehviewer.preference;
 
 import android.content.Context;
 import android.util.AttributeSet;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.widget.CategoryTable;

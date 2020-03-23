@@ -25,21 +25,21 @@ import android.view.View;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 
 public final class ViewAnimationUtils {
-    private ViewAnimationUtils() {}
-
     public static final boolean API_SUPPORT_CIRCULAR_REVEAL =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     // http://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
     public static final boolean API_SUPPORT_CANVAS_CLIP_PATH =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    private ViewAnimationUtils() {
+    }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static Animator createCircularReveal(View view,
-            int centerX,  int centerY, float startRadius, float endRadius) {
+                                                int centerX, int centerY, float startRadius, float endRadius) {
         if (API_SUPPORT_CIRCULAR_REVEAL) {
             return android.view.ViewAnimationUtils.createCircularReveal(
                     view, centerX, centerY, startRadius, endRadius);
-        } else if (view instanceof Reveal){
+        } else if (view instanceof Reveal) {
             return createRevealAnimator((Reveal) view, centerX, centerY,
                     startRadius, endRadius);
         } else {
@@ -49,7 +49,7 @@ public final class ViewAnimationUtils {
     }
 
     private static Animator createRevealAnimator(Reveal reveal, int centerX, int centerY,
-            float startRadius, float endRadius) {
+                                                 float startRadius, float endRadius) {
         ValueAnimator animator = ValueAnimator.ofFloat(startRadius, endRadius);
         animator.addUpdateListener(new RevealAnimatorUpdateListener(reveal, centerX, centerY));
         animator.addListener(new RevealAnimatorListener(reveal));

@@ -19,8 +19,10 @@ package com.hippo.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
 import com.google.android.material.textfield.TextInputEditText;
 import com.hippo.util.ExceptionUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -29,56 +31,56 @@ import java.lang.reflect.Method;
 // https://stackoverflow.com/questions/51891415/nullpointerexception-on-meizu-devices-in-editor-updatecursorpositionmz/52001305
 public class HackyTextInputEditText extends TextInputEditText {
 
-  private static final boolean HAS_METHOD_UPDATE_CURSOR_POSITION_MZ;
-  private static final Field FIELD_M_HINT;
+    private static final boolean HAS_METHOD_UPDATE_CURSOR_POSITION_MZ;
+    private static final Field FIELD_M_HINT;
 
-  static {
-    boolean hasMethodUpdateCursorPositionMz = false;
-    try {
-      Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass("android.widget.Editor");
-      Method[] methods = clazz.getDeclaredMethods();
-      for (Method method : methods) {
-        if ("updateCursorPositionMz".equals(method.getName())) {
-          hasMethodUpdateCursorPositionMz = true;
+    static {
+        boolean hasMethodUpdateCursorPositionMz = false;
+        try {
+            Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass("android.widget.Editor");
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods) {
+                if ("updateCursorPositionMz".equals(method.getName())) {
+                    hasMethodUpdateCursorPositionMz = true;
+                }
+            }
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
         }
-      }
-    } catch (Throwable e) {
-      ExceptionUtils.throwIfFatal(e);
+
+        Field fieldMHint = null;
+        if (hasMethodUpdateCursorPositionMz) {
+            try {
+                fieldMHint = TextView.class.getDeclaredField("mHint");
+                fieldMHint.setAccessible(true);
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+            }
+        }
+
+        HAS_METHOD_UPDATE_CURSOR_POSITION_MZ = hasMethodUpdateCursorPositionMz;
+        FIELD_M_HINT = fieldMHint;
     }
 
-    Field fieldMHint = null;
-    if (hasMethodUpdateCursorPositionMz) {
-      try {
-        fieldMHint = TextView.class.getDeclaredField("mHint");
-        fieldMHint.setAccessible(true);
-      } catch (Throwable e) {
-        ExceptionUtils.throwIfFatal(e);
-      }
+    public HackyTextInputEditText(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    HAS_METHOD_UPDATE_CURSOR_POSITION_MZ = hasMethodUpdateCursorPositionMz;
-    FIELD_M_HINT = fieldMHint;
-  }
-
-  public HackyTextInputEditText(Context context, AttributeSet attrs) {
-    super(context, attrs);
-  }
-
-  @Override
-  public CharSequence getHint() {
-    if (HAS_METHOD_UPDATE_CURSOR_POSITION_MZ && FIELD_M_HINT != null) {
-      try {
-        return getSuperHint();
-      } catch (Throwable e) {
-        ExceptionUtils.throwIfFatal(e);
-        return super.getHint();
-      }
-    } else {
-      return super.getHint();
+    @Override
+    public CharSequence getHint() {
+        if (HAS_METHOD_UPDATE_CURSOR_POSITION_MZ && FIELD_M_HINT != null) {
+            try {
+                return getSuperHint();
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+                return super.getHint();
+            }
+        } else {
+            return super.getHint();
+        }
     }
-  }
 
-  private CharSequence getSuperHint() throws IllegalAccessException {
-    return (CharSequence) FIELD_M_HINT.get(this);
-  }
+    private CharSequence getSuperHint() throws IllegalAccessException {
+        return (CharSequence) FIELD_M_HINT.get(this);
+    }
 }

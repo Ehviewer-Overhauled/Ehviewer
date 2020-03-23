@@ -22,8 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
-import com.hippo.ehviewer.Analytics;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -46,7 +47,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_analytics, container, false);
 
         mReject = ViewUtils.$$(view, R.id.reject);
@@ -82,7 +83,6 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
         } else if (mAccept == v) {
             Settings.putEnableAnalytics(true);
             // Start Analytics
-            Analytics.start(context);
         }
         Settings.putAskAnalytics(false);
 

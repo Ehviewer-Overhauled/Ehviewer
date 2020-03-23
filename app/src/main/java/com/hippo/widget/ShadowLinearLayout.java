@@ -24,14 +24,16 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.ViewOutlineProvider;
 import android.widget.LinearLayout;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.LayoutUtils;
 
 public class ShadowLinearLayout extends LinearLayout {
 
-    private NinePatchDrawable mShadow;
     private final Rect mShadowPaddings = new Rect();
+    private NinePatchDrawable mShadow;
 
     public ShadowLinearLayout(Context context) {
         super(context);

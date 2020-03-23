@@ -21,13 +21,6 @@ import org.json.JSONObject;
 
 public class VoteCommentParser {
 
-    public static class Result {
-        public long id;
-        public int score;
-        public int vote;
-        public int expectVote;
-    }
-
     // {"comment_id":1253922,"comment_score":-19,"comment_vote":0}
     public static Result parse(String body, int vote) throws JSONException {
         Result result = new Result();
@@ -37,5 +30,12 @@ public class VoteCommentParser {
         result.vote = jo.getInt("comment_vote");
         result.expectVote = vote;
         return result;
+    }
+
+    public static class Result {
+        public long id;
+        public int score;
+        public int vote;
+        public int expectVote;
     }
 }

@@ -20,60 +20,61 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+
 import com.hippo.ehviewer.R;
 import com.hippo.widget.LoadImageView;
 
 public class FixedThumb extends LoadImageView {
 
-  private float minAspect;
-  private float maxAspect;
+    private float minAspect;
+    private float maxAspect;
 
-  public FixedThumb(Context context) {
-    super(context);
-    init(context, null, 0, 0);
-  }
-
-  public FixedThumb(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init(context, attrs, 0, 0);
-  }
-
-  public FixedThumb(Context context, AttributeSet attrs, int defStyle) {
-    super(context, attrs, defStyle);
-    init(context, attrs, defStyle, 0);
-  }
-
-  private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FixedThumb, defStyleAttr, defStyleRes);
-    minAspect = a.getFloat(R.styleable.FixedThumb_minAspect, 0.0f);
-    maxAspect = a.getFloat(R.styleable.FixedThumb_maxAspect, 0.0f);
-    a.recycle();
-  }
-
-  public void setFix(float minAspect, float maxAspect) {
-    this.minAspect = minAspect;
-    this.maxAspect = maxAspect;
-  }
-
-  @Override
-  public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) {
-    if (isTarget && drawable != null) {
-      int width = drawable.getIntrinsicWidth();
-      int height = drawable.getIntrinsicHeight();
-      if (width > 0 && height > 0) {
-        float aspect = (float) width / (float) height;
-        if (aspect < maxAspect && aspect > minAspect) {
-          setScaleType(ScaleType.CENTER_CROP);
-          return;
-        }
-      }
+    public FixedThumb(Context context) {
+        super(context);
+        init(context, null, 0, 0);
     }
 
-    setScaleType(ScaleType.FIT_CENTER);
-  }
+    public FixedThumb(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context, attrs, 0, 0);
+    }
 
-  @Override
-  public void onPreSetImageResource(int resId, boolean isTarget) {
-    setScaleType(ScaleType.FIT_CENTER);
-  }
+    public FixedThumb(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(context, attrs, defStyle, 0);
+    }
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FixedThumb, defStyleAttr, defStyleRes);
+        minAspect = a.getFloat(R.styleable.FixedThumb_minAspect, 0.0f);
+        maxAspect = a.getFloat(R.styleable.FixedThumb_maxAspect, 0.0f);
+        a.recycle();
+    }
+
+    public void setFix(float minAspect, float maxAspect) {
+        this.minAspect = minAspect;
+        this.maxAspect = maxAspect;
+    }
+
+    @Override
+    public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) {
+        if (isTarget && drawable != null) {
+            int width = drawable.getIntrinsicWidth();
+            int height = drawable.getIntrinsicHeight();
+            if (width > 0 && height > 0) {
+                float aspect = (float) width / (float) height;
+                if (aspect < maxAspect && aspect > minAspect) {
+                    setScaleType(ScaleType.CENTER_CROP);
+                    return;
+                }
+            }
+        }
+
+        setScaleType(ScaleType.FIT_CENTER);
+    }
+
+    @Override
+    public void onPreSetImageResource(int resId, boolean isTarget) {
+        setScaleType(ScaleType.FIT_CENTER);
+    }
 }

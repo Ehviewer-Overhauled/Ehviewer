@@ -26,16 +26,16 @@ import com.hippo.ehviewer.download.DownloadService;
  * Created by onlymash on 3/25/18.
  */
 
-public class ShortcutsActivity extends Activity{
+public class ShortcutsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         String action = null;
         Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null) {
             action = intent.getAction();
             if (action != null && (action.equals(DownloadService.ACTION_START_ALL) ||
-                    action.equals(DownloadService.ACTION_STOP_ALL))){
+                    action.equals(DownloadService.ACTION_STOP_ALL))) {
                 startService(new Intent(this, DownloadService.class).setAction(action));
             }
         }

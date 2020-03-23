@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.RatingBar;
+
 import androidx.appcompat.widget.AppCompatRatingBar;
 
 public class GalleryRatingBar extends AppCompatRatingBar
@@ -38,7 +39,7 @@ public class GalleryRatingBar extends AppCompatRatingBar
     }
 
     public GalleryRatingBar(Context context, AttributeSet attrs,
-            int defStyle) {
+                            int defStyle) {
         super(context, attrs, defStyle);
         init();
     }

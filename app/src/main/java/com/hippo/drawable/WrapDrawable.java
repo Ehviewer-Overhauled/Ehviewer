@@ -26,12 +26,12 @@ public class WrapDrawable extends Drawable {
 
     private Drawable mDrawable;
 
-    public void setDrawable(Drawable drawable) {
-        mDrawable = drawable;
-    }
-
     public Drawable getDrawable() {
         return mDrawable;
+    }
+
+    public void setDrawable(Drawable drawable) {
+        mDrawable = drawable;
     }
 
     public void updateBounds() {
@@ -64,20 +64,20 @@ public class WrapDrawable extends Drawable {
     }
 
     @Override
-    public void setChangingConfigurations(int configs) {
-        super.setChangingConfigurations(configs);
-
-        if (mDrawable != null) {
-            mDrawable.setChangingConfigurations(configs);
-        }
-    }
-
-    @Override
     public int getChangingConfigurations() {
         if (mDrawable != null) {
             return mDrawable.getChangingConfigurations();
         } else {
             return super.getChangingConfigurations();
+        }
+    }
+
+    @Override
+    public void setChangingConfigurations(int configs) {
+        super.setChangingConfigurations(configs);
+
+        if (mDrawable != null) {
+            mDrawable.setChangingConfigurations(configs);
         }
     }
 

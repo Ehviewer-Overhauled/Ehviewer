@@ -32,30 +32,26 @@ import java.util.List;
 
 public final class SearchDatabase {
 
-    private static final String TAG = SearchDatabase.class.getSimpleName();
-
     public static final String COLUMN_QUERY = "query";
     public static final String COLUMN_DATE = "date";
-
+    private static final String TAG = SearchDatabase.class.getSimpleName();
     private static final String DATABASE_NAME = "search_database.db";
     private static final String TABLE_SUGGESTIONS = "suggestions";
 
     private static final int MAX_HISTORY = 100;
-
+    private static SearchDatabase sInstance;
     private final SQLiteDatabase mDatabase;
 
-    private static SearchDatabase sInstance;
+    private SearchDatabase(Context context) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context);
+        mDatabase = databaseHelper.getWritableDatabase();
+    }
 
     public static SearchDatabase getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new SearchDatabase(context.getApplicationContext());
         }
         return sInstance;
-    }
-
-    private SearchDatabase(Context context) {
-        DatabaseHelper databaseHelper = new DatabaseHelper(context);
-        mDatabase = databaseHelper.getWritableDatabase();
     }
 
     public String[] getSuggestions(String prefix, int limit) {
@@ -69,7 +65,7 @@ public final class SearchDatabase {
                     .append(SqlUtils.sqlEscapeString(prefix)).append("%'");
         }
         sb.append(" ORDER BY ").append(COLUMN_DATE).append(" DESC")
-            .append(" LIMIT ").append(limit);
+                .append(" LIMIT ").append(limit);
 
         try {
             Cursor cursor = mDatabase.rawQuery(sb.toString(), null);
@@ -129,7 +125,7 @@ public final class SearchDatabase {
                 selection = "_id IN " +
                         "(SELECT _id FROM " + TABLE_SUGGESTIONS +
                         " ORDER BY " + COLUMN_DATE + " DESC" +
-                        " LIMIT -1 OFFSET " + String.valueOf(maxEntries) + ")";
+                        " LIMIT -1 OFFSET " + maxEntries + ")";
             }
             mDatabase.delete(TABLE_SUGGESTIONS, selection, null);
         } catch (RuntimeException e) {

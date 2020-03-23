@@ -19,7 +19,9 @@ package com.hippo.ehviewer.client;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
@@ -49,11 +51,19 @@ import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.network.StatusCodeException;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -63,23 +73,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 public class EhEngine {
 
+    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String TAG = EhEngine.class.getSimpleName();
-
     private static final String SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\"";
     private static final String SAD_PANDA_TYPE = "image/gif";
     private static final String SAD_PANDA_LENGTH = "9615";
-
     private static final String KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg";
-
-    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
 
     private static final Pattern PATTERN_NEED_HATH_CLIENT = Pattern.compile("(You must have a H@H client assigned to your account to use this feature\\.)");
@@ -91,7 +93,7 @@ public class EhEngine {
     }
 
     private static void doThrowException(Call call, int code, @Nullable Headers headers,
-            @Nullable String body, Throwable e) throws Throwable {
+                                         @Nullable String body, Throwable e) throws Throwable {
         if (call.isCanceled()) {
             throw new CancelledException();
         }
@@ -131,7 +133,7 @@ public class EhEngine {
     }
 
     private static void throwException(Call call, int code, @Nullable Headers headers,
-        @Nullable String body, Throwable e) throws Throwable {
+                                       @Nullable String body, Throwable e) throws Throwable {
         try {
             doThrowException(call, code, headers, body, e);
         } catch (Throwable error) {
@@ -141,7 +143,7 @@ public class EhEngine {
     }
 
     public static String signIn(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String username, String password) throws Throwable {
+                                String username, String password) throws Throwable {
         FormBody.Builder builder = new FormBody.Builder()
                 .add("UserName", username)
                 .add("PassWord", password)
@@ -232,7 +234,7 @@ public class EhEngine {
     }
 
     public static GalleryListParser.Result getGalleryList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url) throws Throwable {
+                                                          String url) throws Throwable {
         String referer = EhUrl.getReferer();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -266,7 +268,7 @@ public class EhEngine {
 
     // At least, GalleryInfo contain valid gid and token
     public static List<GalleryInfo> fillGalleryListByApi(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+                                                         List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
         // We can only request 25 items one time at most
         final int MAX_REQUEST_SIZE = 25;
         List<GalleryInfo> requestItems = new ArrayList<>(MAX_REQUEST_SIZE);
@@ -281,7 +283,7 @@ public class EhEngine {
     }
 
     private static void doFillGalleryListByApi(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
+                                               List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
         JSONObject json = new JSONObject();
         json.put("method", "gdata");
         JSONArray ja = new JSONArray();
@@ -324,7 +326,7 @@ public class EhEngine {
     }
 
     public static GalleryDetail getGalleryDetail(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url) throws Throwable {
+                                                 String url) throws Throwable {
         String referer = EhUrl.getReferer();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -382,8 +384,8 @@ public class EhEngine {
     }
 
     public static RateGalleryParser.Result rateGallery(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient, long apiUid, String apiKey, long gid,
-            String token, float rating) throws Throwable {
+                                                       OkHttpClient okHttpClient, long apiUid, String apiKey, long gid,
+                                                       String token, float rating) throws Throwable {
         final JSONObject json = new JSONObject();
         json.put("method", "rategallery");
         json.put("apiuid", apiUid);
@@ -423,7 +425,7 @@ public class EhEngine {
     }
 
     public static GalleryCommentList commentGallery(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient, String url, String comment, String id) throws Throwable {
+                                                    OkHttpClient okHttpClient, String url, String comment, String id) throws Throwable {
         FormBody.Builder builder = new FormBody.Builder();
         if (id == null) {
             builder.add("commenttext_new", comment);
@@ -467,7 +469,7 @@ public class EhEngine {
     }
 
     public static String getGalleryToken(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            long gid, String gtoken, int page) throws Throwable {
+                                         long gid, String gtoken, int page) throws Throwable {
         JSONObject json = new JSONObject()
                 .put("method", "gtoken")
                 .put("pagelist", new JSONArray().put(
@@ -504,7 +506,7 @@ public class EhEngine {
     }
 
     public static FavoritesParser.Result getFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url, boolean callApi) throws Throwable {
+                                                      String url, boolean callApi) throws Throwable {
         String referer = EhUrl.getReferer();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -538,10 +540,10 @@ public class EhEngine {
 
     /**
      * @param dstCat -1 for delete, 0 - 9 for cloud favorite, others throw Exception
-     * @param note max 250 characters
+     * @param note   max 250 characters
      */
     public static Void addFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            long gid, String token, int dstCat, String note) throws Throwable {
+                                    long gid, String token, int dstCat, String note) throws Throwable {
         String catStr;
         if (dstCat == -1) {
             catStr = "favdel";
@@ -588,7 +590,7 @@ public class EhEngine {
     }
 
     public static Void addFavoritesRange(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            long[] gidArray, String[] tokenArray, int dstCat) throws Throwable {
+                                         long[] gidArray, String[] tokenArray, int dstCat) throws Throwable {
         AssertUtils.assertEquals(gidArray.length, tokenArray.length);
         for (int i = 0, n = gidArray.length; i < n; i++) {
             addFavorites(task, okHttpClient, gidArray[i], tokenArray[i], dstCat, null);
@@ -597,7 +599,7 @@ public class EhEngine {
     }
 
     public static FavoritesParser.Result modifyFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url, long[] gidArray, int dstCat, boolean callApi) throws Throwable {
+                                                         String url, long[] gidArray, int dstCat, boolean callApi) throws Throwable {
         String catStr;
         if (dstCat == -1) {
             catStr = "delete";
@@ -646,7 +648,7 @@ public class EhEngine {
     }
 
     public static Pair<String, String>[] getTorrentList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url, long gid, String token) throws Throwable {
+                                                        String url, long gid, String token) throws Throwable {
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -677,7 +679,7 @@ public class EhEngine {
     }
 
     public static Pair<String, Pair<String, String>[]> getArchiveList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            String url, long gid, String token) throws Throwable {
+                                                                      String url, long gid, String token) throws Throwable {
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -708,7 +710,7 @@ public class EhEngine {
     }
 
     public static Void downloadArchive(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                    long gid, String token, String or, String res) throws Throwable {
+                                       long gid, String token, String or, String res) throws Throwable {
         if (or == null || or.length() == 0) {
             throw new EhException("Invalid form param or: " + or);
         }
@@ -755,7 +757,7 @@ public class EhEngine {
     }
 
     private static ProfileParser.Result getProfileInternal(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient, String url, String referer) throws Throwable {
+                                                           OkHttpClient okHttpClient, String url, String referer) throws Throwable {
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
         Call call = okHttpClient.newCall(request);
@@ -782,7 +784,7 @@ public class EhEngine {
     }
 
     public static ProfileParser.Result getProfile(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient) throws Throwable {
+                                                  OkHttpClient okHttpClient) throws Throwable {
         String url = EhUrl.URL_FORUMS;
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, null).build();
@@ -810,7 +812,7 @@ public class EhEngine {
     }
 
     public static VoteCommentParser.Result voteComment(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            long apiUid, String apiKey, long gid, String token, long commentId, int commentVote) throws Throwable {
+                                                       long apiUid, String apiKey, long gid, String token, long commentId, int commentVote) throws Throwable {
         final JSONObject json = new JSONObject();
         json.put("method", "votecomment");
         json.put("apiuid", apiUid);
@@ -854,7 +856,7 @@ public class EhEngine {
      * @param image Must be jpeg
      */
     public static GalleryListParser.Result imageSearch(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-            File image, boolean uss, boolean osc, boolean se) throws Throwable {
+                                                       File image, boolean uss, boolean osc, boolean se) throws Throwable {
         MultipartBody.Builder builder = new MultipartBody.Builder();
         builder.setType(MultipartBody.FORM);
         builder.addPart(
@@ -922,7 +924,7 @@ public class EhEngine {
     }
 
     public static GalleryPageParser.Result getGalleryPage(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient, String url, long gid, String token) throws Throwable {
+                                                          OkHttpClient okHttpClient, String url, long gid, String token) throws Throwable {
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -950,7 +952,7 @@ public class EhEngine {
     }
 
     public static GalleryPageApiParser.Result getGalleryPageApi(@Nullable EhClient.Task task,
-            OkHttpClient okHttpClient, long gid, int index, String pToken, String showKey, String previousPToken) throws Throwable {
+                                                                OkHttpClient okHttpClient, long gid, int index, String pToken, String showKey, String previousPToken) throws Throwable {
         final JSONObject json = new JSONObject();
         json.put("method", "showpage");
         json.put("gid", gid);
@@ -966,8 +968,8 @@ public class EhEngine {
         String origin = EhUrl.getOrigin();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer, origin)
-            .post(requestBody)
-            .build();
+                .post(requestBody)
+                .build();
         Call call = okHttpClient.newCall(request);
 
         // Put call

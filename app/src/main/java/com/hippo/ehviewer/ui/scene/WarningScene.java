@@ -20,7 +20,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -43,7 +45,7 @@ public final class WarningScene extends SolidScene implements View.OnClickListen
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_warning, container, false);
 
         mReject = ViewUtils.$$(view, R.id.reject);

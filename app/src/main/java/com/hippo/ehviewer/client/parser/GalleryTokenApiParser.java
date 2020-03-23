@@ -18,18 +18,19 @@ package com.hippo.ehviewer.client.parser;
 
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.util.ExceptionUtils;
+
 import org.json.JSONObject;
 
 public class GalleryTokenApiParser {
 
     /**
      * {
-     *  "tokenlist": [
-     *   {
-     *    "gid":618395,
-     *    "token":"0439fa3666"
-     *   }
-     *  ]
+     * "tokenlist": [
+     * {
+     * "gid":618395,
+     * "token":"0439fa3666"
+     * }
+     * ]
      * }
      */
     public static String parse(String body) throws Exception {

@@ -30,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
@@ -48,7 +49,7 @@ import androidx.core.app.NavUtils;
 import androidx.core.app.TaskStackBuilder;
 
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity implements AppCompatCallback,
-    TaskStackBuilder.SupportParentable, ActionBarDrawerToggle.DelegateProvider {
+        TaskStackBuilder.SupportParentable, ActionBarDrawerToggle.DelegateProvider {
 
     private AppCompatDelegate mDelegate;
     private int mThemeId = 0;
@@ -187,7 +188,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
 
         final ActionBar ab = getSupportActionBar();
         if (item.getItemId() == android.R.id.home && ab != null &&
-            (ab.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
+                (ab.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
             return onSupportNavigateUp();
         }
         return false;
@@ -213,9 +214,8 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
      * </p>
      *
      * @param featureId The desired feature as defined in
-     * {@link android.view.Window} or {@link androidx.core.view.WindowCompat}.
+     *                  {@link android.view.Window} or {@link androidx.core.view.WindowCompat}.
      * @return Returns true if the requested feature is supported and now enabled.
-     *
      * @see android.app.Activity#requestWindowFeature
      * @see android.view.Window#requestFeature
      */
@@ -311,7 +311,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
     /**
      * Support version of {@link #onCreateNavigateUpTaskStack(android.app.TaskStackBuilder)}.
      * This method will be called on all platform versions.
-     *
+     * <p>
      * Define the synthetic task stack that will be generated during Up navigation from
      * a different task.
      *
@@ -338,7 +338,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
     /**
      * Support version of {@link #onPrepareNavigateUpTaskStack(android.app.TaskStackBuilder)}.
      * This method will be called on all platform versions.
-     *
+     * <p>
      * Prepare the synthetic task stack that will be generated during Up navigation
      * from a different task.
      *
@@ -374,7 +374,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
      * {@link #supportNavigateUpTo(android.content.Intent)} for help implementing custom Up navigation.</p>
      *
      * @return true if Up navigation completed successfully and this Activity was finished,
-     *         false otherwise.
+     * false otherwise.
      */
     public boolean onSupportNavigateUp() {
         Intent upIntent = getSupportParentActivityIntent();
@@ -429,7 +429,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
      *
      * @param targetIntent An intent representing the target destination for up navigation
      * @return true if navigating up should recreate a new task stack, false if the same task
-     *         should be used for the destination
+     * should be used for the destination
      */
     public boolean supportShouldUpRecreateTask(@NonNull Intent targetIntent) {
         return NavUtils.shouldUpRecreateTask(this, targetIntent);
@@ -504,7 +504,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
         final int keyCode = event.getKeyCode();
         final ActionBar actionBar = getSupportActionBar();
         if (keyCode == KeyEvent.KEYCODE_MENU
-            && actionBar != null && actionBar.onMenuKeyEvent(event)) {
+                && actionBar != null && actionBar.onMenuKeyEvent(event)) {
             return true;
         }
         return super.dispatchKeyEvent(event);
@@ -526,15 +526,13 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
      */
     private boolean performMenuItemShortcut(int keycode, KeyEvent event) {
         if (!(Build.VERSION.SDK_INT >= 26) && !event.isCtrlPressed()
-            && !KeyEvent.metaStateHasNoModifiers(event.getMetaState())
-            && event.getRepeatCount() == 0
-            && !KeyEvent.isModifierKey(event.getKeyCode())) {
+                && !KeyEvent.metaStateHasNoModifiers(event.getMetaState())
+                && event.getRepeatCount() == 0
+                && !KeyEvent.isModifierKey(event.getKeyCode())) {
             final Window currentWindow = getWindow();
             if (currentWindow != null && currentWindow.getDecorView() != null) {
                 final View decorView = currentWindow.getDecorView();
-                if (decorView.dispatchKeyShortcutEvent(event)) {
-                    return true;
-                }
+                return decorView.dispatchKeyShortcutEvent(event);
             }
         }
         return false;
@@ -553,7 +551,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
     public void openOptionsMenu() {
         ActionBar actionBar = getSupportActionBar();
         if (getWindow().hasFeature(Window.FEATURE_OPTIONS_PANEL)
-            && (actionBar == null || !actionBar.openOptionsMenu())) {
+                && (actionBar == null || !actionBar.openOptionsMenu())) {
             super.openOptionsMenu();
         }
     }
@@ -563,7 +561,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
     public void closeOptionsMenu() {
         ActionBar actionBar = getSupportActionBar();
         if (getWindow().hasFeature(Window.FEATURE_OPTIONS_PANEL)
-            && (actionBar == null || !actionBar.closeOptionsMenu())) {
+                && (actionBar == null || !actionBar.closeOptionsMenu())) {
             super.closeOptionsMenu();
         }
     }

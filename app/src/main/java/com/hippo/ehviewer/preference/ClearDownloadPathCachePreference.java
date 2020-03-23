@@ -18,7 +18,9 @@ package com.hippo.ehviewer.preference;
 
 import android.content.Context;
 import android.util.AttributeSet;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.R;
 import com.hippo.preference.MessagePreference;
@@ -36,7 +38,7 @@ public class ClearDownloadPathCachePreference extends MessagePreference {
     }
 
     public ClearDownloadPathCachePreference(Context context,
-            AttributeSet attrs, int defStyleAttr) {
+                                            AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }

@@ -22,19 +22,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.DirPickerActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
+import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class DownloadFragment extends PreferenceFragment implements
+public class DownloadFragment extends PreferenceFragmentCompat implements
         Preference.OnPreferenceChangeListener,
         Preference.OnPreferenceClickListener {
 
@@ -46,9 +48,9 @@ public class DownloadFragment extends PreferenceFragment implements
     @Nullable
     private Preference mDownloadLocation;
 
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.download_settings);
 
         Preference mediaScan = findPreference(Settings.KEY_MEDIA_SCAN);

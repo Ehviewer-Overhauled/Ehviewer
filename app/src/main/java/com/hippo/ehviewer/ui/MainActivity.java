@@ -36,14 +36,16 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -85,9 +87,9 @@ import com.hippo.util.BitmapUtils;
 import com.hippo.util.PermissionRequester;
 import com.hippo.widget.LoadImageView;
 import com.hippo.yorozuya.IOUtils;
-import com.hippo.yorozuya.ResourcesUtils;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -102,24 +104,6 @@ public final class MainActivity extends StageActivity
 
     private static final String KEY_NAV_CHECKED_ITEM = "nav_checked_item";
     private static final String KEY_CLIP_TEXT_HASH_CODE = "clip_text_hash_code";
-
-    /*---------------
-     Whole life cycle
-     ---------------*/
-    @Nullable
-    private EhDrawerLayout mDrawerLayout;
-    @Nullable
-    private NavigationView mNavView;
-    @Nullable
-    private FrameLayout mRightDrawer;
-    @Nullable
-    private LoadImageView mAvatar;
-    @Nullable
-    private TextView mDisplayName;
-    @Nullable
-    private Button mChangeTheme;
-
-    private int mNavCheckedItem = 0;
 
     static {
         registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -141,6 +125,23 @@ public final class MainActivity extends StageActivity
         registerLaunchMode(HistoryScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TOP);
         registerLaunchMode(ProgressScene.class, SceneFragment.LAUNCH_MODE_STANDARD);
     }
+
+    /*---------------
+     Whole life cycle
+     ---------------*/
+    @Nullable
+    private EhDrawerLayout mDrawerLayout;
+    @Nullable
+    private NavigationView mNavView;
+    @Nullable
+    private FrameLayout mRightDrawer;
+    @Nullable
+    private LoadImageView mAvatar;
+    @Nullable
+    private TextView mDisplayName;
+    @Nullable
+    private Button mChangeTheme;
+    private int mNavCheckedItem = 0;
 
     @Override
     protected int getThemeResId(int theme) {
@@ -334,7 +335,7 @@ public final class MainActivity extends StageActivity
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
         mChangeTheme = (Button) ViewUtils.$$(this, R.id.change_theme);
 
-        mDrawerLayout.setStatusBarColor(ResourcesUtils.getAttrColor(this, R.attr.colorPrimaryDark));
+        //mDrawerLayout.setStatusBarColor(ResourcesUtils.getAttrColor(this, R.attr.colorPrimaryDark));
         // Pre-L need shadow drawable
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
@@ -524,7 +525,7 @@ public final class MainActivity extends StageActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-            @NonNull String[] permissions, @NonNull int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
             if (grantResults.length == 1 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, R.string.you_rejected_me, Toast.LENGTH_SHORT).show();
@@ -629,15 +630,9 @@ public final class MainActivity extends StageActivity
         }
     }
 
-    public void setDrawerGestureBlocker(DrawerLayout.GestureBlocker gestureBlocker) {
-        if (mDrawerLayout != null) {
-            mDrawerLayout.setGestureBlocker(gestureBlocker);
-        }
-    }
-
     public boolean isDrawersVisible() {
         if (mDrawerLayout != null) {
-            return mDrawerLayout.isDrawersVisible();
+            return mDrawerLayout.isDrawerVisible(mDrawerLayout);
         } else {
             return false;
         }

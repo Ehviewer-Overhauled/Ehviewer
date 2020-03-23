@@ -20,16 +20,17 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.analytics.FirebaseAnalytics;
+
 import com.hippo.android.resource.AttrResources;
 import com.hippo.content.ContextLocalWrapper;
-import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
+
 import java.util.Locale;
 
 public abstract class EhActivity extends AppCompatActivity {
@@ -44,10 +45,6 @@ public abstract class EhActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         ((EhApplication) getApplication()).registerActivity(this);
-
-        if (Analytics.isEnabled()) {
-            FirebaseAnalytics.getInstance(this);
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Settings.getApplyNavBarThemeColor()) {
             getWindow().setNavigationBarColor(AttrResources.getAttrColor(this, R.attr.colorPrimaryDark));
@@ -64,10 +61,10 @@ public abstract class EhActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(Settings.getEnabledSecurity()){
+        if (Settings.getEnabledSecurity()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
                     WindowManager.LayoutParams.FLAG_SECURE);
-        }else{
+        } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
     }

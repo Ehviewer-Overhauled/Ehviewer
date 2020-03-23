@@ -46,18 +46,8 @@ public class EhCookieStore extends CookieRepository {
         super(context, "okhttp3-cookie.db");
     }
 
-    public void signOut() {
-        clear();
-    }
-
-    public boolean hasSignedIn() {
-        HttpUrl url = HttpUrl.parse(EhUrl.HOST_E);
-        return contains(url, KEY_IPD_MEMBER_ID) &&
-                contains(url, KEY_IPD_PASS_HASH);
-    }
-
     public static Cookie newCookie(Cookie cookie, String newDomain, boolean forcePersistent,
-            boolean forceLongLive, boolean forceNotHostOnly) {
+                                   boolean forceLongLive, boolean forceNotHostOnly) {
         Cookie.Builder builder = new Cookie.Builder();
         builder.name(cookie.name());
         builder.value(cookie.value());
@@ -84,6 +74,16 @@ public class EhCookieStore extends CookieRepository {
         return builder.build();
     }
 
+    public void signOut() {
+        clear();
+    }
+
+    public boolean hasSignedIn() {
+        HttpUrl url = HttpUrl.parse(EhUrl.HOST_E);
+        return contains(url, KEY_IPD_MEMBER_ID) &&
+                contains(url, KEY_IPD_PASS_HASH);
+    }
+
     @Override
     public List<Cookie> loadForRequest(HttpUrl url) {
         List<Cookie> cookies = super.loadForRequest(url);
@@ -93,7 +93,7 @@ public class EhCookieStore extends CookieRepository {
         if (checkTips) {
             List<Cookie> result = new ArrayList<>(cookies.size() + 1);
             // Add all but skip some
-            for (Cookie cookie: cookies) {
+            for (Cookie cookie : cookies) {
                 String name = cookie.name();
                 if (EhConfig.KEY_CONTENT_WARNING.equals(name)) {
                     continue;

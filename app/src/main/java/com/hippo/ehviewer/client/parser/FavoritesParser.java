@@ -24,21 +24,15 @@ import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.JsoupUtils;
 import com.hippo.yorozuya.AssertUtils;
-import java.util.List;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class FavoritesParser {
+import java.util.List;
 
-    public static class Result {
-        public String[] catArray; // Size 10
-        public int[] countArray; // Size 10
-        public int pages;
-        public int nextPage;
-        public List<GalleryInfo> galleryInfoList;
-    }
+public class FavoritesParser {
 
     public static Result parse(String body) throws Exception {
         if (body.contains("This page requires you to log on.</p>")) {
@@ -76,5 +70,13 @@ public class FavoritesParser {
         re.galleryInfoList = result.galleryInfoList;
 
         return re;
+    }
+
+    public static class Result {
+        public String[] catArray; // Size 10
+        public int[] countArray; // Size 10
+        public int pages;
+        public int nextPage;
+        public List<GalleryInfo> galleryInfoList;
     }
 }

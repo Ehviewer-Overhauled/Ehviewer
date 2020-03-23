@@ -23,8 +23,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhClient;
@@ -45,14 +47,11 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
 
     public static final String KEY_ACTION = "action";
     public static final String ACTION_GALLERY_TOKEN = "gallery_token";
-
-    private static final String KEY_VALID = "valid";
-    private static final String KEY_ERROR = "error";
-
     public static final String KEY_GID = "gid";
     public static final String KEY_PTOKEN = "ptoken";
     public static final String KEY_PAGE = "page";
-
+    private static final String KEY_VALID = "valid";
+    private static final String KEY_ERROR = "error";
     private boolean mValid;
     private String mError;
 
@@ -116,10 +115,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
             mGid = args.getLong(KEY_GID, -1);
             mPToken = args.getString(KEY_PTOKEN, null);
             mPage = args.getInt(KEY_PAGE, -1);
-            if (mGid == -1 || mPToken == null || mPage == -1) {
-                return false;
-            }
-            return true;
+            return mGid != -1 && mPToken != null && mPage != -1;
         }
 
         return false;
@@ -162,7 +158,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_progress, container, false);
         View progress = ViewUtils.$$(view, R.id.progress);
         mTip = (TextView) ViewUtils.$$(view, R.id.tip);

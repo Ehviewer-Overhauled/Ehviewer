@@ -20,15 +20,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,43 +42,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class StageActivity extends EhActivity {
 
-    private static final String TAG = StageActivity.class.getSimpleName();
-
     public static final String ACTION_START_SCENE = "start_scene";
-
     public static final String KEY_SCENE_NAME = "stage_activity_scene_name";
     public static final String KEY_SCENE_ARGS = "stage_activity_scene_args";
-
+    private static final String TAG = StageActivity.class.getSimpleName();
     private static final String KEY_STAGE_ID = "stage_activity_stage_id";
     private static final String KEY_SCENE_TAG_LIST = "stage_activity_scene_tag_list";
     private static final String KEY_NEXT_ID = "stage_activity_next_id";
-
+    private static final Map<Class<?>, Integer> sLaunchModeMap = new HashMap<>();
     private final ArrayList<String> mSceneTagList = new ArrayList<>();
     private final ArrayList<String> mDelaySceneTagList = new ArrayList<>();
     private final AtomicInteger mIdGenerator = new AtomicInteger();
-
-    private int mStageId = IntIdGenerator.INVALID_ID;
-
     private final SceneViewComparator mSceneViewComparator = new SceneViewComparator();
-
-    private final class SceneViewComparator implements Comparator<View> {
-
-        private int getIndex(View view) {
-            Object o = view.getTag(R.id.fragment_tag);
-            if (o instanceof String) {
-                return mDelaySceneTagList.indexOf(o);
-            } else {
-                return -1;
-            }
-        }
-
-        @Override
-        public int compare(View lhs, View rhs) {
-            return getIndex(lhs) - getIndex(rhs);
-        }
-    }
-
-    private static final Map<Class<?>, Integer> sLaunchModeMap = new HashMap<>();
+    private int mStageId = IntIdGenerator.INVALID_ID;
 
     public static void registerLaunchMode(Class<?> clazz, @SceneFragment.LaunchMode int launchMode) {
         if (launchMode != SceneFragment.LAUNCH_MODE_STANDARD &&
@@ -147,7 +126,8 @@ public abstract class StageActivity extends EhActivity {
      * Can't recognize intent in first time {@code onCreate} and {@code onNewIntent},
      * null included.
      */
-    protected void onUnrecognizedIntent(@Nullable Intent intent) {}
+    protected void onUnrecognizedIntent(@Nullable Intent intent) {
+    }
 
     /**
      * Call {@code setContentView} here. Do <b>NOT</b> call {@code startScene} here
@@ -333,7 +313,7 @@ public abstract class StageActivity extends EhActivity {
             String tag = mSceneTagList.get(mSceneTagList.size() - 1);
             Fragment fragment = fragmentManager.findFragmentByTag(tag);
             if (fragment != null) {
-                AssertUtils.assertTrue(SceneFragment.class.isInstance(fragment));
+                AssertUtils.assertTrue(fragment instanceof SceneFragment);
                 currentScene = (SceneFragment) fragment;
             }
         }
@@ -612,5 +592,22 @@ public abstract class StageActivity extends EhActivity {
             return null;
         }
         return fragment.getClass();
+    }
+
+    private final class SceneViewComparator implements Comparator<View> {
+
+        private int getIndex(View view) {
+            Object o = view.getTag(R.id.fragment_tag);
+            if (o instanceof String) {
+                return mDelaySceneTagList.indexOf(o);
+            } else {
+                return -1;
+            }
+        }
+
+        @Override
+        public int compare(View lhs, View rhs) {
+            return getIndex(lhs) - getIndex(rhs);
+        }
     }
 }

@@ -27,7 +27,9 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+
 import androidx.annotation.ColorInt;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.MathUtils;
 
@@ -36,10 +38,9 @@ import com.hippo.yorozuya.MathUtils;
  */
 public class DrawerArrowDrawable extends Drawable {
 
-    private final Paint mPaint = new Paint();
-
     // The angle in degrees that the arrow head is inclined at.
     private static final float ARROW_HEAD_ANGLE = (float) Math.toRadians(45);
+    private final Paint mPaint = new Paint();
     private final float mBarThickness;
     // The length of top and bottom bars when they merge into an arrow
     private final float mTopBottomArrowSize;
@@ -56,12 +57,12 @@ public class DrawerArrowDrawable extends Drawable {
     private final Path mPath = new Path();
     // The reported intrinsic size of the drawable.
     private final int mSize;
+    // the amount that overlaps w/ bar size when rotation is max
+    private final float mMaxCutForBarSize;
     // Whether we should mirror animation when animation is reversed.
     private boolean mVerticalMirror = false;
     // The interpolated version of the original progress
     private float mProgress;
-    // the amount that overlaps w/ bar size when rotation is max
-    private final float mMaxCutForBarSize;
 
     /**
      * @param context used to get the configuration for the drawable from

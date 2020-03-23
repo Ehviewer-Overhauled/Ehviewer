@@ -24,8 +24,28 @@ import java.util.ArrayList;
 // TODO Add url field?
 public class GalleryTagGroup implements Parcelable {
 
-    public String groupName;
+    public static final Parcelable.Creator<GalleryTagGroup> CREATOR = new Parcelable.Creator<GalleryTagGroup>() {
+        @Override
+        public GalleryTagGroup createFromParcel(Parcel source) {
+            return new GalleryTagGroup(source);
+        }
+
+        @Override
+        public GalleryTagGroup[] newArray(int size) {
+            return new GalleryTagGroup[size];
+        }
+    };
     private final ArrayList<String> mTagList;
+    public String groupName;
+
+    public GalleryTagGroup() {
+        mTagList = new ArrayList<>();
+    }
+
+    protected GalleryTagGroup(Parcel in) {
+        this.groupName = in.readString();
+        this.mTagList = in.createStringArrayList();
+    }
 
     public void addTag(String tag) {
         mTagList.add(tag);
@@ -49,25 +69,4 @@ public class GalleryTagGroup implements Parcelable {
         dest.writeString(this.groupName);
         dest.writeStringList(this.mTagList);
     }
-
-    public GalleryTagGroup() {
-        mTagList = new ArrayList<>();
-    }
-
-    protected GalleryTagGroup(Parcel in) {
-        this.groupName = in.readString();
-        this.mTagList = in.createStringArrayList();
-    }
-
-    public static final Parcelable.Creator<GalleryTagGroup> CREATOR = new Parcelable.Creator<GalleryTagGroup>() {
-        @Override
-        public GalleryTagGroup createFromParcel(Parcel source) {
-            return new GalleryTagGroup(source);
-        }
-
-        @Override
-        public GalleryTagGroup[] newArray(int size) {
-            return new GalleryTagGroup[size];
-        }
-    };
 }

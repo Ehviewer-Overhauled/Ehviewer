@@ -29,36 +29,56 @@ import java.net.URLEncoder;
 
 public class FavListUrlBuilder implements Parcelable {
 
-    private static final String TAG = FavListUrlBuilder.class.getSimpleName();
     public static final int FAV_CAT_ALL = -1;
     public static final int FAV_CAT_LOCAL = -2;
+    public static final Parcelable.Creator<FavListUrlBuilder> CREATOR = new Parcelable.Creator<FavListUrlBuilder>() {
 
+        @Override
+        public FavListUrlBuilder createFromParcel(Parcel source) {
+            return new FavListUrlBuilder(source);
+        }
+
+        @Override
+        public FavListUrlBuilder[] newArray(int size) {
+            return new FavListUrlBuilder[size];
+        }
+    };
+    private static final String TAG = FavListUrlBuilder.class.getSimpleName();
     private int mIndex;
     private String mKeyword;
     private int mFavCat = FAV_CAT_ALL;
 
+    public FavListUrlBuilder() {
+    }
+
+    protected FavListUrlBuilder(Parcel in) {
+        this.mIndex = in.readInt();
+        this.mKeyword = in.readString();
+        this.mFavCat = in.readInt();
+    }
+
+    public static boolean isValidFavCat(int favCat) {
+        return favCat >= 0 && favCat <= 9;
+    }
+
     public void setIndex(int index) {
         mIndex = index;
-    }
-
-    public void setKeyword(String keyword) {
-        mKeyword = keyword;
-    }
-
-    public void setFavCat(int favCat) {
-        mFavCat = favCat;
     }
 
     public String getKeyword() {
         return mKeyword;
     }
 
+    public void setKeyword(String keyword) {
+        mKeyword = keyword;
+    }
+
     public int getFavCat() {
         return mFavCat;
     }
 
-    public static boolean isValidFavCat(int favCat) {
-        return favCat >= 0 && favCat <= 9;
+    public void setFavCat(int favCat) {
+        mFavCat = favCat;
     }
 
     public boolean isLocalFavCat() {
@@ -102,26 +122,4 @@ public class FavListUrlBuilder implements Parcelable {
         dest.writeString(this.mKeyword);
         dest.writeInt(this.mFavCat);
     }
-
-    public FavListUrlBuilder() {
-    }
-
-    protected FavListUrlBuilder(Parcel in) {
-        this.mIndex = in.readInt();
-        this.mKeyword = in.readString();
-        this.mFavCat = in.readInt();
-    }
-
-    public static final Parcelable.Creator<FavListUrlBuilder> CREATOR = new Parcelable.Creator<FavListUrlBuilder>() {
-
-        @Override
-        public FavListUrlBuilder createFromParcel(Parcel source) {
-            return new FavListUrlBuilder(source);
-        }
-
-        @Override
-        public FavListUrlBuilder[] newArray(int size) {
-            return new FavListUrlBuilder[size];
-        }
-    };
 }

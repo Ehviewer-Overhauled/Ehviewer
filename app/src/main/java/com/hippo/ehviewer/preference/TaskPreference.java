@@ -22,11 +22,13 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.customview.view.AbsSavedState;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.preference.DialogPreference;
@@ -82,15 +84,6 @@ public abstract class TaskPreference extends DialogPreference {
     protected abstract Task onCreateTask();
 
     @Override
-    public void onActivityDestroy() {
-        super.onActivityDestroy();
-
-        if (null != mTask) {
-            mTask.setPreference(null);
-        }
-    }
-
-    @Override
     protected Parcelable onSaveInstanceState() {
         final Parcelable superState = super.onSaveInstanceState();
         final SavedState myState = new SavedState(superState);
@@ -125,23 +118,6 @@ public abstract class TaskPreference extends DialogPreference {
     }
 
     private static class SavedState extends AbsSavedState {
-        int asyncTaskId;
-
-        public SavedState(Parcel source) {
-            super(source, SavedState.class.getClassLoader());
-            asyncTaskId = source.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeInt(asyncTaskId);
-        }
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
                     @Override
@@ -154,6 +130,22 @@ public abstract class TaskPreference extends DialogPreference {
                         return new SavedState[size];
                     }
                 };
+        int asyncTaskId;
+
+        public SavedState(Parcel source) {
+            super(source, SavedState.class.getClassLoader());
+            asyncTaskId = source.readInt();
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeInt(asyncTaskId);
+        }
     }
 
     public abstract static class Task extends AsyncTask<Void, Void, Object> {

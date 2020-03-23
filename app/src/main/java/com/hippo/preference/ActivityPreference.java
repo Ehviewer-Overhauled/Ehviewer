@@ -19,10 +19,12 @@ package com.hippo.preference;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.R;
 import com.hippo.util.ExceptionUtils;
 

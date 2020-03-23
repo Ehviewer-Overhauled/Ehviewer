@@ -20,8 +20,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
+
 import com.hippo.util.ExceptionUtils;
 
 public class SearchEditText extends AppCompatEditText {
@@ -89,6 +91,7 @@ public class SearchEditText extends AppCompatEditText {
 
     public interface SearchEditTextListener {
         void onClick();
+
         void onBackPressed();
     }
 }

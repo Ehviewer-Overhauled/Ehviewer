@@ -18,8 +18,10 @@ package com.hippo.ehviewer.gallery;
 
 import android.os.Process;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.glgallery.GalleryPageView;
@@ -31,6 +33,7 @@ import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.thread.PriorityThread;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +47,16 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
 
     private static final String TAG = DirGalleryProvider.class.getSimpleName();
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
+    private static FilenameFilter imageFilter =
+            (dir, name) -> StringUtils.endsWith(name.toLowerCase(), SUPPORT_IMAGE_EXTENSIONS);
+    private static Comparator<UniFile> naturalComparator = new Comparator<UniFile>() {
+        private NaturalComparator comparator = new NaturalComparator();
 
+        @Override
+        public int compare(UniFile o1, UniFile o2) {
+            return comparator.compare(o1.getName(), o2.getName());
+        }
+    };
     private final UniFile mDir;
     private final Stack<Integer> mRequests = new Stack<>();
     private final AtomicInteger mDecodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
@@ -242,15 +254,4 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
 
         Log.i(TAG, "ImageDecoder end");
     }
-
-    private static FilenameFilter imageFilter =
-        (dir, name) -> StringUtils.endsWith(name.toLowerCase(), SUPPORT_IMAGE_EXTENSIONS);
-
-    private static Comparator<UniFile> naturalComparator = new Comparator<UniFile>() {
-        private NaturalComparator comparator = new NaturalComparator();
-        @Override
-        public int compare(UniFile o1, UniFile o2) {
-            return comparator.compare(o1.getName(), o2.getName());
-        }
-    };
 }

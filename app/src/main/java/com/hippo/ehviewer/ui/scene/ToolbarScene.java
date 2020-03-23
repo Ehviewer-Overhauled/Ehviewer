@@ -24,10 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.Toolbar;
+
 import com.hippo.ehviewer.R;
 
 public abstract class ToolbarScene extends BaseScene {
@@ -39,14 +41,14 @@ public abstract class ToolbarScene extends BaseScene {
 
     @Nullable
     public View onCreateView3(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return null;
     }
 
     @Nullable
     @Override
     public final View onCreateView2(LayoutInflater inflater,
-            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                    @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_toolbar, container, false);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         FrameLayout contentPanel = (FrameLayout) view.findViewById(R.id.content_panel);

@@ -43,12 +43,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
@@ -58,7 +61,6 @@ import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
-import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.ehviewer.EhApplication;
@@ -102,6 +104,7 @@ import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -114,31 +117,21 @@ public final class GalleryListScene extends BaseScene
         SearchLayout.Helper, SearchBarMover.Helper, View.OnClickListener, FabLayout.OnClickFabListener,
         FabLayout.OnExpandListener {
 
-    @IntDef({STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST})
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface State {}
-
-    private static final int BACK_PRESSED_INTERVAL = 2000;
-
     public final static int REQUEST_CODE_SELECT_IMAGE = 0;
-
     public final static String KEY_ACTION = "action";
     public final static String ACTION_HOMEPAGE = "action_homepage";
     public final static String ACTION_SUBSCRIPTION = "action_subscription";
     public final static String ACTION_WHATS_HOT = "action_whats_hot";
     public final static String ACTION_LIST_URL_BUILDER = "action_list_url_builder";
-
     public final static String KEY_LIST_URL_BUILDER = "list_url_builder";
     public final static String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
     public final static String KEY_STATE = "state";
-
+    private static final int BACK_PRESSED_INTERVAL = 2000;
     private final static int STATE_NORMAL = 0;
     private final static int STATE_SIMPLE_SEARCH = 1;
     private final static int STATE_SEARCH = 2;
     private final static int STATE_SEARCH_SHOW_LIST = 3;
-
     private static final long ANIMATE_TIME = 300L;
-
     /*---------------
      Whole life cycle
      ---------------*/
@@ -146,7 +139,6 @@ public final class GalleryListScene extends BaseScene
     private EhClient mClient;
     @Nullable
     private ListUrlBuilder mUrlBuilder;
-
     /*---------------
      View life cycle
      ---------------*/
@@ -159,7 +151,25 @@ public final class GalleryListScene extends BaseScene
     @Nullable
     private View mSearchFab;
     @Nullable
+    private final Animator.AnimatorListener mSearchFabAnimatorListener = new SimpleAnimatorListener() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (null != mSearchFab) {
+                mSearchFab.setVisibility(View.INVISIBLE);
+            }
+        }
+    };
+    @Nullable
     private FabLayout mFabLayout;
+    @Nullable
+    private final Animator.AnimatorListener mActionFabAnimatorListener = new SimpleAnimatorListener() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (null != mFabLayout) {
+                ((View) mFabLayout.getPrimaryFab()).setVisibility(View.INVISIBLE);
+            }
+        }
+    };
     @Nullable
     private ViewTransition mViewTransition;
     @Nullable
@@ -174,34 +184,15 @@ public final class GalleryListScene extends BaseScene
     private SearchBarMover mSearchBarMover;
     @Nullable
     private AddDeleteDrawable mActionFabDrawable;
-
-    @Nullable
-    private final Animator.AnimatorListener mActionFabAnimatorListener = new SimpleAnimatorListener() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            if (null != mFabLayout) {
-                ((View) mFabLayout.getPrimaryFab()).setVisibility(View.INVISIBLE);
-            }
-        }
-    };
-
-    @Nullable
-    private final Animator.AnimatorListener mSearchFabAnimatorListener = new SimpleAnimatorListener() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            if (null != mSearchFab) {
-                mSearchFab.setVisibility(View.INVISIBLE);
-            }
-        }
-    };
-
     private int mHideActionFabSlop;
     private boolean mShowActionFab = true;
-
+    @State
+    private int mState = STATE_NORMAL;
     @Nullable
     private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {}
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        }
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -212,23 +203,59 @@ public final class GalleryListScene extends BaseScene
             }
         }
     };
-
-    @State
-    private int mState = STATE_NORMAL;
-
     // Double click back exit
     private long mPressBackTime = 0;
-
     private boolean mHasFirstRefresh = false;
-
     private int mNavCheckedId = 0;
-
     private ShowcaseView mShowcaseView;
-
     private DownloadManager mDownloadManager;
     private DownloadManager.DownloadInfoListener mDownloadInfoListener;
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
+
+    @Nullable
+    private static String getSuitableTitleForUrlBuilder(
+            Resources resources, ListUrlBuilder urlBuilder, boolean appName) {
+        String keyword = urlBuilder.getKeyword();
+        int category = urlBuilder.getCategory();
+
+        if (ListUrlBuilder.MODE_NORMAL == urlBuilder.getMode() &&
+                EhUtils.NONE == category &&
+                TextUtils.isEmpty(keyword) &&
+                urlBuilder.getAdvanceSearch() == -1 &&
+                urlBuilder.getMinRating() == -1 &&
+                urlBuilder.getPageFrom() == -1 &&
+                urlBuilder.getPageTo() == -1) {
+            return resources.getString(appName ? R.string.app_name : R.string.homepage);
+        } else if (ListUrlBuilder.MODE_SUBSCRIPTION == urlBuilder.getMode() &&
+                EhUtils.NONE == category &&
+                TextUtils.isEmpty(keyword) &&
+                urlBuilder.getAdvanceSearch() == -1 &&
+                urlBuilder.getMinRating() == -1 &&
+                urlBuilder.getPageFrom() == -1 &&
+                urlBuilder.getPageTo() == -1) {
+            return resources.getString(R.string.subscription);
+        } else if (ListUrlBuilder.MODE_WHATS_HOT == urlBuilder.getMode()) {
+            return resources.getString(R.string.whats_hot);
+        } else if (!TextUtils.isEmpty(keyword)) {
+            return keyword;
+        } else if (MathUtils.hammingWeight(category) == 1) {
+            return EhUtils.getCategory(category);
+        } else {
+            return null;
+        }
+    }
+
+    public static void startScene(SceneFragment scene, ListUrlBuilder lub) {
+        scene.startScene(getStartAnnouncer(lub));
+    }
+
+    public static Announcer getStartAnnouncer(ListUrlBuilder lub) {
+        Bundle args = new Bundle();
+        args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER);
+        args.putParcelable(KEY_LIST_URL_BUILDER, lub);
+        return new Announcer(GalleryListScene.class).setArgs(args);
+    }
 
     @Override
     public int getNavCheckedItem() {
@@ -287,32 +314,43 @@ public final class GalleryListScene extends BaseScene
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
-            public void onUpdate(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list) { }
+            public void onUpdate(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list) {
+            }
+
             @Override
-            public void onUpdateAll() { }
+            public void onUpdateAll() {
+            }
+
             @Override
             public void onReload() {
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
             public void onChange() {
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
-            public void onRenameLabel(String from, String to) { }
+            public void onRenameLabel(String from, String to) {
+            }
+
             @Override
             public void onRemove(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list, int position) {
                 if (mAdapter != null) {
                     mAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
-            public void onUpdateLabels() { }
+            public void onUpdateLabels() {
+            }
         };
         mDownloadManager.addDownloadInfoListener(mDownloadInfoListener);
 
@@ -396,111 +434,6 @@ public final class GalleryListScene extends BaseScene
         });
     }
 
-    private abstract class UrlSuggestion extends SearchBar.Suggestion {
-        @Override
-        public CharSequence getText(float textSize) {
-            Drawable bookImage = DrawableManager.getVectorDrawable(getContext2(), R.drawable.v_book_open_x24);
-            SpannableStringBuilder ssb = new SpannableStringBuilder("    ");
-            ssb.append(getResources2().getString(R.string.gallery_list_search_bar_open_gallery));
-            int imageSize = (int) (textSize * 1.25);
-            if (bookImage != null) {
-                bookImage.setBounds(0, 0, imageSize, imageSize);
-                ssb.setSpan(new ImageSpan(bookImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            return ssb;
-        }
-
-        @Override
-        public void onClick() {
-            startScene(createAnnouncer());
-
-            if (mState == STATE_SIMPLE_SEARCH) {
-                setState(STATE_NORMAL);
-            } else if (mState == STATE_SEARCH_SHOW_LIST) {
-                setState(STATE_SEARCH);
-            }
-        }
-
-        public abstract Announcer createAnnouncer();
-
-        @Override
-        public void onLongClick() { }
-    }
-
-    private class GalleryDetailUrlSuggestion extends UrlSuggestion {
-        private long mGid;
-        private String mToken;
-
-        private GalleryDetailUrlSuggestion(long gid, String token) {
-            mGid = gid;
-            mToken = token;
-        }
-
-        @Override
-        public Announcer createAnnouncer() {
-            Bundle args = new Bundle();
-            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
-            args.putLong(GalleryDetailScene.KEY_GID, mGid);
-            args.putString(GalleryDetailScene.KEY_TOKEN, mToken);
-            return new Announcer(GalleryDetailScene.class).setArgs(args);
-        }
-    }
-
-    private class GalleryPageUrlSuggestion extends UrlSuggestion {
-        private long mGid;
-        private String mPToken;
-        private int mPage;
-
-        private GalleryPageUrlSuggestion(long gid, String pToken, int page) {
-            mGid = gid;
-            mPToken = pToken;
-            mPage = page;
-        }
-
-        @Override
-        public Announcer createAnnouncer() {
-            Bundle args = new Bundle();
-            args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN);
-            args.putLong(ProgressScene.KEY_GID, mGid);
-            args.putString(ProgressScene.KEY_PTOKEN, mPToken);
-            args.putInt(ProgressScene.KEY_PAGE, mPage);
-            return new Announcer(ProgressScene.class).setArgs(args);
-        }
-    }
-
-    @Nullable
-    private static String getSuitableTitleForUrlBuilder(
-            Resources resources, ListUrlBuilder urlBuilder, boolean appName) {
-        String keyword = urlBuilder.getKeyword();
-        int category = urlBuilder.getCategory();
-
-        if (ListUrlBuilder.MODE_NORMAL == urlBuilder.getMode() &&
-                EhUtils.NONE == category &&
-                TextUtils.isEmpty(keyword) &&
-                urlBuilder.getAdvanceSearch() == -1 &&
-                urlBuilder.getMinRating() == -1 &&
-                urlBuilder.getPageFrom() == -1 &&
-                urlBuilder.getPageTo() == -1) {
-            return resources.getString(appName ? R.string.app_name : R.string.homepage);
-        } else if (ListUrlBuilder.MODE_SUBSCRIPTION == urlBuilder.getMode() &&
-            EhUtils.NONE == category &&
-            TextUtils.isEmpty(keyword) &&
-            urlBuilder.getAdvanceSearch() == -1 &&
-            urlBuilder.getMinRating() == -1 &&
-            urlBuilder.getPageFrom() == -1 &&
-            urlBuilder.getPageTo() == -1) {
-            return resources.getString(R.string.subscription);
-        } else if (ListUrlBuilder.MODE_WHATS_HOT == urlBuilder.getMode()) {
-            return resources.getString(R.string.whats_hot);
-        } else if (!TextUtils.isEmpty(keyword)) {
-            return keyword;
-        } else if (MathUtils.hammingWeight(category) == 1) {
-            return EhUtils.getCategory(category);
-        } else {
-            return null;
-        }
-    }
-
     private String wrapTagKeyword(String keyword) {
         keyword = keyword.trim();
 
@@ -576,7 +509,7 @@ public final class GalleryListScene extends BaseScene
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_list, container, false);
 
         Context context = getContext2();
@@ -732,7 +665,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     private void showQuickSearchTipDialog(final List<QuickSearch> list,
-            final ArrayAdapter<QuickSearch> adapter, final ListView listView, final TextView tip) {
+                                          final ArrayAdapter<QuickSearch> adapter, final ListView listView, final TextView tip) {
         Context context = getContext2();
         if (null == context) {
             return;
@@ -752,7 +685,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     private void showAddQuickSearchDialog(final List<QuickSearch> list,
-            final ArrayAdapter<QuickSearch> adapter, final ListView listView, final TextView tip) {
+                                          final ArrayAdapter<QuickSearch> adapter, final ListView listView, final TextView tip) {
         Context context = getContext2();
         final ListUrlBuilder urlBuilder = mUrlBuilder;
         if (null == context || null == urlBuilder) {
@@ -766,7 +699,7 @@ public final class GalleryListScene extends BaseScene
         }
 
         // Check duplicate
-        for (QuickSearch q: list) {
+        for (QuickSearch q : list) {
             if (urlBuilder.equalsQuickSearch(q)) {
                 showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG);
                 return;
@@ -790,7 +723,7 @@ public final class GalleryListScene extends BaseScene
                 }
 
                 // Check name duplicate
-                for (QuickSearch q: list) {
+                for (QuickSearch q : list) {
                     if (text.equals(q.name)) {
                         builder.setError(getString(R.string.duplicate_name));
                         return;
@@ -818,7 +751,7 @@ public final class GalleryListScene extends BaseScene
 
     @Override
     public View onCreateDrawerView(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                                   @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.drawer_list, container, false);
         Toolbar toolbar = (Toolbar) ViewUtils.$$(view, R.id.toolbar);
         final TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
@@ -996,7 +929,7 @@ public final class GalleryListScene extends BaseScene
                 int goTo;
                 try {
                     goTo = Integer.parseInt(text) - 1;
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     builder.setError(getString(R.string.error_invalid_number));
                     return;
                 }
@@ -1065,16 +998,16 @@ public final class GalleryListScene extends BaseScene
         boolean downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID;
         boolean favourited = gi.favoriteSlot != -2;
 
-        CharSequence[] items = new CharSequence[] {
-            context.getString(R.string.read),
-            context.getString(downloaded ? R.string.delete_downloads : R.string.download),
-            context.getString(favourited ? R.string.remove_from_favourites : R.string.add_to_favourites),
+        CharSequence[] items = new CharSequence[]{
+                context.getString(R.string.read),
+                context.getString(downloaded ? R.string.delete_downloads : R.string.download),
+                context.getString(favourited ? R.string.remove_from_favourites : R.string.add_to_favourites),
         };
 
-        int[] icons = new int[] {
-            R.drawable.v_book_open_x24,
-            downloaded ? R.drawable.v_delete_x24 : R.drawable.v_download_x24,
-            favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
+        int[] icons = new int[]{
+                R.drawable.v_book_open_x24,
+                downloaded ? R.drawable.v_delete_x24 : R.drawable.v_download_x24,
+                favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
         };
 
         new AlertDialog.Builder(context)
@@ -1090,10 +1023,10 @@ public final class GalleryListScene extends BaseScene
                         case 1: // Download
                             if (downloaded) {
                                 new AlertDialog.Builder(context)
-                                    .setTitle(R.string.download_remove_dialog_title)
-                                    .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
-                                    .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
-                                    .show();
+                                        .setTitle(R.string.download_remove_dialog_title)
+                                        .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
+                                        .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
+                                        .show();
                             } else {
                                 CommonOperations.startDownload(activity, gi, false);
                             }
@@ -1452,17 +1385,6 @@ public final class GalleryListScene extends BaseScene
         return mState == STATE_SIMPLE_SEARCH || mState == STATE_SEARCH_SHOW_LIST;
     }
 
-    public static void startScene(SceneFragment scene, ListUrlBuilder lub) {
-        scene.startScene(getStartAnnouncer(lub));
-    }
-
-    public static Announcer getStartAnnouncer(ListUrlBuilder lub) {
-        Bundle args = new Bundle();
-        args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER);
-        args.putParcelable(KEY_LIST_URL_BUILDER, lub);
-        return new Announcer(GalleryListScene.class).setArgs(args);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_CODE_SELECT_IMAGE == requestCode) {
@@ -1474,10 +1396,193 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
+    private void onGetGalleryListSuccess(GalleryListParser.Result result, int taskId) {
+        if (mHelper != null && mSearchBarMover != null &&
+                mHelper.isCurrentTask(taskId)) {
+            String emptyString = getResources2().getString(mUrlBuilder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags
+                    ? R.string.gallery_list_empty_hit_subscription
+                    : R.string.gallery_list_empty_hit);
+            mHelper.setEmptyString(emptyString);
+            mHelper.onGetPageData(taskId, result.pages, result.nextPage, result.galleryInfoList);
+        }
+    }
+
+    private void onGetGalleryListFailure(Exception e, int taskId) {
+        if (mHelper != null && mSearchBarMover != null &&
+                mHelper.isCurrentTask(taskId)) {
+            mHelper.onGetException(taskId, e);
+        }
+    }
+
+    @IntDef({STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST})
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface State {
+    }
+
+    private static class GetGalleryListListener extends EhCallback<GalleryListScene, GalleryListParser.Result> {
+
+        private final int mTaskId;
+
+        public GetGalleryListListener(Context context, int stageId, String sceneTag, int taskId) {
+            super(context, stageId, sceneTag);
+            mTaskId = taskId;
+        }
+
+        @Override
+        public void onSuccess(GalleryListParser.Result result) {
+            GalleryListScene scene = getScene();
+            if (scene != null) {
+                scene.onGetGalleryListSuccess(result, mTaskId);
+            }
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            GalleryListScene scene = getScene();
+            if (scene != null) {
+                scene.onGetGalleryListFailure(e, mTaskId);
+            }
+        }
+
+        @Override
+        public void onCancel() {
+        }
+
+        @Override
+        public boolean isInstance(SceneFragment scene) {
+            return scene instanceof GalleryListScene;
+        }
+    }
+
+    private static class AddToFavoriteListener extends EhCallback<GalleryListScene, Void> {
+
+        public AddToFavoriteListener(Context context, int stageId, String sceneTag) {
+            super(context, stageId, sceneTag);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            showTip(R.string.add_to_favorite_success, LENGTH_SHORT);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            showTip(R.string.add_to_favorite_failure, LENGTH_LONG);
+        }
+
+        @Override
+        public void onCancel() {
+        }
+
+        @Override
+        public boolean isInstance(SceneFragment scene) {
+            return scene instanceof GalleryListScene;
+        }
+    }
+
+    private static class RemoveFromFavoriteListener extends EhCallback<GalleryListScene, Void> {
+
+        public RemoveFromFavoriteListener(Context context, int stageId, String sceneTag) {
+            super(context, stageId, sceneTag);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            showTip(R.string.remove_from_favorite_success, LENGTH_SHORT);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG);
+        }
+
+        @Override
+        public void onCancel() {
+        }
+
+        @Override
+        public boolean isInstance(SceneFragment scene) {
+            return scene instanceof GalleryListScene;
+        }
+    }
+
+    private abstract class UrlSuggestion extends SearchBar.Suggestion {
+        @Override
+        public CharSequence getText(float textSize) {
+            Drawable bookImage = DrawableManager.getVectorDrawable(getContext2(), R.drawable.v_book_open_x24);
+            SpannableStringBuilder ssb = new SpannableStringBuilder("    ");
+            ssb.append(getResources2().getString(R.string.gallery_list_search_bar_open_gallery));
+            int imageSize = (int) (textSize * 1.25);
+            if (bookImage != null) {
+                bookImage.setBounds(0, 0, imageSize, imageSize);
+                ssb.setSpan(new ImageSpan(bookImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return ssb;
+        }
+
+        @Override
+        public void onClick() {
+            startScene(createAnnouncer());
+
+            if (mState == STATE_SIMPLE_SEARCH) {
+                setState(STATE_NORMAL);
+            } else if (mState == STATE_SEARCH_SHOW_LIST) {
+                setState(STATE_SEARCH);
+            }
+        }
+
+        public abstract Announcer createAnnouncer();
+
+        @Override
+        public void onLongClick() {
+        }
+    }
+
+    private class GalleryDetailUrlSuggestion extends UrlSuggestion {
+        private long mGid;
+        private String mToken;
+
+        private GalleryDetailUrlSuggestion(long gid, String token) {
+            mGid = gid;
+            mToken = token;
+        }
+
+        @Override
+        public Announcer createAnnouncer() {
+            Bundle args = new Bundle();
+            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
+            args.putLong(GalleryDetailScene.KEY_GID, mGid);
+            args.putString(GalleryDetailScene.KEY_TOKEN, mToken);
+            return new Announcer(GalleryDetailScene.class).setArgs(args);
+        }
+    }
+
+    private class GalleryPageUrlSuggestion extends UrlSuggestion {
+        private long mGid;
+        private String mPToken;
+        private int mPage;
+
+        private GalleryPageUrlSuggestion(long gid, String pToken, int page) {
+            mGid = gid;
+            mPToken = pToken;
+            mPage = page;
+        }
+
+        @Override
+        public Announcer createAnnouncer() {
+            Bundle args = new Bundle();
+            args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN);
+            args.putLong(ProgressScene.KEY_GID, mGid);
+            args.putString(ProgressScene.KEY_PTOKEN, mPToken);
+            args.putInt(ProgressScene.KEY_PAGE, mPage);
+            return new Announcer(ProgressScene.class).setArgs(args);
+        }
+    }
+
     private class GalleryListAdapter extends GalleryAdapter {
 
         public GalleryListAdapter(@NonNull LayoutInflater inflater,
-                @NonNull Resources resources, @NonNull RecyclerView recyclerView, int type) {
+                                  @NonNull Resources resources, @NonNull RecyclerView recyclerView, int type) {
             super(inflater, resources, recyclerView, type, true);
         }
 
@@ -1570,108 +1675,6 @@ public final class GalleryListScene extends BaseScene
                 }
                 showActionFab();
             }
-        }
-    }
-
-    private void onGetGalleryListSuccess(GalleryListParser.Result result, int taskId) {
-        if (mHelper != null && mSearchBarMover != null &&
-                mHelper.isCurrentTask(taskId)) {
-            String emptyString = getResources2().getString(mUrlBuilder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags
-                    ? R.string.gallery_list_empty_hit_subscription
-                    : R.string.gallery_list_empty_hit);
-            mHelper.setEmptyString(emptyString);
-            mHelper.onGetPageData(taskId, result.pages, result.nextPage, result.galleryInfoList);
-        }
-    }
-
-    private void onGetGalleryListFailure(Exception e, int taskId) {
-        if (mHelper != null && mSearchBarMover != null &&
-                mHelper.isCurrentTask(taskId)) {
-            mHelper.onGetException(taskId, e);
-        }
-    }
-
-    private static class GetGalleryListListener extends EhCallback<GalleryListScene, GalleryListParser.Result> {
-
-        private final int mTaskId;
-
-        public GetGalleryListListener(Context context, int stageId, String sceneTag, int taskId) {
-            super(context, stageId, sceneTag);
-            mTaskId = taskId;
-        }
-
-        @Override
-        public void onSuccess(GalleryListParser.Result result) {
-            GalleryListScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryListSuccess(result, mTaskId);
-            }
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            GalleryListScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryListFailure(e, mTaskId);
-            }
-        }
-
-        @Override
-        public void onCancel() {}
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryListScene;
-        }
-    }
-
-    private static class AddToFavoriteListener extends EhCallback<GalleryListScene, Void> {
-
-        public AddToFavoriteListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            showTip(R.string.add_to_favorite_success, LENGTH_SHORT);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            showTip(R.string.add_to_favorite_failure, LENGTH_LONG);
-        }
-
-        @Override
-        public void onCancel() {}
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryListScene;
-        }
-    }
-
-    private static class RemoveFromFavoriteListener extends EhCallback<GalleryListScene, Void> {
-
-        public RemoveFromFavoriteListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            showTip(R.string.remove_from_favorite_success, LENGTH_SHORT);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG);
-        }
-
-        @Override
-        public void onCancel() {}
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryListScene;
         }
     }
 }

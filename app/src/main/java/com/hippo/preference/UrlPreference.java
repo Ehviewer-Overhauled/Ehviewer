@@ -18,8 +18,9 @@ package com.hippo.preference;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.preference.Preference;
 import android.util.AttributeSet;
+
+import androidx.preference.Preference;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.UrlOpener;

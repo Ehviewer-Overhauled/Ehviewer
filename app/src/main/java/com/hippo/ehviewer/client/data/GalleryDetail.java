@@ -23,6 +23,17 @@ import java.util.Arrays;
 
 public class GalleryDetail extends GalleryInfo {
 
+    public static final Creator<GalleryDetail> CREATOR = new Creator<GalleryDetail>() {
+        @Override
+        public GalleryDetail createFromParcel(Parcel source) {
+            return new GalleryDetail(source);
+        }
+
+        @Override
+        public GalleryDetail[] newArray(int size) {
+            return new GalleryDetail[size];
+        }
+    };
     public long apiUid = -1L;
     public String apiKey;
     public int torrentCount;
@@ -40,31 +51,6 @@ public class GalleryDetail extends GalleryInfo {
     public GalleryCommentList comments;
     public int previewPages;
     public PreviewSet previewSet;
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeInt(this.torrentCount);
-        dest.writeString(this.torrentUrl);
-        dest.writeString(this.archiveUrl);
-        dest.writeString(this.parent);
-        dest.writeString(this.visible);
-        dest.writeString(this.language);
-        dest.writeString(this.size);
-        dest.writeInt(this.pages);
-        dest.writeInt(this.favoriteCount);
-        dest.writeByte(isFavorited ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.ratingCount);
-        dest.writeParcelableArray(this.tags, flags);
-        dest.writeParcelable(this.comments, flags);
-        dest.writeInt(this.previewPages);
-        dest.writeParcelable(previewSet, flags);
-    }
 
     public GalleryDetail() {
     }
@@ -93,15 +79,28 @@ public class GalleryDetail extends GalleryInfo {
         this.previewSet = in.readParcelable(PreviewSet.class.getClassLoader());
     }
 
-    public static final Creator<GalleryDetail> CREATOR = new Creator<GalleryDetail>() {
-        @Override
-        public GalleryDetail createFromParcel(Parcel source) {
-            return new GalleryDetail(source);
-        }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-        @Override
-        public GalleryDetail[] newArray(int size) {
-            return new GalleryDetail[size];
-        }
-    };
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeInt(this.torrentCount);
+        dest.writeString(this.torrentUrl);
+        dest.writeString(this.archiveUrl);
+        dest.writeString(this.parent);
+        dest.writeString(this.visible);
+        dest.writeString(this.language);
+        dest.writeString(this.size);
+        dest.writeInt(this.pages);
+        dest.writeInt(this.favoriteCount);
+        dest.writeByte(isFavorited ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.ratingCount);
+        dest.writeParcelableArray(this.tags, flags);
+        dest.writeParcelable(this.comments, flags);
+        dest.writeInt(this.previewPages);
+        dest.writeParcelable(previewSet, flags);
+    }
 }

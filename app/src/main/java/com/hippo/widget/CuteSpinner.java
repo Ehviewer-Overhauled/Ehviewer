@@ -21,7 +21,9 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
+
 import androidx.appcompat.widget.AppCompatSpinner;
+
 import com.hippo.ehviewer.R;
 
 public class CuteSpinner extends AppCompatSpinner {

@@ -18,6 +18,7 @@ package com.hippo.ehviewer;
 
 import android.content.Context;
 import android.content.res.Resources;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 

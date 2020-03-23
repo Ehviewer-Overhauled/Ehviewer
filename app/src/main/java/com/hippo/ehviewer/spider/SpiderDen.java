@@ -19,7 +19,9 @@ package com.hippo.ehviewer.spider;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.webkit.MimeTypeMap;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.Settings;
@@ -37,6 +39,7 @@ import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.Utilities;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,30 +48,20 @@ import java.util.Locale;
 public final class SpiderDen {
 
     @Nullable
-    private final UniFile mDownloadDir;
-    private volatile int mMode = SpiderQueen.MODE_READ;
-    private final long mGid;
-
-    @Nullable
     private static SimpleDiskCache sCache;
+    @Nullable
+    private final UniFile mDownloadDir;
+    private final long mGid;
+    private volatile int mMode = SpiderQueen.MODE_READ;
+
+    public SpiderDen(GalleryInfo galleryInfo) {
+        mGid = galleryInfo.gid;
+        mDownloadDir = getGalleryDownloadDir(galleryInfo);
+    }
 
     public static void initialize(Context context) {
         sCache = new SimpleDiskCache(new File(context.getCacheDir(), "image"),
                 MathUtils.clamp(Settings.getReadCacheSize(), 40, 640) * 1024 * 1024);
-    }
-
-    private static class StartWithFilenameFilter implements FilenameFilter {
-
-        private final String mPrefix;
-
-        public StartWithFilenameFilter(String prefix) {
-            mPrefix = prefix;
-        }
-
-        @Override
-        public boolean accept(UniFile dir, String filename) {
-            return filename.startsWith(mPrefix);
-        }
     }
 
     public static UniFile getGalleryDownloadDir(GalleryInfo galleryInfo) {
@@ -116,9 +109,23 @@ public final class SpiderDen {
         }
     }
 
-    public SpiderDen(GalleryInfo galleryInfo) {
-        mGid = galleryInfo.gid;
-        mDownloadDir = getGalleryDownloadDir(galleryInfo);
+    /**
+     * @param extension with dot
+     */
+    public static String generateImageFilename(int index, String extension) {
+        return String.format(Locale.US, "%08d%s", index + 1, extension);
+    }
+
+    @Nullable
+    private static UniFile findImageFile(UniFile dir, int index) {
+        for (String extension : GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS) {
+            String filename = generateImageFilename(index, extension);
+            UniFile file = dir.findFile(filename);
+            if (file != null) {
+                return file;
+            }
+        }
+        return null;
     }
 
     public void setMode(@SpiderQueen.Mode int mode) {
@@ -156,25 +163,6 @@ public final class SpiderDen {
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
         return sCache.contain(key);
-    }
-
-    /**
-     * @param extension with dot
-     */
-    public static String generateImageFilename(int index, String extension) {
-        return String.format(Locale.US, "%08d%s", index + 1, extension);
-    }
-
-    @Nullable
-    private static UniFile findImageFile(UniFile dir, int index) {
-        for (String extension : GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS) {
-            String filename = generateImageFilename(index, extension);
-            UniFile file = dir.findFile(filename);
-            if (file != null) {
-                return file;
-            }
-        }
-        return null;
     }
 
     private boolean containInDownloadDir(int index) {
@@ -334,7 +322,6 @@ public final class SpiderDen {
         }
     }
 
-
     @Nullable
     private InputStreamPipe openCacheInputStreamPipe(int index) {
         if (sCache == null) {
@@ -376,6 +363,20 @@ public final class SpiderDen {
             return openDownloadInputStreamPipe(index);
         } else {
             return null;
+        }
+    }
+
+    private static class StartWithFilenameFilter implements FilenameFilter {
+
+        private final String mPrefix;
+
+        public StartWithFilenameFilter(String prefix) {
+            mPrefix = prefix;
+        }
+
+        @Override
+        public boolean accept(UniFile dir, String filename) {
+            return filename.startsWith(mPrefix);
         }
     }
 }

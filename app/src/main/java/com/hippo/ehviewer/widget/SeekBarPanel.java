@@ -22,7 +22,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
 

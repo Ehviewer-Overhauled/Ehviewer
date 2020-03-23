@@ -20,10 +20,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.Preference;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.SeekBar;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 
 import com.hippo.ehviewer.R;
 
@@ -57,13 +58,13 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
     }
 
     @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
-        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekbar);
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        SeekBar seekBar = (SeekBar) holder.itemView.findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(this);
         seekBar.setMax(mMax);
         seekBar.setProgress(mProgress);
         seekBar.setEnabled(isEnabled());
+        super.onBindViewHolder(holder);
     }
 
     @Override
@@ -84,10 +85,6 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
         }
     }
 
-    public void setProgress(int progress) {
-        setProgress(progress, true);
-    }
-
     private void setProgress(int progress, boolean notifyChanged) {
         if (progress > mMax) {
             progress = mMax;
@@ -106,6 +103,10 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 
     public int getProgress() {
         return mProgress;
+    }
+
+    public void setProgress(int progress) {
+        setProgress(progress, true);
     }
 
     /**
@@ -188,30 +189,6 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
      * It is important to always call through to super methods.
      */
     private static class SavedState extends BaseSavedState {
-        int progress;
-        int max;
-
-        public SavedState(Parcel source) {
-            super(source);
-
-            // Restore the click counter
-            progress = source.readInt();
-            max = source.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-
-            // Save the click counter
-            dest.writeInt(progress);
-            dest.writeInt(max);
-        }
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
@@ -225,5 +202,28 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
                         return new SavedState[size];
                     }
                 };
+        int progress;
+        int max;
+
+        public SavedState(Parcel source) {
+            super(source);
+
+            // Restore the click counter
+            progress = source.readInt();
+            max = source.readInt();
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+
+            // Save the click counter
+            dest.writeInt(progress);
+            dest.writeInt(max);
+        }
     }
 }

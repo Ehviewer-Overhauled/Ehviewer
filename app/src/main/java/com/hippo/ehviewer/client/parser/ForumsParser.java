@@ -19,6 +19,7 @@ package com.hippo.ehviewer.client.parser;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.util.ExceptionUtils;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

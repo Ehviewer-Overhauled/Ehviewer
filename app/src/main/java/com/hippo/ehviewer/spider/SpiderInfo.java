@@ -19,11 +19,14 @@ package com.hippo.ehviewer.spider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.NumberUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,13 +34,10 @@ import java.io.OutputStreamWriter;
 
 public class SpiderInfo {
 
+    static final String TOKEN_FAILED = "failed";
     private static final String TAG = SpiderInfo.class.getSimpleName();
-
     private static final String VERSION_STR = "VERSION";
     private static final int VERSION = 2;
-
-    static final String TOKEN_FAILED = "failed";
-
     public int startPage = 0;
     public long gid = -1;
     public String token = null;

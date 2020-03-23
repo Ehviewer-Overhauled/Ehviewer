@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -31,9 +32,9 @@ import com.hippo.yorozuya.ViewUtils;
 
 public class GalleryGuideView extends ViewGroup implements View.OnClickListener {
 
+    private final float[] mPoints = new float[3 * 4];
     private int mBgColor;
     private Paint mPaint;
-    private final float[] mPoints = new float[3 * 4];
     private int mStep;
 
     private TextView mLeftText;

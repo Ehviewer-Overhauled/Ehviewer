@@ -19,7 +19,9 @@ package com.hippo.util;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
+
 import com.hippo.ehviewer.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,17 +30,13 @@ import java.util.Locale;
 @SuppressLint("SimpleDateFormat")
 public final class ReadableTime {
 
-    private static Resources sResources;
-
     public static final long SECOND_MILLIS = 1000;
     public static final long MINUTE_MILLIS = 60 * SECOND_MILLIS;
     public static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
     public static final long DAY_MILLIS = 24 * HOUR_MILLIS;
     public static final long WEEK_MILLIS = 7 * DAY_MILLIS;
     public static final long YEAR_MILLIS = 365 * DAY_MILLIS;
-
     public static final int SIZE = 5;
-
     public static final long[] MULTIPLES = {
             YEAR_MILLIS,
             DAY_MILLIS,
@@ -46,7 +44,6 @@ public final class ReadableTime {
             MINUTE_MILLIS,
             SECOND_MILLIS
     };
-
     public static final int[] UNITS = {
             R.plurals.year,
             R.plurals.day,
@@ -54,21 +51,17 @@ public final class ReadableTime {
             R.plurals.minute,
             R.plurals.second
     };
-
     private static final Calendar sCalendar = Calendar.getInstance();
     private static final Object sCalendarLock = new Object();
-
     private static final SimpleDateFormat DATE_FORMAT_WITHOUT_YEAR = new SimpleDateFormat("MMM d");
     private static final SimpleDateFormat DATE_FORMAT_WITH_YEAR = new SimpleDateFormat("MMM d, yyyy");
-
     private static final SimpleDateFormat DATE_FORMAT_WITHOUT_YEAR_ZH = new SimpleDateFormat("M月d日");
     private static final SimpleDateFormat DATE_FORMAT_WITH_YEAR_ZH = new SimpleDateFormat("yyyy年M月d日");
-
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yy-MM-dd HH:mm");
     private static final Object sDateFormatLock1 = new Object();
-
     private static final SimpleDateFormat FILENAMABLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
     private static final Object sDateFormatLock2 = new Object();
+    private static Resources sResources;
 
     public static void initialize(Context context) {
         sResources = context.getApplicationContext().getResources();

@@ -25,7 +25,9 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.BatteryManager;
 import android.util.AttributeSet;
+
 import androidx.appcompat.widget.AppCompatTextView;
+
 import com.hippo.drawable.BatteryDrawable;
 import com.hippo.ehviewer.R;
 
@@ -39,10 +41,22 @@ public class BatteryView extends AppCompatTextView {
     private boolean mCharging = false;
 
     private BatteryDrawable mDrawable;
+    private final Runnable mCharger = new Runnable() {
 
+        private int level = 0;
+
+        @Override
+        public void run() {
+            level += 2;
+            if (level > 100) {
+                level = 0;
+            }
+            mDrawable.setElect(level, false);
+            getHandler().postDelayed(mCharger, 200);
+        }
+    };
     private boolean mAttached = false;
     private boolean mIsChargerWorking = false;
-
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
@@ -71,21 +85,6 @@ public class BatteryView extends AppCompatTextView {
                 }
                 setText(mLevel + "%");
             }
-        }
-    };
-
-    private final Runnable mCharger = new Runnable() {
-
-        private int level = 0;
-
-        @Override
-        public void run() {
-            level += 2;
-            if (level > 100) {
-                level = 0;
-            }
-            mDrawable.setElect(level, false);
-            getHandler().postDelayed(mCharger, 200);
         }
     };
 

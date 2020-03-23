@@ -17,14 +17,15 @@
 package com.hippo.ehviewer.client.parser;
 
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.yorozuya.NumberUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Like http://exhentai.org/g/1234567/a1b2c3d4e5<br>
- *
  */
 public final class GalleryDetailUrlParser {
 

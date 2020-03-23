@@ -19,6 +19,7 @@ package com.hippo.util;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
@@ -56,9 +57,9 @@ public class PermissionRequester {
     }
 
     private static boolean requestPermissions(
-        final Activity activity,
-        final String[] permissions,
-        int requestCode
+            final Activity activity,
+            final String[] permissions,
+            int requestCode
     ) {
         try {
             ActivityCompat.requestPermissions(activity, permissions, requestCode);

@@ -18,6 +18,7 @@ package com.hippo.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+
 import androidx.appcompat.widget.AppCompatTextView;
 
 public class ObservedTextView extends AppCompatTextView {
@@ -60,6 +61,7 @@ public class ObservedTextView extends AppCompatTextView {
 
     public interface OnWindowAttachListener {
         void onAttachedToWindow();
+
         void onDetachedFromWindow();
     }
 }

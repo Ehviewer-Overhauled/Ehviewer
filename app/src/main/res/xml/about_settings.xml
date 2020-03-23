@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,70 +14,82 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Preference
         android:key="declaration"
+        android:summary="@string/settings_about_declaration_summary"
         android:title="@string/settings_about_declaration"
-        android:summary="@string/settings_about_declaration_summary"/>
+        app:iconSpaceReserved="false" />
 
     <Preference
         android:key="author"
-        android:title="@string/settings_about_author"/>
+        android:title="@string/settings_about_author"
+        app:iconSpaceReserved="false" />
 
     <com.hippo.preference.UrlPreference
-      android:key="telegram"
-      android:title="@string/settings_about_telegram"
-      app:url="https://t.me/ehviewer"/>
+        android:key="telegram"
+        android:title="@string/settings_about_telegram"
+        app:iconSpaceReserved="false"
+        app:url="https://t.me/ehviewer" />
 
     <com.hippo.preference.UrlPreference
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
-        app:url="https://github.com/seven332/EhViewer/releases/latest"/>
+        app:iconSpaceReserved="false"
+        app:url="https://github.com/seven332/EhViewer/releases/latest" />
 
     <com.hippo.preference.UrlPreference
         android:key="website"
         android:title="@string/settings_about_website"
-        app:url="http://www.ehviewer.com"/>
+        app:iconSpaceReserved="false"
+        app:url="http://www.ehviewer.com" />
 
     <com.hippo.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
-        app:url="https://github.com/seven332/EhViewer"/>
+        app:iconSpaceReserved="false"
+        app:url="https://github.com/seven332/EhViewer" />
 
     <com.hippo.preference.UrlPreference
         android:key="changelog"
         android:title="@string/settings_about_changelog"
-        app:url="http://www.ehviewer.com/changelog"/>
+        app:iconSpaceReserved="false"
+        app:url="http://www.ehviewer.com/changelog" />
 
     <com.hippo.preference.UrlPreference
         android:key="help"
         android:title="@string/settings_about_help"
-        app:url="http://www.ehviewer.com/help"/>
+        app:iconSpaceReserved="false"
+        app:url="http://www.ehviewer.com/help" />
 
     <com.hippo.preference.ActivityPreference
         android:key="license"
-        android:title="@string/settings_about_license"
         android:summary="@string/settings_about_license_summary"
-        app:activity="com.hippo.ehviewer.ui.LicenseActivity"/>
+        android:title="@string/settings_about_license"
+        app:activity="com.hippo.ehviewer.ui.LicenseActivity"
+        app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.VersionPreference
-        android:key="version"/>
+        android:key="version"
+        app:iconSpaceReserved="false" />
 
     <Preference
         android:key="check_for_updates"
-        android:title="@string/settings_about_check_for_updates"/>
+        android:title="@string/settings_about_check_for_updates"
+        app:iconSpaceReserved="false" />
 
-    <com.hippo.preference.SwitchPreference
+    <SwitchPreferenceCompat
+        android:defaultValue="@bool/beta"
         android:key="beta_update_channel"
-        android:title="@string/settings_about_beta_update_channel"
         android:summary="@string/settings_about_beta_update_channel_summary"
-        android:defaultValue="@bool/beta"/>
+        android:title="@string/settings_about_beta_update_channel"
+        app:iconSpaceReserved="false" />
 
     <Preference
         android:key="donate"
-        android:title="@string/settings_about_donate"/>
+        android:title="@string/settings_about_donate"
+        app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

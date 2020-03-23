@@ -27,180 +27,14 @@ public class EhConfig implements Cloneable {
      * The Cookie key of uconfig
      */
     public static final String KEY_UCONFIG = "uconfig";
-
-    /**
-     * The key of load images through the Hentai@Home Network
-     * @see #LOAD_FROM_HAH_YES
-     * @see #LOAD_FROM_HAH_NO
-     */
-    private static final String KEY_LOAD_FROM_HAH = "uh";
-    /**
-     * The key of Image Size Settings
-     * @see #IMAGE_SIZE_AUTO
-     * @see #IMAGE_SIZE_780X
-     * @see #IMAGE_SIZE_980X
-     * @see #IMAGE_SIZE_1280X
-     * @see #IMAGE_SIZE_1600X
-     * @see #IMAGE_SIZE_2400X
-     */
-    private static final String KEY_IMAGE_SIZE = "xr";
-    /**
-     * The key of scale images width
-     */
-    private static final String KEY_SCALE_WIDTH = "rx";
-    /**
-     * The key of scale images height
-     */
-    private static final String KEY_SCALE_HEIGHT = "ry";
-    /**
-     * The key of Gallery Name Display
-     * @see #GALLERY_TITLE_DEFAULT
-     * @see #GALLERY_TITLE_JAPANESE
-     */
-    private static final String KEY_GALLERY_TITLE = "tl";
-    /**
-     * The key of the behavior for downloading archiver
-     * @see #ARCHIVER_DOWNLOAD_MAMS
-     * @see #ARCHIVER_DOWNLOAD_MAAS
-     * @see #ARCHIVER_DOWNLOAD_AAMS
-     * @see #ARCHIVER_DOWNLOAD_AAAS
-     */
-    private static final String KEY_ARCHIVER_DOWNLOAD = "ar";
-    /**
-     * The key of display mode would you like to use on the front and search pages
-     * @see #LAYOUT_MODE_LIST
-     * @see #LAYOUT_MODE_THUMB
-     */
-    private static final String KEY_LAYOUT_MODE = "dm";
-    /**
-     * The key for show popular
-     * @see #POPULAR_YES
-     * @see #POPULAR_NO
-     */
-    private static final String KEY_POPULAR = "prn";
-    /**
-     * The key of categories would you like to view as default on the front page
-     */
-    private static final String KEY_DEFAULT_CATEGORIES = "cats";
-    /**
-     * The key for favorites sort
-     * @see #FAVORITES_SORT_GALLERY_UPDATE_TIME
-     * @see #FAVORITES_SORT_FAVORITED_TIME
-     */
-    private static final String KEY_FAVORITES_SORT = "fs";
-    /**
-     * The key of exclude certain namespaces from a default tag search
-     */
-    private static final String KEY_EXCLUDED_NAMESPACES = "xns";
-    /**
-     * The key of hide galleries in certain languages from the gallery list and searches
-     */
-    private static final String KEY_EXCLUDED_LANGUAGES = "xl";
-    /**
-     * The key of how many results would you like per page for the index/search page and torrent search pages
-     * @see #RESULT_COUNT_25
-     * @see #RESULT_COUNT_50
-     * @see #RESULT_COUNT_100
-     * @see #RESULT_COUNT_200
-     */
-    private static final String KEY_RESULT_COUNT = "rc";
-    /**
-     * The key of mouse-over thumb
-     * @see #MOUSE_OVER_YES
-     * @see #MOUSE_OVER_NO
-     */
-    private static final String KEY_MOUSE_OVER = "lt";
-    /**
-     * The key of preview size
-     * @see #PREVIEW_SIZE_NORMAL
-     * @see #PREVIEW_SIZE_LARGE
-     */
-    private static final String KEY_PREVIEW_SIZE = "ts";
-    /**
-     * The key of preview row per page
-     * @see #PREVIEW_ROW_4
-     * @see #PREVIEW_ROW_10
-     * @see #PREVIEW_ROW_20
-     * @see #PREVIEW_ROW_40
-     */
-    private static final String KEY_PREVIEW_ROW = "tr";
-    /**
-     * The key of sort order for gallery comments
-     * @see #COMMENTS_SORT_OLDEST_FIRST
-     * @see #COMMENTS_SORT_RECENT_FIRST
-     * @see #COMMENTS_SORT_HIGHEST_SCORE_FIRST
-     */
-    private static final String KEY_COMMENTS_SORT = "cs";
-    /**
-     * The key of show gallery comment votes
-     * @see #COMMENTS_VOTES_POP
-     * @see #COMMENTS_VOTES_ALWAYS
-     */
-    private static final String KEY_COMMENTS_VOTES = "sc";
-    /**
-     * The key of sort order for gallery tags
-     * @see #TAGS_SORT_ALPHABETICAL
-     * @see #TAGS_SORT_POWER
-     */
-    private static final String KEY_TAGS_SORT = "to";
-    /**
-     * The key of show gallery page numbers
-     * @see #SHOW_GALLERY_INDEX_NO
-     * @see #SHOW_GALLERY_INDEX_YES
-     */
-    private static final String KEY_SHOW_GALLERY_INDEX = "pn";
-    /**
-     * The key of the IP:Port of a proxy-enabled Hentai@Home Client
-     * to load all images
-     */
-    private static final String KEY_HAH_CLIENT_IP_PORT = "hp";
-    /**
-     * The key of the passkey of a proxy-enabled Hentai@Home Client
-     * to load all images
-     */
-    private static final String KEY_HAH_CLIENT_PASSKEY = "hk";
-    /**
-     * The key of enable Tag Flagging
-     * @see #ENABLE_TAG_FLAGGING_NO
-     * @see #ENABLE_TAG_FLAGGING_YES
-     */
-    private static final String KEY_ENABLE_TAG_FLAGGING = "tf";
-    /**
-     * The key of always display the original images instead of the resampled versions
-     * @see #ALWAYS_ORIGINAL_NO
-     * @see #ALWAYS_ORIGINAL_YES
-     */
-    private static final String KEY_ALWAYS_ORIGINAL = "oi";
-    /**
-     * The key of enable the multi-Page Viewer
-     * @see #MULTI_PAGE_NO
-     * @see #MULTI_PAGE_YES
-     */
-    private static final String KEY_MULTI_PAGE = "qb";
-    /**
-     * The key of multi-Page Viewer Display Style
-     * @see #MULTI_PAGE_STYLE_C
-     * @see #MULTI_PAGE_STYLE_N
-     * @see #MULTI_PAGE_STYLE_Y
-     */
-    private static final String KEY_MULTI_PAGE_STYLE = "ms";
-    /**
-     * The key of multi-Page Viewer Thumbnail Pane
-     * @see #MULTI_PAGE_THUMB_HIDE
-     * @see #MULTI_PAGE_THUMB_SHOW
-     */
-    private static final String KEY_MULTI_PAGE_THUMB = "mt";
-
     /**
      * The Cookie key of lofi resolution
      */
     public static final String KEY_LOFI_RESOLUTION = "xres";
-
     /**
      * The Cookie key of show warning
      */
     public static final String KEY_CONTENT_WARNING = "nw";
-
     /**
      * load images through the Hentai@Home Network
      */
@@ -209,7 +43,6 @@ public class EhConfig implements Cloneable {
      * do not load images through the Hentai@Home Network
      */
     public static final String LOAD_FROM_HAH_NO = "n";
-
     /**
      * Image Size Auto
      */
@@ -234,16 +67,6 @@ public class EhConfig implements Cloneable {
      * Image Size 2400x
      */
     public static final String IMAGE_SIZE_2400X = "2400";
-
-    /**
-     * Default gallery title
-     */
-    private static final String GALLERY_TITLE_DEFAULT = "r";
-    /**
-     * Japanese gallery title
-     */
-    private static final String GALLERY_TITLE_JAPANESE = "j";
-
     /**
      * Manual Accept, Manual Start
      */
@@ -260,7 +83,6 @@ public class EhConfig implements Cloneable {
      * Auto Accept, Auto Start
      */
     public static final String ARCHIVER_DOWNLOAD_AAAS = "3";
-
     /**
      * List View on the front and search pages
      */
@@ -269,16 +91,6 @@ public class EhConfig implements Cloneable {
      * Thumbnail View on the front and search pages
      */
     public static final String LAYOUT_MODE_THUMB = "t";
-
-    /**
-     * Show popular
-     */
-    private static final String POPULAR_YES = "y";
-    /**
-     * Don't show popular
-     */
-    private static final String POPULAR_NO = "n";
-
     public static final int MISC = 0x1;
     public static final int DOUJINSHI = 0x2;
     public static final int MANGA = 0x4;
@@ -290,7 +102,6 @@ public class EhConfig implements Cloneable {
     public static final int NON_H = 0x100;
     public static final int WESTERN = 0x200;
     public static final int ALL_CATEGORY = 0x3ff;
-
     public static final int NAMESPACES_RECLASS = 0x1;
     public static final int NAMESPACES_LANGUAGE = 0x2;
     public static final int NAMESPACES_PARODY = 0x4;
@@ -299,7 +110,6 @@ public class EhConfig implements Cloneable {
     public static final int NAMESPACES_ARTIST = 0x20;
     public static final int NAMESPACES_MALE = 0x40;
     public static final int NAMESPACES_FEMALE = 0x80;
-
     public static final String JAPANESE_ORIGINAL = "0";
     public static final String JAPANESE_TRANSLATED = "1024";
     public static final String JAPANESE_REWRITE = "2048";
@@ -351,16 +161,6 @@ public class EhConfig implements Cloneable {
     public static final String OTHER_ORIGINAL = "255";
     public static final String OTHER_TRANSLATED = "1279";
     public static final String OTHER_REWRITE = "2303";
-
-    /**
-     * Sort favorites by last gallery update time
-     */
-    private static final String FAVORITES_SORT_GALLERY_UPDATE_TIME = "p";
-    /**
-     * Sort favorites by favorited time
-     */
-    private static final String FAVORITES_SORT_FAVORITED_TIME = "f";
-
     /**
      * 25 results per page for the index/search page and torrent search pages
      */
@@ -377,7 +177,6 @@ public class EhConfig implements Cloneable {
      * 200 results per page for the index/search page and torrent search pages
      */
     public static final String RESULT_COUNT_200 = "3";
-
     /**
      * On mouse-over
      */
@@ -386,7 +185,6 @@ public class EhConfig implements Cloneable {
      * On page load
      */
     public static final String MOUSE_OVER_NO = "p";
-
     /**
      * Preview normal size
      */
@@ -395,7 +193,6 @@ public class EhConfig implements Cloneable {
      * Preview large size
      */
     public static final String PREVIEW_SIZE_LARGE = "l";
-
     /**
      * 4 row preview per page
      */
@@ -412,7 +209,6 @@ public class EhConfig implements Cloneable {
      * 40 row preview per page
      */
     public static final String PREVIEW_ROW_40 = "20";
-
     /**
      * Oldest comments first
      */
@@ -425,7 +221,6 @@ public class EhConfig implements Cloneable {
      * By highest score
      */
     public static final String COMMENTS_SORT_HIGHEST_SCORE_FIRST = "s";
-
     /**
      * Show gallery comment votes On score hover or click
      */
@@ -434,7 +229,6 @@ public class EhConfig implements Cloneable {
      * Always show gallery comment votes
      */
     public static final String COMMENTS_VOTES_ALWAYS = "1";
-
     /**
      * Sort order for gallery tags alphabetically
      */
@@ -443,7 +237,6 @@ public class EhConfig implements Cloneable {
      * Sort order for gallery tags by tag power
      */
     public static final String TAGS_SORT_POWER = "p";
-
     /**
      * Show gallery page numbers
      */
@@ -452,7 +245,6 @@ public class EhConfig implements Cloneable {
      * Do not show gallery page numbers
      */
     public static final String SHOW_GALLERY_INDEX_NO = "0";
-
     /**
      * Enable Tag Flagging
      */
@@ -461,7 +253,6 @@ public class EhConfig implements Cloneable {
      * Do not enable Tag Flagging
      */
     public static final String ENABLE_TAG_FLAGGING_NO = "n";
-
     /**
      * Always display the original images
      */
@@ -470,7 +261,6 @@ public class EhConfig implements Cloneable {
      * Do not Always display the original images
      */
     public static final String ALWAYS_ORIGINAL_NO = "n";
-
     /**
      * Enable the Multi-Page Viewe
      */
@@ -479,7 +269,6 @@ public class EhConfig implements Cloneable {
      * Do not enable the Multi-Page Viewe
      */
     public static final String MULTI_PAGE_NO = "n";
-
     /**
      * Align left, only scale if image is larger than browser width
      */
@@ -492,7 +281,6 @@ public class EhConfig implements Cloneable {
      * Align center, Always scale images to fit browser width
      */
     public static final String MULTI_PAGE_STYLE_Y = "y";
-
     /**
      * Show Multi-Page Viewer Thumbnail Pane
      */
@@ -501,32 +289,232 @@ public class EhConfig implements Cloneable {
      * Hide Multi-Page Viewer Thumbnail Pane
      */
     public static final String MULTI_PAGE_THUMB_HIDE = "y";
-
     /**
      * 460x for lofi resolution
      */
     public static final String LOFI_RESOLUTION_460X = "1";
-
     /**
      * 780X for lofi resolution
      */
     public static final String LOFI_RESOLUTION_780X = "2";
-
     /**
      * 980X for lofi resolution
      */
     public static final String LOFI_RESOLUTION_980X = "3";
-
     /**
      * show warning
      */
     public static final String CONTENT_WARNING_SHOW = "0";
-
     /**
      * not show warning
      */
     public static final String CONTENT_WARNING_NOT_SHOW = "1";
-
+    /**
+     * The key of load images through the Hentai@Home Network
+     *
+     * @see #LOAD_FROM_HAH_YES
+     * @see #LOAD_FROM_HAH_NO
+     */
+    private static final String KEY_LOAD_FROM_HAH = "uh";
+    /**
+     * The key of Image Size Settings
+     *
+     * @see #IMAGE_SIZE_AUTO
+     * @see #IMAGE_SIZE_780X
+     * @see #IMAGE_SIZE_980X
+     * @see #IMAGE_SIZE_1280X
+     * @see #IMAGE_SIZE_1600X
+     * @see #IMAGE_SIZE_2400X
+     */
+    private static final String KEY_IMAGE_SIZE = "xr";
+    /**
+     * The key of scale images width
+     */
+    private static final String KEY_SCALE_WIDTH = "rx";
+    /**
+     * The key of scale images height
+     */
+    private static final String KEY_SCALE_HEIGHT = "ry";
+    /**
+     * The key of Gallery Name Display
+     *
+     * @see #GALLERY_TITLE_DEFAULT
+     * @see #GALLERY_TITLE_JAPANESE
+     */
+    private static final String KEY_GALLERY_TITLE = "tl";
+    /**
+     * The key of the behavior for downloading archiver
+     *
+     * @see #ARCHIVER_DOWNLOAD_MAMS
+     * @see #ARCHIVER_DOWNLOAD_MAAS
+     * @see #ARCHIVER_DOWNLOAD_AAMS
+     * @see #ARCHIVER_DOWNLOAD_AAAS
+     */
+    private static final String KEY_ARCHIVER_DOWNLOAD = "ar";
+    /**
+     * The key of display mode would you like to use on the front and search pages
+     *
+     * @see #LAYOUT_MODE_LIST
+     * @see #LAYOUT_MODE_THUMB
+     */
+    private static final String KEY_LAYOUT_MODE = "dm";
+    /**
+     * The key for show popular
+     *
+     * @see #POPULAR_YES
+     * @see #POPULAR_NO
+     */
+    private static final String KEY_POPULAR = "prn";
+    /**
+     * The key of categories would you like to view as default on the front page
+     */
+    private static final String KEY_DEFAULT_CATEGORIES = "cats";
+    /**
+     * The key for favorites sort
+     *
+     * @see #FAVORITES_SORT_GALLERY_UPDATE_TIME
+     * @see #FAVORITES_SORT_FAVORITED_TIME
+     */
+    private static final String KEY_FAVORITES_SORT = "fs";
+    /**
+     * The key of exclude certain namespaces from a default tag search
+     */
+    private static final String KEY_EXCLUDED_NAMESPACES = "xns";
+    /**
+     * The key of hide galleries in certain languages from the gallery list and searches
+     */
+    private static final String KEY_EXCLUDED_LANGUAGES = "xl";
+    /**
+     * The key of how many results would you like per page for the index/search page and torrent search pages
+     *
+     * @see #RESULT_COUNT_25
+     * @see #RESULT_COUNT_50
+     * @see #RESULT_COUNT_100
+     * @see #RESULT_COUNT_200
+     */
+    private static final String KEY_RESULT_COUNT = "rc";
+    /**
+     * The key of mouse-over thumb
+     *
+     * @see #MOUSE_OVER_YES
+     * @see #MOUSE_OVER_NO
+     */
+    private static final String KEY_MOUSE_OVER = "lt";
+    /**
+     * The key of preview size
+     *
+     * @see #PREVIEW_SIZE_NORMAL
+     * @see #PREVIEW_SIZE_LARGE
+     */
+    private static final String KEY_PREVIEW_SIZE = "ts";
+    /**
+     * The key of preview row per page
+     *
+     * @see #PREVIEW_ROW_4
+     * @see #PREVIEW_ROW_10
+     * @see #PREVIEW_ROW_20
+     * @see #PREVIEW_ROW_40
+     */
+    private static final String KEY_PREVIEW_ROW = "tr";
+    /**
+     * The key of sort order for gallery comments
+     *
+     * @see #COMMENTS_SORT_OLDEST_FIRST
+     * @see #COMMENTS_SORT_RECENT_FIRST
+     * @see #COMMENTS_SORT_HIGHEST_SCORE_FIRST
+     */
+    private static final String KEY_COMMENTS_SORT = "cs";
+    /**
+     * The key of show gallery comment votes
+     *
+     * @see #COMMENTS_VOTES_POP
+     * @see #COMMENTS_VOTES_ALWAYS
+     */
+    private static final String KEY_COMMENTS_VOTES = "sc";
+    /**
+     * The key of sort order for gallery tags
+     *
+     * @see #TAGS_SORT_ALPHABETICAL
+     * @see #TAGS_SORT_POWER
+     */
+    private static final String KEY_TAGS_SORT = "to";
+    /**
+     * The key of show gallery page numbers
+     *
+     * @see #SHOW_GALLERY_INDEX_NO
+     * @see #SHOW_GALLERY_INDEX_YES
+     */
+    private static final String KEY_SHOW_GALLERY_INDEX = "pn";
+    /**
+     * The key of the IP:Port of a proxy-enabled Hentai@Home Client
+     * to load all images
+     */
+    private static final String KEY_HAH_CLIENT_IP_PORT = "hp";
+    /**
+     * The key of the passkey of a proxy-enabled Hentai@Home Client
+     * to load all images
+     */
+    private static final String KEY_HAH_CLIENT_PASSKEY = "hk";
+    /**
+     * The key of enable Tag Flagging
+     *
+     * @see #ENABLE_TAG_FLAGGING_NO
+     * @see #ENABLE_TAG_FLAGGING_YES
+     */
+    private static final String KEY_ENABLE_TAG_FLAGGING = "tf";
+    /**
+     * The key of always display the original images instead of the resampled versions
+     *
+     * @see #ALWAYS_ORIGINAL_NO
+     * @see #ALWAYS_ORIGINAL_YES
+     */
+    private static final String KEY_ALWAYS_ORIGINAL = "oi";
+    /**
+     * The key of enable the multi-Page Viewer
+     *
+     * @see #MULTI_PAGE_NO
+     * @see #MULTI_PAGE_YES
+     */
+    private static final String KEY_MULTI_PAGE = "qb";
+    /**
+     * The key of multi-Page Viewer Display Style
+     *
+     * @see #MULTI_PAGE_STYLE_C
+     * @see #MULTI_PAGE_STYLE_N
+     * @see #MULTI_PAGE_STYLE_Y
+     */
+    private static final String KEY_MULTI_PAGE_STYLE = "ms";
+    /**
+     * The key of multi-Page Viewer Thumbnail Pane
+     *
+     * @see #MULTI_PAGE_THUMB_HIDE
+     * @see #MULTI_PAGE_THUMB_SHOW
+     */
+    private static final String KEY_MULTI_PAGE_THUMB = "mt";
+    /**
+     * Default gallery title
+     */
+    private static final String GALLERY_TITLE_DEFAULT = "r";
+    /**
+     * Japanese gallery title
+     */
+    private static final String GALLERY_TITLE_JAPANESE = "j";
+    /**
+     * Show popular
+     */
+    private static final String POPULAR_YES = "y";
+    /**
+     * Don't show popular
+     */
+    private static final String POPULAR_NO = "n";
+    /**
+     * Sort favorites by last gallery update time
+     */
+    private static final String FAVORITES_SORT_GALLERY_UPDATE_TIME = "p";
+    /**
+     * Sort favorites by favorited time
+     */
+    private static final String FAVORITES_SORT_FAVORITED_TIME = "f";
     /**
      * Load images through the Hentai@Home Network<br/>
      * key: {@link #KEY_LOAD_FROM_HAH}<br/>
@@ -538,7 +526,7 @@ public class EhConfig implements Cloneable {
      * Image Size<br/>
      * key: {@link #KEY_IMAGE_SIZE}<br/>
      * value: {@link #IMAGE_SIZE_AUTO}, {@link #IMAGE_SIZE_780X}, {@link #IMAGE_SIZE_980X},
-     *        {@link #IMAGE_SIZE_1280X}, {@link #IMAGE_SIZE_1600X}, {@link #IMAGE_SIZE_2400X}
+     * {@link #IMAGE_SIZE_1280X}, {@link #IMAGE_SIZE_1600X}, {@link #IMAGE_SIZE_2400X}
      */
     public String imageSize = IMAGE_SIZE_AUTO;
 

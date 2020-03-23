@@ -23,22 +23,21 @@ import org.json.JSONObject;
 
 public class RateGalleryParser {
 
-    public static class Result {
-        public float rating;
-        public int ratingCount;
-    }
-
     public static Result parse(String body) throws Exception {
         try {
             JSONObject jsonObject = new JSONObject(body);
             Result result = new Result();
-            result.rating = (float)jsonObject.getDouble("rating_avg");
+            result.rating = (float) jsonObject.getDouble("rating_avg");
             result.ratingCount = jsonObject.getInt("rating_cnt");
             return result;
         } catch (JSONException e) {
-            Exception exception = new ParseException("Can't parse rate gallery", body);
-            exception.initCause(e);
+            Exception exception = new ParseException("Can't parse rate gallery", body, e);
             throw exception;
         }
+    }
+
+    public static class Result {
+        public float rating;
+        public int ratingCount;
     }
 }

@@ -30,7 +30,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
@@ -40,6 +42,7 @@ import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -195,8 +198,24 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         setImagePath(ss.imagePath);
     }
 
+    public interface Helper {
+        void onSelectImage();
+    }
+
     private static class SavedState extends AbsSavedState {
 
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         String imagePath;
 
         /**
@@ -219,22 +238,5 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
             super.writeToParcel(out, flags);
             out.writeString(imagePath);
         }
-
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-    }
-
-    public interface Helper {
-        void onSelectImage();
     }
 }

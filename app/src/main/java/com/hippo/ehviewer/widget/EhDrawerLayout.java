@@ -18,16 +18,18 @@ package com.hippo.ehviewer.widget;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.google.android.material.snackbar.Snackbar;
-import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.AnimationUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,18 +76,17 @@ public class EhDrawerLayout extends DrawerLayout {
     public static class Behavior extends CoordinatorLayout.Behavior<EhDrawerLayout> {
         // We only support the FAB <> Snackbar shift movement on Honeycomb and above. This is
         // because we can use view translation properties which greatly simplifies the code.
-        private static final boolean SNACKBAR_BEHAVIOR_ENABLED = Build.VERSION.SDK_INT >= 11;
 
         @Override
         public boolean layoutDependsOn(CoordinatorLayout parent,
-                EhDrawerLayout child, View dependency) {
+                                       EhDrawerLayout child, View dependency) {
             // We're dependent on all SnackbarLayouts (if enabled)
-            return SNACKBAR_BEHAVIOR_ENABLED && dependency instanceof Snackbar.SnackbarLayout;
+            return dependency instanceof Snackbar.SnackbarLayout;
         }
 
         @Override
         public boolean onDependentViewChanged(CoordinatorLayout parent, EhDrawerLayout child,
-                View dependency) {
+                                              View dependency) {
             if (dependency instanceof Snackbar.SnackbarLayout) {
                 for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                     View view = child.getAboveSnackViewAt(i);
@@ -96,7 +97,7 @@ public class EhDrawerLayout extends DrawerLayout {
         }
 
         private void updateChildTranslationForSnackbar(CoordinatorLayout parent,
-                EhDrawerLayout view, final View child) {
+                                                       EhDrawerLayout view, final View child) {
             final float targetTransY = getChildTranslationYForSnackbar(parent, view);
             float childTranslationY = 0.0f;
             Object obj = child.getTag(R.id.fab_translation_y);
@@ -147,7 +148,7 @@ public class EhDrawerLayout extends DrawerLayout {
         }
 
         private float getChildTranslationYForSnackbar(CoordinatorLayout parent,
-                EhDrawerLayout child) {
+                                                      EhDrawerLayout child) {
             float minOffset = 0;
             final List<View> dependencies = parent.getDependencies(child);
             for (int i = 0, z = dependencies.size(); i < z; i++) {

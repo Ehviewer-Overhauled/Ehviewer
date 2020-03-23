@@ -40,14 +40,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+
 import com.hippo.ehviewer.R;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.ViewUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,18 +58,14 @@ public class SearchBar extends CardView implements View.OnClickListener,
         TextView.OnEditorActionListener, TextWatcher,
         SearchEditText.SearchEditTextListener {
 
-    private static final String STATE_KEY_SUPER = "super";
-    private static final String STATE_KEY_STATE = "state";
-
-    private static final long ANIMATE_TIME = 300L;
-
     public static final int STATE_NORMAL = 0;
     public static final int STATE_SEARCH = 1;
     public static final int STATE_SEARCH_LIST = 2;
-
-    private int mState = STATE_NORMAL;
-
+    private static final String STATE_KEY_SUPER = "super";
+    private static final String STATE_KEY_STATE = "state";
+    private static final long ANIMATE_TIME = 300L;
     private final Rect mRect = new Rect();
+    private int mState = STATE_NORMAL;
     private int mWidth;
     private int mHeight;
     private int mBaseHeight;
@@ -218,12 +217,12 @@ public class SearchBar extends CardView implements View.OnClickListener,
         mSuggestionProvider = suggestionProvider;
     }
 
-    public void setText(String text) {
-        mEditText.setText(text);
-    }
-
     public String getText() {
         return mEditText.getText().toString();
+    }
+
+    public void setText(String text) {
+        mEditText.setText(text);
     }
 
     public void cursorToEnd() {
@@ -428,14 +427,14 @@ public class SearchBar extends CardView implements View.OnClickListener,
     }
 
     @SuppressWarnings("unused")
-    public void setProgress(float progress) {
-        mProgress = progress;
-        invalidate();
+    public float getProgress() {
+        return mProgress;
     }
 
     @SuppressWarnings("unused")
-    public float getProgress() {
-        return mProgress;
+    public void setProgress(float progress) {
+        mProgress = progress;
+        invalidate();
     }
 
     @Override
@@ -496,10 +495,15 @@ public class SearchBar extends CardView implements View.OnClickListener,
 
     public interface Helper {
         void onClickTitle();
+
         void onClickLeftIcon();
+
         void onClickRightIcon();
+
         void onSearchEditTextClick();
+
         void onApplySearch(String query);
+
         void onSearchEditTextBackPressed();
     }
 
@@ -511,6 +515,15 @@ public class SearchBar extends CardView implements View.OnClickListener,
     public interface SuggestionProvider {
 
         List<Suggestion> providerSuggestions(String text);
+    }
+
+    public abstract static class Suggestion {
+
+        public abstract CharSequence getText(float textSize);
+
+        public abstract void onClick();
+
+        public abstract void onLongClick();
     }
 
     private class SuggestionAdapter extends BaseAdapter {
@@ -549,15 +562,6 @@ public class SearchBar extends CardView implements View.OnClickListener,
 
             return textView;
         }
-    }
-
-    public abstract static class Suggestion {
-
-        public abstract CharSequence getText(float textSize);
-
-        public abstract void onClick();
-
-        public abstract void onLongClick();
     }
 
     public class KeywordSuggestion extends Suggestion {

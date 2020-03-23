@@ -18,7 +18,9 @@ package com.hippo.drawable;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
 import com.hippo.conaco.Unikery;
@@ -31,11 +33,9 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
         ObservedTextView.OnWindowAttachListener {
 
     private static final String TAG = UnikeryDrawable.class.getSimpleName();
-
-    private int mTaskId = Unikery.INVALID_ID;
-
     private final ObservedTextView mTextView;
     private final Conaco<ImageBitmap> mConaco;
+    private int mTaskId = Unikery.INVALID_ID;
     private String mUrl;
 
     public UnikeryDrawable(ObservedTextView textView, Conaco<ImageBitmap> conaco) {
@@ -91,13 +91,13 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
     }
 
     @Override
-    public void setTaskId(int id) {
-        mTaskId = id;
+    public int getTaskId() {
+        return mTaskId;
     }
 
     @Override
-    public int getTaskId() {
-        return mTaskId;
+    public void setTaskId(int id) {
+        mTaskId = id;
     }
 
     @Override
@@ -107,16 +107,20 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
     }
 
     @Override
-    public void onMiss(int source) {}
+    public void onMiss(int source) {
+    }
 
     @Override
-    public void onRequest() {}
+    public void onRequest() {
+    }
 
     @Override
-    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {}
+    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {
+    }
 
     @Override
-    public void onWait() {}
+    public void onWait() {
+    }
 
     @Override
     public boolean onGetValue(@NonNull ImageBitmap value, int source) {

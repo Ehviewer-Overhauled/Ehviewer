@@ -17,12 +17,15 @@
 package com.hippo.ehviewer.client.parser;
 
 import android.text.TextUtils;
+
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.yorozuya.StringUtils;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GalleryPageApiParser {
 

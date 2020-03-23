@@ -28,9 +28,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhUtils;
@@ -45,6 +47,7 @@ import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.collect.LongList;
 import com.hippo.yorozuya.collect.SparseJBArray;
 import com.hippo.yorozuya.collect.SparseJLArray;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -70,7 +73,11 @@ public class DownloadService extends Service implements DownloadManager.Download
     private static final int ID_DOWNLOADING = 1;
     private static final int ID_DOWNLOADED = 2;
     private static final int ID_509 = 3;
-
+    private final static SparseJBArray sItemStateArray = new SparseJBArray();
+    private final static SparseJLArray<String> sItemTitleArray = new SparseJLArray<>();
+    private static int sFailedCount;
+    private static int sFinishedCount;
+    private static int sDownloadedCount;
     @Nullable
     private NotificationManager mNotifyManager;
     @Nullable
@@ -81,15 +88,6 @@ public class DownloadService extends Service implements DownloadManager.Download
     private NotificationDelay mDownloadingDelay;
     private NotificationDelay mDownloadedDelay;
     private NotificationDelay m509Delay;
-
-
-    private final static SparseJBArray sItemStateArray = new SparseJBArray();
-    private final static SparseJLArray<String> sItemTitleArray = new SparseJLArray<>();
-
-    private static int sFailedCount;
-    private static int sFinishedCount;
-    private static int sDownloadedCount;
-
     private String CHANNEL_ID;
 
     public static void clear() {
@@ -104,9 +102,9 @@ public class DownloadService extends Service implements DownloadManager.Download
     public void onCreate() {
         super.onCreate();
 
-        CHANNEL_ID = getPackageName()+".download";
+        CHANNEL_ID = getPackageName() + ".download";
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mNotifyManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID, getString(R.string.download_service),
                     NotificationManager.IMPORTANCE_LOW));
         }
@@ -433,7 +431,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                     continue;
                 }
                 style.addLine(getString(fin ? R.string.stat_download_done_line_succeeded :
-                                R.string.stat_download_done_line_failed, title));
+                        R.string.stat_download_done_line_failed, title));
             }
         } else {
             style = null;
@@ -473,29 +471,21 @@ public class DownloadService extends Service implements DownloadManager.Download
     // Avoid frequent notification
     private static class NotificationDelay implements Runnable {
 
-        @IntDef({OPS_NOTIFY, OPS_CANCEL, OPS_START_FOREGROUND})
-        @Retention(RetentionPolicy.SOURCE)
-        private @interface Ops {}
-
         private static final int OPS_NOTIFY = 0;
         private static final int OPS_CANCEL = 1;
         private static final int OPS_START_FOREGROUND = 2;
-
         private static final long DELAY = 1000; // 1s
-
-        private Service mService;
         private final NotificationManager mNotifyManager;
         private final NotificationCompat.Builder mBuilder;
         private final int mId;
-
+        private Service mService;
         private long mLastTime;
         private boolean mPosted;
         // false for show, true for cancel
         @Ops
         private int mOps;
-
         public NotificationDelay(Service service, NotificationManager notifyManager,
-                NotificationCompat.Builder builder, int id) {
+                                 NotificationCompat.Builder builder, int id) {
             mService = service;
             mNotifyManager = notifyManager;
             mBuilder = builder;
@@ -576,6 +566,11 @@ public class DownloadService extends Service implements DownloadManager.Download
                     }
                     break;
             }
+        }
+
+        @IntDef({OPS_NOTIFY, OPS_CANCEL, OPS_START_FOREGROUND})
+        @Retention(RetentionPolicy.SOURCE)
+        private @interface Ops {
         }
     }
 }

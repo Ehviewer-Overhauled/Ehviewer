@@ -30,8 +30,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Interpolator;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
+
 import com.hippo.ehviewer.R;
 import com.hippo.hotspot.Hotspot;
 import com.hippo.hotspot.Hotspotable;
@@ -45,19 +47,20 @@ public class CheckTextView extends AppCompatTextView implements OnClickListener,
     private static final String STATE_KEY_CHECKED = "checked";
 
     private static final long ANIMATION_DURATION = 200;
-
+    Animator mAnimator;
+    private final Animator.AnimatorListener mAnimatorListener = new SimpleAnimatorListener() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            mAnimator = null;
+        }
+    };
     private int mMaskColor;
-
     private boolean mChecked = false;
     private boolean mPrepareAnimator = false;
-
     private Paint mPaint;
     private float mRadius = 0f;
     private float mX;
     private float mY;
-
-    Animator mAnimator;
-
     private float mMaxRadius;
 
     public CheckTextView(Context context, AttributeSet attrs) {
@@ -100,22 +103,15 @@ public class CheckTextView extends AppCompatTextView implements OnClickListener,
         mMaxRadius = MathUtils.coverageRadius(getWidth(), getHeight(), x, y);
     }
 
+    public float getRadius() {
+        return mRadius;
+    }
+
     public void setRadius(float radius) {
         float bigger = Math.max(mRadius, radius);
         mRadius = radius;
         invalidate((int) (mX - bigger), (int) (mY - bigger), (int) (mX + bigger), (int) (mY + bigger));
     }
-
-    public float getRadius() {
-        return mRadius;
-    }
-
-    private final Animator.AnimatorListener mAnimatorListener = new SimpleAnimatorListener() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            mAnimator = null;
-        }
-    };
 
     public void prepareAnimations() {
         mPrepareAnimator = true;
@@ -174,14 +170,10 @@ public class CheckTextView extends AppCompatTextView implements OnClickListener,
         }
     }
 
-    public void setChecked(boolean checked) {
-        setChecked(checked, true);
-    }
-
     /**
      * Changes the checked state of this CheckTextView.
      *
-     * @param checked checked true to check the CheckTextView, false to uncheck it
+     * @param checked   checked true to check the CheckTextView, false to uncheck it
      * @param animation true for show animation
      */
     public void setChecked(boolean checked, boolean animation) {
@@ -202,6 +194,10 @@ public class CheckTextView extends AppCompatTextView implements OnClickListener,
      */
     public boolean isChecked() {
         return mChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        setChecked(checked, true);
     }
 
     @Override

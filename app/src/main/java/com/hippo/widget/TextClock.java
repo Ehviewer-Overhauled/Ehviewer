@@ -30,7 +30,9 @@ import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.ViewDebug.ExportedProperty;
+
 import androidx.appcompat.widget.AppCompatTextView;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -57,8 +59,17 @@ public class TextClock extends AppCompatTextView {
     private boolean mAttached;
 
     private Calendar mTime;
-    private String mTimeZone;
+    private final Runnable mTicker = new Runnable() {
+        @Override
+        public void run() {
+            onTimeChanged();
 
+            long now = SystemClock.uptimeMillis();
+            long next = now + (1000 - now % 1000);
+
+            getHandler().postAtTime(mTicker, next);
+        }
+    };
     private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -72,7 +83,7 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
+    private String mTimeZone;
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -81,18 +92,6 @@ public class TextClock extends AppCompatTextView {
                 createTime(timeZone);
             }
             onTimeChanged();
-        }
-    };
-
-    private final Runnable mTicker = new Runnable() {
-        @Override
-        public void run() {
-            onTimeChanged();
-
-            long now = SystemClock.uptimeMillis();
-            long next = now + (1000 - now % 1000);
-
-            getHandler().postAtTime(mTicker, next);
         }
     };
 
@@ -168,7 +167,7 @@ public class TextClock extends AppCompatTextView {
     /**
      * Selects either one of {@link #getFormat12Hour()} or {@link #getFormat24Hour()}
      * depending on whether the user has selected 24-hour format.
-     *
+     * <p>
      * Calling this method does not schedule or unschedule the time ticker.
      */
     private void chooseFormat() {

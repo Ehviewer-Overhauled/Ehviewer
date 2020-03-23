@@ -26,8 +26,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -113,7 +115,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     @Nullable
     @Override
     public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_login, container, false);
 
         View loginForm = ViewUtils.$$(view, R.id.login_form);

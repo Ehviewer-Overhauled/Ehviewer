@@ -18,14 +18,16 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
 import android.widget.Toast;
+
 import androidx.annotation.StringRes;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
 
-public abstract class EhCallback<E extends SceneFragment, T> implements EhClient.Callback<T>  {
+public abstract class EhCallback<E extends SceneFragment, T> implements EhClient.Callback<T> {
 
     private final EhApplication mApplication;
     private final int mStageId;

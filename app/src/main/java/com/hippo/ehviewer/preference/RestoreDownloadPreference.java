@@ -19,10 +19,12 @@ package com.hippo.ehviewer.preference;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Parcel;
-import android.preference.Preference;
 import android.util.AttributeSet;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.preference.Preference;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.R;
@@ -36,11 +38,13 @@ import com.hippo.ehviewer.spider.SpiderQueen;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import okhttp3.OkHttpClient;
 
 public class RestoreDownloadPreference extends TaskPreference {
@@ -123,7 +127,7 @@ public class RestoreDownloadPreference extends TaskPreference {
                 return null;
             }
 
-            for (UniFile file: files) {
+            for (UniFile file : files) {
                 RestoreItem restoreItem = getRestoreItem(file);
                 if (null != restoreItem) {
                     restoreItemList.add(restoreItem);
@@ -184,27 +188,6 @@ public class RestoreDownloadPreference extends TaskPreference {
 
     private static class RestoreItem extends GalleryInfo {
 
-        public String dirname;
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeString(this.dirname);
-        }
-
-        public RestoreItem() {
-        }
-
-        protected RestoreItem(Parcel in) {
-            super(in);
-            this.dirname = in.readString();
-        }
-
         public static final Creator<RestoreItem> CREATOR = new Creator<RestoreItem>() {
             @Override
             public RestoreItem createFromParcel(Parcel source) {
@@ -216,5 +199,25 @@ public class RestoreDownloadPreference extends TaskPreference {
                 return new RestoreItem[size];
             }
         };
+        public String dirname;
+
+        public RestoreItem() {
+        }
+
+        protected RestoreItem(Parcel in) {
+            super(in);
+            this.dirname = in.readString();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(this.dirname);
+        }
     }
 }

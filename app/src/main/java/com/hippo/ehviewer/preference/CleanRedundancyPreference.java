@@ -19,7 +19,9 @@ package com.hippo.ehviewer.preference;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -91,7 +93,7 @@ public class CleanRedundancyPreference extends TaskPreference {
             }
 
             int count = 0;
-            for (UniFile f: files) {
+            for (UniFile f : files) {
                 if (clearFile(f)) {
                     ++count;
                 }
@@ -110,7 +112,7 @@ public class CleanRedundancyPreference extends TaskPreference {
             }
 
             Toast.makeText(mApplication, 0 == count ?
-                    mApplication.getString(R.string.settings_download_clean_redundancy_no_redundancy):
+                    mApplication.getString(R.string.settings_download_clean_redundancy_no_redundancy) :
                     mApplication.getString(R.string.settings_download_clean_redundancy_done, count), Toast.LENGTH_SHORT).show();
             super.onPostExecute(o);
         }

@@ -19,10 +19,13 @@ package com.hippo.ehviewer.client;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
+
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.data.GalleryInfo;
+
 import java.util.regex.Pattern;
 
 public class EhUtils {
@@ -64,20 +67,20 @@ public class EhUtils {
             EhConfig.ASIAN_PORN,
             EhConfig.NON_H,
             EhConfig.WESTERN,
-            UNKNOWN };
+            UNKNOWN};
 
     private static final String[][] CATEGORY_STRINGS = {
-            new String[] { "misc" },
-            new String[] { "doujinshi" },
-            new String[] { "manga" },
-            new String[] { "artistcg", "Artist CG Sets", "Artist CG" },
-            new String[] { "gamecg", "Game CG Sets", "Game CG" },
-            new String[] { "imageset", "Image Sets", "Image Set" },
-            new String[] { "cosplay" },
-            new String[] { "asianporn", "Asian Porn" },
-            new String[] { "non-h" },
-            new String[] { "western" },
-            new String[] { "unknown" }
+            new String[]{"misc"},
+            new String[]{"doujinshi"},
+            new String[]{"manga"},
+            new String[]{"artistcg", "Artist CG Sets", "Artist CG"},
+            new String[]{"gamecg", "Game CG Sets", "Game CG"},
+            new String[]{"imageset", "Image Sets", "Image Set"},
+            new String[]{"cosplay"},
+            new String[]{"asianporn", "Asian Porn"},
+            new String[]{"non-h"},
+            new String[]{"western"},
+            new String[]{"unknown"}
     };
 
     public static int getCategory(String type) {

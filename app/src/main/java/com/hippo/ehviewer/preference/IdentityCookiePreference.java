@@ -21,15 +21,19 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.preference.MessagePreference;
 import com.hippo.text.Html;
+
 import java.util.LinkedList;
 import java.util.List;
+
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 

@@ -18,7 +18,9 @@ package com.hippo.ehviewer.client.parser;
 
 import android.text.TextUtils;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryInfo;
@@ -27,15 +29,17 @@ import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.JsoupUtils;
 import com.hippo.yorozuya.NumberUtils;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 public class GalleryListParser {
 
@@ -47,25 +51,18 @@ public class GalleryListParser {
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
     private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("page=(\\d+)");
 
-    private static final String[][] FAVORITE_SLOT_RGB = new String[][] {
-        new String[] { "0", "0", "0"},
-        new String[] { "240", "0", "0"},
-        new String[] { "240", "160", "0"},
-        new String[] { "208", "208", "0"},
-        new String[] { "0", "128", "0"},
-        new String[] { "144", "240", "64"},
-        new String[] { "64", "176", "240"},
-        new String[] { "0", "0", "240"},
-        new String[] { "80", "0", "128"},
-        new String[] { "224", "128", "224"},
+    private static final String[][] FAVORITE_SLOT_RGB = new String[][]{
+            new String[]{"0", "0", "0"},
+            new String[]{"240", "0", "0"},
+            new String[]{"240", "160", "0"},
+            new String[]{"208", "208", "0"},
+            new String[]{"0", "128", "0"},
+            new String[]{"144", "240", "64"},
+            new String[]{"64", "176", "240"},
+            new String[]{"0", "0", "240"},
+            new String[]{"80", "0", "128"},
+            new String[]{"224", "128", "224"},
     };
-
-    public static class Result {
-        public int pages;
-        public int nextPage;
-        public boolean noWatchedTags;
-        public List<GalleryInfo> galleryInfoList;
-    }
 
     private static int parsePages(Document d, String body) throws ParseException {
         try {
@@ -356,5 +353,12 @@ public class GalleryListParser {
         }
 
         return result;
+    }
+
+    public static class Result {
+        public int pages;
+        public int nextPage;
+        public boolean noWatchedTags;
+        public List<GalleryInfo> galleryInfoList;
     }
 }

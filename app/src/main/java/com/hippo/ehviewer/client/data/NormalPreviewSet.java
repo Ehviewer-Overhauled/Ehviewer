@@ -25,6 +25,17 @@ import java.util.ArrayList;
 
 public class NormalPreviewSet extends PreviewSet {
 
+    public static final Creator<NormalPreviewSet> CREATOR = new Creator<NormalPreviewSet>() {
+        @Override
+        public NormalPreviewSet createFromParcel(Parcel source) {
+            return new NormalPreviewSet(source);
+        }
+
+        @Override
+        public NormalPreviewSet[] newArray(int size) {
+            return new NormalPreviewSet[size];
+        }
+    };
     private IntList mPositionList = new IntList();
     private ArrayList<String> mImageKeyList = new ArrayList<>();
     private ArrayList<String> mImageUrlList = new ArrayList<>();
@@ -33,6 +44,20 @@ public class NormalPreviewSet extends PreviewSet {
     private IntList mClipWidthList = new IntList();
     private IntList mClipHeightList = new IntList();
     private ArrayList<String> mPageUrlList = new ArrayList<>();
+
+    public NormalPreviewSet() {
+    }
+
+    protected NormalPreviewSet(Parcel in) {
+        this.mPositionList = in.readParcelable(IntList.class.getClassLoader());
+        this.mImageKeyList = in.createStringArrayList();
+        this.mImageUrlList = in.createStringArrayList();
+        this.mOffsetXList = in.readParcelable(IntList.class.getClassLoader());
+        this.mOffsetYList = in.readParcelable(IntList.class.getClassLoader());
+        this.mClipWidthList = in.readParcelable(IntList.class.getClassLoader());
+        this.mClipHeightList = in.readParcelable(IntList.class.getClassLoader());
+        this.mPageUrlList = in.createStringArrayList();
+    }
 
     private String getImageKey(String imageUrl) {
         int index = imageUrl.indexOf('/');
@@ -44,7 +69,7 @@ public class NormalPreviewSet extends PreviewSet {
     }
 
     public void addItem(int position, String imageUrl, int xOffset, int yOffset, int width,
-            int height, String pageUrl) {
+                        int height, String pageUrl) {
         mPositionList.add(position);
         mImageKeyList.add(getImageKey(imageUrl));
         mImageUrlList.add(imageUrl);
@@ -107,30 +132,4 @@ public class NormalPreviewSet extends PreviewSet {
         dest.writeParcelable(this.mClipHeightList, flags);
         dest.writeStringList(this.mPageUrlList);
     }
-
-    public NormalPreviewSet() {
-    }
-
-    protected NormalPreviewSet(Parcel in) {
-        this.mPositionList = in.readParcelable(IntList.class.getClassLoader());
-        this.mImageKeyList = in.createStringArrayList();
-        this.mImageUrlList = in.createStringArrayList();
-        this.mOffsetXList = in.readParcelable(IntList.class.getClassLoader());
-        this.mOffsetYList = in.readParcelable(IntList.class.getClassLoader());
-        this.mClipWidthList = in.readParcelable(IntList.class.getClassLoader());
-        this.mClipHeightList = in.readParcelable(IntList.class.getClassLoader());
-        this.mPageUrlList = in.createStringArrayList();
-    }
-
-    public static final Creator<NormalPreviewSet> CREATOR = new Creator<NormalPreviewSet>() {
-        @Override
-        public NormalPreviewSet createFromParcel(Parcel source) {
-            return new NormalPreviewSet(source);
-        }
-
-        @Override
-        public NormalPreviewSet[] newArray(int size) {
-            return new NormalPreviewSet[size];
-        }
-    };
 }

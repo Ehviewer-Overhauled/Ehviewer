@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
+
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhConfig;
 import com.hippo.widget.CheckTextView;
@@ -81,9 +82,9 @@ public class CategoryTable extends TableLayout implements View.OnLongClickListen
         mAsianPorn = (CheckTextView) row4.getChildAt(0);
         mMisc = (CheckTextView) row4.getChildAt(1);
 
-        mOptions = new CheckTextView[] {
-            mDoujinshi, mManga, mArtistCG, mGameCG, mWestern,
-            mNonH, mImageSets, mCosplay, mAsianPorn, mMisc
+        mOptions = new CheckTextView[]{
+                mDoujinshi, mManga, mArtistCG, mGameCG, mWestern,
+                mNonH, mImageSets, mCosplay, mAsianPorn, mMisc
         };
 
         for (CheckTextView option : mOptions) {
@@ -106,25 +107,8 @@ public class CategoryTable extends TableLayout implements View.OnLongClickListen
     }
 
     /**
-     * Set each button checked or not according to category.
-     *
-     * @param category target category
-     */
-    public void setCategory(int category) {
-        mDoujinshi.setChecked(!NumberUtils.int2boolean(category & EhConfig.DOUJINSHI), false);
-        mManga.setChecked(!NumberUtils.int2boolean(category & EhConfig.MANGA), false);
-        mArtistCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.ARTIST_CG), false);
-        mGameCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.GAME_CG), false);
-        mWestern.setChecked(!NumberUtils.int2boolean(category & EhConfig.WESTERN), false);
-        mNonH.setChecked(!NumberUtils.int2boolean(category & EhConfig.NON_H), false);
-        mImageSets.setChecked(!NumberUtils.int2boolean(category & EhConfig.IMAGE_SET), false);
-        mCosplay.setChecked(!NumberUtils.int2boolean(category & EhConfig.COSPLAY), false);
-        mAsianPorn.setChecked(!NumberUtils.int2boolean(category & EhConfig.ASIAN_PORN), false);
-        mMisc.setChecked(!NumberUtils.int2boolean(category & EhConfig.MISC), false);
-    }
-
-    /**
      * Get category according to button.
+     *
      * @return the category of this view
      */
     public int getCategory() {
@@ -140,6 +124,24 @@ public class CategoryTable extends TableLayout implements View.OnLongClickListen
         if (!mAsianPorn.isChecked()) category |= EhConfig.ASIAN_PORN;
         if (!mMisc.isChecked()) category |= EhConfig.MISC;
         return category;
+    }
+
+    /**
+     * Set each button checked or not according to category.
+     *
+     * @param category target category
+     */
+    public void setCategory(int category) {
+        mDoujinshi.setChecked(!NumberUtils.int2boolean(category & EhConfig.DOUJINSHI), false);
+        mManga.setChecked(!NumberUtils.int2boolean(category & EhConfig.MANGA), false);
+        mArtistCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.ARTIST_CG), false);
+        mGameCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.GAME_CG), false);
+        mWestern.setChecked(!NumberUtils.int2boolean(category & EhConfig.WESTERN), false);
+        mNonH.setChecked(!NumberUtils.int2boolean(category & EhConfig.NON_H), false);
+        mImageSets.setChecked(!NumberUtils.int2boolean(category & EhConfig.IMAGE_SET), false);
+        mCosplay.setChecked(!NumberUtils.int2boolean(category & EhConfig.COSPLAY), false);
+        mAsianPorn.setChecked(!NumberUtils.int2boolean(category & EhConfig.ASIAN_PORN), false);
+        mMisc.setChecked(!NumberUtils.int2boolean(category & EhConfig.MISC), false);
     }
 
     @Override

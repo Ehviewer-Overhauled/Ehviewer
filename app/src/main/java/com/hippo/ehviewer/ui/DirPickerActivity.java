@@ -23,16 +23,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ripple.Ripple;
 import com.hippo.widget.DirExplorer;
 import com.hippo.yorozuya.FileUtils;
+
 import java.io.File;
 
 public class DirPickerActivity extends ToolbarActivity

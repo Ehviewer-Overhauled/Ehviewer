@@ -19,8 +19,10 @@ package com.hippo.ehviewer.client.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+
 import com.hippo.ehviewer.client.EhConfig;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
@@ -29,6 +31,7 @@ import com.hippo.ehviewer.widget.AdvanceSearchTable;
 import com.hippo.network.UrlBuilder;
 import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,10 +40,6 @@ import java.net.URLEncoder;
 
 public class ListUrlBuilder implements Cloneable, Parcelable {
 
-    @IntDef({MODE_NORMAL, MODE_UPLOADER, MODE_TAG, MODE_WHATS_HOT, MODE_IMAGE_SEARCH, MODE_SUBSCRIPTION})
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface Mode {}
-
     // Mode
     public static final int MODE_NORMAL = 0x0;
     public static final int MODE_UPLOADER = 0x1;
@@ -48,10 +47,19 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     public static final int MODE_WHATS_HOT = 0x3;
     public static final int MODE_IMAGE_SEARCH = 0x4;
     public static final int MODE_SUBSCRIPTION = 0x5;
-
     public static final int DEFAULT_ADVANCE = AdvanceSearchTable.SNAME | AdvanceSearchTable.STAGS;
     public static final int DEFAULT_MIN_RATING = 2;
+    public static final Creator<ListUrlBuilder> CREATOR = new Creator<ListUrlBuilder>() {
+        @Override
+        public ListUrlBuilder createFromParcel(Parcel source) {
+            return new ListUrlBuilder(source);
+        }
 
+        @Override
+        public ListUrlBuilder[] newArray(int size) {
+            return new ListUrlBuilder[size];
+        }
+    };
     @Mode
     private int mMode = MODE_NORMAL;
 
@@ -69,6 +77,25 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     private boolean mUseSimilarityScan;
     private boolean mOnlySearchCovers;
     private boolean mShowExpunged;
+
+    public ListUrlBuilder() {
+    }
+
+    @SuppressWarnings("WrongConstant")
+    protected ListUrlBuilder(Parcel in) {
+        this.mMode = in.readInt();
+        this.mPageIndex = in.readInt();
+        this.mCategory = in.readInt();
+        this.mKeyword = in.readString();
+        this.mAdvanceSearch = in.readInt();
+        this.mMinRating = in.readInt();
+        this.mPageFrom = in.readInt();
+        this.mPageTo = in.readInt();
+        this.mImagePath = in.readString();
+        this.mUseSimilarityScan = in.readByte() != 0;
+        this.mOnlySearchCovers = in.readByte() != 0;
+        this.mShowExpunged = in.readByte() != 0;
+    }
 
     /**
      * Make this ListUrlBuilder point to homepage
@@ -197,6 +224,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
 
     /**
      * Make them the same
+     *
      * @param lub The template
      */
     public void set(ListUrlBuilder lub) {
@@ -263,11 +291,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         if (q.pageFrom != mPageFrom) {
             return false;
         }
-        if (q.pageTo != mPageTo) {
-            return false;
-        }
-
-        return true;
+        return q.pageTo == mPageTo;
     }
 
     /**
@@ -497,17 +521,23 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 // Advance search
                 if (mAdvanceSearch != -1) {
                     ub.addQuery("advsearch", "1");
-                    if((mAdvanceSearch & AdvanceSearchTable.SNAME) != 0) ub.addQuery("f_sname", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.STAGS) != 0) ub.addQuery("f_stags", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SDESC) != 0) ub.addQuery("f_sdesc", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.STORR) != 0) ub.addQuery("f_storr", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.STO) != 0) ub.addQuery("f_sto", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SDT1) != 0) ub.addQuery("f_sdt1", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SDT2) != 0) ub.addQuery("f_sdt2", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SH) != 0) ub.addQuery("f_sh", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SFL) != 0) ub.addQuery("f_sfl", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SFU) != 0) ub.addQuery("f_sfu", "on");
-                    if((mAdvanceSearch & AdvanceSearchTable.SFT) != 0) ub.addQuery("f_sft", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SNAME) != 0)
+                        ub.addQuery("f_sname", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.STAGS) != 0)
+                        ub.addQuery("f_stags", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SDESC) != 0)
+                        ub.addQuery("f_sdesc", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.STORR) != 0)
+                        ub.addQuery("f_storr", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.STO) != 0) ub.addQuery("f_sto", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SDT1) != 0)
+                        ub.addQuery("f_sdt1", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SDT2) != 0)
+                        ub.addQuery("f_sdt2", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SH) != 0) ub.addQuery("f_sh", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SFL) != 0) ub.addQuery("f_sfl", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SFU) != 0) ub.addQuery("f_sfu", "on");
+                    if ((mAdvanceSearch & AdvanceSearchTable.SFT) != 0) ub.addQuery("f_sft", "on");
                     // Set min star
                     if (mMinRating != -1) {
                         ub.addQuery("f_sr", "on");
@@ -576,34 +606,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         dest.writeByte(mShowExpunged ? (byte) 1 : (byte) 0);
     }
 
-    public ListUrlBuilder() {
+    @IntDef({MODE_NORMAL, MODE_UPLOADER, MODE_TAG, MODE_WHATS_HOT, MODE_IMAGE_SEARCH, MODE_SUBSCRIPTION})
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface Mode {
     }
-
-    @SuppressWarnings("WrongConstant")
-    protected ListUrlBuilder(Parcel in) {
-        this.mMode = in.readInt();
-        this.mPageIndex = in.readInt();
-        this.mCategory = in.readInt();
-        this.mKeyword = in.readString();
-        this.mAdvanceSearch = in.readInt();
-        this.mMinRating = in.readInt();
-        this.mPageFrom = in.readInt();
-        this.mPageTo = in.readInt();
-        this.mImagePath = in.readString();
-        this.mUseSimilarityScan = in.readByte() != 0;
-        this.mOnlySearchCovers = in.readByte() != 0;
-        this.mShowExpunged = in.readByte() != 0;
-    }
-
-    public static final Creator<ListUrlBuilder> CREATOR = new Creator<ListUrlBuilder>() {
-        @Override
-        public ListUrlBuilder createFromParcel(Parcel source) {
-            return new ListUrlBuilder(source);
-        }
-
-        @Override
-        public ListUrlBuilder[] newArray(int size) {
-            return new ListUrlBuilder[size];
-        }
-    };
 }

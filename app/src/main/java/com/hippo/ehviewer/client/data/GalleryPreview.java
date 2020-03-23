@@ -23,6 +23,17 @@ import com.hippo.widget.LoadImageView;
 
 public class GalleryPreview implements Parcelable {
 
+    public static final Parcelable.Creator<GalleryPreview> CREATOR = new Parcelable.Creator<GalleryPreview>() {
+        @Override
+        public GalleryPreview createFromParcel(Parcel source) {
+            return new GalleryPreview(source);
+        }
+
+        @Override
+        public GalleryPreview[] newArray(int size) {
+            return new GalleryPreview[size];
+        }
+    };
     String imageKey;
     String imageUrl;
     String pageUrl;
@@ -31,6 +42,19 @@ public class GalleryPreview implements Parcelable {
     int offsetY = Integer.MIN_VALUE;
     int clipWidth = Integer.MIN_VALUE;
     int clipHeight = Integer.MIN_VALUE;
+
+    public GalleryPreview() {
+    }
+
+    protected GalleryPreview(Parcel in) {
+        this.imageUrl = in.readString();
+        this.pageUrl = in.readString();
+        this.position = in.readInt();
+        this.offsetX = in.readInt();
+        this.offsetY = in.readInt();
+        this.clipWidth = in.readInt();
+        this.clipHeight = in.readInt();
+    }
 
     public int getPosition() {
         return position;
@@ -56,29 +80,4 @@ public class GalleryPreview implements Parcelable {
         dest.writeInt(this.clipWidth);
         dest.writeInt(this.clipHeight);
     }
-
-    public GalleryPreview() {
-    }
-
-    protected GalleryPreview(Parcel in) {
-        this.imageUrl = in.readString();
-        this.pageUrl = in.readString();
-        this.position = in.readInt();
-        this.offsetX = in.readInt();
-        this.offsetY = in.readInt();
-        this.clipWidth = in.readInt();
-        this.clipHeight = in.readInt();
-    }
-
-    public static final Parcelable.Creator<GalleryPreview> CREATOR = new Parcelable.Creator<GalleryPreview>() {
-        @Override
-        public GalleryPreview createFromParcel(Parcel source) {
-            return new GalleryPreview(source);
-        }
-
-        @Override
-        public GalleryPreview[] newArray(int size) {
-            return new GalleryPreview[size];
-        }
-    };
 }

@@ -27,26 +27,16 @@ import java.util.List;
 
 public final class EhFilter {
 
-    private static final String TAG = EhFilter.class.getSimpleName();
-
     public static final int MODE_TITLE = 0;
     public static final int MODE_UPLOADER = 1;
     public static final int MODE_TAG = 2;
     public static final int MODE_TAG_NAMESPACE = 3;
-
+    private static final String TAG = EhFilter.class.getSimpleName();
+    private static EhFilter sInstance;
     private final List<Filter> mTitleFilterList = new ArrayList<>();
     private final List<Filter> mUploaderFilterList = new ArrayList<>();
     private final List<Filter> mTagFilterList = new ArrayList<>();
     private final List<Filter> mTagNamespaceFilterList = new ArrayList<>();
-
-    private static EhFilter sInstance;
-
-    public static EhFilter getInstance() {
-        if (sInstance == null) {
-            sInstance = new EhFilter();
-        }
-        return sInstance;
-    }
 
     private EhFilter() {
         List<Filter> list = EhDB.getAllFilter();
@@ -73,6 +63,13 @@ public final class EhFilter {
                     break;
             }
         }
+    }
+
+    public static EhFilter getInstance() {
+        if (sInstance == null) {
+            sInstance = new EhFilter();
+        }
+        return sInstance;
     }
 
     public List<Filter> getTitleFilterList() {
@@ -216,11 +213,7 @@ public final class EhFilter {
                 !tagNamespace.equals(filterNamespace)) {
             return false;
         }
-        if (!tagName.equals(filterName)) {
-            return false;
-        }
-
-        return true;
+        return tagName.equals(filterName);
     }
 
     public synchronized boolean filterTag(GalleryInfo info) {
@@ -232,7 +225,7 @@ public final class EhFilter {
         String[] tags = info.simpleTags;
         List<Filter> filters = mTagFilterList;
         if (null != tags && filters.size() > 0) {
-            for (String tag: tags) {
+            for (String tag : tags) {
                 for (int i = 0, n = filters.size(); i < n; i++) {
                     if (filters.get(i).enable && matchTag(tag, filters.get(i).text)) {
                         return false;
@@ -267,7 +260,7 @@ public final class EhFilter {
         String[] tags = info.simpleTags;
         List<Filter> filters = mTagNamespaceFilterList;
         if (null != tags && filters.size() > 0) {
-            for (String tag: tags) {
+            for (String tag : tags) {
                 for (int i = 0, n = filters.size(); i < n; i++) {
                     if (filters.get(i).enable && matchTagNamespace(tag, filters.get(i).text)) {
                         return false;

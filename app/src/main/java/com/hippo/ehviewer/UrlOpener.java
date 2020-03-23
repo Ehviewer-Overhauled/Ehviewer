@@ -22,7 +22,9 @@ import android.net.Uri;
 import android.provider.Browser;
 import android.text.TextUtils;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;

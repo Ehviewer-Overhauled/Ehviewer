@@ -24,7 +24,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
 
@@ -36,7 +38,7 @@ public class ListCheckBoxDialogBuilder extends AlertDialog.Builder {
 
     @SuppressLint("InflateParams")
     public ListCheckBoxDialogBuilder(Context context, CharSequence[] items,
-            final OnItemClickListener listener, String checkText, boolean checked) {
+                                     final OnItemClickListener listener, String checkText, boolean checked) {
         super(context);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_list_checkbox_builder, null);
         setView(view);

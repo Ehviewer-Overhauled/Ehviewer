@@ -18,14 +18,17 @@ package com.hippo.scene;
 
 import android.os.Bundle;
 import android.view.View;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.collect.IntList;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -33,26 +36,24 @@ import java.util.List;
 
 public class SceneFragment extends Fragment {
 
-    @IntDef({LAUNCH_MODE_STANDARD, LAUNCH_MODE_SINGLE_TOP, LAUNCH_MODE_SINGLE_TASK})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface LaunchMode {}
-
     public static final int LAUNCH_MODE_STANDARD = 0;
     public static final int LAUNCH_MODE_SINGLE_TOP = 1;
     public static final int LAUNCH_MODE_SINGLE_TASK = 2;
-
-    /** Standard scene result: operation canceled. */
-    public static final int RESULT_CANCELED  = 0;
-    /** Standard scene result: operation succeeded. */
+    /**
+     * Standard scene result: operation canceled.
+     */
+    public static final int RESULT_CANCELED = 0;
+    /**
+     * Standard scene result: operation succeeded.
+     */
     public static final int RESULT_OK = -1;
-
     int resultCode = RESULT_CANCELED;
     Bundle result = null;
-
     List<String> mRequestSceneTagList = new ArrayList<>(0);
     IntList mRequestCodeList = new IntList(0);
 
-    public void onNewArguments(@NonNull Bundle args) {}
+    public void onNewArguments(@NonNull Bundle args) {
+    }
 
     public void startScene(Announcer announcer) {
         FragmentActivity activity = getActivity();
@@ -155,5 +156,10 @@ public class SceneFragment extends Fragment {
     public void setResult(int resultCode, Bundle result) {
         this.resultCode = resultCode;
         this.result = result;
+    }
+
+    @IntDef({LAUNCH_MODE_STANDARD, LAUNCH_MODE_SINGLE_TOP, LAUNCH_MODE_SINGLE_TASK})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface LaunchMode {
     }
 }

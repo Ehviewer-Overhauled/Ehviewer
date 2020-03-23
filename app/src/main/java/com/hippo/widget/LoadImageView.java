@@ -26,9 +26,11 @@ import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+
 import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
 import com.hippo.conaco.DataContainer;
@@ -40,38 +42,28 @@ import com.hippo.image.ImageBitmap;
 import com.hippo.image.ImageDrawable;
 import com.hippo.image.RecycledException;
 import com.hippo.util.DrawableManager;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 public class LoadImageView extends FixedAspectImageView implements Unikery<ImageBitmap>,
         View.OnClickListener, View.OnLongClickListener, Animatable {
 
-    private static final String TAG = LoadImageView.class.getSimpleName();
-
-    @IntDef({RETRY_TYPE_NONE, RETRY_TYPE_CLICK, RETRY_TYPE_LONG_CLICK})
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface RetryType {}
-
     public static final int RETRY_TYPE_NONE = 0;
     public static final int RETRY_TYPE_CLICK = 1;
     public static final int RETRY_TYPE_LONG_CLICK = 2;
-
+    private static final String TAG = LoadImageView.class.getSimpleName();
     private int mTaskId = Unikery.INVALID_ID;
-
     private Conaco<ImageBitmap> mConaco;
-
     private String mKey;
     private String mUrl;
     private DataContainer mContainer;
     private boolean mUseNetwork;
-
     private int mOffsetX = Integer.MIN_VALUE;
     private int mOffsetY = Integer.MIN_VALUE;
     private int mClipWidth = Integer.MIN_VALUE;
     private int mClipHeight = Integer.MIN_VALUE;
-
     private int mRetryType;
-
     private boolean mFailed;
 
     public LoadImageView(Context context) {
@@ -101,13 +93,13 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     @Override
-    public void setTaskId(int id) {
-        mTaskId = id;
+    public int getTaskId() {
+        return mTaskId;
     }
 
     @Override
-    public int getTaskId() {
-        return mTaskId;
+    public void setTaskId(int id) {
+        mTaskId = id;
     }
 
     @Override
@@ -265,10 +257,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     @Override
-    public void onRequest() {}
+    public void onRequest() {
+    }
 
     @Override
-    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {}
+    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {
+    }
 
     @Override
     public void onWait() {
@@ -368,7 +362,14 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         return true;
     }
 
-    public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) { }
+    public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) {
+    }
 
-    public void onPreSetImageResource(int resId, boolean isTarget) { }
+    public void onPreSetImageResource(int resId, boolean isTarget) {
+    }
+
+    @IntDef({RETRY_TYPE_NONE, RETRY_TYPE_CLICK, RETRY_TYPE_LONG_CLICK})
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface RetryType {
+    }
 }

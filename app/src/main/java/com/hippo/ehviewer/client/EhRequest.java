@@ -20,18 +20,24 @@ import com.hippo.ehviewer.Settings;
 
 public class EhRequest {
 
+    EhClient.Task task;
     private int mMethod;
     private Object[] mArgs;
     private EhClient.Callback mCallback;
     private EhConfig mEhConfig;
-
-    EhClient.Task task;
-
     private boolean mCancel = false;
+
+    public int getMethod() {
+        return mMethod;
+    }
 
     public EhRequest setMethod(int method) {
         mMethod = method;
         return this;
+    }
+
+    public Object[] getArgs() {
+        return mArgs;
     }
 
     public EhRequest setArgs(Object... args) {
@@ -39,30 +45,22 @@ public class EhRequest {
         return this;
     }
 
+    public EhClient.Callback getCallback() {
+        return mCallback;
+    }
+
     public EhRequest setCallback(EhClient.Callback callback) {
         mCallback = callback;
         return this;
     }
 
+    public EhConfig getEhConfig() {
+        return mEhConfig != null ? mEhConfig : Settings.getEhConfig();
+    }
+
     public EhRequest setEhConfig(EhConfig ehConfig) {
         mEhConfig = ehConfig;
         return this;
-    }
-
-    public int getMethod() {
-        return mMethod;
-    }
-
-    public Object[] getArgs() {
-        return mArgs;
-    }
-
-    public EhClient.Callback getCallback() {
-        return mCallback;
-    }
-
-    public EhConfig getEhConfig() {
-        return mEhConfig != null ? mEhConfig : Settings.getEhConfig();
     }
 
     public void cancel() {

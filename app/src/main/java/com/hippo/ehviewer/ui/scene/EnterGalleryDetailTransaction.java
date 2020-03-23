@@ -18,10 +18,12 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
 import android.view.View;
+
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
+
 import com.hippo.ehviewer.R;
 import com.hippo.scene.TransitionHelper;
 
@@ -35,7 +37,7 @@ class EnterGalleryDetailTransaction implements TransitionHelper {
 
     @Override
     public boolean onTransition(Context context, FragmentTransaction transaction,
-            Fragment exit, Fragment enter) {
+                                Fragment exit, Fragment enter) {
         if (mThumb == null || !(enter instanceof GalleryDetailScene)) {
             return false;
         }

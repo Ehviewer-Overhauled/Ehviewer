@@ -28,8 +28,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
+
 import java.text.NumberFormat;
 
 /**
@@ -40,12 +43,14 @@ import java.text.NumberFormat;
  */
 public class ProgressDialog extends AlertDialog {
 
-    /** Creates a ProgressDialog with a circular, spinning progress
+    /**
+     * Creates a ProgressDialog with a circular, spinning progress
      * bar. This is the default.
      */
     public static final int STYLE_SPINNER = 0;
 
-    /** Creates a ProgressDialog with a horizontal progress bar.
+    /**
+     * Creates a ProgressDialog with a horizontal progress bar.
      */
     public static final int STYLE_HORIZONTAL = 1;
 
@@ -81,30 +86,24 @@ public class ProgressDialog extends AlertDialog {
         initFormats();
     }
 
-    private void initFormats() {
-        mProgressNumberFormat = "%1d/%2d";
-        mProgressPercentFormat = NumberFormat.getPercentInstance();
-        mProgressPercentFormat.setMaximumFractionDigits(0);
-    }
-
     public static ProgressDialog show(Context context, CharSequence title,
-            CharSequence message) {
+                                      CharSequence message) {
         return show(context, title, message, false);
     }
 
     public static ProgressDialog show(Context context, CharSequence title,
-            CharSequence message, boolean indeterminate) {
+                                      CharSequence message, boolean indeterminate) {
         return show(context, title, message, indeterminate, false, null);
     }
 
     public static ProgressDialog show(Context context, CharSequence title,
-            CharSequence message, boolean indeterminate, boolean cancelable) {
+                                      CharSequence message, boolean indeterminate, boolean cancelable) {
         return show(context, title, message, indeterminate, cancelable, null);
     }
 
     public static ProgressDialog show(Context context, CharSequence title,
-            CharSequence message, boolean indeterminate,
-            boolean cancelable, OnCancelListener cancelListener) {
+                                      CharSequence message, boolean indeterminate,
+                                      boolean cancelable, OnCancelListener cancelListener) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setTitle(title);
         dialog.setMessage(message);
@@ -113,6 +112,12 @@ public class ProgressDialog extends AlertDialog {
         dialog.setOnCancelListener(cancelListener);
         dialog.show();
         return dialog;
+    }
+
+    private void initFormats() {
+        mProgressNumberFormat = "%1d/%2d";
+        mProgressPercentFormat = NumberFormat.getPercentInstance();
+        mProgressPercentFormat.setMaximumFractionDigits(0);
     }
 
     @Override
@@ -200,6 +205,13 @@ public class ProgressDialog extends AlertDialog {
         mHasStarted = false;
     }
 
+    public int getProgress() {
+        if (mProgress != null) {
+            return mProgress.getProgress();
+        }
+        return mProgressVal;
+    }
+
     public void setProgress(int value) {
         if (mHasStarted) {
             mProgress.setProgress(value);
@@ -209,6 +221,13 @@ public class ProgressDialog extends AlertDialog {
         }
     }
 
+    public int getSecondaryProgress() {
+        if (mProgress != null) {
+            return mProgress.getSecondaryProgress();
+        }
+        return mSecondaryProgressVal;
+    }
+
     public void setSecondaryProgress(int secondaryProgress) {
         if (mProgress != null) {
             mProgress.setSecondaryProgress(secondaryProgress);
@@ -216,20 +235,6 @@ public class ProgressDialog extends AlertDialog {
         } else {
             mSecondaryProgressVal = secondaryProgress;
         }
-    }
-
-    public int getProgress() {
-        if (mProgress != null) {
-            return mProgress.getProgress();
-        }
-        return mProgressVal;
-    }
-
-    public int getSecondaryProgress() {
-        if (mProgress != null) {
-            return mProgress.getSecondaryProgress();
-        }
-        return mSecondaryProgressVal;
     }
 
     public int getMax() {
@@ -282,19 +287,19 @@ public class ProgressDialog extends AlertDialog {
         }
     }
 
+    public boolean isIndeterminate() {
+        if (mProgress != null) {
+            return mProgress.isIndeterminate();
+        }
+        return mIndeterminate;
+    }
+
     public void setIndeterminate(boolean indeterminate) {
         if (mProgress != null) {
             mProgress.setIndeterminate(indeterminate);
         } else {
             mIndeterminate = indeterminate;
         }
-    }
-
-    public boolean isIndeterminate() {
-        if (mProgress != null) {
-            return mProgress.isIndeterminate();
-        }
-        return mIndeterminate;
     }
 
     @Override
@@ -318,9 +323,10 @@ public class ProgressDialog extends AlertDialog {
      * Change the format of the small text showing current and maximum units
      * of progress.  The default is "%1d/%2d".
      * Should not be called during the number is progressing.
+     *
      * @param format A string passed to {@link String#format String.format()};
-     * use "%1d" for the current number and "%2d" for the maximum.  If null,
-     * nothing will be shown.
+     *               use "%1d" for the current number and "%2d" for the maximum.  If null,
+     *               nothing will be shown.
      */
     public void setProgressNumberFormat(String format) {
         mProgressNumberFormat = format;
@@ -332,8 +338,9 @@ public class ProgressDialog extends AlertDialog {
      * The default is
      * {@link NumberFormat#getPercentInstance() NumberFormat.getPercentageInstnace().}
      * Should not be called during the number is progressing.
+     *
      * @param format An instance of a {@link NumberFormat} to generate the
-     * percentage text.  If null, nothing will be shown.
+     *               percentage text.  If null, nothing will be shown.
      */
     public void setProgressPercentFormat(NumberFormat format) {
         mProgressPercentFormat = format;
