@@ -34,6 +34,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
@@ -308,23 +309,15 @@ public class DownloadLabelsScene extends ToolbarScene {
                 new RenameLabelDialogHelper(builder, dialog, raw.getLabel(), position);
             } else if (delete == v) {
                 final DownloadLabel label = mList.get(position);
-                new AlertDialog.Builder(context)
+                new MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.delete_label_title)
                         .setMessage(getString(R.string.delete_label_message, label.getLabel()))
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                EhApplication.getDownloadManager(context).deleteLabel(label.getLabel());
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> EhApplication.getDownloadManager(context).deleteLabel(label.getLabel()))
+                        .setOnDismissListener(dialog -> {
+                            if (null != mAdapter) {
+                                mAdapter.notifyDataSetChanged();
                             }
-                        })
-                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                if (null != mAdapter) {
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                                updateView();
-                            }
+                            updateView();
                         }).show();
             }
         }

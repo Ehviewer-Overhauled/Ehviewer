@@ -31,6 +31,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -207,16 +208,13 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         hideSoftInput();
 
         if (!checkIpbMemberId(ipbMemberId) || !(checkIpbPassHash(ipbPassHash))) {
-            new AlertDialog.Builder(context).setTitle(R.string.waring)
+            new MaterialAlertDialogBuilder(context).setTitle(R.string.waring)
                     .setMessage(R.string.wrong_cookie_warning)
                     .setNegativeButton(R.string.i_dont_think_so, null)
-                    .setPositiveButton(R.string.i_will_check_it, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            storeCookie(ipbMemberId, ipbPassHash, igneous);
-                            setResult(RESULT_OK, null);
-                            finish();
-                        }
+                    .setPositiveButton(R.string.i_will_check_it, (dialog, which) -> {
+                        storeCookie(ipbMemberId, ipbPassHash, igneous);
+                        setResult(RESULT_OK, null);
+                        finish();
                     }).show();
         } else {
             storeCookie(ipbMemberId, ipbPassHash, igneous);

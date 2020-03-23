@@ -68,12 +68,6 @@
         android:title="@string/black_dark_theme"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
-        android:key="apply_nav_bar_theme_color"
-        android:title="@string/settings_eh_apply_nav_bar_theme_color"
-        android:defaultValue="false"
-        app:iconSpaceReserved="false"/>
-
     <SimpleMenuPreference
         android:key="launch_page"
         android:title="@string/settings_eh_launch_page"

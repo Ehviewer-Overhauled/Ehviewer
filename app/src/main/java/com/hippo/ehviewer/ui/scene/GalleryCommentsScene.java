@@ -53,6 +53,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
@@ -311,7 +312,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             }
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(context);
         context = builder.getContext();
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
@@ -373,36 +374,33 @@ public final class GalleryCommentsScene extends ToolbarScene
             menuId.add(R.id.check_vote_status);
         }
 
-        new AlertDialog.Builder(context)
-                .setItems(menu.toArray(new String[menu.size()]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which < 0 || which >= menuId.size()) {
-                            return;
-                        }
-                        int id = menuId.get(which);
-                        switch (id) {
-                            case R.id.copy:
-                                ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                                cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
-                                showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
-                                break;
-                            case R.id.vote_up:
-                                voteComment(comment.id, 1);
-                                break;
-                            case R.id.vote_down:
-                                voteComment(comment.id, -1);
-                                break;
-                            case R.id.check_vote_status:
-                                showVoteStatusDialog(context, comment.voteState);
-                                break;
-                            case R.id.edit_comment:
-                                prepareEditComment(comment.id);
-                                if (!mInAnimation && mEditPanel != null && mEditPanel.getVisibility() != View.VISIBLE) {
-                                    showEditPanel(true);
-                                }
-                                break;
-                        }
+        new MaterialAlertDialogBuilder(context)
+                .setItems(menu.toArray(new String[menu.size()]), (dialog, which) -> {
+                    if (which < 0 || which >= menuId.size()) {
+                        return;
+                    }
+                    int id = menuId.get(which);
+                    switch (id) {
+                        case R.id.copy:
+                            ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                            cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
+                            showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                            break;
+                        case R.id.vote_up:
+                            voteComment(comment.id, 1);
+                            break;
+                        case R.id.vote_down:
+                            voteComment(comment.id, -1);
+                            break;
+                        case R.id.check_vote_status:
+                            showVoteStatusDialog(context, comment.voteState);
+                            break;
+                        case R.id.edit_comment:
+                            prepareEditComment(comment.id);
+                            if (!mInAnimation && mEditPanel != null && mEditPanel.getVisibility() != View.VISIBLE) {
+                                showEditPanel(true);
+                            }
+                            break;
                     }
                 }).show();
     }

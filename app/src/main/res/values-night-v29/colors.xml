@@ -1,0 +1,3 @@
+<resources>
+    <color name="colorNavigationBar">@android:color/transparent</color>
+</resources>

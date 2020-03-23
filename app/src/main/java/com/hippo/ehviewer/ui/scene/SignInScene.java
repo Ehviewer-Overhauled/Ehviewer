@@ -30,6 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -327,7 +328,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             return;
         }
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.sign_in_failed)
                 .setMessage(ExceptionUtils.getReadableString(e) + "\n\n" + getString(R.string.sign_in_failed_tip))
                 .setPositiveButton(R.string.get_it, null)

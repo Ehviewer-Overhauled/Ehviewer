@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
@@ -149,7 +150,7 @@ public class DirPickerActivity extends ToolbarActivity
                 items[i] = getString(R.string.application_file_directory, i);
             }
 
-            new AlertDialog.Builder(this).setItems(items, (dialog, which) -> {
+            new MaterialAlertDialogBuilder(this).setItems(items, (dialog, which) -> {
                 File dir = dirs[which];
                 if (!FileUtils.ensureDirectory(dir)) {
                     Toast.makeText(DirPickerActivity.this, R.string.directory_not_writable, Toast.LENGTH_SHORT).show();

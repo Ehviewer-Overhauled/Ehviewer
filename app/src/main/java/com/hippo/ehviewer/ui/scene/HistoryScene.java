@@ -36,6 +36,7 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
@@ -213,20 +214,17 @@ public class HistoryScene extends ToolbarScene
     }
 
     private void showClearAllDialog() {
-        new AlertDialog.Builder(getContext2())
+        new MaterialAlertDialogBuilder(getContext2())
                 .setMessage(R.string.clear_all_history)
-                .setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
-                            return;
-                        }
-
-                        EhDB.clearHistoryInfo();
-                        updateLazyList();
-                        mAdapter.notifyDataSetChanged();
-                        updateView(true);
+                .setPositiveButton(R.string.clear_all, (dialog, which) -> {
+                    if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
+                        return;
                     }
+
+                    EhDB.clearHistoryInfo();
+                    updateLazyList();
+                    mAdapter.notifyDataSetChanged();
+                    updateView(true);
                 }).show();
     }
 
@@ -275,7 +273,7 @@ public class HistoryScene extends ToolbarScene
         }
 
         final GalleryInfo gi = mLazyList.get(position);
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
                 .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
                     @Override

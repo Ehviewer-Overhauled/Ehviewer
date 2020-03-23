@@ -23,6 +23,8 @@ import android.content.pm.PackageManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 public class PermissionRequester {
 
     /**
@@ -40,14 +42,9 @@ public class PermissionRequester {
         }
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-            new AlertDialog.Builder(activity)
+            new MaterialAlertDialogBuilder(activity)
                     .setMessage(rationale)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestPermissions(activity, new String[]{permission}, requestCode);
-                        }
-                    }).setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> requestPermissions(activity, new String[]{permission}, requestCode)).setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else {
             return requestPermissions(activity, new String[]{permission}, requestCode);

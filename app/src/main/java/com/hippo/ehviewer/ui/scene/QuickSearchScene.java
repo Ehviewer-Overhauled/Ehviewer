@@ -31,6 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
@@ -178,24 +179,18 @@ public final class QuickSearchScene extends ToolbarScene {
             }
 
             final QuickSearch quickSearch = mQuickSearchList.get(position);
-            new AlertDialog.Builder(context)
+            new MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.delete_quick_search_title)
                     .setMessage(getString(R.string.delete_quick_search_message, quickSearch.name))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            EhDB.deleteQuickSearch(quickSearch);
-                            mQuickSearchList.remove(position);
-                        }
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        EhDB.deleteQuickSearch(quickSearch);
+                        mQuickSearchList.remove(position);
                     })
-                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            if (null != mAdapter) {
-                                mAdapter.notifyDataSetChanged();
-                            }
-                            updateView();
+                    .setOnDismissListener(dialog -> {
+                        if (null != mAdapter) {
+                            mAdapter.notifyDataSetChanged();
                         }
+                        updateView();
                     }).show();
         }
     }

@@ -26,6 +26,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.app.ListCheckBoxDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -309,28 +310,18 @@ public final class CommonOperations {
         }
 
         private void showUpToDateDialog() {
-            new AlertDialog.Builder(mActivity)
+            new MaterialAlertDialogBuilder(mActivity)
                     .setMessage(R.string.update_to_date)
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
         }
 
         private void showUpdateDialog(String versionName, int versionCode, String size, CharSequence info, final String url) {
-            new AlertDialog.Builder(mActivity)
+            new MaterialAlertDialogBuilder(mActivity)
                     .setTitle(R.string.update)
                     .setMessage(mActivity.getString(R.string.update_plain, versionName, size, info))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            UrlOpener.openUrl(mActivity, url, false);
-                        }
-                    })
-                    .setNegativeButton(R.string.update_ignore, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Settings.putSkipUpdateVersion(versionCode);
-                        }
-                    }).show();
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> UrlOpener.openUrl(mActivity, url, false))
+                    .setNegativeButton(R.string.update_ignore, (dialog, which) -> Settings.putSkipUpdateVersion(versionCode)).show();
         }
 
         private void handleResult(JSONObject jo) {

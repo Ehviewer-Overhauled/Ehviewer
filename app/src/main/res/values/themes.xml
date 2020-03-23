@@ -14,12 +14,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- ========== -->
     <!-- Base Theme -->
     <!-- ========== -->
     <style name="BaseTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:navigationBarColor">@color/colorNavigationBar</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -67,7 +69,6 @@
     </style>
 
     <style name="AppTheme.NoActionBar.Translucent">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 

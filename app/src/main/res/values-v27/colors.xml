@@ -1,0 +1,3 @@
+<resources>
+    <color name="colorNavigationBar">?android:windowBackground</color>
+</resources>

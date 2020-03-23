@@ -38,21 +38,21 @@
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/seven332/EhViewer/releases/latest" />
+        app:url="https://github.com/NekoInverter/EhViewer/releases/latest" />
 
-    <com.hippo.preference.UrlPreference
+    <!--<com.hippo.preference.UrlPreference
         android:key="website"
         android:title="@string/settings_about_website"
         app:iconSpaceReserved="false"
-        app:url="http://www.ehviewer.com" />
+        app:url="http://www.ehviewer.com" />-->
 
     <com.hippo.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/seven332/EhViewer" />
+        app:url="https://github.com/NekoInverter/EhViewer" />
 
-    <com.hippo.preference.UrlPreference
+    <!--<com.hippo.preference.UrlPreference
         android:key="changelog"
         android:title="@string/settings_about_changelog"
         app:iconSpaceReserved="false"
@@ -62,20 +62,20 @@
         android:key="help"
         android:title="@string/settings_about_help"
         app:iconSpaceReserved="false"
-        app:url="http://www.ehviewer.com/help" />
+        app:url="http://www.ehviewer.com/help" />-->
 
     <com.hippo.preference.ActivityPreference
         android:key="license"
         android:summary="@string/settings_about_license_summary"
         android:title="@string/settings_about_license"
-        app:activity="com.hippo.ehviewer.ui.LicenseActivity"
+        app:activity="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.VersionPreference
         android:key="version"
         app:iconSpaceReserved="false" />
 
-    <Preference
+    <!--<Preference
         android:key="check_for_updates"
         android:title="@string/settings_about_check_for_updates"
         app:iconSpaceReserved="false" />
@@ -90,6 +90,6 @@
     <Preference
         android:key="donate"
         android:title="@string/settings_about_donate"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false" />-->
 
 </PreferenceScreen>

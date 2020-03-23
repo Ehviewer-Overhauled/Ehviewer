@@ -39,7 +39,6 @@ public class EhFragment extends PreferenceFragmentCompat
 
         Preference theme = findPreference(Settings.KEY_THEME);
         Preference blackDarkTheme = findPreference(Settings.KEY_BLACK_DARK_THEME);
-        Preference applyNavBarThemeColor = findPreference(Settings.KEY_APPLY_NAV_BAR_THEME_COLOR);
         Preference gallerySite = findPreference(Settings.KEY_GALLERY_SITE);
         Preference listMode = findPreference(Settings.KEY_LIST_MODE);
         Preference detailSize = findPreference(Settings.KEY_DETAIL_SIZE);
@@ -48,17 +47,12 @@ public class EhFragment extends PreferenceFragmentCompat
         Preference tagTranslationsSource = findPreference("tag_translations_source");
 
         theme.setOnPreferenceChangeListener(this);
-        applyNavBarThemeColor.setOnPreferenceChangeListener(this);
         gallerySite.setOnPreferenceChangeListener(this);
         listMode.setOnPreferenceChangeListener(this);
         detailSize.setOnPreferenceChangeListener(this);
         thumbSize.setOnPreferenceChangeListener(this);
         showTagTranslations.setOnPreferenceChangeListener(this);
         blackDarkTheme.setOnPreferenceChangeListener(this);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            getPreferenceScreen().removePreference(applyNavBarThemeColor);
-        }
 
         if (!EhTagDatabase.isPossible(getActivity())) {
             getPreferenceScreen().removePreference(showTagTranslations);
@@ -71,9 +65,6 @@ public class EhFragment extends PreferenceFragmentCompat
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
             AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
-            ((EhApplication) getActivity().getApplication()).recreate();
-            return true;
-        } else if (Settings.KEY_APPLY_NAV_BAR_THEME_COLOR.equals(key)) {
             ((EhApplication) getActivity().getApplication()).recreate();
             return true;
         } else if (Settings.KEY_GALLERY_SITE.equals(key)) {

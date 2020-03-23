@@ -164,12 +164,6 @@
             android:theme="@style/AppTheme.Toolbar" />
 
         <activity
-            android:name="com.hippo.ehviewer.ui.LicenseActivity"
-            android:configChanges="screenSize|uiMode"
-            android:label="@string/license"
-            android:theme="@style/AppTheme.Toolbar" />
-
-        <activity
             android:name="com.hippo.ehviewer.ui.FilterActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/filter"

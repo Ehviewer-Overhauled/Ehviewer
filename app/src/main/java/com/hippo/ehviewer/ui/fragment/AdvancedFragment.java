@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -57,7 +58,7 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             return;
         }
         Arrays.sort(files);
-        new AlertDialog.Builder(context).setItems(files, (dialog, which) -> {
+        new MaterialAlertDialogBuilder(context).setItems(files, (dialog, which) -> {
             File file = new File(dir, files[which]);
             String error = EhDB.importDB(context, file);
             if (null == error) {

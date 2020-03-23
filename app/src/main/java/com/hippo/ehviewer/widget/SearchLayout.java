@@ -39,6 +39,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
@@ -313,7 +314,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     @Override
     public void onClick(View v) {
         if (mNormalSearchModeHelp == v) {
-            new AlertDialog.Builder(getContext())
+            new MaterialAlertDialogBuilder(getContext())
                     .setMessage(R.string.search_tip)
                     .show();
         } else if (mAction == v) {

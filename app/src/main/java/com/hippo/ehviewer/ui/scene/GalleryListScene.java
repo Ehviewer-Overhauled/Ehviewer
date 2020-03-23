@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
@@ -1010,7 +1011,7 @@ public final class GalleryListScene extends BaseScene
                 favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
         };
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
                 .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
                     switch (which) {
@@ -1022,7 +1023,7 @@ public final class GalleryListScene extends BaseScene
                             break;
                         case 1: // Download
                             if (downloaded) {
-                                new AlertDialog.Builder(context)
+                                new MaterialAlertDialogBuilder(context)
                                         .setTitle(R.string.download_remove_dialog_title)
                                         .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
                                         .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))

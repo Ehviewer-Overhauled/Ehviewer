@@ -98,9 +98,6 @@ public abstract class EhActivity extends AppCompatActivity {
 
         ((EhApplication) getApplication()).registerActivity(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Settings.getApplyNavBarThemeColor()) {
-            getWindow().setNavigationBarColor(AttrResources.getAttrColor(this, R.attr.colorPrimaryDark));
-        }
         mTheme = getTheme(this);
     }
 

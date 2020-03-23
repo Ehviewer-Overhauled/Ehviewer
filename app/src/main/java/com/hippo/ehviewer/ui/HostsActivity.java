@@ -39,6 +39,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.android.resource.AttrResources;
@@ -161,7 +162,7 @@ public class HostsActivity extends ToolbarActivity
                 ip.setText(arguments.getString(KEY_IP));
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext()).setView(view);
+            AlertDialog.Builder builder = new MaterialAlertDialogBuilder(requireContext()).setView(view);
             onCreateDialogBuilder(builder);
             AlertDialog dialog = builder.create();
             dialog.setOnShowListener(d -> onCreateDialog((AlertDialog) d));

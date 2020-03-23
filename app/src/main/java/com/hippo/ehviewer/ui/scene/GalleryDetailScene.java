@@ -53,6 +53,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.drawable.RoundSideRectDrawable;
@@ -1183,7 +1184,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 if (EhApplication.getDownloadManager(context).getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
                     CommonOperations.startDownload(activity, galleryInfo, false);
                 } else {
-                    new AlertDialog.Builder(context)
+                    new MaterialAlertDialogBuilder(context)
                             .setTitle(R.string.download_remove_dialog_title)
                             .setMessage(getString(R.string.download_remove_dialog_message, galleryInfo.title))
                             .setPositiveButton(android.R.string.ok, (dialog1, which1) -> EhApplication.getDownloadManager(context).deleteDownload(galleryInfo.gid))
@@ -1234,7 +1235,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         } else if (mTorrent == v) {
             if (mGalleryDetail != null) {
                 TorrentListDialogHelper helper = new TorrentListDialogHelper();
-                Dialog dialog = new AlertDialog.Builder(context)
+                Dialog dialog = new MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.torrents)
                         .setView(R.layout.dialog_torrent_list)
                         .setOnDismissListener(helper)
@@ -1250,7 +1251,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 return;
             }
             ArchiveListDialogHelper helper = new ArchiveListDialogHelper();
-            Dialog dialog = new AlertDialog.Builder(context)
+            Dialog dialog = new MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.dialog_archive_title)
                     .setView(R.layout.dialog_archive_list)
                     .setOnDismissListener(helper)
@@ -1265,7 +1266,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 return;
             }
             RateDialogHelper helper = new RateDialogHelper();
-            Dialog dialog = new AlertDialog.Builder(context)
+            Dialog dialog = new MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.rate)
                     .setView(R.layout.dialog_rate)
                     .setNegativeButton(android.R.string.cancel, null)
@@ -1327,7 +1328,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             return;
         }
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setMessage(getString(R.string.filter_the_uploader, uploader))
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -1349,7 +1350,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             return;
         }
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setMessage(getString(R.string.filter_the_tag, tag))
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -1379,7 +1380,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
         final String tag2 = temp;
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(tag)
                 .setItems(R.array.tag_menu_entries, (dialog, which) -> {
                     switch (which) {

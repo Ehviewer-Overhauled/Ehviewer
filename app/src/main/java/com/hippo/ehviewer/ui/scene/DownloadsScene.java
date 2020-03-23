@@ -58,6 +58,7 @@ import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
 import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
@@ -502,7 +503,7 @@ public class DownloadsScene extends ToolbarScene
                 return true;
             }
             case R.id.action_reset_reading_progress: {
-                new AlertDialog.Builder(getContext())
+                new MaterialAlertDialogBuilder(getContext())
                         .setMessage(R.string.reset_reading_progress_message)
                         .setNegativeButton(android.R.string.cancel, null)
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -558,7 +559,7 @@ public class DownloadsScene extends ToolbarScene
                         for (int i = 0, n = list.size(); i < n; i++) {
                             items[i + 2] = list.get(i).getLabel();
                         }
-                        new AlertDialog.Builder(context)
+                        new MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.default_download_label)
                                 .setItems(items, new DialogInterface.OnClickListener() {
                                     @Override
@@ -774,7 +775,7 @@ public class DownloadsScene extends ToolbarScene
 
                     MoveDialogHelper helper = new MoveDialogHelper(labels, downloadInfoList);
 
-                    new AlertDialog.Builder(context)
+                    new MaterialAlertDialogBuilder(context)
                             .setTitle(R.string.download_move_dialog_title)
                             .setItems(labels, helper)
                             .show();

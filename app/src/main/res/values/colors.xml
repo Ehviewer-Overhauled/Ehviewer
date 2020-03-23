@@ -167,4 +167,5 @@
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
+    <color name="colorNavigationBar">?colorPrimaryDark</color>
 </resources>

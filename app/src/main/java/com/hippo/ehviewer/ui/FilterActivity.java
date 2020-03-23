@@ -35,6 +35,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.R;
@@ -131,14 +132,14 @@ public class FilterActivity extends ToolbarActivity {
     }
 
     private void showTipDialog() {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.filter)
                 .setMessage(R.string.filter_tip)
                 .show();
     }
 
     private void showAddFilterDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.add_filter)
                 .setView(R.layout.dialog_add_filter)
                 .setPositiveButton(R.string.add, null)
@@ -149,7 +150,7 @@ public class FilterActivity extends ToolbarActivity {
 
     private void showDeleteFilterDialog(final Filter filter) {
         String message = getString(R.string.delete_filter, filter.text);
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setMessage(message)
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mFilterList) {

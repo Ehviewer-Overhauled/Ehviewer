@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.CommonOperations;
@@ -88,45 +89,25 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         if (KEY_DOWNLOAD_LOCATION.equals(key)) {
-            int sdk = Build.VERSION.SDK_INT;
-            if (sdk < Build.VERSION_CODES.KITKAT) {
-                openDirPicker();
-            } else if (sdk < Build.VERSION_CODES.LOLLIPOP) {
-                showDirPickerDialogKK();
-            } else {
-                showDirPickerDialogL();
-            }
+            showDirPickerDialogL();
             return true;
         }
         return false;
     }
 
-    private void showDirPickerDialogKK() {
-        new AlertDialog.Builder(getActivity()).setMessage(R.string.settings_download_pick_dir_kk)
-                .setPositiveButton(R.string.settings_download_continue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        openDirPicker();
-                    }
-                }).show();
-    }
-
     private void showDirPickerDialogL() {
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        openDirPicker();
-                        break;
-                    case DialogInterface.BUTTON_NEUTRAL:
-                        openDirPickerL();
-                        break;
-                }
+        DialogInterface.OnClickListener listener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    openDirPicker();
+                    break;
+                case DialogInterface.BUTTON_NEUTRAL:
+                    openDirPickerL();
+                    break;
             }
         };
 
-        new AlertDialog.Builder(getActivity()).setMessage(R.string.settings_download_pick_dir_l)
+        new MaterialAlertDialogBuilder(requireActivity()).setMessage(R.string.settings_download_pick_dir_l)
                 .setPositiveButton(R.string.settings_download_continue, listener)
                 .setNeutralButton(R.string.settings_download_document, listener)
                 .show();
@@ -172,7 +153,7 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
             case REQUEST_CODE_PICK_IMAGE_DIR_L: {
                 if (resultCode == Activity.RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Uri treeUri = data.getData();
-                    getActivity().getContentResolver().takePersistableUriPermission(
+                    requireActivity().getContentResolver().takePersistableUriPermission(
                             treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
                     if (uniFile != null) {

@@ -30,6 +30,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.CommonOperations;
@@ -55,14 +57,15 @@ public class AboutFragment extends PreferenceFragmentCompat
         addPreferencesFromResource(R.xml.about_settings);
 
         Preference author = findPreference(KEY_AUTHOR);
-        Preference donate = findPreference(KEY_DONATE);
-        Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
+        //Preference donate = findPreference(KEY_DONATE);
+        //Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
 
         author.setSummary(getString(R.string.settings_about_author_summary).replace('$', '@'));
 
         author.setOnPreferenceClickListener(this);
-        donate.setOnPreferenceClickListener(this);
-        checkForUpdate.setOnPreferenceClickListener(this);
+        //donate.setOnPreferenceClickListener(this);
+        //checkForUpdate.setOnPreferenceClickListener(this);
+        OssLicensesMenuActivity.setActivityTitle(getString(R.string.license));
     }
 
     @Override
@@ -80,7 +83,7 @@ public class AboutFragment extends PreferenceFragmentCompat
     }
 
     private void showDonationDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
                 .setView(R.layout.dialog_donate)
                 .show();
 
