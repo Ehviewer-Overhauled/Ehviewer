@@ -63,29 +63,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
         android:paddingBottom="4dp">
 
         <Button
-            android:id="@+id/cancel"
-            style="?attr/buttonBarNegativeButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@android:string/cancel"
-            android:textColor="?attr/colorAccent" />
-
-        <Button
             android:id="@+id/set"
-            style="?attr/buttonBarPositiveButtonStyle"
-            android:layout_width="0dp"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/set"
-            android:textColor="?attr/colorPrimary" />
+            android:text="@string/set" />
+        <Button
+            android:id="@+id/cancel"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/cancel" />
 
     </LinearLayout>
 </LinearLayout>

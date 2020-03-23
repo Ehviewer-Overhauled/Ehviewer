@@ -26,25 +26,11 @@
         app:maxHeight="360dp"
         app:maxWidth="320dp">
 
-        <LinearLayout
+        <com.hippo.widget.lockpattern.LockPatternView
+            android:id="@+id/pattern_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content" />
 
-            <com.hippo.widget.lockpattern.LockPatternView
-                android:id="@+id/pattern_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <ImageView
-                android:id="@+id/fingerprint_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_fp_40px"
-                android:visibility="gone" />
-
-        </LinearLayout>
 
     </com.hippo.widget.MaxSizeContainer>
 </FrameLayout>

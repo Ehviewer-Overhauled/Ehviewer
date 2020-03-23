@@ -50,11 +50,10 @@
             android:text="@string/enable_fingerprint" />
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/buttonPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
             android:paddingTop="4dp"
@@ -63,20 +62,19 @@
             style="?attr/buttonBarStyle">
 
             <Button
-                android:id="@+id/cancel"
-                style="?attr/buttonBarNegativeButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@android:string/cancel"/>
-
-            <Button
                 android:id="@+id/set"
-                style="?attr/buttonBarPositiveButtonStyle"
-                android:layout_width="0dp"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/set"/>
+                android:text="@string/set" />
+            <Button
+                android:id="@+id/cancel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@android:string/cancel" />
 
         </LinearLayout>
     </LinearLayout>

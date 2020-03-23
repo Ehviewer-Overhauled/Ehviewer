@@ -125,25 +125,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
         android:paddingBottom="4dp">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
         <Button
             android:id="@+id/ok"
-            style="?attr/buttonBarPositiveButtonStyle"
-            android:layout_width="0dp"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@android:string/ok"
-            android:textColor="?attr/colorPrimary"
             android:textStyle="bold" />
 
     </LinearLayout>
