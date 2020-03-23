@@ -711,4 +711,7 @@
 
     <string name="download_service">下载服务</string>
     <string name="favorite_name">收藏画廊</string>
+
+    <string name="follow_system">跟随系统</string>
+    <string name="black_dark_theme">纯黑深色主题</string>
 </resources>

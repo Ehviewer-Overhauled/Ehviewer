@@ -17,7 +17,7 @@
 package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
-import android.os.Build;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -54,7 +54,7 @@ public class EhFragment extends PreferenceFragmentCompat
         showTagTranslations.setOnPreferenceChangeListener(this);
         blackDarkTheme.setOnPreferenceChangeListener(this);
 
-        if (!EhTagDatabase.isPossible(getActivity())) {
+        if (!EhTagDatabase.isPossible(requireActivity())) {
             getPreferenceScreen().removePreference(showTagTranslations);
             getPreferenceScreen().removePreference(tagTranslationsSource);
         }
@@ -65,24 +65,26 @@ public class EhFragment extends PreferenceFragmentCompat
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
             AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
-            ((EhApplication) getActivity().getApplication()).recreate();
+            ((EhApplication) requireActivity().getApplication()).recreate();
             return true;
         } else if (Settings.KEY_GALLERY_SITE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
+            requireActivity().setResult(Activity.RESULT_OK);
             return true;
         } else if (Settings.KEY_LIST_MODE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
+            requireActivity().setResult(Activity.RESULT_OK);
             return true;
         } else if (Settings.KEY_DETAIL_SIZE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
+            requireActivity().setResult(Activity.RESULT_OK);
         } else if (Settings.KEY_THUMB_SIZE.equals(key)) {
-            getActivity().setResult(Activity.RESULT_OK);
+            requireActivity().setResult(Activity.RESULT_OK);
         } else if (Settings.KEY_SHOW_TAG_TRANSLATIONS.equals(key)) {
             if (Boolean.TRUE.equals(newValue)) {
-                EhTagDatabase.update(getActivity());
+                EhTagDatabase.update(requireActivity());
             }
         } else if (Settings.KEY_BLACK_DARK_THEME.equals(key)) {
-            ((EhApplication) getActivity().getApplication()).recreate();
+            if ((requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0) {
+                ((EhApplication) requireActivity().getApplication()).recreate();
+            }
             return true;
         }
         return true;
