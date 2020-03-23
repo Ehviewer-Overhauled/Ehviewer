@@ -4,6 +4,6 @@
 manifest-merger-release-report.txt
 /src/main/libs
 /src/main/obj
-
+*.jks
 # Intellij
 *.iml

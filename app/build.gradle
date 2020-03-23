@@ -2,14 +2,30 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-
+    signingConfigs {
+        def keystorePwd = null
+        def alias = null
+        def pwd = null
+        if (project.rootProject.file('local.properties').exists()) {
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            keystorePwd = properties.getProperty("RELEASE_STORE_PASSWORD")
+            alias = properties.getProperty("RELEASE_KEY_ALIAS")
+            pwd = properties.getProperty("RELEASE_KEY_PASSWORD")
+        }
+        release {
+            storeFile file("hitokoto.jks")
+            storePassword keystorePwd != null ? keystorePwd : System.getenv("KEYSTORE_PASS")
+            keyAlias alias != null ? alias : System.getenv("ALIAS_NAME")
+            keyPassword pwd != null ? pwd : System.getenv("ALIAS_PASS")
+        }
+    }
     defaultConfig {
         applicationId "com.hippo.ehviewer"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 104
         versionName "1.7.3"
-        vectorDrawables.useSupportLibrary = true
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
@@ -34,10 +50,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.fileprovider"'
+            signingConfig signingConfigs.release
         }
         debug {
             applicationIdSuffix ".debug"
             buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.debug.fileprovider"'
+            signingConfig signingConfigs.release
         }
     }
 
