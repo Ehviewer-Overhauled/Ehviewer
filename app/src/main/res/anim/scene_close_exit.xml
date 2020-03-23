@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,27 +14,26 @@
   ~ limitations under the License.
   -->
 
-<set
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
 
     <alpha
-        android:fromAlpha="1.0"
-        android:toAlpha="0.0"
-        android:interpolator="@android:interpolator/linear"
-        android:fillEnabled="true"
-        android:fillBefore="false"
+        android:duration="150"
         android:fillAfter="true"
+        android:fillBefore="false"
+        android:fillEnabled="true"
+        android:fromAlpha="1.0"
+        android:interpolator="@android:interpolator/linear"
         android:startOffset="100"
-        android:duration="150"/>
+        android:toAlpha="0.0" />
 
     <translate
-        android:fromYDelta="0%"
-        android:toYDelta="8%"
-        android:fillEnabled="true"
-        android:fillBefore="true"
+        android:duration="250"
         android:fillAfter="true"
+        android:fillBefore="true"
+        android:fillEnabled="true"
+        android:fromYDelta="0%"
         android:interpolator="@anim/accelerate_quart"
-        android:duration="250"/>
+        android:toYDelta="8%" />
 
 </set>

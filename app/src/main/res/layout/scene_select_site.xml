@@ -103,19 +103,12 @@
         android:paddingBottom="4dp"
         android:gravity="bottom"
         style="?attr/buttonBarStyle">
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
         <Button
             android:id="@+id/ok"
-            style="?attr/buttonBarPositiveButtonStyle"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
             android:text="@android:string/ok"/>
 

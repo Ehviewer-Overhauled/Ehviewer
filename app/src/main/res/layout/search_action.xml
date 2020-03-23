@@ -28,7 +28,7 @@
         android:layout_weight="1"
         android:textColor="?attr/colorPrimary"
         android:textStyle="bold"
-        style="?attr/buttonBarPositiveButtonStyle"/>
+        style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
     <Space
         android:layout_width="0dp"

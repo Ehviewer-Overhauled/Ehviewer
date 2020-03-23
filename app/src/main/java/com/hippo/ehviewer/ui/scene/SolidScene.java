@@ -45,10 +45,10 @@ public class SolidScene extends BaseScene {
                     break;
                 }
             case CHECK_STEP_WARNING:
-                if (Settings.getAskAnalytics()) {
+                /*if (Settings.getAskAnalytics()) {
                     startScene(new Announcer(AnalyticsScene.class).setArgs(args));
                     break;
-                }
+                }*/
             case CHECK_STEP_ANALYTICS:
                 if (EhUtils.needSignedIn(getContext2())) {
                     startScene(new Announcer(SignInScene.class).setArgs(args));

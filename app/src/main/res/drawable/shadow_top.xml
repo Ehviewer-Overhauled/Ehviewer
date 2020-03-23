@@ -21,7 +21,7 @@
 
     <gradient
         android:startColor="@android:color/transparent"
-        android:endColor="@color/shadow_light"
+        android:endColor="@color/shadow"
         android:angle="270"/>
 
 </shape>

@@ -515,7 +515,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
         mDownload = (TextView) ViewUtils.$$(mActionGroup, R.id.download);
         mRead = ViewUtils.$$(mActionGroup, R.id.read);
-        Ripple.addRipple(mOtherActions, isDarkTheme);
         Ripple.addRipple(mDownload, isDarkTheme);
         Ripple.addRipple(mRead, isDarkTheme);
         mUploader.setOnClickListener(this);

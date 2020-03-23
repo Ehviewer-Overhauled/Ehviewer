@@ -25,14 +25,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,7 +45,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
@@ -139,21 +136,11 @@ public final class MainActivity extends StageActivity
     private LoadImageView mAvatar;
     @Nullable
     private TextView mDisplayName;
-    @Nullable
-    private Button mChangeTheme;
     private int mNavCheckedItem = 0;
 
     @Override
     protected int getThemeResId(int theme) {
-        switch (theme) {
-            case Settings.THEME_LIGHT:
-            default:
-                return R.style.AppTheme_Main;
-            case Settings.THEME_DARK:
-                return R.style.AppTheme_Main_Dark;
-            case Settings.THEME_BLACK:
-                return R.style.AppTheme_Main_Black;
-        }
+        return R.style.AppTheme_Main;
     }
 
     @Override
@@ -168,9 +155,9 @@ public final class MainActivity extends StageActivity
             return new Announcer(SecurityScene.class);
         } else if (Settings.getShowWarning()) {
             return new Announcer(WarningScene.class);
-        } else if (Settings.getAskAnalytics()) {
+        }/* else if (Settings.getAskAnalytics()) {
             return new Announcer(AnalyticsScene.class);
-        } else if (EhUtils.needSignedIn(this)) {
+        }*/ else if (EhUtils.needSignedIn(this)) {
             return new Announcer(SignInScene.class);
         } else if (Settings.getSelectSite()) {
             return new Announcer(SelectSiteScene.class);
@@ -194,12 +181,12 @@ public final class MainActivity extends StageActivity
                 newArgs.putString(WarningScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(WarningScene.KEY_TARGET_ARGS, announcer.getArgs());
                 return new Announcer(WarningScene.class).setArgs(newArgs);
-            } else if (Settings.getAskAnalytics()) {
+            }/* else if (Settings.getAskAnalytics()) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(AnalyticsScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(AnalyticsScene.KEY_TARGET_ARGS, announcer.getArgs());
                 return new Announcer(AnalyticsScene.class).setArgs(newArgs);
-            } else if (EhUtils.needSignedIn(this)) {
+            }*/ else if (EhUtils.needSignedIn(this)) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(SignInScene.KEY_TARGET_ARGS, announcer.getArgs());
@@ -333,26 +320,12 @@ public final class MainActivity extends StageActivity
         View headerLayout = mNavView.getHeaderView(0);
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
-        mChangeTheme = (Button) ViewUtils.$$(this, R.id.change_theme);
-
-        //mDrawerLayout.setStatusBarColor(ResourcesUtils.getAttrColor(this, R.attr.colorPrimaryDark));
-        // Pre-L need shadow drawable
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
-            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
-        }
 
         updateProfile();
 
         if (mNavView != null) {
             mNavView.setNavigationItemSelectedListener(this);
         }
-
-        mChangeTheme.setText(getThemeText());
-        mChangeTheme.setOnClickListener(v -> {
-            Settings.putTheme(getNextTheme());
-            ((EhApplication) getApplication()).recreate();
-        });
 
         if (savedInstanceState == null) {
             onInit();
@@ -366,35 +339,6 @@ public final class MainActivity extends StageActivity
         }
 
         EhTagDatabase.update(this);
-    }
-
-    private String getThemeText() {
-        int resId;
-        switch (Settings.getTheme()) {
-            default:
-            case Settings.THEME_LIGHT:
-                resId = R.string.theme_light;
-                break;
-            case Settings.THEME_DARK:
-                resId = R.string.theme_dark;
-                break;
-            case Settings.THEME_BLACK:
-                resId = R.string.theme_black;
-                break;
-        }
-        return getString(resId);
-    }
-
-    private int getNextTheme() {
-        switch (Settings.getTheme()) {
-            default:
-            case Settings.THEME_LIGHT:
-                return Settings.THEME_DARK;
-            case Settings.THEME_DARK:
-                return Settings.THEME_BLACK;
-            case Settings.THEME_BLACK:
-                return Settings.THEME_LIGHT;
-        }
     }
 
     private void checkDownloadLocation() {

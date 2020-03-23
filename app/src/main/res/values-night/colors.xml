@@ -16,47 +16,17 @@
 
 <resources>
 
-    <!-- primary_drawable     54% -->
-    <!-- secondary_drawable   26% -->
-    <!-- primary_drawable_dark     100% -->
-    <!-- secondary_drawable_dark    30% -->
-    <!-- primary_drawable_black     80% -->
-    <!-- secondary_drawable_black   24% -->
-    <color name="primary_drawable">#8a000000</color>
-    <color name="secondary_drawable">#42000000</color>
-    <color name="primary_drawable_light">#8a000000</color>
-    <color name="secondary_drawable_light">#42000000</color>
-    <color name="primary_drawable_dark">#ffffffff</color>
-    <color name="secondary_drawable_dark">#4dffffff</color>
-    <color name="primary_drawable_black">#ccffffff</color>
-    <color name="secondary_drawable_black">#3dffffff</color>
+    <color name="primary_drawable">#ffffffff</color>
+    <color name="secondary_drawable">#4dffffff</color>
+    <color name="background">#ff303030</color>
 
-    <color name="primary_text_default_material_black">#d9ffffff</color>
-    <color name="primary_text_disabled_material_black">#4dffffff</color>
-
-    <color name="background">#fffafafa</color>
-
-    <color name="content">#fff</color>
-    <color name="content_black">@color/grey_925</color>
-
-    <color name="content_activated">@color/grey_300</color>
-    <color name="content_activated_black">@color/grey_700</color>
-
-    <color name="widget">@color/grey_200</color>
-    <color name="widget_black">@color/grey_850</color>
-
-    <color name="progress">@color/colorAccent</color>
-    <color name="progress_black">@color/grey_700</color>
-
-    <color name="tag_group_background">@color/colorAccent</color>
-    <color name="tag_group_background_black">@color/grey_875</color>
-
-    <color name="tag_background">@color/colorPrimary</color>
-    <color name="tag_background_black">@color/grey_875</color>
-
-    <color name="gallery_detail_button_background">@color/grey_100</color>
-    <color name="gallery_detail_button_background_black">@color/grey_900</color>
-
+    <color name="content">@color/grey_825</color>
+    <color name="content_activated">@color/grey_600</color>
+    <color name="widget">@color/grey_700</color>
+    <color name="progress">@color/grey_600</color>
+    <color name="tag_group_background">@color/grey_775</color>
+    <color name="tag_background">@color/grey_775</color>
+    <color name="gallery_detail_button_background">@color/grey_800</color>
     <color name="red_500">#fff44336</color>
     <color name="teal_500">#ff009688</color>
     <color name="teal_700">#ff00796b</color>
@@ -145,25 +115,15 @@
     <color name="unknown_bg">@android:color/black</color>
 
     <!-- divider -->
-    <color name="divider">#20000000</color>
+    <color name="divider">#20ffffff</color>
 
-    <color name="divider_black">#20ffffff</color>
     <!-- shadow -->
     <color name="shadow">#38000000</color>
-
-    <!-- Gallery Activity -->
-    <color name="gallery_slider_background_dark">@color/grey_800</color>
-    <color name="gallery_slider_background_black">@color/grey_900</color>
 
     <color name="big_icon">#1f000000</color>
 
     <color name="guide_bg">#e5009688</color>
 
-    <!-- Lock pattern view -->
-    <color name="lock_pattern_view_regular_color_light">#8a000000</color>
-    <color name="lock_pattern_view_regular_color_dark">#8affffff</color>
-    <color name="lock_pattern_view_success_color">@color/colorPrimary</color>
-    <color name="lock_pattern_view_error_color">@color/red_500</color>
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>

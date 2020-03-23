@@ -282,4 +282,15 @@
         <item>SOCKS</item>
     </string-array>
 
+    <string-array name="night_mode_entries" translatable="false">
+        <item>@string/follow_system</item>
+        <item>@string/settings_eh_theme_light</item>
+        <item>@string/settings_eh_theme_dark</item>
+    </string-array>
+
+    <string-array name="night_mode_values">
+        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

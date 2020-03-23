@@ -484,6 +484,7 @@ public class DownloadService extends Service implements DownloadManager.Download
         // false for show, true for cancel
         @Ops
         private int mOps;
+
         public NotificationDelay(Service service, NotificationManager notifyManager,
                                  NotificationCompat.Builder builder, int id) {
             mService = service;

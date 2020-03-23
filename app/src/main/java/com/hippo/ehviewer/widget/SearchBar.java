@@ -42,8 +42,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.hippo.ehviewer.R;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
@@ -54,7 +54,7 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchBar extends CardView implements View.OnClickListener,
+public class SearchBar extends MaterialCardView implements View.OnClickListener,
         TextView.OnEditorActionListener, TextWatcher,
         SearchEditText.SearchEditTextListener {
 

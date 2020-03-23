@@ -49,8 +49,9 @@ public class Settings {
      ********************/
 
     public static final String KEY_THEME = "theme";
-    public static final int THEME_LIGHT = 0;
-    public static final int THEME_DARK = 1;
+    public static final String KEY_BLACK_DARK_THEME = "black_dark_theme";
+    public static final int THEME_LIGHT = 1;
+    public static final int THEME_SYSTEM = -1;
     public static final int THEME_BLACK = 2;
     public static final String KEY_APPLY_NAV_BAR_THEME_COLOR = "apply_nav_bar_theme_color";
     public static final String KEY_GALLERY_SITE = "gallery_site";
@@ -109,7 +110,7 @@ public class Settings {
     private static final boolean DEFAULT_SELECT_SITE = true;
     private static final String KEY_QUICK_SEARCH_TIP = "quick_search_tip";
     private static final boolean DEFAULT_QUICK_SEARCH_TIP = true;
-    private static final int DEFAULT_THEME = THEME_LIGHT;
+    private static final int DEFAULT_THEME = THEME_SYSTEM;
     private static final boolean DEFAULT_APPLY_NAV_BAR_THEME_COLOR = true;
     private static final int DEFAULT_GALLERY_SITE = 1;
     private static final String KEY_LAUNCH_PAGE = "launch_page";
@@ -129,6 +130,8 @@ public class Settings {
     private static final String DEFAULT_EXCLUDED_LANGUAGES = null;
     private static final String KEY_CELLULAR_NETWORK_WARNING = "cellular_network_warning";
     private static final boolean DEFAULT_CELLULAR_NETWORK_WARNING = false;
+    private static final String KEY_NIGHT_MODE = "night_mode";
+    private static final String DEFAULT_NIGHT_MODE = "-1";
     /********************
      ****** Read
      ********************/

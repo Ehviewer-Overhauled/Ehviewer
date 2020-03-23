@@ -25,7 +25,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.fragment.AboutFragment;
 import com.hippo.ehviewer.ui.fragment.AdvancedFragment;
 import com.hippo.ehviewer.ui.fragment.DownloadFragment;
@@ -50,15 +49,7 @@ public final class SettingsActivity extends EhActivity {
 
     @Override
     protected int getThemeResId(int theme) {
-        switch (theme) {
-            case Settings.THEME_LIGHT:
-            default:
-                return R.style.AppTheme_Settings;
-            case Settings.THEME_DARK:
-                return R.style.AppTheme_Settings_Dark;
-            case Settings.THEME_BLACK:
-                return R.style.AppTheme_Settings_Black;
-        }
+        return R.style.AppTheme_Settings;
     }
 
     private void setActionBarUpIndicator(Drawable drawable) {

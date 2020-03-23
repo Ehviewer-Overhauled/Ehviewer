@@ -48,6 +48,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.hippo.android.resource.AttrResources;
@@ -176,15 +177,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     protected int getThemeResId(int theme) {
-        switch (theme) {
-            case Settings.THEME_LIGHT:
-            default:
-                return R.style.AppTheme_Gallery;
-            case Settings.THEME_DARK:
-                return R.style.AppTheme_Gallery_Dark;
-            case Settings.THEME_BLACK:
-                return R.style.AppTheme_Gallery_Black;
-        }
+        return R.style.AppTheme_Gallery;
     }
 
     private void buildProvider() {
@@ -246,8 +239,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    @SuppressWarnings({"deprecation", "WrongConstant"})
+    @SuppressWarnings({"WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         if (Settings.getReadingFullscreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,

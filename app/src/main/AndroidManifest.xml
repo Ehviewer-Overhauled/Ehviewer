@@ -134,6 +134,7 @@
         <activity
             android:name="com.hippo.ehviewer.ui.SettingsActivity"
             android:configChanges="screenSize|uiMode"
+            android:label="@string/settings"
             android:theme="@style/AppTheme.Settings"/>
 
         <activity

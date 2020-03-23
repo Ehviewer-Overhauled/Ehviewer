@@ -36,15 +36,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             app:headerLayout="@layout/nav_header_main"
-            app:menu="@menu/nav_drawer_main">
-
-            <Button
-                android:id="@+id/change_theme"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center" />
-        </com.google.android.material.navigation.NavigationView>
+            app:menu="@menu/nav_drawer_main" />
 
 
         <com.hippo.ehviewer.widget.EhDrawerView

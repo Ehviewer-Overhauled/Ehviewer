@@ -19,7 +19,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <solid
-        android:color="@color/divider_dark"/>
+        android:color="@color/divider_black"/>
 
     <size
         android:height="1dp"/>

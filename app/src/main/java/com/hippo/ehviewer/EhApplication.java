@@ -31,6 +31,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.collection.LruCache;
 
 import com.getkeepsafe.relinker.ReLinker;
@@ -281,6 +282,8 @@ public class EhApplication extends RecordingApplication {
         if (EhDB.needMerge()) {
             EhDB.mergeOldDB(this);
         }
+
+        AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
 
         // Do io tasks in new thread
         new AsyncTask<Void, Void, Void>() {

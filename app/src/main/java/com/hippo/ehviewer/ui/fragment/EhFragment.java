@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 
 import com.hippo.ehviewer.EhApplication;
@@ -37,6 +38,7 @@ public class EhFragment extends PreferenceFragmentCompat
         addPreferencesFromResource(R.xml.eh_settings);
 
         Preference theme = findPreference(Settings.KEY_THEME);
+        Preference blackDarkTheme = findPreference(Settings.KEY_BLACK_DARK_THEME);
         Preference applyNavBarThemeColor = findPreference(Settings.KEY_APPLY_NAV_BAR_THEME_COLOR);
         Preference gallerySite = findPreference(Settings.KEY_GALLERY_SITE);
         Preference listMode = findPreference(Settings.KEY_LIST_MODE);
@@ -52,6 +54,7 @@ public class EhFragment extends PreferenceFragmentCompat
         detailSize.setOnPreferenceChangeListener(this);
         thumbSize.setOnPreferenceChangeListener(this);
         showTagTranslations.setOnPreferenceChangeListener(this);
+        blackDarkTheme.setOnPreferenceChangeListener(this);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             getPreferenceScreen().removePreference(applyNavBarThemeColor);
@@ -67,6 +70,7 @@ public class EhFragment extends PreferenceFragmentCompat
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
             ((EhApplication) getActivity().getApplication()).recreate();
             return true;
         } else if (Settings.KEY_APPLY_NAV_BAR_THEME_COLOR.equals(key)) {
@@ -86,6 +90,9 @@ public class EhFragment extends PreferenceFragmentCompat
             if (Boolean.TRUE.equals(newValue)) {
                 EhTagDatabase.update(getActivity());
             }
+        } else if (Settings.KEY_BLACK_DARK_THEME.equals(key)) {
+            ((EhApplication) getActivity().getApplication()).recreate();
+            return true;
         }
         return true;
     }

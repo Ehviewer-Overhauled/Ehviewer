@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:minWidth="@dimen/single_max_width"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:hint="@string/username">
 
                 <com.hippo.widget.HackyTextInputEditText
@@ -67,6 +68,7 @@
                 android:layout_gravity="center_horizontal"
                 android:minWidth="@dimen/single_max_width"
                 android:hint="@string/password"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:passwordToggleEnabled="true">
 
                 <com.hippo.widget.HackyTextInputEditText
@@ -89,7 +91,7 @@
                 android:id="@+id/buttonPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
                 android:paddingTop="4dp"
@@ -98,25 +100,22 @@
                 style="?attr/buttonBarStyle">
 
                 <Button
-                    android:id="@+id/register"
-                    style="?attr/buttonBarNegativeButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="?attr/colorAccent"
-                    android:textStyle="bold"
-                    android:text="@string/register"/>
-
-                <Button
                     android:id="@+id/sign_in"
-                    style="?attr/buttonBarPositiveButtonStyle"
-                    android:layout_width="0dp"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
                     android:text="@string/sign_in"/>
 
+                <Button
+                    android:id="@+id/register"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:text="@string/register"/>
             </LinearLayout>
 
             <TextView

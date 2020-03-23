@@ -28,8 +28,7 @@ public final class ViewAnimationUtils {
     public static final boolean API_SUPPORT_CIRCULAR_REVEAL =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     // http://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
-    public static final boolean API_SUPPORT_CANVAS_CLIP_PATH =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+
     private ViewAnimationUtils() {
     }
 
@@ -90,18 +89,12 @@ public final class ViewAnimationUtils {
 
         @Override
         public void onAnimationStart(Animator animation) {
-            if (!API_SUPPORT_CANVAS_CLIP_PATH) {
-                mView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-            }
             mReveal.setRevealEnable(true);
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             mReveal.setRevealEnable(false);
-            if (!API_SUPPORT_CANVAS_CLIP_PATH) {
-                mView.setLayerType(View.LAYER_TYPE_NONE, null);
-            }
         }
     }
 }
