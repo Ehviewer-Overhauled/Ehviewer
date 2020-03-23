@@ -59,17 +59,10 @@ public class UConfigActivity extends ToolbarActivity {
 
         // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
         CookieManager cookieManager = CookieManager.getInstance();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.flush();
-            cookieManager.removeAllCookies(null);
-            cookieManager.removeSessionCookies(null);
-        } else {
-            CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
-            cookieSyncManager.startSync();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncManager.stopSync();
-        }
+        cookieManager.flush();
+        cookieManager.removeAllCookies(null);
+        cookieManager.removeSessionCookies(null);
+
 
         // Copy cookies from okhttp cookie store to CookieManager
         url = EhUrl.getUConfigUrl();

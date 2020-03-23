@@ -69,17 +69,9 @@ public class WebViewSignInScene extends SolidScene {
 
         // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
         CookieManager cookieManager = CookieManager.getInstance();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.flush();
-            cookieManager.removeAllCookies(null);
-            cookieManager.removeSessionCookies(null);
-        } else {
-            CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(context);
-            cookieSyncManager.startSync();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncManager.stopSync();
-        }
+        cookieManager.flush();
+        cookieManager.removeAllCookies(null);
+        cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
         mWebView.getSettings().setJavaScriptEnabled(true);

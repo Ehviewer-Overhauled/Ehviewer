@@ -150,12 +150,6 @@
             android:theme="@style/AppTheme.Settings" />
 
         <activity
-            android:name="com.hippo.ehviewer.ui.ExcludedLanguagesActivity"
-            android:configChanges="screenSize|uiMode"
-            android:label="@string/excluded_languages"
-            android:theme="@style/AppTheme.Toolbar" />
-
-        <activity
             android:name="com.hippo.ehviewer.ui.FilterActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/filter"

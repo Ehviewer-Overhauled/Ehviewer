@@ -243,7 +243,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @SuppressWarnings({"WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        if (Settings.getReadingFullscreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);

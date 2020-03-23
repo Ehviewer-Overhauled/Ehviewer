@@ -29,6 +29,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="left|center_vertical"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="12dp" />
 
             <TextView
@@ -48,6 +51,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="right|center_vertical"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="12dp" />
 
             <com.hippo.ehviewer.widget.SearchEditText

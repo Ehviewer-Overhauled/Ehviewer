@@ -407,10 +407,8 @@ public class HistoryScene extends ToolbarScene
             holder.simpleLanguage.setText(gi.simpleLanguage);
 
             // Update transition name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                long gid = gi.gid;
-                ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gid));
-            }
+            long gid = gi.gid;
+            ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gid));
         }
 
         @Override

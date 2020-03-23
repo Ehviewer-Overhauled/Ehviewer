@@ -25,76 +25,11 @@ import android.view.View;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 
 public final class ViewAnimationUtils {
-    public static final boolean API_SUPPORT_CIRCULAR_REVEAL =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     // http://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
 
-    private ViewAnimationUtils() {
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static Animator createCircularReveal(View view,
                                                 int centerX, int centerY, float startRadius, float endRadius) {
-        if (API_SUPPORT_CIRCULAR_REVEAL) {
             return android.view.ViewAnimationUtils.createCircularReveal(
                     view, centerX, centerY, startRadius, endRadius);
-        } else if (view instanceof Reveal) {
-            return createRevealAnimator((Reveal) view, centerX, centerY,
-                    startRadius, endRadius);
-        } else {
-            throw new IllegalStateException("Only View implements CircularReveal or" +
-                    " api >= 21 can create circular reveal");
-        }
-    }
-
-    private static Animator createRevealAnimator(Reveal reveal, int centerX, int centerY,
-                                                 float startRadius, float endRadius) {
-        ValueAnimator animator = ValueAnimator.ofFloat(startRadius, endRadius);
-        animator.addUpdateListener(new RevealAnimatorUpdateListener(reveal, centerX, centerY));
-        animator.addListener(new RevealAnimatorListener(reveal));
-        return animator;
-    }
-
-    private static class RevealAnimatorUpdateListener
-            implements ValueAnimator.AnimatorUpdateListener {
-
-        private final Reveal mReveal;
-        private final int mCenterX;
-        private final int mCenterY;
-
-        public RevealAnimatorUpdateListener(Reveal reveal, int centerX, int centerY) {
-            mReveal = reveal;
-            mCenterX = centerX;
-            mCenterY = centerY;
-        }
-
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            Object value = animation.getAnimatedValue();
-            if (value instanceof Float) {
-                mReveal.setReveal(mCenterX, mCenterY, (Float) value);
-            }
-        }
-    }
-
-    private static class RevealAnimatorListener extends SimpleAnimatorListener {
-
-        private final Reveal mReveal;
-        private final View mView;
-
-        public RevealAnimatorListener(Reveal reveal) {
-            mReveal = reveal;
-            mView = (View) reveal;
-        }
-
-        @Override
-        public void onAnimationStart(Animator animation) {
-            mReveal.setRevealEnable(true);
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            mReveal.setRevealEnable(false);
-        }
     }
 }

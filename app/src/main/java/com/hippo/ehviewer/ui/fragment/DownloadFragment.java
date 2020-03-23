@@ -91,14 +91,12 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
     }
 
     private void openDirPickerL() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            try {
-                startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                Toast.makeText(getActivity(), R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
-            }
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        try {
+            startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            Toast.makeText(getActivity(), R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
         }
     }
 

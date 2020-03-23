@@ -29,12 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="?attr/galleryDetailHeaderBackgroundColor" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/shadow_bottom" />
+            android:background="?attr/galleryDetailHeaderBackgroundColor"
+            android:elevation="4dp" />
 
         <Space
             android:layout_width="match_parent"
@@ -49,7 +45,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
 
             <com.hippo.widget.LoadImageView
                 android:id="@+id/thumb"
@@ -109,6 +106,9 @@
                 android:layout_height="56dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:paddingLeft="12dp"
                 android:paddingTop="16dp"
                 android:paddingRight="12dp"
@@ -137,6 +137,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:textColor="?attr/textColorThemePrimary" />
 
                 <View
@@ -152,6 +155,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:text="@string/read"
                     android:textColor="?attr/textColorThemeAccent" />
 

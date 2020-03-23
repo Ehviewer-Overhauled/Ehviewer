@@ -32,23 +32,14 @@ public class RevealLinearLayout extends LinearLayout implements Reveal {
 
     public RevealLinearLayout(Context context) {
         super(context);
-        init();
     }
 
     public RevealLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public RevealLinearLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    private void init() {
-        if (!ViewAnimationUtils.API_SUPPORT_CIRCULAR_REVEAL) {
-            setWillNotDraw(false);
-        }
     }
 
     @Override

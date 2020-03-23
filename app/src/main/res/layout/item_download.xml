@@ -88,6 +88,9 @@
                 android:id="@+id/start"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 app:srcCompat="@drawable/v_play_x24" />
 
@@ -95,6 +98,9 @@
                 android:id="@+id/stop"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 app:srcCompat="@drawable/v_pause_x24" />
 

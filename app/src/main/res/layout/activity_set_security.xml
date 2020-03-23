@@ -76,6 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/set" />
+
         <Button
             android:id="@+id/cancel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"

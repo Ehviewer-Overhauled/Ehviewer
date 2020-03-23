@@ -42,7 +42,10 @@
             <FrameLayout
                 android:id="@+id/heart_group"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true">
 
                 <TextView
                     android:id="@+id/heart"
@@ -68,7 +71,10 @@
                 android:id="@+id/rate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:drawablePadding="8dp"
+                android:focusable="true"
                 android:gravity="center_horizontal"
                 android:text="@string/rate"
                 android:textColor="?android:attr/textColorPrimary" />
@@ -77,7 +83,10 @@
                 android:id="@+id/share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:drawablePadding="8dp"
+                android:focusable="true"
                 android:gravity="center_horizontal"
                 android:text="@string/share"
                 android:textColor="?android:attr/textColorPrimary" />
@@ -94,7 +103,10 @@
                 android:id="@+id/archive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:drawablePadding="8dp"
+                android:focusable="true"
                 android:gravity="center_horizontal"
                 android:text="@string/archive"
                 android:textColor="?android:attr/textColorPrimary" />
@@ -103,7 +115,10 @@
                 android:id="@+id/similar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:drawablePadding="8dp"
+                android:focusable="true"
                 android:gravity="center_horizontal"
                 android:text="@string/similar_gallery"
                 android:textColor="?android:attr/textColorPrimary" />
@@ -112,7 +127,10 @@
                 android:id="@+id/search_cover"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:drawablePadding="8dp"
+                android:focusable="true"
                 android:gravity="center_horizontal"
                 android:text="@string/search_cover"
                 android:textColor="?android:attr/textColorPrimary" />

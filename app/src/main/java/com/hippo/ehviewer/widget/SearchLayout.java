@@ -126,7 +126,6 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         mNormalSearchModeHelp = (ImageView) normalView.findViewById(R.id.normal_search_mode_help);
         mEnableAdvanceSwitch = (SwitchCompat) normalView.findViewById(R.id.search_enable_advance);
         mNormalSearchModeHelp.setOnClickListener(this);
-        Ripple.addRipple(mNormalSearchModeHelp, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme));
         mEnableAdvanceSwitch.setOnCheckedChangeListener(SearchLayout.this);
         mEnableAdvanceSwitch.setSwitchPadding(resources.getDimensionPixelSize(R.dimen.switch_padding));
 

@@ -18,7 +18,10 @@
     android:id="@+id/previews"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
     android:divider="@drawable/spacer_keyline"
+    android:focusable="true"
     android:orientation="vertical"
     android:padding="@dimen/keyline_margin"
     android:showDividers="middle">

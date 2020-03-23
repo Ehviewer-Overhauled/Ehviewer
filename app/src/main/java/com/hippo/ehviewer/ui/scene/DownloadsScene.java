@@ -1086,10 +1086,6 @@ public class DownloadsScene extends ToolbarScene
             thumb.setOnClickListener(this);
             start.setOnClickListener(this);
             stop.setOnClickListener(this);
-
-            boolean isDarkTheme = !AttrResources.getAttrBoolean(getContext2(), R.attr.isLightTheme);
-            Ripple.addRipple(start, isDarkTheme);
-            Ripple.addRipple(stop, isDarkTheme);
         }
 
         @Override
@@ -1186,9 +1182,7 @@ public class DownloadsScene extends ToolbarScene
             bindForState(holder, info);
 
             // Update transition name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(info.gid));
-            }
+            ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(info.gid));
         }
 
         @Override

@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/CardView.Normal"
     android:layout_width="match_parent"
@@ -46,4 +46,4 @@
         android:textStyle="bold"
         tools:ignore="SpUsage" />
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

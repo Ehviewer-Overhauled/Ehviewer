@@ -82,9 +82,6 @@ public class CheckTextView extends AppCompatTextView implements OnClickListener,
         mPaint.setColor(mMaskColor);
 
         setOnClickListener(this);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Hotspot.addHotspotable(this, this);
-        }
     }
 
     @Override
