@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +14,9 @@
   ~ limitations under the License.
   -->
 
-<selector
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:state_activated="true" android:drawable="@drawable/tile_background_activated"/>
-    <item android:drawable="@drawable/transparent"/>
+    <item android:drawable="@drawable/tile_background_activated" android:state_activated="true" />
+    <item android:drawable="@drawable/transparent" />
 
 </selector>

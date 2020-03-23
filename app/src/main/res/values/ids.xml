@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,18 +16,18 @@
 
 <resources>
 
-    <item name="tag" type="id"/>
-    <item name="index" type="id"/>
+    <item name="tag" type="id" />
+    <item name="index" type="id" />
 
-    <item name="fragment_tag" type="id"/>
+    <item name="fragment_tag" type="id" />
 
-    <item name="copy" type="id"/>
-    <item name="vote_up" type="id"/>
-    <item name="vote_down" type="id"/>
-    <item name="check_vote_status" type="id"/>
-    <item name="edit_comment" type="id"/>
+    <item name="copy" type="id" />
+    <item name="vote_up" type="id" />
+    <item name="vote_down" type="id" />
+    <item name="check_vote_status" type="id" />
+    <item name="edit_comment" type="id" />
 
-    <item name="fab_translation_y" type="id"/>
-    <item name="fab_translation_y_animator" type="id"/>
+    <item name="fab_translation_y" type="id" />
+    <item name="fab_translation_y_animator" type="id" />
 
 </resources>

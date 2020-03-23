@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +14,13 @@
   ~ limitations under the License.
   -->
 
-<shape
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
     <size
         android:width="@dimen/keyline_margin"
-        android:height="@dimen/keyline_margin"/>
+        android:height="@dimen/keyline_margin" />
 
-    <solid
-        android:color="@android:color/transparent"/>
+    <solid android:color="@android:color/transparent" />
 
 </shape>

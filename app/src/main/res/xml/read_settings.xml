@@ -23,7 +23,7 @@
         android:summary="%s"
         android:title="@string/settings_read_screen_rotation"
         app:entries="@array/screen_rotation_entries"
-        app:entryValues="@array/screen_rotation_entry_values" 
+        app:entryValues="@array/screen_rotation_entry_values"
         app:iconSpaceReserved="false" />
 
     <SimpleMenuPreference
@@ -32,7 +32,7 @@
         android:summary="%s"
         android:title="@string/settings_read_reading_direction"
         app:entries="@array/reading_direction_entries"
-        app:entryValues="@array/reading_direction_entry_values" 
+        app:entryValues="@array/reading_direction_entry_values"
         app:iconSpaceReserved="false" />
 
     <SimpleMenuPreference
@@ -41,7 +41,7 @@
         android:summary="%s"
         android:title="@string/settings_read_page_scaling"
         app:entries="@array/page_scaling_entries"
-        app:entryValues="@array/page_scaling_entry_values" 
+        app:entryValues="@array/page_scaling_entry_values"
         app:iconSpaceReserved="false" />
 
     <SimpleMenuPreference
@@ -50,55 +50,55 @@
         android:summary="%s"
         android:title="@string/settings_read_start_position"
         app:entries="@array/start_position_entries"
-        app:entryValues="@array/start_position_values" 
+        app:entryValues="@array/start_position_values"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="keep_screen_on"
-        android:title="@string/settings_read_keep_screen_on" 
+        android:title="@string/settings_read_keep_screen_on"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="gallery_show_clock"
-        android:title="@string/settings_read_show_clock" 
+        android:title="@string/settings_read_show_clock"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="gallery_show_progress"
-        android:title="@string/settings_read_show_progress" 
+        android:title="@string/settings_read_show_progress"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="gallery_show_battery"
-        android:title="@string/settings_read_show_battery" 
+        android:title="@string/settings_read_show_battery"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="gallery_show_page_interval"
-        android:title="@string/settings_read_show_page_interval" 
+        android:title="@string/settings_read_show_page_interval"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="volume_page"
-        android:title="@string/settings_read_volume_page" 
+        android:title="@string/settings_read_volume_page"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="reading_fullscreen"
-        android:title="@string/settings_read_reading_fullscreen" 
+        android:title="@string/settings_read_reading_fullscreen"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="custom_screen_lightness"
-        android:title="@string/settings_read_custom_screen_lightness" 
+        android:title="@string/settings_read_custom_screen_lightness"
         app:iconSpaceReserved="false" />
 
     <SeekBarPreference
@@ -106,8 +106,8 @@
         android:dependency="custom_screen_lightness"
         android:key="screen_lightness"
         android:title="@string/settings_read_screen_lightness"
+        app:iconSpaceReserved="false"
         app:max="200"
-        app:showSeekBarValue="true" 
-        app:iconSpaceReserved="false" />
+        app:showSeekBarValue="true" />
 
 </PreferenceScreen>

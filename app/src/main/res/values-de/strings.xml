@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -552,5 +551,5 @@
     <string name="settings_eh_identity_cookies_copy">Kopieren</string>
     <string name="settings_eh_show_gallery_pages">Galerieseitenzahl anzeigen</string>
     <string name="settings_eh_show_gallery_pages_summary">Die Galerieseitenzahle in der Galerieliste anzeigen</string>
-    
+
 </resources>

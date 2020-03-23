@@ -118,7 +118,7 @@
     <string name="gallery_list_search_bar_hint_e_hentai">Chercher sur E-Hentai</string>
     <string name="gallery_list_search_bar_open_gallery">Ouvrir la galerie spécifiée</string>
     <string name="gallery_list_empty_hit">Le monde est grand et le panda s\'assied tout seul.</string>
-	<string name="gallery_list_empty_hit_subscription">Vous pouvez suivre des tags à Paramètres -> EH -> Mes tags.</string>
+    <string name="gallery_list_empty_hit_subscription">Vous pouvez suivre des tags à Paramètres -> EH -> Mes tags.</string>
 
     <string name="search">Chercher</string>
 
@@ -342,15 +342,15 @@
     <string name="clear_all_history">Effacer toute l\'historique ?</string>
 
     <!-- Filter -->
-	<string name="filter">Bloqueur des galeries</string>
+    <string name="filter">Bloqueur des galeries</string>
     <string name="filter_title">Titre</string>
     <string name="filter_uploader">Uploader</string>
     <string name="filter_tag">Tag</string>
     <string name="filter_tag_namespace">Espace de nom de tag</string>
     <string name="tip">Astuce</string>
-	<string name="delete_filter">Supprimer le bloqueur bloqueur \"%s\" ?</string>
+    <string name="delete_filter">Supprimer le bloqueur bloqueur \"%s\" ?</string>
     <string name="show_definition">Montrer les expliques</string>
-	<string name="add_filter">Ajouter un bloqueur</string>
+    <string name="add_filter">Ajouter un bloqueur</string>
     <string name="filter_text">Texte du bloqueur</string>
     <string name="filter_tip">Les galeries non désirées qui satisfont les critères des bloqueurs ne sont pas affichées.\n\nBloqueur du titre : exclure les galeries dont le titre contient le mot.\n\nBloqueur d\'uploader : exclure les galerie mises en ligne par cet uploader.\n\nBloqueur de tag : exclure les galeries qui ont ce tag. Il vas prendre plus de temps pour charger la liste.\n\nBloqueur d\'espace de nom de tag : exclure les galeries qui ont cette espace de nom de tag. Il vas prendre plus de temps pour charger la liste.</string>
 

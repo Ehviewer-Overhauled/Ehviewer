@@ -20,11 +20,10 @@
     <!-- Base Theme -->
     <!-- ========== -->
     <style name="BaseTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="android:navigationBarColor">@color/colorNavigationBar</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/lightNavigationBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
         <item name="actionBarStyle">@style/ActionBarStyle</item>
 
         <item name="colorEdgeEffect">@color/colorPrimary</item>
@@ -55,9 +54,13 @@
         <!--<item name="preferenceHeaderBackground">@drawable/preference_header_background</item>-->
         <item name="toolbarPopupTheme">@style/ToolbarPopupTheme</item>
         <item name="galleryDetailDivider">@drawable/divider_gallery_detail</item>
+        <item name="android:navigationBarColor">@color/colorNavigationBar</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">
+            @bool/lightNavigationBar
+        </item>
     </style>
 
-    <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Light"/>
+    <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="AppTheme" parent="BaseTheme">
         <item name="android:colorEdgeEffect">?attr/colorEdgeEffect</item>
@@ -76,10 +79,9 @@
     <!-- Base Black Theme -->
     <!-- =============== -->
 
-    <style name="ThemeOverlay"/>
+    <style name="ThemeOverlay" />
+
     <style name="ThemeOverlay.Black">
-        <item name="android:navigationBarColor">@android:color/black</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
         <item name="android:colorEdgeEffect">?attr/colorEdgeEffect</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@android:color/black</item>
@@ -122,6 +124,8 @@
         <item name="preferenceHeaderBackground">@drawable/preference_header_background_black</item>
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="galleryDetailDivider">@drawable/divider_gallery_detail_dark</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
 
     <!-- ========= -->

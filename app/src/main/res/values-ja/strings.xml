@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -146,7 +145,7 @@
     <string name="search_sr">評価の下限：</string>
     <string name="search_sp">ページ：</string>
     <string name="search_sp_to">から</string>
-	<string name="search_sp_suffix">まで</string>
+    <string name="search_sp_suffix">まで</string>
     <string name="search_sf">既定フィルターから下記のものを例外とする：</string>
     <string name="search_sfl">言語</string>
     <string name="search_sfu">アップローダ</string>
@@ -443,11 +442,11 @@
     <string name="settings_read_custom_screen_lightness">画面の明るさを設定</string>
     <string name="settings_read_screen_lightness">画面の明るさ</string>
 
-  
-   <!-- My Tags Activity -->
+
+    <!-- My Tags Activity -->
     <string name="my_tags">マイ タグ</string>
-  
-  
+
+
     <string name="settings_download">ダウンロード</string>
     <string name="settings_download_download_location">ダウンロードパス</string>
     <string name="settings_download_invalid_download_location">無効なダウンロードパス</string>
@@ -528,8 +527,8 @@
     <string name="proxy_port">ポート</string>
     <string name="proxy_domain_not_supported">ドメインには対応していません</string>
     <string name="proxy_invalid_port">入力したポートは無効です</string>
-  
-  
+
+
     <!-- ExcludedLanguagesScene -->
     <string name="excluded_languages">言語を除外</string>
     <string name="select_all">すべて選択</string>
@@ -673,7 +672,7 @@
     <string name="settings_advanced_custom_hosts_title">カスタムhosts.txt</string>
     <string name="settings_advanced_custom_hosts_summary">ホスト名をIPにマッピング\n既定のhosts.txtを上書きできます。</string>
 
-     <string name="settings_eh_theme">テーマ</string>
+    <string name="settings_eh_theme">テーマ</string>
     <string name="settings_eh_theme_light">ライト</string>
     <string name="settings_eh_theme_dark">ダーク</string>
     <string name="settings_eh_theme_black">ブラック</string>

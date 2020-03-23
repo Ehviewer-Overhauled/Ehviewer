@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -389,7 +388,7 @@
     <string name="settings_read_start_position_bottom_right">Abajo a la derecha</string>
     <string name="settings_read_start_position_center">Centro</string>
     <string name="settings_read_keep_screen_on">Pantalla siempre encendida</string>
-	<string name="settings_read_show_page_interval">Mostrar intervalo de página</string>
+    <string name="settings_read_show_page_interval">Mostrar intervalo de página</string>
     <string name="settings_read_show_clock">Mostrar hora</string>
     <string name="settings_read_show_progress">Mostrar progreso de lectura</string>
     <string name="settings_read_show_battery">Mostrar porcentaje de la batería</string>

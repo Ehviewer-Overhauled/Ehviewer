@@ -1,4 +1,4 @@
 <resources>
 
-    <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Light"/>
+    <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Light" />
 </resources>

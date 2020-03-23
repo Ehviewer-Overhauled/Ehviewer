@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.hippo.preference.ActivityPreference
         android:key="pattern_protection"
-        app:iconSpaceReserved="false"
         android:title="@string/settings_privacy_pattern_protection_title"
-        app:activity="com.hippo.ehviewer.ui.SetSecurityActivity"/>
+        app:activity="com.hippo.ehviewer.ui.SetSecurityActivity"
+        app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
+        android:defaultValue="false"
         android:key="enable_secure"
-        app:iconSpaceReserved="false"
         android:title="@string/settings_privacy_secure"
-        app:summaryOn="@string/settings_privacy_secure_summary"
+        app:iconSpaceReserved="false"
         app:summaryOff="@string/settings_privacy_secure_summary"
-        android:defaultValue="false"/>
-<!--
-    <SwitchPreferenceCompat
-        app:iconSpaceReserved="false"
-        android:key="enable_analytics"
-        android:title="@string/settings_privacy_enable_analytics"
-        android:defaultValue="true"/>
+        app:summaryOn="@string/settings_privacy_secure_summary" />
+    <!--
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            android:key="enable_analytics"
+            android:title="@string/settings_privacy_enable_analytics"
+            android:defaultValue="true"/>
 
-    <com.hippo.preference.MessagePreference
-        android:key="about_analytics"
-        android:title="@string/settings_privacy_about_analytics"
-        app:iconSpaceReserved="false"
-        app:dialogMessage="@string/analytics_explain"
-        app:dialogMessageHtml="true"
-        app:dialogMessageLinkify="true"/>-->
+        <com.hippo.preference.MessagePreference
+            android:key="about_analytics"
+            android:title="@string/settings_privacy_about_analytics"
+            app:iconSpaceReserved="false"
+            app:dialogMessage="@string/analytics_explain"
+            app:dialogMessageHtml="true"
+            app:dialogMessageLinkify="true"/>-->
 </PreferenceScreen>

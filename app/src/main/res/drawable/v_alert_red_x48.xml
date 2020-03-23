@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +14,14 @@
   ~ limitations under the License.
   -->
 
-<vector
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
 
     <path
-        android:pathData="@string/pd_alert"
-        android:fillColor="@color/red_500"/>
+        android:fillColor="@color/red_500"
+        android:pathData="@string/pd_alert" />
 
 </vector>

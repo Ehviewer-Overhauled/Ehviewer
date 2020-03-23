@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,7 +71,7 @@
     <string name="error_socket">เน็ตเวิร์คเกิดข้อผิดพลาด</string>
     <string name="error_unknown">มันแปลกๆนะ</string>
     <string name="error_cant_find_activity">หาแอปพลิเคชั่นไม่เจอ</string>
-    <string name="error_cannot_parse_the_url">ไม่สามารถวิเคราะห์ URL </string> 
+    <string name="error_cannot_parse_the_url">ไม่สามารถวิเคราะห์ URL </string>
     <string name="error_not_folder_path">ไม่พบโฟลเดอร์ปลายทาง</string>
     <string name="error_no_provider">ไม่มีผู้ให้บริการ</string>
     <string name="error_decoding_failed">การถอดรหัสล้มเหลว</string>
@@ -88,7 +87,7 @@
     <string name="error_get_ptoken_error">การรับ pToken มีปัญหา</string>
     <string name="error_cant_create_temp_file">ไม่สามารถสร้างไฟล์ชั่วคราวได้</string>
     <string name="error_cant_save_image">ไม่สามารถบันทึกรูปภาพได้</string>
-    <string name="error_invalid_number">จำนวนไม่ถูกต้อง</string> 
+    <string name="error_invalid_number">จำนวนไม่ถูกต้อง</string>
 
     <string name="app_waring">เนื้อหาภายในแอปพลิเคชั่นนี้มาจากอินเทอร์เน็ตทั้งหมด อาจมีเนื้อหาบางอย่างที่มีผลต่อร่างกายหรือจิตใจของคุณ คุณจะต้องยอมรับความเสี่ยงที่ดังกล่าว และดำเนินการต่อไป</string>
     <string name="error_username_cannot_empty">ชื่อผู้ใช้ห้ามเว้นว่างไว้</string>

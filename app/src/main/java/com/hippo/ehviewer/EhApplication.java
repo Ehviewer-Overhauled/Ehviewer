@@ -277,7 +277,7 @@ public class EhApplication extends RecordingApplication {
         EhEngine.initialize();
         BitmapUtils.initialize(this);
         Image.initialize(this);
-        A7Zip.loadLibrary(A7ZipExtractLite.LIBRARY, libname -> ReLinker.loadLibrary(EhApplication.this, libname));
+        ReLinker.loadLibrary(this, "a7zip-extract-lite");
 
         if (EhDB.needMerge()) {
             EhDB.mergeOldDB(this);
