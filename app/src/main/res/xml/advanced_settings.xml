@@ -89,7 +89,7 @@
         app:activity="com.hippo.ehviewer.ui.HostsActivity"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.preference.ExportDataPreference
+    <Preference
         android:key="export_data"
         android:title="@string/settings_advanced_export_data"
         android:summary="@string/settings_advanced_export_data_summary"

@@ -53,7 +53,16 @@ public class AppConfig {
     @Nullable
     public static File getExternalAppDir() {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = new File(Environment.getExternalStorageDirectory(), APP_DIRNAME);
+            File dir = sContext.getExternalFilesDir(null);
+            return FileUtils.ensureDirectory(dir) ? dir : null;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static File getExternalMediaDir() {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            File dir = new File(sContext.getExternalMediaDirs()[0], APP_DIRNAME);
             return FileUtils.ensureDirectory(dir) ? dir : null;
         }
         return null;
@@ -64,6 +73,7 @@ public class AppConfig {
      */
     @Nullable
     public static File getDirInExternalAppDir(String filename) {
+
         File appFolder = getExternalAppDir();
         if (appFolder != null) {
             File dir = new File(appFolder, filename);
@@ -94,17 +104,12 @@ public class AppConfig {
 
     @Nullable
     public static File getExternalImageDir() {
-        return getDirInExternalAppDir(IMAGE);
+        return getExternalMediaDir();
     }
 
     @Nullable
     public static File getExternalParseErrorDir() {
         return getDirInExternalAppDir(PARSE_ERROR);
-    }
-
-    @Nullable
-    public static File getExternalLogcatDir() {
-        return getDirInExternalAppDir(LOGCAT);
     }
 
     @Nullable

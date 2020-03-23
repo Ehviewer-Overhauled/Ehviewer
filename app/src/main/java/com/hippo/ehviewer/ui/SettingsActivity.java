@@ -38,15 +38,6 @@ public final class SettingsActivity extends EhActivity {
 
     private static final int REQUEST_CODE_FRAGMENT = 0;
 
-    private static final String[] ENTRY_FRAGMENTS = {
-            EhFragment.class.getName(),
-            ReadFragment.class.getName(),
-            DownloadFragment.class.getName(),
-            AdvancedFragment.class.getName(),
-            AboutFragment.class.getName(),
-            PrivacyFragment.class.getName(),
-    };
-
     @Override
     protected int getThemeResId(int theme) {
         return R.style.AppTheme_Settings;

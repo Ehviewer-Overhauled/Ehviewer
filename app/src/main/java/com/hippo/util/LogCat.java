@@ -16,26 +16,20 @@
 
 package com.hippo.util;
 
-import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public final class LogCat {
 
     private LogCat() {
     }
 
-    public static boolean save(File file) {
-        if (!FileUtils.ensureFile(file)) {
-            return false;
-        }
-
+    public static boolean save(OutputStream outputStream) {
         try {
             Process p = Runtime.getRuntime().exec("logcat -d");
-            IOUtils.copy(p.getInputStream(), new FileOutputStream(file));
+            IOUtils.copy(p.getInputStream(), outputStream);
             return true;
         } catch (IOException e) {
             e.printStackTrace();

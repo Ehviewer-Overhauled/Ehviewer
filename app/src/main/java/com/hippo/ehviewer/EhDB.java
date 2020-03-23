@@ -20,6 +20,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -619,7 +620,7 @@ public class EhDB {
         return true;
     }
 
-    public static synchronized boolean exportDB(Context context, File file) {
+    public static synchronized boolean exportDB(Context context, Uri uri) {
         final String ehExportName = "eh.export.db";
 
         // Delete old export db
@@ -659,7 +660,7 @@ public class EhDB {
             OutputStream os = null;
             try {
                 is = new FileInputStream(dbFile);
-                os = new FileOutputStream(file);
+                os = context.getContentResolver().openOutputStream(uri);;
                 IOUtils.copy(is, os);
                 return true;
             } catch (IOException e) {
@@ -669,7 +670,6 @@ public class EhDB {
                 IOUtils.closeQuietly(os);
             }
             // Delete failed file
-            file.delete();
             return false;
         } finally {
             context.deleteDatabase(ehExportName);
@@ -680,8 +680,23 @@ public class EhDB {
      * @param file The db file
      * @return error string, null for no error
      */
-    public static synchronized String importDB(Context context, File file) {
+    public static synchronized String importDB(Context context, Uri uri) {
         try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            File file = File.createTempFile("importDatabase", "");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            byte[] buff = new byte[1024];
+            int read;
+            if (inputStream != null) {
+                while ((read = inputStream.read(buff, 0, buff.length)) > 0) {
+                    outputStream.write(buff, 0, read);
+                }
+            } else {
+                return context.getString(R.string.cant_read_the_file);
+            }
+            inputStream.close();
+            outputStream.close();
+
             SQLiteDatabase db = SQLiteDatabase.openDatabase(
                     file.getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
             int newVersion = DaoMaster.SCHEMA_VERSION;

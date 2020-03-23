@@ -330,7 +330,6 @@ public final class MainActivity extends StageActivity
         }
 
         if (savedInstanceState == null) {
-            onInit();
             CommonOperations.checkUpdate(this, false);
             checkDownloadLocation();
             if (Settings.getCellularNetworkWarning()) {
@@ -360,12 +359,6 @@ public final class MainActivity extends StageActivity
         if (Network.getActiveNetworkType(this) == ConnectivityManager.TYPE_MOBILE) {
             showTip(R.string.cellular_network_warning, BaseScene.LENGTH_SHORT);
         }
-    }
-
-    private void onInit() {
-        // Check permission
-        PermissionRequester.request(this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                getString(R.string.write_rationale), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
     }
 
     private void onRestore(Bundle savedInstanceState) {
