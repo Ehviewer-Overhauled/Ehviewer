@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +14,10 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingLeft="?attr/dialogPreferredPadding"
     android:paddingTop="18dp"
     android:paddingRight="?attr/dialogPreferredPadding">
@@ -28,9 +26,9 @@
         android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:entries="@array/proxy_types"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:entries="@array/proxy_types"/>
+        android:paddingBottom="8dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ip_input_layout"
@@ -42,7 +40,7 @@
             android:id="@+id/ip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"/>
+            android:inputType="text" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,7 +54,7 @@
             android:id="@+id/port"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal" />
 
     </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

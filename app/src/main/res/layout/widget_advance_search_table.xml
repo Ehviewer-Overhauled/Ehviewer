@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +12,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,20 +22,20 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
             android:checked="true"
-            android:text="@string/search_sname"/>
+            android:text="@string/search_sname" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
             android:checked="true"
-            android:text="@string/search_stags"/>
+            android:text="@string/search_stags" />
     </LinearLayout>
 
     <LinearLayout
@@ -49,18 +47,18 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sdesc"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sdesc" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
-            android:text="@string/search_storr"/>
+            android:layout_weight="1"
+            android:text="@string/search_storr" />
     </LinearLayout>
 
     <LinearLayout
@@ -72,18 +70,18 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sto"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sto" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
-            android:text="@string/search_sdt1"/>
+            android:layout_weight="1"
+            android:text="@string/search_sdt1" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,18 +93,18 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sdt2"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sdt2" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
-            android:text="@string/search_sh"/>
+            android:layout_weight="1"
+            android:text="@string/search_sh" />
     </LinearLayout>
 
     <LinearLayout
@@ -118,18 +116,18 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sr"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sr" />
 
         <Spinner
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:entries="@array/search_min_rating"/>
+            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:entries="@array/search_min_rating" />
     </LinearLayout>
 
     <LinearLayout
@@ -141,48 +139,48 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sp"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:text="@string/search_sp" />
 
         <EditText
             android:id="@+id/spf"
             android:layout_width="64dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
+            android:imeOptions="actionNext"
             android:inputType="number"
-            android:maxLines="1"
-            android:imeOptions="actionNext"/>
+            android:maxLines="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
             android:text="@string/search_sp_to"
-            android:textColor="?android:attr/textColorPrimary"/>
+            android:textColor="?android:attr/textColorPrimary" />
 
         <EditText
             android:id="@+id/spt"
             android:layout_width="64dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
+            android:imeOptions="actionNone"
             android:inputType="number"
-            android:maxLines="1"
-            android:imeOptions="actionNone"/>
+            android:maxLines="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:text="@string/search_sp_suffix"
-            android:textColor="?android:attr/textColorPrimary"/>
+            android:textColor="?android:attr/textColorPrimary" />
     </LinearLayout>
 
     <LinearLayout
@@ -196,7 +194,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/search_sf"
-            android:textColor="?android:attr/textColorPrimary"/>
+            android:textColor="?android:attr/textColorPrimary" />
     </LinearLayout>
 
     <LinearLayout
@@ -207,26 +205,26 @@
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sfl"/>
+            android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sfl" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_gravity="center_vertical"
-            android:text="@string/search_sfu"/>
+            android:layout_weight="1"
+            android:text="@string/search_sfu" />
 
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_gravity="center_vertical"
-            android:text="@string/search_sft"/>
+            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
+            android:layout_weight="1"
+            android:text="@string/search_sft" />
     </LinearLayout>
 </merge>
