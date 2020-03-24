@@ -321,7 +321,6 @@ public final class MainActivity extends StageActivity
         View headerLayout = mNavView.getHeaderView(0);
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
-        mDrawerLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
         updateProfile();
 
