@@ -16,8 +16,8 @@
 
 <path>
 
-    <external-path
+    <external-cache-path
         name="temp"
-        path="EhViewer/temp" />
+        path="/" />
 
 </path>

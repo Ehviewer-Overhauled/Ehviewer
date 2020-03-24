@@ -99,7 +99,7 @@ public class AppConfig {
 
     @Nullable
     public static File getExternalTempDir() {
-        return getDirInExternalAppDir(TEMP);
+        return sContext.getExternalCacheDir();
     }
 
     @Nullable

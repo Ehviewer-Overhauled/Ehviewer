@@ -50,6 +50,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
@@ -749,17 +750,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mimeType = "image/jpeg";
         }
 
-        Uri uri = new Uri.Builder()
-                .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority(BuildConfig.FILE_PROVIDER_AUTHORITY)
-                .appendPath("temp")
-                .appendPath(filename)
-                .build();
+        Uri uri = FileProvider.getUriForFile(this, BuildConfig.FILE_PROVIDER_AUTHORITY, new File(dir, filename));
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.setType(mimeType);
+        intent.setDataAndType(uri, getContentResolver().getType(uri));
 
         try {
             startActivity(Intent.createChooser(intent, getString(R.string.share_image)));
