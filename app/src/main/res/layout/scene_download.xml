@@ -63,7 +63,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_check_all_dark_x24" />
+            app:srcCompat="@drawable/v_check_all_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -71,7 +72,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_play_dark_x24" />
+            app:srcCompat="@drawable/v_play_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -79,7 +81,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_pause_dark_x24" />
+            app:srcCompat="@drawable/v_pause_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -87,7 +90,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_delete_dark_x24" />
+            app:srcCompat="@drawable/v_delete_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -95,7 +99,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_folder_move_dark_x24" />
+            app:srcCompat="@drawable/v_folder_move_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"

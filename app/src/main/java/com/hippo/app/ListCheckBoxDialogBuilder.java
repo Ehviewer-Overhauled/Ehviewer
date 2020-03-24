@@ -27,10 +27,11 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
 
-public class ListCheckBoxDialogBuilder extends AlertDialog.Builder {
+public class ListCheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
 
     private final CheckBox mCheckBox;
 
@@ -45,14 +46,11 @@ public class ListCheckBoxDialogBuilder extends AlertDialog.Builder {
         ListView listView = (ListView) ViewUtils.$$(view, R.id.list_view);
         mCheckBox = (CheckBox) ViewUtils.$$(view, R.id.checkbox);
         listView.setAdapter(new ArrayAdapter<>(getContext(), R.layout.item_select_dialog, items));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (listener != null) {
-                    listener.onItemClick(ListCheckBoxDialogBuilder.this, mDialog, position);
-                }
-                mDialog.dismiss();
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            if (listener != null) {
+                listener.onItemClick(ListCheckBoxDialogBuilder.this, mDialog, position);
             }
+            mDialog.dismiss();
         });
         mCheckBox.setText(checkText);
         mCheckBox.setChecked(checked);

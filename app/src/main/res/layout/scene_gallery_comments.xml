@@ -81,7 +81,7 @@
         android:paddingRight="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"

@@ -34,7 +34,7 @@
         android:layout_marginTop="@dimen/gallery_search_bar_margin_v"
         android:layout_marginRight="@dimen/gallery_search_bar_margin_h" />
 
-    <com.hippo.widget.FabLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -47,7 +47,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_go_to_dark_x24" />
+            app:srcCompat="@drawable/v_go_to_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -55,16 +56,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_refresh_dark_x24" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/v_download_dark_x24" />
+            app:srcCompat="@drawable/v_refresh_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -73,7 +66,8 @@
             android:visibility="gone"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_delete_dark_x24" />
+            app:srcCompat="@drawable/v_download_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -82,7 +76,18 @@
             android:visibility="gone"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_folder_move_dark_x24" />
+            app:srcCompat="@drawable/v_delete_dark_x24"
+            app:tint="#fff" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:backgroundTint="?attr/widgetColorThemeAccent"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/v_folder_move_dark_x24"
+            app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"

@@ -68,10 +68,10 @@ public final class CommonOperations {
     private static boolean UPDATING;
 
     public static void checkUpdate(Activity activity, boolean feedback) {
-        if (!UPDATING) {
+        /*if (!UPDATING) {
             UPDATING = true;
             new UpdateTask(activity, feedback).executeOnExecutor(IoThreadPoolExecutor.getInstance());
-        }
+        }*/
     }
 
     private static void doAddToFavorites(Activity activity, GalleryInfo galleryInfo,

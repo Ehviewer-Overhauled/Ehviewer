@@ -21,7 +21,7 @@
     </style>
 
     <!-- TextAppearance -->
-    <style name="TextAppearance" parent="TextAppearance.AppCompat"></style>
+    <style name="TextAppearance" parent="TextAppearance.AppCompat" />
 
     <!-- Progress View -->
     <style name="ProgressView">
