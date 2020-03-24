@@ -18,13 +18,13 @@ An E-Hentai Application for Android.
 
 Windows
 
-    > git clone https://github.com/seven332/EhViewer
+    > git clone https://github.com/NekoInverter/EhViewer
     > cd EhViewer
     > gradlew app:assembleDebug
 
 Linux
 
-    $ git clone https://github.com/seven332/EhViewer
+    $ git clone https://github.com/NekoInverter/EhViewer
     $ cd EhViewer
     $ ./gradlew app:assembleDebug
 
@@ -35,9 +35,9 @@ The apk is in app\build\outputs\apk
 
 # Download
 
-[下载](https://github.com/seven332/EhViewer/releases)
+[下载](https://github.com/NekoInverter/EhViewer/releases)
 
-[Download](https://github.com/seven332/EhViewer/releases)
+[Download](https://github.com/NekoInverter/EhViewer/releases)
 
 
 # Thanks
