@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer.ui;
 
-import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -39,13 +38,14 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
@@ -82,7 +82,6 @@ import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
-import com.hippo.util.PermissionRequester;
 import com.hippo.widget.LoadImageView;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.SimpleHandler;
@@ -321,7 +320,12 @@ public final class MainActivity extends StageActivity
         View headerLayout = mNavView.getHeaderView(0);
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
-
+        ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
+            int theme = isNightMode(getResources().getConfiguration()) ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
+            AppCompatDelegate.setDefaultNightMode(theme);
+            ((EhApplication) getApplication()).recreate();
+            Settings.putTheme(theme);
+        });
         updateProfile();
 
         if (mNavView != null) {
