@@ -147,6 +147,8 @@ public class DownloadsScene extends ToolbarScene
 
     private List<String> mLabels;
 
+    private int mType = -1;
+
     private static void deleteFileAsync(UniFile... files) {
         new AsyncTask<UniFile, Void, Void>() {
             @Override
@@ -259,15 +261,26 @@ public class DownloadsScene extends ToolbarScene
         if (null == mDownloadManager) {
             return;
         }
-
+        List<DownloadInfo> list;
         if (mLabel == null) {
-            mList = mDownloadManager.getDefaultDownloadInfoList();
+            list = mDownloadManager.getDefaultDownloadInfoList();
         } else {
-            mList = mDownloadManager.getLabelDownloadInfoList(mLabel);
-            if (mList == null) {
+            list = mDownloadManager.getLabelDownloadInfoList(mLabel);
+            if (list == null) {
                 mLabel = null;
-                mList = mDownloadManager.getDefaultDownloadInfoList();
+                list = mDownloadManager.getDefaultDownloadInfoList();
             }
+        }
+
+        if (mType != -1) {
+            mList = new ArrayList<>();
+            for (DownloadInfo info : list) {
+                if (info.state == mType) {
+                    mList.add(info);
+                }
+            }
+        } else {
+            mList = list;
         }
 
         if (mAdapter != null) {
@@ -505,6 +518,16 @@ public class DownloadsScene extends ToolbarScene
 
         int id = item.getItemId();
         switch (id) {
+            case R.id.action_filter: {
+                new MaterialAlertDialogBuilder(requireActivity())
+                        .setSingleChoiceItems(R.array.download_state, mType + 1, (dialog, which) -> {
+                            mType = which - 1;
+                            updateForLabel();
+                            dialog.dismiss();
+                        })
+                        .show();
+                return true;
+            }
             case R.id.action_start_all: {
                 Intent intent = new Intent(activity, DownloadService.class);
                 intent.setAction(DownloadService.ACTION_START_ALL);
