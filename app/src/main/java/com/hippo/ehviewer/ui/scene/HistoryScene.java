@@ -18,6 +18,7 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,15 +50,21 @@ import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
+import com.hippo.ehviewer.FavouriteStatusRouter;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryInfo;
+import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.HistoryInfo;
+import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.ui.CommonOperations;
+import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
+import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
@@ -66,6 +74,8 @@ import com.hippo.widget.LoadImageView;
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ViewUtils;
+
+import java.util.List;
 
 import de.greenrobot.dao.query.LazyList;
 
@@ -83,9 +93,86 @@ public class HistoryScene extends ToolbarScene {
     @Nullable
     private LazyList<HistoryInfo> mLazyList;
 
+    private DownloadManager mDownloadManager;
+    private DownloadManager.DownloadInfoListener mDownloadInfoListener;
+    private FavouriteStatusRouter mFavouriteStatusRouter;
+    private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener);
+        mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener);
+    }
+
     @Override
     public int getNavCheckedItem() {
         return R.id.nav_history;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Context context = getContext2();
+        assert context != null;
+        mDownloadManager = EhApplication.getDownloadManager(context);
+        mDownloadManager = EhApplication.getDownloadManager(context);
+        mFavouriteStatusRouter = EhApplication.getFavouriteStatusRouter(context);
+
+        mDownloadInfoListener = new DownloadManager.DownloadInfoListener() {
+            @Override
+            public void onAdd(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list, int position) {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onUpdate(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list) {
+            }
+
+            @Override
+            public void onUpdateAll() {
+            }
+
+            @Override
+            public void onReload() {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChange() {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onRenameLabel(String from, String to) {
+            }
+
+            @Override
+            public void onRemove(@NonNull DownloadInfo info, @NonNull List<DownloadInfo> list, int position) {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onUpdateLabels() {
+            }
+        };
+        mDownloadManager.addDownloadInfoListener(mDownloadInfoListener);
+
+        mFavouriteStatusRouterListener = (gid, slot) -> {
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
+        };
+        mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener);
     }
 
     @Nullable
@@ -257,7 +344,7 @@ public class HistoryScene extends ToolbarScene {
         return true;
     }
 
-    public boolean onItemLongClick(View view, int position) {
+    public boolean onItemLongClick(int position) {
         final Context context = getContext2();
         final MainActivity activity = getActivity2();
         if (null == context || null == activity || null == mLazyList) {
@@ -265,29 +352,62 @@ public class HistoryScene extends ToolbarScene {
         }
 
         final GalleryInfo gi = mLazyList.get(position);
+
+        if (gi == null) {
+            return true;
+        }
+
+        boolean downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID;
+        boolean favourited = gi.favoriteSlot != -2;
+
+        CharSequence[] items = new CharSequence[]{
+                context.getString(R.string.read),
+                context.getString(downloaded ? R.string.delete_downloads : R.string.download),
+                context.getString(favourited ? R.string.remove_from_favourites : R.string.add_to_favourites),
+        };
+
+        int[] icons = new int[]{
+                R.drawable.v_book_open_x24,
+                downloaded ? R.drawable.v_delete_x24 : R.drawable.v_download_x24,
+                favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
+        };
+
         new MaterialAlertDialogBuilder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
-                .setItems(R.array.gallery_list_menu_entries, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Download
+                .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Read
+                            Intent intent = new Intent(activity, GalleryActivity.class);
+                            intent.setAction(GalleryActivity.ACTION_EH);
+                            intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, gi);
+                            startActivity(intent);
+                            break;
+                        case 1: // Download
+                            if (downloaded) {
+                                new MaterialAlertDialogBuilder(context)
+                                        .setTitle(R.string.download_remove_dialog_title)
+                                        .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
+                                        .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
+                                        .show();
+                            } else {
                                 CommonOperations.startDownload(activity, gi, false);
-                                break;
-                            case 1: // Favorites
-                                CommonOperations.addToFavorites(activity, gi,
-                                        new addToFavoriteListener(context,
-                                                activity.getStageId(), getTag()));
-                                break;
-                        }
+                            }
+                            break;
+                        case 2: // Favorites
+                            if (favourited) {
+                                CommonOperations.removeFromFavorites(activity, gi, new RemoveFromFavoriteListener(context, activity.getStageId(), getTag()));
+                            } else {
+                                CommonOperations.addToFavorites(activity, gi, new AddToFavoriteListener(context, activity.getStageId(), getTag()));
+                            }
+                            break;
                     }
                 }).show();
         return true;
     }
 
-    private static class addToFavoriteListener extends EhCallback<HistoryScene, Void> {
+    private static class AddToFavoriteListener extends EhCallback<GalleryListScene, Void> {
 
-        public addToFavoriteListener(Context context, int stageId, String sceneTag) {
+        public AddToFavoriteListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
         }
 
@@ -307,11 +427,37 @@ public class HistoryScene extends ToolbarScene {
 
         @Override
         public boolean isInstance(SceneFragment scene) {
-            return scene instanceof HistoryScene;
+            return scene instanceof GalleryListScene;
         }
     }
 
-    private class HistoryHolder extends AbstractSwipeableItemViewHolder {
+    private static class RemoveFromFavoriteListener extends EhCallback<GalleryListScene, Void> {
+
+        public RemoveFromFavoriteListener(Context context, int stageId, String sceneTag) {
+            super(context, stageId, sceneTag);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            showTip(R.string.remove_from_favorite_success, LENGTH_SHORT);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG);
+        }
+
+        @Override
+        public void onCancel() {
+        }
+
+        @Override
+        public boolean isInstance(SceneFragment scene) {
+            return scene instanceof GalleryListScene;
+        }
+    }
+
+    private static class HistoryHolder extends AbstractSwipeableItemViewHolder {
 
         public final View card;
         public final LoadImageView thumb;
@@ -403,7 +549,7 @@ public class HistoryScene extends ToolbarScene {
             ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gid));
 
             holder.card.setOnClickListener(v -> onItemClick(holder.itemView, position));
-            holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, position));
+            holder.card.setOnLongClickListener(v -> onItemLongClick(position));
         }
 
         @Override
