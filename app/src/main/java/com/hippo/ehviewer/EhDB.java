@@ -222,7 +222,7 @@ public class EhDB {
                             search = search.substring("uploader:".length());
                         }
 
-                        quickSearch.setTime((long) cursor.getInt(0));
+                        quickSearch.setTime(cursor.getInt(0));
                         quickSearch.setName(cursor.getString(1));
                         quickSearch.setMode(mode);
                         quickSearch.setCategory(cursor.getInt(3));
@@ -660,7 +660,7 @@ public class EhDB {
             OutputStream os = null;
             try {
                 is = new FileInputStream(dbFile);
-                os = context.getContentResolver().openOutputStream(uri);;
+                os = context.getContentResolver().openOutputStream(uri);
                 IOUtils.copy(is, os);
                 return true;
             } catch (IOException e) {

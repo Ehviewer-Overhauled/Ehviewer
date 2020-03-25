@@ -34,19 +34,16 @@ import android.widget.TextView;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ripple.Ripple;
 import com.hippo.widget.RadioGridGroup;
 import com.hippo.yorozuya.ViewUtils;
 
@@ -121,17 +118,17 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         // Create normal view
         View normalView = mInflater.inflate(R.layout.search_normal, null);
         mNormalView = normalView;
-        mCategoryTable = (CategoryTable) normalView.findViewById(R.id.search_category_table);
-        mNormalSearchMode = (RadioGridGroup) normalView.findViewById(R.id.normal_search_mode);
-        mNormalSearchModeHelp = (ImageView) normalView.findViewById(R.id.normal_search_mode_help);
-        mEnableAdvanceSwitch = (SwitchCompat) normalView.findViewById(R.id.search_enable_advance);
+        mCategoryTable = normalView.findViewById(R.id.search_category_table);
+        mNormalSearchMode = normalView.findViewById(R.id.normal_search_mode);
+        mNormalSearchModeHelp = normalView.findViewById(R.id.normal_search_mode_help);
+        mEnableAdvanceSwitch = normalView.findViewById(R.id.search_enable_advance);
         mNormalSearchModeHelp.setOnClickListener(this);
         mEnableAdvanceSwitch.setOnCheckedChangeListener(SearchLayout.this);
         mEnableAdvanceSwitch.setSwitchPadding(resources.getDimensionPixelSize(R.dimen.switch_padding));
 
         // Create advance view
         mAdvanceView = mInflater.inflate(R.layout.search_advance, null);
-        mTableAdvanceSearch = (AdvanceSearchTable) mAdvanceView.findViewById(R.id.search_advance_search_table);
+        mTableAdvanceSearch = mAdvanceView.findViewById(R.id.search_advance_search_table);
 
         // Create image view
         mImageView = (ImageSearchLayout) mInflater.inflate(R.layout.search_image, null);
@@ -139,7 +136,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
 
         // Create action view
         mActionView = mInflater.inflate(R.layout.search_action, null);
-        mAction = (TextView) mActionView.findViewById(R.id.action);
+        mAction = mActionView.findViewById(R.id.action);
         mAction.setOnClickListener(this);
     }
 
@@ -381,8 +378,8 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
                 view = mActionView;
             } else {
                 view = mInflater.inflate(R.layout.search_category, parent, false);
-                TextView title = (TextView) view.findViewById(R.id.category_title);
-                FrameLayout content = (FrameLayout) view.findViewById(R.id.category_content);
+                TextView title = view.findViewById(R.id.category_title);
+                FrameLayout content = view.findViewById(R.id.category_content);
                 switch (viewType) {
                     case ITEM_TYPE_NORMAL:
                         title.setText(R.string.search_normal);

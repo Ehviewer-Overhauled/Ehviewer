@@ -17,10 +17,8 @@
 package com.hippo.util;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;

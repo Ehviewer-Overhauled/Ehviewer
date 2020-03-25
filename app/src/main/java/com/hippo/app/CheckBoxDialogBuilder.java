@@ -21,7 +21,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
@@ -36,7 +35,7 @@ public class CheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_checkbox_builder, null);
         setView(view);
         setMessage(message);
-        mCheckBox = (CheckBox) view.findViewById(R.id.checkbox);
+        mCheckBox = view.findViewById(R.id.checkbox);
         mCheckBox.setText(checkText);
         mCheckBox.setChecked(checked);
     }

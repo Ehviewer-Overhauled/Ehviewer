@@ -21,11 +21,8 @@ import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
@@ -70,7 +67,6 @@ import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.reveal.ViewAnimationUtils;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
@@ -95,8 +91,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class GalleryCommentsScene extends ToolbarScene
-        implements EasyRecyclerView.OnItemClickListener,
-        View.OnClickListener {
+        implements View.OnClickListener {
 
     public static final String TAG = GalleryCommentsScene.class.getSimpleName();
 
@@ -218,9 +213,9 @@ public final class GalleryCommentsScene extends ToolbarScene
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         mRecyclerView.addItemDecoration(decoration);
-        mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setOnItemClickListener(this);
+        //mRecyclerView.setOnItemClickListener(this);
         mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(),
                 mRecyclerView.getPaddingRight(), mRecyclerView.getPaddingBottom() + paddingBottomFab);
         // Cancel change animator
@@ -339,7 +334,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 LayoutUtils.dp2pix(context, 1));
         decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, R.attr.dialogPreferredPadding));
         rv.addItemDecoration(decoration);
-        rv.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //rv.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         rv.setClipToPadding(false);
         builder.setView(rv).show();
     }
@@ -405,8 +400,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 }).show();
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(EasyRecyclerView parent, View view, int position) {
         MainActivity activity = getActivity2();
         if (null == activity) {
             return false;
@@ -927,6 +921,11 @@ public final class GalleryCommentsScene extends ToolbarScene
             if (context == null || mCommentList == null) {
                 return;
             }
+
+            holder.itemView.setOnClickListener(v -> onItemClick(mRecyclerView, holder.itemView, position));
+            holder.itemView.setClickable(true);
+            holder.itemView.setFocusable(true);
+
 
             if (holder instanceof ActualCommentHolder) {
                 ((ActualCommentHolder) holder).bind(mCommentList.comments[position]);

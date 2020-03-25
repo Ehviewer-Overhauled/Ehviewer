@@ -22,12 +22,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -46,7 +43,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -84,7 +80,6 @@ import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.io.UniFileInputStreamPipe;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.unifile.UniFile;
@@ -110,8 +105,6 @@ import java.util.List;
 
 public class DownloadsScene extends ToolbarScene
         implements DownloadManager.DownloadInfoListener,
-        EasyRecyclerView.OnItemClickListener,
-        EasyRecyclerView.OnItemLongClickListener,
         FabLayout.OnClickFabListener, FastScroller.OnDragHandlerListener {
 
     public static final String KEY_GID = "gid";
@@ -315,11 +308,12 @@ public class DownloadsScene extends ToolbarScene
         mLayoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.getDetailSizeResId()));
         mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        mRecyclerView.setDrawSelectorOnTop(true);
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setOnItemClickListener(this);
-        mRecyclerView.setOnItemLongClickListener(this);
+        mRecyclerView.setClipChildren(false);
+        //mRecyclerView.setOnItemClickListener(this);
+        //mRecyclerView.setOnItemLongClickListener(this);
         mRecyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM);
         mRecyclerView.setCustomCheckedListener(new DownloadChoiceListener());
         // Cancel change animation
@@ -535,7 +529,7 @@ public class DownloadsScene extends ToolbarScene
         final Context context = getContext2();
         AssertUtils.assertNotNull(context);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.download_labels);
         toolbar.inflateMenu(R.menu.drawer_download);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -593,7 +587,7 @@ public class DownloadsScene extends ToolbarScene
         }
 
         // TODO handle download label items update
-        ListView listView = (ListView) view.findViewById(R.id.list_view);
+        ListView listView = view.findViewById(R.id.list_view);
         listView.setAdapter(new ArrayAdapter<>(context, R.layout.item_simple_list, labels));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -643,8 +637,7 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(int position) {
         Activity activity = getActivity2();
         EasyRecyclerView recyclerView = mRecyclerView;
         if (null == activity || null == recyclerView) {
@@ -671,8 +664,7 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
-    @Override
-    public boolean onItemLongClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemLongClick(int position) {
         EasyRecyclerView recyclerView = mRecyclerView;
         if (recyclerView == null) {
             return false;
@@ -1070,17 +1062,17 @@ public class DownloadsScene extends ToolbarScene
         public DownloadHolder(View itemView) {
             super(itemView);
 
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
             start = itemView.findViewById(R.id.start);
             stop = itemView.findViewById(R.id.stop);
-            state = (TextView) itemView.findViewById(R.id.state);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-            percent = (TextView) itemView.findViewById(R.id.percent);
-            speed = (TextView) itemView.findViewById(R.id.speed);
+            state = itemView.findViewById(R.id.state);
+            progressBar = itemView.findViewById(R.id.progress_bar);
+            percent = itemView.findViewById(R.id.percent);
+            speed = itemView.findViewById(R.id.speed);
 
             // TODO cancel on click listener when select items
             thumb.setOnClickListener(this);
@@ -1183,6 +1175,9 @@ public class DownloadsScene extends ToolbarScene
 
             // Update transition name
             ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(info.gid));
+
+            holder.itemView.setOnClickListener(v -> onItemClick(position));
+            holder.itemView.setOnLongClickListener(v -> onItemLongClick(position));
         }
 
         @Override
@@ -1209,9 +1204,6 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onOutOfCustomChoice(EasyRecyclerView view) {
-            if (mRecyclerView != null) {
-                mRecyclerView.setOnItemLongClickListener(DownloadsScene.this);
-            }
             if (mFabLayout != null) {
                 mFabLayout.setExpanded(false);
             }

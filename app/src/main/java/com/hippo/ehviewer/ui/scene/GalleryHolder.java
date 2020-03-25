@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.widget.LoadImageView;
@@ -38,6 +39,7 @@ class GalleryHolder extends RecyclerView.ViewHolder {
     public final TextView simpleLanguage;
     public final ImageView favourited;
     public final ImageView downloaded;
+    public final MaterialCardView card;
 
     public GalleryHolder(View itemView) {
         super(itemView);
@@ -52,5 +54,6 @@ class GalleryHolder extends RecyclerView.ViewHolder {
         simpleLanguage = itemView.findViewById(R.id.simple_language);
         favourited = itemView.findViewById(R.id.favourited);
         downloaded = itemView.findViewById(R.id.downloaded);
+        card = itemView.findViewById(R.id.card);
     }
 }

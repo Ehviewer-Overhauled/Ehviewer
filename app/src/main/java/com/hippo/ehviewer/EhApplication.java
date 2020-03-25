@@ -35,8 +35,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.collection.LruCache;
 
 import com.getkeepsafe.relinker.ReLinker;
-import com.hippo.a7zip.A7Zip;
-import com.hippo.a7zip.A7ZipExtractLite;
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.conaco.Conaco;
 import com.hippo.content.RecordingApplication;

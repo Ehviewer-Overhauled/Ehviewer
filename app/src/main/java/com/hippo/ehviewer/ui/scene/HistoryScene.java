@@ -19,10 +19,7 @@ package com.hippo.ehviewer.ui.scene;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -31,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -62,7 +58,6 @@ import com.hippo.ehviewer.dao.HistoryInfo;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.widget.SimpleRatingView;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.DrawableManager;
@@ -74,9 +69,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import de.greenrobot.dao.query.LazyList;
 
-public class HistoryScene extends ToolbarScene
-        implements EasyRecyclerView.OnItemClickListener,
-        EasyRecyclerView.OnItemLongClickListener {
+public class HistoryScene extends ToolbarScene {
 
     /*---------------
      View life cycle
@@ -130,11 +123,12 @@ public class HistoryScene extends ToolbarScene
         layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.getDetailSizeResId()));
         layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        mRecyclerView.setDrawSelectorOnTop(true);
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setOnItemClickListener(this);
-        mRecyclerView.setOnItemLongClickListener(this);
+        mRecyclerView.setClipChildren(false);
+        //mRecyclerView.setOnItemClickListener(this);
+        //mRecyclerView.setOnItemLongClickListener(this);
         int interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval);
         int paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
         int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
@@ -246,8 +240,7 @@ public class HistoryScene extends ToolbarScene
         return false;
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(View view, int position) {
         if (null == mLazyList) {
             return false;
         }
@@ -264,8 +257,7 @@ public class HistoryScene extends ToolbarScene
         return true;
     }
 
-    @Override
-    public boolean onItemLongClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemLongClick(View view, int position) {
         final Context context = getContext2();
         final MainActivity activity = getActivity2();
         if (null == context || null == activity || null == mLazyList) {
@@ -334,13 +326,13 @@ public class HistoryScene extends ToolbarScene
             super(itemView);
 
             card = itemView.findViewById(R.id.card);
-            thumb = (LoadImageView) itemView.findViewById(R.id.thumb);
-            title = (TextView) itemView.findViewById(R.id.title);
-            uploader = (TextView) itemView.findViewById(R.id.uploader);
-            rating = (SimpleRatingView) itemView.findViewById(R.id.rating);
-            category = (TextView) itemView.findViewById(R.id.category);
-            posted = (TextView) itemView.findViewById(R.id.posted);
-            simpleLanguage = (TextView) itemView.findViewById(R.id.simple_language);
+            thumb = itemView.findViewById(R.id.thumb);
+            title = itemView.findViewById(R.id.title);
+            uploader = itemView.findViewById(R.id.uploader);
+            rating = itemView.findViewById(R.id.rating);
+            category = itemView.findViewById(R.id.category);
+            posted = itemView.findViewById(R.id.posted);
+            simpleLanguage = itemView.findViewById(R.id.simple_language);
         }
 
         @Override
@@ -409,6 +401,9 @@ public class HistoryScene extends ToolbarScene
             // Update transition name
             long gid = gi.gid;
             ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gid));
+
+            holder.card.setOnClickListener(v -> onItemClick(holder.itemView, position));
+            holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, position));
         }
 
         @Override

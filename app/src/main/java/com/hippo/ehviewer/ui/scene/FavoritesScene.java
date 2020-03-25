@@ -21,9 +21,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -80,7 +78,6 @@ import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.refreshlayout.RefreshLayout;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -99,7 +96,7 @@ import java.util.List;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 public class FavoritesScene extends BaseScene implements
-        EasyRecyclerView.OnItemClickListener, EasyRecyclerView.OnItemLongClickListener,
+        EasyRecyclerView.OnItemClickListener,
         FastScroller.OnDragHandlerListener, SearchBarMover.Helper, SearchBar.Helper,
         FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
         EasyRecyclerView.CustomChoiceListener {
@@ -254,7 +251,7 @@ public class FavoritesScene extends BaseScene implements
     public View onCreateView2(LayoutInflater inflater,
                               @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
-        ContentLayout contentLayout = (ContentLayout) view.findViewById(R.id.content_layout);
+        ContentLayout contentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getActivity2();
         AssertUtils.assertNotNull(activity);
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
@@ -275,11 +272,12 @@ public class FavoritesScene extends BaseScene implements
         contentLayout.getFastScroller().setOnDragHandlerListener(this);
 
         mAdapter = new FavoritesAdapter(inflater, resources, mRecyclerView, Settings.getListMode());
-        mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        mRecyclerView.setDrawSelectorOnTop(true);
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setOnItemClickListener(this);
-        mRecyclerView.setOnItemLongClickListener(this);
+        mRecyclerView.setClipChildren(false);
+        //mRecyclerView.setOnItemClickListener(this);
+        //mRecyclerView.setOnItemLongClickListener(this);
         mRecyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM);
         mRecyclerView.setCustomCheckedListener(this);
 
@@ -466,7 +464,7 @@ public class FavoritesScene extends BaseScene implements
             }
         });
 
-        EasyRecyclerView recyclerView = (EasyRecyclerView) view.findViewById(R.id.recycler_view_drawer);
+        EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
 
@@ -578,9 +576,7 @@ public class FavoritesScene extends BaseScene implements
         return true;
     }
 
-    @Override
-    @Implemented(EasyRecyclerView.OnItemLongClickListener.class)
-    public boolean onItemLongClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemLongClick(View view, int position) {
         // Can not into
         if (mRecyclerView != null && !mSearchMode) {
             if (!mRecyclerView.isInCustomChoice()) {
@@ -875,6 +871,7 @@ public class FavoritesScene extends BaseScene implements
     @Override
     @Implemented(EasyRecyclerView.CustomChoiceListener.class)
     public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
+
         if (view.getCheckedItemCount() == 0) {
             view.outOfCustomChoiceMode();
         }
@@ -1216,6 +1213,16 @@ public class FavoritesScene extends BaseScene implements
         @Override
         public int getItemCount() {
             return null != mHelper ? mHelper.size() : 0;
+        }
+
+        @Override
+        void onItemClick(View view, int position) {
+            FavoritesScene.this.onItemClick(null, view, position, 0);
+        }
+
+        @Override
+        boolean onItemLongClick(View view, int position) {
+            return FavoritesScene.this.onItemLongClick(view, position);
         }
 
         @Nullable

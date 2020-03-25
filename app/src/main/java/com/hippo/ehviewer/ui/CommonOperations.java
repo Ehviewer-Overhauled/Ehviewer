@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.ui;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -43,7 +42,6 @@ import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.text.Html;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
-import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.collect.LongList;

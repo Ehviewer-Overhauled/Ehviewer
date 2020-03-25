@@ -17,19 +17,14 @@
 package com.hippo.reveal;
 
 import android.animation.Animator;
-import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.view.View;
-
-import com.hippo.yorozuya.SimpleAnimatorListener;
 
 public final class ViewAnimationUtils {
     // http://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
 
     public static Animator createCircularReveal(View view,
                                                 int centerX, int centerY, float startRadius, float endRadius) {
-            return android.view.ViewAnimationUtils.createCircularReveal(
-                    view, centerX, centerY, startRadius, endRadius);
+        return android.view.ViewAnimationUtils.createCircularReveal(
+                view, centerX, centerY, startRadius, endRadius);
     }
 }

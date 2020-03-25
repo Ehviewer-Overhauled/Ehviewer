@@ -13,12 +13,17 @@
   ~ limitations under the License.
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card"
     style="@style/CardView.Reactive"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="2dp">
+    android:layout_margin="2dp"
+    android:background="?selectableItemBackground"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -85,7 +90,7 @@
             android:layout_marginRight="6dp"
             android:layout_marginBottom="4dp" />
 
-        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/posted"
@@ -124,4 +129,4 @@
 
         </LinearLayout>
     </RelativeLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

@@ -22,8 +22,6 @@ package com.hippo.ehviewer.ui;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -48,14 +46,13 @@ import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
-import com.hippo.ripple.Ripple;
 import com.hippo.yorozuya.LayoutUtils;
 
 import java.util.List;
 import java.util.Locale;
 
 public class HostsActivity extends ToolbarActivity
-        implements EasyRecyclerView.OnItemClickListener, View.OnClickListener {
+        implements View.OnClickListener {
 
     private static final String DIALOG_TAG_ADD_HOST = AddHostDialogFragment.class.getName();
     private static final String DIALOG_TAG_EDIT_HOST = EditHostDialogFragment.class.getName();
@@ -92,9 +89,9 @@ public class HostsActivity extends ToolbarActivity
                 LayoutUtils.dp2pix(this, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);
-        recyclerView.setSelector(Ripple.generateRippleDrawable(this, !AttrResources.getAttrBoolean(this, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //recyclerView.setSelector(Ripple.generateRippleDrawable(this, !AttrResources.getAttrBoolean(this, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setOnItemClickListener(this);
+        //recyclerView.setOnItemClickListener(this);
         recyclerView.setPadding(
                 recyclerView.getPaddingLeft(),
                 recyclerView.getPaddingTop(),
@@ -118,8 +115,7 @@ public class HostsActivity extends ToolbarActivity
         }
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView easyRecyclerView, View view, int position, long id) {
+    public boolean onItemClick(int position) {
         Pair<String, String> pair = data.get(position);
         Bundle args = new Bundle();
         args.putString(KEY_HOST, pair.first);
@@ -269,6 +265,7 @@ public class HostsActivity extends ToolbarActivity
             Pair<String, String> pair = data.get(position);
             holder.host.setText(pair.first);
             holder.ip.setText(pair.second);
+            holder.itemView.setOnClickListener(v -> onItemClick(position));
         }
 
         @Override

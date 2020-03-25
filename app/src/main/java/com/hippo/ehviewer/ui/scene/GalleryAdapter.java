@@ -172,6 +172,10 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         return holder;
     }
 
+    abstract void onItemClick(View view, int position);
+
+    abstract boolean onItemLongClick(View view, int position);
+
     @Override
     public int getItemViewType(int position) {
         return mType;
@@ -238,6 +242,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
         // Update transition name
         ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gi.gid));
+
+        holder.card.setOnClickListener(v -> onItemClick(holder.itemView, position));
+        holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, position));
     }
 
     @IntDef({TYPE_LIST, TYPE_GRID})

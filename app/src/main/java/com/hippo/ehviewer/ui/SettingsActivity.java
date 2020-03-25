@@ -25,12 +25,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.fragment.AboutFragment;
-import com.hippo.ehviewer.ui.fragment.AdvancedFragment;
-import com.hippo.ehviewer.ui.fragment.DownloadFragment;
-import com.hippo.ehviewer.ui.fragment.EhFragment;
-import com.hippo.ehviewer.ui.fragment.PrivacyFragment;
-import com.hippo.ehviewer.ui.fragment.ReadFragment;
 import com.hippo.ehviewer.ui.fragment.SettingsFragment;
 import com.hippo.util.DrawableManager;
 

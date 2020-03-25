@@ -19,10 +19,8 @@ package com.hippo.ehviewer.ui.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -199,10 +197,11 @@ public class AdvancedFragment extends PreferenceFragmentCompat
                         Toast.makeText(getActivity(),
                                 ok ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
                                         getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();
-                    }catch (Exception e){
-                        Toast.makeText(getActivity(), getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();}
+                    } catch (Exception e) {
+                        Toast.makeText(getActivity(), getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();
+                    }
                 }
-                }
+            }
         }
         super.onActivityResult(group, requestCode, resultCode, data);
     }

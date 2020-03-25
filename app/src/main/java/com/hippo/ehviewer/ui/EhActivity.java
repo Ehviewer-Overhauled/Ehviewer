@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 
@@ -27,7 +26,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.content.ContextLocalWrapper;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;

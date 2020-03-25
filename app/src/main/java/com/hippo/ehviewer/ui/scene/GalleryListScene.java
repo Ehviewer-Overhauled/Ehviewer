@@ -22,9 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -90,7 +88,6 @@ import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.ehviewer.widget.SearchLayout;
 import com.hippo.refreshlayout.RefreshLayout;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -113,8 +110,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class GalleryListScene extends BaseScene
-        implements EasyRecyclerView.OnItemClickListener, EasyRecyclerView.OnItemLongClickListener,
-        SearchBar.Helper, SearchBar.OnStateChangeListener, FastScroller.OnDragHandlerListener,
+        implements SearchBar.Helper, SearchBar.OnStateChangeListener, FastScroller.OnDragHandlerListener,
         SearchLayout.Helper, SearchBarMover.Helper, View.OnClickListener, FabLayout.OnClickFabListener,
         FabLayout.OnExpandListener {
 
@@ -541,11 +537,12 @@ public final class GalleryListScene extends BaseScene
 
         mAdapter = new GalleryListAdapter(inflater, resources,
                 mRecyclerView, Settings.getListMode());
-        mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        mRecyclerView.setDrawSelectorOnTop(true);
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setOnItemClickListener(this);
-        mRecyclerView.setOnItemLongClickListener(this);
+        mRecyclerView.setClipChildren(false);
+        //mRecyclerView.setOnItemClickListener(this);
+        //mRecyclerView.setOnItemLongClickListener(this);
         mRecyclerView.addOnScrollListener(mOnScrollListener);
 
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
@@ -866,8 +863,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(View view, int position) {
         if (null == mHelper || null == mRecyclerView) {
             return false;
         }
@@ -983,8 +979,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    @Override
-    public boolean onItemLongClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemLongClick(View view, int position) {
         final Context context = getContext2();
         final MainActivity activity = getActivity2();
         if (null == context || null == activity || null == mHelper) {
@@ -1590,6 +1585,16 @@ public final class GalleryListScene extends BaseScene
         @Override
         public int getItemCount() {
             return null != mHelper ? mHelper.size() : 0;
+        }
+
+        @Override
+        void onItemClick(View view, int position) {
+            GalleryListScene.this.onItemClick(view, position);
+        }
+
+        @Override
+        boolean onItemLongClick(View view, int position) {
+            return GalleryListScene.this.onItemLongClick(view, position);
         }
 
         @Nullable

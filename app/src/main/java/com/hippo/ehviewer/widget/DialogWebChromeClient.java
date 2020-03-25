@@ -26,8 +26,6 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
 

@@ -17,7 +17,6 @@
 package com.hippo.util;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.WindowManager;

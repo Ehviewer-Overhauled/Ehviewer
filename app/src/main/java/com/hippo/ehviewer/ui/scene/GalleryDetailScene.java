@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,7 +47,6 @@ import android.widget.TextView;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
@@ -87,7 +87,6 @@ import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryRatingBar;
 import com.hippo.reveal.ViewAnimationUtils;
-import com.hippo.ripple.Ripple;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.scene.TransitionHelper;
@@ -973,14 +972,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             GalleryComment comment = comments[i];
             View v = inflater.inflate(R.layout.item_gallery_comment, mComments, false);
             mComments.addView(v, i);
-            TextView user = (TextView) v.findViewById(R.id.user);
+            TextView user = v.findViewById(R.id.user);
             user.setText(comment.user);
-            TextView time = (TextView) v.findViewById(R.id.time);
+            TextView time = v.findViewById(R.id.time);
             time.setText(ReadableTime.getTimeAgo(comment.time));
-            ObservedTextView c = (ObservedTextView) v.findViewById(R.id.comment);
+            ObservedTextView c = v.findViewById(R.id.comment);
             c.setMaxLines(5);
             c.setText(Html.fromHtml(comment.comment,
                     new URLImageGetter(c, EhApplication.getConaco(context)), null));
+            v.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 
@@ -1010,11 +1010,11 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             View view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false);
             mGridLayout.addView(view);
 
-            LoadImageView image = (LoadImageView) view.findViewById(R.id.image);
+            LoadImageView image = view.findViewById(R.id.image);
             previewSet.load(image, gd.gid, i);
             image.setTag(R.id.index, i);
             image.setOnClickListener(this);
-            TextView text = (TextView) view.findViewById(R.id.text);
+            TextView text = view.findViewById(R.id.text);
             text.setText(Integer.toString(previewSet.getPosition(i) + 1));
         }
     }

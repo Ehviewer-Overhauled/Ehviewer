@@ -22,13 +22,11 @@ package com.hippo.ehviewer.ui;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -73,12 +71,12 @@ public class UConfigActivity extends ToolbarActivity {
 
         setContentView(R.layout.activity_u_config);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        webView = (WebView) findViewById(R.id.webview);
+        webView = findViewById(R.id.webview);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new UConfigWebViewClient());
         webView.setWebChromeClient(new DialogWebChromeClient(this));
         webView.loadUrl(url);
-        progress = (ProgressView) findViewById(R.id.progress);
+        progress = findViewById(R.id.progress);
 
         Snackbar.make(webView, R.string.apply_tip, Snackbar.LENGTH_LONG).show();
     }
