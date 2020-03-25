@@ -72,7 +72,7 @@ public class AboutFragment extends PreferenceFragmentCompat
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         if (KEY_AUTHOR.equals(key)) {
-            AppHelper.sendEmail(getActivity(), EhApplication.getDeveloperEmail(),
+            AppHelper.sendEmail(requireActivity(), EhApplication.getDeveloperEmail(),
                     "About EhViewer", null);
         } else if (KEY_DONATE.equals(key)) {
             showDonationDialog();

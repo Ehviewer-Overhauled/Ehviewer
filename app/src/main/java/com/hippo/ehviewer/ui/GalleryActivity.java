@@ -179,11 +179,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mSize;
     private int mCurrentIndex;
 
-    @Override
-    protected int getThemeResId(int theme) {
-        return R.style.AppTheme_Gallery;
-    }
-
     private void buildProvider() {
         if (mGalleryProvider != null) {
             return;

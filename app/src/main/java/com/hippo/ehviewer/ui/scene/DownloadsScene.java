@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -59,6 +60,7 @@ import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.conaco.DataContainer;
 import com.hippo.conaco.ProgressNotifier;
+import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -457,7 +459,7 @@ public class DownloadsScene extends ToolbarScene
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateTitle();
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
+        setNavigationIcon(new DrawerArrowDrawable(getContext2(), Color.WHITE));
     }
 
     @Override
@@ -485,7 +487,7 @@ public class DownloadsScene extends ToolbarScene
 
     @Override
     public void onNavigationClick() {
-        onBackPressed();
+        toggleDrawer(Gravity.LEFT);
     }
 
     @Override

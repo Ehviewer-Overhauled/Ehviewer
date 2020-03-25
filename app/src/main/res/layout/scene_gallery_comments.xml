@@ -36,11 +36,12 @@
         android:gravity="center_horizontal"
         android:text="@string/no_one_comments_gallery" />
 
-    <com.hippo.reveal.RevealLinearLayout
+    <LinearLayout
         android:id="@+id/edit_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@android:color/transparent"
         android:orientation="vertical"
         android:visibility="invisible">
 
@@ -72,7 +73,7 @@
                 android:padding="16dp" />
 
         </LinearLayout>
-    </com.hippo.reveal.RevealLinearLayout>
+    </LinearLayout>
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"

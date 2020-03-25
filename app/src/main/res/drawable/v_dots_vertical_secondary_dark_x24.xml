@@ -21,7 +21,7 @@
     android:viewportHeight="24">
 
     <path
-        android:fillColor="@color/secondary_drawable_dark"
+        android:fillColor="@color/primary_drawable_black"
         android:pathData="@string/pd_dots_vertical" />
 
 </vector>

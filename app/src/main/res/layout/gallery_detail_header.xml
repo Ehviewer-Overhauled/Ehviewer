@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.hippo.reveal.RevealView
+        <View
             android:id="@+id/color_bg"
             android:layout_width="match_parent"
             android:layout_height="0dp"

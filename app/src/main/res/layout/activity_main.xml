@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <com.hippo.ehviewer.widget.EhStageLayout
+        <com.hippo.scene.StageLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -39,7 +39,7 @@
             app:menu="@menu/nav_drawer_main" />
 
 
-        <com.hippo.ehviewer.widget.EhDrawerView
+        <com.hippo.widget.DrawerView
             android:id="@+id/right_drawer"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

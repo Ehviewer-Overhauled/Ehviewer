@@ -20,8 +20,6 @@ import android.animation.Animator;
 import android.view.View;
 
 public final class ViewAnimationUtils {
-    // http://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
-
     public static Animator createCircularReveal(View view,
                                                 int centerX, int centerY, float startRadius, float endRadius) {
         return android.view.ViewAnimationUtils.createCircularReveal(

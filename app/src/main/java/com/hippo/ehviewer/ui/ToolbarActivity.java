@@ -30,11 +30,6 @@ import com.hippo.ehviewer.R;
 public abstract class ToolbarActivity extends EhActivity {
 
     @Override
-    protected int getThemeResId(int theme) {
-        return R.style.AppTheme_Toolbar;
-    }
-
-    @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(R.layout.activity_toolbar);
         getLayoutInflater().inflate(layoutResID, findViewById(R.id.content_panel), true);

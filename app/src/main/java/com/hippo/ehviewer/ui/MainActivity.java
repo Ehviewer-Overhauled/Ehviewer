@@ -21,6 +21,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -137,11 +138,6 @@ public final class MainActivity extends StageActivity
     @Nullable
     private TextView mDisplayName;
     private int mNavCheckedItem = 0;
-
-    @Override
-    protected int getThemeResId(int theme) {
-        return R.style.AppTheme_Main;
-    }
 
     @Override
     public int getContainerViewId() {
@@ -321,7 +317,7 @@ public final class MainActivity extends StageActivity
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
         ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
-            int theme = isNightMode(getResources().getConfiguration()) ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
+            int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
             AppCompatDelegate.setDefaultNightMode(theme);
             ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);

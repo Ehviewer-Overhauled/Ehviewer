@@ -20,8 +20,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +48,7 @@ import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAct
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.hippo.android.resource.AttrResources;
+import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -240,7 +243,7 @@ public class HistoryScene extends ToolbarScene {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.history);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
+        setNavigationIcon(new DrawerArrowDrawable(getContext2(), Color.WHITE));
     }
 
     @Override
@@ -286,7 +289,7 @@ public class HistoryScene extends ToolbarScene {
 
     @Override
     public void onNavigationClick() {
-        onBackPressed();
+        toggleDrawer(Gravity.LEFT);
     }
 
     @Override

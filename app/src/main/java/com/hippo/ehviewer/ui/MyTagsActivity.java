@@ -39,7 +39,6 @@ import okhttp3.HttpUrl;
 
 public class MyTagsActivity extends ToolbarActivity {
 
-    private WebView webView;
     private ProgressView progress;
     private String url;
 
@@ -64,7 +63,7 @@ public class MyTagsActivity extends ToolbarActivity {
 
         setContentView(R.layout.activity_my_tags);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        webView = findViewById(R.id.webview);
+        WebView webView = findViewById(R.id.webview);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new MyTagsWebViewClient());
         webView.setWebChromeClient(new DialogWebChromeClient(this));

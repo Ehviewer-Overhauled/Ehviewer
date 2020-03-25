@@ -48,7 +48,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.fileprovider"'
             signingConfig signingConfigs.release
@@ -67,12 +68,8 @@ android {
     }
 }
 
-task copyNotice(type: Copy) {
-    finalizedBy ":daogenerator:executeDaoGenerator"
-}
-
 tasks.withType(JavaCompile) {
-    task -> task.dependsOn copyNotice
+    task -> task.dependsOn ":daogenerator:executeDaoGenerator"
 }
 
 dependencies {
@@ -81,7 +78,7 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.0.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.getkeepsafe.relinker:relinker:1.4.1'
     implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
     implementation 'com.github.seven332.a7zip:extract-lite:d4ddec5793'

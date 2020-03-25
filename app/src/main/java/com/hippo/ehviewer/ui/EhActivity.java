@@ -85,13 +85,8 @@ public abstract class EhActivity extends AppCompatActivity {
         }
     }
 
-    @StyleRes
-    protected abstract int getThemeResId(int theme);
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(getThemeResId(Settings.getTheme()));
-
         super.onCreate(savedInstanceState);
 
         ((EhApplication) getApplication()).registerActivity(this);
