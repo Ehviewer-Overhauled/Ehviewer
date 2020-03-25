@@ -68,7 +68,7 @@ public class EhDB {
 
     private static final String TAG = EhDB.class.getSimpleName();
 
-    private static final int MAX_HISTORY_COUNT = 100;
+    private static final int MAX_HISTORY_COUNT = 200;
 
     private static DaoSession sDaoSession;
 
