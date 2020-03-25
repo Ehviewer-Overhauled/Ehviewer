@@ -27,7 +27,7 @@
         android:contentDescription="@null"
         android:drawSelectorOnTop="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/sadpanda_low_poly" />
+        app:srcCompat="@drawable/sadpanda_low_poly" />
 
     <com.hippo.widget.LoadImageView
         android:id="@+id/avatar"

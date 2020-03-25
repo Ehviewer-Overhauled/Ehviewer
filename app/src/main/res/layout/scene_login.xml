@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:padding="@dimen/keyline_margin"
-                android:src="@mipmap/ic_launcher" />
+                app:srcCompat="@mipmap/ic_launcher" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/username_layout"
@@ -149,7 +149,6 @@
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/translucent_bg"
         android:clickable="true"
         android:visibility="gone">
 
