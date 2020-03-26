@@ -30,6 +30,7 @@ import androidx.preference.PreferenceGroup;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
@@ -106,6 +107,7 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("text/plain");
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.putExtra(Intent.EXTRA_TITLE, "logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
             startActivityForResult(intent, REQUEST_DUMP_LOGCAT);
             return true;
@@ -115,13 +117,15 @@ public class AdvancedFragment extends PreferenceFragmentCompat
         } else if (KEY_IMPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/x-sqlite3");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setType("*/*");
             startActivityForResult(intent, REQUEST_CODE_IMPORT);
             return true;
         } else if (KEY_EXPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/x-sqlite3");
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.putExtra(Intent.EXTRA_TITLE, ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db");
             startActivityForResult(intent, REQUEST_CODE_EXPORT);
             return true;
@@ -138,6 +142,7 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
+                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     try {
                         AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
                                 .setCancelable(false)
@@ -165,6 +170,7 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
+                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     try {
                         AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
                                 .setCancelable(false)
@@ -192,6 +198,7 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
+                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     try {
                         boolean ok = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
                         Toast.makeText(getActivity(),
