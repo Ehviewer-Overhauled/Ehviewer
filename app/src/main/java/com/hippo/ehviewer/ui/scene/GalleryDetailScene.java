@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui.scene;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -23,10 +24,12 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -48,6 +51,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -139,6 +144,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private static final String KEY_GALLERY_DETAIL = "gallery_detail";
     private static final String KEY_REQUEST_ID = "request_id";
     private static final boolean TRANSITION_ANIMATION_DISABLED = true;
+    private static final int REQUEST_WRITE_STORAGE = 1;
     /*---------------
      View life cycle
      ---------------*/
@@ -1222,13 +1228,18 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             }
         } else if (mTorrent == v) {
             if (mGalleryDetail != null) {
-                TorrentListDialogHelper helper = new TorrentListDialogHelper();
-                Dialog dialog = new MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.torrents)
-                        .setView(R.layout.dialog_torrent_list)
-                        .setOnDismissListener(helper)
-                        .show();
-                helper.setDialog(dialog, mGalleryDetail.torrentUrl);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+                } else {
+                    TorrentListDialogHelper helper = new TorrentListDialogHelper();
+                    Dialog dialog = new MaterialAlertDialogBuilder(context)
+                            .setTitle(R.string.torrents)
+                            .setView(R.layout.dialog_torrent_list)
+                            .setOnDismissListener(helper)
+                            .show();
+                    helper.setDialog(dialog, mGalleryDetail.torrentUrl);
+                }
             }
         } else if (mArchive == v) {
             if (mGalleryDetail == null) {
@@ -1307,6 +1318,20 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 return;
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_WRITE_STORAGE && grantResults[0] == PackageManager.PERMISSION_GRANTED && mGalleryDetail != null) {
+            TorrentListDialogHelper helper = new TorrentListDialogHelper();
+            Dialog dialog = new MaterialAlertDialogBuilder(requireActivity())
+                    .setTitle(R.string.torrents)
+                    .setView(R.layout.dialog_torrent_list)
+                    .setOnDismissListener(helper)
+                    .show();
+            helper.setDialog(dialog, mGalleryDetail.torrentUrl);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void showFilterUploaderDialog() {
