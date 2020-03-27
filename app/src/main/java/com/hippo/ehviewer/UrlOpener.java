@@ -19,17 +19,16 @@ package com.hippo.ehviewer;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.Browser;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.browser.customtabs.CustomTabsIntent;
 
+import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
-import com.hippo.util.ExceptionUtils;
 
 public final class UrlOpener {
 
@@ -57,14 +56,9 @@ public final class UrlOpener {
             }
         }
 
-        // Intent.ACTION_VIEW
-        intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-        try {
-            context.startActivity(intent);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            Toast.makeText(context, R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
-        }
+        CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
+        customTabsIntent.setShowTitle(true);
+        customTabsIntent.setToolbarColor(AttrResources.getAttrColor(context, R.attr.colorPrimary));
+        customTabsIntent.build().launchUrl(context, uri);
     }
 }
