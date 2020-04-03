@@ -452,7 +452,7 @@ public final class MainActivity extends StageActivity
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
             Announcer announcer = createAnnouncerFromClipboardUrl(text);
             if (announcer != null && mDrawerLayout != null) {
-                Snackbar snackbar = Snackbar.make(mDrawerLayout, R.string.clipboard_gallery_url_snack_message, Snackbar.LENGTH_INDEFINITE);
+                Snackbar snackbar = Snackbar.make(mDrawerLayout, R.string.clipboard_gallery_url_snack_message, Snackbar.LENGTH_SHORT);
                 snackbar.setAction(R.string.clipboard_gallery_url_snack_action, v -> startScene(announcer));
                 snackbar.show();
             }
