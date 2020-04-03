@@ -195,6 +195,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         } else if (Intent.ACTION_VIEW.equals(mAction)) {
             if (mUri != null) {
                 // Only support zip now
+                grantUriPermission(BuildConfig.APPLICATION_ID, mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
             }
         }

@@ -66,7 +66,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private String error;
 
     public ArchiveGalleryProvider(Context context, Uri uri) {
-        file = UniFile.fromUri(context, uri);
+        file = UniFile.fromMediaUri(context, uri);
     }
 
     @Override

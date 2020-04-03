@@ -16,12 +16,13 @@
 
 package com.hippo.ehviewer.gallery;
 
+import androidx.annotation.NonNull;
+
 import com.hippo.a7zip.ArchiveException;
 import com.hippo.a7zip.InArchive;
-import com.hippo.a7zip.InStream;
 import com.hippo.a7zip.PropID;
 import com.hippo.a7zip.PropType;
-import com.hippo.a7zip.SequentialOutStream;
+import com.hippo.a7zip.SeekableInputStream;
 import com.hippo.unifile.UniRandomAccessFile;
 
 import java.io.Closeable;
@@ -48,7 +49,7 @@ class A7ZipArchive implements Closeable {
     }
 
     static A7ZipArchive create(UniRandomAccessFile file) throws ArchiveException {
-        InStream store = new UniRandomAccessFileInStream(file);
+        SeekableInputStream store = new UniRandomAccessFileInStream(file);
         InArchive archive = InArchive.open(store);
         if ((archive.getArchivePropertyType(PropID.ENCRYPTED) == PropType.BOOL && archive.getArchiveBooleanProperty(PropID.ENCRYPTED))
                 || (archive.getArchivePropertyType(PropID.SOLID) == PropType.BOOL && archive.getArchiveBooleanProperty(PropID.SOLID))
@@ -102,8 +103,9 @@ class A7ZipArchive implements Closeable {
         }
     }
 
-    private static class UniRandomAccessFileInStream implements InStream {
+    private static class UniRandomAccessFileInStream extends SeekableInputStream {
 
+        private final byte[] scratch = new byte[8];
         private UniRandomAccessFile file;
 
         public UniRandomAccessFileInStream(UniRandomAccessFile file) {
@@ -126,6 +128,16 @@ class A7ZipArchive implements Closeable {
         }
 
         @Override
+        public int read() throws IOException {
+            return (file.read(scratch, 0, 1) != -1) ? scratch[0] & 0xff : -1;
+        }
+
+        @Override
+        public int read(@NonNull byte[] b) throws IOException {
+            return file.read(b, 0, b.length);
+        }
+
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
             return file.read(b, off, len);
         }
@@ -136,12 +148,17 @@ class A7ZipArchive implements Closeable {
         }
     }
 
-    private static class OutputStreamSequentialOutStream implements SequentialOutStream {
+    private static class OutputStreamSequentialOutStream extends OutputStream {
 
         private OutputStream stream;
 
         public OutputStreamSequentialOutStream(OutputStream stream) {
             this.stream = stream;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            stream.write(b);
         }
 
         @Override
