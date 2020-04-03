@@ -16,42 +16,38 @@
 
 package com.hippo.ehviewer.preference;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Toast;
 
-import androidx.preference.PreferenceViewHolder;
-
-import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
+import com.hippo.ehviewer.ui.SettingsActivity;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.preference.ActivityPreference;
 
 import okhttp3.HttpUrl;
 
 public class SignInRequiredActivityPreference extends ActivityPreference {
 
-    private View view;
+    @SuppressLint("StaticFieldLeak")
+    private final SettingsActivity mActivity;
 
     public SignInRequiredActivityPreference(Context context) {
         super(context);
+        mActivity = (SettingsActivity) context;
     }
 
     public SignInRequiredActivityPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mActivity = (SettingsActivity) context;
     }
 
     public SignInRequiredActivityPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    public void onBindViewHolder(PreferenceViewHolder holder) {
-        view = holder.itemView;
-        super.onBindViewHolder(holder);
+        mActivity = (SettingsActivity) context;
     }
 
     @Override
@@ -66,11 +62,7 @@ public class SignInRequiredActivityPreference extends ActivityPreference {
                 store.contains(ex, EhCookieStore.KEY_IPD_PASS_HASH)) {
             super.onClick();
         } else {
-            if (view != null) {
-                Snackbar.make(view, R.string.error_please_login_first, 3000).show();
-            } else {
-                Toast.makeText(getContext(), R.string.error_please_login_first, Toast.LENGTH_LONG).show();
-            }
+            mActivity.showTip(R.string.error_please_login_first, BaseScene.LENGTH_SHORT);
         }
     }
 }

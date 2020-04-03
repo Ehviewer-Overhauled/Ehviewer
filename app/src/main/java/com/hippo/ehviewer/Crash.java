@@ -145,9 +145,6 @@ public final class Crash {
         fw.write("RADIO=");
         fw.write(Build.getRadioVersion());
         fw.write("\r\n");
-        fw.write("SERIAL=");
-        fw.write(Build.SERIAL);
-        fw.write("\r\n");
         fw.write("TAGS=");
         fw.write(Build.TAGS);
         fw.write("\r\n");

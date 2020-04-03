@@ -161,12 +161,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         @Override
         public void run() {
             UniRandomAccessFile uraf = null;
-            if (file != null) {
-                try {
-                    uraf = file.createRandomAccessFile("r");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                uraf = file.createRandomAccessFile("r");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             if (uraf == null) {
                 size = STATE_ERROR;

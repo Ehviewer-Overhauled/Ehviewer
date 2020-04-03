@@ -971,7 +971,7 @@ public class Settings {
     }
 
     public static boolean getEnableFingerprint() {
-        return getBoolean(KEY_ENABLE_FINGERPRINT, false);
+        return getBoolean(KEY_ENABLE_FINGERPRINT, true);
     }
 
     public static void putEnableFingerprint(boolean value) {

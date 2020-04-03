@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
@@ -28,6 +27,8 @@ import androidx.preference.Preference;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.CommonOperations;
+import com.hippo.ehviewer.ui.SettingsActivity;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
@@ -95,7 +96,7 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
             startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            Toast.makeText(getActivity(), R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
+            ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
         }
     }
 
@@ -113,8 +114,8 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
                             Settings.putDownloadLocation(uniFile);
                             onUpdateDownloadLocation();
                         } else {
-                            Toast.makeText(getActivity(), R.string.settings_download_cant_get_download_location,
-                                    Toast.LENGTH_SHORT).show();
+                            ((SettingsActivity) requireActivity()).showTip(R.string.settings_download_cant_get_download_location,
+                                    BaseScene.LENGTH_SHORT);
                         }
                     }
                 }

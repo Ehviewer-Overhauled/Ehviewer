@@ -67,8 +67,6 @@ public class EhDns implements Dns {
 
     @Override
     public List<InetAddress> lookup(String hostname) throws UnknownHostException {
-        if (hostname == null) throw new UnknownHostException("hostname == null");
-
         InetAddress inetAddress = hosts.get(hostname);
         if (inetAddress != null) {
             return Collections.singletonList(inetAddress);

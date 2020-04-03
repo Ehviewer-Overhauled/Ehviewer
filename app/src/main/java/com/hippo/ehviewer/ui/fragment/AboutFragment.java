@@ -16,29 +16,17 @@
 
 package com.hippo.ehviewer.ui.fragment;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.util.AppHelper;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
-
-import java.nio.charset.StandardCharsets;
 
 public class AboutFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener {
@@ -46,11 +34,6 @@ public class AboutFragment extends PreferenceFragmentCompat
     private static final String KEY_AUTHOR = "author";
     private static final String KEY_DONATE = "donate";
     private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
-
-    private static String base64Decode(String encoded) {
-        byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
-        return new String(bytes, StandardCharsets.UTF_8);
-    }
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
@@ -74,43 +57,9 @@ public class AboutFragment extends PreferenceFragmentCompat
         if (KEY_AUTHOR.equals(key)) {
             AppHelper.sendEmail(requireActivity(), EhApplication.getDeveloperEmail(),
                     "About EhViewer", null);
-        } else if (KEY_DONATE.equals(key)) {
-            showDonationDialog();
         } else if (KEY_CHECK_FOR_UPDATES.equals(key)) {
             CommonOperations.checkUpdate(getActivity(), true);
         }
         return true;
-    }
-
-    private void showDonationDialog() {
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
-                .setView(R.layout.dialog_donate)
-                .show();
-
-        String alipayStr = base64Decode("c2V2ZW4zMzJAMTYzLmNvbQ==");
-        TextView alipayText = dialog.findViewById(R.id.alipay_text);
-        alipayText.setText(alipayStr);
-        dialog.findViewById(R.id.alipay_copy).setOnClickListener(v -> copyToClipboard(alipayStr));
-
-        String paypalStr = base64Decode("aHR0cHM6Ly9wYXlwYWwubWUvc2V2ZW4zMzI=");
-        TextView paypalText = dialog.findViewById(R.id.paypal_text);
-        paypalText.setText(paypalStr);
-        dialog.findViewById(R.id.paypal_open).setOnClickListener(v -> openUrl(paypalStr));
-        dialog.findViewById(R.id.paypal_copy).setOnClickListener(v -> copyToClipboard(paypalStr));
-    }
-
-    private void copyToClipboard(String text) {
-        ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        if (cmb != null) {
-            cmb.setPrimaryClip(ClipData.newPlainText(null, text));
-            Toast.makeText(getActivity(), R.string.settings_about_donate_copied, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void openUrl(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        Intent chooser = Intent.createChooser(intent, "");
-        startActivity(chooser);
     }
 }

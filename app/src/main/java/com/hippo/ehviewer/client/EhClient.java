@@ -116,13 +116,7 @@ public class EhClient {
 
                 if (mCallback != null) {
                     // TODO Avoid new runnable
-                    final Callback finalCallback = mCallback;
-                    SimpleHandler.getInstance().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            finalCallback.onCancel();
-                        }
-                    });
+                    SimpleHandler.getInstance().post(mCallback::onCancel);
                 }
 
                 Status status = getStatus();
@@ -144,7 +138,6 @@ public class EhClient {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         protected Object doInBackground(Object... params) {
             try {
                 switch (mMethod) {

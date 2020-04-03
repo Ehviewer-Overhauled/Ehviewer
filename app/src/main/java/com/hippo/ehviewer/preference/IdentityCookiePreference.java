@@ -104,6 +104,9 @@ public class IdentityCookiePreference extends MessagePreference {
 
                 IdentityCookiePreference.this.onClick(dialog, which);
             });
+            builder.setNegativeButton(android.R.string.cancel, null);
+        } else {
+            builder.setPositiveButton(android.R.string.ok, null);
         }
     }
 }

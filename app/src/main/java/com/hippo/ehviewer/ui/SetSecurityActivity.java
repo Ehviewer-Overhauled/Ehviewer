@@ -59,11 +59,9 @@ public class SetSecurityActivity extends ToolbarActivity implements View.OnClick
                     LockPatternUtils.stringToPattern(pattern));
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (BiometricManager.from(this).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
-                mFingerprint.setVisibility(View.VISIBLE);
-                mFingerprint.setChecked(Settings.getEnableFingerprint());
-            }
+        if (BiometricManager.from(this).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+            mFingerprint.setVisibility(View.VISIBLE);
+            mFingerprint.setChecked(Settings.getEnableFingerprint());
         }
 
         mCancel.setOnClickListener(this);

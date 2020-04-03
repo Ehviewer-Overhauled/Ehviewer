@@ -78,7 +78,7 @@ public class SpiderInfo {
             }
         }
 
-        return startPage >= 0 ? startPage : 0;
+        return Math.max(startPage, 0);
     }
 
     private static int getVersion(String str) {
@@ -171,7 +171,7 @@ public class SpiderInfo {
             writer.write(VERSION_STR);
             writer.write(Integer.toString(VERSION));
             writer.write("\n");
-            writer.write(String.format("%08x", startPage >= 0 ? startPage : 0)); // Avoid negative
+            writer.write(String.format("%08x", Math.max(startPage, 0))); // Avoid negative
             writer.write("\n");
             writer.write(Long.toString(gid));
             writer.write("\n");

@@ -77,8 +77,6 @@ public final class QuickSearchScene extends ToolbarScene {
         mQuickSearchList = null;
     }
 
-    @SuppressWarnings("deprecation")
-    @Nullable
     @Override
     public View onCreateView3(LayoutInflater inflater,
                               @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

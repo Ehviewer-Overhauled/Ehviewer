@@ -55,12 +55,7 @@ import java.util.Map;
 public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
     private static final String TAG = DownloadManager.class.getSimpleName();
-    private static final Comparator<DownloadInfo> DATE_DESC_COMPARATOR = new Comparator<DownloadInfo>() {
-        @Override
-        public int compare(DownloadInfo lhs, DownloadInfo rhs) {
-            return lhs.time - rhs.time > 0 ? -1 : 1;
-        }
-    };
+    private static final Comparator<DownloadInfo> DATE_DESC_COMPARATOR = (lhs, rhs) -> lhs.time - rhs.time > 0 ? -1 : 1;
     private final Context mContext;
     // All download info list
     private final LinkedList<DownloadInfo> mAllInfoList;
@@ -95,7 +90,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         HashMap<String, LinkedList<DownloadInfo>> map = new HashMap<>();
         mMap = map;
         for (DownloadLabel label : labels) {
-            map.put(label.getLabel(), new LinkedList<DownloadInfo>());
+            map.put(label.getLabel(), new LinkedList<>());
         }
 
         // Create default for non tag
@@ -340,15 +335,13 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     void startAllDownload() {
         boolean update = false;
         // Start all STATE_NONE and STATE_FAILED item
-        LinkedList<DownloadInfo> allInfoList = mAllInfoList;
-        LinkedList<DownloadInfo> waitList = mWaitList;
-        for (DownloadInfo info : allInfoList) {
+        for (DownloadInfo info : mAllInfoList) {
             if (info.state == DownloadInfo.STATE_NONE || info.state == DownloadInfo.STATE_FAILED) {
                 update = true;
                 // Set state DownloadInfo.STATE_WAIT
                 info.state = DownloadInfo.STATE_WAIT;
                 // Add to wait list
-                waitList.add(info);
+                mWaitList.add(info);
                 // Update in DB
                 EhDB.putDownloadInfo(info);
             }
@@ -413,7 +406,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         for (DownloadLabel label : downloadLabelList) {
             String labelString = label.getLabel();
             if (!containLabel(labelString)) {
-                mMap.put(labelString, new LinkedList<DownloadInfo>());
+                mMap.put(labelString, new LinkedList<>());
                 mLabelList.add(EhDB.addDownloadLabel(label));
             }
         }
@@ -748,7 +741,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         }
 
         mLabelList.add(EhDB.addDownloadLabel(label));
-        mMap.put(label, new LinkedList<DownloadInfo>());
+        mMap.put(label, new LinkedList<>());
 
         for (DownloadInfoListener l : mDownloadInfoListeners) {
             l.onUpdateLabels();

@@ -167,7 +167,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
-                0, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(),
+                0, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
                 new PriorityThreadFactory(SpiderWorker.class.getSimpleName(), Process.THREAD_PRIORITY_BACKGROUND));
     }
 
@@ -1019,6 +1019,33 @@ public final class SpiderQueen implements Runnable {
         void onGetImageFailure(int index, String error);
     }
 
+    private static class AutoCloseInputStream extends InputStream {
+
+        private final InputStreamPipe mPipe;
+        private final InputStream mIs;
+
+        public AutoCloseInputStream(InputStreamPipe pipe, InputStream is) {
+            mPipe = pipe;
+            mIs = is;
+        }
+
+        @Override
+        public int read() throws IOException {
+            return mIs.read();
+        }
+
+        @Override
+        public int read(@NonNull byte[] buffer, int byteOffset, int byteCount) throws IOException {
+            return mIs.read(buffer, byteOffset, byteCount);
+        }
+
+        @Override
+        public void close() throws IOException {
+            mPipe.close();
+            mPipe.release();
+        }
+    }
+
     private class SpiderWorker implements Runnable {
 
         private final long mGid;
@@ -1604,33 +1631,6 @@ public final class SpiderQueen implements Runnable {
             if (DEBUG_LOG) {
                 Log.i(TAG, Thread.currentThread().getName() + ": end");
             }
-        }
-    }
-
-    private class AutoCloseInputStream extends InputStream {
-
-        private final InputStreamPipe mPipe;
-        private final InputStream mIs;
-
-        public AutoCloseInputStream(InputStreamPipe pipe, InputStream is) {
-            mPipe = pipe;
-            mIs = is;
-        }
-
-        @Override
-        public int read() throws IOException {
-            return mIs.read();
-        }
-
-        @Override
-        public int read(@NonNull byte[] buffer, int byteOffset, int byteCount) throws IOException {
-            return mIs.read(buffer, byteOffset, byteCount);
-        }
-
-        @Override
-        public void close() throws IOException {
-            mPipe.close();
-            mPipe.release();
         }
     }
 }

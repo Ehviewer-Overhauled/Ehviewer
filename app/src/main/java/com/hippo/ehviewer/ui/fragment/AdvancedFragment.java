@@ -17,11 +17,9 @@
 package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -29,18 +27,16 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceGroup;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.ui.SettingsActivity;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.LogCat;
 import com.hippo.util.ReadableTime;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
-
-import java.io.File;
-import java.util.Arrays;
 
 public class AdvancedFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -54,28 +50,6 @@ public class AdvancedFragment extends PreferenceFragmentCompat
     private static final String KEY_APP_LANGUAGE = "app_language";
     private static final String KEY_IMPORT_DATA = "import_data";
     private static final String KEY_EXPORT_DATA = "export_data";
-
-    private static void importData(final Context context) {
-        final File dir = AppConfig.getExternalDataDir();
-        if (null == dir) {
-            Toast.makeText(context, R.string.cant_get_data_dir, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        final String[] files = dir.list();
-        if (null == files || files.length <= 0) {
-            Toast.makeText(context, R.string.cant_find_any_data, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Arrays.sort(files);
-        new MaterialAlertDialogBuilder(context).setItems(files, (dialog, which) -> {
-            File file = new File(dir, files[which]);
-            //String error = EhDB.importDB(context, file);
-            //if (null == error) {
-            //    error = context.getString(R.string.settings_advanced_import_data_successfully);
-            //}
-            //Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-        }).show();
-    }
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
@@ -154,15 +128,15 @@ public class AdvancedFragment extends PreferenceFragmentCompat
                                 if (alertDialog.isShowing()) {
                                     alertDialog.dismiss();
                                 }
-                                Toast.makeText(requireContext(),
+                                ((SettingsActivity) requireActivity()).showTip(
                                         (success)
                                                 ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
                                                 : GetText.getString(R.string.settings_advanced_export_data_failed),
-                                        Toast.LENGTH_SHORT).show();
+                                        BaseScene.LENGTH_SHORT);
                             });
                         }).start();
                     } catch (Exception e) {
-                        GetText.getString(R.string.settings_advanced_export_data_failed);
+                        ((SettingsActivity) requireActivity()).showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
                     }
                 }
             }
@@ -183,14 +157,14 @@ public class AdvancedFragment extends PreferenceFragmentCompat
                                     alertDialog.dismiss();
                                 }
                                 if (null == error) {
-                                    Toast.makeText(requireContext(), getString(R.string.settings_advanced_import_data_successfully), Toast.LENGTH_SHORT).show();
+                                    ((SettingsActivity) requireActivity()).showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
                                 } else {
-                                    Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+                                    ((SettingsActivity) requireActivity()).showTip(error, BaseScene.LENGTH_SHORT);
                                 }
                             });
                         }).start();
                     } catch (Exception e) {
-                        Toast.makeText(requireContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        ((SettingsActivity) requireActivity()).showTip(e.getLocalizedMessage(), BaseScene.LENGTH_SHORT);
                     }
                 }
             }
@@ -201,11 +175,11 @@ public class AdvancedFragment extends PreferenceFragmentCompat
                     requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     try {
                         boolean ok = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
-                        Toast.makeText(getActivity(),
+                        ((SettingsActivity) requireActivity()).showTip(
                                 ok ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
-                                        getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();
+                                        getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
                     } catch (Exception e) {
-                        Toast.makeText(getActivity(), getString(R.string.settings_advanced_dump_logcat_failed), Toast.LENGTH_SHORT).show();
+                        ((SettingsActivity) requireActivity()).showTip(getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
                     }
                 }
             }

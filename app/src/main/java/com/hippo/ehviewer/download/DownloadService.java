@@ -104,7 +104,7 @@ public class DownloadService extends Service implements DownloadManager.Download
 
         CHANNEL_ID = getPackageName() + ".download";
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && mNotifyManager != null) {
             mNotifyManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID, getString(R.string.download_service),
                     NotificationManager.IMPORTANCE_LOW));
         }
@@ -203,7 +203,6 @@ public class DownloadService extends Service implements DownloadManager.Download
         throw new IllegalStateException("No bindService");
     }
 
-    @SuppressWarnings("deprecation")
     private void ensureDownloadingBuilder() {
         if (mDownloadingBuilder != null) {
             return;
@@ -422,11 +421,10 @@ public class DownloadService extends Service implements DownloadManager.Download
             style = new NotificationCompat.InboxStyle();
             style.setBigContentTitle(getString(R.string.stat_download_done_title));
             SparseJBArray stateArray = sItemStateArray;
-            SparseJLArray<String> titleArray = sItemTitleArray;
             for (int i = 0, n = stateArray.size(); i < n; i++) {
                 long id = stateArray.keyAt(i);
                 boolean fin = stateArray.valueAt(i);
-                String title = titleArray.get(id);
+                String title = sItemTitleArray.get(id);
                 if (title == null) {
                     continue;
                 }

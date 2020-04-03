@@ -51,6 +51,7 @@ public class ClearDownloadPathCachePreference extends MessagePreference {
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
         super.onPrepareDialogBuilder(builder);
         builder.setTitle(null);
+        builder.setNegativeButton(android.R.string.cancel, null);
     }
 
     @Override

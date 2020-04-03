@@ -19,10 +19,13 @@ package com.hippo.ehviewer.ui;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.fragment.SettingsFragment;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 
 public final class SettingsActivity extends EhActivity {
 
@@ -40,6 +43,18 @@ public final class SettingsActivity extends EhActivity {
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    public void showTip(@StringRes int id, int length) {
+        showTip(getString(id), length);
+    }
+
+    /**
+     * If activity is running, show snack bar, otherwise show toast
+     */
+    public void showTip(CharSequence message, int length) {
+        Snackbar.make(findViewById(R.id.snackbar), message,
+                length == BaseScene.LENGTH_LONG ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

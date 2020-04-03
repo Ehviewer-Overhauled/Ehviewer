@@ -559,7 +559,7 @@ public class DownloadsScene extends ToolbarScene
                 LongList gidList = new LongList();
                 for (int i = list.size() - 1; i > -1; i--) {
                     DownloadInfo info = list.get(i);
-                    if(info.state!=DownloadInfo.STATE_FINISH){
+                    if (info.state != DownloadInfo.STATE_FINISH) {
                         gidList.add(info.gid);
                     }
                 }

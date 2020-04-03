@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui.scene;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,7 +99,11 @@ public class SecurityScene extends SolidScene implements
             mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
         }
 
-        if (isFingerprintAuthAvailable()) {
+        startBiometricPrompt();
+    }
+
+    private void startBiometricPrompt() {
+        if (Settings.getEnableFingerprint() && BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
             BiometricPrompt biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
@@ -147,6 +150,7 @@ public class SecurityScene extends SolidScene implements
     public View onCreateView2(LayoutInflater inflater,
                               @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_security, container, false);
+        view.setOnClickListener(v -> startBiometricPrompt());
 
         mPatternView = (LockPatternView) ViewUtils.$$(view, R.id.pattern_view);
         mPatternView.setOnPatternListener(this);
@@ -205,11 +209,5 @@ public class SecurityScene extends SolidScene implements
             startSceneForCheckStep(CHECK_STEP_SECURITY, getArguments());
             finish();
         }
-    }
-
-    private boolean isFingerprintAuthAvailable() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && Settings.getEnableFingerprint()
-                && BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
     }
 }
