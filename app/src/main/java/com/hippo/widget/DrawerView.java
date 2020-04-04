@@ -19,11 +19,11 @@ package com.hippo.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 
+import com.google.android.material.card.MaterialCardView;
 import com.hippo.yorozuya.LayoutUtils;
 
-public class DrawerView extends FrameLayout {
+public class DrawerView extends MaterialCardView {
 
     private static final int DEFAULT_MAX_WIDTH = 280;
 

@@ -17,7 +17,10 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.SparseArray;
@@ -35,6 +38,8 @@ import androidx.annotation.StyleRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
+import com.hippo.android.resource.AttrResources;
+import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -186,6 +191,22 @@ public abstract class BaseScene extends SceneFragment {
         drawerView = null;
     }
 
+    public void setWhiteStatusBar(boolean set) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decorView = requireActivity().getWindow().getDecorView();
+            int flags = decorView.getSystemUiVisibility();
+            if (set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            } else {
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            }
+            decorView.setSystemUiVisibility(flags);
+            ((DrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(set ? Color.WHITE : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        } else {
+            ((DrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        }
+    }
+
     public void onDestroyDrawerView() {
     }
 
@@ -218,6 +239,7 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         AppHelper.hideSoftInput(getActivity());
+        setWhiteStatusBar(true);
     }
 
     public void createThemeContext(@StyleRes int style) {

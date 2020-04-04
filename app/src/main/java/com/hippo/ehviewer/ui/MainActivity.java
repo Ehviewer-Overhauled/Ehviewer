@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +41,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -131,7 +134,7 @@ public final class MainActivity extends StageActivity
     @Nullable
     private NavigationView mNavView;
     @Nullable
-    private FrameLayout mRightDrawer;
+    private MaterialCardView mRightDrawer;
     @Nullable
     private LoadImageView mAvatar;
     @Nullable
@@ -311,7 +314,7 @@ public final class MainActivity extends StageActivity
 
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(this, R.id.draw_view);
         mNavView = (NavigationView) ViewUtils.$$(this, R.id.nav_view);
-        mRightDrawer = (FrameLayout) ViewUtils.$$(this, R.id.right_drawer);
+        mRightDrawer = (MaterialCardView) ViewUtils.$$(this, R.id.right_drawer);
         View headerLayout = mNavView.getHeaderView(0);
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
@@ -321,6 +324,7 @@ public final class MainActivity extends StageActivity
             ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);
         });
+
         updateProfile();
 
         if (mNavView != null) {

@@ -334,7 +334,7 @@ public class FavoritesScene extends BaseScene implements
                 .withMaterialShowcase()
                 .setStyle(R.style.Guide)
                 .setTarget(new PointTarget(point.x, point.y / 3))
-                .blockAllTouches()
+                .hideOnTouchOutside()
                 .setContentTitle(R.string.guide_collections_title)
                 .setContentText(R.string.guide_collections_text)
                 .replaceEndButton(R.layout.button_guide)

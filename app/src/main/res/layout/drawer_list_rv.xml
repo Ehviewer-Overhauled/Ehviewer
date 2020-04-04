@@ -17,6 +17,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -26,7 +29,7 @@
         android:background="?attr/toolbarColor"
         android:elevation="8dp"
         android:saveEnabled="false"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
         app:popupTheme="?attr/toolbarPopupTheme" />
 
     <FrameLayout

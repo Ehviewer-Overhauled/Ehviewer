@@ -35,7 +35,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            android:fitsSystemWindows="true"
             app:headerLayout="@layout/nav_header_main"
+            app:insetForeground="@null"
             app:menu="@menu/nav_drawer_main" />
 
 
@@ -44,9 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:background="?android:attr/windowBackground"
-            android:clickable="true"
-            android:focusable="true"
+            android:background="@android:color/transparent"
             android:maxWidth="@dimen/drawer_max_width" />
 
     </com.hippo.ehviewer.widget.EhDrawerLayout>

@@ -610,7 +610,7 @@ public final class GalleryListScene extends BaseScene
                 .withMaterialShowcase()
                 .setStyle(R.style.Guide)
                 .setTarget(new PointTarget(point.x, point.y / 3))
-                .blockAllTouches()
+                .hideOnTouchOutside()
                 .setContentTitle(R.string.guide_quick_search_title)
                 .setContentText(R.string.guide_quick_search_text)
                 .replaceEndButton(R.layout.button_guide)

@@ -79,7 +79,7 @@
                 android:layout_marginRight="@dimen/keyline_margin"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="?attr/galleryDetailHeaderTitleColor"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/text_little_small" />
 
             <TextView

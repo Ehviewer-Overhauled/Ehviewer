@@ -603,6 +603,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setWhiteStatusBar(false);
     }
 
     @Override
