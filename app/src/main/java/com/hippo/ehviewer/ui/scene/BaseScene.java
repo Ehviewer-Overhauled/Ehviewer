@@ -201,7 +201,7 @@ public abstract class BaseScene extends SceneFragment {
                 flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             }
             decorView.setSystemUiVisibility(flags);
-            ((DrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(set ? Color.WHITE : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+            ((DrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(set ? Color.TRANSPARENT : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
         } else {
             ((DrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
         }
