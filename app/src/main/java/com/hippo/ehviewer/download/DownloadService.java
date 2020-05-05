@@ -22,7 +22,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -245,13 +244,11 @@ public class DownloadService extends Service implements DownloadManager.Download
 
         mDownloadedBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(getString(R.string.stat_download_done_title))
                 .setDeleteIntent(piClear)
                 .setOngoing(false)
                 .setAutoCancel(true)
-                .setContentIntent(piActivity)
-                .setChannelId(CHANNEL_ID);
+                .setContentIntent(piActivity);
 
         mDownloadedDelay = new NotificationDelay(this, mNotifyManager, mDownloadedBuilder, ID_DOWNLOADED);
     }
@@ -263,19 +260,20 @@ public class DownloadService extends Service implements DownloadManager.Download
 
         m509dBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_alert)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentText(getString(R.string.stat_509_alert_title))
                 .setContentText(getString(R.string.stat_509_alert_text))
                 .setAutoCancel(true)
                 .setOngoing(false)
-                .setCategory(NotificationCompat.CATEGORY_ERROR)
-                .setChannelId(CHANNEL_ID);
+                .setCategory(NotificationCompat.CATEGORY_ERROR);
 
         m509Delay = new NotificationDelay(this, mNotifyManager, m509dBuilder, ID_509);
     }
 
     @Override
     public void onGet509() {
+        if (mDownloadManager != null) {
+            mDownloadManager.stopAllDownload();
+        }
         if (mNotifyManager == null) {
             return;
         }
