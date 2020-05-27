@@ -1,5 +1,3 @@
-[![Telegram](https://img.shields.io/badge/chat-Telegram-blue.svg)](https://t.me/ehviewer)
-
 # EhViewer
 
 ![Icon](art/launcher_icon-web.png)
@@ -12,26 +10,6 @@ An E-Hentai Application for Android.
 # Screenshot
 
 ![screenshot-01](art/screenshot-01.png)
-
-
-# Build
-
-Windows
-
-    > git clone https://github.com/NekoInverter/EhViewer
-    > cd EhViewer
-    > gradlew app:assembleDebug
-
-Linux
-
-    $ git clone https://github.com/NekoInverter/EhViewer
-    $ cd EhViewer
-    $ ./gradlew app:assembleDebug
-
-生成的 apk 文件在 app\build\outputs\apk 目录下
-
-The apk is in app\build\outputs\apk
-
 
 # Download
 
