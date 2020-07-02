@@ -257,6 +257,8 @@ public class Settings {
     private static final boolean DEFAULT_GUIDE_GALLERY = true;
     private static final String KEY_CLIPBOARD_TEXT_HASH_CODE = "clipboard_text_hash_code";
     private static final int DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0;
+    private static final String KEY_DOWNLOAD_DELAY = "download_delay";
+    private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static Context sContext;
     private static SharedPreferences sSettingsPre;
     private static EhConfig sEhConfig;
@@ -738,6 +740,14 @@ public class Settings {
 
     public static void putMultiThreadDownload(int value) {
         putIntToStr(KEY_MULTI_THREAD_DOWNLOAD, value);
+    }
+
+    public static int getDownloadDelay() {
+        return getIntFromStr(KEY_DOWNLOAD_DELAY, DEFAULT_DOWNLOAD_DELAY);
+    }
+
+    public static void putDownloadDelay(int value) {
+        putIntToStr(KEY_DOWNLOAD_DELAY, value);
     }
 
     public static int getPreloadImage() {

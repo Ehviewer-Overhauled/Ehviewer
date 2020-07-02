@@ -40,6 +40,15 @@
         app:iconSpaceReserved="false" />
 
     <SimpleMenuPreference
+        android:key="download_delay"
+        android:title="@string/settings_download_download_delay"
+        android:summary="@string/settings_download_download_delay_summary"
+        app:entries="@array/download_delay_entries"
+        app:entryValues="@array/download_delay_entry_values"
+        android:defaultValue="0"
+        app:iconSpaceReserved="false" />
+
+    <SimpleMenuPreference
         android:defaultValue="5"
         android:key="preload_image"
         android:summary="@string/settings_download_preload_image_summary"

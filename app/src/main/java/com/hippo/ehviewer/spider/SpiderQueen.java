@@ -143,6 +143,7 @@ public final class SpiderQueen implements Runnable {
     private final int mPreloadNumber;
     private int mReadReference = 0;
     private int mDownloadReference = 0;
+    private final int mDownloadDelay;
     // It mQueenThread is null, failed or stopped
     @Nullable
     private volatile Thread mQueenThread;
@@ -169,6 +170,7 @@ public final class SpiderQueen implements Runnable {
         mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
                 0, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
                 new PriorityThreadFactory(SpiderWorker.class.getSimpleName(), Process.THREAD_PRIORITY_BACKGROUND));
+        mDownloadDelay = Settings.getDownloadDelay();
     }
 
     @UiThread
@@ -1349,6 +1351,11 @@ public final class SpiderQueen implements Runnable {
 
                     // Download finished
                     updatePageState(index, STATE_FINISHED);
+                    try {
+                        Thread.sleep(mDownloadDelay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();

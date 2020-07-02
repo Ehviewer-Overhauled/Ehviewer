@@ -554,6 +554,8 @@
     <string name="settings_download_media_scan_summary_off">Most gallery apps will ignore pictures in the download path</string>
     <string name="settings_download_multi_thread_download">Multi-threaded download</string>
     <string name="settings_download_multi_thread_download_summary">Up to %s images</string>
+    <string name="settings_download_download_delay">Download delay</string>
+    <string name="settings_download_download_delay_summary">Delay %s ms per download</string>
     <string name="settings_download_preload_image">Preload image</string>
     <string name="settings_download_preload_image_summary">Preload next %s image</string>
     <string name="settings_download_image_resolution">Image resolution</string>

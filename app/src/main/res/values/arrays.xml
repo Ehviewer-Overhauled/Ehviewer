@@ -115,6 +115,28 @@
         <item>7</item>
     </string-array>
 
+    <string-array name="download_delay_entries" translatable="false">
+        <item>0</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>10000</item>
+        <item>20000</item>
+    </string-array>
+
+    <string-array name="download_delay_entry_values" translatable="false">
+        <item>0</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>3000</item>
+        <item>10000</item>
+        <item>20000</item>
+    </string-array>
+
     <string-array name="preload_image_entries" translatable="false">
         <item>3</item>
         <item>5</item>
