@@ -22,10 +22,11 @@ import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
+import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.util.AppHelper;
+import com.microsoft.appcenter.distribute.Distribute;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
 public class AboutFragment extends PreferenceFragmentCompat
@@ -41,13 +42,14 @@ public class AboutFragment extends PreferenceFragmentCompat
 
         Preference author = findPreference(KEY_AUTHOR);
         //Preference donate = findPreference(KEY_DONATE);
-        //Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
+        Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
 
         author.setSummary(getString(R.string.settings_about_author_summary).replace('$', '@'));
 
         author.setOnPreferenceClickListener(this);
         //donate.setOnPreferenceClickListener(this);
-        //checkForUpdate.setOnPreferenceClickListener(this);
+        checkForUpdate.setOnPreferenceClickListener(this);
+        checkForUpdate.setVisible(Analytics.isEnabled());
         OssLicensesMenuActivity.setActivityTitle(getString(R.string.license));
     }
 
@@ -58,7 +60,7 @@ public class AboutFragment extends PreferenceFragmentCompat
             AppHelper.sendEmail(requireActivity(), EhApplication.getDeveloperEmail(),
                     "About EhViewer", null);
         } else if (KEY_CHECK_FOR_UPDATES.equals(key)) {
-            CommonOperations.checkUpdate(getActivity(), true);
+            Distribute.checkForUpdate();
         }
         return true;
     }

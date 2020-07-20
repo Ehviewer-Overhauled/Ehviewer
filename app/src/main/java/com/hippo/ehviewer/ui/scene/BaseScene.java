@@ -39,6 +39,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hippo.android.resource.AttrResources;
+import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
@@ -292,6 +293,12 @@ public abstract class BaseScene extends SceneFragment {
         if (null != activity && null != view) {
             AppHelper.showSoftInput(activity, view);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Analytics.onSceneView(this);
     }
 
     @Override

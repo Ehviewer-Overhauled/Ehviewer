@@ -75,12 +75,12 @@
         android:key="version"
         app:iconSpaceReserved="false" />
 
-    <!--<Preference
+    <Preference
         android:key="check_for_updates"
         android:title="@string/settings_about_check_for_updates"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <!--<SwitchPreferenceCompat
         android:defaultValue="@bool/beta"
         android:key="beta_update_channel"
         android:summary="@string/settings_about_beta_update_channel_summary"

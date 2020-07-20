@@ -93,7 +93,6 @@
     <string name="content_layout_restore_tip">クリックしてもう一度試す</string>
     <string name="write_rationale">EhViewerはギャラリーをダウンロードするためのWRITE_EXTERNAL_STORAGE権限を請求します。許可してもらえないでしょうか？</string>
     <string name="you_rejected_me">痛い</string>
-    <string name="analytics_explain">ご使用のデバイスの情報やこのアプリの利用情報を収集するように同意しますか？収集情報はアプリ向上のために使用されます。&lt;br&gt;&lt;br&gt;データ分析サービスはGoogle Analytics for Firebaseによって提供されます。 &lt;a href=&quot;https://www.google.com/policies/privacy/&quot;&gt;https://www.google.com/policies/privacy/&lt;/a&gt;にプライバシーポリシーをご覧ください。&lt;br&gt;&lt;br&gt;アプリ利用情報収集に参加すると、Android APIバージョン、デバイスモデル、言語、地域、アプリバージョンや、セッション時間などの情報は収集されます。開発者は、電話番号、電子メールアドレス、IMEI情報などを記録しないことを保証します。&lt;br&gt;&lt;br&gt;同意しない限り、データは収集されません。&lt;br&gt;&lt;br&gt;送信されたデータはGoogle Analytics for Firebaseで分析され、分析レポートにはこのアプリ開発者しかアクセスできません。</string>
     <string name="get_it">了解</string>
     <string name="accept">同意</string>
     <string name="reject">拒否</string>

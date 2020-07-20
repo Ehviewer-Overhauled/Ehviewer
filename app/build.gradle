@@ -27,8 +27,8 @@ android {
         applicationId "com.hippo.ehviewer"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 106
-        versionName "1.7.5"
+        versionCode 107
+        versionName "1.7.6"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
@@ -102,6 +102,10 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-thread:0.1.1'
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
+    def appCenterSdkVersion = '3.2.2'
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
     implementation 'com.squareup.okhttp3:okhttp:3.14.7'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'tech.rectifier.preferencex-android:preferencex-simplemenu:88f93154b2'

@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -74,6 +75,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         Context context = getContext2();
+        MainActivity activity = getActivity2();
         if (null == context) {
             return;
         }
@@ -83,11 +85,11 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
         } else if (mAccept == v) {
             Settings.putEnableAnalytics(true);
             // Start Analytics
+            Analytics.start(activity.getApplication());
         }
         Settings.putAskAnalytics(false);
 
         // Start new scene and finish it self
-        MainActivity activity = getActivity2();
         if (null != activity) {
             startSceneForCheckStep(CHECK_STEP_ANALYTICS, getArguments());
         }

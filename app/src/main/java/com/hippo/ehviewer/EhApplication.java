@@ -281,6 +281,10 @@ public class EhApplication extends RecordingApplication {
             EhDB.mergeOldDB(this);
         }
 
+        if (Settings.getEnableAnalytics()) {
+            Analytics.start(this);
+        }
+
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
 
         // Do io tasks in new thread
