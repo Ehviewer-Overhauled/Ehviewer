@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -27,6 +28,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -52,6 +54,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -109,6 +113,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private static final long HIDE_SLIDER_DELAY = 3000;
 
     private static final int WRITE_REQUEST_CODE = 43;
+    private static final int REQUEST_WRITE_STORAGE = 1;
     private final ConcurrentPool<NotifyTask> mNotifyTaskPool = new ConcurrentPool<>(3);
     private String mAction;
     private String mFilename;
@@ -179,6 +184,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mSize;
     private int mCurrentIndex;
 
+    private int mSavingPage = -1;
+
     private void buildProvider() {
         if (mGalleryProvider != null) {
             return;
@@ -195,7 +202,14 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         } else if (Intent.ACTION_VIEW.equals(mAction)) {
             if (mUri != null) {
                 // Only support zip now
-                grantUriPermission(BuildConfig.APPLICATION_ID, mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    grantUriPermission(BuildConfig.APPLICATION_ID, mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (Exception e) {
+                    // Some stupid file manager send us a uri and don't allow us to read it
+                    // java.lang.SecurityException: UID 10671 does not have permission to
+                    // content://com.UCMobile.fileProvider/external_files/BaiduNetdisk/getvoice [user 0]
+                    Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show();
+                }
                 mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
             }
         }
@@ -775,6 +789,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            mSavingPage = page;
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+            return;
+        }
+
         String filename = mGalleryProvider.getImageFilename(page);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                 MimeTypeMap.getFileExtensionFromUrl(filename));
@@ -805,6 +826,19 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         Toast.makeText(this, getString(R.string.image_saved, imageUri.toString()), Toast.LENGTH_SHORT).show();
         // Sync media store
         //sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, file.getUri()));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mSavingPage != -1) {
+                saveImage(mSavingPage);
+            } else {
+                Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+            }
+            mSavingPage = -1;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void saveImageTo(int page) {
