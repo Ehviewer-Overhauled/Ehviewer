@@ -358,7 +358,6 @@
     <string name="set_pattern_protection">Définir le modéle de déverrouillage</string>
     <string name="set_pattern_protection_tip">Déssinez un modéle pour définir le modéle de déverrouillage\nContinuer sans rien déssiner pour effacer le modéle</string>
     <string name="set">Définir</string>
-    <string name="enable_fingerprint">Permettre le déverrouillage avec l\'empreinte digitale</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">Paramètres EHentai</string>

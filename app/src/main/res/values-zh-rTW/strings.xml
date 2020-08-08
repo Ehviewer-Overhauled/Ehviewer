@@ -373,7 +373,6 @@
     <string name="set_pattern_protection">設定圖形解鎖</string>
     <string name="set_pattern_protection_tip">繪製圖案來設定繪圖解鎖\n留白以取消圖案保護</string>
     <string name="set">設定</string>
-    <string name="enable_fingerprint">啟用指紋解鎖</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 設定</string>

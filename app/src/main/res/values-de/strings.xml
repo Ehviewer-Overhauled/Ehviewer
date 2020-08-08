@@ -287,7 +287,6 @@
     <string name="set_pattern_protection">Sperrmuster festlegen</string>
     <string name="set_pattern_protection_tip">Zeichne ein Muster, um es als Sperrmuster festzulegen.\nLasse frei, um das Sperrmuster zu entfernen.</string>
     <string name="set">Festlegen</string>
-    <string name="enable_fingerprint">Mit Fingerabdrücke entsperren</string>
     <string name="u_config">EHentai-Einstellungen</string>
     <string name="apply">Übernehmen</string>
     <string name="apply_tip">Zum Speichern der Einstellungen auf Häkchen tippen</string>

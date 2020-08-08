@@ -421,7 +421,7 @@
     <string name="set_pattern_protection">Set pattern protection</string>
     <string name="set_pattern_protection_tip">Draw a pattern to set pattern protection\nLeave blank to clear pattern protection</string>
     <string name="set">Set</string>
-    <string name="enable_fingerprint">Also allow fingerprint unlock</string>
+    <string name="enable_biometric">Also allow biometric unlock</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">EHentai settings</string>

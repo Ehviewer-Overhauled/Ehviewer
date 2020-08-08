@@ -341,7 +341,6 @@
     <string name="set_pattern_protection">ตั้้งการป้องกันแบบรูปแบบ</string>
     <string name="set_pattern_protection_tip">ลากรูปแบบเพื่อตั้งค่าการป้องกันแบบรูปแบบ\nเว้นว้างไว้เพื่อลบการป้องกันแบบรูปแบบ</string>
     <string name="set">กำหนด</string>
-    <string name="enable_fingerprint">อนุญาตใช้สแกนลายนิ้วมือเพื่อปลดล็อกเช่นกัน</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">การตั้งค่า EHentai</string>

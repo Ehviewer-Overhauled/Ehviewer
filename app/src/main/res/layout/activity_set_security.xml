@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20dp"
-        android:text="@string/enable_fingerprint"
+        android:text="@string/enable_biometric"
         android:visibility="gone" />
 
     <LinearLayout

@@ -326,7 +326,6 @@
     <string name="set_pattern_protection">패턴 보호 사용</string>
     <string name="set_pattern_protection_tip">패턴 보호를 사용하려면 패턴을 그리세요.\n비워두면 패턴 보호가 해제됩니다.</string>
     <string name="set">지정</string>
-    <string name="enable_fingerprint">지문으로 잠금 해제 허용</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">E-Hentai 설정</string>
