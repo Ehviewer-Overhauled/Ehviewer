@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -62,7 +63,6 @@ import androidx.transition.TransitionInflater;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.beerbelly.BeerBelly;
-import com.hippo.drawable.RoundSideRectDrawable;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -936,7 +936,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             TextView tgName = (TextView) inflater.inflate(R.layout.item_gallery_tag, ll, false);
             ll.addView(tgName);
             tgName.setText(readableTagName != null ? readableTagName : tg.groupName);
-            tgName.setBackgroundDrawable(new RoundSideRectDrawable(colorName));
+            tgName.setBackgroundTintList(ColorStateList.valueOf(colorName));
 
             String prefix = EhTagDatabase.namespaceToPrefix(tg.groupName);
             if (prefix == null) {
@@ -956,7 +956,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 }
 
                 tag.setText(readableTag != null ? readableTag : tagStr);
-                tag.setBackgroundDrawable(new RoundSideRectDrawable(colorTag));
+                tag.setBackgroundTintList(ColorStateList.valueOf(colorTag));
                 tag.setTag(R.id.tag, tg.groupName + ":" + tagStr);
                 tag.setOnClickListener(this);
                 tag.setOnLongClickListener(this);

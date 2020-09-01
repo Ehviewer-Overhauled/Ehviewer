@@ -48,7 +48,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/contentColorThemePrimary"
+            android:background="?colorPrimarySurface"
             android:elevation="4dp"
             android:orientation="horizontal">
 
@@ -63,6 +63,7 @@
                 android:maxHeight="112dp"
                 android:minHeight="56dp"
                 android:padding="@dimen/keyline_margin"
+                android:textColor="?colorOnPrimarySurface"
                 android:theme="@style/CommentEditText" />
 
             <ImageView
@@ -70,6 +71,9 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_gravity="bottom"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="16dp" />
 
         </LinearLayout>
