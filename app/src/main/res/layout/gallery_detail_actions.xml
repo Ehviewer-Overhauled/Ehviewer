@@ -22,6 +22,17 @@
     android:paddingTop="@dimen/keyline_margin"
     android:paddingBottom="@dimen/keyline_margin">
 
+    <TextView
+        android:id="@+id/newerVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="@string/newer_version_avaliable"
+        android:textColor="?attr/textColorThemeAccent"
+        android:visibility="gone" />
+
     <HorizontalScrollView
         android:id="@+id/actions_scroll_view"
         android:layout_width="wrap_content"

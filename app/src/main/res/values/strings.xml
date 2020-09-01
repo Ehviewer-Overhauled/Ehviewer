@@ -282,6 +282,7 @@
     <string name="filter_the_uploader">Block the uploader \"%s\"?</string>
     <string name="filter_the_tag">Block the tag \"%s\"?</string>
     <string name="filter_added">Blocker added</string>
+    <string name="newer_version_avaliable">There are newer versions of this gallery available.</string>
 
     <!-- Rating -->
     <string name="rating10">MASTERPIECE</string>

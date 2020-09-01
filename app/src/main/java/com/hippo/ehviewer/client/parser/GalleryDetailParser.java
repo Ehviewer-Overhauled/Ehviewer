@@ -62,7 +62,7 @@ public class GalleryDetailParser {
 
     private static final Pattern PATTERN_ERROR = Pattern.compile("<div class=\"d\">\n<p>([^<]+)</p>");
     private static final Pattern PATTERN_DETAIL = Pattern.compile("var gid = (\\d+);.+?var token = \"([a-f0-9]+)\";.+?var apiuid = ([\\-\\d]+);.+?var apikey = \"([a-f0-9]+)\";", Pattern.DOTALL);
-    private static final Pattern PATTERN_TORRENT = Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download \\((\\d+)\\)</a>");
+    private static final Pattern PATTERN_TORRENT = Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download[^<]+(\\d+)[^<]+</a");
     private static final Pattern PATTERN_ARCHIVE = Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Archive Download</a>");
     private static final Pattern PATTERN_COVER = Pattern.compile("width:(\\d+)px; height:(\\d+)px.+?url\\((.+?)\\)");
     private static final Pattern PATTERN_TAG_GROUP = Pattern.compile("<tr><td[^<>]+>([\\w\\s]+):</td><td>(?:<div[^<>]+><a[^<>]+>[\\w\\s]+</a></div>)+</td></tr>");
@@ -72,6 +72,7 @@ public class GalleryDetailParser {
     private static final Pattern PATTERN_PREVIEW_PAGES = Pattern.compile("<td[^>]+><a[^>]+>([\\d,]+)</a></td><td[^>]+>(?:<a[^>]+>)?&gt;(?:</a>)?</td>");
     private static final Pattern PATTERN_NORMAL_PREVIEW = Pattern.compile("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"");
     private static final Pattern PATTERN_LARGE_PREVIEW = Pattern.compile("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"");
+    private static final Pattern PATTERN_NEWER_VERSION = Pattern.compile("<div id=\"gnd\".+?<a href=\"([^<>]+)\">([^<>]+)</a>.+?added ([^<>]+)<br /></div>");
 
     private static final GalleryTagGroup[] EMPTY_GALLERY_TAG_GROUP_ARRAY = new GalleryTagGroup[0];
     private static final GalleryCommentList EMPTY_GALLERY_COMMENT_ARRAY = new GalleryCommentList(new GalleryComment[0], false);
@@ -133,6 +134,17 @@ public class GalleryDetailParser {
         } else {
             gd.torrentCount = 0;
             gd.torrentUrl = "";
+        }
+
+        matcher = PATTERN_NEWER_VERSION.matcher(body);
+        if (matcher.find()) {
+            gd.newerUrl = StringUtils.unescapeXml(StringUtils.trim(matcher.group(1)));
+            gd.newerName = StringUtils.unescapeXml(StringUtils.trim(matcher.group(2)));
+            gd.newerDate = StringUtils.unescapeXml(StringUtils.trim(matcher.group(3)));
+        } else {
+            gd.newerUrl = "";
+            gd.newerName = "";
+            gd.newerDate = "";
         }
 
         matcher = PATTERN_ARCHIVE.matcher(body);

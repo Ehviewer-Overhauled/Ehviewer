@@ -84,6 +84,7 @@ import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
+import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
@@ -189,6 +190,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private TextView mPosted;
     @Nullable
     private TextView mFavoredTimes;
+    @Nullable
+    private TextView mNewerVersion;
     // Actions
     @Nullable
     private View mActions;
@@ -542,6 +545,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mInfo.setOnClickListener(this);
 
         mActions = ViewUtils.$$(belowHeader, R.id.actions);
+        mNewerVersion = (TextView) ViewUtils.$$(mActions, R.id.newerVersion);
         mRatingText = (TextView) ViewUtils.$$(mActions, R.id.rating_text);
         mRating = (RatingBar) ViewUtils.$$(mActions, R.id.rating);
         mHeartGroup = ViewUtils.$$(mActions, R.id.heart_group);
@@ -553,6 +557,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mRate = (TextView) ViewUtils.$$(mActions, R.id.rate);
         mSimilar = (TextView) ViewUtils.$$(mActions, R.id.similar);
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
+        mNewerVersion.setOnClickListener(this);
         mHeartGroup.setOnClickListener(this);
         mTorrent.setOnClickListener(this);
         mArchive.setOnClickListener(this);
@@ -637,6 +642,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mFavoredTimes = null;
 
         mActions = null;
+        mNewerVersion = null;
         mRatingText = null;
         mRating = null;
         mHeartGroup = null;
@@ -861,7 +867,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
         if (mThumb == null || mTitle == null || mUploader == null || mCategory == null ||
                 mLanguage == null || mPages == null || mSize == null || mPosted == null ||
-                mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null) {
+                mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null || mNewerVersion == null) {
             return;
         }
 
@@ -881,6 +887,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mSize.setText(gd.size);
         mPosted.setText(gd.posted);
         mFavoredTimes.setText(resources.getString(R.string.favored_times, gd.favoriteCount));
+        if (!TextUtils.isEmpty(gd.newerUrl)) {
+            mNewerVersion.setVisibility(View.VISIBLE);
+        }
 
         mRatingText.setText(getAllRatingText(gd.rating, gd.ratingCount));
         mRating.setRating(gd.rating);
@@ -1198,6 +1207,17 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 intent.setAction(GalleryActivity.ACTION_EH);
                 intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, galleryInfo);
                 startActivity(intent);
+            }
+        } else if (mNewerVersion == v) {
+            if (mGalleryDetail != null) {
+                GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(mGalleryDetail.newerUrl, false);
+                if (result != null) {
+                    Bundle args = new Bundle();
+                    args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
+                    args.putLong(GalleryDetailScene.KEY_GID, result.gid);
+                    args.putString(GalleryDetailScene.KEY_TOKEN, result.token);
+                    startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
+                }
             }
         } else if (mInfo == v) {
             Bundle args = new Bundle();
