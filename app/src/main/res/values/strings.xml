@@ -784,4 +784,6 @@
     <string name="download_filter">Filter</string>
     <string name="download_all">All</string>
     <string name="download_start_all_reversed">Start all (reversed)</string>
+
+    <string name="no_browser_installed">Just install a browser please.</string>
 </resources>

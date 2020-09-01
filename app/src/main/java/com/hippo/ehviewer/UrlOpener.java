@@ -16,10 +16,12 @@
 
 package com.hippo.ehviewer;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -59,6 +61,10 @@ public final class UrlOpener {
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
         customTabsIntent.setShowTitle(true);
         customTabsIntent.setToolbarColor(AttrResources.getAttrColor(context, R.attr.colorPrimary));
-        customTabsIntent.build().launchUrl(context, uri);
+        try {
+            customTabsIntent.build().launchUrl(context, uri);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(context, R.string.no_browser_installed, Toast.LENGTH_LONG).show();
+        }
     }
 }
