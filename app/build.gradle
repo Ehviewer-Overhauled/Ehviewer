@@ -27,8 +27,8 @@ android {
         applicationId "com.hippo.ehviewer"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 110
-        versionName "1.7.8"
+        versionCode 111
+        versionName "1.7.9"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.browser:browser:1.2.0"
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation 'com.getkeepsafe.relinker:relinker:1.4.1'
     implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
     implementation 'com.github.seven332.a7zip:extract-lite:1b21783'
@@ -102,7 +102,7 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-thread:0.1.1'
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
-    def appCenterSdkVersion = '3.3.0'
+    def appCenterSdkVersion = '3.3.1'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
