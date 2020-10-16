@@ -1059,7 +1059,7 @@ public class DownloadsScene extends ToolbarScene
                 });
                 if (position > 0) {
                     holder.option.setVisibility(View.VISIBLE);
-                    holder.option.setOnClickListener(v -> {
+                    holder.itemView.setOnLongClickListener(v -> {
                         if (context != null) {
                             PopupMenu popupMenu = new PopupMenu(context, holder.option);
                             popupMenu.inflate(R.menu.download_label_option);
@@ -1086,6 +1086,7 @@ public class DownloadsScene extends ToolbarScene
                                 return false;
                             });
                         }
+                        return true;
                     });
                 } else {
                     holder.option.setVisibility(View.GONE);
@@ -1105,7 +1106,7 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public boolean onCheckCanStartDrag(@NonNull DownloadLabelHolder holder, int position, int x, int y) {
-            return position != 0;
+            return position != 0 && x > holder.option.getX() && y > holder.option.getY();
         }
 
         @Override

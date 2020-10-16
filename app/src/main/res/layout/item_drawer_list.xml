@@ -20,12 +20,11 @@
 
     <ImageView
         android:id="@+id/iv_option"
-        app:srcCompat="@drawable/ic_more_vert_black_24dp"
+        app:srcCompat="@drawable/ic_baseline_reorder_24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:paddingLeft="?attr/listPreferredItemPaddingLeft"
-        android:paddingRight="?attr/listPreferredItemPaddingRight"
-        android:background="?attr/selectableItemBackgroundBorderless"/>
+        android:paddingRight="?attr/listPreferredItemPaddingRight" />
 
 </LinearLayout>
