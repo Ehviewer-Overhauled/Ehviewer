@@ -552,6 +552,10 @@ public class DownloadsScene extends ToolbarScene
                 }
                 return true;
             }
+            case R.id.action_open_download_labels: {
+                openDrawer(Gravity.RIGHT);
+                return true;
+            }
             case R.id.action_reset_reading_progress: {
                 new MaterialAlertDialogBuilder(getContext())
                         .setMessage(R.string.reset_reading_progress_message)

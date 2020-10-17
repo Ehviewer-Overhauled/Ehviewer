@@ -36,6 +36,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_open_download_labels"
+        android:icon="@drawable/ic_baseline_label_24"
+        android:title="@string/download_labels"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_reset_reading_progress"
         android:title="@string/download_reset_reading_progress"
         app:showAsAction="never" />

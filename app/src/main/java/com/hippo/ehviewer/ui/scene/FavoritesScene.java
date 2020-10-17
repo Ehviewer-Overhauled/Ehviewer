@@ -755,12 +755,15 @@ public class FavoritesScene extends BaseScene implements
 
         if (!mRecyclerView.isInCustomChoice()) {
             switch (position) {
-                case 0: // Go to
+                case 0: // Open right
+                    openDrawer(Gravity.RIGHT);
+                    break;
+                case 1: // Go to
                     if (mHelper.canGoTo()) {
                         showGoToDialog();
                     }
                     break;
-                case 1: // Refresh
+                case 2: // Refresh
                     mHelper.refresh();
                     break;
             }

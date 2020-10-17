@@ -52,6 +52,15 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
+            app:srcCompat="@drawable/v_magnify_dark_x24"
+            app:tint="#fff" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="?attr/widgetColorThemeAccent"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_go_to_dark_x24"
             app:tint="#fff" />
 
