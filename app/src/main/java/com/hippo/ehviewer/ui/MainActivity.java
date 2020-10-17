@@ -31,8 +31,6 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +39,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.card.MaterialCardView;
@@ -329,7 +326,6 @@ public final class MainActivity extends StageActivity
         }
 
         if (savedInstanceState == null) {
-            CommonOperations.checkUpdate(this, false);
             checkDownloadLocation();
             if (Settings.getCellularNetworkWarning()) {
                 checkCellularNetwork();

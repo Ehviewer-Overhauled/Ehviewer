@@ -141,9 +141,9 @@ public final class SpiderQueen implements Runnable {
     private final List<OnSpiderListener> mSpiderListeners = new ArrayList<>();
     private final int mWorkerMaxCount;
     private final int mPreloadNumber;
+    private final int mDownloadDelay;
     private int mReadReference = 0;
     private int mDownloadReference = 0;
-    private final int mDownloadDelay;
     // It mQueenThread is null, failed or stopped
     @Nullable
     private volatile Thread mQueenThread;
