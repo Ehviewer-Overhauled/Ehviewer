@@ -1082,9 +1082,16 @@ public class DownloadsScene extends ToolbarScene
                                         }
                                         break;
                                     case R.id.menu_label_remove:
-                                        mDownloadManager.deleteLabel(label);
-                                        mLabels.remove(position);
-                                        notifyDataSetChanged();
+                                        new MaterialAlertDialogBuilder(requireContext())
+                                                .setTitle(getString(R.string.delete_label_title))
+                                                .setMessage(getString(R.string.delete_label_message, label))
+                                                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                                                    mDownloadManager.deleteLabel(label);
+                                                    mLabels.remove(position);
+                                                    notifyDataSetChanged();
+                                                })
+                                                .setNegativeButton(android.R.string.cancel, null)
+                                                .show();
                                         break;
                                 }
                                 return false;
@@ -1582,8 +1589,9 @@ public class DownloadsScene extends ToolbarScene
                 mBuilder.setError(null);
                 mDialog.dismiss();
                 EhApplication.getDownloadManager(context).addLabel(text);
-                if (mAdapter != null && mLabels != null) {
-                    mAdapter.notifyItemInserted(mLabels.size() - 1);
+                initLabels();
+                if (mLabelAdapter != null && mLabels != null) {
+                    mLabelAdapter.notifyItemInserted(mLabels.size() - 1);
                 }
                 if (mViewTransition != null) {
                     if (mLabels != null && mLabels.size() > 0) {
@@ -1592,10 +1600,6 @@ public class DownloadsScene extends ToolbarScene
                         mViewTransition.showView(1);
                     }
                 }
-            }
-            if (mLabelAdapter != null) {
-                initLabels();
-                mLabelAdapter.notifyDataSetChanged();
             }
         }
     }

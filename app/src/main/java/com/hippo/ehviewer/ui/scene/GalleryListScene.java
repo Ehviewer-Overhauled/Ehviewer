@@ -739,7 +739,7 @@ public final class GalleryListScene extends BaseScene
             quickSearch.name = text;
             EhDB.insertQuickSearch(quickSearch);
             mQuickSearchList.add(quickSearch);
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemInserted(mQuickSearchList.size() - 1);
 
             if (0 == mQuickSearchList.size()) {
                 tip.setVisibility(View.VISIBLE);
@@ -1547,9 +1547,16 @@ public final class GalleryListScene extends BaseScene
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getItemId() == R.id.menu_qs_remove) {
-                                EhDB.deleteQuickSearch(quickSearch);
-                                mQuickSearchList.remove(position);
-                                notifyDataSetChanged();
+                                new MaterialAlertDialogBuilder(requireContext())
+                                        .setTitle(getString(R.string.delete_quick_search_title))
+                                        .setMessage(getString(R.string.delete_quick_search_message, quickSearch.name))
+                                        .setPositiveButton(R.string.delete, (dialog, which) -> {
+                                            EhDB.deleteQuickSearch(quickSearch);
+                                            mQuickSearchList.remove(position);
+                                            notifyDataSetChanged();
+                                        })
+                                        .setNegativeButton(android.R.string.cancel, null)
+                                        .show();
                                 return true;
                             }
                             return false;
