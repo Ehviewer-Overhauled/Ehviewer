@@ -559,6 +559,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
         mNewerVersion.setOnClickListener(this);
         mHeartGroup.setOnClickListener(this);
+        mHeartGroup.setOnLongClickListener(this);
         mTorrent.setOnClickListener(this);
         mArchive.setOnClickListener(this);
         mShare.setOnClickListener(this);
@@ -1443,6 +1444,25 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 CommonOperations.startDownload(activity, galleryInfo, true);
             }
             return true;
+        } else if (mHeartGroup == v) {
+            if (mGalleryDetail != null && !mModifingFavorites) {
+                boolean remove = false;
+                if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
+                    mModifingFavorites = true;
+                    CommonOperations.removeFromFavorites(activity, mGalleryDetail,
+                            new ModifyFavoritesListener(activity,
+                                    activity.getStageId(), getTag(), true));
+                    remove = true;
+                }
+                if (!remove) {
+                    mModifingFavorites = true;
+                    CommonOperations.addToFavorites(activity, mGalleryDetail,
+                            new ModifyFavoritesListener(activity,
+                                    activity.getStageId(), getTag(), false), true);
+                }
+                // Update UI
+                updateFavoriteDrawable();
+            }
         } else {
             String tag = (String) v.getTag(R.id.tag);
             if (null != tag) {
