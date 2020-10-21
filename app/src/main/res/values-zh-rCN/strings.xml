@@ -237,6 +237,8 @@
     <string name="filter_the_uploader">屏蔽上传者“%s”？</string>
     <string name="filter_the_tag">屏蔽标签“%s”？</string>
     <string name="filter_added">已添加屏蔽项</string>
+    <string name="newer_version_avaliable">此画廊有新版本可用。</string>
+    <string name="newer_version_title">%1$s, 添加于 %2$s</string>
 
     <!-- Rating -->
     <string name="rating10">根本把持不住</string>

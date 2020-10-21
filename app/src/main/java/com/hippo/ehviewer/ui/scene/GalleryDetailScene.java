@@ -84,7 +84,6 @@ import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
-import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
@@ -121,6 +120,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.HttpUrl;
@@ -888,7 +888,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mSize.setText(gd.size);
         mPosted.setText(gd.posted);
         mFavoredTimes.setText(resources.getString(R.string.favored_times, gd.favoriteCount));
-        if (!TextUtils.isEmpty(gd.newerUrl)) {
+        if (gd.newerVersions != null && gd.newerVersions.size() != 0) {
             mNewerVersion.setVisibility(View.VISIBLE);
         }
 
@@ -1211,14 +1211,20 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             }
         } else if (mNewerVersion == v) {
             if (mGalleryDetail != null) {
-                GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(mGalleryDetail.newerUrl, false);
-                if (result != null) {
-                    Bundle args = new Bundle();
-                    args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
-                    args.putLong(GalleryDetailScene.KEY_GID, result.gid);
-                    args.putString(GalleryDetailScene.KEY_TOKEN, result.token);
-                    startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
+                ArrayList<CharSequence> titles = new ArrayList<>();
+                for (GalleryInfo newerVersion : mGalleryDetail.newerVersions) {
+                    titles.add(getString(R.string.newer_version_title, newerVersion.title, newerVersion.posted));
                 }
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setItems(titles.toArray(new CharSequence[0]), (dialog, which) -> {
+                            GalleryInfo newerVersion = mGalleryDetail.newerVersions.get(which);
+                            Bundle args = new Bundle();
+                            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
+                            args.putLong(GalleryDetailScene.KEY_GID, newerVersion.gid);
+                            args.putString(GalleryDetailScene.KEY_TOKEN, newerVersion.token);
+                            startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
+                        })
+                        .show();
             }
         } else if (mInfo == v) {
             Bundle args = new Bundle();

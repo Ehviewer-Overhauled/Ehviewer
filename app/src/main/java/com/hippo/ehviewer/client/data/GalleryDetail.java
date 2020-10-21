@@ -19,6 +19,7 @@ package com.hippo.ehviewer.client.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GalleryDetail extends GalleryInfo {
@@ -40,9 +41,7 @@ public class GalleryDetail extends GalleryInfo {
     public String torrentUrl;
     public String archiveUrl;
     public String parent;
-    public String newerUrl;
-    public String newerName;
-    public String newerDate;
+    public ArrayList<GalleryInfo> newerVersions = new ArrayList<>();
     public String visible;
     public String language;
     public String size;
@@ -64,9 +63,8 @@ public class GalleryDetail extends GalleryInfo {
         this.torrentUrl = in.readString();
         this.archiveUrl = in.readString();
         this.parent = in.readString();
-        this.newerUrl = in.readString();
-        this.newerName = in.readString();
-        this.newerDate = in.readString();
+        //noinspection unchecked
+        this.newerVersions = in.readArrayList(GalleryInfo.class.getClassLoader());
         this.visible = in.readString();
         this.language = in.readString();
         this.size = in.readString();
@@ -97,9 +95,7 @@ public class GalleryDetail extends GalleryInfo {
         dest.writeString(this.torrentUrl);
         dest.writeString(this.archiveUrl);
         dest.writeString(this.parent);
-        dest.writeString(this.newerUrl);
-        dest.writeString(this.newerName);
-        dest.writeString(this.newerDate);
+        dest.writeList(this.newerVersions);
         dest.writeString(this.visible);
         dest.writeString(this.language);
         dest.writeString(this.size);

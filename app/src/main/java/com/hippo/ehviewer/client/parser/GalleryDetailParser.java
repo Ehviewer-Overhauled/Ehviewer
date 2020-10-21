@@ -25,6 +25,7 @@ import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryComment;
 import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
+import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.LargePreviewSet;
 import com.hippo.ehviewer.client.data.NormalPreviewSet;
@@ -72,7 +73,7 @@ public class GalleryDetailParser {
     private static final Pattern PATTERN_PREVIEW_PAGES = Pattern.compile("<td[^>]+><a[^>]+>([\\d,]+)</a></td><td[^>]+>(?:<a[^>]+>)?&gt;(?:</a>)?</td>");
     private static final Pattern PATTERN_NORMAL_PREVIEW = Pattern.compile("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"");
     private static final Pattern PATTERN_LARGE_PREVIEW = Pattern.compile("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"");
-    private static final Pattern PATTERN_NEWER_VERSION = Pattern.compile("<div id=\"gnd\".+?<a href=\"([^<>]+)\">([^<>]+)</a>.+?added ([^<>]+)<br /></div>");
+    private static final Pattern PATTERN_NEWER_DATE = Pattern.compile(", added (.+?)<br />");
 
     private static final GalleryTagGroup[] EMPTY_GALLERY_TAG_GROUP_ARRAY = new GalleryTagGroup[0];
     private static final GalleryCommentList EMPTY_GALLERY_COMMENT_ARRAY = new GalleryCommentList(new GalleryComment[0], false);
@@ -134,17 +135,6 @@ public class GalleryDetailParser {
         } else {
             gd.torrentCount = 0;
             gd.torrentUrl = "";
-        }
-
-        matcher = PATTERN_NEWER_VERSION.matcher(body);
-        if (matcher.find()) {
-            gd.newerUrl = StringUtils.unescapeXml(StringUtils.trim(matcher.group(1)));
-            gd.newerName = StringUtils.unescapeXml(StringUtils.trim(matcher.group(2)));
-            gd.newerDate = StringUtils.unescapeXml(StringUtils.trim(matcher.group(3)));
-        } else {
-            gd.newerUrl = "";
-            gd.newerName = "";
-            gd.newerDate = "";
         }
 
         matcher = PATTERN_ARCHIVE.matcher(body);
@@ -262,6 +252,33 @@ public class GalleryDetailParser {
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             throw new ParseException("Can't parse gallery detail", body);
+        }
+
+        // newer version
+        try {
+            Element gnd = d.getElementById("gnd");
+            if (gnd != null) {
+                matcher = PATTERN_NEWER_DATE.matcher(body);
+                ArrayList<String> dates = new ArrayList<>();
+                while (matcher.find()) {
+                    dates.add(matcher.group(1));
+                }
+                Elements elements = gnd.select("a");
+                for (int i = 0; i< elements.size(); i++) {
+                    Element element = elements.get(i);
+                    GalleryInfo gi = new GalleryInfo();
+                    GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(element.attr("href"));
+                    if (result != null) {
+                        gi.gid = result.gid;
+                        gi.token = result.token;
+                        gi.title = StringUtils.trim(element.text());
+                        gi.posted = dates.get(i);
+                        gd.newerVersions.add(gi);
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
