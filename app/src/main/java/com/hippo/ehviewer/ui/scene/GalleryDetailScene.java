@@ -49,6 +49,7 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -212,7 +213,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     @Nullable
     private TextView mShare;
     @Nullable
-    private TextView mRate;
+    private View mRate;
     @Nullable
     private TextView mSimilar;
     @Nullable
@@ -554,7 +555,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTorrent = (TextView) ViewUtils.$$(mActions, R.id.torrent);
         mArchive = (TextView) ViewUtils.$$(mActions, R.id.archive);
         mShare = (TextView) ViewUtils.$$(mActions, R.id.share);
-        mRate = (TextView) ViewUtils.$$(mActions, R.id.rate);
+        mRate = ViewUtils.$$(mActions, R.id.rate);
         mSimilar = (TextView) ViewUtils.$$(mActions, R.id.similar);
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
         mNewerVersion.setOnClickListener(this);
@@ -566,7 +567,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mRate.setOnClickListener(this);
         mSimilar.setOnClickListener(this);
         mSearchCover.setOnClickListener(this);
-        ensureActionDrawable(context);
+        ensureActionDrawable();
 
         mTags = (LinearLayout) ViewUtils.$$(belowHeader, R.id.tags);
         mNoTags = (TextView) ViewUtils.$$(mTags, R.id.no_tags);
@@ -722,28 +723,23 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         return true;
     }
 
-    private void setActionDrawable(TextView text, Drawable drawable) {
+    private void setActionDrawable(@Nullable TextView text, @DrawableRes int resId) {
+        if (text == null) return;
+        Context context = text.getContext();
+        Drawable drawable = DrawableManager.getVectorDrawable(context, resId);
+        if (drawable == null) return;
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         text.setCompoundDrawables(null, drawable, null, null);
     }
 
-    private void ensureActionDrawable(Context context) {
-        Drawable heart = DrawableManager.getVectorDrawable(context, R.drawable.v_heart_primary_x48);
-        setActionDrawable(mHeart, heart);
-        Drawable heartOutline = DrawableManager.getVectorDrawable(context, R.drawable.v_heart_outline_primary_x48);
-        setActionDrawable(mHeartOutline, heartOutline);
-        Drawable torrent = DrawableManager.getVectorDrawable(context, R.drawable.v_utorrent_primary_x48);
-        setActionDrawable(mTorrent, torrent);
-        Drawable archive = DrawableManager.getVectorDrawable(context, R.drawable.v_archive_primary_x48);
-        setActionDrawable(mArchive, archive);
-        Drawable share = DrawableManager.getVectorDrawable(context, R.drawable.v_share_primary_x48);
-        setActionDrawable(mShare, share);
-        Drawable rate = DrawableManager.getVectorDrawable(context, R.drawable.v_thumb_up_primary_x48);
-        setActionDrawable(mRate, rate);
-        Drawable similar = DrawableManager.getVectorDrawable(context, R.drawable.v_similar_primary_x48);
-        setActionDrawable(mSimilar, similar);
-        Drawable searchCover = DrawableManager.getVectorDrawable(context, R.drawable.v_file_find_primary_x48);
-        setActionDrawable(mSearchCover, searchCover);
+    private void ensureActionDrawable() {
+        setActionDrawable(mHeart, R.drawable.v_heart_primary_x48);
+        setActionDrawable(mHeartOutline, R.drawable.v_heart_outline_primary_x48);
+        setActionDrawable(mTorrent, R.drawable.v_utorrent_primary_x48);
+        setActionDrawable(mArchive, R.drawable.v_archive_primary_x48);
+        setActionDrawable(mShare, R.drawable.v_share_primary_x48);
+        setActionDrawable(mSimilar, R.drawable.v_similar_primary_x48);
+        setActionDrawable(mSearchCover, R.drawable.v_file_find_primary_x48);
     }
 
     private boolean createCircularReveal() {

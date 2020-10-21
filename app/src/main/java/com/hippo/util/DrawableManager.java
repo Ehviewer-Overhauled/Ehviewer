@@ -17,21 +17,15 @@
 package com.hippo.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 public final class DrawableManager {
 
     public static Drawable getVectorDrawable(@NonNull Context context, @DrawableRes int resId) {
-        return getVectorDrawable(context.getResources(), resId, context.getTheme());
-    }
-
-    public static Drawable getVectorDrawable(@NonNull Resources res,
-                                             @DrawableRes int resId, @Nullable Resources.Theme theme) {
-        return res.getDrawable(resId, theme);
+        return ResourcesCompat.getDrawable(context.getResources(), resId, context.getTheme());
     }
 }

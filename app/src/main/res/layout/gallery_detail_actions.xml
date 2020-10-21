@@ -19,8 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="@dimen/keyline_margin"
-    android:paddingBottom="@dimen/keyline_margin">
+    android:paddingTop="@dimen/keyline_margin">
 
     <TextView
         android:id="@+id/newerVersion"
@@ -77,18 +76,6 @@
                     android:textColor="?android:attr/textColorPrimary" />
 
             </FrameLayout>
-
-            <TextView
-                android:id="@+id/rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
-                android:text="@string/rate"
-                android:textColor="?android:attr/textColorPrimary" />
 
             <TextView
                 android:id="@+id/share"
@@ -152,20 +139,29 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <androidx.appcompat.widget.AppCompatRatingBar
-        android:id="@+id/rating"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/rate"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:isIndicator="true"
-        android:theme="@style/RatingBarTheme" />
+        android:background="?selectableItemBackground"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/keyline_margin">
 
-    <TextView
-        android:id="@+id/rating_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="?android:attr/textColorPrimary" />
+        <androidx.appcompat.widget.AppCompatRatingBar
+            android:id="@+id/rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:isIndicator="true"
+            android:theme="@style/RatingBarTheme" />
+
+        <TextView
+            android:id="@+id/rating_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="?android:attr/textColorPrimary" />
+    </LinearLayout>
 
 </LinearLayout>

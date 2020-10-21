@@ -16,12 +16,11 @@
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/text1"
+    style="?attr/materialAlertDialogBodyTextStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
     android:gravity="center_vertical"
     android:minHeight="?attr/listPreferredItemHeightSmall"
     android:paddingLeft="?attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?attr/listPreferredItemPaddingRight"
-    android:textAppearance="?attr/textAppearanceListItemSmall"
-    android:textColor="?attr/textColorAlertDialogListItem" />
+    android:paddingRight="?attr/listPreferredItemPaddingRight" />
