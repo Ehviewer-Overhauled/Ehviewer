@@ -437,6 +437,10 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         invalidate();
     }
 
+    public SearchEditText getEditText(){
+        return mEditText;
+    }
+
     @Override
     public void draw(@NonNull Canvas canvas) {
         if (mInAnimation) {

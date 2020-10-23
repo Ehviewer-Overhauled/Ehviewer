@@ -244,6 +244,10 @@ public abstract class StageActivity extends EhActivity {
     }
 
     public void startScene(Announcer announcer) {
+        startScene(announcer, false);
+    }
+
+    public void startScene(Announcer announcer, boolean horizontal) {
         Class<?> clazz = announcer.clazz;
         Bundle args = announcer.args;
         TransitionHelper tranHelper = announcer.tranHelper;
@@ -264,7 +268,11 @@ public abstract class StageActivity extends EhActivity {
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
 
                     // Use default animation
-                    transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
+                    if (horizontal) {
+                        transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit_horizontal);
+                    } else {
+                        transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
+                    }
 
                     // Remove top fragments
                     for (int j = i + 1; j < n; j++) {
@@ -352,7 +360,11 @@ public abstract class StageActivity extends EhActivity {
                 newScene.setEnterTransition(null);
                 newScene.setExitTransition(null);
                 // Set default animation
-                transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
+                if (horizontal) {
+                    transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit_horizontal);
+                } else {
+                    transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
+                }
             }
             // Detach current scene
             if (!currentScene.isDetached()) {

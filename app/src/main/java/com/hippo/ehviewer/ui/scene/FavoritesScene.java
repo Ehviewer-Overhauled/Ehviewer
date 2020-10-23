@@ -643,8 +643,10 @@ public class FavoritesScene extends BaseScene implements
 
         if (!mSearchMode) {
             enterSearchMode(true);
-        } else {
-            if (mSearchBar != null) {
+        } else if (mSearchBar != null) {
+            if (mSearchBar.getEditText().length() == 0) {
+                exitSearchMode(true);
+            }else {
                 mSearchBar.applySearch();
             }
         }

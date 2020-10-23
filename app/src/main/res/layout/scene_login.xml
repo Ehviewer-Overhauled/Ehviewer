@@ -103,8 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/sign_in"
-                    android:textStyle="bold" />
+                    android:text="@string/sign_in" />
 
                 <Button
                     android:id="@+id/register"
@@ -112,36 +111,44 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/register"
-                    android:textStyle="bold" />
+                    android:text="@string/register" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/sign_in_via_webview"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="8dp"
-                android:text="@string/sign_in_via_webview"
-                android:textColor="?attr/textColorThemeAccent" />
+                android:clipToPadding="false"
+                android:gravity="bottom|center_horizontal"
+                android:orientation="horizontal"
+                android:paddingLeft="12dp"
+                android:paddingTop="4dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="4dp">
 
-            <TextView
-                android:id="@+id/sign_in_via_cookies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="8dp"
-                android:text="@string/sign_in_via_cookies"
-                android:textColor="?attr/textColorThemeAccent" />
+                <TextView
+                    android:id="@+id/sign_in_via_webview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/sign_in_via_webview"
+                    android:textColor="?attr/textColorThemeAccent" />
 
-            <TextView
-                android:id="@+id/skip_signing_in"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/skip_signing_in"
-                android:textColor="?attr/textColorThemeAccent" />
+                <TextView
+                    android:id="@+id/sign_in_via_cookies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/sign_in_via_cookies"
+                    android:textColor="?attr/textColorThemeAccent" />
 
+                <TextView
+                    android:id="@+id/skip_signing_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/skip_signing_in"
+                    android:textColor="?attr/textColorThemeAccent" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

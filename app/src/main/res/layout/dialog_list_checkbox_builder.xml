@@ -19,7 +19,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.hippo.widget.IndicatingListView xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.hippo.widget.IndicatingListView
         android:id="@+id/list_view"
         style="@style/Indicating"
         android:layout_width="match_parent"

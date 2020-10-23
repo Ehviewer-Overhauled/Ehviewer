@@ -19,8 +19,8 @@
     android:layout_height="wrap_content"
     android:background="@null"
     android:text="@string/get_it"
-    android:visibility="gone"
     android:textAllCaps="true"
     android:textColor="@android:color/white"
     android:textSize="@dimen/text_little_small"
-    android:textStyle="bold" />
+    android:textStyle="bold"
+    android:visibility="gone" />

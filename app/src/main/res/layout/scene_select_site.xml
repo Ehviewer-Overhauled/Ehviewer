@@ -15,85 +15,82 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/keyline_margin">
 
-    <com.hippo.widget.MaxSizeContainer xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        app:maxWidth="@dimen/single_max_width">
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingVertical="@dimen/keyline_margin">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="@string/select_scene"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
-                <TextView
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/button_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/keyline_margin"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/site_e"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/select_scene"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                    android:padding="8dp"
+                    android:text="@string/site_e" />
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <RadioGroup
-                    android:id="@+id/radio_group"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/site_ex"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="@dimen/keyline_margin">
+                    android:padding="8dp"
+                    android:text="@string/site_ex" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                    <RadioButton
-                        android:id="@+id/site_e"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/keyline_margin"
-                        android:gravity="center_vertical"
-                        android:text="@string/site_e"
-                        android:textSize="@dimen/text_medium" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_scene_explain" />
 
-                    <RadioButton
-                        android:id="@+id/site_ex"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:text="@string/site_ex"
-                        android:textSize="@dimen/text_medium" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-                </RadioGroup>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/select_scene_explain" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-        </ScrollView>
-    </com.hippo.widget.MaxSizeContainer>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/buttonPanel"
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:gravity="bottom"
         android:orientation="horizontal"
         android:paddingLeft="12dp"
@@ -107,8 +104,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@android:string/ok"
-            android:textStyle="bold" />
+            android:text="@android:string/ok" />
 
     </LinearLayout>
 </LinearLayout>

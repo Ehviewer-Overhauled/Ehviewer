@@ -1237,8 +1237,12 @@ public final class GalleryListScene extends BaseScene
         if (mSearchBar.getState() == SearchBar.STATE_NORMAL) {
             setState(STATE_SEARCH);
         } else {
-            // Clear
-            mSearchBar.setText("");
+            if (mSearchBar.getEditText().length() == 0) {
+                setState(STATE_NORMAL);
+            } else {
+                // Clear
+                mSearchBar.setText("");
+            }
         }
     }
 

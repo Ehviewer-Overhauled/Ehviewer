@@ -14,14 +14,15 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/CardMessage"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:background="@drawable/round_side_rect"
-    android:paddingLeft="12dp"
-    android:paddingTop="4dp"
-    android:paddingRight="12dp"
-    android:paddingBottom="4dp"
-    android:textColor="@android:color/white" />
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <alpha
+        android:duration="217"
+        android:fillAfter="true"
+        android:fillBefore="false"
+        android:fillEnabled="true"
+        android:fromAlpha="1.0"
+        android:interpolator="@android:interpolator/accelerate_decelerate"
+        android:toAlpha="0.7" />
+
+</set>

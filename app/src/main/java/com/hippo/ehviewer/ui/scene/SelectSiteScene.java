@@ -20,11 +20,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhUrl;
@@ -33,7 +34,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 public class SelectSiteScene extends SolidScene implements View.OnClickListener {
 
-    private RadioGroup mRadioGroup;
+    private MaterialButtonToggleGroup mButtonGroup;
     private View mOk;
 
     @Override
@@ -47,7 +48,12 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
                               @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_select_site, container, false);
 
-        mRadioGroup = (RadioGroup) ViewUtils.$$(view, R.id.radio_group);
+        mButtonGroup = (MaterialButtonToggleGroup) ViewUtils.$$(view, R.id.button_group);
+        if (EhApplication.getEhCookieStore(requireContext()).hasSignedIn()) {
+            ((MaterialButton) view.findViewById(R.id.site_ex)).setChecked(true);
+        } else {
+            ((MaterialButton) view.findViewById(R.id.site_e)).setChecked(true);
+        }
         mOk = ViewUtils.$$(view, R.id.ok);
 
         mOk.setOnClickListener(this);
@@ -59,19 +65,19 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
     public void onDestroyView() {
         super.onDestroyView();
 
-        mRadioGroup = null;
+        mButtonGroup = null;
         mOk = null;
     }
 
     @Override
     public void onClick(View v) {
         MainActivity activity = getActivity2();
-        if (null == activity || null == mRadioGroup) {
+        if (null == activity || null == mButtonGroup) {
             return;
         }
 
         if (v == mOk) {
-            int id = mRadioGroup.getCheckedRadioButtonId();
+            int id = mButtonGroup.getCheckedButtonId();
             switch (id) {
                 case R.id.site_e:
                     Settings.putSelectSite(false);
@@ -86,7 +92,7 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
                     finish();
                     break;
                 default:
-                    Toast.makeText(activity, R.string.no_select, Toast.LENGTH_SHORT).show();
+                    showTip(R.string.no_select, LENGTH_SHORT);
                     break;
             }
         }

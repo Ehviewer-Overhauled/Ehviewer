@@ -55,6 +55,13 @@ public class SceneFragment extends Fragment {
     public void onNewArguments(@NonNull Bundle args) {
     }
 
+    public void startScene(Announcer announcer, boolean horizontal) {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof StageActivity) {
+            ((StageActivity) activity).startScene(announcer, horizontal);
+        }
+    }
+
     public void startScene(Announcer announcer) {
         FragmentActivity activity = getActivity();
         if (activity instanceof StageActivity) {

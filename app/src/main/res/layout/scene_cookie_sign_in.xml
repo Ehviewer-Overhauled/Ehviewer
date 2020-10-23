@@ -29,103 +29,100 @@
         android:padding="@dimen/keyline_margin"
         app:srcCompat="@drawable/v_cookie_brown_x48" />
 
-    <com.hippo.widget.MaxSizeContainer xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        app:maxWidth="@dimen/single_max_width">
+        android:clipToPadding="false"
+        android:paddingVertical="@dimen/keyline_margin">
 
-        <ScrollView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingTop="@dimen/keyline_margin"
-            android:paddingBottom="@dimen/keyline_margin">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:paddingHorizontal="32dp"
+                android:text="@string/cookie_explain"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="@dimen/text_little_small" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ipb_member_id_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_margin"
+                android:hint="ipb_member_id"
+                android:minWidth="@dimen/single_max_width">
+
+                <com.hippo.widget.HackyTextInputEditText
+                    android:id="@+id/ipb_member_id"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/cookie_explain"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="@dimen/text_little_small" />
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/ipb_member_id_layout"
-                    android:layout_width="wrap_content"
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ipb_pass_hash_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:hint="ipb_pass_hash"
+                android:minWidth="@dimen/single_max_width">
+
+                <com.hippo.widget.HackyTextInputEditText
+                    android:id="@+id/ipb_pass_hash"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="@dimen/keyline_margin"
-                    android:hint="ipb_member_id"
-                    android:minWidth="@dimen/single_max_width">
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
-                    <com.hippo.widget.HackyTextInputEditText
-                        android:id="@+id/ipb_member_id"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionNext"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        tools:ignore="HardcodedText" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/igneous_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:hint="igneous"
+                android:minWidth="@dimen/single_max_width">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/ipb_pass_hash_layout"
-                    android:layout_width="wrap_content"
+                <com.hippo.widget.HackyTextInputEditText
+                    android:id="@+id/igneous"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:hint="ipb_pass_hash"
-                    android:minWidth="@dimen/single_max_width">
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
-                    <com.hippo.widget.HackyTextInputEditText
-                        android:id="@+id/ipb_pass_hash"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionNext"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        tools:ignore="HardcodedText" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/igneous_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:hint="igneous"
-                    android:minWidth="@dimen/single_max_width">
-
-                    <com.hippo.widget.HackyTextInputEditText
-                        android:id="@+id/igneous"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionDone"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        tools:ignore="HardcodedText" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-        </ScrollView>
-    </com.hippo.widget.MaxSizeContainer>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/buttonPanel"
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:gravity="bottom"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
@@ -136,8 +133,7 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@android:string/ok"
-            android:textStyle="bold" />
+            android:text="@android:string/ok" />
 
     </LinearLayout>
 </LinearLayout>

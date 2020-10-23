@@ -77,8 +77,8 @@
                 android:layout_alignLeft="@id/title"
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="@dimen/keyline_margin"
-                android:ellipsize="end"
                 android:background="?selectableItemBackgroundBorderless"
+                android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/text_little_small" />

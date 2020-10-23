@@ -28,61 +28,53 @@
         android:padding="@dimen/keyline_margin"
         app:srcCompat="@drawable/v_chart_accent_x48" />
 
-    <com.hippo.widget.MaxSizeContainer xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        app:maxWidth="@dimen/single_max_width">
+        android:clipToPadding="false"
+        android:paddingVertical="@dimen/keyline_margin">
 
-        <ScrollView
+        <TextView
+            android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingTop="@dimen/keyline_margin"
-            android:paddingBottom="@dimen/keyline_margin">
+            android:paddingHorizontal="32dp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="@dimen/text_little_small" />
 
-            <TextView
-                android:id="@+id/text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="8dp"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="@dimen/text_little_small" />
-
-        </ScrollView>
-
-    </com.hippo.widget.MaxSizeContainer>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/buttonPanel"
         style="?attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:gravity="bottom"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
         android:paddingBottom="4dp">
 
         <Button
+            android:id="@+id/reject"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:text="@string/reject" />
+
+        <Button
             android:id="@+id/accept"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
             android:layout_weight="1"
-            android:text="@string/accept"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/reject"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/reject"
-            android:textStyle="bold" />
+            android:text="@string/accept" />
 
     </LinearLayout>
 </LinearLayout>
