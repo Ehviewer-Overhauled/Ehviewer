@@ -72,8 +72,10 @@ public abstract class TaskPreference extends DialogPreference {
     protected void onTaskEnd() {
         // Dismiss dialog
         Dialog dialog = getDialog();
-        if (null != dialog) {
+        try {
             dialog.dismiss();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         // Clear async
         mTask = null;

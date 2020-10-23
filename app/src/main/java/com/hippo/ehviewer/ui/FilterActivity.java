@@ -143,6 +143,7 @@ public class FilterActivity extends ToolbarActivity {
                 .setTitle(R.string.add_filter)
                 .setView(R.layout.dialog_add_filter)
                 .setPositiveButton(R.string.add, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
         AddFilterDialogHelper helper = new AddFilterDialogHelper();
         helper.setDialog(dialog);
@@ -161,7 +162,9 @@ public class FilterActivity extends ToolbarActivity {
                         mAdapter.notifyDataSetChanged();
                     }
                     updateView(true);
-                }).show();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private class AddFilterDialogHelper implements View.OnClickListener {

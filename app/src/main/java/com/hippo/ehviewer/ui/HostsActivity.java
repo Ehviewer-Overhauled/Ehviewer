@@ -213,6 +213,7 @@ public class HostsActivity extends ToolbarActivity
         protected void onCreateDialogBuilder(AlertDialog.Builder builder) {
             builder.setTitle(R.string.add_host);
             builder.setPositiveButton(R.string.add_host_add, null);
+            builder.setNegativeButton(android.R.string.cancel, null);
         }
 
         @Override
