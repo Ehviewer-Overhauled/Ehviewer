@@ -36,10 +36,8 @@ import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.LogCat;
 import com.hippo.util.ReadableTime;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class AdvancedFragment extends PreferenceFragmentCompat
-        implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+public class AdvancedFragment extends BaseSettingsFragment {
 
     private static final int REQUEST_CODE_EXPORT = 1;
     private static final int REQUEST_CODE_IMPORT = 2;
@@ -67,11 +65,6 @@ public class AdvancedFragment extends PreferenceFragmentCompat
         exportData.setOnPreferenceClickListener(this);
 
         appLanguage.setOnPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -195,5 +188,11 @@ public class AdvancedFragment extends PreferenceFragmentCompat
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.settings_advanced);
     }
 }

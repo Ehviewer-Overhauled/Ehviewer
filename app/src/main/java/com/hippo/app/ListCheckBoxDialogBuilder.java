@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -59,6 +60,7 @@ public class ListCheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
         return mCheckBox.isChecked();
     }
 
+    @NonNull
     @Override
     public AlertDialog create() {
         mDialog = super.create();

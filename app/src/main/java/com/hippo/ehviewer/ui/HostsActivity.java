@@ -75,6 +75,7 @@ public class HostsActivity extends ToolbarActivity
         data = hosts.getAll();
 
         setContentView(R.layout.activity_hosts);
+        setTitle(R.string.hosts);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
         recyclerView = findViewById(R.id.recycler_view);
         tip = findViewById(R.id.tip);

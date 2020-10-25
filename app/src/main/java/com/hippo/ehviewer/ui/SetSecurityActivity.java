@@ -46,6 +46,7 @@ public class SetSecurityActivity extends ToolbarActivity implements View.OnClick
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_security);
+        setTitle(R.string.set_pattern_protection);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
 
         mPatternView = (LockPatternView) ViewUtils.$$(this, R.id.pattern_view);

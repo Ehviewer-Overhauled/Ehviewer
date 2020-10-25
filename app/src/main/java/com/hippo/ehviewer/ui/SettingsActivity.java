@@ -20,28 +20,25 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.fragment.SettingsFragment;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 
-public final class SettingsActivity extends EhActivity {
+public final class SettingsActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
+        setTitle(R.string.settings);
+        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment, new SettingsFragment())
                     .commitAllowingStateLoss();
-        }
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -49,9 +46,6 @@ public final class SettingsActivity extends EhActivity {
         showTip(getString(id), length);
     }
 
-    /**
-     * If activity is running, show snack bar, otherwise show toast
-     */
     public void showTip(CharSequence message, int length) {
         Snackbar.make(findViewById(R.id.snackbar), message,
                 length == BaseScene.LENGTH_LONG ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT).show();
@@ -59,12 +53,10 @@ public final class SettingsActivity extends EhActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

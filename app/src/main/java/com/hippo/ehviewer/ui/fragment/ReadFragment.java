@@ -21,12 +21,17 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.R;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class ReadFragment extends PreferenceFragmentCompat {
+public class ReadFragment extends BaseSettingsFragment {
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.read_settings);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.settings_read);
     }
 }

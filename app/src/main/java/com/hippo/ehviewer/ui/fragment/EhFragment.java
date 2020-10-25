@@ -28,10 +28,8 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class EhFragment extends PreferenceFragmentCompat
-        implements Preference.OnPreferenceChangeListener {
+public class EhFragment extends BaseSettingsFragment {
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
@@ -88,5 +86,11 @@ public class EhFragment extends PreferenceFragmentCompat
             return true;
         }
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.settings_eh);
     }
 }

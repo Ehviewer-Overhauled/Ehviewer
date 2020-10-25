@@ -564,14 +564,6 @@ public final class MainActivity extends StageActivity
         }
     }
 
-    public boolean isDrawersVisible() {
-        if (mDrawerLayout != null) {
-            return mDrawerLayout.isDrawerVisible(mDrawerLayout);
-        } else {
-            return false;
-        }
-    }
-
     public void setNavCheckedItem(@IdRes int resId) {
         mNavCheckedItem = resId;
         if (mNavView != null) {

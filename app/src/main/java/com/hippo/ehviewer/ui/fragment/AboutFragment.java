@@ -27,13 +27,11 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.util.AppHelper;
 import com.microsoft.appcenter.distribute.Distribute;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class AboutFragment extends PreferenceFragmentCompat
-        implements Preference.OnPreferenceClickListener {
+public class AboutFragment extends BaseSettingsFragment {
 
     private static final String KEY_AUTHOR = "author";
-    private static final String KEY_DONATE = "donate";
+    //private static final String KEY_DONATE = "donate";
     private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
 
     @Override
@@ -63,5 +61,11 @@ public class AboutFragment extends PreferenceFragmentCompat
             Distribute.checkForUpdate();
         }
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.settings_about);
     }
 }

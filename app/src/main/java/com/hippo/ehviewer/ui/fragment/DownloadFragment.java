@@ -31,11 +31,8 @@ import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class DownloadFragment extends PreferenceFragmentCompat implements
-        Preference.OnPreferenceChangeListener,
-        Preference.OnPreferenceClickListener {
+public class DownloadFragment extends BaseSettingsFragment {
 
     public static final int REQUEST_CODE_PICK_IMAGE_DIR_L = 1;
 
@@ -147,5 +144,11 @@ public class DownloadFragment extends PreferenceFragmentCompat implements
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.settings_download);
     }
 }

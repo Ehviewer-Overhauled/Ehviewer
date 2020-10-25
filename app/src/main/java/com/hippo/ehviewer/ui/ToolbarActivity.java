@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import com.hippo.ehviewer.R;
@@ -61,6 +63,13 @@ public abstract class ToolbarActivity extends EhActivity {
         View toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             ((Toolbar) toolbar).setNavigationIcon(icon);
+        }
+    }
+
+    public void setTitle(@StringRes int string) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(string);
         }
     }
 }

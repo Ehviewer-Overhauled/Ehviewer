@@ -19,6 +19,7 @@ package com.hippo.ehviewer.ui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 
@@ -128,11 +129,13 @@ public abstract class EhActivity extends AppCompatActivity {
             } else if (split.length == 3) {
                 locale = new Locale(split[0], split[1], split[2]);
             }
+        } else {
+            Resources res = EhApplication.getInstance().getResources();
+            Configuration configuration = res.getConfiguration();
+            locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? configuration.getLocales().get(0) : configuration.locale;
         }
 
-        if (locale != null) {
-            newBase = ContextLocalWrapper.wrap(newBase, locale);
-        }
+        newBase = ContextLocalWrapper.wrap(newBase, locale);
 
         super.attachBaseContext(newBase);
     }

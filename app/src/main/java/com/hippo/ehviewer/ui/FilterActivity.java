@@ -62,6 +62,7 @@ public class FilterActivity extends ToolbarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
+        setTitle(R.string.filter);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
 
         mFilterList = new FilterList();

@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -63,6 +64,7 @@ public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements
         mTextInputLayout.setError(error);
     }
 
+    @NonNull
     @Override
     public AlertDialog create() {
         mDialog = super.create();

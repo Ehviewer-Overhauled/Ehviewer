@@ -139,8 +139,6 @@
         <item name="gallerySliderBackgroundColor">@color/gallery_slider_background_dark</item>
     </style>
 
-    <style name="AppTheme.Settings" parent="AppTheme" />
-
     <!-- ============ -->
     <!-- Widget Theme -->
     <!-- ============ -->

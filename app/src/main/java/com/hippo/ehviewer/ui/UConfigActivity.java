@@ -70,6 +70,7 @@ public class UConfigActivity extends ToolbarActivity {
         }
 
         setContentView(R.layout.activity_u_config);
+        setTitle(R.string.u_config);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
         webView = findViewById(R.id.webview);
         webView.getSettings().setJavaScriptEnabled(true);
