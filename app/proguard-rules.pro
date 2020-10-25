@@ -18,4 +18,3 @@
 
 -keepattributes SourceFile,LineNumberTable
 -keep class com.hippo.** { *; }
--repackageclasses ''

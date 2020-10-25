@@ -785,7 +785,7 @@ public class FavoritesScene extends BaseScene implements
         }
 
         switch (position) {
-            case 2: { // Download
+            case 3: { // Download
                 Activity activity = getActivity2();
                 if (activity != null) {
                     CommonOperations.startDownload(getActivity2(), mModifyGiList, false);
@@ -796,7 +796,7 @@ public class FavoritesScene extends BaseScene implements
                 }
                 break;
             }
-            case 3: { // Delete
+            case 4: { // Delete
                 DeleteDialogHelper helper = new DeleteDialogHelper();
                 new MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.delete_favorites_dialog_title)
@@ -806,7 +806,7 @@ public class FavoritesScene extends BaseScene implements
                         .show();
                 break;
             }
-            case 4: { // Move
+            case 5: { // Move
                 MoveDialogHelper helper = new MoveDialogHelper();
                 // First is local favorite, the other 10 is cloud favorite
                 String[] array = new String[11];
