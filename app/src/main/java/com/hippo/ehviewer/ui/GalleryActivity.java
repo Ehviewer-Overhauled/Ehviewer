@@ -83,6 +83,7 @@ import com.hippo.util.SystemUiHelper;
 import com.hippo.widget.ColorView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.ConcurrentPool;
+import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.ResourcesUtils;
@@ -783,12 +784,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        File dir = AppConfig.getExternalImageDir();
-        if (null == dir) {
-            Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             mSavingPage = page;
@@ -803,29 +798,39 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mimeType = "image/jpeg";
         }
 
+        String realPath;
         ContentResolver resolver = getContentResolver();
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
         values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis());
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "EhViewer");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + AppConfig.APP_DIRNAME);
+            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+            realPath = Environment.DIRECTORY_PICTURES + File.separator + AppConfig.APP_DIRNAME;
         } else {
-            File path = new File(AppConfig.getExternalImageDir() + File.separator + "EhViewer");
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdirs();
-            //noinspection deprecation
+            File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), AppConfig.APP_DIRNAME);
+            realPath = path.toString();
+            if (!FileUtils.ensureDirectory(path)) {
+                Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                return;
+            }
             values.put(MediaStore.MediaColumns.DATA, path + File.separator + filename);
         }
         Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         if (!mGalleryProvider.save(page, UniFile.fromMediaUri(this, imageUri))) {
+            resolver.delete(imageUri, null, null);
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
             return;
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0);
+                resolver.update(imageUri, contentValues, null, null);
+            }
         }
 
-        Toast.makeText(this, getString(R.string.image_saved, imageUri.toString()), Toast.LENGTH_SHORT).show();
-        // Sync media store
-        //sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, file.getUri()));
+        Toast.makeText(this, getString(R.string.image_saved, realPath), Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 
@@ -34,16 +35,14 @@ import java.nio.charset.StandardCharsets;
 
 public class AppConfig {
 
-    private static final String APP_DIRNAME = "EhViewer";
+    public static final String APP_DIRNAME = "EhViewer";
 
     private static final String DOWNLOAD = "download";
     private static final String TEMP = "temp";
-    private static final String IMAGE = "image";
     private static final String PARSE_ERROR = "parse_error";
-    private static final String LOGCAT = "logcat";
-    private static final String DATA = "data";
     private static final String CRASH = "crash";
 
+    @SuppressLint("StaticFieldLeak")
     private static Context sContext;
 
     public static void initialize(Context context) {
@@ -54,15 +53,6 @@ public class AppConfig {
     public static File getExternalAppDir() {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             File dir = sContext.getExternalFilesDir(null);
-            return FileUtils.ensureDirectory(dir) ? dir : null;
-        }
-        return null;
-    }
-
-    @Nullable
-    public static File getExternalMediaDir() {
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = new File(sContext.getExternalMediaDirs()[0], APP_DIRNAME);
             return FileUtils.ensureDirectory(dir) ? dir : null;
         }
         return null;
@@ -103,28 +93,13 @@ public class AppConfig {
     }
 
     @Nullable
-    public static File getExternalImageDir() {
-        return getExternalMediaDir();
-    }
-
-    @Nullable
     public static File getExternalParseErrorDir() {
         return getDirInExternalAppDir(PARSE_ERROR);
     }
 
     @Nullable
-    public static File getExternalDataDir() {
-        return getDirInExternalAppDir(DATA);
-    }
-
-    @Nullable
     public static File getExternalCrashDir() {
         return getDirInExternalAppDir(CRASH);
-    }
-
-    @Nullable
-    public static File createExternalTempFile() {
-        return FileUtils.createTempFile(getExternalTempDir(), null);
     }
 
     @Nullable
