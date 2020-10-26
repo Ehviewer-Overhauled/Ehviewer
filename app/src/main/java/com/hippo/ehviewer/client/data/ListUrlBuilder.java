@@ -584,7 +584,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
             case MODE_IMAGE_SEARCH:
                 return EhUrl.getImageSearchUrl();
             case MODE_TOPLIST:
-                StringBuilder sb = new StringBuilder(EhUrl.getHost());
+                StringBuilder sb = new StringBuilder(EhUrl.HOST_E);
                 sb.append("toplist.php?tl=");
                 try {
                     sb.append(URLEncoder.encode(mKeyword, "UTF-8"));
