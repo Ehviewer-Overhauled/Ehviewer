@@ -47,6 +47,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     public static final int MODE_WHATS_HOT = 0x3;
     public static final int MODE_IMAGE_SEARCH = 0x4;
     public static final int MODE_SUBSCRIPTION = 0x5;
+    public static final int MODE_TOPLIST = 0x6;
     public static final int DEFAULT_ADVANCE = AdvanceSearchTable.SNAME | AdvanceSearchTable.STAGS;
     public static final int DEFAULT_MIN_RATING = 2;
     public static final Creator<ListUrlBuilder> CREATOR = new Creator<ListUrlBuilder>() {
@@ -582,6 +583,18 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 return EhUrl.getPopularUrl();
             case MODE_IMAGE_SEARCH:
                 return EhUrl.getImageSearchUrl();
+            case MODE_TOPLIST:
+                StringBuilder sb = new StringBuilder(EhUrl.getHost());
+                sb.append("toplist.php?tl=");
+                try {
+                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Empty
+                }
+                if (mPageIndex != 0) {
+                    sb.append('/').append(mPageIndex);
+                }
+                return sb.toString();
         }
     }
 
@@ -606,7 +619,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         dest.writeByte(mShowExpunged ? (byte) 1 : (byte) 0);
     }
 
-    @IntDef({MODE_NORMAL, MODE_UPLOADER, MODE_TAG, MODE_WHATS_HOT, MODE_IMAGE_SEARCH, MODE_SUBSCRIPTION})
+    @IntDef({MODE_NORMAL, MODE_UPLOADER, MODE_TAG, MODE_WHATS_HOT, MODE_IMAGE_SEARCH, MODE_SUBSCRIPTION, MODE_TOPLIST})
     @Retention(RetentionPolicy.SOURCE)
     private @interface Mode {
     }

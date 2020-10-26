@@ -487,6 +487,21 @@ public final class MainActivity extends StageActivity
         }
     }
 
+    public void recreateDrawerView(SceneFragment scene) {
+        if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
+            BaseScene baseScene = (BaseScene) scene;
+            mRightDrawer.removeAllViews();
+            View drawerView = baseScene.createDrawerView(
+                    baseScene.getLayoutInflater2(), mRightDrawer, null);
+            if (drawerView != null) {
+                mRightDrawer.addView(drawerView);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+            } else {
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+            }
+        }
+    }
+
     @Override
     public void onSceneViewDestroyed(SceneFragment scene) {
         super.onSceneViewDestroyed(scene);
@@ -624,6 +639,11 @@ public final class MainActivity extends StageActivity
         } else if (id == R.id.nav_whats_hot) {
             Bundle args = new Bundle();
             args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_WHATS_HOT);
+            startSceneFirstly(new Announcer(GalleryListScene.class)
+                    .setArgs(args));
+        } else if (id == R.id.nav_toplist) {
+            Bundle args = new Bundle();
+            args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_TOP_LIST);
             startSceneFirstly(new Announcer(GalleryListScene.class)
                     .setArgs(args));
         } else if (id == R.id.nav_favourite) {

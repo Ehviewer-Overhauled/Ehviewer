@@ -787,4 +787,9 @@
     <string name="download_start_all_reversed">Start all (reversed)</string>
 
     <string name="no_browser_installed">Just install a browser please.</string>
+    <string name="toplist_alltime">All-Time</string>
+    <string name="toplist_pastyear">Past Year</string>
+    <string name="toplist_pastmonth">Past Month</string>
+    <string name="toplist_yesterday">Yesterday</string>
+    <string name="toplist">Toplist</string>
 </resources>

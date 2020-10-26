@@ -126,6 +126,7 @@ public final class GalleryListScene extends BaseScene
     public final static String ACTION_HOMEPAGE = "action_homepage";
     public final static String ACTION_SUBSCRIPTION = "action_subscription";
     public final static String ACTION_WHATS_HOT = "action_whats_hot";
+    public final static String ACTION_TOP_LIST = "action_top_list";
     public final static String ACTION_LIST_URL_BUILDER = "action_list_url_builder";
     public final static String KEY_LIST_URL_BUILDER = "list_url_builder";
     public final static String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
@@ -218,6 +219,7 @@ public final class GalleryListScene extends BaseScene
     private DownloadManager.DownloadInfoListener mDownloadInfoListener;
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
+    private boolean mIsTopList = false;
 
     @Nullable
     private static String getSuitableTitleForUrlBuilder(
@@ -243,6 +245,18 @@ public final class GalleryListScene extends BaseScene
             return resources.getString(R.string.subscription);
         } else if (ListUrlBuilder.MODE_WHATS_HOT == urlBuilder.getMode()) {
             return resources.getString(R.string.whats_hot);
+        } else if (ListUrlBuilder.MODE_TOPLIST == urlBuilder.getMode()) {
+            switch (urlBuilder.getKeyword()) {
+                case "11":
+                    return resources.getString(R.string.toplist_alltime);
+                case "12":
+                    return resources.getString(R.string.toplist_pastyear);
+                case "13":
+                    return resources.getString(R.string.toplist_pastmonth);
+                case "15":
+                    return resources.getString(R.string.toplist_yesterday);
+            }
+            return null;
         } else if (!TextUtils.isEmpty(keyword)) {
             return keyword;
         } else if (MathUtils.hammingWeight(category) == 1) {
@@ -282,6 +296,10 @@ public final class GalleryListScene extends BaseScene
         } else if (ACTION_WHATS_HOT.equals(action)) {
             mUrlBuilder.reset();
             mUrlBuilder.setMode(ListUrlBuilder.MODE_WHATS_HOT);
+        } else if (ACTION_TOP_LIST.equals(action)) {
+            mUrlBuilder.reset();
+            mUrlBuilder.setMode(ListUrlBuilder.MODE_TOPLIST);
+            mUrlBuilder.setKeyword("11");
         } else if (ACTION_LIST_URL_BUILDER.equals(action)) {
             ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
             if (builder != null) {
@@ -472,13 +490,19 @@ public final class GalleryListScene extends BaseScene
         String keyword = builder.getKeyword();
         int category = builder.getCategory();
 
+        boolean isTopList = builder.getMode() == ListUrlBuilder.MODE_TOPLIST;
+        if (isTopList != mIsTopList) {
+            mIsTopList = isTopList;
+            recreateDrawerView();
+        }
+
         // Update normal search mode
         mSearchLayout.setNormalSearchMode(builder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION
                 ? R.id.search_subscription_search
                 : R.id.search_normal_search);
 
         // Update search edit text
-        if (!TextUtils.isEmpty(keyword) && null != mSearchBar) {
+        if (!TextUtils.isEmpty(keyword) && null != mSearchBar && !mIsTopList) {
             if (builder.getMode() == ListUrlBuilder.MODE_TAG) {
                 keyword = wrapTagKeyword(keyword);
             }
@@ -505,6 +529,8 @@ public final class GalleryListScene extends BaseScene
             checkedItemId = R.id.nav_subscription;
         } else if (ListUrlBuilder.MODE_WHATS_HOT == builder.getMode()) {
             checkedItemId = R.id.nav_whats_hot;
+        } else if (ListUrlBuilder.MODE_TOPLIST == builder.getMode()) {
+            checkedItemId = R.id.nav_toplist;
         } else {
             checkedItemId = 0;
         }
@@ -777,8 +803,12 @@ public final class GalleryListScene extends BaseScene
         dragDropManager.attachRecyclerView(recyclerView);
         mQuickSearchList = EhDB.getAllQuickSearch();
         tip.setText(R.string.quick_search_tip);
-        toolbar.setTitle(R.string.quick_search);
-        toolbar.inflateMenu(R.menu.drawer_gallery_list);
+        if (mIsTopList) {
+            toolbar.setTitle(R.string.toplist);
+        } else {
+            toolbar.setTitle(R.string.quick_search);
+        }
+        if (!mIsTopList) toolbar.inflateMenu(R.menu.drawer_gallery_list);
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_add) {
@@ -791,7 +821,7 @@ public final class GalleryListScene extends BaseScene
             return true;
         });
 
-        if (0 == mQuickSearchList.size()) {
+        if (0 == mQuickSearchList.size() && !mIsTopList) {
             tip.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -1526,7 +1556,7 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         public void onBindViewHolder(@NonNull QsDrawerHolder holder, int position) {
-            if (mQuickSearchList != null) {
+            if (mQuickSearchList != null && !mIsTopList) {
                 holder.key.setText(mQuickSearchList.get(position).getName());
                 holder.itemView.setOnClickListener(v -> {
                     if (null == mHelper || null == mUrlBuilder) {
@@ -1568,22 +1598,39 @@ public final class GalleryListScene extends BaseScene
                     });
                     return true;
                 });
+            } else {
+                int[] keywords = {11, 12, 13, 15};
+                int[] toplists = {R.string.toplist_alltime, R.string.toplist_pastyear, R.string.toplist_pastmonth, R.string.toplist_yesterday};
+                holder.key.setText(getString(toplists[position]));
+                holder.option.setVisibility(View.GONE);
+                holder.itemView.setOnClickListener(v -> {
+                    if (null == mHelper || null == mUrlBuilder) {
+                        return;
+                    }
+
+                    mUrlBuilder.setKeyword(String.valueOf(keywords[position]));
+                    mUrlBuilder.setPageIndex(0);
+                    onUpdateUrlBuilder();
+                    mHelper.refresh();
+                    setState(STATE_NORMAL);
+                    closeDrawer(Gravity.RIGHT);
+                });
             }
         }
 
         @Override
         public long getItemId(int position) {
-            return mQuickSearchList != null ? mQuickSearchList.get(position).getId() : 0;
+            return !mIsTopList ? mQuickSearchList != null ? mQuickSearchList.get(position).getId() : 0 : position;
         }
 
         @Override
         public int getItemCount() {
-            return mQuickSearchList != null ? mQuickSearchList.size() : 0;
+            return !mIsTopList ? mQuickSearchList != null ? mQuickSearchList.size() : 0 : 4;
         }
 
         @Override
         public boolean onCheckCanStartDrag(@NonNull QsDrawerHolder holder, int position, int x, int y) {
-            return x > holder.option.getX() && y > holder.option.getY();
+            return !mIsTopList && x > holder.option.getX() && y > holder.option.getY();
         }
 
         @Override
@@ -1652,8 +1699,8 @@ public final class GalleryListScene extends BaseScene
     }
 
     private class GalleryDetailUrlSuggestion extends UrlSuggestion {
-        private long mGid;
-        private String mToken;
+        private final long mGid;
+        private final String mToken;
 
         private GalleryDetailUrlSuggestion(long gid, String token) {
             mGid = gid;
@@ -1671,9 +1718,9 @@ public final class GalleryListScene extends BaseScene
     }
 
     private class GalleryPageUrlSuggestion extends UrlSuggestion {
-        private long mGid;
-        private String mPToken;
-        private int mPage;
+        private final long mGid;
+        private final String mPToken;
+        private final int mPage;
 
         private GalleryPageUrlSuggestion(long gid, String pToken, int page) {
             mGid = gid;

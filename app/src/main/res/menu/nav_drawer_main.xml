@@ -33,6 +33,11 @@
             android:title="@string/whats_hot" />
 
         <item
+            android:id="@+id/nav_toplist"
+            android:icon="@drawable/ic_baseline_format_list_numbered_24"
+            android:title="@string/toplist" />
+
+        <item
             android:id="@+id/nav_favourite"
             android:icon="@drawable/v_heart_black_x24"
             android:title="@string/favourite" />

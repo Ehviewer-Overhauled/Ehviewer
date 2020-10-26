@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.client.parser;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.hippo.ehviewer.client.EhUrl;
@@ -34,6 +35,7 @@ public final class GalleryListUrlParser {
     private static final String PATH_NORMAL = "/";
     private static final String PATH_UPLOADER = "/uploader/";
     private static final String PATH_TAG = "/tag/";
+    private static final String PATH_TOPLIST = "/toplist.php";
 
     public static ListUrlBuilder parse(String urlStr) {
         URL url;
@@ -59,6 +61,8 @@ public final class GalleryListUrlParser {
             return parseUploader(path);
         } else if (path.startsWith(PATH_TAG)) {
             return parseTag(path);
+        } else if (path.startsWith(PATH_TOPLIST)) {
+            return parseToplist(urlStr);
         } else if (path.startsWith("/")) {
             int category;
             try {
@@ -131,4 +135,25 @@ public final class GalleryListUrlParser {
         builder.setKeyword(tag);
         return builder;
     }
+
+    // TODO get page
+    private static ListUrlBuilder parseToplist(String path) {
+        Uri uri = Uri.parse(path);
+
+        if (uri == null || TextUtils.isEmpty(uri.getQueryParameter("tl"))) {
+            return null;
+        }
+
+        int tl = Integer.parseInt(uri.getQueryParameter("tl"));
+
+        if (tl > 15 || tl < 11) {
+            return null;
+        }
+
+        ListUrlBuilder builder = new ListUrlBuilder();
+        builder.setMode(ListUrlBuilder.MODE_TOPLIST);
+        builder.setKeyword(String.valueOf(tl));
+        return builder;
+    }
+
 }
