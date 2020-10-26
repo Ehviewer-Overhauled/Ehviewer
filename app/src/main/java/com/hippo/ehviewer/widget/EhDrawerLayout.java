@@ -19,6 +19,7 @@ package com.hippo.ehviewer.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,24 +74,24 @@ public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.At
 
     @NonNull
     @Override
-    public CoordinatorLayout.Behavior getBehavior() {
+    public Behavior getBehavior() {
         return new Behavior();
     }
 
     public static class Behavior extends CoordinatorLayout.Behavior<EhDrawerLayout> {
 
         @Override
-        public boolean layoutDependsOn(CoordinatorLayout parent, EhDrawerLayout child, View dependency) {
+        public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull EhDrawerLayout child, @NonNull View dependency) {
             return dependency instanceof Snackbar.SnackbarLayout;
         }
 
         @Override
-        public boolean onDependentViewChanged(CoordinatorLayout parent, EhDrawerLayout child, View dependency) {
+        public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, EhDrawerLayout child, @NonNull View dependency) {
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {
                     float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight() - LayoutUtils.dp2pix(view.getContext(), 4));
-                    view.setTranslationY(translationY);
+                    ViewCompat.animate(view).setInterpolator(new OvershootInterpolator()).translationY(translationY).start();
                 }
             }
             return false;
@@ -98,10 +99,13 @@ public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.At
 
         @Override
         public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull EhDrawerLayout child, @NonNull View dependency) {
+            if (child.getAboveSnackViewCount() > 1) {
+                return;
+            }
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {
-                    ViewCompat.animate(view).translationY(0).start();
+                    ViewCompat.animate(view).setInterpolator(new OvershootInterpolator()).translationY(0).start();
                 }
             }
         }
