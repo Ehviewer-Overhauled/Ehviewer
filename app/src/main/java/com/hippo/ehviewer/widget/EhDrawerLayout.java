@@ -90,7 +90,7 @@ public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.At
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {
-                    float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight() - LayoutUtils.dp2pix(view.getContext(), 4));
+                    float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight() - LayoutUtils.dp2pix(view.getContext(), 8));
                     ViewCompat.animate(view).setInterpolator(new OvershootInterpolator()).translationY(translationY).start();
                 }
             }

@@ -494,6 +494,7 @@ public final class GalleryListScene extends BaseScene
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList;
             recreateDrawerView();
+            mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_dark_x24);
         }
 
         // Update normal search mode
