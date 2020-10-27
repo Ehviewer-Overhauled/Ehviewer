@@ -757,12 +757,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                MimeTypeMap.getFileExtensionFromUrl(filename));
-        if (TextUtils.isEmpty(mimeType)) {
-            mimeType = "image/jpeg";
-        }
-
         Uri uri = FileProvider.getUriForFile(this, BuildConfig.FILE_PROVIDER_AUTHORITY, new File(dir, filename));
 
         Intent intent = new Intent();
@@ -818,19 +812,21 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             values.put(MediaStore.MediaColumns.DATA, path + File.separator + filename);
         }
         Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        if (imageUri == null) {
+            Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (!mGalleryProvider.save(page, UniFile.fromMediaUri(this, imageUri))) {
             resolver.delete(imageUri, null, null);
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
             return;
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0);
-                resolver.update(imageUri, contentValues, null, null);
-            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            resolver.update(imageUri, contentValues, null, null);
         }
 
-        Toast.makeText(this, getString(R.string.image_saved, realPath), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.image_saved, realPath + File.separator + filename), Toast.LENGTH_SHORT).show();
     }
 
     @Override
