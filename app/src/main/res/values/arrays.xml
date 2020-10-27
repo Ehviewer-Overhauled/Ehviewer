@@ -52,12 +52,14 @@
         <item>@string/homepage</item>
         <item>@string/subscription</item>
         <item>@string/whats_hot</item>
+        <item>@string/toplist</item>
     </string-array>
 
     <string-array name="launch_page_entry_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
 
     <string-array name="detail_size_entries" translatable="false">

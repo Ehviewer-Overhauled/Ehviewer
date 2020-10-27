@@ -465,6 +465,8 @@ public class Settings {
                 return GalleryListScene.ACTION_SUBSCRIPTION;
             case 2:
                 return GalleryListScene.ACTION_WHATS_HOT;
+            case 3:
+                return GalleryListScene.ACTION_TOP_LIST;
         }
     }
 
