@@ -629,6 +629,39 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+
+    @Nullable
+    public String getExtension(int index) {
+        int state = getPageState(index);
+        if (STATE_FINISHED != state) {
+            return null;
+        }
+
+        InputStreamPipe pipe = mSpiderDen.openInputStreamPipe(index);
+        if (null == pipe) {
+            return null;
+        }
+
+        OutputStream os = null;
+        try {
+            pipe.obtain();
+
+            // Get dst file
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(pipe.open(), null, options);
+            pipe.close();
+
+            return MimeTypeMap.getSingleton().getExtensionFromMimeType(options.outMimeType);
+        } catch (IOException e) {
+            return null;
+        } finally {
+            pipe.close();
+            pipe.release();
+            IOUtils.closeQuietly(os);
+        }
+    }
+
     public int getStartPage() {
         SpiderInfo spiderInfo = readSpiderInfoFromLocal();
         if (spiderInfo != null) {

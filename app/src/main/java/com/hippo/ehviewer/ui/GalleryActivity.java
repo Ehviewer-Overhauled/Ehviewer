@@ -785,7 +785,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        String filename = mGalleryProvider.getImageFilename(page);
+        String filename = mGalleryProvider.getImageFilenameWithExtension(page);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                 MimeTypeMap.getFileExtensionFromUrl(filename));
         if (TextUtils.isEmpty(mimeType)) {

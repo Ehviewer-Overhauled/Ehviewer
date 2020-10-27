@@ -125,8 +125,33 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
     @NonNull
     @Override
     public String getImageFilename(int index) {
-        // TODO
-        return Integer.toString(index);
+        UniFile[] fileList = mFileList.get();
+        if (null == fileList || index < 0 || index >= fileList.length) {
+            return Integer.toString(index);
+        }
+        UniFile src = fileList[index];
+        String name = src.getName();
+        if (name == null) {
+            return Integer.toString(index);
+        }
+        return name;
+    }
+
+    @NonNull
+    @Override
+    public String getImageFilenameWithExtension(int index) {
+        UniFile[] fileList = mFileList.get();
+        if (null == fileList || index < 0 || index >= fileList.length) {
+            return Integer.toString(index);
+        }
+        UniFile src = fileList[index];
+        String extension = FileUtils.getExtensionFromFilename(src.getName());
+        String name = src.getName();
+        if (name == null) {
+            return Integer.toString(index);
+        }
+        name = null != extension ? name + "." + extension : name;
+        return name;
     }
 
     @Override

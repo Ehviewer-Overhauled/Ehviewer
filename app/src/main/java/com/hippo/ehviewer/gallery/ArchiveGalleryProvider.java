@@ -157,6 +157,13 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         return null;
     }
 
+    @NonNull
+    @Override
+    public String getImageFilenameWithExtension(int index) {
+        // TODO
+        return Integer.toString(index);
+    }
+
     private class ArchiveTask implements Runnable {
         @Override
         public void run() {

@@ -77,6 +77,18 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
         return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.gid, mGalleryInfo.token, index + 1);
     }
 
+    @NonNull
+    @Override
+    public String getImageFilenameWithExtension(int index) {
+        if (null != mSpiderQueen) {
+            String extension = mSpiderQueen.getExtension(index);
+            if (extension != null) {
+                return String.format(Locale.US, "%d-%s-%08d.%s", mGalleryInfo.gid, mGalleryInfo.token, index + 1, extension);
+            }
+        }
+        return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.gid, mGalleryInfo.token, index + 1);
+    }
+
     @Override
     public boolean save(int index, @NonNull UniFile file) {
         if (null != mSpiderQueen) {

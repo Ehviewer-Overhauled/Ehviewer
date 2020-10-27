@@ -45,6 +45,12 @@ public abstract class GalleryProvider2 extends GalleryProvider {
     @NonNull
     public abstract String getImageFilename(int index);
 
+    /**
+     * @return with extension
+     */
+    @NonNull
+    public abstract String getImageFilenameWithExtension(int index);
+
     public abstract boolean save(int index, @NonNull UniFile file);
 
     /**
