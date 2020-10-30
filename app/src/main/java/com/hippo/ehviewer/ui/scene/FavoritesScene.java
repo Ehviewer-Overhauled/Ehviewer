@@ -22,13 +22,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ImageSpan;
 import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.Gravity;
@@ -166,7 +162,7 @@ public class FavoritesScene extends BaseScene implements
     private boolean mModifyAdd;
 
     private ShowcaseView mShowcaseView;
-    private Runnable showNormalFabsRunnable = new Runnable() {
+    private final Runnable showNormalFabsRunnable = new Runnable() {
         @Override
         public void run() {
             if (mFabLayout != null) {
@@ -380,15 +376,7 @@ public class FavoritesScene extends BaseScene implements
 
         // Update hint
         if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-            Drawable searchImage = DrawableManager.getVectorDrawable(context, R.drawable.v_magnify_x24);
-            SpannableStringBuilder ssb = new SpannableStringBuilder("   ");
-            ssb.append(getString(R.string.favorites_search_bar_hint, favCatName));
-            int textSize = (int) (mSearchBar.getEditTextTextSize() * 1.25);
-            if (searchImage != null) {
-                searchImage.setBounds(0, 0, textSize, textSize);
-                ssb.setSpan(new ImageSpan(searchImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            mSearchBar.setEditTextHint(ssb);
+            mSearchBar.setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName));
         }
 
         mOldFavCat = favCatName;
@@ -646,7 +634,7 @@ public class FavoritesScene extends BaseScene implements
         } else if (mSearchBar != null) {
             if (mSearchBar.getEditText().length() == 0) {
                 exitSearchMode(true);
-            }else {
+            } else {
                 mSearchBar.applySearch();
             }
         }

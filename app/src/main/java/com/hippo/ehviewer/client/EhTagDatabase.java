@@ -17,9 +17,9 @@
 package com.hippo.ehviewer.client;
 
 import android.content.Context;
-import android.util.Base64;
 
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -56,7 +57,7 @@ public class EhTagDatabase {
     private static final Map<String, String> NAMESPACE_TO_PREFIX = new HashMap<>();
     private static volatile EhTagDatabase instance;
     // TODO more lock for different language
-    private static Lock lock = new ReentrantLock();
+    private static final Lock lock = new ReentrantLock();
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -189,6 +190,7 @@ public class EhTagDatabase {
 
             return true;
         } catch (Throwable t) {
+            t.printStackTrace();
             ExceptionUtils.throwIfFatal(t);
             return false;
         }
@@ -203,9 +205,9 @@ public class EhTagDatabase {
         }
 
         String sha1Name = urls[0];
-        String sha1Url = urls[1];
+        String sha1Url = urls[1] + "?_t=" + System.currentTimeMillis();
         String dataName = urls[2];
-        String dataUrl = urls[3];
+        String dataUrl = urls[3] + "?_t=" + System.currentTimeMillis();
 
         // Clear tags if name if different
         EhTagDatabase tmp = instance;
@@ -350,10 +352,66 @@ public class EhTagDatabase {
             } else if (compare > 0) {
                 low = start + end + 1;
             } else {
-                byte[] bytes = Base64.decode(tags, start + middle + 1, end - middle - 1, Base64.DEFAULT);
-                return new String(bytes, TextUrl.UTF_8);
+                return new String(tags, start + middle + 1, end - middle - 1, TextUrl.UTF_8);
             }
         }
         return null;
+    }
+
+    public ArrayList<Pair<String, String>> getTagFromTranslation(String translation) {
+        return searchTag(tags, translation);
+    }
+
+    @Nullable
+    private ArrayList<Pair<String, String>> searchTag(byte[] tags, String translation) {
+        ArrayList<Pair<String, String>> searchHints = new ArrayList<>();
+        int begin = 0;
+        while (begin < tags.length - 1) {
+            int start = begin;
+            // Look for the starting '\n'
+            while (tags[start] != '\n') {
+                start++;
+            }
+
+            // Look for the middle '\r'.
+            int middle = 1;
+            while (tags[start + middle] != '\r') {
+                middle++;
+            }
+
+            // Look for the ending '\n'
+            int end = middle + 1;
+            while (tags[start + end] != '\n') {
+                end++;
+            }
+
+            begin = start + end;
+
+            byte[] hintBytes = new byte[end - middle - 1];
+            System.arraycopy(tags, start + middle + 1, hintBytes, 0, end - middle - 1);
+            String hint = new String(hintBytes, TextUrl.UTF_8);
+            byte[] keywordBytes = new byte[middle];
+            System.arraycopy(tags, start + 1, keywordBytes, 0, middle);
+            String keyword = new String(keywordBytes, TextUrl.UTF_8);
+            int index = keyword.indexOf(':');
+            boolean keywordMatches;
+            if (index == -1 || index >= keyword.length() - 1) {
+                keywordMatches = keyword.contains(translation);
+            } else {
+                keywordMatches = keyword.substring(index + 1).contains(translation);
+            }
+
+            if (hint.contains(translation) || keywordMatches) {
+                Pair<String, String> pair = new Pair<>(hint, keyword);
+                if (!searchHints.contains(pair)) {
+                    searchHints.add(pair);
+                }
+            }
+            if (searchHints.size() > 20) {
+                break;
+            }
+
+        }
+        return searchHints;
     }
 }

@@ -748,7 +748,7 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     private static class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
 
-        private long mCommentId;
+        private final long mCommentId;
 
         public CommentGalleryListener(Context context, int stageId, String sceneTag, long commentId) {
             super(context, stageId, sceneTag);

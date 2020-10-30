@@ -62,8 +62,8 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     private MarginItemDecoration mListDecoration;
     private MarginItemDecoration mGirdDecoration;
     private int mType = TYPE_INVALID;
-    private boolean mShowFavourited;
-    private DownloadManager mDownloadManager;
+    private final boolean mShowFavourited;
+    private final DownloadManager mDownloadManager;
 
     public GalleryAdapter(@NonNull LayoutInflater inflater, @NonNull Resources resources,
                           @NonNull RecyclerView recyclerView, int type, boolean showFavourited) {

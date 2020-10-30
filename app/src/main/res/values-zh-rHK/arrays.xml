@@ -18,9 +18,9 @@
 
     <string-array name="tag_translation_metadata" tools:ignore="InconsistentArrays">
         <item>tag-translations-zh-rCN.sha1</item>
-        <item>https://cdn.jsdelivr.net/gh/Mapaler/EhViewer@tag-translations/tag-translations/tag-translations-zh-rCN.sha1</item>
+        <item>https://cdn.jsdelivr.net/gh/NekoInverter/tag-translations@main/tag-translations/tag-translations-zh-rCN.sha1</item>
         <item>tag-translations-zh-rCN</item>
-        <item>https://cdn.jsdelivr.net/gh/Mapaler/EhViewer@tag-translations/tag-translations/tag-translations-zh-rCN</item>
+        <item>https://cdn.jsdelivr.net/gh/NekoInverter/tag-translations@main/tag-translations/tag-translations-zh-rCN</item>
     </string-array>
 
 </resources>

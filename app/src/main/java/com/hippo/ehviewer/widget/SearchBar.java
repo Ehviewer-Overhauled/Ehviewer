@@ -22,7 +22,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -35,18 +34,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 
 import com.google.android.material.card.MaterialCardView;
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.ViewUtils;
@@ -137,18 +139,10 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mSuggestionList = new ArrayList<>();
         mSuggestionAdapter = new SuggestionAdapter(LayoutInflater.from(getContext()));
         mListView.setAdapter(mSuggestionAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSuggestionList.get(position).onClick();
-            }
-        });
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                mSuggestionList.get(position).onLongClick();
-                return true;
-            }
+        mListView.setOnItemClickListener((parent, view, position, id) -> mSuggestionList.get(position).onClick());
+        mListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            mSuggestionList.get(position).onLongClick();
+            return true;
         });
     }
 
@@ -176,6 +170,16 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             }
         }
 
+        EhTagDatabase ehTagDatabase = EhTagDatabase.getInstance(getContext());
+
+        if (!TextUtils.isEmpty(text) && ehTagDatabase != null) {
+            ArrayList<Pair<String, String>> searchHints = ehTagDatabase.getTagFromTranslation(text);
+
+            for (Pair<String, String> searchHint : searchHints) {
+                mSuggestionList.add(new TagSuggestion(searchHint.first, searchHint.second));
+            }
+        }
+
         String[] keywords = mSearchDatabase.getSuggestions(text, 128);
         for (String keyword : keywords) {
             mSuggestionList.add(new KeywordSuggestion(keyword));
@@ -195,10 +199,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     public void setAllowEmptySearch(boolean allowEmptySearch) {
         mAllowEmptySearch = allowEmptySearch;
-    }
-
-    public float getEditTextTextSize() {
-        return mEditText.getTextSize();
     }
 
     public void setEditTextHint(CharSequence hint) {
@@ -244,21 +244,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     public void setRightDrawable(Drawable drawable) {
         mActionButton.setImageDrawable(drawable);
-    }
-
-    public void setLeftIconVisibility(int visibility) {
-        mMenuButton.setVisibility(visibility);
-    }
-
-    public void setRightIconVisibility(int visibility) {
-        mActionButton.setVisibility(visibility);
-    }
-
-    public void setEditTextMargin(int left, int right) {
-        MarginLayoutParams lp = (MarginLayoutParams) mEditText.getLayoutParams();
-        lp.leftMargin = left;
-        lp.rightMargin = right;
-        mEditText.setLayoutParams(lp);
     }
 
     public void applySearch() {
@@ -345,10 +330,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
     }
 
-    public void showImeAndSuggestionsList() {
-        showImeAndSuggestionsList(true);
-    }
-
     public void showImeAndSuggestionsList(boolean animation) {
         // Show ime
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -372,18 +353,12 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                     mInAnimation = false;
                 }
             });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                oa.setAutoCancel(true);
-            }
+            oa.setAutoCancel(true);
             oa.start();
         } else {
             mListContainer.setVisibility(View.VISIBLE);
             setProgress(1f);
         }
-    }
-
-    private void hideImeAndSuggestionsList() {
-        hideImeAndSuggestionsList(true);
     }
 
     private void hideImeAndSuggestionsList(boolean animation) {
@@ -407,9 +382,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                     mInAnimation = false;
                 }
             });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                oa.setAutoCancel(true);
-            }
+            oa.setAutoCancel(true);
             oa.start();
         } else {
             setProgress(0f);
@@ -426,18 +399,17 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
     }
 
-    @SuppressWarnings("unused")
     public float getProgress() {
         return mProgress;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setProgress(float progress) {
         mProgress = progress;
         invalidate();
     }
 
-    public SearchEditText getEditText(){
+    public SearchEditText getEditText() {
         return mEditText;
     }
 
@@ -532,7 +504,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     private class SuggestionAdapter extends BaseAdapter {
 
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
 
         private SuggestionAdapter(LayoutInflater inflater) {
             mInflater = inflater;
@@ -555,22 +527,62 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView;
+            View view;
             if (convertView == null) {
-                textView = (TextView) mInflater.inflate(R.layout.item_simple_list, parent, false);
+                view = mInflater.inflate(R.layout.item_simple_list_2, parent, false);
             } else {
-                textView = (TextView) convertView;
+                view = convertView;
             }
 
-            textView.setText(mSuggestionList.get(position).getText(textView.getTextSize()));
+            TextView textView1 = view.findViewById(android.R.id.text1);
+            CharSequence text1 = mSuggestionList.get(position).getText(textView1.getTextSize());
+            TextView textView2 = view.findViewById(android.R.id.text2);
+            CharSequence text2 = mSuggestionList.get(position).getText(textView2.getTextSize());
+            textView1.setText(text1);
+            if (text1.equals(text2)) {
+                textView2.setVisibility(View.GONE);
+                textView2.setText("");
+            } else {
+                textView2.setVisibility(View.VISIBLE);
+                textView2.setText(text2);
+            }
 
-            return textView;
+            return view;
+        }
+    }
+
+    public class TagSuggestion extends SearchBar.Suggestion {
+        public String mHint;
+        public String mKeyword;
+
+        private TagSuggestion(String hint, String keyword) {
+            mHint = hint;
+            mKeyword = keyword;
+        }
+
+        @Override
+        public CharSequence getText(float textSize) {
+            if (LayoutUtils.pix2sp(getContext(), textSize) > 15) {
+                return mKeyword;
+            } else {
+                return mHint;
+            }
+        }
+
+        @Override
+        public void onClick() {
+            mEditText.setText(wrapTagKeyword(mKeyword));
+            mEditText.setSelection(mEditText.getText().length());
+        }
+
+        @Override
+        public void onLongClick() {
         }
     }
 
     public class KeywordSuggestion extends Suggestion {
 
-        private String mKeyword;
+        private final String mKeyword;
 
         private KeywordSuggestion(String keyword) {
             mKeyword = keyword;
@@ -592,5 +604,26 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             mSearchDatabase.deleteQuery(mKeyword);
             updateSuggestions(false);
         }
+    }
+
+    private String wrapTagKeyword(String keyword) {
+        keyword = keyword.trim();
+
+        int index1 = keyword.indexOf(':');
+        if (index1 == -1 || index1 >= keyword.length() - 1) {
+            // Can't find :, or : is the last char
+            return keyword;
+        }
+        if (keyword.charAt(index1 + 1) == '"') {
+            // The char after : is ", the word must be quoted
+            return keyword;
+        }
+        int index2 = keyword.indexOf(' ');
+        if (index2 <= index1) {
+            // Can't find space, or space is before :
+            return keyword;
+        }
+
+        return keyword.substring(0, index1 + 1) + "\"" + keyword.substring(index1 + 1) + "$\"";
     }
 }
