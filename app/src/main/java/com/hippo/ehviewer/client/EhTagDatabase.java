@@ -358,12 +358,12 @@ public class EhTagDatabase {
         return null;
     }
 
-    public ArrayList<Pair<String, String>> getTagFromTranslation(String translation) {
-        return searchTag(tags, translation);
+    public ArrayList<Pair<String, String>> suggest(String keyword) {
+        return searchTag(tags, keyword);
     }
 
     @Nullable
-    private ArrayList<Pair<String, String>> searchTag(byte[] tags, String translation) {
+    private ArrayList<Pair<String, String>> searchTag(byte[] tags, String keyword) {
         ArrayList<Pair<String, String>> searchHints = new ArrayList<>();
         int begin = 0;
         while (begin < tags.length - 1) {
@@ -390,19 +390,19 @@ public class EhTagDatabase {
             byte[] hintBytes = new byte[end - middle - 1];
             System.arraycopy(tags, start + middle + 1, hintBytes, 0, end - middle - 1);
             String hint = new String(hintBytes, TextUrl.UTF_8);
-            byte[] keywordBytes = new byte[middle];
-            System.arraycopy(tags, start + 1, keywordBytes, 0, middle);
-            String keyword = new String(keywordBytes, TextUrl.UTF_8);
-            int index = keyword.indexOf(':');
+            byte[] tagBytes = new byte[middle];
+            System.arraycopy(tags, start + 1, tagBytes, 0, middle);
+            String tag = new String(tagBytes, TextUrl.UTF_8);
+            int index = tag.indexOf(':');
             boolean keywordMatches;
-            if (index == -1 || index >= keyword.length() - 1) {
-                keywordMatches = keyword.contains(translation);
+            if (index == -1 || index >= tag.length() - 1 || keyword.length() > 2) {
+                keywordMatches = containsIgnoreSpace(tag, keyword);
             } else {
-                keywordMatches = keyword.substring(index + 1).contains(translation);
+                keywordMatches = containsIgnoreSpace(tag.substring(index + 1), keyword);
             }
 
-            if (hint.contains(translation) || keywordMatches) {
-                Pair<String, String> pair = new Pair<>(hint, keyword);
+            if (keywordMatches || containsIgnoreSpace(hint, keyword)) {
+                Pair<String, String> pair = new Pair<>(hint, tag);
                 if (!searchHints.contains(pair)) {
                     searchHints.add(pair);
                 }
@@ -413,5 +413,9 @@ public class EhTagDatabase {
 
         }
         return searchHints;
+    }
+
+    private boolean containsIgnoreSpace(String text, String key){
+        return text.replace(" ","").contains(key.replace(" ",""));
     }
 }

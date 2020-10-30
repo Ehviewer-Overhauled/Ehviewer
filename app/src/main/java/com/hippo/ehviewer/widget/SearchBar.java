@@ -171,12 +171,16 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
 
         EhTagDatabase ehTagDatabase = EhTagDatabase.getInstance(getContext());
+        if (!TextUtils.isEmpty(text) && ehTagDatabase != null && !text.endsWith(" ")) {
+            String[] s = text.split(" ");
+            if (s != null && s.length > 0) {
+                String keyword = s[s.length - 1];
+                ArrayList<Pair<String, String>> searchHints = ehTagDatabase.suggest(keyword);
 
-        if (!TextUtils.isEmpty(text) && ehTagDatabase != null) {
-            ArrayList<Pair<String, String>> searchHints = ehTagDatabase.getTagFromTranslation(text);
+                for (Pair<String, String> searchHint : searchHints) {
+                    mSuggestionList.add(new TagSuggestion(searchHint.first, searchHint.second));
+                }
 
-            for (Pair<String, String> searchHint : searchHints) {
-                mSuggestionList.add(new TagSuggestion(searchHint.first, searchHint.second));
             }
         }
 
@@ -573,7 +577,12 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
         @Override
         public void onClick() {
-            mEditText.setText(wrapTagKeyword(mKeyword));
+            String text = mEditText.getText().toString();
+            String temp = wrapTagKeyword(mKeyword) + " ";
+            if (text.contains(" ")) {
+                temp = text.substring(0, text.lastIndexOf(" ")) + " " + temp;
+            }
+            mEditText.setText(temp);
             mEditText.setSelection(mEditText.getText().length());
         }
 
