@@ -393,7 +393,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        if (mListContainer.getVisibility() == View.VISIBLE) {
+        if (mListContainer.getVisibility() == View.VISIBLE && (!mInAnimation || mHeight == 0)) {
             mWidth = right - left;
             mHeight = bottom - top;
         }
@@ -415,7 +415,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        if (mInAnimation) {
+        if (mInAnimation && mHeight != 0) {
             final int state = canvas.save();
             int bottom = MathUtils.lerp(mBaseHeight, mHeight, mProgress);
             mRect.set(0, 0, mWidth, bottom);
