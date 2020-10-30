@@ -419,10 +419,12 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             final int state = canvas.save();
             int bottom = MathUtils.lerp(mBaseHeight, mHeight, mProgress);
             mRect.set(0, 0, mWidth, bottom);
+            setClipBounds(mRect);
             canvas.clipRect(mRect);
             super.draw(canvas);
             canvas.restoreToCount(state);
         } else {
+            setClipBounds(null);
             super.draw(canvas);
         }
     }
