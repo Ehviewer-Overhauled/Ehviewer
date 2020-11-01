@@ -54,6 +54,7 @@ public class EhClient {
     public static final int METHOD_IMAGE_SEARCH = 16;
     public static final int METHOD_ARCHIVE_LIST = 17;
     public static final int METHOD_DOWNLOAD_ARCHIVE = 18;
+    public static final int METHOD_VOTE_TAG = 19;
 
     private final ThreadPoolExecutor mRequestThreadPool;
     private final OkHttpClient mOkHttpClient;
@@ -175,6 +176,8 @@ public class EhClient {
                         return EhEngine.getArchiveList(this, mOkHttpClient, (String) params[0], (Long) params[1], (String) params[2]);
                     case METHOD_DOWNLOAD_ARCHIVE:
                         return EhEngine.downloadArchive(this, mOkHttpClient, (Long) params[0], (String) params[1], (String) params[2], (String) params[3]);
+                    case METHOD_VOTE_TAG:
+                        return EhEngine.voteTag(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (String) params[4], (Integer) params[5]);
                     default:
                         return new IllegalStateException("Can't detect method " + mMethod);
                 }

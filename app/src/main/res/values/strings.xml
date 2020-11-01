@@ -792,4 +792,7 @@
     <string name="toplist_pastmonth">Past Month</string>
     <string name="toplist_yesterday">Yesterday</string>
     <string name="toplist">Toplist</string>
+    <string name="tag_vote_down">Vote down</string>
+    <string name="tag_vote_up">Vote up</string>
+    <string name="tag_vote_successfully">Vote successfully</string>
 </resources>

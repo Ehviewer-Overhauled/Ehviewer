@@ -406,7 +406,7 @@
     <string name="page_menu_refresh">@string/refresh</string>
     <string name="page_menu_share">@string/share</string>
     <string name="page_menu_save">保存</string>
-    <string name="page_menu_save_to">保存到...</string>
+    <string name="page_menu_save_to">保存到…</string>
     <string name="page_menu_add_bookmark">添加书签</string>
     <string name="gallery_menu_title">菜单</string>
     <string name="share_image">分享图片</string>
@@ -728,4 +728,7 @@
     <string name="toplist_pastmonth">过去一个月</string>
     <string name="toplist_yesterday">昨日</string>
     <string name="toplist">排行</string>
+    <string name="tag_vote_down">坏耶</string>
+    <string name="tag_vote_up">好耶</string>
+    <string name="tag_vote_successfully">投票成功</string>
 </resources>

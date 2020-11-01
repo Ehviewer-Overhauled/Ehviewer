@@ -86,6 +86,7 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
+import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
 import com.hippo.ehviewer.ui.CommonOperations;
@@ -114,6 +115,7 @@ import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
+import com.hippo.yorozuya.collect.IntList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1417,18 +1419,56 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
         final String tag2 = temp;
 
+        List<String> menu = new ArrayList<>();
+        final IntList menuId = new IntList();
+        Resources resources = context.getResources();
+
+        menu.add(resources.getString(R.string.show_definition));
+        menuId.add(R.id.show_definition);
+        menu.add(resources.getString(R.string.add_filter));
+        menuId.add(R.id.add_filter);
+        menu.add(resources.getString(R.string.tag_vote_up));
+        menuId.add(R.id.vote_up);
+        menu.add(resources.getString(R.string.tag_vote_down));
+        menuId.add(R.id.vote_down);
+
         new MaterialAlertDialogBuilder(context)
                 .setTitle(tag)
-                .setItems(R.array.tag_menu_entries, (dialog, which) -> {
-                    switch (which) {
-                        case 0:
+                .setItems(menu.toArray(new String[0]), (dialog, which) -> {
+                    if (which < 0 || which >= menuId.size()) {
+                        return;
+                    }
+                    int id = menuId.get(which);
+                    switch (id) {
+                        case R.id.vote_up:
+                            voteTag(tag2, 1);
+                            break;
+                        case R.id.vote_down:
+                            voteTag(tag2, -1);
+                            break;
+                        case R.id.show_definition:
                             UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(tag2), false);
                             break;
-                        case 1:
+                        case R.id.add_filter:
                             showFilterTagDialog(tag);
                             break;
                     }
                 }).show();
+    }
+
+    private void voteTag(String tag, int vote) {
+        Context context = getContext2();
+        MainActivity activity = getActivity2();
+        if (null == context || null == activity) {
+            return;
+        }
+
+        EhRequest request = new EhRequest()
+                .setMethod(EhClient.METHOD_VOTE_TAG)
+                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGid, mToken, tag, vote)
+                .setCallback(new VoteTagListener(context,
+                        activity.getStageId(), getTag(), mGid));
+        EhApplication.getEhClient(context).execute(request);
     }
 
     @Override
@@ -1708,6 +1748,39 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Override
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
+        }
+
+        @Override
+        public boolean isInstance(SceneFragment scene) {
+            return scene instanceof GalleryDetailScene;
+        }
+    }
+
+    private static class VoteTagListener extends EhCallback<GalleryDetailScene, VoteTagParser.Result> {
+
+        private final long mGid;
+
+        public VoteTagListener(Context context, int stageId, String sceneTag, long gid) {
+            super(context, stageId, sceneTag);
+            mGid = gid;
+        }
+
+        @Override
+        public void onSuccess(VoteTagParser.Result result) {
+            if (!TextUtils.isEmpty(result.error)) {
+                showTip(result.error, LENGTH_SHORT);
+            } else {
+                showTip(R.string.tag_vote_successfully, LENGTH_SHORT);
+            }
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            showTip(R.string.vote_failed, LENGTH_LONG);
+        }
+
+        @Override
+        public void onCancel() {
         }
 
         @Override

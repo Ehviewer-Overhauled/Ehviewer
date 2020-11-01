@@ -26,6 +26,8 @@
     <item name="vote_down" type="id" />
     <item name="check_vote_status" type="id" />
     <item name="edit_comment" type="id" />
+    <item name="show_definition" type="id" />
+    <item name="add_filter" type="id" />
 
     <item name="fab_translation_y" type="id" />
     <item name="fab_translation_y_animator" type="id" />

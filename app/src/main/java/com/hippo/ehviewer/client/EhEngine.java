@@ -48,6 +48,7 @@ import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.SignInParser;
 import com.hippo.ehviewer.client.parser.TorrentParser;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
+import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.network.StatusCodeException;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
@@ -845,6 +846,47 @@ public class EhEngine {
             headers = response.headers();
             body = response.body().string();
             return VoteCommentParser.parse(body, commentVote);
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            throwException(call, code, headers, body, e);
+            throw e;
+        }
+    }
+
+    public static VoteTagParser.Result voteTag(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
+                                                   long apiUid, String apiKey, long gid, String token, String tags, int vote) throws Throwable {
+        final JSONObject json = new JSONObject();
+        json.put("method", "taggallery");
+        json.put("apiuid", apiUid);
+        json.put("apikey", apiKey);
+        json.put("gid", gid);
+        json.put("token", token);
+        json.put("tags", tags);
+        json.put("vote", vote);
+        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        String url = EhUrl.getApiUrl();
+        String referer = EhUrl.getReferer();
+        String origin = EhUrl.getOrigin();
+        Log.d(TAG, url);
+        Request request = new EhRequestBuilder(url, referer, origin)
+                .post(requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+
+        // Put call
+        if (null != task) {
+            task.setCall(call);
+        }
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        try {
+            Response response = call.execute();
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            return VoteTagParser.parse(body);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             throwException(call, code, headers, body, e);
