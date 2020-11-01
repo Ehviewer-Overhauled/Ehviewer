@@ -1441,10 +1441,10 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     int id = menuId.get(which);
                     switch (id) {
                         case R.id.vote_up:
-                            voteTag(tag2, 1);
+                            voteTag(tag, 1);
                             break;
                         case R.id.vote_down:
-                            voteTag(tag2, -1);
+                            voteTag(tag, -1);
                             break;
                         case R.id.show_definition:
                             UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(tag2), false);
@@ -1465,7 +1465,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_TAG)
-                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGid, mToken, tag, vote)
+                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, tag, vote)
                 .setCallback(new VoteTagListener(context,
                         activity.getStageId(), getTag(), mGid));
         EhApplication.getEhClient(context).execute(request);

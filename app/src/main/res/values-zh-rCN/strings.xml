@@ -728,7 +728,7 @@
     <string name="toplist_pastmonth">过去一个月</string>
     <string name="toplist_yesterday">昨日</string>
     <string name="toplist">排行</string>
-    <string name="tag_vote_down">坏耶</string>
-    <string name="tag_vote_up">好耶</string>
+    <string name="tag_vote_down">不，这不是</string>
+    <string name="tag_vote_up">是的，这很正确</string>
     <string name="tag_vote_successfully">投票成功</string>
 </resources>

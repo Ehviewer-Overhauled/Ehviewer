@@ -9,7 +9,7 @@ public class VoteTagParser {
     public static VoteTagParser.Result parse(String body) throws JSONException {
         VoteTagParser.Result result = new VoteTagParser.Result();
         JSONObject jo = new JSONObject(body);
-        result.error = jo.getString("error");
+        if (jo.has("error")) result.error = jo.getString("error");
         return result;
     }
 
