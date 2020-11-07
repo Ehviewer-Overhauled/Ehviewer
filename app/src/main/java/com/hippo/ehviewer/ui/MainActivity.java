@@ -318,6 +318,8 @@ public final class MainActivity extends StageActivity
             ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);
         });
+        mDrawerLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
         updateProfile();
 
