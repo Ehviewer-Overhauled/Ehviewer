@@ -731,4 +731,6 @@
     <string name="tag_vote_down">不，这不是</string>
     <string name="tag_vote_up">是的，这很正确</string>
     <string name="tag_vote_successfully">投票成功</string>
+    <string name="from_clipboard">从剪贴板导入</string>
+    <string name="from_clipboard_error">未在剪贴板中发现 Cookeis。</string>
 </resources>

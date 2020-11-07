@@ -795,4 +795,6 @@
     <string name="tag_vote_down">Vote down</string>
     <string name="tag_vote_up">Vote up</string>
     <string name="tag_vote_successfully">Vote successfully</string>
+    <string name="from_clipboard">From clipboard</string>
+    <string name="from_clipboard_error">No cookies found in clipboard.</string>
 </resources>
