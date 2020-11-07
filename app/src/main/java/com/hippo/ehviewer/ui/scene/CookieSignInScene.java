@@ -223,8 +223,8 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         if (!checkIpbMemberId(ipbMemberId) || !(checkIpbPassHash(ipbPassHash))) {
             new MaterialAlertDialogBuilder(context).setTitle(R.string.waring)
                     .setMessage(R.string.wrong_cookie_warning)
-                    .setNegativeButton(R.string.i_dont_think_so, null)
-                    .setPositiveButton(R.string.i_will_check_it, (dialog, which) -> {
+                    .setPositiveButton(R.string.i_will_check_it, null)
+                    .setNegativeButton(R.string.i_dont_think_so, (dialog, which) -> {
                         storeCookie(ipbMemberId, ipbPassHash, igneous);
                         setResult(RESULT_OK, null);
                         finish();
