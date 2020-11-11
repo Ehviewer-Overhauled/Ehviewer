@@ -269,7 +269,7 @@ public abstract class StageActivity extends EhActivity {
 
                     // Use default animation
                     if (horizontal) {
-                        transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit_horizontal);
+                        transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit);
                     } else {
                         transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
                     }
@@ -361,7 +361,7 @@ public abstract class StageActivity extends EhActivity {
                 newScene.setExitTransition(null);
                 // Set default animation
                 if (horizontal) {
-                    transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit_horizontal);
+                    transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit);
                 } else {
                     transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
                 }

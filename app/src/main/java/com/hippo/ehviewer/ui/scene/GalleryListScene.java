@@ -1721,16 +1721,20 @@ public final class GalleryListScene extends BaseScene
 
     private abstract class UrlSuggestion extends SearchBar.Suggestion {
         @Override
-        public CharSequence getText(float textSize) {
-            Drawable bookImage = DrawableManager.getVectorDrawable(getContext2(), R.drawable.v_book_open_x24);
-            SpannableStringBuilder ssb = new SpannableStringBuilder("    ");
-            ssb.append(getResources2().getString(R.string.gallery_list_search_bar_open_gallery));
-            int imageSize = (int) (textSize * 1.25);
-            if (bookImage != null) {
-                bookImage.setBounds(0, 0, imageSize, imageSize);
-                ssb.setSpan(new ImageSpan(bookImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        public CharSequence getText(TextView textView) {
+            if (textView.getId() == android.R.id.text1) {
+                Drawable bookImage = DrawableManager.getVectorDrawable(textView.getContext(), R.drawable.v_book_open_x24);
+                SpannableStringBuilder ssb = new SpannableStringBuilder("    ");
+                ssb.append(getString(R.string.gallery_list_search_bar_open_gallery));
+                int imageSize = (int) (textView.getTextSize() * 1.25);
+                if (bookImage != null) {
+                    bookImage.setBounds(0, 0, imageSize, imageSize);
+                    ssb.setSpan(new ImageSpan(bookImage), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+                return ssb;
+            } else {
+                return null;
             }
-            return ssb;
         }
 
         @Override
@@ -1746,9 +1750,6 @@ public final class GalleryListScene extends BaseScene
 
         public abstract Announcer createAnnouncer();
 
-        @Override
-        public void onLongClick() {
-        }
     }
 
     private class GalleryDetailUrlSuggestion extends UrlSuggestion {

@@ -35,9 +35,8 @@
         style="@style/CardView.Normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/gallery_search_bar_margin_h"
-        android:layout_marginTop="@dimen/gallery_search_bar_margin_v"
-        android:layout_marginRight="@dimen/gallery_search_bar_margin_h" />
+        android:layout_marginHorizontal="@dimen/gallery_search_bar_margin_h"
+        android:layout_marginVertical="@dimen/gallery_search_bar_margin_v" />
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"

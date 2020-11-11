@@ -21,7 +21,8 @@
     android:paddingLeft="?attr/listPreferredItemPaddingLeft"
     android:paddingTop="8dp"
     android:paddingRight="?attr/listPreferredItemPaddingRight"
-    android:paddingBottom="8dp">
+    android:paddingBottom="8dp"
+    android:background="?selectableItemBackground">
 
     <TextView
         android:id="@android:id/text1"

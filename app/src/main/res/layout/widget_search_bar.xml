@@ -24,6 +24,18 @@
             android:layout_width="match_parent"
             android:layout_height="48dp">
 
+            <TextView
+                android:id="@+id/search_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="48dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="@dimen/text_little_large" />
+
             <ImageView
                 android:id="@+id/search_menu"
                 android:layout_width="48dp"
@@ -33,18 +45,6 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="12dp" />
-
-            <TextView
-                android:id="@+id/search_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="48dp"
-                android:layout_marginRight="48dp"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="@dimen/text_little_large" />
 
             <ImageView
                 android:id="@+id/search_action"
@@ -86,12 +86,10 @@
                 android:layout_height="1dp"
                 android:background="?attr/dividerColor" />
 
-            <ListView
+            <com.hippo.easyrecyclerview.EasyRecyclerView
                 android:id="@+id/search_bar_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="?attr/dividerColor"
-                android:dividerHeight="1dp" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </LinearLayout>

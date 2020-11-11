@@ -34,21 +34,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.ViewUtils;
@@ -77,7 +79,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
     private TextView mTitleTextView;
     private ImageView mActionButton;
     private SearchEditText mEditText;
-    private ListView mListView;
+    private EasyRecyclerView mListView;
     private View mListContainer;
     private View mListHeader;
 
@@ -120,7 +122,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mActionButton = (ImageView) ViewUtils.$$(this, R.id.search_action);
         mEditText = (SearchEditText) ViewUtils.$$(this, R.id.search_edit_text);
         mListContainer = ViewUtils.$$(this, R.id.list_container);
-        mListView = (ListView) ViewUtils.$$(mListContainer, R.id.search_bar_list);
+        mListView = (EasyRecyclerView) ViewUtils.$$(mListContainer, R.id.search_bar_list);
         mListHeader = ViewUtils.$$(mListContainer, R.id.list_header);
 
         mViewTransition = new ViewTransition(mTitleTextView, mEditText);
@@ -139,11 +141,16 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mSuggestionList = new ArrayList<>();
         mSuggestionAdapter = new SuggestionAdapter(LayoutInflater.from(getContext()));
         mListView.setAdapter(mSuggestionAdapter);
-        mListView.setOnItemClickListener((parent, view, position, id) -> mSuggestionList.get(position).onClick());
-        mListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            mSuggestionList.get(position).onLongClick();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context,
+                layoutManager.getOrientation());
+        mListView.addItemDecoration(dividerItemDecoration);
+        mListView.setLayoutManager(layoutManager);
+        mListView.setOnItemClickListener((parent, view, position, id) -> {
+            mSuggestionList.get(position).onClick();
             return true;
         });
+        mListView.setOnItemLongClickListener((parent, view, position, id) -> mSuggestionList.get(position).onLongClick());
     }
 
     private void addListHeader() {
@@ -173,7 +180,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         EhTagDatabase ehTagDatabase = EhTagDatabase.getInstance(getContext());
         if (!TextUtils.isEmpty(text) && ehTagDatabase != null && !text.endsWith(" ")) {
             String[] s = text.split(" ");
-            if (s != null && s.length > 0) {
+            if (s.length > 0) {
                 String keyword = s[s.length - 1];
                 ArrayList<Pair<String, String>> searchHints = ehTagDatabase.suggest(keyword);
 
@@ -197,7 +204,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mSuggestionAdapter.notifyDataSetChanged();
 
         if (scrollToTop) {
-            mListView.setSelection(0);
+            mListView.scrollToPosition(0);
         }
     }
 
@@ -501,14 +508,28 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     public abstract static class Suggestion {
 
-        public abstract CharSequence getText(float textSize);
+        public abstract CharSequence getText(TextView textView);
 
         public abstract void onClick();
 
-        public abstract void onLongClick();
+        public boolean onLongClick() {
+            return false;
+        }
+
     }
 
-    private class SuggestionAdapter extends BaseAdapter {
+    private static class SuggestionHolder extends RecyclerView.ViewHolder {
+        TextView text1;
+        TextView text2;
+
+        public SuggestionHolder(@NonNull View itemView) {
+            super(itemView);
+            text1 = itemView.findViewById(android.R.id.text1);
+            text2 = itemView.findViewById(android.R.id.text2);
+        }
+    }
+
+    private class SuggestionAdapter extends RecyclerView.Adapter<SuggestionHolder> {
 
         private final LayoutInflater mInflater;
 
@@ -516,14 +537,25 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             mInflater = inflater;
         }
 
+        @NonNull
         @Override
-        public int getCount() {
-            return mSuggestionList.size();
+        public SuggestionHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new SuggestionHolder(mInflater.inflate(R.layout.item_simple_list_2, parent, false));
         }
 
         @Override
-        public Object getItem(int position) {
-            return mSuggestionList.get(position);
+        public void onBindViewHolder(@NonNull SuggestionHolder holder, int position) {
+            Suggestion suggestion = mSuggestionList.get(position);
+            CharSequence text1 = suggestion.getText(holder.text1);
+            CharSequence text2 = suggestion.getText(holder.text2);
+            holder.text1.setText(text1);
+            if (text2 == null) {
+                holder.text2.setVisibility(View.GONE);
+                holder.text2.setText("");
+            } else {
+                holder.text2.setVisibility(View.VISIBLE);
+                holder.text2.setText(text2);
+            }
         }
 
         @Override
@@ -532,29 +564,10 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-            if (convertView == null) {
-                view = mInflater.inflate(R.layout.item_simple_list_2, parent, false);
-            } else {
-                view = convertView;
-            }
-
-            TextView textView1 = view.findViewById(android.R.id.text1);
-            CharSequence text1 = mSuggestionList.get(position).getText(textView1.getTextSize());
-            TextView textView2 = view.findViewById(android.R.id.text2);
-            CharSequence text2 = mSuggestionList.get(position).getText(textView2.getTextSize());
-            textView1.setText(text1);
-            if (text1.equals(text2)) {
-                textView2.setVisibility(View.GONE);
-                textView2.setText("");
-            } else {
-                textView2.setVisibility(View.VISIBLE);
-                textView2.setText(text2);
-            }
-
-            return view;
+        public int getItemCount() {
+            return mSuggestionList.size();
         }
+
     }
 
     public class TagSuggestion extends SearchBar.Suggestion {
@@ -567,8 +580,8 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
 
         @Override
-        public CharSequence getText(float textSize) {
-            if (LayoutUtils.pix2sp(getContext(), textSize) > 15) {
+        public CharSequence getText(TextView textView) {
+            if (textView.getId() == android.R.id.text1) {
                 return mKeyword;
             } else {
                 return mHint;
@@ -577,17 +590,16 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
         @Override
         public void onClick() {
-            String text = mEditText.getText().toString();
-            String temp = wrapTagKeyword(mKeyword) + " ";
-            if (text.contains(" ")) {
-                temp = text.substring(0, text.lastIndexOf(" ")) + " " + temp;
+            Editable editable = mEditText.getText();
+            if (editable != null) {
+                String text = editable.toString();
+                String temp = wrapTagKeyword(mKeyword) + " ";
+                if (text.contains(" ")) {
+                    temp = text.substring(0, text.lastIndexOf(" ")) + " " + temp;
+                }
+                mEditText.setText(temp);
+                mEditText.setSelection(editable.length());
             }
-            mEditText.setText(temp);
-            mEditText.setSelection(mEditText.getText().length());
-        }
-
-        @Override
-        public void onLongClick() {
         }
     }
 
@@ -600,20 +612,31 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         }
 
         @Override
-        public CharSequence getText(float textSize) {
-            return mKeyword;
+        public CharSequence getText(TextView textView) {
+            if (textView.getId() == android.R.id.text1) {
+                return mKeyword;
+            } else {
+                return null;
+            }
         }
 
         @Override
         public void onClick() {
             mEditText.setText(mKeyword);
-            mEditText.setSelection(mEditText.getText().length());
+            mEditText.setSelection(mEditText.length());
         }
 
         @Override
-        public void onLongClick() {
-            mSearchDatabase.deleteQuery(mKeyword);
-            updateSuggestions(false);
+        public boolean onLongClick() {
+            new MaterialAlertDialogBuilder(getContext())
+                    .setMessage(getContext().getString(R.string.delete_search_history, mKeyword))
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(R.string.delete, (dialog, which) -> {
+                        mSearchDatabase.deleteQuery(mKeyword);
+                        updateSuggestions(false);
+                    })
+                    .show();
+            return true;
         }
     }
 
