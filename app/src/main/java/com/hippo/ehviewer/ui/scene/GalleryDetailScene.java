@@ -262,7 +262,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private int mState = STATE_INIT;
     private boolean mModifingFavorites;
 
-    private static String getRatingText(float rating, Resources resources) {
+    private String getRatingText(float rating) {
         int resId;
         switch (Math.round(rating * 2)) {
             case 0:
@@ -303,7 +303,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 break;
         }
 
-        return resources.getString(resId);
+        return getString(resId);
     }
 
     @Nullable
@@ -1037,7 +1037,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private String getAllRatingText(float rating, int ratingCount) {
         Resources resources = getResources2();
         AssertUtils.assertNotNull(resources);
-        return resources.getString(R.string.rating_text, getRatingText(rating, resources), rating, ratingCount);
+        return resources.getString(R.string.rating_text, getRatingText(rating), rating, ratingCount);
     }
 
     private void setTransitionName() {
@@ -2161,7 +2161,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         public void setDialog(Dialog dialog, float rating) {
             mRatingText = (TextView) ViewUtils.$$(dialog, R.id.rating_text);
             mRatingBar = (GalleryRatingBar) ViewUtils.$$(dialog, R.id.rating_view);
-            mRatingText.setText(getRatingText(rating, getResources2()));
+            mRatingText.setText(getRatingText(rating));
             mRatingBar.setRating(rating);
             mRatingBar.setOnUserRateListener(this);
         }
@@ -2169,7 +2169,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Override
         public void onUserRate(float rating) {
             if (null != mRatingText) {
-                mRatingText.setText(getRatingText(rating, getResources2()));
+                mRatingText.setText(getRatingText(rating));
             }
         }
 
