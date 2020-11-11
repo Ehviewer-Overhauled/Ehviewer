@@ -89,6 +89,8 @@ public class DownloadFragment extends BaseSettingsFragment {
 
     private void openDirPickerL() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try {
             startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
         } catch (Throwable e) {

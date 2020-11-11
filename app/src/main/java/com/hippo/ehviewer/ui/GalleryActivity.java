@@ -861,6 +861,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_TITLE, filename);
         try {
             startActivityForResult(intent, WRITE_REQUEST_CODE);
@@ -876,6 +877,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
                 Uri uri = resultData.getData();
+                grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 String filepath = getCacheDir() + "/" + mCacheFileName;
                 File cachefile = new File(filepath);
 

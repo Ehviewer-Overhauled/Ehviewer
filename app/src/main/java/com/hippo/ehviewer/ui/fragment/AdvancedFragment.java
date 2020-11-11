@@ -34,6 +34,7 @@ import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
+import com.hippo.util.ExceptionUtils;
 import com.hippo.util.LogCat;
 import com.hippo.util.ReadableTime;
 
@@ -76,7 +77,12 @@ public class AdvancedFragment extends BaseSettingsFragment {
             intent.setType("text/plain");
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.putExtra(Intent.EXTRA_TITLE, "logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
-            startActivityForResult(intent, REQUEST_DUMP_LOGCAT);
+            try {
+                startActivityForResult(intent, REQUEST_DUMP_LOGCAT);
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+            }
             return true;
         } else if (KEY_CLEAR_MEMORY_CACHE.equals(key)) {
             ((EhApplication) getActivity().getApplication()).clearMemoryCache();
@@ -84,9 +90,14 @@ public class AdvancedFragment extends BaseSettingsFragment {
         } else if (KEY_IMPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setType("*/*");
-            startActivityForResult(intent, REQUEST_CODE_IMPORT);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            try {
+                startActivityForResult(intent, REQUEST_CODE_IMPORT);
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+            }
             return true;
         } else if (KEY_EXPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -94,7 +105,12 @@ public class AdvancedFragment extends BaseSettingsFragment {
             intent.setType("application/x-sqlite3");
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.putExtra(Intent.EXTRA_TITLE, ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db");
-            startActivityForResult(intent, REQUEST_CODE_EXPORT);
+            try {
+                startActivityForResult(intent, REQUEST_CODE_EXPORT);
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+            }
             return true;
         }
         return false;
