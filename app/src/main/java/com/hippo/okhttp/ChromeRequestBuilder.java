@@ -22,7 +22,7 @@ public class ChromeRequestBuilder extends Request.Builder {
 
     private static final String CHROME_USER_AGENT =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36";
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36";
 
     private static final String CHROME_ACCEPT =
             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
