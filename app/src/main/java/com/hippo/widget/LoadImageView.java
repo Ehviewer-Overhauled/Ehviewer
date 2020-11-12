@@ -65,25 +65,25 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private int mClipHeight = Integer.MIN_VALUE;
     private int mRetryType;
     private boolean mFailed;
+    private boolean mLoadFromDrawable;
 
     public LoadImageView(Context context) {
         super(context);
-        init(context, null, 0, 0);
+        init(context, null, 0);
     }
 
     public LoadImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs, 0, 0);
+        init(context, attrs, 0);
     }
 
     public LoadImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, attrs, defStyle, 0);
+        init(context, attrs, defStyle);
     }
 
-    @SuppressWarnings("WrongConstant")
-    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, defStyleRes);
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0);
         setRetryType(a.getInt(R.styleable.LoadImageView_retryType, 0));
         a.recycle();
 
@@ -106,10 +106,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        if (mFailed) {
-            onFailure();
-        } else if (mTaskId == Unikery.INVALID_ID) /* if (!mConaco.isLoading(mTaskId)) TODO Update Conaco */ {
-            load(mKey, mUrl, mContainer, mUseNetwork);
+        if (!mLoadFromDrawable) {
+            if (mFailed) {
+                onFailure();
+            } else if (mTaskId == Unikery.INVALID_ID) /* if (!mConaco.isLoading(mTaskId)) TODO Update Conaco */ {
+                load(mKey, mUrl, mContainer, mUseNetwork);
+            }
         }
     }
 
@@ -117,10 +119,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        // Cancel
-        mConaco.cancel(this);
-        // Clear drawable
-        clearDrawable();
+        if (!mLoadFromDrawable) {
+            // Cancel
+            mConaco.cancel(this);
+            // Clear drawable
+            clearDrawable();
+        }
     }
 
     private ImageDrawable getImageDrawable() {
@@ -212,6 +216,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
             return;
         }
 
+        mLoadFromDrawable = false;
         mFailed = false;
         clearRetry();
 
@@ -231,12 +236,14 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
 
     public void load(Drawable drawable) {
         unload();
+        mLoadFromDrawable = true;
         onPreSetImageDrawable(drawable, true);
         setImageDrawable(drawable);
     }
 
     public void load(@DrawableRes int id) {
         unload();
+        mLoadFromDrawable = true;
         onPreSetImageResource(id, true);
         setImageResource(id);
     }
