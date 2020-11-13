@@ -61,7 +61,7 @@ public class MyTagsActivity extends ToolbarActivity {
             cookieManager.setCookie(url, cookie.toString());
         }
 
-        setContentView(R.layout.activity_my_tags);
+        setContentView(R.layout.activity_webview);
         setTitle(R.string.my_tags);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
         WebView webView = findViewById(R.id.webview);

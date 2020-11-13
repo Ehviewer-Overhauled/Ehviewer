@@ -30,7 +30,7 @@
         app:summaryOff="@string/settings_download_media_scan_summary_off"
         app:summaryOn="@string/settings_download_media_scan_summary_on" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="3"
         android:key="download_thread"
         android:summary="@string/settings_download_multi_thread_download_summary"
@@ -39,7 +39,7 @@
         app:entryValues="@array/multi_thread_download_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:key="download_delay"
         android:title="@string/settings_download_download_delay"
         android:summary="@string/settings_download_download_delay_summary"
@@ -48,7 +48,7 @@
         android:defaultValue="0"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="5"
         android:key="preload_image"
         android:summary="@string/settings_download_preload_image_summary"
@@ -57,7 +57,7 @@
         app:entryValues="@array/preload_image_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="a"
         android:key="image_size"
         android:summary="@string/settings_download_image_resolution_summary"

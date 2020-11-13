@@ -17,7 +17,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="0"
         android:key="screen_rotation"
         android:summary="%s"
@@ -26,7 +26,7 @@
         app:entryValues="@array/screen_rotation_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="1"
         android:key="reading_direction"
         android:summary="%s"
@@ -35,7 +35,7 @@
         app:entryValues="@array/reading_direction_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="3"
         android:key="page_scaling"
         android:summary="%s"
@@ -44,7 +44,7 @@
         app:entryValues="@array/page_scaling_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SimpleMenuPreference
+    <com.takisoft.preferencex.SimpleMenuPreference
         android:defaultValue="1"
         android:key="start_position"
         android:summary="%s"

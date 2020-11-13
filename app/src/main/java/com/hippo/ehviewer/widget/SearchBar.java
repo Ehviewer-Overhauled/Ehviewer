@@ -40,17 +40,19 @@ import android.widget.TextView;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
+import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.ViewUtils;
@@ -142,9 +144,12 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mSuggestionAdapter = new SuggestionAdapter(LayoutInflater.from(getContext()));
         mListView.setAdapter(mSuggestionAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context,
-                layoutManager.getOrientation());
-        mListView.addItemDecoration(dividerItemDecoration);
+        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
+                LinearDividerItemDecoration.VERTICAL,
+                AttrResources.getAttrColor(context, R.attr.dividerColor),
+                LayoutUtils.dp2pix(context, 1));
+        decoration.setShowLastDivider(false);
+        mListView.addItemDecoration(decoration);
         mListView.setLayoutManager(layoutManager);
         mListView.setOnItemClickListener((parent, view, position, id) -> {
             mSuggestionList.get(position).onClick();

@@ -264,6 +264,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                 .setSmallIcon(R.drawable.ic_stat_alert)
                 .setContentText(getString(R.string.stat_509_alert_title))
                 .setContentText(getString(R.string.stat_509_alert_text))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.stat_509_alert_text)))
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setAutoCancel(true)
                 .setOngoing(false)

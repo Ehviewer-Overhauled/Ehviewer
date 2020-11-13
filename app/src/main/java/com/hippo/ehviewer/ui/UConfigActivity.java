@@ -69,7 +69,7 @@ public class UConfigActivity extends ToolbarActivity {
             cookieManager.setCookie(url, cookie.toString());
         }
 
-        setContentView(R.layout.activity_u_config);
+        setContentView(R.layout.activity_webview);
         setTitle(R.string.u_config);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
         webView = findViewById(R.id.webview);
