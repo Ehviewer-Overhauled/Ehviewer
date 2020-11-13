@@ -88,7 +88,7 @@
 
     <SwitchPreferenceCompat
         android:defaultValue="false"
-        android:key="doh"
+        android:key="dns_over_https"
         android:summary="@string/settings_advanced_dns_over_http_summary"
         android:title="@string/settings_advanced_dns_over_http_title"
         app:iconSpaceReserved="false" />
