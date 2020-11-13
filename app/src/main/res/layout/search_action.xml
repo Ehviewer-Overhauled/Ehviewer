@@ -13,24 +13,23 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="?attr/buttonBarStyle"
+<com.google.android.material.tabs.TabLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/action"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:background="@android:color/transparent"
+    app:tabIndicator="@null"
+    app:tabMode="fixed">
 
-    <Button
-        android:id="@+id/action"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="0dp"
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="?attr/colorPrimary"
-        android:textStyle="bold" />
+        android:text="@string/keyword_search" />
 
-    <Space
-        android:layout_width="0dp"
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:text="@string/image_search" />
 
-</LinearLayout>
+</com.google.android.material.tabs.TabLayout>

@@ -100,6 +100,7 @@ import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
 import com.hippo.util.DrawableManager;
+import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
@@ -558,7 +559,7 @@ public final class GalleryListScene extends BaseScene
         int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
         int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
 
-        mViewTransition = new ViewTransition(contentLayout, mSearchLayout);
+        mViewTransition = new BringOutTransition(contentLayout, mSearchLayout);
 
         mHelper = new GalleryListHelper();
         contentLayout.setHelper(mHelper);

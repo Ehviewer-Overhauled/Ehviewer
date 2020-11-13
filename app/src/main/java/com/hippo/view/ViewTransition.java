@@ -17,21 +17,20 @@
 package com.hippo.view;
 
 import android.animation.Animator;
-import android.animation.ObjectAnimator;
+import android.animation.AnimatorListenerAdapter;
 import android.view.View;
-
-import com.hippo.yorozuya.SimpleAnimatorListener;
+import android.view.ViewPropertyAnimator;
 
 public class ViewTransition {
 
-    private static final long ANIMATE_TIME = 300L;
+    protected static final long ANIMATE_TIME = 300L;
 
     private final View[] mViews;
 
     private int mShownView = -1;
 
-    private Animator mAnimator1;
-    private Animator mAnimator2;
+    protected ViewPropertyAnimator mAnimator1;
+    protected ViewPropertyAnimator mAnimator2;
 
     private OnShowViewListener mOnShowViewListener;
 
@@ -82,13 +81,6 @@ public class ViewTransition {
             }
 
             if (animation) {
-                for (int i = 0; i < length; i++) {
-                    if (i != oldShownView && i != shownView) {
-                        View v = views[i];
-                        v.setAlpha(0f);
-                        v.setVisibility(View.GONE);
-                    }
-                }
                 startAnimations(views[oldShownView], views[shownView]);
             } else {
                 for (int i = 0; i < length; i++) {
@@ -113,30 +105,27 @@ public class ViewTransition {
         }
     }
 
-    private void startAnimations(final View hiddenView, final View shownView) {
-        ObjectAnimator oa1 = ObjectAnimator.ofFloat(hiddenView, "alpha", 0f);
-        oa1.setDuration(ANIMATE_TIME);
-        oa1.addListener(new SimpleAnimatorListener() {
+    protected void startAnimations(final View hiddenView, final View shownView) {
+        mAnimator1 = hiddenView.animate().alpha(0);
+        mAnimator1.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                hiddenView.setVisibility(View.GONE);
+                if (hiddenView != null) {
+                    hiddenView.setVisibility(View.GONE);
+                }
                 mAnimator1 = null;
             }
-        });
-        oa1.start();
-        mAnimator1 = oa1;
+        }).start();
 
+        shownView.setAlpha(0);
         shownView.setVisibility(View.VISIBLE);
-        ObjectAnimator oa2 = ObjectAnimator.ofFloat(shownView, "alpha", 1f);
-        oa2.setDuration(ANIMATE_TIME);
-        oa2.addListener(new SimpleAnimatorListener() {
+        mAnimator2 = shownView.animate().alpha(1);
+        mAnimator2.setDuration(ANIMATE_TIME).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAnimator2 = null;
             }
-        });
-        oa2.start();
-        mAnimator2 = oa2;
+        }).start();
     }
 
     public interface OnShowViewListener {

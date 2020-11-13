@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.tabs.TabLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.R;
@@ -51,7 +52,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnCheckedChangeListener,
-        View.OnClickListener, ImageSearchLayout.Helper {
+        View.OnClickListener, ImageSearchLayout.Helper, TabLayout.OnTabSelectedListener {
 
     public static final int SEARCH_MODE_NORMAL = 0;
     public static final int SEARCH_MODE_IMAGE = 1;
@@ -70,6 +71,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
             {ITEM_TYPE_IMAGE, ITEM_TYPE_ACTION}, // SEARCH_MODE_IMAGE
     };
     private LayoutInflater mInflater;
+    @SearchMode
     private int mSearchMode = SEARCH_MODE_NORMAL;
     private boolean mEnableAdvance = false;
     private View mNormalView;
@@ -81,7 +83,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     private AdvanceSearchTable mTableAdvanceSearch;
     private ImageSearchLayout mImageView;
     private View mActionView;
-    private TextView mAction;
+    private TabLayout mAction;
     private LinearLayoutManager mLayoutManager;
     private SearchAdapter mAdapter;
     private Helper mHelper;
@@ -137,7 +139,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         // Create action view
         mActionView = mInflater.inflate(R.layout.search_action, null);
         mAction = mActionView.findViewById(R.id.action);
-        mAction.setOnClickListener(this);
+        mAction.addOnTabSelectedListener(this);
     }
 
     public void setHelper(Helper helper) {
@@ -220,6 +222,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     public void formatListUrlBuilder(ListUrlBuilder urlBuilder, String query) throws EhException {
         urlBuilder.reset();
 
@@ -257,26 +260,17 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         }
     }
 
-    public void setSearchMode(@SearchMode int searchMode, boolean animation) {
-        if (mSearchMode != searchMode) {
-            int oldItemCount = mAdapter.getItemCount();
-            mSearchMode = searchMode;
-            int newItemCount = mAdapter.getItemCount();
-
-            if (animation) {
-                mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
-                mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
-            } else {
-                mAdapter.notifyDataSetChanged();
-            }
-
-            if (mHelper != null) {
-                mHelper.onChangeSearchMode();
-            }
+    @Override
+    public void onClick(View v) {
+        if (mNormalSearchModeHelp == v) {
+            new MaterialAlertDialogBuilder(getContext())
+                    .setMessage(R.string.search_tip)
+                    .show();
         }
     }
 
-    public void toggleSearchMode() {
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
         int oldItemCount = mAdapter.getItemCount();
 
         mSearchMode++;
@@ -289,18 +283,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
         mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
 
-        // Update action text
-        int resId;
-        switch (mSearchMode) {
-            default:
-            case SEARCH_MODE_NORMAL:
-                resId = R.string.image_search;
-                break;
-            case SEARCH_MODE_IMAGE:
-                resId = R.string.keyword_search;
-                break;
-        }
-        mAction.setText(resId);
+        mSearchMode = tab.getPosition();
 
         if (mHelper != null) {
             mHelper.onChangeSearchMode();
@@ -308,14 +291,13 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     }
 
     @Override
-    public void onClick(View v) {
-        if (mNormalSearchModeHelp == v) {
-            new MaterialAlertDialogBuilder(getContext())
-                    .setMessage(R.string.search_tip)
-                    .show();
-        } else if (mAction == v) {
-            toggleSearchMode();
-        }
+    public void onTabUnselected(TabLayout.Tab tab) {
+
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+
     }
 
     @IntDef({SEARCH_MODE_NORMAL, SEARCH_MODE_IMAGE})
@@ -329,13 +311,13 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         void onSelectImage();
     }
 
-    private class SimpleHolder extends RecyclerView.ViewHolder {
+    private static class SimpleHolder extends RecyclerView.ViewHolder {
         public SimpleHolder(View itemView) {
             super(itemView);
         }
     }
 
-    private class SearchAdapter extends EasyRecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class SearchAdapter extends EasyRecyclerView.Adapter<SimpleHolder> {
 
         @Override
         public int getItemCount() {
@@ -355,8 +337,9 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
             return type;
         }
 
+        @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public SimpleHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
 
             if (viewType == ITEM_TYPE_ACTION) {
@@ -364,17 +347,6 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
                 mActionView.setLayoutParams(new RecyclerView.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
-                int resId;
-                switch (mSearchMode) {
-                    default:
-                    case SEARCH_MODE_NORMAL:
-                        resId = R.string.image_search;
-                        break;
-                    case SEARCH_MODE_IMAGE:
-                        resId = R.string.keyword_search;
-                        break;
-                }
-                mAction.setText(resId);
                 view = mActionView;
             } else {
                 view = mInflater.inflate(R.layout.search_category, parent, false);
@@ -403,8 +375,10 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            // Empty, bind view in create view
+        public void onBindViewHolder(SimpleHolder holder, int position) {
+            if (holder.getItemViewType() == ITEM_TYPE_ACTION) {
+                mAction.selectTab(mAction.getTabAt(mSearchMode));
+            }
         }
     }
 }
