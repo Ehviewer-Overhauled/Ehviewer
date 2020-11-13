@@ -145,14 +145,15 @@ public class EhEngine {
 
     public static String signIn(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
                                 String username, String password) throws Throwable {
+        String referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00";
         FormBody.Builder builder = new FormBody.Builder()
+                .add("referer", referer)
+                .add("b", "")
+                .add("bt", "")
                 .add("UserName", username)
                 .add("PassWord", password)
-                .add("submit", "Log me in")
-                .add("CookieDate", "1")
-                .add("temporary_https", "off");
+                .add("CookieDate", "1");
         String url = EhUrl.API_SIGN_IN;
-        String referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00";
         String origin = "https://forums.e-hentai.org";
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer, origin)
@@ -854,7 +855,7 @@ public class EhEngine {
     }
 
     public static VoteTagParser.Result voteTag(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                   long apiUid, String apiKey, long gid, String token, String tags, int vote) throws Throwable {
+                                               long apiUid, String apiKey, long gid, String token, String tags, int vote) throws Throwable {
         final JSONObject json = new JSONObject();
         json.put("method", "taggallery");
         json.put("apiuid", apiUid);
