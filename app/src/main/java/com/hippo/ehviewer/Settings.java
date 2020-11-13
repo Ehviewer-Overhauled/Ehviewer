@@ -91,7 +91,8 @@ public class Settings {
     public static final String KEY_ENABLE_FINGERPRINT = "enable_fingerprint";
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
     public static final int DEFAULT_READ_CACHE_SIZE = 160;
-    public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts";
+    public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
+    public static final String KEY_DOH = "dns_over_https";
     public static final String KEY_APP_LANGUAGE = "app_language";
     private static final String TAG = Settings.class.getSimpleName();
     private static final String KEY_VERSION_CODE = "version_code";
@@ -235,6 +236,7 @@ public class Settings {
     private static final String KEY_SAVE_CRASH_LOG = "save_crash_log";
     private static final boolean DEFAULT_SAVE_CRASH_LOG = false;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
+    private static final boolean DEFAULT_DOH = false;
     private static final String DEFAULT_APP_LANGUAGE = "system";
     private static final String KEY_PROXY_TYPE = "proxy_type";
     private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM;
@@ -272,9 +274,9 @@ public class Settings {
 
     private static void fixDefaultValue(Context context) {
         // Enable builtin hosts if the country is CN
-        if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
+        if (!sSettingsPre.contains(KEY_DOH)) {
             if ("CN".equals(Locale.getDefault().getCountry())) {
-                putBuiltInHosts(true);
+                putDoH(true);
             }
         }
     }
@@ -1000,6 +1002,14 @@ public class Settings {
 
     public static void putBuiltInHosts(boolean value) {
         putBoolean(KEY_BUILT_IN_HOSTS, value);
+    }
+
+    public static boolean getDoH() {
+        return getBoolean(KEY_DOH, DEFAULT_DOH);
+    }
+
+    public static void putDoH(boolean value) {
+        putBoolean(KEY_DOH, value);
     }
 
     public static String getAppLanguage() {

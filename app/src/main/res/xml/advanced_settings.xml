@@ -86,6 +86,13 @@
         app:activity="com.hippo.ehviewer.ui.HostsActivity"
         app:iconSpaceReserved="false" />
 
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="doh"
+        android:summary="@string/settings_advanced_dns_over_http_summary"
+        android:title="@string/settings_advanced_dns_over_http_title"
+        app:iconSpaceReserved="false" />
+
     <Preference
         android:key="export_data"
         android:summary="@string/settings_advanced_export_data_summary"

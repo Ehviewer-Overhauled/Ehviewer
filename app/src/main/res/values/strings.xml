@@ -598,6 +598,8 @@
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">Built-in hosts.txt</string>
     <string name="settings_advanced_built_in_hosts_summary">Apply the built-in host-to-IP mapping provided by the app.\nIt can be overridden by custom hosts.txt.</string>
+    <string name="settings_advanced_dns_over_http_title">DNS over HTTPS</string>
+    <string name="settings_advanced_dns_over_http_summary">Workaround DNS poisoning in some nations.</string>
     <string name="settings_advanced_custom_hosts_title">Custom hosts.txt</string>
     <string name="settings_advanced_custom_hosts_summary">Map hostnames to IP addresses.\nIt can override built-in hosts.txt.</string>
     <string name="settings_privacy_pattern_protection_title">Pattern protection</string>

@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.Dns;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class EhDns implements Dns {
 
@@ -53,9 +56,27 @@ public class EhDns implements Dns {
     }
 
     private final Hosts hosts;
+    private static DnsOverHttps dnsOverHttps;
 
     public EhDns(Context context) {
         hosts = EhApplication.getHosts(context);
+        DnsOverHttps.Builder builder = new DnsOverHttps.Builder()
+                .client(new OkHttpClient.Builder().build())
+                .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"));
+        try {
+            builder.bootstrapDnsHosts(InetAddress.getByName("162.159.36.1"),
+                    InetAddress.getByName("162.159.46.1"),
+                    InetAddress.getByName("1.1.1.1"),
+                    InetAddress.getByName("1.0.0.1"),
+                    InetAddress.getByName("162.159.132.53"),
+                    InetAddress.getByName("2606:4700:4700::1111"),
+                    InetAddress.getByName("2606:4700:4700::1001"),
+                    InetAddress.getByName("2606:4700:4700::0064"),
+                    InetAddress.getByName("2606:4700:4700::6400"));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        dnsOverHttps = builder.post(true).build();
     }
 
     private static void put(Map<String, InetAddress> map, String host, String ip) {
@@ -77,6 +98,12 @@ public class EhDns implements Dns {
             inetAddress = builtInHosts.get(hostname);
             if (inetAddress != null) {
                 return Collections.singletonList(inetAddress);
+            }
+        }
+        if (Settings.getDoH()) {
+            List<InetAddress> inetAddresses = dnsOverHttps.lookup(hostname);
+            if (inetAddresses != null && inetAddresses.size() > 0) {
+                return inetAddresses;
             }
         }
 

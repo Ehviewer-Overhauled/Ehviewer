@@ -111,6 +111,7 @@ dependencies {
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
     implementation 'com.squareup.okhttp3:okhttp:3.14.7'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.14.7'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'tech.rectifier.preferencex-android:preferencex-simplemenu:88f93154b2'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
