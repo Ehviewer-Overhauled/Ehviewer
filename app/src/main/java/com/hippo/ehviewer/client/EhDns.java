@@ -22,6 +22,8 @@ package com.hippo.ehviewer.client;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.Settings;
@@ -45,7 +47,7 @@ public class EhDns implements Dns {
         put(map, "e-hentai.org", "104.20.26.25");
         put(map, "repo.e-hentai.org", "94.100.29.73");
         put(map, "forums.e-hentai.org", "94.100.18.243");
-        put(map, "ehgt.org", "81.171.14.118");
+        put(map, "ehgt.org", "178.162.139.24");
         put(map, "ul.ehgt.org", "94.100.24.82");
         builtInHosts = map;
     }
@@ -63,8 +65,9 @@ public class EhDns implements Dns {
         }
     }
 
+    @NonNull
     @Override
-    public List<InetAddress> lookup(String hostname) throws UnknownHostException {
+    public List<InetAddress> lookup(@NonNull String hostname) throws UnknownHostException {
         InetAddress inetAddress = hosts.get(hostname);
         if (inetAddress != null) {
             return Collections.singletonList(inetAddress);
