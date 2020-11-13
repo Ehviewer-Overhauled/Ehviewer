@@ -67,6 +67,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 public class EhApplication extends RecordingApplication {
@@ -88,6 +89,7 @@ public class EhApplication extends RecordingApplication {
     private EhClient mEhClient;
     private EhProxySelector mEhProxySelector;
     private OkHttpClient mOkHttpClient;
+    private Cache mOkHttpCache;
     private ImageBitmapHelper mImageBitmapHelper;
     private Conaco<ImageBitmap> mConaco;
     private LruCache<Long, GalleryDetail> mGalleryDetailCache;
@@ -137,11 +139,21 @@ public class EhApplication extends RecordingApplication {
                     .writeTimeout(5, TimeUnit.SECONDS)
                     .callTimeout(10, TimeUnit.SECONDS)
                     .cookieJar(getEhCookieStore(application))
+                    .cache(getOkHttpCache(application))
                     .dns(new EhDns(application))
                     .proxySelector(getEhProxySelector(application))
                     .build();
         }
         return application.mOkHttpClient;
+    }
+
+    @NonNull
+    public static Cache getOkHttpCache(@NonNull Context context) {
+        EhApplication application = ((EhApplication) context.getApplicationContext());
+        if (application.mOkHttpCache == null) {
+            application.mOkHttpCache = new Cache(new File(application.getCacheDir(), "http_cache"), 50L * 1024L * 1024L);
+        }
+        return application.mOkHttpCache;
     }
 
     @NonNull

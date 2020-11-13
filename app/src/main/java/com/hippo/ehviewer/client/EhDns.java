@@ -61,7 +61,7 @@ public class EhDns implements Dns {
     public EhDns(Context context) {
         hosts = EhApplication.getHosts(context);
         DnsOverHttps.Builder builder = new DnsOverHttps.Builder()
-                .client(new OkHttpClient.Builder().build())
+                .client(new OkHttpClient.Builder().cache(EhApplication.getOkHttpCache(context)).build())
                 .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"));
         try {
             builder.bootstrapDnsHosts(InetAddress.getByName("162.159.36.1"),
