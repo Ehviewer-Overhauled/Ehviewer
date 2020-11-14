@@ -27,8 +27,8 @@ android {
         applicationId "com.hippo.ehviewer"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 117
-        versionName "1.7.13"
+        versionCode 118
+        versionName "1.7.14"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
