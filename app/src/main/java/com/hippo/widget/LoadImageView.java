@@ -120,8 +120,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         super.onDetachedFromWindow();
 
         if (!mLoadFromDrawable) {
-            // Cancel
-            mConaco.cancel(this);
+            try {
+                // Cancel
+                mConaco.cancel(this);
+            } catch (Exception e) {
+                // Ignore
+            }
             // Clear drawable
             clearDrawable();
         }
