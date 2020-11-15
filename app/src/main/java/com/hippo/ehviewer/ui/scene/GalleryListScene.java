@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -51,9 +52,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
-import com.github.amlcurran.showcaseview.targets.PointTarget;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
@@ -107,6 +107,7 @@ import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
@@ -217,7 +218,6 @@ public final class GalleryListScene extends BaseScene
     private long mPressBackTime = 0;
     private boolean mHasFirstRefresh = false;
     private int mNavCheckedId = 0;
-    private ShowcaseView mShowcaseView;
     private DownloadManager mDownloadManager;
     private DownloadManager.DownloadInfoListener mDownloadInfoListener;
     private FavouriteStatusRouter mFavouriteStatusRouter;
@@ -635,34 +635,30 @@ public final class GalleryListScene extends BaseScene
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
+        Rect bounds = new Rect(point.x + LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 + LayoutUtils.dp2pix(requireContext(), 20),
+                point.x - LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 - LayoutUtils.dp2pix(requireContext(), 20));
 
-        mShowcaseView = new ShowcaseView.Builder(activity)
-                .withMaterialShowcase()
-                .setStyle(R.style.Guide)
-                .setTarget(new PointTarget(point.x, point.y / 3))
-                .hideOnTouchOutside()
-                .setContentTitle(R.string.guide_quick_search_title)
-                .setContentText(R.string.guide_quick_search_text)
-                .replaceEndButton(R.layout.button_guide)
-                .setShowcaseEventListener(new SimpleShowcaseEventListener() {
+        TapTargetView.showFor(requireActivity(),
+                TapTarget.forBounds(bounds,
+                        getString(R.string.guide_quick_search_title),
+                        getString(R.string.guide_quick_search_text))
+                        .transparentTarget(true),
+                new TapTargetView.Listener() {
                     @Override
-                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        mShowcaseView = null;
-                        ViewUtils.removeFromParent(showcaseView);
+                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                        super.onTargetClick(view);
                         Settings.putGuideQuickSearch(false);
                         openDrawer(Gravity.RIGHT);
                     }
-                }).build();
+                });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        if (null != mShowcaseView) {
-            ViewUtils.removeFromParent(mShowcaseView);
-            mShowcaseView = null;
-        }
         if (null != mSearchBarMover) {
             mSearchBarMover.cancelAnimation();
             mSearchBarMover = null;
@@ -845,10 +841,6 @@ public final class GalleryListScene extends BaseScene
 
     @Override
     public void onBackPressed() {
-        if (null != mShowcaseView) {
-            return;
-        }
-
         if (null != mFabLayout && mFabLayout.isExpanded()) {
             mFabLayout.setExpanded(false);
             return;

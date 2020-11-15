@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -43,9 +44,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
-import com.github.amlcurran.showcaseview.targets.PointTarget;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.android.resource.AttrResources;
@@ -82,6 +82,7 @@ import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
 import com.hippo.yorozuya.AssertUtils;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
@@ -161,7 +162,6 @@ public class FavoritesScene extends BaseScene implements
     // For modify action
     private boolean mModifyAdd;
 
-    private ShowcaseView mShowcaseView;
     private final Runnable showNormalFabsRunnable = new Runnable() {
         @Override
         public void run() {
@@ -325,24 +325,24 @@ public class FavoritesScene extends BaseScene implements
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
+        Rect bounds = new Rect(point.x + LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 + LayoutUtils.dp2pix(requireContext(), 20),
+                point.x - LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 - LayoutUtils.dp2pix(requireContext(), 20));
 
-        mShowcaseView = new ShowcaseView.Builder(activity)
-                .withMaterialShowcase()
-                .setStyle(R.style.Guide)
-                .setTarget(new PointTarget(point.x, point.y / 3))
-                .hideOnTouchOutside()
-                .setContentTitle(R.string.guide_collections_title)
-                .setContentText(R.string.guide_collections_text)
-                .replaceEndButton(R.layout.button_guide)
-                .setShowcaseEventListener(new SimpleShowcaseEventListener() {
+        TapTargetView.showFor(requireActivity(),
+                TapTarget.forBounds(bounds,
+                        getString(R.string.guide_collections_title),
+                        getString(R.string.guide_collections_text))
+                        .transparentTarget(true),
+                new TapTargetView.Listener() {
                     @Override
-                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        mShowcaseView = null;
-                        ViewUtils.removeFromParent(showcaseView);
+                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                        super.onTargetClick(view);
                         Settings.putGuideCollections(false);
                         openDrawer(Gravity.RIGHT);
                     }
-                }).build();
+                });
     }
 
     // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
@@ -389,11 +389,6 @@ public class FavoritesScene extends BaseScene implements
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        if (null != mShowcaseView) {
-            ViewUtils.removeFromParent(mShowcaseView);
-            mShowcaseView = null;
-        }
 
         if (null != mHelper) {
             mHelper.destroy();
@@ -472,10 +467,6 @@ public class FavoritesScene extends BaseScene implements
 
     @Override
     public void onBackPressed() {
-        if (null != mShowcaseView) {
-            return;
-        }
-
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
             mRecyclerView.outOfCustomChoiceMode();
         } else if (mFabLayout != null && mFabLayout.isExpanded()) {

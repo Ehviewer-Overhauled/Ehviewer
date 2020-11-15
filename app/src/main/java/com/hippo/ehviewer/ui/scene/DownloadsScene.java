@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -55,10 +56,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
-import com.github.amlcurran.showcaseview.targets.PointTarget;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
@@ -105,6 +104,7 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.LongList;
@@ -150,8 +150,6 @@ public class DownloadsScene extends ToolbarScene
     private DownloadAdapter mAdapter;
     @Nullable
     private AutoStaggeredGridLayoutManager mLayoutManager;
-
-    private ShowcaseView mShowcaseView;
 
     private int mInitPosition = -1;
 
@@ -432,23 +430,19 @@ public class DownloadsScene extends ToolbarScene
             return;
         }
 
-        mShowcaseView = new ShowcaseView.Builder(activity)
-                .withMaterialShowcase()
-                .setStyle(R.style.Guide)
-                .setTarget(new ViewTarget(((DownloadHolder) holder).thumb))
-                .hideOnTouchOutside()
-                .setContentTitle(R.string.guide_download_thumb_title)
-                .setContentText(R.string.guide_download_thumb_text)
-                .replaceEndButton(R.layout.button_guide)
-                .setShowcaseEventListener(new SimpleShowcaseEventListener() {
+        TapTargetView.showFor(requireActivity(),
+                TapTarget.forView(((DownloadHolder) holder).thumb,
+                        getString(R.string.guide_download_thumb_title),
+                        getString(R.string.guide_download_thumb_text))
+                        .transparentTarget(true),
+                new TapTargetView.Listener() {
                     @Override
-                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        mShowcaseView = null;
-                        ViewUtils.removeFromParent(showcaseView);
+                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                        super.onTargetDismissed(view, userInitiated);
                         Settings.putGuideDownloadThumb(false);
                         guideDownloadLabels();
                     }
-                }).build();
+                });
     }
 
     private void guideDownloadLabels() {
@@ -460,24 +454,24 @@ public class DownloadsScene extends ToolbarScene
         Display display = activity.getWindowManager().getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
+        Rect bounds = new Rect(point.x + LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 + LayoutUtils.dp2pix(requireContext(), 20),
+                point.x - LayoutUtils.dp2pix(requireContext(), 20),
+                point.y / 3 - LayoutUtils.dp2pix(requireContext(), 20));
 
-        mShowcaseView = new ShowcaseView.Builder(activity)
-                .withMaterialShowcase()
-                .setStyle(R.style.Guide)
-                .setTarget(new PointTarget(point.x, point.y / 3))
-                .hideOnTouchOutside()
-                .setContentTitle(R.string.guide_download_labels_title)
-                .setContentText(R.string.guide_download_labels_text)
-                .replaceEndButton(R.layout.button_guide)
-                .setShowcaseEventListener(new SimpleShowcaseEventListener() {
+        TapTargetView.showFor(requireActivity(),
+                TapTarget.forBounds(bounds,
+                        getString(R.string.guide_download_labels_title),
+                        getString(R.string.guide_download_labels_text))
+                        .transparentTarget(true),
+                new TapTargetView.Listener() {
                     @Override
-                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        mShowcaseView = null;
-                        ViewUtils.removeFromParent(showcaseView);
+                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
+                        super.onTargetClick(view);
                         Settings.puttGuideDownloadLabels(false);
                         openDrawer(Gravity.RIGHT);
                     }
-                }).build();
+                });
     }
 
     @Override
@@ -491,10 +485,6 @@ public class DownloadsScene extends ToolbarScene
     public void onDestroyView() {
         super.onDestroyView();
 
-        if (null != mShowcaseView) {
-            ViewUtils.removeFromParent(mShowcaseView);
-            mShowcaseView = null;
-        }
         if (null != mRecyclerView) {
             mRecyclerView.stopScroll();
             mRecyclerView = null;
@@ -677,10 +667,6 @@ public class DownloadsScene extends ToolbarScene
 
     @Override
     public void onBackPressed() {
-        if (null != mShowcaseView) {
-            return;
-        }
-
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
             mRecyclerView.outOfCustomChoiceMode();
         } else {

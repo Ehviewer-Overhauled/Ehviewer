@@ -130,12 +130,6 @@
         <item name="android:textColor">?attr/guideTextColor</item>
     </style>
 
-    <style name="Guide">
-        <item name="sv_backgroundColor">?attr/guideBackgroundColor</item>
-        <item name="sv_titleTextAppearance">@style/Guide.Title</item>
-        <item name="sv_detailTextAppearance">@style/Guide.Text</item>
-    </style>
-
     <style name="CardView.Normal">
         <item name="cardBackgroundColor">?attr/contentColorPrimary</item>
     </style>
