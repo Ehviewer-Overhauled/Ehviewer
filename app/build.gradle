@@ -97,7 +97,6 @@ dependencies {
     implementation 'com.github.seven332:glview:0.1.0'
     implementation 'com.github.seven332:glview-image:0.1.0'
     implementation 'com.github.seven332:hotspot:0.1.0'
-    implementation 'com.github.seven332:image:0.1.12'
     implementation 'com.github.seven332:refreshlayout:0.1.0'
     implementation 'com.github.seven332:streampipe:0.1.0'
     implementation 'com.github.seven332:tuxiang:0.1.6'
@@ -113,7 +112,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.14.7'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.14.7'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
-    implementation 'tech.rectifier.preferencex-android:preferencex-simplemenu:88f93154b2'
+    implementation 'com.github.NekoInverter:Image:8fd6c1e1df'
+    implementation 'com.github.NekoInverter.preferencex-android:preferencex-simplemenu:88f93154b2'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     implementation 'org.greenrobot:greendao:2.2.1'
     implementation 'org.jsoup:jsoup:1.12.2'
@@ -127,8 +127,8 @@ configurations.all {
         force 'com.github.seven332:glgallery:25893283ca'
         force 'com.github.seven332:glview:ba6aee61d7'
         force 'com.github.seven332:glview-image:68d94b0fc2'
-        force 'com.github.seven332:image:09b43c0c68'
 
         exclude group: 'com.github.seven332', module: 'okhttp'
+        exclude group: 'com.github.seven332', module: 'image'
     }
 }
