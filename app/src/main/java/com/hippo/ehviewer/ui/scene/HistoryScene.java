@@ -370,22 +370,26 @@ public class HistoryScene extends ToolbarScene {
                 context.getString(R.string.read),
                 context.getString(R.string.delete_downloads),
                 context.getString(favourited ? R.string.remove_from_favourites : R.string.add_to_favourites),
+                context.getString(R.string.delete),
                 context.getString(R.string.download_move_dialog_title),
         } : new CharSequence[]{
                 context.getString(R.string.read),
                 context.getString(R.string.download),
                 context.getString(favourited ? R.string.remove_from_favourites : R.string.add_to_favourites),
+                context.getString(R.string.delete),
         };
 
         int[] icons = downloaded ? new int[]{
                 R.drawable.v_book_open_x24,
                 R.drawable.v_delete_x24,
                 favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
+                R.drawable.v_delete_x24,
                 R.drawable.v_folder_move_x24,
         } : new int[]{
                 R.drawable.v_book_open_x24,
                 R.drawable.v_download_x24,
                 favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
+                R.drawable.v_delete_x24,
         };
 
         new MaterialAlertDialogBuilder(context)
@@ -416,7 +420,18 @@ public class HistoryScene extends ToolbarScene {
                                 CommonOperations.addToFavorites(activity, gi, new AddToFavoriteListener(context, activity.getStageId(), getTag()));
                             }
                             break;
-                        case 3: // Move
+                        case 3: // Delete
+                            if (null == mLazyList || null == mAdapter) {
+                                return;
+                            }
+
+                            HistoryInfo info = mLazyList.get(position);
+                            EhDB.deleteHistoryInfo(info);
+                            updateLazyList();
+                            mAdapter.notifyDataSetChanged();
+                            updateView(true);
+                            break;
+                        case 4: // Move
                             List<DownloadLabel> labelRawList = EhApplication.getDownloadManager(context).getLabelList();
                             List<String> labelList = new ArrayList<>(labelRawList.size() + 1);
                             labelList.add(getString(R.string.default_download_label_name));
