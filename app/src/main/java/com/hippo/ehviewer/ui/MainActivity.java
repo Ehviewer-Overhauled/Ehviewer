@@ -39,12 +39,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -677,6 +677,20 @@ public final class MainActivity extends StageActivity
             default:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
+        }
+    }
+
+    public void setDrawerGestureBlocker(EhDrawerLayout.GestureBlocker gestureBlocker) {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.setGestureBlocker(gestureBlocker);
+        }
+    }
+
+    public boolean isDrawersVisible() {
+        if (mDrawerLayout != null) {
+            return mDrawerLayout.isDrawersVisible();
+        } else {
+            return false;
         }
     }
 }

@@ -3,7 +3,6 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
     ndkVersion "21.3.6528147"
     signingConfigs {
         def keystorePwd = null
@@ -112,6 +111,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.14.7'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.14.7'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
+    implementation 'com.github.NekoInverter:DrawerLayout:6ba992f8d4'
     implementation 'com.github.NekoInverter:Image:8fd6c1e1df'
     implementation 'com.github.NekoInverter.preferencex-android:preferencex-simplemenu:88f93154b2'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'

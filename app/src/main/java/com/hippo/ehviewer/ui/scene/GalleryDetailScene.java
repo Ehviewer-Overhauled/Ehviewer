@@ -38,9 +38,11 @@ import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -93,6 +95,7 @@ import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
+import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.ehviewer.widget.GalleryRatingBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
@@ -483,7 +486,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         AssertUtils.assertNotNull(context);
 
         View actionsScrollView = ViewUtils.$$(view, R.id.actions_scroll_view);
-        /*setDrawerGestureBlocker(new DrawerLayout.GestureBlocker() {
+        setDrawerGestureBlocker(new EhDrawerLayout.GestureBlocker() {
             private void transformPointToViewLocal(int[] point, View child) {
                 ViewParent viewParent = child.getParent();
 
@@ -492,7 +495,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     point[0] += view.getScrollX() - child.getLeft();
                     point[1] += view.getScrollY() - child.getTop();
 
-                    if (view instanceof DrawerLayout) {
+                    if (view instanceof EhDrawerLayout) {
                         break;
                     }
 
@@ -509,7 +512,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     && point[0] > 0 && point[0] < actionsScrollView.getWidth()
                     && point[1] > 0 && point[1] < actionsScrollView.getHeight();
             }
-        });*/
+        });
 
         Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());

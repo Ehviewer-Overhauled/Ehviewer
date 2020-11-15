@@ -112,10 +112,26 @@ public abstract class BaseScene extends SceneFragment {
         }
     }
 
+    public void setDrawerGestureBlocker(EhDrawerLayout.GestureBlocker gestureBlocker) {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            ((MainActivity) activity).setDrawerGestureBlocker(gestureBlocker);
+        }
+    }
+
     public void toggleDrawer(int drawerGravity) {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).toggleDrawer(drawerGravity);
+        }
+    }
+
+    public boolean isDrawersVisible() {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            return ((MainActivity) activity).isDrawersVisible();
+        } else {
+            return false;
         }
     }
 
