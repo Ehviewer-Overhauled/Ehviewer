@@ -3,6 +3,7 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 30
+    buildToolsVersion "30.0.2"
     ndkVersion "21.3.6528147"
     signingConfigs {
         def keystorePwd = null
@@ -23,7 +24,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.hippo.ehviewer"
+        applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 118
@@ -49,12 +50,10 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.fileprovider"'
             signingConfig signingConfigs.release
         }
         debug {
             applicationIdSuffix ".debug"
-            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.debug.fileprovider"'
             signingConfig signingConfigs.release
         }
     }
