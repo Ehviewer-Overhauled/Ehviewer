@@ -125,7 +125,13 @@ public class AdvancedFragment extends BaseSettingsFragment {
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    try {
+                        // grantUriPermission might throw RemoteException on MIUI
+                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    } catch (Exception e){
+                        ExceptionUtils.throwIfFatal(e);
+                        e.printStackTrace();
+                    }
                     try {
                         AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
                                 .setCancelable(false)
@@ -153,7 +159,13 @@ public class AdvancedFragment extends BaseSettingsFragment {
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    try {
+                        // grantUriPermission might throw RemoteException on MIUI
+                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } catch (Exception e){
+                        ExceptionUtils.throwIfFatal(e);
+                        e.printStackTrace();
+                    }
                     try {
                         AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
                                 .setCancelable(false)
@@ -181,7 +193,13 @@ public class AdvancedFragment extends BaseSettingsFragment {
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    try {
+                        // grantUriPermission might throw RemoteException on MIUI
+                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    } catch (Exception e){
+                        ExceptionUtils.throwIfFatal(e);
+                        e.printStackTrace();
+                    }
                     try {
                         boolean ok = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
                         ((SettingsActivity) requireActivity()).showTip(

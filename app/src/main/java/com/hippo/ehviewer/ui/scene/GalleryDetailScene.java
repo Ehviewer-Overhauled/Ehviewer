@@ -1040,9 +1040,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private String getAllRatingText(float rating, int ratingCount) {
-        Resources resources = getResources2();
-        AssertUtils.assertNotNull(resources);
-        return resources.getString(R.string.rating_text, getRatingText(rating), rating, ratingCount);
+        return getString(R.string.rating_text, getRatingText(rating), rating, ratingCount);
     }
 
     private void setTransitionName() {
