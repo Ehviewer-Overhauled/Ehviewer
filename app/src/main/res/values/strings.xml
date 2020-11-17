@@ -802,4 +802,6 @@
     <string name="delete_search_history">Delete \"%s\" from search history?</string>
     <string name="read_theme">Color theme</string>
     <string name="follow_app">Follow app</string>
+    <string name="settings_e_ink_mode_title">E-Ink mode</string>
+    <string name="settings_e_ink_mode_summary">Some optimizations for the ink screen.</string>
 </resources>

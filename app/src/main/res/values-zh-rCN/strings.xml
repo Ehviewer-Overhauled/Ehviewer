@@ -738,4 +738,6 @@
     <string name="settings_advanced_dns_over_http_summary">解决某些地区的 DNS 污染问题</string>
     <string name="read_theme">色彩主题</string>
     <string name="follow_app">跟随应用</string>
+    <string name="settings_e_ink_mode_title">墨水屏模式</string>
+    <string name="settings_e_ink_mode_summary">为墨水屏做一些优化</string>
 </resources>

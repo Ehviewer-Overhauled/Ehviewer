@@ -177,4 +177,9 @@
         <attr name="max" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="FastScroller">
+        <attr name="handler" format="reference"/>
+        <attr name="draggable" format="boolean"/>
+    </declare-styleable>
+
 </resources>

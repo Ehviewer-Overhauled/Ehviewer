@@ -133,6 +133,8 @@ public class Settings {
     private static final boolean DEFAULT_CELLULAR_NETWORK_WARNING = false;
     private static final String KEY_NIGHT_MODE = "night_mode";
     private static final String DEFAULT_NIGHT_MODE = "-1";
+    private static final String KEY_E_INK_MODE = "e_ink_mode";
+    private static final boolean DEFAULT_E_INK_MODE = false;
     /********************
      ****** Read
      ********************/
@@ -558,6 +560,14 @@ public class Settings {
         sEhConfig.excludedLanguages = value;
         sEhConfig.setDirty();
         putString(KEY_EXCLUDED_LANGUAGES, value);
+    }
+
+    public static void putEInkMode(boolean value) {
+        putBoolean(KEY_E_INK_MODE, value);
+    }
+
+    public static boolean getEInkMode() {
+        return getBoolean(KEY_E_INK_MODE, DEFAULT_E_INK_MODE);
     }
 
     public static boolean getCellularNetworkWarning() {
