@@ -237,9 +237,9 @@ public class Settings {
     private static final boolean DEFAULT_BETA_UPDATE_CHANNEL = EhApplication.BETA;
     private static final String KEY_SKIP_UPDATE_VERSION = "skip_update_version";
     private static final int DEFAULT_SKIP_UPDATE_VERSION = 0;
-    private static final boolean DEFAULT_SAVE_PARSE_ERROR_BODY = EhApplication.BETA;
+    private static final boolean DEFAULT_SAVE_PARSE_ERROR_BODY = true;
     private static final String KEY_SAVE_CRASH_LOG = "save_crash_log";
-    private static final boolean DEFAULT_SAVE_CRASH_LOG = false;
+    private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
     private static final boolean DEFAULT_DOH = false;
     private static final String DEFAULT_APP_LANGUAGE = "system";
