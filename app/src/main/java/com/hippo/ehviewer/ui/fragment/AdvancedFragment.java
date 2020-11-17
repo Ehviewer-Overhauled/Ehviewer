@@ -27,6 +27,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceGroup;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -37,6 +38,17 @@ import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.LogCat;
 import com.hippo.util.ReadableTime;
+import com.hippo.yorozuya.IOUtils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class AdvancedFragment extends BaseSettingsFragment {
 
@@ -74,9 +86,9 @@ public class AdvancedFragment extends BaseSettingsFragment {
         if (KEY_DUMP_LOGCAT.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("text/plain");
+            intent.setType("application/zip");
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.putExtra(Intent.EXTRA_TITLE, "logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
+            intent.putExtra(Intent.EXTRA_TITLE, "log-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".zip");
             try {
                 startActivityForResult(intent, REQUEST_DUMP_LOGCAT);
             } catch (Throwable e) {
@@ -128,7 +140,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                     try {
                         // grantUriPermission might throw RemoteException on MIUI
                         requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         ExceptionUtils.throwIfFatal(e);
                         e.printStackTrace();
                     }
@@ -162,7 +174,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                     try {
                         // grantUriPermission might throw RemoteException on MIUI
                         requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         ExceptionUtils.throwIfFatal(e);
                         e.printStackTrace();
                     }
@@ -196,14 +208,75 @@ public class AdvancedFragment extends BaseSettingsFragment {
                     try {
                         // grantUriPermission might throw RemoteException on MIUI
                         requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         ExceptionUtils.throwIfFatal(e);
                         e.printStackTrace();
                     }
                     try {
-                        boolean ok = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
+                        File zipFile = new File(AppConfig.getExternalTempDir(), "logs.zip");
+                        if (zipFile.exists()) {
+                            //noinspection ResultOfMethodCallIgnored
+                            zipFile.delete();
+                        }
+
+                        ArrayList<File> files = new ArrayList<>();
+                        files.addAll(Arrays.asList(AppConfig.getExternalParseErrorDir().listFiles()));
+                        files.addAll(Arrays.asList(AppConfig.getExternalCrashDir().listFiles()));
+
+                        boolean finished = false;
+
+                        BufferedInputStream origin = null;
+                        ZipOutputStream out = null;
+                        try {
+                            FileOutputStream dest = new FileOutputStream(zipFile);
+                            out = new ZipOutputStream(new BufferedOutputStream(dest));
+                            byte[] bytes = new byte[1024 * 64];
+
+                            for (File file : files) {
+                                if (!file.isFile()) {
+                                    continue;
+                                }
+                                try {
+                                    FileInputStream fi = new FileInputStream(file);
+                                    origin = new BufferedInputStream(fi, bytes.length);
+
+                                    ZipEntry entry = new ZipEntry(file.getName());
+                                    out.putNextEntry(entry);
+                                    int count;
+                                    while ((count = origin.read(bytes, 0, bytes.length)) != -1) {
+                                        out.write(bytes, 0, count);
+                                    }
+                                    if (origin != null) {
+                                        origin.close();
+                                        origin = null;
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            ZipEntry entry = new ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
+                            out.putNextEntry(entry);
+                            LogCat.save(out);
+                            out.closeEntry();
+                            out.close();
+                            IOUtils.copy(new FileInputStream(zipFile), requireActivity().getContentResolver().openOutputStream(uri));
+                            finished = true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (origin != null) {
+                                origin.close();
+                            }
+                            if (out != null) {
+                                out.close();
+                            }
+                        }
+                        if (!finished) {
+                            finished = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
+                        }
                         ((SettingsActivity) requireActivity()).showTip(
-                                ok ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
+                                finished ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
                                         getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
                     } catch (Exception e) {
                         ((SettingsActivity) requireActivity()).showTip(getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
