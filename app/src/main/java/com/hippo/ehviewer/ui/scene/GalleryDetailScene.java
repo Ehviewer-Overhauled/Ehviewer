@@ -626,6 +626,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         AssertUtils.assertNotNull(context);
         EhApplication.getDownloadManager(context).removeDownloadInfoListener(this);
 
+        setDrawerGestureBlocker(null);
+
         mTip = null;
         mViewTransition = null;
 
