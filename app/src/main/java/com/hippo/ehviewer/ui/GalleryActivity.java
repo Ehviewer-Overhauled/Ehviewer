@@ -256,7 +256,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     @SuppressWarnings({"WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        switch (Settings.getReadTheme()) {
+            case 0:
+                break;
+            case 1:
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case 2:
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+        }
         if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
@@ -321,11 +330,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         // System UI helper
         if (Settings.getReadingFullscreen()) {
             int systemUiLevel;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                systemUiLevel = SystemUiHelper.LEVEL_IMMERSIVE;
-            } else {
-                systemUiLevel = SystemUiHelper.LEVEL_HIDE_STATUS_BAR;
-            }
+            systemUiLevel = SystemUiHelper.LEVEL_IMMERSIVE;
             mSystemUiHelper = new SystemUiHelper(this, systemUiLevel,
                     SystemUiHelper.FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES | SystemUiHelper.FLAG_IMMERSIVE_STICKY);
             mSystemUiHelper.hide();
@@ -954,6 +959,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         private final Spinner mReadingDirection;
         private final Spinner mScaleMode;
         private final Spinner mStartPosition;
+        private final Spinner mReadTheme;
         private final SwitchCompat mKeepScreenOn;
         private final SwitchCompat mShowClock;
         private final SwitchCompat mShowProgress;
@@ -971,6 +977,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mReadingDirection = mView.findViewById(R.id.reading_direction);
             mScaleMode = mView.findViewById(R.id.page_scaling);
             mStartPosition = mView.findViewById(R.id.start_position);
+            mReadTheme = mView.findViewById(R.id.read_theme);
             mKeepScreenOn = mView.findViewById(R.id.keep_screen_on);
             mShowClock = mView.findViewById(R.id.show_clock);
             mShowProgress = mView.findViewById(R.id.show_progress);
@@ -985,6 +992,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mReadingDirection.setSelection(Settings.getReadingDirection());
             mScaleMode.setSelection(Settings.getPageScaling());
             mStartPosition.setSelection(Settings.getStartPosition());
+            mReadTheme.setSelection(Settings.getReadTheme());
             mKeepScreenOn.setChecked(Settings.getKeepScreenOn());
             mShowClock.setChecked(Settings.getShowClock());
             mShowProgress.setChecked(Settings.getShowProgress());
@@ -1013,6 +1021,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             int layoutMode = GalleryView.sanitizeLayoutMode(mReadingDirection.getSelectedItemPosition());
             int scaleMode = GalleryView.sanitizeScaleMode(mScaleMode.getSelectedItemPosition());
             int startPosition = GalleryView.sanitizeStartPosition(mStartPosition.getSelectedItemPosition());
+            int readTheme = mReadTheme.getSelectedItemPosition();
             boolean keepScreenOn = mKeepScreenOn.isChecked();
             boolean showClock = mShowClock.isChecked();
             boolean showProgress = mShowProgress.isChecked();
@@ -1023,12 +1032,14 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             boolean customScreenLightness = mCustomScreenLightness.isChecked();
             int screenLightness = mScreenLightness.getProgress();
 
+            int oldReadTheme = Settings.getReadTheme();
             boolean oldReadingFullscreen = Settings.getReadingFullscreen();
 
             Settings.putScreenRotation(screenRotation);
             Settings.putReadingDirection(layoutMode);
             Settings.putPageScaling(scaleMode);
             Settings.putStartPosition(startPosition);
+            Settings.putReadTheme(readTheme);
             Settings.putKeepScreenOn(keepScreenOn);
             Settings.putShowClock(showClock);
             Settings.putShowProgress(showProgress);
@@ -1056,6 +1067,17 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     break;
             }
             setRequestedOrientation(orientation);
+            switch (Settings.getReadTheme()) {
+                case 0:
+                    getDelegate().setLocalNightMode(AppCompatDelegate.getDefaultNightMode());
+                    break;
+                case 1:
+                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    break;
+                case 2:
+                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    break;
+            }
             mGalleryView.setLayoutMode(layoutMode);
             mGalleryView.setScaleMode(scaleMode);
             mGalleryView.setStartPosition(startPosition);
@@ -1081,7 +1103,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mLayoutMode = layoutMode;
             updateSlider();
 
-            if (oldReadingFullscreen != readingFullscreen) {
+            if (oldReadingFullscreen != readingFullscreen || oldReadTheme != readTheme) {
                 recreate();
             }
         }

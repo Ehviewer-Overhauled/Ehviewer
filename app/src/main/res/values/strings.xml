@@ -800,4 +800,6 @@
     <string name="from_clipboard">From clipboard</string>
     <string name="from_clipboard_error">No cookies found in clipboard.</string>
     <string name="delete_search_history">Delete \"%s\" from search history?</string>
+    <string name="read_theme">Color theme</string>
+    <string name="follow_app">Follow app</string>
 </resources>

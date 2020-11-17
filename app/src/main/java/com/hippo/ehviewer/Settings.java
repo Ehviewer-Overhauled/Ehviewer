@@ -175,6 +175,8 @@ public class Settings {
     private static final int DEFAULT_PRELOAD_IMAGE = 5;
     private static final String KEY_DOWNLOAD_ORIGIN_IMAGE = "download_origin_image";
     private static final boolean DEFAULT_DOWNLOAD_ORIGIN_IMAGE = false;
+    private static final String KEY_READ_THEME = "read_theme";
+    private static final int DEFAULT_READ_THEME = 1;
     /********************
      ****** Favorites
      ********************/
@@ -667,6 +669,14 @@ public class Settings {
 
     public static void putScreenLightness(int value) {
         putInt(KEY_SCREEN_LIGHTNESS, value);
+    }
+
+    public static int getReadTheme() {
+        return getIntFromStr(KEY_READ_THEME, DEFAULT_READ_THEME);
+    }
+
+    public static void putReadTheme(int value) {
+        putIntToStr(KEY_READ_THEME, value);
     }
 
     public static boolean getEnabledSecurity() {

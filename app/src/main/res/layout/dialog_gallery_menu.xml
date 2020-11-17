@@ -123,6 +123,29 @@
                     android:entries="@array/start_position_entries" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="@string/read_theme"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <com.hippo.widget.CuteSpinner
+                    android:id="@+id/read_theme"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="2"
+                    android:entries="@array/read_theme_entries" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

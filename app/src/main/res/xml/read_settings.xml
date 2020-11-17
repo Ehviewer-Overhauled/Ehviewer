@@ -53,6 +53,15 @@
         app:entryValues="@array/start_position_values"
         app:iconSpaceReserved="false" />
 
+    <com.takisoft.preferencex.SimpleMenuPreference
+        android:defaultValue="1"
+        android:key="read_theme"
+        android:summary="%s"
+        android:title="@string/read_theme"
+        app:entries="@array/read_theme_entries"
+        app:entryValues="@array/read_theme_entry_values"
+        app:iconSpaceReserved="false" />
+
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="keep_screen_on"
