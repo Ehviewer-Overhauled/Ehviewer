@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.WindowManager;
 
 import androidx.annotation.DimenRes;
 import androidx.annotation.NonNull;
@@ -277,10 +278,24 @@ public class Settings {
     }
 
     private static void fixDefaultValue(Context context) {
-        // Enable builtin hosts if the country is CN
+        // Enable DoH if the country is CN
         if (!sSettingsPre.contains(KEY_DOH)) {
             if ("CN".equals(Locale.getDefault().getCountry())) {
                 putDoH(true);
+            }
+        }
+        // Enable show tag translations if the country is CN
+        if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
+            if ("CN".equals(Locale.getDefault().getCountry())) {
+                putShowTagTranslations(true);
+            }
+        }
+        if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            // Probably an E-Ink device?
+            if (wm.getDefaultDisplay().getRefreshRate() < 5.0) {
+                putReadTheme(1);
+                putEInkMode(true);
             }
         }
     }
@@ -530,6 +545,10 @@ public class Settings {
 
     public static boolean getShowTagTranslations() {
         return getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS);
+    }
+
+    public static void putShowTagTranslations(boolean value) {
+        putBoolean(KEY_SHOW_TAG_TRANSLATIONS, value);
     }
 
     public static int getDefaultCategories() {
