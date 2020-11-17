@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.WindowManager;
 
 import androidx.annotation.DimenRes;
@@ -293,9 +294,13 @@ public class Settings {
         if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             // Probably an E-Ink device?
-            if (wm.getDefaultDisplay().getRefreshRate() < 5.0) {
-                putReadTheme(1);
-                putEInkMode(true);
+            if (wm != null) {
+                Display display = wm.getDefaultDisplay();
+                // Someone may install EHViewer on a device with no screen?
+                if (display != null && display.getRefreshRate() < 5.0) {
+                    putReadTheme(2);
+                    putEInkMode(true);
+                }
             }
         }
     }
