@@ -152,16 +152,14 @@
     <color name="shadow">#38000000</color>
 
     <!-- Gallery Activity -->
-    <color name="gallery_slider_background_dark">@color/grey_800</color>
-    <color name="gallery_slider_background_black">@color/grey_900</color>
+    <color name="gallery_slider_background">@color/grey_100</color>
 
     <color name="big_icon">#1f000000</color>
 
     <color name="guide_bg">#e5009688</color>
 
     <!-- Lock pattern view -->
-    <color name="lock_pattern_view_regular_color_light">#8a000000</color>
-    <color name="lock_pattern_view_regular_color_dark">#8affffff</color>
+    <color name="lock_pattern_view_regular_color">#8a000000</color>
     <color name="lock_pattern_view_success_color">@color/colorPrimary</color>
     <color name="lock_pattern_view_error_color">@color/red_500</color>
 
