@@ -29,6 +29,9 @@ import java.util.Map;
 public final class Analytics {
 
     public static void start(Application application) {
+        if (BuildConfig.DEBUG) {
+            return;
+        }
         AppCenter.start(application, "1aa06805-037c-4f3c-8aaa-e23d1433986d", com.microsoft.appcenter.analytics.Analytics.class, Crashes.class, Distribute.class);
         AppCenter.setUserId(Settings.getUserID());
     }
