@@ -16,10 +16,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -28,7 +27,7 @@
             android:checked="true"
             android:text="@string/search_sname" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -40,11 +39,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -52,7 +49,7 @@
             android:layout_weight="1"
             android:text="@string/search_sdesc" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -63,11 +60,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -75,7 +70,7 @@
             android:layout_weight="1"
             android:text="@string/search_sto" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -86,11 +81,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -98,7 +91,7 @@
             android:layout_weight="1"
             android:text="@string/search_sdt2" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -109,11 +102,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -132,11 +123,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -185,9 +174,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
@@ -199,10 +186,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin">
+        android:layout_height="wrap_content">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -210,7 +196,7 @@
             android:layout_weight="1"
             android:text="@string/search_sfl" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -219,7 +205,7 @@
             android:layout_weight="1"
             android:text="@string/search_sfu" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

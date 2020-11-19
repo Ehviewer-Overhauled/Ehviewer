@@ -32,7 +32,6 @@
         android:layout_height="wrap_content"
         android:checkedButton="@+id/search_normal_search"
         android:orientation="vertical"
-        android:paddingTop="@dimen/search_item_interval"
         app:columnCount="2">
 
         <androidx.appcompat.widget.AppCompatRadioButton

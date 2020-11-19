@@ -40,22 +40,20 @@
 
         <TableRow>
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_uss"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/advance_search_table_item_margin"
-                android:layout_marginBottom="@dimen/advance_search_table_item_margin"
                 android:layout_weight="1"
                 android:checked="true"
                 android:text="@string/search_uss" />
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_osc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-                android:layout_marginBottom="@dimen/advance_search_table_item_margin"
                 android:layout_weight="1"
                 android:checked="false"
                 android:text="@string/search_osc" />
@@ -63,11 +61,10 @@
 
         <TableRow>
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_se"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/advance_search_table_item_margin"
                 android:layout_marginRight="@dimen/advance_search_table_item_margin"
                 android:layout_weight="1"
                 android:checked="false"
@@ -77,7 +74,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-                android:layout_marginTop="@dimen/advance_search_table_item_margin"
                 android:layout_weight="1"
                 android:checked="false" />
 

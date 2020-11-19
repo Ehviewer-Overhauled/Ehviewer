@@ -38,7 +38,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/fingerprint_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
