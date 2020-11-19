@@ -266,6 +266,7 @@ public class FavoritesScene extends BaseScene implements
         mHelper.setEmptyString(resources.getString(R.string.gallery_list_empty_hit));
         contentLayout.setHelper(mHelper);
         contentLayout.getFastScroller().setOnDragHandlerListener(this);
+        contentLayout.setFitPaddingTop(paddingTopSB);
 
         mAdapter = new FavoritesAdapter(inflater, resources, mRecyclerView, Settings.getListMode());
         //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
@@ -279,8 +280,6 @@ public class FavoritesScene extends BaseScene implements
 
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
-
-        refreshLayout.setHeaderTranslationY(paddingTopSB);
 
         mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
         mSearchBar.setLeftDrawable(mLeftDrawable);

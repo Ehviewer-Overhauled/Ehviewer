@@ -550,7 +550,6 @@ public final class GalleryListScene extends BaseScene
         ContentLayout contentLayout = (ContentLayout) ViewUtils.$$(mainLayout, R.id.content_layout);
         mRecyclerView = contentLayout.getRecyclerView();
         FastScroller fastScroller = contentLayout.getFastScroller();
-        RefreshLayout refreshLayout = contentLayout.getRefreshLayout();
         mSearchLayout = (SearchLayout) ViewUtils.$$(mainLayout, R.id.search_layout);
         mSearchBar = (SearchBar) ViewUtils.$$(mainLayout, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(mainLayout, R.id.fab_layout);
@@ -564,6 +563,7 @@ public final class GalleryListScene extends BaseScene
         mHelper = new GalleryListHelper();
         contentLayout.setHelper(mHelper);
         contentLayout.getFastScroller().setOnDragHandlerListener(this);
+        contentLayout.setFitPaddingTop(paddingTopSB);
 
         mAdapter = new GalleryListAdapter(inflater, resources,
                 mRecyclerView, Settings.getListMode());
@@ -573,8 +573,6 @@ public final class GalleryListScene extends BaseScene
 
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
-
-        refreshLayout.setHeaderTranslationY(paddingTopSB);
 
         mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
         mRightDrawable = new AddDeleteDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
@@ -785,7 +783,7 @@ public final class GalleryListScene extends BaseScene
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
         qsDrawerAdapter.setHasStableIds(true);
         final GeneralItemAnimator animator = new DraggableItemAnimator();
-        mRecyclerView.setItemAnimator(animator);
+        recyclerView.setItemAnimator(animator);
         recyclerView.setAdapter(dragDropManager.createWrappedAdapter(qsDrawerAdapter));
         dragDropManager.attachRecyclerView(recyclerView);
         mQuickSearchList = EhDB.getAllQuickSearch();

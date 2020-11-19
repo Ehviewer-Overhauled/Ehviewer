@@ -63,7 +63,7 @@ public class ContentLayout extends FrameLayout {
     private EasyRecyclerView mRecyclerView;
     private FastScroller mFastScroller;
 
-    private ContentHelper mContentHelper;
+    private ContentHelper<?> mContentHelper;
 
     private int mRecyclerViewOriginTop;
     private int mRecyclerViewOriginBottom;
@@ -129,7 +129,7 @@ public class ContentLayout extends FrameLayout {
         return mRefreshLayout;
     }
 
-    public void setHelper(ContentHelper helper) {
+    public void setHelper(ContentHelper<?> helper) {
         mContentHelper = helper;
         helper.init(this);
     }
@@ -148,7 +148,7 @@ public class ContentLayout extends FrameLayout {
         // RecyclerView
         mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerViewOriginTop + fitPaddingTop, mRecyclerView.getPaddingRight(), mRecyclerView.getPaddingBottom());
         // RefreshLayout
-        mRefreshLayout.setProgressViewOffset(false, fitPaddingTop, fitPaddingTop + LayoutUtils.dp2pix(getContext(), 32)); // TODO
+        mRefreshLayout.setHeaderProgressViewOffset(true, 0, fitPaddingTop + LayoutUtils.dp2pix(getContext(), 32)); // TODO
     }
 
     public void setFitPaddingBottom(int fitPaddingBottom) {
@@ -310,12 +310,7 @@ public class ContentLayout extends FrameLayout {
             mRecyclerView.addOnScrollListener(mOnScrollListener);
             mRefreshLayout.setOnRefreshListener(mOnRefreshListener);
 
-            mTipView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    refresh();
-                }
-            });
+            mTipView.setOnClickListener(v -> refresh());
         }
 
         /**
