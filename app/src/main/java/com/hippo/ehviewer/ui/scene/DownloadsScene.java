@@ -525,6 +525,7 @@ public class DownloadsScene extends ToolbarScene
                         .setSingleChoiceItems(R.array.download_state, mType + 1, (dialog, which) -> {
                             mType = which - 1;
                             updateForLabel();
+                            updateView();
                             dialog.dismiss();
                         })
                         .show();
