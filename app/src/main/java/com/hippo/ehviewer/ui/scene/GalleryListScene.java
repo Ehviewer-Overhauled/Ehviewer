@@ -95,7 +95,6 @@ import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.ehviewer.widget.SearchLayout;
-import com.hippo.refreshlayout.RefreshLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -1660,7 +1659,13 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         public long getItemId(int position) {
-            return !mIsTopList ? mQuickSearchList != null ? mQuickSearchList.get(position).getId() : 0 : position;
+            if (mIsTopList) {
+                return position;
+            }
+            if (mQuickSearchList == null) {
+                return 0;
+            }
+            return mQuickSearchList.get(position).getId();
         }
 
         @Override
@@ -1686,10 +1691,8 @@ public final class GalleryListScene extends BaseScene
             if (null == mQuickSearchList) {
                 return;
             }
-
+            Collections.swap(mQuickSearchList, fromPosition, toPosition);
             EhDB.moveQuickSearch(fromPosition, toPosition);
-            final QuickSearch item = mQuickSearchList.remove(fromPosition);
-            mQuickSearchList.add(toPosition, item);
         }
 
         @Override
@@ -1699,10 +1702,12 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         public void onItemDragStarted(int position) {
+            notifyDataSetChanged();
         }
 
         @Override
         public void onItemDragFinished(int fromPosition, int toPosition, boolean result) {
+            notifyDataSetChanged();
         }
     }
 

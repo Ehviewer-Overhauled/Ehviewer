@@ -113,6 +113,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -134,8 +135,6 @@ public class DownloadsScene extends ToolbarScene
     private String mLabel;
     @Nullable
     private List<DownloadInfo> mList;
-    @Nullable
-    private List<DownloadLabel> mListLabel = null;
 
     /*---------------
      View life cycle
@@ -183,11 +182,11 @@ public class DownloadsScene extends ToolbarScene
         if (context == null) {
             return;
         }
-        mListLabel = EhApplication.getDownloadManager(context).getLabelList();
-        mLabels = new ArrayList<>(mListLabel.size() + 1);
+        List<DownloadLabel> listLabel = EhApplication.getDownloadManager(context).getLabelList();
+        mLabels = new ArrayList<>(listLabel.size() + 1);
         // Add default label name
         mLabels.add(getString(R.string.default_download_label_name));
-        for (DownloadLabel raw : mListLabel) {
+        for (DownloadLabel raw : listLabel) {
             mLabels.add(raw.getLabel());
         }
     }
@@ -1057,18 +1056,16 @@ public class DownloadsScene extends ToolbarScene
                             popupMenu.show();
                             popupMenu.setOnMenuItemClickListener(item -> {
                                 switch (item.getItemId()) {
-                                    case R.id.menu_label_rename:
-                                        if (mListLabel != null && position <= mListLabel.size()) {
-                                            DownloadLabel raw = mListLabel.get(position - 1);
-                                            EditTextDialogBuilder builder = new EditTextDialogBuilder(
-                                                    context, raw.getLabel(), getString(R.string.download_labels));
-                                            builder.setTitle(R.string.rename_label_title);
-                                            builder.setPositiveButton(android.R.string.ok, null);
-                                            AlertDialog dialog = builder.show();
-                                            new RenameLabelDialogHelper(builder, dialog, raw.getLabel());
-                                        }
+                                    case R.id.menu_label_rename: {
+                                        EditTextDialogBuilder builder = new EditTextDialogBuilder(
+                                                context, label, getString(R.string.download_labels));
+                                        builder.setTitle(R.string.rename_label_title);
+                                        builder.setPositiveButton(android.R.string.ok, null);
+                                        AlertDialog dialog = builder.show();
+                                        new RenameLabelDialogHelper(builder, dialog, label);
                                         break;
-                                    case R.id.menu_label_remove:
+                                    }
+                                    case R.id.menu_label_remove: {
                                         new MaterialAlertDialogBuilder(requireContext())
                                                 .setTitle(getString(R.string.delete_label_title))
                                                 .setMessage(getString(R.string.delete_label_message, label))
@@ -1080,6 +1077,7 @@ public class DownloadsScene extends ToolbarScene
                                                 .setNegativeButton(android.R.string.cancel, null)
                                                 .show();
                                         break;
+                                    }
                                 }
                                 return false;
                             });
@@ -1120,8 +1118,7 @@ public class DownloadsScene extends ToolbarScene
             }
 
             EhApplication.getDownloadManager(context).moveLabel(fromPosition - 1, toPosition - 1);
-            final String item = mLabels.remove(fromPosition);
-            mLabels.add(toPosition, item);
+            Collections.swap(mLabels, fromPosition, toPosition);
         }
 
         @Override
@@ -1131,10 +1128,12 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onItemDragStarted(int position) {
+            notifyDataSetChanged();
         }
 
         @Override
         public void onItemDragFinished(int fromPosition, int toPosition, boolean result) {
+            notifyDataSetChanged();
         }
     }
 
@@ -1579,13 +1578,6 @@ public class DownloadsScene extends ToolbarScene
                 initLabels();
                 if (mLabelAdapter != null && mLabels != null) {
                     mLabelAdapter.notifyItemInserted(mLabels.size() - 1);
-                }
-                if (mViewTransition != null) {
-                    if (mLabels != null && mLabels.size() > 0) {
-                        mViewTransition.showView(0);
-                    } else {
-                        mViewTransition.showView(1);
-                    }
                 }
             }
         }
