@@ -16,199 +16,226 @@
 
 package com.hippo.widget;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Bundle;
-import android.os.Parcelable;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.animation.Interpolator;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.AppCompatCheckedTextView;
 
 import com.hippo.ehviewer.R;
-import com.hippo.hotspot.Hotspotable;
-import com.hippo.yorozuya.AnimationUtils;
-import com.hippo.yorozuya.MathUtils;
-import com.hippo.yorozuya.SimpleAnimatorListener;
 
-public class CheckTextView extends AppCompatTextView implements OnClickListener, Hotspotable {
+public class CheckTextView extends AppCompatCheckedTextView implements View.OnClickListener {
 
-    private static final String STATE_KEY_SUPER = "super";
-    private static final String STATE_KEY_CHECKED = "checked";
+    private Drawable mForeground;
 
-    private static final long ANIMATION_DURATION = 200;
-    Animator mAnimator;
-    private final Animator.AnimatorListener mAnimatorListener = new SimpleAnimatorListener() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            mAnimator = null;
-        }
-    };
-    private int mMaskColor;
-    private boolean mChecked = false;
-    private boolean mPrepareAnimator = false;
-    private Paint mPaint;
-    private float mRadius = 0f;
-    private float mX;
-    private float mY;
-    private float mMaxRadius;
+    private final Rect mSelfBounds = new Rect();
+
+    private final Rect mOverlayBounds = new Rect();
+
+    private int mForegroundGravity = Gravity.FILL;
+
+    protected boolean mForegroundInPadding = true;
+
+    boolean mForegroundBoundsChanged = false;
+
+    public CheckTextView(Context context) {
+        this(context, null);
+    }
 
     public CheckTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+        this(context, attrs, 0);
     }
 
-    public CheckTextView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(context, attrs);
+    public CheckTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        init(context, attrs, defStyleAttr);
     }
 
-    private void init(Context context, AttributeSet attrs) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CheckTextView);
-        mMaskColor = a.getColor(R.styleable.CheckTextView_maskColor, Color.WHITE);
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CheckTextView,
+                defStyleAttr, 0);
+
+        mForegroundGravity = a.getInt(
+                R.styleable.CheckTextView_android_foregroundGravity, mForegroundGravity);
+
+        Drawable d = a.getDrawable(R.styleable.CheckTextView_android_foreground);
+        if (d != null) {
+            setForeground(d);
+        }
+
+        mForegroundInPadding = a.getBoolean(
+                R.styleable.CheckTextView_foregroundInsidePadding, true);
+
         a.recycle();
-
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        mPaint.setColor(mMaskColor);
-
         setOnClickListener(this);
     }
 
-    @Override
-    public void setHotspot(float x, float y) {
-        mX = x;
-        mY = y;
-        mMaxRadius = MathUtils.coverageRadius(getWidth(), getHeight(), x, y);
+    /**
+     * Describes how the foreground is positioned.
+     *
+     * @return foreground gravity.
+     * @see #setForegroundGravity(int)
+     */
+    public int getForegroundGravity() {
+        return mForegroundGravity;
     }
 
-    @Override
-    public void drawableHotspotChanged(float x, float y) {
-        super.drawableHotspotChanged(x, y);
-
-        mX = x;
-        mY = y;
-        mMaxRadius = MathUtils.coverageRadius(getWidth(), getHeight(), x, y);
-    }
-
-    public float getRadius() {
-        return mRadius;
-    }
-
-    public void setRadius(float radius) {
-        float bigger = Math.max(mRadius, radius);
-        mRadius = radius;
-        invalidate((int) (mX - bigger), (int) (mY - bigger), (int) (mX + bigger), (int) (mY + bigger));
-    }
-
-    public void prepareAnimations() {
-        mPrepareAnimator = true;
-    }
-
-    private void createAnimations() {
-        float startRadius;
-        float endRadius;
-        Interpolator interpolator;
-        if (mChecked) {
-            startRadius = 0;
-            endRadius = mMaxRadius;
-            interpolator = AnimationUtils.FAST_SLOW_INTERPOLATOR;
-        } else {
-            startRadius = mMaxRadius;
-            endRadius = 0;
-            interpolator = AnimationUtils.SLOW_FAST_INTERPOLATOR;
-        }
-        mRadius = startRadius;
-
-        final ObjectAnimator radiusAnim = ObjectAnimator.ofFloat(this, "radius", startRadius, endRadius);
-        radiusAnim.setDuration(ANIMATION_DURATION);
-        radiusAnim.setInterpolator(interpolator);
-        radiusAnim.addListener(mAnimatorListener);
-        radiusAnim.start();
-        mAnimator = radiusAnim;
-    }
-
-    private void cancelAnimations() {
-        if (mAnimator != null) {
-            mAnimator.cancel();
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        setChecked(!mChecked);
-    }
-
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (mPrepareAnimator) {
-            mPrepareAnimator = false;
-            cancelAnimations();
-            createAnimations();
-        }
-
-        if (mAnimator != null) {
-            canvas.drawCircle(mX, mY, mRadius, mPaint);
-        } else {
-            if (mChecked) {
-                canvas.drawColor(mMaskColor);
+    /**
+     * Describes how the foreground is positioned. Defaults to START and TOP.
+     *
+     * @param foregroundGravity See {@link android.view.Gravity}
+     * @see #getForegroundGravity()
+     */
+    public void setForegroundGravity(int foregroundGravity) {
+        if (mForegroundGravity != foregroundGravity) {
+            if ((foregroundGravity & Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.START;
             }
+
+            if ((foregroundGravity & Gravity.VERTICAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.TOP;
+            }
+
+            mForegroundGravity = foregroundGravity;
+
+            if (mForegroundGravity == Gravity.FILL && mForeground != null) {
+                Rect padding = new Rect();
+                mForeground.getPadding(padding);
+            }
+
+            requestLayout();
+        }
+    }
+
+    @Override
+    protected boolean verifyDrawable(@NonNull Drawable who) {
+        return super.verifyDrawable(who) || (who == mForeground);
+    }
+
+    @Override
+    public void jumpDrawablesToCurrentState() {
+        super.jumpDrawablesToCurrentState();
+        if (mForeground != null) {
+            mForeground.jumpToCurrentState();
+        }
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        if (mForeground != null && mForeground.isStateful()) {
+            mForeground.setState(getDrawableState());
         }
     }
 
     /**
-     * Changes the checked state of this CheckTextView.
+     * Supply a Drawable that is to be rendered on top of all of the child
+     * views in the frame layout.  Any padding in the Drawable will be taken
+     * into account by ensuring that the children are inset to be placed
+     * inside of the padding area.
      *
-     * @param checked   checked true to check the CheckTextView, false to uncheck it
-     * @param animation true for show animation
+     * @param drawable The Drawable to be drawn on top of the children.
      */
-    public void setChecked(boolean checked, boolean animation) {
-        if (mChecked != checked) {
-            mChecked = checked;
-
-            if (animation) {
-                prepareAnimations();
+    public void setForeground(Drawable drawable) {
+        if (mForeground != drawable) {
+            if (mForeground != null) {
+                mForeground.setCallback(null);
+                unscheduleDrawable(mForeground);
             }
+
+            mForeground = drawable;
+
+            if (drawable != null) {
+                setWillNotDraw(false);
+                drawable.setCallback(this);
+                if (drawable.isStateful()) {
+                    drawable.setState(getDrawableState());
+                }
+                if (mForegroundGravity == Gravity.FILL) {
+                    Rect padding = new Rect();
+                    drawable.getPadding(padding);
+                }
+            } else {
+                setWillNotDraw(true);
+            }
+            requestLayout();
             invalidate();
         }
     }
 
     /**
-     * Get the checked state of it.
+     * Returns the drawable used as the foreground of this FrameLayout. The
+     * foreground drawable, if non-null, is always drawn on top of the children.
      *
-     * @return true is it is checked
+     * @return A Drawable or null if no foreground was set.
      */
-    public boolean isChecked() {
-        return mChecked;
-    }
-
-    public void setChecked(boolean checked) {
-        setChecked(checked, true);
+    public Drawable getForeground() {
+        return mForeground;
     }
 
     @Override
-    public Parcelable onSaveInstanceState() {
-        final Bundle state = new Bundle();
-        state.putParcelable(STATE_KEY_SUPER, super.onSaveInstanceState());
-        state.putBoolean(STATE_KEY_CHECKED, mChecked);
-        return state;
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        mForegroundBoundsChanged |= changed;
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle) {
-            final Bundle savedState = (Bundle) state;
-            super.onRestoreInstanceState(savedState.getParcelable(STATE_KEY_SUPER));
-            setChecked(savedState.getBoolean(STATE_KEY_CHECKED), false);
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mForegroundBoundsChanged = true;
+    }
+
+    @Override
+    public void draw(@NonNull Canvas canvas) {
+        super.draw(canvas);
+
+        if (mForeground != null) {
+            final Drawable foreground = mForeground;
+
+            if (mForegroundBoundsChanged) {
+                mForegroundBoundsChanged = false;
+                final Rect selfBounds = mSelfBounds;
+                final Rect overlayBounds = mOverlayBounds;
+
+                final int w = getRight() - getLeft();
+                final int h = getBottom() - getTop();
+
+                if (mForegroundInPadding) {
+                    selfBounds.set(0, 0, w, h);
+                } else {
+                    selfBounds.set(getPaddingLeft(), getPaddingTop(),
+                            w - getPaddingRight(), h - getPaddingBottom());
+                }
+
+                Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
+                        foreground.getIntrinsicHeight(), selfBounds, overlayBounds);
+                foreground.setBounds(overlayBounds);
+            }
+
+            foreground.draw(canvas);
         }
+    }
+
+    @Override
+    public void drawableHotspotChanged(float x, float y) {
+        super.drawableHotspotChanged(x, y);
+        if (mForeground != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mForeground.setHotspot(x, y);
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        setChecked(!isChecked());
     }
 }

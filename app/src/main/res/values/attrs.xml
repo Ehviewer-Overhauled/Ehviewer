@@ -97,7 +97,9 @@
     </declare-styleable>
 
     <declare-styleable name="CheckTextView">
-        <attr name="maskColor" format="color" />
+        <attr name="android:foregroundGravity" />
+        <attr name="android:foreground" />
+        <attr name="foregroundInsidePadding" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="DividerView">

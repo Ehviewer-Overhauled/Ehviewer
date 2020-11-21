@@ -120,7 +120,7 @@
     <color name="loading_indicator_yellow">@color/yellow_800</color>
     <color name="loading_indicator_orange">@color/deep_orange_400</color>
 
-    <color name="check_text_view_mask">#8a000000</color>
+    <color name="check_text_view_mask">#4a000000</color>
 
     <!-- Red -->
     <color name="doujinshi">#fff44336</color>

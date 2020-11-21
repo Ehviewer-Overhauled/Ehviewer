@@ -98,7 +98,7 @@ public class CategoryTable extends TableLayout implements View.OnLongClickListen
             boolean checked = ((CheckTextView) v).isChecked();
             for (CheckTextView option : mOptions) {
                 if (option != v) {
-                    option.setChecked(!checked, false);
+                    option.setChecked(!checked);
                 }
             }
         }
@@ -132,16 +132,16 @@ public class CategoryTable extends TableLayout implements View.OnLongClickListen
      * @param category target category
      */
     public void setCategory(int category) {
-        mDoujinshi.setChecked(!NumberUtils.int2boolean(category & EhConfig.DOUJINSHI), false);
-        mManga.setChecked(!NumberUtils.int2boolean(category & EhConfig.MANGA), false);
-        mArtistCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.ARTIST_CG), false);
-        mGameCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.GAME_CG), false);
-        mWestern.setChecked(!NumberUtils.int2boolean(category & EhConfig.WESTERN), false);
-        mNonH.setChecked(!NumberUtils.int2boolean(category & EhConfig.NON_H), false);
-        mImageSets.setChecked(!NumberUtils.int2boolean(category & EhConfig.IMAGE_SET), false);
-        mCosplay.setChecked(!NumberUtils.int2boolean(category & EhConfig.COSPLAY), false);
-        mAsianPorn.setChecked(!NumberUtils.int2boolean(category & EhConfig.ASIAN_PORN), false);
-        mMisc.setChecked(!NumberUtils.int2boolean(category & EhConfig.MISC), false);
+        mDoujinshi.setChecked(!NumberUtils.int2boolean(category & EhConfig.DOUJINSHI));
+        mManga.setChecked(!NumberUtils.int2boolean(category & EhConfig.MANGA));
+        mArtistCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.ARTIST_CG));
+        mGameCG.setChecked(!NumberUtils.int2boolean(category & EhConfig.GAME_CG));
+        mWestern.setChecked(!NumberUtils.int2boolean(category & EhConfig.WESTERN));
+        mNonH.setChecked(!NumberUtils.int2boolean(category & EhConfig.NON_H));
+        mImageSets.setChecked(!NumberUtils.int2boolean(category & EhConfig.IMAGE_SET));
+        mCosplay.setChecked(!NumberUtils.int2boolean(category & EhConfig.COSPLAY));
+        mAsianPorn.setChecked(!NumberUtils.int2boolean(category & EhConfig.ASIAN_PORN));
+        mMisc.setChecked(!NumberUtils.int2boolean(category & EhConfig.MISC));
     }
 
     @Override
