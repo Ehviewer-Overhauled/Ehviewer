@@ -151,21 +151,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         decoration.setShowLastDivider(false);
         mListView.addItemDecoration(decoration);
         mListView.setLayoutManager(layoutManager);
-        mListView.setOnItemClickListener((parent, view, position, id) -> {
-            if (position < mSuggestionList.size()) {
-                mSuggestionList.get(position).onClick();
-                return true;
-            } else {
-                return false;
-            }
-        });
-        mListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            if (position < mSuggestionList.size()) {
-                return mSuggestionList.get(position).onLongClick();
-            } else {
-                return false;
-            }
-        });
     }
 
     private void addListHeader() {
@@ -571,6 +556,19 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                 holder.text2.setVisibility(View.VISIBLE);
                 holder.text2.setText(text2);
             }
+
+            holder.itemView.setOnClickListener(v -> {
+                if (position < mSuggestionList.size()) {
+                    mSuggestionList.get(position).onClick();
+                }
+            });
+            holder.itemView.setOnLongClickListener(v -> {
+                if (position < mSuggestionList.size()) {
+                    return mSuggestionList.get(position).onLongClick();
+                } else {
+                    return false;
+                }
+            });
         }
 
         @Override

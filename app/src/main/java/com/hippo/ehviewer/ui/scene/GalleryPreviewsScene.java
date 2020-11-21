@@ -62,7 +62,7 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerView.OnItemClickListener {
+public class GalleryPreviewsScene extends ToolbarScene {
 
     public static final String KEY_GALLERY_INFO = "gallery_info";
     private final static String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
@@ -116,7 +116,7 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean hasFirstRefresh;
@@ -149,7 +149,6 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
         layoutManager.setStrategy(AutoGridLayoutManager.STRATEGY_SUITABLE_SIZE);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setOnItemClickListener(this);
         int padding = LayoutUtils.dp2pix(context, 4);
         MarginItemDecoration decoration = new MarginItemDecoration(padding, padding, padding, padding, padding);
         mRecyclerView.addItemDecoration(decoration);
@@ -204,22 +203,21 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
         }
 
         int id = item.getItemId();
-        switch (id) {
-            case R.id.action_go_to:
-                if (mHelper == null) {
-                    return true;
-                }
-                int pages = mHelper.getPages();
-                if (pages > 0 && mHelper.canGoTo()) {
-                    GoToDialogHelper helper = new GoToDialogHelper(pages, mHelper.getPageForTop());
-                    AlertDialog dialog = new MaterialAlertDialogBuilder(context).setTitle(R.string.go_to)
-                            .setView(R.layout.dialog_go_to)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .create();
-                    dialog.show();
-                    helper.setDialog(dialog);
-                }
+        if (id == R.id.action_go_to) {
+            if (mHelper == null) {
                 return true;
+            }
+            int pages = mHelper.getPages();
+            if (pages > 0 && mHelper.canGoTo()) {
+                GoToDialogHelper helper = new GoToDialogHelper(pages, mHelper.getPageForTop());
+                AlertDialog dialog = new MaterialAlertDialogBuilder(context).setTitle(R.string.go_to)
+                        .setView(R.layout.dialog_go_to)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create();
+                dialog.show();
+                helper.setDialog(dialog);
+            }
+            return true;
         }
         return false;
     }
@@ -229,8 +227,7 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
         onBackPressed();
     }
 
-    @Override
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(int position) {
         Context context = getContext2();
         if (null != context && null != mHelper && null != mGalleryInfo) {
             GalleryPreview p = mHelper.getDataAtEx(position);
@@ -300,7 +297,7 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
         }
     }
 
-    private class GalleryPreviewHolder extends RecyclerView.ViewHolder {
+    private static class GalleryPreviewHolder extends RecyclerView.ViewHolder {
 
         public LoadImageView image;
         public TextView text;
@@ -322,14 +319,15 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
             AssertUtils.assertNotNull(mInflater);
         }
 
+        @NonNull
         @Override
-        public GalleryPreviewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public GalleryPreviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new GalleryPreviewHolder(mInflater.inflate(R.layout.item_gallery_preview, parent, false));
         }
 
         @Override
         @SuppressLint("SetTextI18n")
-        public void onBindViewHolder(GalleryPreviewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull GalleryPreviewHolder holder, int position) {
             if (null != mHelper) {
                 GalleryPreview preview = mHelper.getDataAtEx(position);
                 if (preview != null) {
@@ -337,6 +335,7 @@ public class GalleryPreviewsScene extends ToolbarScene implements EasyRecyclerVi
                     holder.text.setText(Integer.toString(preview.getPosition() + 1));
                 }
             }
+            holder.itemView.setOnClickListener(v -> onItemClick(position));
         }
 
         @Override

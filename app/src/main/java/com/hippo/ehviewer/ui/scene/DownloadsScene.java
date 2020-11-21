@@ -1403,10 +1403,6 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onIntoCustomChoice(EasyRecyclerView view) {
-            if (mRecyclerView != null) {
-                mRecyclerView.setOnItemLongClickListener(null);
-                mRecyclerView.setLongClickable(false);
-            }
             if (mFabLayout != null) {
                 mFabLayout.setExpanded(true);
             }

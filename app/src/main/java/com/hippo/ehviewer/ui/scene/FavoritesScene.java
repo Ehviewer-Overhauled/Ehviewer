@@ -30,7 +30,6 @@ import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -93,7 +92,6 @@ import java.util.List;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 public class FavoritesScene extends BaseScene implements
-        EasyRecyclerView.OnItemClickListener,
         FastScroller.OnDragHandlerListener, SearchBarMover.Helper, SearchBar.Helper,
         FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
         EasyRecyclerView.CustomChoiceListener {
@@ -426,24 +424,20 @@ public class FavoritesScene extends BaseScene implements
 
         toolbar.setTitle(R.string.collections);
         toolbar.inflateMenu(R.menu.drawer_favorites);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.action_default_favorites_slot:
-                        String[] items = new String[12];
-                        items[0] = getString(R.string.let_me_select);
-                        items[1] = getString(R.string.local_favorites);
-                        String[] favCat = Settings.getFavCat();
-                        System.arraycopy(favCat, 0, items, 2, 10);
-                        new MaterialAlertDialogBuilder(context)
-                                .setTitle(R.string.default_favorites_collection)
-                                .setItems(items, (dialog, which) -> Settings.putDefaultFavSlot(which - 2)).show();
-                        return true;
-                }
-                return false;
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.action_default_favorites_slot) {
+                String[] items = new String[12];
+                items[0] = getString(R.string.let_me_select);
+                items[1] = getString(R.string.local_favorites);
+                String[] favCat = Settings.getFavCat();
+                System.arraycopy(favCat, 0, items, 2, 10);
+                new MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.default_favorites_collection)
+                        .setItems(items, (dialog, which) -> Settings.putDefaultFavSlot(which - 2)).show();
+                return true;
             }
+            return false;
         });
 
         EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
@@ -452,7 +446,6 @@ public class FavoritesScene extends BaseScene implements
 
         mDrawerAdapter = new FavDrawerAdapter(inflater);
         recyclerView.setAdapter(mDrawerAdapter);
-        recyclerView.setOnItemClickListener(this);
 
         return view;
     }
@@ -497,9 +490,7 @@ public class FavoritesScene extends BaseScene implements
         }
     }
 
-    @Override
-    @Implemented(EasyRecyclerView.OnItemClickListener.class)
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+    public boolean onItemClick(View view, int position) {
         if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
             // Skip if in search mode
             if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -1088,6 +1079,7 @@ public class FavoritesScene extends BaseScene implements
                 holder.value.setText(Integer.toString(mFavCountArray[position - 2]));
                 holder.itemView.setEnabled(true);
             }
+            holder.itemView.setOnClickListener(v -> onItemClick(holder.itemView, position));
         }
 
         @Override
@@ -1200,7 +1192,7 @@ public class FavoritesScene extends BaseScene implements
 
         @Override
         void onItemClick(View view, int position) {
-            FavoritesScene.this.onItemClick(null, view, position, 0);
+            FavoritesScene.this.onItemClick(view, position);
         }
 
         @Override
