@@ -83,7 +83,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
     private SearchEditText mEditText;
     private EasyRecyclerView mListView;
     private View mListContainer;
-    private View mListHeader;
 
     private ViewTransition mViewTransition;
 
@@ -125,7 +124,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mEditText = (SearchEditText) ViewUtils.$$(this, R.id.search_edit_text);
         mListContainer = ViewUtils.$$(this, R.id.list_container);
         mListView = (EasyRecyclerView) ViewUtils.$$(mListContainer, R.id.search_bar_list);
-        mListHeader = ViewUtils.$$(mListContainer, R.id.list_header);
 
         mViewTransition = new ViewTransition(mTitleTextView, mEditText);
 
@@ -148,17 +146,10 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                 LinearDividerItemDecoration.VERTICAL,
                 AttrResources.getAttrColor(context, R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
+        decoration.setShowFirstDivider(true);
         decoration.setShowLastDivider(false);
         mListView.addItemDecoration(decoration);
         mListView.setLayoutManager(layoutManager);
-    }
-
-    private void addListHeader() {
-        mListHeader.setVisibility(VISIBLE);
-    }
-
-    private void removeListHeader() {
-        mListHeader.setVisibility(GONE);
     }
 
     private void updateSuggestions() {
@@ -196,11 +187,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             }
         }
 
-        if (mSuggestionList.size() == 0) {
-            removeListHeader();
-        } else {
-            addListHeader();
-        }
         mSuggestionAdapter.notifyDataSetChanged();
 
         if (scrollToTop) {

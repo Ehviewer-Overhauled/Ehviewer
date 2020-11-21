@@ -80,12 +80,6 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <View
-                android:id="@+id/list_header"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?attr/dividerColor" />
-
             <com.hippo.easyrecyclerview.EasyRecyclerView
                 android:id="@+id/search_bar_list"
                 android:layout_width="match_parent"
