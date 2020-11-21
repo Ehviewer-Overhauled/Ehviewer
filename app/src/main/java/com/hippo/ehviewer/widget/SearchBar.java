@@ -177,6 +177,11 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
             }
         }
 
+        String[] keywords = mSearchDatabase.getSuggestions(text, 128);
+        for (String keyword : keywords) {
+            mSuggestionList.add(new KeywordSuggestion(keyword));
+        }
+
         EhTagDatabase ehTagDatabase = EhTagDatabase.getInstance(getContext());
         if (!TextUtils.isEmpty(text) && ehTagDatabase != null && !text.endsWith(" ")) {
             String[] s = text.split(" ");
@@ -189,11 +194,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                 }
 
             }
-        }
-
-        String[] keywords = mSearchDatabase.getSuggestions(text, 128);
-        for (String keyword : keywords) {
-            mSuggestionList.add(new KeywordSuggestion(keyword));
         }
 
         if (mSuggestionList.size() == 0) {
