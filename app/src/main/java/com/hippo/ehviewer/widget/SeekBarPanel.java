@@ -16,10 +16,12 @@
 
 package com.hippo.ehviewer.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowInsets;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -28,10 +30,10 @@ import androidx.annotation.NonNull;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
 
-public class SeekBarPanel extends LinearLayout {
+public class SeekBarPanel extends LinearLayout implements View.OnApplyWindowInsetsListener {
 
     private SeekBar mSeekBar;
-    private int[] mLocation = new int[2];
+    private final int[] mLocation = new int[2];
 
     public SeekBarPanel(Context context) {
         super(context);
@@ -49,8 +51,10 @@ public class SeekBarPanel extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mSeekBar = (SeekBar) ViewUtils.$$(this, R.id.seek_bar);
+        setOnApplyWindowInsetsListener(this);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         if (mSeekBar == null) {
@@ -67,9 +71,8 @@ public class SeekBarPanel extends LinearLayout {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    protected boolean fitSystemWindows(Rect insets) {
-        insets.top = 0;
-        return super.fitSystemWindows(insets);
+    public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+        setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+        return insets.consumeSystemWindowInsets();
     }
 }
