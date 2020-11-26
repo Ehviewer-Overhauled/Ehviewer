@@ -72,6 +72,7 @@
         <item name="android:gravity">center</item>
         <item name="android:minHeight">@dimen/category_table_item_height</item>
         <item name="android:foreground">@drawable/check_text_view_foreground</item>
+        <item name="android:theme">@style/Theme.MaterialComponents</item>
     </style>
 
     <style name="TextAppearance.CategoryTitle" parent="TextAppearance.AppCompat.Small">
