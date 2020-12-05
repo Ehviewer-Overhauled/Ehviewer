@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.client;
 
 import android.content.Context;
+import android.util.Base64;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
@@ -76,9 +77,20 @@ public class EhTagDatabase {
 
     public EhTagDatabase(String name, BufferedSource source) throws IOException {
         this.name = name;
-        int totalBytes = source.readInt();
+        String[] tmp;
+        StringBuilder buffer = new StringBuilder();
+        source.readInt();
+        for (String i : source.readUtf8().split("\n")) {
+            tmp = i.split("\r", 2);
+            buffer.append(tmp[0]);
+            buffer.append("\r");
+            buffer.append(new String(Base64.decode(tmp[1], Base64.DEFAULT), TextUrl.UTF_8));
+            buffer.append("\n");
+        }
+        byte[] b = buffer.toString().getBytes(TextUrl.UTF_8);
+        int totalBytes = b.length;
         tags = new byte[totalBytes];
-        source.readFully(tags);
+        System.arraycopy(b, 0, tags, 0, totalBytes);
     }
 
     @Nullable
@@ -415,7 +427,7 @@ public class EhTagDatabase {
         return searchHints;
     }
 
-    private boolean containsIgnoreSpace(String text, String key){
-        return text.replace(" ","").contains(key.replace(" ",""));
+    private boolean containsIgnoreSpace(String text, String key) {
+        return text.replace(" ", "").contains(key.replace(" ", ""));
     }
 }

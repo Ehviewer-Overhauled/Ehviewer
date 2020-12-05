@@ -38,7 +38,7 @@
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/NekoInverter/EhViewer/releases/latest" />
+        app:url="https://gitlab.com/NekoInverter/EhViewer/-/tags" />
 
     <!--<com.hippo.preference.UrlPreference
         android:key="website"
@@ -50,7 +50,7 @@
         android:key="source"
         android:title="@string/settings_about_source"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/NekoInverter/EhViewer" />
+        app:url="https://gitlab.com/NekoInverter/EhViewer" />
 
     <!--<com.hippo.preference.UrlPreference
         android:key="changelog"
