@@ -38,7 +38,7 @@
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
         app:iconSpaceReserved="false"
-        app:url="https://gitlab.com/NekoInverter/EhViewer/-/tags" />
+        app:url="https://install.appcenter.ms/users/nekoinverter/apps/ehviewer/distribution_groups/public" />
 
     <!--<com.hippo.preference.UrlPreference
         android:key="website"
