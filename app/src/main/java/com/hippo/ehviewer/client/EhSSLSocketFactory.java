@@ -24,14 +24,7 @@ public class EhSSLSocketFactory extends SSLSocketFactory {
         InetAddress address = s.getInetAddress();
         Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address.getHostAddress());
         if (autoClose) s.close();
-        if (host.endsWith("e-hentai.org") ||
-                host.endsWith("exhentai.org") ||
-                host.endsWith("ehgt.org") ||
-                host.endsWith("hath.network")) {
-            return getDefault().createSocket(address, port);
-        } else {
-            return getDefault().createSocket(host, port);
-        }
+        return getDefault().createSocket(address, port);
     }
 
     @Override

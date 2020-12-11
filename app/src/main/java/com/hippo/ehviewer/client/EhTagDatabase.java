@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -59,6 +58,7 @@ public class EhTagDatabase {
     private static volatile EhTagDatabase instance;
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
+    private static OkHttpClient client;
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -78,7 +78,7 @@ public class EhTagDatabase {
     public EhTagDatabase(String name, BufferedSource source) throws IOException {
         this.name = name;
         String[] tmp;
-        StringBuilder buffer = new StringBuilder("");
+        StringBuilder buffer = new StringBuilder();
         source.readInt();
         for (String i : source.readUtf8().split("\n")) {
             tmp = i.split("\r", 2);
@@ -95,6 +95,7 @@ public class EhTagDatabase {
         int totalBytes = b.length;
         tags = new byte[totalBytes];
         System.arraycopy(b, 0, tags, 0, totalBytes);
+        client = new OkHttpClient.Builder().build();
     }
 
     @Nullable
@@ -259,8 +260,6 @@ public class EhTagDatabase {
                         FileUtils.delete(dataFile);
                     }
                 }
-
-                OkHttpClient client = EhApplication.getOkHttpClient(EhApplication.getInstance());
 
                 // Save new sha1
                 File tempSha1File = new File(dir, sha1Name + ".tmp");
