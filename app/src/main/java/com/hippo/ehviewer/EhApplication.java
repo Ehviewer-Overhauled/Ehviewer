@@ -42,6 +42,8 @@ import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhDns;
 import com.hippo.ehviewer.client.EhEngine;
+import com.hippo.ehviewer.client.EhSSLSocketFactory;
+import com.hippo.ehviewer.client.EhX509TrustManager;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
@@ -140,6 +142,8 @@ public class EhApplication extends RecordingApplication {
                     .callTimeout(10, TimeUnit.SECONDS)
                     .cookieJar(getEhCookieStore(application))
                     .cache(getOkHttpCache(application))
+                    .sslSocketFactory(new EhSSLSocketFactory(), new EhX509TrustManager())
+                    .hostnameVerifier((hostname, session) -> true)
                     .dns(new EhDns(application))
                     .proxySelector(getEhProxySelector(application))
                     .build();
