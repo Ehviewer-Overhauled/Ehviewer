@@ -74,7 +74,7 @@
 
     <SwitchPreferenceCompat
         android:defaultValue="false"
-        android:key="built_in_hosts"
+        android:key="built_in_hosts_2"
         android:summary="@string/settings_advanced_built_in_hosts_summary"
         android:title="@string/settings_advanced_built_in_hosts_title"
         app:iconSpaceReserved="false" />
