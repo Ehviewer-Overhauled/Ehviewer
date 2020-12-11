@@ -805,4 +805,6 @@
     <string name="settings_e_ink_mode_title">E-Ink mode</string>
     <string name="settings_e_ink_mode_summary">Some optimizations for the ink screen.</string>
     <string name="settings_advanced_clear_memory_cache_done">Memory cache cleaning completed</string>
+    <string name="action_add_tag">Add tag</string>
+    <string name="action_add_tag_tip">Enter new tags, separated with comma</string>
 </resources>

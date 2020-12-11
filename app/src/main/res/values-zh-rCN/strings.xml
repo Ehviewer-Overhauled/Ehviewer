@@ -741,4 +741,6 @@
     <string name="settings_e_ink_mode_title">墨水屏模式</string>
     <string name="settings_e_ink_mode_summary">为墨水屏做一些优化</string>
     <string name="settings_advanced_clear_memory_cache_done">完成内存缓存清理</string>
+    <string name="action_add_tag">添加标签</string>
+    <string name="action_add_tag_tip">添加新标签，用逗号「,」分割</string>
 </resources>

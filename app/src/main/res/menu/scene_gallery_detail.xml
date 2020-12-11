@@ -17,6 +17,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_add_tag"
+        android:title="@string/action_add_tag" />
+
+    <item
         android:id="@+id/action_refresh"
         android:title="@string/refresh" />
 

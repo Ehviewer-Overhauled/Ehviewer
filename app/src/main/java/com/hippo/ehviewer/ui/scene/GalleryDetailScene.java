@@ -37,7 +37,6 @@ import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -55,6 +54,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -65,6 +65,7 @@ import androidx.transition.TransitionInflater;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
+import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
@@ -506,11 +507,11 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
             @Override
             public boolean shouldBlockGesture(MotionEvent ev) {
-                int[] point = new int[] {(int) ev.getX(), (int) ev.getY()};
+                int[] point = new int[]{(int) ev.getX(), (int) ev.getY()};
                 transformPointToViewLocal(point, actionsScrollView);
                 return !isDrawersVisible()
-                    && point[0] > 0 && point[0] < actionsScrollView.getWidth()
-                    && point[1] > 0 && point[1] < actionsScrollView.getHeight();
+                        && point[0] > 0 && point[0] < actionsScrollView.getWidth()
+                        && point[1] > 0 && point[1] < actionsScrollView.getHeight();
             }
         });
 
@@ -1064,26 +1065,33 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         PopupMenu popup = new PopupMenu(context, mOtherActions, Gravity.TOP);
         mPopupMenu = popup;
         popup.getMenuInflater().inflate(R.menu.scene_gallery_detail, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_open_in_other_app:
-                        String url = getGalleryDetailUrl(false);
-                        Activity activity = getActivity2();
-                        if (null != url && null != activity) {
-                            UrlOpener.openUrl(activity, url, false);
-                        }
-                        break;
-                    case R.id.action_refresh:
-                        if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
-                            adjustViewVisibility(STATE_REFRESH, true);
-                            request();
-                        }
-                        break;
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_open_in_other_app) {
+                String url = getGalleryDetailUrl(false);
+                Activity activity = getActivity2();
+                if (null != url && null != activity) {
+                    UrlOpener.openUrl(activity, url, false);
                 }
-                return true;
+            } else if (itemId == R.id.action_refresh) {
+                if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
+                    adjustViewVisibility(STATE_REFRESH, true);
+                    request();
+                }
+            } else if (itemId == R.id.action_add_tag) {
+                if (mGalleryDetail != null) {
+                    EditTextDialogBuilder builder = new EditTextDialogBuilder(context, "", getString(R.string.action_add_tag_tip));
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    AlertDialog dialog = builder.setTitle(R.string.action_add_tag)
+                            .show();
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                            .setOnClickListener(v -> {
+                                voteTag(builder.getText().trim(), 1);
+                                dialog.dismiss();
+                            });
+                }
             }
+            return true;
         });
     }
 
