@@ -99,6 +99,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
         } else if (KEY_CLEAR_MEMORY_CACHE.equals(key)) {
             ((EhApplication) getActivity().getApplication()).clearMemoryCache();
             Runtime.getRuntime().gc();
+            ((SettingsActivity) requireActivity()).showTip(R.string.settings_advanced_clear_memory_cache_done, BaseScene.LENGTH_SHORT);
         } else if (KEY_IMPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);

@@ -740,4 +740,5 @@
     <string name="follow_app">跟随应用</string>
     <string name="settings_e_ink_mode_title">墨水屏模式</string>
     <string name="settings_e_ink_mode_summary">为墨水屏做一些优化</string>
+    <string name="settings_advanced_clear_memory_cache_done">完成内存缓存清理</string>
 </resources>
