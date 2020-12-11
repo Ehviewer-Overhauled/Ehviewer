@@ -58,7 +58,7 @@ public class EhTagDatabase {
     private static volatile EhTagDatabase instance;
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
-    private static OkHttpClient client;
+    private static final OkHttpClient client = new OkHttpClient.Builder().build();
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -95,7 +95,6 @@ public class EhTagDatabase {
         int totalBytes = b.length;
         tags = new byte[totalBytes];
         System.arraycopy(b, 0, tags, 0, totalBytes);
-        client = new OkHttpClient.Builder().build();
     }
 
     @Nullable
@@ -189,7 +188,7 @@ public class EhTagDatabase {
         return equals(s1, s2);
     }
 
-    private static boolean save(OkHttpClient client, String url, File file) {
+    private static boolean save(String url, File file) {
         Request request = new Request.Builder().url(url).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
@@ -263,7 +262,7 @@ public class EhTagDatabase {
 
                 // Save new sha1
                 File tempSha1File = new File(dir, sha1Name + ".tmp");
-                if (!save(client, sha1Url, tempSha1File)) {
+                if (!save(sha1Url, tempSha1File)) {
                     FileUtils.delete(tempSha1File);
                     return;
                 }
@@ -277,7 +276,7 @@ public class EhTagDatabase {
 
                 // Save new data
                 File tempDataFile = new File(dir, dataName + ".tmp");
-                if (!save(client, dataUrl, tempDataFile)) {
+                if (!save(dataUrl, tempDataFile)) {
                     FileUtils.delete(tempDataFile);
                     return;
                 }
@@ -377,7 +376,6 @@ public class EhTagDatabase {
         return searchTag(tags, keyword);
     }
 
-    @Nullable
     private ArrayList<Pair<String, String>> searchTag(byte[] tags, String keyword) {
         ArrayList<Pair<String, String>> searchHints = new ArrayList<>();
         int begin = 0;
