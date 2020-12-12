@@ -1697,8 +1697,9 @@ public final class GalleryListScene extends BaseScene
             if (null == mQuickSearchList) {
                 return;
             }
-            Collections.swap(mQuickSearchList, fromPosition, toPosition);
             EhDB.moveQuickSearch(fromPosition, toPosition);
+            final QuickSearch item = mQuickSearchList.remove(fromPosition);
+            mQuickSearchList.add(toPosition, item);
         }
 
         @Override

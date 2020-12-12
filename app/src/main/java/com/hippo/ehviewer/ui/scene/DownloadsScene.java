@@ -1124,7 +1124,8 @@ public class DownloadsScene extends ToolbarScene
             }
 
             EhApplication.getDownloadManager(context).moveLabel(fromPosition - 1, toPosition - 1);
-            Collections.swap(mLabels, fromPosition, toPosition);
+            final String item = mLabels.remove(fromPosition);
+            mLabels.add(toPosition, item);
         }
 
         @Override
