@@ -19,6 +19,7 @@ package com.hippo.ehviewer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
@@ -287,7 +288,7 @@ public class Settings {
                 putDoH(true);
             }
         }
-        if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
             if ("CN".equals(Locale.getDefault().getCountry())) {
                 putDF(true);
             }
