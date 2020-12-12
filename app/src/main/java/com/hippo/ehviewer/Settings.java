@@ -95,6 +95,7 @@ public class Settings {
     public static final int DEFAULT_READ_CACHE_SIZE = 160;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
     public static final String KEY_DOH = "dns_over_https";
+    public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_APP_LANGUAGE = "app_language";
     private static final String TAG = Settings.class.getSimpleName();
     private static final String KEY_VERSION_CODE = "version_code";
@@ -243,6 +244,7 @@ public class Settings {
     private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
     private static final boolean DEFAULT_DOH = false;
+    private static final boolean DEFAULT_FRONTING = false;
     private static final String DEFAULT_APP_LANGUAGE = "system";
     private static final String KEY_PROXY_TYPE = "proxy_type";
     private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM;
@@ -283,6 +285,11 @@ public class Settings {
         if (!sSettingsPre.contains(KEY_DOH)) {
             if ("CN".equals(Locale.getDefault().getCountry())) {
                 putDoH(true);
+            }
+        }
+        if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
+            if ("CN".equals(Locale.getDefault().getCountry())) {
+                putDF(true);
             }
         }
         // Enable show tag translations if the country is CN
@@ -1054,6 +1061,14 @@ public class Settings {
 
     public static void putDoH(boolean value) {
         putBoolean(KEY_DOH, value);
+    }
+
+    public static boolean getDF() {
+        return getBoolean(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING);
+    }
+
+    public static void putDF(boolean value) {
+        putBoolean(KEY_DOMAIN_FRONTING, value);
     }
 
     public static String getAppLanguage() {
