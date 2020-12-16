@@ -151,21 +151,19 @@ public class EhApplication extends RecordingApplication {
                     .hostnameVerifier((hostname, session) -> true)
                     .dns(new EhDns(application))
                     .proxySelector(getEhProxySelector(application));
-            if (Settings.getDF()) {
-                try {
-                    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
-                            TrustManagerFactory.getDefaultAlgorithm());
-                    trustManagerFactory.init((KeyStore) null);
-                    TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-                    if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-                        throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
-                    }
-                    X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
-                    builder.sslSocketFactory(new EhSSLSocketFactory(), trustManager);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    builder.sslSocketFactory(new EhSSLSocketFactory(), new EhX509TrustManager());
+            try {
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                        TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init((KeyStore) null);
+                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                    throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
                 }
+                X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
+                builder.sslSocketFactory(new EhSSLSocketFactory(), trustManager);
+            } catch (Exception e) {
+                e.printStackTrace();
+                builder.sslSocketFactory(new EhSSLSocketFactory(), new EhX509TrustManager());
             }
             application.mOkHttpClient = builder.build();
         }

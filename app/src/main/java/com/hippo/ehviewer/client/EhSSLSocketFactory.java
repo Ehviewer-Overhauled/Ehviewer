@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class EhSSLSocketFactory extends SSLSocketFactory {
@@ -27,9 +29,12 @@ public class EhSSLSocketFactory extends SSLSocketFactory {
             return ((SSLSocketFactory) getDefault()).createSocket(s, host, port, autoClose);
         }
         InetAddress address = s.getInetAddress();
-        Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address.getHostAddress());
         if (autoClose) s.close();
-        return getDefault().createSocket(address, port);
+        SSLSocket socket = (SSLSocket) getDefault().createSocket(address, port);
+        SSLSession sslSession = socket.getSession();
+        Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address.getHostAddress() + " Protocol:" + sslSession.getProtocol() + " CipherSuite:" + sslSession.getCipherSuite());
+        socket.setEnabledProtocols(socket.getSupportedProtocols());
+        return socket;
     }
 
     @Override
