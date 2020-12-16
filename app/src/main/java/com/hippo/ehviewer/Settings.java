@@ -288,7 +288,7 @@ public class Settings {
                 putDoH(true);
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
+        if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
             if ("CN".equals(Locale.getDefault().getCountry())) {
                 putDF(true);
             }
