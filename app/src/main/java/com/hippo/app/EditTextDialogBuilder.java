@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,10 +34,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.R;
 
-public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements EditText.OnEditorActionListener {
+public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements EditText.OnEditorActionListener, DialogInterface.OnDismissListener {
 
     private final TextInputLayout mTextInputLayout;
     private final EditText mEditText;
+    private final InputMethodManager mInputMethodManager;
     private AlertDialog mDialog;
 
     @SuppressLint("InflateParams")
@@ -50,6 +52,7 @@ public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements
         mEditText.setSelection(mEditText.getText().length());
         mEditText.setOnEditorActionListener(this);
         mTextInputLayout.setHint(hint);
+        mInputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     public EditText getEditText() {
@@ -68,6 +71,7 @@ public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements
     @Override
     public AlertDialog create() {
         mDialog = super.create();
+        mDialog.setOnDismissListener(this);
         return mDialog;
     }
 
@@ -82,5 +86,10 @@ public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        mInputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 }
