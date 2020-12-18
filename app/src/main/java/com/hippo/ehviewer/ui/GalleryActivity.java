@@ -72,7 +72,6 @@ import com.hippo.ehviewer.gallery.GalleryProvider2;
 import com.hippo.ehviewer.widget.GalleryGuideView;
 import com.hippo.ehviewer.widget.GalleryHeader;
 import com.hippo.ehviewer.widget.ReversibleSeekBar;
-import com.hippo.glgallery.GalleryPageView;
 import com.hippo.glgallery.GalleryProvider;
 import com.hippo.glgallery.GalleryView;
 import com.hippo.glgallery.SimpleAdapter;
@@ -241,7 +240,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(KEY_ACTION, mAction);
         outState.putString(KEY_FILENAME, mFilename);
@@ -353,7 +352,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
         mSize = mGalleryProvider.size();
         mCurrentIndex = startPage;
-        mLayoutMode = mGalleryView.getLayoutMode();
+        if (mGalleryView != null) {
+            mLayoutMode = mGalleryView.getLayoutMode();
+        }
         updateSlider();
 
         // Update keep screen on
@@ -545,14 +546,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         return super.onKeyUp(keyCode, event);
-    }
-
-    private GalleryPageView findPageByIndex(int index) {
-        if (mGalleryView != null) {
-            return mGalleryView.findPageByIndex(index);
-        } else {
-            return null;
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -882,30 +875,37 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
                 Uri uri = resultData.getData();
-                grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                String filepath = getCacheDir() + "/" + mCacheFileName;
-                File cachefile = new File(filepath);
+                if (uri != null) {
+                    try {
+                        // grantUriPermission might throw RemoteException on MIUI
+                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    } catch (Exception e) {
+                        ExceptionUtils.throwIfFatal(e);
+                        e.printStackTrace();
+                    }
+                    String filepath = getCacheDir() + "/" + mCacheFileName;
+                    File cachefile = new File(filepath);
 
-                InputStream is = null;
-                OutputStream os = null;
-                ContentResolver resolver = getContentResolver();
+                    InputStream is = null;
+                    OutputStream os = null;
+                    ContentResolver resolver = getContentResolver();
 
-                try {
-                    is = new FileInputStream(cachefile);
-                    os = resolver.openOutputStream(uri);
-                    IOUtils.copy(is, os);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    IOUtils.closeQuietly(is);
-                    IOUtils.closeQuietly(os);
+                    try {
+                        is = new FileInputStream(cachefile);
+                        os = resolver.openOutputStream(uri);
+                        IOUtils.copy(is, os);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        IOUtils.closeQuietly(is);
+                        IOUtils.closeQuietly(os);
+                    }
+
+                    //noinspection ResultOfMethodCallIgnored
+                    cachefile.delete();
+
+                    Toast.makeText(this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show();
                 }
-
-                cachefile.delete();
-
-                Toast.makeText(this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show();
-                // Sync media store
-                //sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
             }
         }
     }
@@ -926,28 +926,25 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     private void pageDialogListener(AlertDialog.Builder builder, CharSequence[] items, int page) {
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (mGalleryProvider == null) {
-                    return;
-                }
+        builder.setItems(items, (dialog, which) -> {
+            if (mGalleryProvider == null) {
+                return;
+            }
 
-                switch (which) {
-                    case 0: // Refresh
-                        mGalleryProvider.removeCache(page);
-                        mGalleryProvider.forceRequest(page);
-                        break;
-                    case 1: // Share
-                        shareImage(page);
-                        break;
-                    case 2: // Save
-                        saveImage(page);
-                        break;
-                    case 3: // Save to
-                        saveImageTo(page);
-                        break;
-                }
+            switch (which) {
+                case 0: // Refresh
+                    mGalleryProvider.removeCache(page);
+                    mGalleryProvider.forceRequest(page);
+                    break;
+                case 1: // Share
+                    shareImage(page);
+                    break;
+                case 2: // Save
+                    saveImage(page);
+                    break;
+                case 3: // Save to
+                    saveImageTo(page);
+                    break;
             }
         });
     }
