@@ -9,9 +9,7 @@ import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.biometric.BiometricManager;
-import androidx.fragment.app.Fragment;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -19,7 +17,7 @@ import com.hippo.widget.lockpattern.LockPatternUtils;
 import com.hippo.widget.lockpattern.LockPatternView;
 import com.hippo.yorozuya.ViewUtils;
 
-public class SetSecurityFragment extends Fragment implements View.OnClickListener {
+public class SetSecurityFragment extends BaseFragment implements View.OnClickListener {
 
     @Nullable
     private LockPatternView mPatternView;
@@ -81,9 +79,5 @@ public class SetSecurityFragment extends Fragment implements View.OnClickListene
             }
             requireActivity().onBackPressed();
         }
-    }
-
-    public void setTitle(@StringRes int string) {
-        requireActivity().setTitle(string);
     }
 }

@@ -1,49 +1,33 @@
-/*
- * Copyright 2018 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.hippo.ehviewer.ui;
-
-/*
- * Created by Hippo on 2018/2/9.
- */
+package com.hippo.ehviewer.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.ehviewer.widget.DialogWebChromeClient;
 import com.hippo.widget.ProgressView;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
-public class UConfigActivity extends ToolbarActivity {
+public class UConfigFragment extends BaseFragment {
 
     private WebView webView;
     private ProgressView progress;
@@ -51,9 +35,31 @@ public class UConfigActivity extends ToolbarActivity {
     private boolean loaded;
 
     @SuppressLint("SetJavaScriptEnabled")
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_webview, container, false);
+        setTitle(R.string.u_config);
+        webView = view.findViewById(R.id.webview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new UConfigWebViewClient());
+        webView.setWebChromeClient(new DialogWebChromeClient(requireContext()));
+        progress = view.findViewById(R.id.progress);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        progress.setVisibility(View.VISIBLE);
+        webView.loadUrl(url);
+        showTip(R.string.apply_tip, BaseScene.LENGTH_LONG);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
         CookieManager cookieManager = CookieManager.getInstance();
@@ -64,22 +70,10 @@ public class UConfigActivity extends ToolbarActivity {
 
         // Copy cookies from okhttp cookie store to CookieManager
         url = EhUrl.getUConfigUrl();
-        EhCookieStore store = EhApplication.getEhCookieStore(this);
+        EhCookieStore store = EhApplication.getEhCookieStore(requireContext());
         for (Cookie cookie : store.getCookies(HttpUrl.parse(url))) {
             cookieManager.setCookie(url, cookie.toString());
         }
-
-        setContentView(R.layout.activity_webview);
-        setTitle(R.string.u_config);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        webView = findViewById(R.id.webview);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new UConfigWebViewClient());
-        webView.setWebChromeClient(new DialogWebChromeClient(this));
-        webView.loadUrl(url);
-        progress = findViewById(R.id.progress);
-
-        Snackbar.make(webView, R.string.apply_tip, Snackbar.LENGTH_LONG).show();
     }
 
     private void apply() {
@@ -91,26 +85,20 @@ public class UConfigActivity extends ToolbarActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.activity_u_config, menu);
-        return true;
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.activity_u_config, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_apply:
-                if (loaded) {
-                    apply();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_apply) {
+            if (loaded) {
+                apply();
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private Cookie longLive(Cookie cookie) {
@@ -124,8 +112,8 @@ public class UConfigActivity extends ToolbarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         webView.destroy();
 
         // Put cookies back to okhttp cookie store
@@ -133,9 +121,12 @@ public class UConfigActivity extends ToolbarActivity {
         String cookiesString = cookieManager.getCookie(url);
 
         if (cookiesString != null && !cookiesString.isEmpty()) {
-            EhCookieStore store = EhApplication.getEhCookieStore(this);
+            EhCookieStore store = EhApplication.getEhCookieStore(requireContext());
             HttpUrl eUrl = HttpUrl.parse(EhUrl.HOST_E);
             HttpUrl exUrl = HttpUrl.parse(EhUrl.HOST_EX);
+            if (eUrl == null || exUrl == null) {
+                return;
+            }
 
             // The cookies saved in the uconfig page should be shared between e and ex
             for (String header : cookiesString.split(";")) {

@@ -27,12 +27,11 @@ import androidx.preference.Preference;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 
-public class DownloadFragment extends BaseSettingsFragment {
+public class DownloadFragment extends BasePreferenceFragment {
 
     public static final int REQUEST_CODE_PICK_IMAGE_DIR_L = 1;
 
@@ -95,7 +94,7 @@ public class DownloadFragment extends BaseSettingsFragment {
             startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+            showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
         }
     }
 
@@ -113,7 +112,7 @@ public class DownloadFragment extends BaseSettingsFragment {
                             Settings.putDownloadLocation(uniFile);
                             onUpdateDownloadLocation();
                         } else {
-                            ((SettingsActivity) requireActivity()).showTip(R.string.settings_download_cant_get_download_location,
+                            showTip(R.string.settings_download_cant_get_download_location,
                                     BaseScene.LENGTH_SHORT);
                         }
                     }

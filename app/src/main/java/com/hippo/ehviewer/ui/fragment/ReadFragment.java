@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.R;
 
-public class ReadFragment extends BaseSettingsFragment {
+public class ReadFragment extends BasePreferenceFragment {
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {

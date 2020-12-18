@@ -17,9 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +39,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
 
-public class FilterFragment extends Fragment {
+public class FilterFragment extends BaseFragment {
 
     @Nullable
     private ViewTransition mViewTransition;
@@ -452,7 +450,4 @@ public class FilterFragment extends Fragment {
         }
     }
 
-    public void setTitle(@StringRes int string) {
-        requireActivity().setTitle(string);
-    }
 }

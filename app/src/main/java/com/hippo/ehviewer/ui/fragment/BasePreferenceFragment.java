@@ -6,9 +6,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.preference.Preference;
 
+import com.hippo.ehviewer.ui.SettingsActivity;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-public class BaseSettingsFragment extends PreferenceFragmentCompat
+public class BasePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -27,5 +28,13 @@ public class BaseSettingsFragment extends PreferenceFragmentCompat
 
     public void setTitle(@StringRes int string) {
         requireActivity().setTitle(string);
+    }
+
+    public void showTip(@StringRes int id, int length) {
+        ((SettingsActivity) requireActivity()).showTip(getString(id), length);
+    }
+
+    public void showTip(CharSequence message, int length) {
+        ((SettingsActivity) requireActivity()).showTip(message, length);
     }
 }

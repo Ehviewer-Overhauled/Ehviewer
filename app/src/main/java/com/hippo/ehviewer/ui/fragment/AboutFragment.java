@@ -28,7 +28,7 @@ import com.hippo.ehviewer.R;
 import com.hippo.util.AppHelper;
 import com.microsoft.appcenter.distribute.Distribute;
 
-public class AboutFragment extends BaseSettingsFragment {
+public class AboutFragment extends BasePreferenceFragment {
 
     private static final String KEY_AUTHOR = "author";
     //private static final String KEY_DONATE = "donate";

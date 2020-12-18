@@ -11,10 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +31,7 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.List;
 import java.util.Locale;
 
-public class HostsFragment extends Fragment
+public class HostsFragment extends BaseFragment
         implements View.OnClickListener {
 
     private static final String DIALOG_TAG_ADD_HOST = AddHostDialogFragment.class.getName();
@@ -83,8 +81,6 @@ public class HostsFragment extends Fragment
                 recyclerView.getPaddingBottom() + getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab));
 
         fab.setOnClickListener(this);
-
-        updateView(false);
 
         return view;
     }
@@ -276,7 +272,4 @@ public class HostsFragment extends Fragment
         }
     }
 
-    public void setTitle(@StringRes int string) {
-        requireActivity().setTitle(string);
-    }
 }

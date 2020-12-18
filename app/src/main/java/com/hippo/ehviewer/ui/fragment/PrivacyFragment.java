@@ -14,7 +14,7 @@ import com.hippo.ehviewer.Settings;
  * Created by Mo10 on 2018/2/10.
  */
 
-public class PrivacyFragment extends BaseSettingsFragment {
+public class PrivacyFragment extends BasePreferenceFragment {
     private static final String KEY_PATTERN_PROTECTION = "pattern_protection";
 
     @Override

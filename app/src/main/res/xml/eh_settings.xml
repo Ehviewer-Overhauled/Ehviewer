@@ -38,18 +38,18 @@
         app:entryValues="@array/gallery_site_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.preference.SignInRequiredActivityPreference
+    <com.hippo.ehviewer.preference.SignInRequiredPreference
         android:key="u_config"
         android:summary="@string/settings_u_config_summary"
         android:title="@string/settings_u_config"
-        app:activity="com.hippo.ehviewer.ui.UConfigActivity"
+        android:fragment="com.hippo.ehviewer.ui.fragment.UConfigFragment"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.preference.SignInRequiredActivityPreference
+    <com.hippo.ehviewer.preference.SignInRequiredPreference
         android:key="my_tags"
         android:summary="@string/settings_my_tags_summary"
         android:title="@string/settings_my_tags"
-        app:activity="com.hippo.ehviewer.ui.MyTagsActivity"
+        android:fragment="com.hippo.ehviewer.ui.fragment.MyTagsFragment"
         app:iconSpaceReserved="false" />
 
     <com.takisoft.preferencex.SimpleMenuPreference

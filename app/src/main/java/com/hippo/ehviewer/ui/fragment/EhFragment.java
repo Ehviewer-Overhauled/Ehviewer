@@ -29,7 +29,7 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
 
-public class EhFragment extends BaseSettingsFragment {
+public class EhFragment extends BasePreferenceFragment {
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {

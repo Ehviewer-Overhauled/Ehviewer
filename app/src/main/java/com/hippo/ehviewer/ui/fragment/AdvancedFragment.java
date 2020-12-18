@@ -33,7 +33,6 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.LogCat;
@@ -50,7 +49,7 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class AdvancedFragment extends BaseSettingsFragment {
+public class AdvancedFragment extends BasePreferenceFragment {
 
     private static final int REQUEST_CODE_EXPORT = 1;
     private static final int REQUEST_CODE_IMPORT = 2;
@@ -93,13 +92,13 @@ public class AdvancedFragment extends BaseSettingsFragment {
                 startActivityForResult(intent, REQUEST_DUMP_LOGCAT);
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
-                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
             }
             return true;
         } else if (KEY_CLEAR_MEMORY_CACHE.equals(key)) {
             ((EhApplication) getActivity().getApplication()).clearMemoryCache();
             Runtime.getRuntime().gc();
-            ((SettingsActivity) requireActivity()).showTip(R.string.settings_advanced_clear_memory_cache_done, BaseScene.LENGTH_SHORT);
+            showTip(R.string.settings_advanced_clear_memory_cache_done, BaseScene.LENGTH_SHORT);
         } else if (KEY_IMPORT_DATA.equals(key)) {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -109,7 +108,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                 startActivityForResult(intent, REQUEST_CODE_IMPORT);
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
-                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
             }
             return true;
         } else if (KEY_EXPORT_DATA.equals(key)) {
@@ -122,7 +121,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                 startActivityForResult(intent, REQUEST_CODE_EXPORT);
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
-                ((SettingsActivity) requireActivity()).showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
             }
             return true;
         }
@@ -156,7 +155,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                                 if (alertDialog.isShowing()) {
                                     alertDialog.dismiss();
                                 }
-                                ((SettingsActivity) requireActivity()).showTip(
+                                showTip(
                                         (success)
                                                 ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
                                                 : GetText.getString(R.string.settings_advanced_export_data_failed),
@@ -164,7 +163,7 @@ public class AdvancedFragment extends BaseSettingsFragment {
                             });
                         }).start();
                     } catch (Exception e) {
-                        ((SettingsActivity) requireActivity()).showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
+                        showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
                     }
                 }
             }
@@ -191,14 +190,14 @@ public class AdvancedFragment extends BaseSettingsFragment {
                                     alertDialog.dismiss();
                                 }
                                 if (null == error) {
-                                    ((SettingsActivity) requireActivity()).showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
+                                    showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
                                 } else {
-                                    ((SettingsActivity) requireActivity()).showTip(error, BaseScene.LENGTH_SHORT);
+                                    showTip(error, BaseScene.LENGTH_SHORT);
                                 }
                             });
                         }).start();
                     } catch (Exception e) {
-                        ((SettingsActivity) requireActivity()).showTip(e.getLocalizedMessage(), BaseScene.LENGTH_SHORT);
+                        showTip(e.getLocalizedMessage(), BaseScene.LENGTH_SHORT);
                     }
                 }
             }
@@ -276,11 +275,11 @@ public class AdvancedFragment extends BaseSettingsFragment {
                         if (!finished) {
                             finished = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
                         }
-                        ((SettingsActivity) requireActivity()).showTip(
+                        showTip(
                                 finished ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
                                         getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
                     } catch (Exception e) {
-                        ((SettingsActivity) requireActivity()).showTip(getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
+                        showTip(getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
                     }
                 }
             }
