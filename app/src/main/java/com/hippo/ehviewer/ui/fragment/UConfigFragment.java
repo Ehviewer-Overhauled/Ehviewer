@@ -43,6 +43,8 @@ public class UConfigFragment extends BaseFragment {
         setTitle(R.string.u_config);
         webView = view.findViewById(R.id.webview);
         webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new UConfigWebViewClient());
         webView.setWebChromeClient(new DialogWebChromeClient(requireContext()));
