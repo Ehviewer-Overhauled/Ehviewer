@@ -103,7 +103,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         Resources resources = context.getResources();
         mInflater = LayoutInflater.from(context);
 
-        mLayoutManager = new LinearLayoutManager(context);
+        mLayoutManager = new SearchLayoutManager(context);
         mAdapter = new SearchAdapter();
         setLayoutManager(mLayoutManager);
         setAdapter(mAdapter);
@@ -380,6 +380,22 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         public void onBindViewHolder(SimpleHolder holder, int position) {
             if (holder.getItemViewType() == ITEM_TYPE_ACTION) {
                 mAction.selectTab(mAction.getTabAt(mSearchMode));
+            }
+        }
+    }
+
+    static class SearchLayoutManager extends LinearLayoutManager {
+
+        public SearchLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
             }
         }
     }
