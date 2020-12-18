@@ -13,6 +13,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
@@ -36,6 +37,7 @@ public class MyTagsFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.activity_webview, container, false);
         setTitle(R.string.my_tags);
         webView = view.findViewById(R.id.webview);
+        webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new MyTagsWebViewClient());
         webView.setWebChromeClient(new DialogWebChromeClient(requireContext()));
