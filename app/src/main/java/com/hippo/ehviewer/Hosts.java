@@ -35,6 +35,7 @@ import com.hippo.util.SqlUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Hosts {
@@ -46,11 +47,10 @@ public class Hosts {
 
     private static final int DB_VERSION = VERSION_1;
 
-    private final SQLiteOpenHelper helper;
     private final SQLiteDatabase db;
 
     public Hosts(Context context, String name) {
-        helper = new MSQLiteBuilder()
+        SQLiteOpenHelper helper = new MSQLiteBuilder()
                 .version(VERSION_1)
                 .createTable(TABLE_HOSTS)
                 .insertColumn(TABLE_HOSTS, COLUMN_HOST, String.class)
@@ -120,8 +120,16 @@ public class Hosts {
     /**
      * Returns true if the ip is valid.
      */
-    public static boolean isValidIp(String ip) {
-        return ip != null && (parseV4(ip) != null || parseV6(ip) != null);
+    public static boolean isValidIp(String ip_list) {
+        if (ip_list == null) {
+            return false;
+        }
+        for (String ip: ip_list.split("\\+")) {
+            if (parseV4(ip) == null && parseV6(ip) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // org.xbill.DNS.Address.parseV4
@@ -265,30 +273,27 @@ public class Hosts {
      * Gets a InetAddress with the host.
      */
     @Nullable
-    public InetAddress get(String host) {
+    public List<InetAddress> get(String host) {
         if (!isValidHost(host)) {
             return null;
         }
-
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host});
-        try {
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
             if (cursor.moveToNext()) {
-                String ip = SqlUtils.getString(cursor, COLUMN_IP, null);
-                return toInetAddress(host, ip);
+                String[] ip_l = SqlUtils.getString(cursor, COLUMN_IP, null).split("\\+");
+                InetAddress[] addr_l = new InetAddress[ip_l.length];
+                for (int i = 0; i < ip_l.length; i++) {
+                    addr_l[i] = toInetAddress(host, ip_l[i]);
+                }
+                return Arrays.asList(addr_l);
             } else {
                 return null;
             }
-        } finally {
-            cursor.close();
         }
     }
 
     private boolean contains(String host) {
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host});
-        try {
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
             return cursor.moveToNext();
-        } finally {
-            cursor.close();
         }
     }
 
@@ -326,23 +331,13 @@ public class Hosts {
     public List<Pair<String, String>> getAll() {
         List<Pair<String, String>> result = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + ";", null);
-        try {
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + ";", null)) {
             while (cursor.moveToNext()) {
                 String host = SqlUtils.getString(cursor, COLUMN_HOST, null);
                 String ip = SqlUtils.getString(cursor, COLUMN_IP, null);
-
-                InetAddress inetAddress = toInetAddress(host, ip);
-                if (inetAddress == null) {
-                    continue;
-                }
-
                 result.add(new Pair<>(host, ip));
             }
-        } finally {
-            cursor.close();
         }
-
         return result;
     }
 }

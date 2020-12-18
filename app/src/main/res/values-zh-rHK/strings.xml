@@ -387,7 +387,7 @@
     <string name="hosts">自定義 hosts.txt</string>
     <string name="hosts_tip">hosts.txt</string>
     <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP</string>
+    <string name="hosts_ip">IP1(+IP2+IP3...)</string>
     <string name="add_host">添加 host</string>
     <string name="add_host_add">添加</string>
     <string name="edit_host">編輯 host</string>
