@@ -157,20 +157,20 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
     }
 
     private void updateSuggestions(boolean scrollToTop) {
-        mSuggestionList.clear();
+        List<Suggestion> suggestions = new ArrayList<>();
 
         String text = mEditText.getText().toString();
 
         if (mSuggestionProvider != null) {
-            List<Suggestion> suggestions = mSuggestionProvider.providerSuggestions(text);
-            if (suggestions != null && !suggestions.isEmpty()) {
-                mSuggestionList.addAll(suggestions);
+            List<Suggestion> providerSuggestions = mSuggestionProvider.providerSuggestions(text);
+            if (providerSuggestions != null && !providerSuggestions.isEmpty()) {
+                suggestions.addAll(providerSuggestions);
             }
         }
 
         String[] keywords = mSearchDatabase.getSuggestions(text, 128);
         for (String keyword : keywords) {
-            mSuggestionList.add(new KeywordSuggestion(keyword));
+            suggestions.add(new KeywordSuggestion(keyword));
         }
 
         EhTagDatabase ehTagDatabase = EhTagDatabase.getInstance(getContext());
@@ -181,12 +181,13 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
                 ArrayList<Pair<String, String>> searchHints = ehTagDatabase.suggest(keyword);
 
                 for (Pair<String, String> searchHint : searchHints) {
-                    mSuggestionList.add(new TagSuggestion(searchHint.first, searchHint.second));
+                    suggestions.add(new TagSuggestion(searchHint.first, searchHint.second));
                 }
 
             }
         }
 
+        mSuggestionList = suggestions;
         mSuggestionAdapter.notifyDataSetChanged();
 
         if (scrollToTop) {
