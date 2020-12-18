@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.hippo.android.resource.AttrResources;
@@ -60,7 +61,10 @@ public final class UrlOpener {
 
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
         customTabsIntent.setShowTitle(true);
-        customTabsIntent.setToolbarColor(AttrResources.getAttrColor(context, R.attr.colorPrimary));
+        CustomTabColorSchemeParams darkParams = new CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(AttrResources.getAttrColor(context, R.attr.colorPrimary))
+                .build();
+        customTabsIntent.setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_LIGHT, darkParams);
         try {
             customTabsIntent.build().launchUrl(context, uri);
         } catch (ActivityNotFoundException e) {

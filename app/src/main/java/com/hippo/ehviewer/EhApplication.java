@@ -275,7 +275,7 @@ public class EhApplication extends RecordingApplication {
 
     @NonNull
     public static String getDeveloperEmail() {
-        return "ehviewersu$gmail.com".replace('$', '@');
+        return "nekoworkshop$protonmail.com".replace('$', '@');
     }
 
     @SuppressLint("StaticFieldLeak")
