@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -58,7 +59,6 @@ public class EhTagDatabase {
     private static volatile EhTagDatabase instance;
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
-    private static final OkHttpClient client = new OkHttpClient.Builder().build();
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -188,7 +188,7 @@ public class EhTagDatabase {
         return equals(s1, s2);
     }
 
-    private static boolean save(String url, File file) {
+    private static boolean save(OkHttpClient client, String url, File file) {
         Request request = new Request.Builder().url(url).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
@@ -221,9 +221,9 @@ public class EhTagDatabase {
         }
 
         String sha1Name = urls[0];
-        String sha1Url = urls[1] + "?_t=" + System.currentTimeMillis();
+        String sha1Url = urls[1];
         String dataName = urls[2];
-        String dataUrl = urls[3] + "?_t=" + System.currentTimeMillis();
+        String dataUrl = urls[3];
 
         // Clear tags if name if different
         EhTagDatabase tmp = instance;
@@ -260,9 +260,11 @@ public class EhTagDatabase {
                     }
                 }
 
+                OkHttpClient client = EhApplication.getOkHttpClient(context);
+
                 // Save new sha1
                 File tempSha1File = new File(dir, sha1Name + ".tmp");
-                if (!save(sha1Url, tempSha1File)) {
+                if (!save(client, sha1Url, tempSha1File)) {
                     FileUtils.delete(tempSha1File);
                     return;
                 }
@@ -276,7 +278,7 @@ public class EhTagDatabase {
 
                 // Save new data
                 File tempDataFile = new File(dir, dataName + ".tmp");
-                if (!save(dataUrl, tempDataFile)) {
+                if (!save(client, dataUrl, tempDataFile)) {
                     FileUtils.delete(tempDataFile);
                     return;
                 }
