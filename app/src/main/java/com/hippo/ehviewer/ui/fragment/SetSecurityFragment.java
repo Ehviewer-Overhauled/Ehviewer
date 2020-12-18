@@ -1,29 +1,17 @@
-/*
- * Copyright 2016 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.hippo.ehviewer.ui;
+package com.hippo.ehviewer.ui.fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.biometric.BiometricManager;
+import androidx.fragment.app.Fragment;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -31,7 +19,7 @@ import com.hippo.widget.lockpattern.LockPatternUtils;
 import com.hippo.widget.lockpattern.LockPatternView;
 import com.hippo.yorozuya.ViewUtils;
 
-public class SetSecurityActivity extends ToolbarActivity implements View.OnClickListener {
+public class SetSecurityFragment extends Fragment implements View.OnClickListener {
 
     @Nullable
     private LockPatternView mPatternView;
@@ -42,17 +30,16 @@ public class SetSecurityActivity extends ToolbarActivity implements View.OnClick
     @Nullable
     private CheckBox mFingerprint;
 
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_set_security);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_set_security, container, false);
         setTitle(R.string.set_pattern_protection);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
 
-        mPatternView = (LockPatternView) ViewUtils.$$(this, R.id.pattern_view);
-        mCancel = ViewUtils.$$(this, R.id.cancel);
-        mSet = ViewUtils.$$(this, R.id.set);
-        mFingerprint = (CheckBox) ViewUtils.$$(this, R.id.fingerprint_checkbox);
+        mPatternView = (LockPatternView) ViewUtils.$$(view, R.id.pattern_view);
+        mCancel = ViewUtils.$$(view, R.id.cancel);
+        mSet = ViewUtils.$$(view, R.id.set);
+        mFingerprint = (CheckBox) ViewUtils.$$(view, R.id.fingerprint_checkbox);
 
         String pattern = Settings.getSecurity();
         if (!TextUtils.isEmpty(pattern)) {
@@ -60,36 +47,26 @@ public class SetSecurityActivity extends ToolbarActivity implements View.OnClick
                     LockPatternUtils.stringToPattern(pattern));
         }
 
-        if (BiometricManager.from(this).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+        if (BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
             mFingerprint.setVisibility(View.VISIBLE);
             mFingerprint.setChecked(Settings.getEnableFingerprint());
         }
 
         mCancel.setOnClickListener(this);
         mSet.setOnClickListener(this);
+        return view;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         mPatternView = null;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
     public void onClick(View v) {
         if (v == mCancel) {
-            finish();
+            requireActivity().onBackPressed();
         } else if (v == mSet) {
             if (null != mPatternView && null != mFingerprint) {
                 String security;
@@ -102,7 +79,11 @@ public class SetSecurityActivity extends ToolbarActivity implements View.OnClick
                 Settings.putEnableFingerprint(mFingerprint.getVisibility() == View.VISIBLE &&
                         mFingerprint.isChecked() && !security.isEmpty());
             }
-            finish();
+            requireActivity().onBackPressed();
         }
+    }
+
+    public void setTitle(@StringRes int string) {
+        requireActivity().setTitle(string);
     }
 }

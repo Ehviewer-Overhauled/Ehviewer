@@ -1,39 +1,20 @@
-/*
- * Copyright 2018 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.hippo.ehviewer.ui;
-
-/*
- * Created by Hippo on 2018/3/23.
- */
+package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,14 +32,14 @@ import com.hippo.yorozuya.LayoutUtils;
 import java.util.List;
 import java.util.Locale;
 
-public class HostsActivity extends ToolbarActivity
+public class HostsFragment extends Fragment
         implements View.OnClickListener {
 
     private static final String DIALOG_TAG_ADD_HOST = AddHostDialogFragment.class.getName();
     private static final String DIALOG_TAG_EDIT_HOST = EditHostDialogFragment.class.getName();
 
-    private static final String KEY_HOST = "com.hippo.ehviewer.ui.HostsActivity.HOST";
-    private static final String KEY_IP = "com.hippo.ehviewer.ui.HostsActivity.IP";
+    private static final String KEY_HOST = "com.hippo.ehviewer.ui.fragment.HostsFragment.HOST";
+    private static final String KEY_IP = "com.hippo.ehviewer.ui.fragment.HostsFragment.IP";
 
     private Hosts hosts;
     private List<Pair<String, String>> data;
@@ -68,31 +49,32 @@ public class HostsActivity extends ToolbarActivity
     private HostsAdapter adapter;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        hosts = EhApplication.getHosts(this);
+        hosts = EhApplication.getHosts(requireContext());
         data = hosts.getAll();
+    }
 
-        setContentView(R.layout.activity_hosts);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_hosts, container, false);
         setTitle(R.string.hosts);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        recyclerView = findViewById(R.id.recycler_view);
-        tip = findViewById(R.id.tip);
-        FloatingActionButton fab = findViewById(R.id.fab);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        tip = view.findViewById(R.id.tip);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
 
         adapter = new HostsAdapter();
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(this, R.attr.dividerColor),
-                LayoutUtils.dp2pix(this, 1));
+                AttrResources.getAttrColor(requireActivity(), R.attr.dividerColor),
+                LayoutUtils.dp2pix(requireActivity(), 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);
-        //recyclerView.setSelector(Ripple.generateRippleDrawable(this, !AttrResources.getAttrBoolean(this, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         recyclerView.setHasFixedSize(true);
-        //recyclerView.setOnItemClickListener(this);
         recyclerView.setPadding(
                 recyclerView.getPaddingLeft(),
                 recyclerView.getPaddingTop(),
@@ -103,17 +85,8 @@ public class HostsActivity extends ToolbarActivity
 
         recyclerView.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
         tip.setVisibility(data.isEmpty() ? View.VISIBLE : View.GONE);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return view;
     }
 
     public boolean onItemClick(int position) {
@@ -124,14 +97,14 @@ public class HostsActivity extends ToolbarActivity
 
         DialogFragment fragment = new EditHostDialogFragment();
         fragment.setArguments(args);
-        fragment.show(getSupportFragmentManager(), DIALOG_TAG_EDIT_HOST);
+        fragment.show(getChildFragmentManager(), DIALOG_TAG_EDIT_HOST);
 
         return true;
     }
 
     @Override
     public void onClick(View v) {
-        new AddHostDialogFragment().show(getSupportFragmentManager(), DIALOG_TAG_ADD_HOST);
+        new AddHostDialogFragment().show(getChildFragmentManager(), DIALOG_TAG_ADD_HOST);
     }
 
     private void notifyHostsChanges() {
@@ -143,15 +116,15 @@ public class HostsActivity extends ToolbarActivity
 
     public abstract static class HostDialogFragment extends DialogFragment {
 
-        private TextView host;
-        private TextView ip;
+        private HostsFragment hostsFragment;
 
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_hosts, null, false);
-            host = view.findViewById(R.id.host);
-            ip = view.findViewById(R.id.ip);
+            hostsFragment = (HostsFragment) getParentFragment();
+            View view = getLayoutInflater().inflate(R.layout.dialog_hosts, null, false);
+            TextView host = view.findViewById(R.id.host);
+            TextView ip = view.findViewById(R.id.ip);
 
             Bundle arguments = getArguments();
             if (savedInstanceState == null && arguments != null) {
@@ -174,35 +147,45 @@ public class HostsActivity extends ToolbarActivity
         protected void put(AlertDialog dialog) {
             TextView host = dialog.findViewById(R.id.host);
             TextView ip = dialog.findViewById(R.id.ip);
+            if (host == null || ip == null) {
+                return;
+            }
             String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
             String ipString = ip.getText().toString().trim();
 
             if (!Hosts.isValidHost(hostString)) {
                 TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
-                hostInputLayout.setError(getContext().getString(R.string.invalid_host));
+                if (hostInputLayout == null) {
+                    return;
+                }
+                hostInputLayout.setError(getString(R.string.invalid_host));
                 return;
             }
 
             if (!Hosts.isValidIp(ipString)) {
                 TextInputLayout ipInputLayout = dialog.findViewById(R.id.ip_input_layout);
-                ipInputLayout.setError(getContext().getString(R.string.invalid_ip));
+                if (ipInputLayout == null) {
+                    return;
+                }
+                ipInputLayout.setError(getString(R.string.invalid_ip));
                 return;
             }
 
-            HostsActivity activity = (HostsActivity) dialog.getOwnerActivity();
-            activity.hosts.put(hostString, ipString);
-            activity.notifyHostsChanges();
+            hostsFragment.hosts.put(hostString, ipString);
+            hostsFragment.notifyHostsChanges();
 
             dialog.dismiss();
         }
 
         protected void delete(AlertDialog dialog) {
             TextView host = dialog.findViewById(R.id.host);
+            if (host == null) {
+                return;
+            }
             String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
 
-            HostsActivity activity = (HostsActivity) dialog.getOwnerActivity();
-            activity.hosts.delete(hostString);
-            activity.notifyHostsChanges();
+            hostsFragment.hosts.delete(hostString);
+            hostsFragment.notifyHostsChanges();
 
             dialog.dismiss();
         }
@@ -234,13 +217,17 @@ public class HostsActivity extends ToolbarActivity
 
         @Override
         protected void onCreateDialog(AlertDialog dialog) {
-            dialog.findViewById(R.id.host_input_layout).setEnabled(false);
+            TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
+            if (hostInputLayout == null) {
+                return;
+            }
+            hostInputLayout.setEnabled(false);
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> put(dialog));
             dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> delete(dialog));
         }
     }
 
-    private class HostsHolder extends RecyclerView.ViewHolder {
+    private static class HostsHolder extends RecyclerView.ViewHolder {
 
         public final TextView host;
         public final TextView ip;
@@ -274,5 +261,9 @@ public class HostsActivity extends ToolbarActivity
         public int getItemCount() {
             return data.size();
         }
+    }
+
+    public void setTitle(@StringRes int string) {
+        requireActivity().setTitle(string);
     }
 }

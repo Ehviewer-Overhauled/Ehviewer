@@ -79,11 +79,11 @@
         android:title="@string/settings_advanced_built_in_hosts_title"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.preference.ActivityPreference
-        android:key="custom_hosts"
+    <Preference
+        android:key="custom_hosts_2"
         android:summary="@string/settings_advanced_custom_hosts_summary"
         android:title="@string/settings_advanced_custom_hosts_title"
-        app:activity="com.hippo.ehviewer.ui.HostsActivity"
+        android:fragment="com.hippo.ehviewer.ui.fragment.HostsFragment"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat

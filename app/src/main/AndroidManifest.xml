@@ -144,20 +144,13 @@
             android:name="com.hippo.ehviewer.ui.SettingsActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/settings"
-            android:theme="@style/AppTheme.Toolbar"/>
+            android:theme="@style/AppTheme.Toolbar" />
 
         <activity
             android:name="com.hippo.ehviewer.ui.FilterActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/filter"
             android:theme="@style/AppTheme.Toolbar" />
-
-        <activity
-            android:name="com.hippo.ehviewer.ui.SetSecurityActivity"
-            android:configChanges="screenSize|uiMode"
-            android:label="@string/set_pattern_protection"
-            android:theme="@style/AppTheme.Toolbar" />
-
         <activity
             android:name="com.hippo.ehviewer.ui.UConfigActivity"
             android:configChanges="screenSize|uiMode"
@@ -168,12 +161,6 @@
             android:name="com.hippo.ehviewer.ui.MyTagsActivity"
             android:configChanges="screenSize|uiMode"
             android:label="@string/my_tags"
-            android:theme="@style/AppTheme.Toolbar" />
-
-        <activity
-            android:name="com.hippo.ehviewer.ui.HostsActivity"
-            android:configChanges="screenSize|uiMode"
-            android:label="@string/hosts"
             android:theme="@style/AppTheme.Toolbar" />
 
         <activity
