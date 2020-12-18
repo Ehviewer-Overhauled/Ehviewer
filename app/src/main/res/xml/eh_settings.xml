@@ -144,11 +144,11 @@
         app:iconSpaceReserved="false"
         app:url="@string/settings_eh_tag_translations_source_url" />
 
-    <com.hippo.preference.ActivityPreference
+    <Preference
         android:key="filter"
         android:summary="@string/settings_eh_filter_summary"
         android:title="@string/settings_eh_filter"
-        app:activity="com.hippo.ehviewer.ui.FilterActivity"
+        android:fragment="com.hippo.ehviewer.ui.fragment.FilterFragment"
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat

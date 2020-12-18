@@ -1,27 +1,12 @@
-/*
- * Copyright 2016 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.hippo.ehviewer.ui;
+package com.hippo.ehviewer.ui.fragment;
 
 import android.content.DialogInterface;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,27 +15,34 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
+import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhFilter;
 import com.hippo.ehviewer.dao.Filter;
 import com.hippo.util.DrawableManager;
 import com.hippo.view.ViewTransition;
+import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
 
-public class FilterActivity extends ToolbarActivity {
+public class FilterFragment extends Fragment {
 
-    @Nullable
-    private EasyRecyclerView mRecyclerView;
     @Nullable
     private ViewTransition mViewTransition;
     @Nullable
@@ -59,30 +51,59 @@ public class FilterActivity extends ToolbarActivity {
     private FilterList mFilterList;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_filter);
+        setHasOptionsMenu(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_filter, container, false);
         setTitle(R.string.filter);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
 
         mFilterList = new FilterList();
 
-        mRecyclerView = (EasyRecyclerView) ViewUtils.$$(this, R.id.recycler_view);
-        TextView tip = (TextView) ViewUtils.$$(this, R.id.tip);
-        mViewTransition = new ViewTransition(mRecyclerView, tip);
+        RecyclerView recyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
+        TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
+        mViewTransition = new ViewTransition(recyclerView, tip);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
 
-        Drawable drawable = DrawableManager.getVectorDrawable(this, R.drawable.big_filter);
+        Drawable drawable = DrawableManager.getVectorDrawable(requireActivity(), R.drawable.big_filter);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         tip.setCompoundDrawables(null, drawable, null, null);
 
         mAdapter = new FilterAdapter();
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setClipChildren(false);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.hasFixedSize();
-        mRecyclerView.setItemAnimator(null);
+        mAdapter.setHasStableIds(true);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setClipToPadding(false);
+        recyclerView.setClipChildren(false);
+        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
+                LinearDividerItemDecoration.VERTICAL,
+                AttrResources.getAttrColor(requireActivity(), R.attr.dividerColor),
+                LayoutUtils.dp2pix(requireActivity(), 1));
+        decoration.setShowLastDivider(true);
+        recyclerView.addItemDecoration(decoration);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.setHasFixedSize(true);
+        DefaultItemAnimator defaultItemAnimator = (DefaultItemAnimator) recyclerView.getItemAnimator();
+        if (defaultItemAnimator != null) {
+            defaultItemAnimator.setSupportsChangeAnimations(false);
+        }
+        recyclerView.setPadding(
+                recyclerView.getPaddingLeft(),
+                recyclerView.getPaddingTop(),
+                recyclerView.getPaddingRight(),
+                recyclerView.getPaddingBottom() + getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab));
 
+        fab.setOnClickListener(v -> showAddFilterDialog());
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         updateView(false);
     }
 
@@ -99,48 +120,40 @@ public class FilterActivity extends ToolbarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
 
-        mRecyclerView = null;
         mViewTransition = null;
         mAdapter = null;
         mFilterList = null;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.activity_filter, menu);
-        return true;
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.activity_filter, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_add:
-                showAddFilterDialog();
-                return true;
-            case R.id.action_tip:
-                showTipDialog();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_tip) {
+            showTipDialog();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void showTipDialog() {
-        new MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(R.string.filter)
                 .setMessage(R.string.filter_tip)
+                .setPositiveButton(android.R.string.ok, null)
                 .show();
     }
 
     private void showAddFilterDialog() {
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(R.string.add_filter)
                 .setView(R.layout.dialog_add_filter)
                 .setPositiveButton(R.string.add, null)
@@ -152,7 +165,7 @@ public class FilterActivity extends ToolbarActivity {
 
     private void showDeleteFilterDialog(final Filter filter) {
         String message = getString(R.string.delete_filter, filter.text);
-        new MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(requireActivity())
                 .setMessage(message)
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mFilterList) {
@@ -224,41 +237,17 @@ public class FilterActivity extends ToolbarActivity {
         }
     }
 
-    private class FilterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private static class FilterHolder extends RecyclerView.ViewHolder {
 
+        private final MaterialCheckBox checkbox;
         private final TextView text;
-        private final ImageView icon;
+        private final ImageView delete;
 
         public FilterHolder(View itemView) {
             super(itemView);
-            text = (TextView) ViewUtils.$$(itemView, R.id.text);
-            icon = itemView.findViewById(R.id.icon);
-
-            if (null != icon) {
-                icon.setOnClickListener(this);
-            }
-            // click on the filter text to enable/disable it
-            text.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            int position = getAdapterPosition();
-            if (position < 0 || null == mFilterList) {
-                return;
-            }
-            Filter filter = mFilterList.get(position);
-            if (FilterList.MODE_HEADER != filter.mode) {
-                if (v instanceof ImageView) {
-                    showDeleteFilterDialog(filter);
-                } else if (v instanceof TextView) {
-                    mFilterList.trigger(filter);
-
-                    //for updating delete line on filter text
-                    mAdapter.notifyItemChanged(getAdapterPosition());
-                }
-
-            }
+            checkbox = itemView.findViewById(R.id.checkbox);
+            text = itemView.findViewById(R.id.text);
+            delete = itemView.findViewById(R.id.delete);
         }
     }
 
@@ -280,8 +269,9 @@ public class FilterActivity extends ToolbarActivity {
             }
         }
 
+        @NonNull
         @Override
-        public FilterHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public FilterHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             int layoutId;
             switch (viewType) {
                 default:
@@ -293,18 +283,11 @@ public class FilterActivity extends ToolbarActivity {
                     break;
             }
 
-            FilterHolder holder = new FilterHolder(getLayoutInflater().inflate(layoutId, parent, false));
-
-            if (R.layout.item_filter == layoutId) {
-                holder.icon.setImageDrawable(
-                        DrawableManager.getVectorDrawable(FilterActivity.this, R.drawable.v_delete_x24));
-            }
-
-            return holder;
+            return new FilterHolder(getLayoutInflater().inflate(layoutId, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(FilterHolder holder, int position) {
+        public void onBindViewHolder(@NonNull FilterHolder holder, int position) {
             if (null == mFilterList) {
                 return;
             }
@@ -313,19 +296,28 @@ public class FilterActivity extends ToolbarActivity {
             if (FilterList.MODE_HEADER == filter.mode) {
                 holder.text.setText(filter.text);
             } else {
-                holder.text.setText(filter.text);
-                // add a delete line if the filter is disabled
-                if (!filter.enable) {
-                    holder.text.setPaintFlags(holder.text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                } else {
-                    holder.text.setPaintFlags(holder.text.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                }
+                holder.checkbox.setText(filter.text);
+                holder.checkbox.setChecked(filter.enable);
+                holder.itemView.setOnClickListener(v -> {
+                    mFilterList.trigger(filter);
+
+                    //for updating delete line on filter text
+                    if (mAdapter != null) {
+                        mAdapter.notifyItemChanged(position);
+                    }
+                });
+                holder.delete.setOnClickListener(v -> showDeleteFilterDialog(filter));
             }
         }
 
         @Override
         public int getItemCount() {
             return null != mFilterList ? mFilterList.size() : 0;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return null != mFilterList ? mFilterList.get(position).text.hashCode() : 0;
         }
     }
 
@@ -441,8 +433,6 @@ public class FilterActivity extends ToolbarActivity {
                     return getTagNamespaceHeader();
                 } else if (index <= size) {
                     return mTagNamespaceFilterList.get(index - 1);
-                } else {
-                    index -= size + 1;
                 }
             }
 
@@ -460,5 +450,9 @@ public class FilterActivity extends ToolbarActivity {
         public void trigger(Filter filter) {
             mEhFilter.triggerFilter(filter);
         }
+    }
+
+    public void setTitle(@StringRes int string) {
+        requireActivity().setTitle(string);
     }
 }

@@ -18,12 +18,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_add"
-        android:icon="@drawable/v_plus_dark_x24"
-        android:title="@string/add"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_tip"
         android:icon="@drawable/v_info_outline_dark_x24"
         android:title="@string/tip"

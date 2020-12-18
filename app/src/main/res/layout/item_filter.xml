@@ -17,45 +17,32 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipChildren="false">
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingHorizontal="@dimen/keyline_margin">
 
-    <com.hippo.widget.ShadowLinearLayout
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/contentColorPrimary"
-        android:orientation="vertical">
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:focusable="false"
+        android:paddingStart="0dp"
+        android:paddingEnd="24dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="12dp"
-                app:srcCompat="@drawable/v_copy_x24" />
-
-            <TextView
-                android:id="@+id/text"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:singleLine="true"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="@dimen/text_little_small" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="1dp"
-            android:background="?attr/dividerColor" />
-
-    </com.hippo.widget.ShadowLinearLayout>
+    <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/delete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
+        android:layout_gravity="end|center_vertical"
+        android:background="?selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@string/delete"
+        android:focusable="true"
+        app:srcCompat="@drawable/v_delete_x24" />
 </FrameLayout>

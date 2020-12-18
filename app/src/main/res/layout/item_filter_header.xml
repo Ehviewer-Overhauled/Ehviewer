@@ -19,6 +19,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-    android:textColor="?android:attr/textColorPrimary" />
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp"
+    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />

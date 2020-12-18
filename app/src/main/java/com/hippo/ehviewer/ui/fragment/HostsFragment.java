@@ -22,12 +22,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.android.resource.AttrResources;
-import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
+import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.LayoutUtils;
+import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +45,7 @@ public class HostsFragment extends Fragment
     private Hosts hosts;
     private List<Pair<String, String>> data;
 
-    private EasyRecyclerView recyclerView;
-    private View tip;
+    private ViewTransition mViewTransition;
     private HostsAdapter adapter;
 
     @Override
@@ -61,8 +61,9 @@ public class HostsFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_hosts, container, false);
         setTitle(R.string.hosts);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        tip = view.findViewById(R.id.tip);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
+        mViewTransition = new ViewTransition(recyclerView, tip);
         FloatingActionButton fab = view.findViewById(R.id.fab);
 
         adapter = new HostsAdapter();
@@ -83,10 +84,15 @@ public class HostsFragment extends Fragment
 
         fab.setOnClickListener(this);
 
-        recyclerView.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
-        tip.setVisibility(data.isEmpty() ? View.VISIBLE : View.GONE);
+        updateView(false);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        updateView(false);
     }
 
     public boolean onItemClick(int position) {
@@ -107,10 +113,17 @@ public class HostsFragment extends Fragment
         new AddHostDialogFragment().show(getChildFragmentManager(), DIALOG_TAG_ADD_HOST);
     }
 
-    private void notifyHostsChanges() {
+    private void updateView(boolean animation) {
+        if (null == mViewTransition) {
+            return;
+        }
+
         data = hosts.getAll();
-        recyclerView.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
-        tip.setVisibility(data.isEmpty() ? View.VISIBLE : View.GONE);
+        if (data.isEmpty()) {
+            mViewTransition.showView(1, animation);
+        } else {
+            mViewTransition.showView(0, animation);
+        }
         adapter.notifyDataSetChanged();
     }
 
@@ -172,7 +185,7 @@ public class HostsFragment extends Fragment
             }
 
             hostsFragment.hosts.put(hostString, ipString);
-            hostsFragment.notifyHostsChanges();
+            hostsFragment.updateView(true);
 
             dialog.dismiss();
         }
@@ -185,7 +198,7 @@ public class HostsFragment extends Fragment
             String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
 
             hostsFragment.hosts.delete(hostString);
-            hostsFragment.notifyHostsChanges();
+            hostsFragment.updateView(true);
 
             dialog.dismiss();
         }
