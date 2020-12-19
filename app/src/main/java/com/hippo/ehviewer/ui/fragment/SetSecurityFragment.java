@@ -32,7 +32,6 @@ public class SetSecurityFragment extends BaseFragment implements View.OnClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_set_security, container, false);
-        setTitle(R.string.set_pattern_protection);
 
         mPatternView = (LockPatternView) ViewUtils.$$(view, R.id.pattern_view);
         mCancel = ViewUtils.$$(view, R.id.cancel);
@@ -79,5 +78,10 @@ public class SetSecurityFragment extends BaseFragment implements View.OnClickLis
             }
             requireActivity().onBackPressed();
         }
+    }
+
+    @Override
+    public int getFragmentTitle() {
+        return R.string.set_pattern_protection;
     }
 }

@@ -12,6 +12,17 @@ import com.takisoft.preferencex.PreferenceFragmentCompat;
 public class BasePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     @Override
+    public void onStart() {
+        super.onStart();
+        setTitle(getFragmentTitle());
+    }
+
+    @StringRes
+    public int getFragmentTitle() {
+        return -1;
+    }
+
+    @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         return false;
     }
@@ -26,7 +37,7 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
 
     }
 
-    public void setTitle(@StringRes int string) {
+    private void setTitle(@StringRes int string) {
         requireActivity().setTitle(string);
     }
 

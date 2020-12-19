@@ -30,8 +30,7 @@ public class ReadFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setTitle(R.string.settings_read);
+    public int getFragmentTitle() {
+        return R.string.settings_read;
     }
 }

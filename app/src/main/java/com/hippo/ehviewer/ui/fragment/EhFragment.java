@@ -89,8 +89,7 @@ public class EhFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setTitle(R.string.settings_eh);
+    public int getFragmentTitle() {
+        return R.string.settings_eh;
     }
 }

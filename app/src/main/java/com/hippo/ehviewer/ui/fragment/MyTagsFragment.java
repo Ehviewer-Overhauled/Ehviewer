@@ -35,7 +35,6 @@ public class MyTagsFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_webview, container, false);
-        setTitle(R.string.my_tags);
         webView = view.findViewById(R.id.webview);
         webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
         webView.getSettings().setBuiltInZoomControls(true);
@@ -89,5 +88,10 @@ public class MyTagsFragment extends BaseFragment {
         public void onPageFinished(WebView view, String url) {
             progress.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public int getFragmentTitle() {
+        return R.string.my_tags;
     }
 }

@@ -40,7 +40,6 @@ public class UConfigFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_webview, container, false);
-        setTitle(R.string.u_config);
         webView = view.findViewById(R.id.webview);
         webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
         webView.getSettings().setBuiltInZoomControls(true);
@@ -166,5 +165,10 @@ public class UConfigFragment extends BaseFragment {
             progress.setVisibility(View.GONE);
             loaded = true;
         }
+    }
+
+    @Override
+    public int getFragmentTitle() {
+        return R.string.u_config;
     }
 }

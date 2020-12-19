@@ -58,7 +58,6 @@ public class FilterFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_filter, container, false);
-        setTitle(R.string.filter);
 
         mFilterList = new FilterList();
 
@@ -450,4 +449,8 @@ public class FilterFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public int getFragmentTitle() {
+        return R.string.filter;
+    }
 }

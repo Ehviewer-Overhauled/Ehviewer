@@ -58,7 +58,6 @@ public class HostsFragment extends BaseFragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_hosts, container, false);
-        setTitle(R.string.hosts);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mViewTransition = new ViewTransition(recyclerView, tip);
@@ -272,4 +271,8 @@ public class HostsFragment extends BaseFragment
         }
     }
 
+    @Override
+    public int getFragmentTitle() {
+        return R.string.hosts;
+    }
 }

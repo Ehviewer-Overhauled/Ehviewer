@@ -13,8 +13,7 @@ public class SettingsFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setTitle(R.string.settings);
+    public int getFragmentTitle() {
+        return R.string.settings;
     }
 }
