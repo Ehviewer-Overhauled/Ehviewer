@@ -45,6 +45,16 @@ android {
         checkReleaseBuilds true
     }
 
+    packagingOptions {
+        exclude 'META-INF/**'
+        exclude 'kotlin/**'
+        exclude 'org/**'
+        exclude '**.properties'
+        exclude '**.bin'
+    }
+
+    dependenciesInfo.includeInApk false
+
     buildTypes {
         release {
             minifyEnabled true
@@ -105,8 +115,8 @@ dependencies {
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
-    implementation 'com.squareup.okhttp3:okhttp:3.14.7'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.14.7'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.0'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'com.github.NekoInverter:DrawerLayout:6ba992f8d4'
     implementation 'com.github.NekoInverter:Image:8fd6c1e1df'

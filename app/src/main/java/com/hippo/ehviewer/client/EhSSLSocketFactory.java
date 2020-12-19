@@ -29,7 +29,8 @@ public class EhSSLSocketFactory extends SSLSocketFactory {
             return ((SSLSocketFactory) getDefault()).createSocket(s, host, port, autoClose);
         }
         InetAddress address = s.getInetAddress();
-        if (autoClose) s.close();
+        // okhttp 4.9 don't like this
+        //if (autoClose) s.close();
         SSLSocket socket = (SSLSocket) getDefault().createSocket(address, port);
         SSLSession sslSession = socket.getSession();
         Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address.getHostAddress() + " Protocol:" + sslSession.getProtocol() + " CipherSuite:" + sslSession.getCipherSuite());
