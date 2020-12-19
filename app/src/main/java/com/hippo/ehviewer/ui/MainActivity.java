@@ -40,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.WindowCompat;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -319,8 +320,7 @@ public final class MainActivity extends StageActivity
             ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) mDrawerLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         updateProfile();
 
