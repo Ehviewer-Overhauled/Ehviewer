@@ -27,7 +27,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hippo.content.ContextLocalWrapper;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -118,6 +117,26 @@ public abstract class EhActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+        applyOverrideConfiguration(new Configuration());
+    }
+
+    @Override
+    public void applyOverrideConfiguration(Configuration newConfig) {
+        super.applyOverrideConfiguration(updateConfigurationIfSupported(newConfig));
+    }
+
+    private Configuration updateConfigurationIfSupported(Configuration config) {
+        // Configuration.getLocales is added after 24 and Configuration.locale is deprecated in 24
+        if (Build.VERSION.SDK_INT >= 24) {
+            if (!config.getLocales().isEmpty()) {
+                return config;
+            }
+        } else {
+            if (config.locale != null) {
+                return config;
+            }
+        }
         Locale locale = null;
         String language = Settings.getAppLanguage();
         if (language != null && !language.equals("system")) {
@@ -134,9 +153,9 @@ public abstract class EhActivity extends AppCompatActivity {
             Configuration configuration = res.getConfiguration();
             locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? configuration.getLocales().get(0) : configuration.locale;
         }
-
-        newBase = ContextLocalWrapper.wrap(newBase, locale);
-
-        super.attachBaseContext(newBase);
+        if (locale != null) {
+            config.setLocale(locale);
+        }
+        return config;
     }
 }
