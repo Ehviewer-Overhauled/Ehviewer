@@ -41,6 +41,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +50,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -223,6 +224,10 @@ public final class GalleryListScene extends BaseScene
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
     private boolean mIsTopList = false;
+
+    ActivityResultLauncher<String[]> selectImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(),
+            result -> mSearchLayout.setImageUri(result));
 
     @Nullable
     private static String getSuitableTitleForUrlBuilder(
@@ -1421,11 +1426,7 @@ public final class GalleryListScene extends BaseScene
 
     @Override
     public void onSelectImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,
-                getString(R.string.select_image)), REQUEST_CODE_SELECT_IMAGE);
+        selectImageLauncher.launch(new String[]{"image/*"});
     }
 
     // SearchBarMover.Helper

@@ -33,7 +33,7 @@ import java.util.List;
 
 class A7ZipArchive implements Closeable {
 
-    private InArchive archive;
+    private final InArchive archive;
 
     private A7ZipArchive(InArchive archive) {
         this.archive = archive;
@@ -84,9 +84,9 @@ class A7ZipArchive implements Closeable {
 
     static class A7ZipArchiveEntry {
 
-        private InArchive archive;
-        private int index;
-        private String path;
+        private final InArchive archive;
+        private final int index;
+        private final String path;
 
         private A7ZipArchiveEntry(InArchive archive, int index, String path) {
             this.archive = archive;
@@ -106,7 +106,7 @@ class A7ZipArchive implements Closeable {
     private static class UniRandomAccessFileInStream extends SeekableInputStream {
 
         private final byte[] scratch = new byte[8];
-        private UniRandomAccessFile file;
+        private final UniRandomAccessFile file;
 
         public UniRandomAccessFileInStream(UniRandomAccessFile file) {
             this.file = file;
@@ -150,7 +150,7 @@ class A7ZipArchive implements Closeable {
 
     private static class OutputStreamSequentialOutStream extends OutputStream {
 
-        private OutputStream stream;
+        private final OutputStream stream;
 
         public OutputStreamSequentialOutStream(OutputStream stream) {
             this.stream = stream;

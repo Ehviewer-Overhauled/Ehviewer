@@ -40,7 +40,6 @@ import androidx.annotation.NonNull;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.R;
 
 import java.util.ArrayList;

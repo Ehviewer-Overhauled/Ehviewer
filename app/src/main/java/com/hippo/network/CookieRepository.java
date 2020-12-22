@@ -48,8 +48,8 @@ public class CookieRepository implements CookieJar {
      * verification).
      */
     private static final Pattern VERIFY_AS_IP_ADDRESS = Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)");
-    private CookieDatabase db;
-    private Map<String, CookieSet> map;
+    private final CookieDatabase db;
+    private final Map<String, CookieSet> map;
 
     public CookieRepository(Context context, String name) {
         db = new CookieDatabase(context, name);

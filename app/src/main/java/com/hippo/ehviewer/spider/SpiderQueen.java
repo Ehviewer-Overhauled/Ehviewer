@@ -152,7 +152,7 @@ public final class SpiderQueen implements Runnable {
     private volatile int[] mPageStateArray;
     // For download, when it go to mPageStateArray.size(), done
     private volatile int mDownloadPage = -1;
-    private AtomicReference<String> showKey = new AtomicReference<>();
+    private final AtomicReference<String> showKey = new AtomicReference<>();
 
     private SpiderQueen(EhApplication application, @NonNull GalleryInfo galleryInfo) {
         mHttpClient = EhApplication.getOkHttpClient(application);

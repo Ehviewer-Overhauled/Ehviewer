@@ -82,7 +82,7 @@ public class EhDns implements Dns {
     private static void put(Map<String, List<InetAddress>> map, String host, String ips) {
         String[] ipList = ips.split("\\+");
         InetAddress[] addresses = new InetAddress[ipList.length];
-        for (int i = 0;i < ipList.length;i++) {
+        for (int i = 0; i < ipList.length; i++) {
             addresses[i] = Hosts.toInetAddress(host, ipList[i]);
         }
         map.put(host, Arrays.asList(addresses));

@@ -30,11 +30,11 @@ import com.hippo.ehviewer.R;
 
 public class SelectItemWithIconAdapter extends BaseAdapter {
 
-    private Context context;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final LayoutInflater inflater;
 
-    private CharSequence[] texts;
-    private int[] icons;
+    private final CharSequence[] texts;
+    private final int[] icons;
 
     public SelectItemWithIconAdapter(Context context, CharSequence[] texts, int[] icons) {
         int count = texts.length;

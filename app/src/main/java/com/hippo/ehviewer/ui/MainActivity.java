@@ -320,7 +320,8 @@ public final class MainActivity extends StageActivity
             ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         updateProfile();
 

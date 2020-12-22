@@ -34,7 +34,7 @@ public class FavouriteStatusRouter {
     @SuppressLint("UseSparseArrays")
     private final HashMap<Integer, Map<Long, GalleryInfo>> maps = new HashMap<>();
 
-    private List<Listener> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
 
     public int saveDataMap(Map<Long, GalleryInfo> map) {
         int id = idGenerator.nextId();

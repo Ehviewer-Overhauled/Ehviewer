@@ -34,7 +34,7 @@ class Pipe {
     private boolean inClosed = false;
     private boolean outClosed = false;
 
-    private InputStream inputStream = new InputStream() {
+    private final InputStream inputStream = new InputStream() {
         @Override
         public int read() throws IOException {
             synchronized (Pipe.this) {
@@ -94,7 +94,7 @@ class Pipe {
         }
     };
 
-    private OutputStream outputStream = new OutputStream() {
+    private final OutputStream outputStream = new OutputStream() {
         @Override
         public void write(int b) throws IOException {
             synchronized (Pipe.this) {

@@ -47,10 +47,10 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
 
     private static final String TAG = DirGalleryProvider.class.getSimpleName();
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
-    private static FilenameFilter imageFilter =
+    private static final FilenameFilter imageFilter =
             (dir, name) -> StringUtils.endsWith(name.toLowerCase(), SUPPORT_IMAGE_EXTENSIONS);
-    private static Comparator<UniFile> naturalComparator = new Comparator<UniFile>() {
-        private NaturalComparator comparator = new NaturalComparator();
+    private static final Comparator<UniFile> naturalComparator = new Comparator<UniFile>() {
+        private final NaturalComparator comparator = new NaturalComparator();
 
         @Override
         public int compare(UniFile o1, UniFile o2) {

@@ -47,8 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ArchiveGalleryProvider extends GalleryProvider2 {
 
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
-    private static Comparator<A7ZipArchive.A7ZipArchiveEntry> naturalComparator = new Comparator<A7ZipArchive.A7ZipArchiveEntry>() {
-        private NaturalComparator comparator = new NaturalComparator();
+    private static final Comparator<A7ZipArchive.A7ZipArchiveEntry> naturalComparator = new Comparator<A7ZipArchive.A7ZipArchiveEntry>() {
+        private final NaturalComparator comparator = new NaturalComparator();
 
         @Override
         public int compare(A7ZipArchive.A7ZipArchiveEntry o1, A7ZipArchive.A7ZipArchiveEntry o2) {

@@ -38,11 +38,11 @@ public class GalleryHeader extends ViewGroup {
     private View progress;
     private View clock;
 
-    private Rect batteryRect = new Rect();
-    private Rect progressRect = new Rect();
-    private Rect clockRect = new Rect();
+    private final Rect batteryRect = new Rect();
+    private final Rect progressRect = new Rect();
+    private final Rect clockRect = new Rect();
 
-    private int[] location = new int[2];
+    private final int[] location = new int[2];
 
     private int lastX = 0;
     private int lastY = 0;

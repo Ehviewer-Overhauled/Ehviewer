@@ -21,7 +21,6 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -49,12 +48,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -78,6 +78,7 @@ import com.hippo.glgallery.SimpleAdapter;
 import com.hippo.glview.view.GLRootView;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.util.SystemUiHelper;
 import com.hippo.widget.ColorView;
 import com.hippo.yorozuya.AnimationUtils;
@@ -112,8 +113,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private static final long SLIDER_ANIMATION_DURING = 150;
     private static final long HIDE_SLIDER_DELAY = 3000;
 
-    private static final int WRITE_REQUEST_CODE = 43;
-    private static final int REQUEST_WRITE_STORAGE = 1;
     private final ConcurrentPool<NotifyTask> mNotifyTaskPool = new ConcurrentPool<>(3);
     private String mAction;
     private String mFilename;
@@ -185,6 +184,54 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mCurrentIndex;
 
     private int mSavingPage = -1;
+
+    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
+    ActivityResultLauncher<String> saveImageToLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument(),
+            uri -> {
+                if (uri != null) {
+                    try {
+                        // grantUriPermission might throw RemoteException on MIUI
+                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    } catch (Exception e) {
+                        ExceptionUtils.throwIfFatal(e);
+                        e.printStackTrace();
+                    }
+                    String filepath = getCacheDir() + "/" + mCacheFileName;
+                    File cachefile = new File(filepath);
+
+                    ContentResolver resolver = getContentResolver();
+
+                    IoThreadPoolExecutor.getInstance().execute(() -> {
+                        InputStream is = null;
+                        OutputStream os = null;
+                        try {
+                            is = new FileInputStream(cachefile);
+                            os = resolver.openOutputStream(uri);
+                            IOUtils.copy(is, os);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            IOUtils.closeQuietly(is);
+                            IOUtils.closeQuietly(os);
+                            runOnUiThread(() -> Toast.makeText(GalleryActivity.this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show());
+                        }
+                        //noinspection ResultOfMethodCallIgnored
+                        cachefile.delete();
+                    });
+                }
+
+
+            });
 
     private void buildProvider() {
         if (mGalleryProvider != null) {
@@ -779,7 +826,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             mSavingPage = page;
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+            requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             return;
         }
 
@@ -827,19 +874,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         Toast.makeText(this, getString(R.string.image_saved, realPath + File.separator + filename), Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_WRITE_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mSavingPage != -1) {
-                saveImage(mSavingPage);
-            } else {
-                Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-            }
-            mSavingPage = -1;
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
     private void saveImageTo(int page) {
         if (null == mGalleryProvider) {
             return;
@@ -856,57 +890,11 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
         mCacheFileName = filename;
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        intent.putExtra(Intent.EXTRA_TITLE, filename);
         try {
-            startActivityForResult(intent, WRITE_REQUEST_CODE);
+            saveImageToLauncher.launch(filename);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             Toast.makeText(this, R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        super.onActivityResult(requestCode, resultCode, resultData);
-        if (requestCode == WRITE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (resultData != null) {
-                Uri uri = resultData.getData();
-                if (uri != null) {
-                    try {
-                        // grantUriPermission might throw RemoteException on MIUI
-                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e) {
-                        ExceptionUtils.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-                    String filepath = getCacheDir() + "/" + mCacheFileName;
-                    File cachefile = new File(filepath);
-
-                    InputStream is = null;
-                    OutputStream os = null;
-                    ContentResolver resolver = getContentResolver();
-
-                    try {
-                        is = new FileInputStream(cachefile);
-                        os = resolver.openOutputStream(uri);
-                        IOUtils.copy(is, os);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        IOUtils.closeQuietly(is);
-                        IOUtils.closeQuietly(os);
-                    }
-
-                    //noinspection ResultOfMethodCallIgnored
-                    cachefile.delete();
-
-                    Toast.makeText(this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 

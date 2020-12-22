@@ -591,11 +591,11 @@ class HtmlToSpannedConverter implements ContentHandler {
         sColorNameMap.put("yellowgreen", 0xFF9ACD32);
     }
 
-    private String mSource;
-    private XMLReader mReader;
-    private SpannableStringBuilder mSpannableStringBuilder;
-    private Html.ImageGetter mImageGetter;
-    private Html.TagHandler mTagHandler;
+    private final String mSource;
+    private final XMLReader mReader;
+    private final SpannableStringBuilder mSpannableStringBuilder;
+    private final Html.ImageGetter mImageGetter;
+    private final Html.TagHandler mTagHandler;
 
     public HtmlToSpannedConverter(
             String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler,
@@ -1101,7 +1101,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     }
 
     private static class Header {
-        private int mLevel;
+        private final int mLevel;
 
         public Header(int level) {
             mLevel = level;

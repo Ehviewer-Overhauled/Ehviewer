@@ -16,11 +16,12 @@
 
 package com.hippo.ehviewer.ui.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 
@@ -40,6 +41,22 @@ public class DownloadFragment extends BasePreferenceFragment {
     @Nullable
     private Preference mDownloadLocation;
 
+    ActivityResultLauncher<Uri> pickImageDirLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocumentTree(),
+            treeUri -> {
+                if (treeUri != null) {
+                    requireActivity().getContentResolver().takePersistableUriPermission(
+                            treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
+                    if (uniFile != null) {
+                        Settings.putDownloadLocation(uniFile);
+                        onUpdateDownloadLocation();
+                    } else {
+                        showTip(R.string.settings_download_cant_get_download_location,
+                                BaseScene.LENGTH_SHORT);
+                    }
+                }
+            });
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
@@ -87,41 +104,11 @@ public class DownloadFragment extends BasePreferenceFragment {
     }
 
     private void openDirPickerL() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try {
-            startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE_DIR_L);
+            pickImageDirLauncher.launch(null);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_PICK_IMAGE_DIR_L: {
-                if (resultCode == Activity.RESULT_OK) {
-                    Uri treeUri = data.getData();
-                    if (treeUri != null) {
-                        requireActivity().getContentResolver().takePersistableUriPermission(
-                                treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
-                        if (uniFile != null) {
-                            Settings.putDownloadLocation(uniFile);
-                            onUpdateDownloadLocation();
-                        } else {
-                            showTip(R.string.settings_download_cant_get_download_location,
-                                    BaseScene.LENGTH_SHORT);
-                        }
-                    }
-                }
-                break;
-            }
-            default: {
-                super.onActivityResult(requestCode, resultCode, data);
-            }
         }
     }
 

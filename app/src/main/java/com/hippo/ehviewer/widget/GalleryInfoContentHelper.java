@@ -36,7 +36,7 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
 
     @SuppressLint("UseSparseArrays")
     private Map<Long, GalleryInfo> map = new HashMap<>();
-    private FavouriteStatusRouter.Listener listener;
+    private final FavouriteStatusRouter.Listener listener;
 
     public GalleryInfoContentHelper() {
         listener = (gid, slot) -> {

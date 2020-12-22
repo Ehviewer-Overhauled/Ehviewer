@@ -124,7 +124,7 @@ public class Hosts {
         if (ip_list == null) {
             return false;
         }
-        for (String ip: ip_list.split("\\+")) {
+        for (String ip : ip_list.split("\\+")) {
             if (parseV4(ip) == null && parseV6(ip) == null) {
                 return false;
             }

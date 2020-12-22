@@ -31,7 +31,7 @@ import com.hippo.ehviewer.R;
 
 public class DialogWebChromeClient extends WebChromeClient {
 
-    private Context context;
+    private final Context context;
 
     public DialogWebChromeClient(Context context) {
         this.context = context;

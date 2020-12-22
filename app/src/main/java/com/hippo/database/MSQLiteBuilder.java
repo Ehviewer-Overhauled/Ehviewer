@@ -48,7 +48,7 @@ public class MSQLiteBuilder {
 
     private int version = 0;
     private List<String> statements;
-    private SparseArray<List<String>> statementsMap = new SparseArray<>();
+    private final SparseArray<List<String>> statementsMap = new SparseArray<>();
 
     private static String javaTypeToSQLiteType(Class clazz) {
         String type = JAVA_TYPE_TO_SQLITE_TYPE.get(clazz);

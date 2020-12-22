@@ -33,7 +33,7 @@ import okhttp3.HttpUrl;
 
 class CookieSet {
 
-    private Map<Key, Cookie> map = new HashMap<>();
+    private final Map<Key, Cookie> map = new HashMap<>();
 
     /**
      * Adds a cookie to this {@code CookieSet}.
@@ -72,9 +72,9 @@ class CookieSet {
 
     static class Key {
 
-        private String name;
-        private String domain;
-        private String path;
+        private final String name;
+        private final String domain;
+        private final String path;
 
         public Key(Cookie cookie) {
             this.name = cookie.name();

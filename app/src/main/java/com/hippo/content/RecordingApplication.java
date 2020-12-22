@@ -33,7 +33,7 @@ import java.util.List;
 
 public abstract class RecordingApplication extends SceneApplication {
 
-    private List<WeakReference<Activity>> list = new LinkedList<>();
+    private final List<WeakReference<Activity>> list = new LinkedList<>();
 
     @Override
     public void onCreate() {

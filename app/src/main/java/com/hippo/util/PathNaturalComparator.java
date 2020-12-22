@@ -14,7 +14,7 @@ public class PathNaturalComparator implements Comparator<String> {
     private static final boolean TYPE_SEPARATOR = false;
     private static final boolean TYPE_NORMAL = true;
 
-    private Comparator<String> naturalComparator = new NaturalComparator();
+    private final Comparator<String> naturalComparator = new NaturalComparator();
 
     private static int nextSegmentStart(String str, int index) {
         if (index >= str.length()) {

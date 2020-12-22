@@ -264,7 +264,7 @@ public class GalleryDetailParser {
                     dates.add(matcher.group(1));
                 }
                 Elements elements = gnd.select("a");
-                for (int i = 0; i< elements.size(); i++) {
+                for (int i = 0; i < elements.size(); i++) {
                     Element element = elements.get(i);
                     GalleryInfo gi = new GalleryInfo();
                     GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(element.attr("href"));
