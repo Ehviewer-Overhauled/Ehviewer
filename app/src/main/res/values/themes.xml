@@ -51,7 +51,6 @@
         <item name="galleryDetailButtonBackgroundColor">@color/gallery_detail_button_background
         </item>
 
-        <!--<item name="preferenceHeaderBackground">@drawable/preference_header_background</item>-->
         <item name="toolbarPopupTheme">@style/ToolbarPopupTheme</item>
         <item name="galleryDetailDivider">@drawable/divider_gallery_detail</item>
         <item name="android:navigationBarColor">@color/colorNavigationBar</item>
@@ -82,12 +81,7 @@
     <style name="ThemeOverlay" />
 
     <style name="ThemeOverlay.Black">
-        <item name="android:colorEdgeEffect">?attr/colorEdgeEffect</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@android:color/black</item>
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="colorControlActivated">@color/colorPrimary</item>
-        <item name="actionBarStyle">@style/ActionBarStyle</item>
 
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
@@ -98,34 +92,24 @@
         <item name="colorEdgeEffect">@color/grey_500</item>
         <item name="dividerColor">@color/divider_black</item>
         <item name="toolbarColor">@android:color/black</item>
-        <item name="textColorThemePrimary">?android:attr/textColorSecondary</item>
-        <item name="textColorThemeAccent">?android:attr/textColorSecondary</item>
         <item name="drawableColorPrimary">@color/primary_drawable_black</item>
         <item name="drawableColorSecondary">@color/secondary_drawable_black</item>
         <item name="drawableColorThemePrimary">@color/primary_drawable_black</item>
         <item name="contentColorPrimary">@color/content_black</item>
-        <item name="contentColorThemePrimary">?attr/contentColorPrimary</item>
-        <item name="contentColorThemeAccent">?attr/contentColorPrimary</item>
         <item name="contentColorReactive">@color/content_reactive_black</item>
         <item name="widgetColorThemePrimary">@color/widget_black</item>
         <item name="widgetColorThemeAccent">@color/widget_black</item>
         <item name="progressColor">@color/progress_black</item>
         <item name="guideBackgroundColor">#e5000000</item>
-        <item name="guideTitleColor">?android:attr/textColorPrimary</item>
-        <item name="guideTextColor">?android:attr/textColorSecondary</item>
         <item name="tagGroupBackgroundColor">@color/tag_group_background_black</item>
         <item name="tagBackgroundColor">@color/tag_background_black</item>
-        <item name="galleryDetailHeaderTitleColor">?android:attr/textColorPrimary</item>
         <item name="galleryDetailHeaderBackgroundColor">@android:color/black</item>
         <item name="galleryDetailButtonBackgroundColor">
             @color/gallery_detail_button_background_black
         </item>
 
-        <item name="preferenceHeaderBackground">@drawable/preference_header_background_black</item>
-        <item name="toolbarPopupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
         <item name="galleryDetailDivider">@drawable/divider_gallery_detail_dark</item>
         <item name="android:navigationBarColor">@android:color/black</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
 
     <!-- ========= -->
