@@ -17,4 +17,8 @@
 #}
 
 -keepattributes SourceFile,LineNumberTable
--keep class com.hippo.** { *; }
+-keep class com.hippo.a7zip.* { *; }
+-keep class com.hippo.ehviewer.dao.* { *; }
+-keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { *; }
+-keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { *; }
+-keep class com.hippo.image.* { *; }
