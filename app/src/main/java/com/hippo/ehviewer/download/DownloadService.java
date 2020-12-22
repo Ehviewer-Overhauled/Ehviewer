@@ -218,7 +218,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                 .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setColorized(true)
-                .addAction(R.drawable.ic_pause_x24, getString(R.string.stat_download_action_stop_all), piStopAll)
+                .addAction(R.drawable.ic_baseline_pause_24, getString(R.string.stat_download_action_stop_all), piStopAll)
                 .setShowWhen(false)
                 .setChannelId(CHANNEL_ID);
 
@@ -261,7 +261,7 @@ public class DownloadService extends Service implements DownloadManager.Download
         }
 
         m509dBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_alert)
+                .setSmallIcon(R.drawable.ic_baseline_warning_24)
                 .setContentText(getString(R.string.stat_509_alert_title))
                 .setContentText(getString(R.string.stat_509_alert_text))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.stat_509_alert_text)))

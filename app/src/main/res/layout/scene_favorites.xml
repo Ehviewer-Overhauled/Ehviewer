@@ -84,7 +84,7 @@
             android:visibility="gone"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_delete_dark_x24"
+            app:srcCompat="@drawable/v_delete_x24"
             app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

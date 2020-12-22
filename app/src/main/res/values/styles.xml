@@ -31,16 +31,6 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
-    <style name="ProgressView.Small">
-        <item name="android:minWidth">16dp</item>
-        <item name="android:minHeight">16dp</item>
-    </style>
-
-    <style name="ProgressView.Large">
-        <item name="android:minWidth">76dp</item>
-        <item name="android:minHeight">76dp</item>
-    </style>
-
     <style name="TextAppearance.CardTitle">
         <item name="android:textSize">@dimen/text_little_small</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
@@ -97,10 +87,6 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="ButtonInCard.Accent">
-        <item name="android:textColor">?attr/colorAccent</item>
-    </style>
-
     <style name="Slider">
         <item name="thickness">2dp</item>
         <item name="radius">6dp</item>
@@ -110,25 +96,13 @@
         <item name="dark">false</item>
     </style>
 
-    <style name="Slider.Dark">
-        <item name="dark">true</item>
-    </style>
-
     <style name="Indicating">
         <item name="indicatorHeight">1dp</item>
         <item name="indicatorColor">?attr/dividerColor</item>
     </style>
 
-    <style name="Widget.Design.FloatingActionButton.Mini">
-        <item name="fabSize">mini</item>
-    </style>
-
     <style name="Guide.Title" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">?attr/guideTitleColor</item>
-    </style>
-
-    <style name="Guide.Text" parent="TextAppearance.AppCompat.Subhead">
-        <item name="android:textColor">?attr/guideTextColor</item>
     </style>
 
     <style name="CardView.Normal">

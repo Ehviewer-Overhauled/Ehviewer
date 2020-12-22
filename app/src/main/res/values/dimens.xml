@@ -20,13 +20,9 @@
     <dimen name="single_max_width">260dp</dimen>
     <dimen name="drawer_max_width">280dp</dimen>
 
-    <dimen name="dialog_padding_top_material">18dp</dimen>
-
     <!-- Text size -->
     <dimen name="text_super_large">24sp</dimen>
-    <dimen name="text_large">22sp</dimen>
     <dimen name="text_little_large">20sp</dimen>
-    <dimen name="text_medium">18sp</dimen>
     <dimen name="text_little_small">16sp</dimen>
     <dimen name="text_small">14sp</dimen>
     <dimen name="text_super_small">12sp</dimen>
@@ -118,7 +114,6 @@
     <dimen name="gallery_detail_thumb_width">128dp</dimen>
     <dimen name="gallery_detail_thumb_height">192dp</dimen>
 
-    <dimen name="gallery_page_text">56sp</dimen>
     <dimen name="gallery_widget_margin_h">12dp</dimen>
     <dimen name="gallery_widget_margin_v">12dp</dimen>
 
@@ -131,8 +126,6 @@
 
     <!-- Custom preference -->
     <dimen name="preference_widget_width">48dp</dimen>
-    <dimen name="preference_item_padding_side">8dip</dimen>
-    <dimen name="preference_item_padding_inner">8dip</dimen>
 
     <!-- Gallery -->
     <dimen name="gallery_pager_interval">48dp</dimen>
