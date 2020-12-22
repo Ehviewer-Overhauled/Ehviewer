@@ -32,8 +32,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.AbsoluteLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -116,10 +116,10 @@ public class Slider extends View {
         mBubble = new BubbleView(context, textPaint);
         mBubble.setScaleX(0.0f);
         mBubble.setScaleY(0.0f);
-        AbsoluteLayout absoluteLayout = new AbsoluteLayout(context);
-        absoluteLayout.addView(mBubble);
-        absoluteLayout.setBackgroundDrawable(null);
-        mPopup = new PopupWindow(absoluteLayout);
+        RelativeLayout relativeLayout = new RelativeLayout(context);
+        relativeLayout.addView(mBubble);
+        relativeLayout.setBackgroundDrawable(null);
+        mPopup = new PopupWindow(relativeLayout);
         mPopup.setOutsideTouchable(false);
         mPopup.setTouchable(false);
         mPopup.setFocusable(false);
@@ -143,28 +143,22 @@ public class Slider extends View {
 
         mProgressAnimation = new ValueAnimator();
         mProgressAnimation.setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR);
-        mProgressAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                float value = (Float) animation.getAnimatedValue();
-                mDrawPercent = value;
-                mDrawProgress = Math.round(MathUtils.lerp((float) mStart, mEnd, value));
-                updateBubblePosition();
-                mBubble.setProgress(mDrawProgress);
-                invalidate();
-            }
+        mProgressAnimation.addUpdateListener(animation -> {
+            float value = (Float) animation.getAnimatedValue();
+            mDrawPercent = value;
+            mDrawProgress = Math.round(MathUtils.lerp((float) mStart, mEnd, value));
+            updateBubblePosition();
+            mBubble.setProgress(mDrawProgress);
+            invalidate();
         });
 
         mBubbleScaleAnimation = new ValueAnimator();
-        mBubbleScaleAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                float value = (Float) animation.getAnimatedValue();
-                mDrawBubbleScale = value;
-                mBubble.setScaleX(value);
-                mBubble.setScaleY(value);
-                invalidate();
-            }
+        mBubbleScaleAnimation.addUpdateListener(animation -> {
+            float value = (Float) animation.getAnimatedValue();
+            mDrawBubbleScale = value;
+            mBubble.setScaleX(value);
+            mBubble.setScaleY(value);
+            invalidate();
         });
     }
 
@@ -190,8 +184,7 @@ public class Slider extends View {
                 mCharHeight + LayoutUtils.dp2pix(mContext, 8));
 
         if (oldWidth != mBubbleWidth && oldHeight != mBubbleHeight) {
-            //noinspection deprecation
-            AbsoluteLayout.LayoutParams lp = (AbsoluteLayout.LayoutParams) mBubble.getLayoutParams();
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBubble.getLayoutParams();
             lp.width = mBubbleWidth;
             lp.height = mBubbleHeight;
             mBubble.setLayoutParams(lp);
@@ -386,6 +379,7 @@ public class Slider extends View {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         int action = event.getAction();
@@ -473,7 +467,6 @@ public class Slider extends View {
         private final Rect mRect = new Rect();
         private String mProgressStr = "";
 
-        @SuppressWarnings("deprecation")
         public BubbleView(Context context, Paint paint) {
             super(context);
             setImageResource(R.drawable.v_slider_bubble);

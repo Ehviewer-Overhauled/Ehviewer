@@ -302,7 +302,7 @@ public class EhEngine {
         String origin = EhUrl.getOrigin();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer, origin)
-                .post(RequestBody.create(MEDIA_TYPE_JSON, json.toString()))
+                .post(RequestBody.create(json.toString(), MEDIA_TYPE_JSON))
                 .build();
         Call call = okHttpClient.newCall(request);
 
@@ -395,7 +395,7 @@ public class EhEngine {
         json.put("gid", gid);
         json.put("token", token);
         json.put("rating", (int) Math.ceil(rating * 2));
-        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
         String url = EhUrl.getApiUrl();
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         String origin = EhUrl.getOrigin();
@@ -476,7 +476,7 @@ public class EhEngine {
                 .put("method", "gtoken")
                 .put("pagelist", new JSONArray().put(
                         new JSONArray().put(gid).put(gtoken).put(page + 1)));
-        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
         String url = EhUrl.getApiUrl();
         String referer = EhUrl.getReferer();
         String origin = EhUrl.getOrigin();
@@ -823,7 +823,7 @@ public class EhEngine {
         json.put("token", token);
         json.put("comment_id", commentId);
         json.put("comment_vote", commentVote);
-        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
         String url = EhUrl.getApiUrl();
         String referer = EhUrl.getReferer();
         String origin = EhUrl.getOrigin();
@@ -864,7 +864,7 @@ public class EhEngine {
         json.put("token", token);
         json.put("tags", tags);
         json.put("vote", vote);
-        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
         String url = EhUrl.getApiUrl();
         String referer = EhUrl.getReferer();
         String origin = EhUrl.getOrigin();
@@ -904,29 +904,29 @@ public class EhEngine {
         builder.setType(MultipartBody.FORM);
         builder.addPart(
                 Headers.of("Content-Disposition", "form-data; name=\"sfile\"; filename=\"a.jpg\""),
-                RequestBody.create(MEDIA_TYPE_JPEG, image)
+                RequestBody.create(image, MEDIA_TYPE_JPEG)
         );
         if (uss) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_similar\""),
-                    RequestBody.create(null, "on")
+                    RequestBody.create("on", null)
             );
         }
         if (osc) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_covers\""),
-                    RequestBody.create(null, "on")
+                    RequestBody.create("on", null)
             );
         }
         if (se) {
             builder.addPart(
                     Headers.of("Content-Disposition", "form-data; name=\"fs_exp\""),
-                    RequestBody.create(null, "on")
+                    RequestBody.create("on", null)
             );
         }
         builder.addPart(
                 Headers.of("Content-Disposition", "form-data; name=\"f_sfile\""),
-                RequestBody.create(null, "File Search")
+                RequestBody.create("File Search", null)
         );
         String url = EhUrl.getImageSearchUrl();
         String referer = EhUrl.getReferer();
@@ -1002,7 +1002,7 @@ public class EhEngine {
         json.put("page", index + 1);
         json.put("imgkey", pToken);
         json.put("showkey", showKey);
-        final RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json.toString());
+        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
         String url = EhUrl.getApiUrl();
         String referer = null;
         if (index > 0 && previousPToken != null) {

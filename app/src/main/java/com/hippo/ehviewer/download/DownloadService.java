@@ -31,6 +31,7 @@ import android.util.Log;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -216,7 +217,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setColorized(true)
                 .addAction(R.drawable.ic_baseline_pause_24, getString(R.string.stat_download_action_stop_all), piStopAll)
                 .setShowWhen(false)
@@ -246,7 +247,7 @@ public class DownloadService extends Service implements DownloadManager.Download
         mDownloadedBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setContentTitle(getString(R.string.stat_download_done_title))
-                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setDeleteIntent(piClear)
                 .setOngoing(false)
                 .setAutoCancel(true)
@@ -265,7 +266,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                 .setContentText(getString(R.string.stat_509_alert_title))
                 .setContentText(getString(R.string.stat_509_alert_text))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.stat_509_alert_text)))
-                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setAutoCancel(true)
                 .setOngoing(false)
                 .setCategory(NotificationCompat.CATEGORY_ERROR);

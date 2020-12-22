@@ -23,8 +23,6 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.network.StatusCodeException;
 
-import org.apache.http.conn.ConnectTimeoutException;
-
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketException;
@@ -42,8 +40,7 @@ public final class ExceptionUtils {
         e.printStackTrace();
         if (e instanceof MalformedURLException) {
             return GetText.getString(R.string.error_invalid_url);
-        } else if (e instanceof ConnectTimeoutException ||
-                e instanceof SocketTimeoutException) {
+        } else if (e instanceof SocketTimeoutException) {
             return GetText.getString(R.string.error_timeout);
         } else if (e instanceof UnknownHostException) {
             return GetText.getString(R.string.error_unknown_host);

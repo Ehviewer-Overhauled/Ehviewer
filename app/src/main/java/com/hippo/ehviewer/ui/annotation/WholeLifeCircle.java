@@ -17,8 +17,9 @@
 package com.hippo.ehviewer.ui.annotation;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

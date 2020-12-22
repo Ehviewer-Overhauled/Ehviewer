@@ -44,7 +44,7 @@ public class SetSecurityFragment extends BaseFragment implements View.OnClickLis
                     LockPatternUtils.stringToPattern(pattern));
         }
 
-        if (BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+        if (BiometricManager.from(requireContext()).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS) {
             mFingerprint.setVisibility(View.VISIBLE);
             mFingerprint.setChecked(Settings.getEnableFingerprint());
         }

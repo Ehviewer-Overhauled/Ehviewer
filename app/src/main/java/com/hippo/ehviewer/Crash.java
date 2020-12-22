@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 public final class Crash {
     private Crash() {
@@ -109,11 +110,8 @@ public final class Crash {
         fw.write("BOOTLOADER=");
         fw.write(Build.BOOTLOADER);
         fw.write("\r\n");
-        fw.write("CPU_ABI=");
-        fw.write(Build.CPU_ABI);
-        fw.write("\r\n");
-        fw.write("CPU_ABI2=");
-        fw.write(Build.CPU_ABI2);
+        fw.write("SUPPORTED_ABIS=");
+        fw.write(Arrays.toString(Build.SUPPORTED_ABIS));
         fw.write("\r\n");
         fw.write("DEVICE=");
         fw.write(Build.DEVICE);
