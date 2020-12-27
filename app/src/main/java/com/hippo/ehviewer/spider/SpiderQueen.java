@@ -43,6 +43,7 @@ import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.Image509Exception;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.ehviewer.client.parser.GalleryDetailParser;
+import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
@@ -768,6 +769,42 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+    private String getPTokenFromMultiPageViewer(int index) {
+        SpiderInfo spiderInfo = mSpiderInfo.get();
+        if (spiderInfo == null) {
+            return null;
+        }
+
+        try {
+            String url = EhUrl.getGalleryMultiPageViewerUrl(
+                    mGalleryInfo.gid, mGalleryInfo.token);
+            if (DEBUG_PTOKEN) {
+                Log.d(TAG, "getPTokenFromMultiPageViewer index " + index + ", url " + url);
+            }
+            String referer = EhUrl.getReferer();
+            Request request = new EhRequestBuilder(url, referer).build();
+            Response response = mHttpClient.newCall(request).execute();
+            String body = response.body().string();
+
+            ArrayList<String> list = GalleryMultiPageViewerPTokenParser.parse(body);
+
+            for (int i = 0; i < list.size(); i++) {
+                synchronized (mPTokenLock) {
+                    spiderInfo.pTokenMap.put(i, list.get(i));
+                }
+            }
+
+            String pToken;
+            synchronized (mPTokenLock) {
+                pToken = spiderInfo.pTokenMap.get(index);
+            }
+            return pToken;
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            return null;
+        }
+    }
+
     private String getPTokenFromInternet(int index) {
         SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo == null) {
@@ -924,6 +961,11 @@ public final class SpiderQueen implements Runnable {
             if (null == pToken) {
                 // Preview size may changed, so try to get pToken twice
                 pToken = getPTokenFromInternet(index);
+            }
+
+            if (null == pToken) {
+                // Multi-page viewer enabled maybe
+                pToken = getPTokenFromMultiPageViewer(index);
             }
 
             if (null == pToken) {

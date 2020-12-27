@@ -158,6 +158,11 @@ public class EhUrl {
         return builder.build();
     }
 
+    public static String getGalleryMultiPageViewerUrl(long gid, String token) {
+        UrlBuilder builder = new UrlBuilder(getHost() + "mpv/" + gid + '/' + token + '/');
+        return builder.build();
+    }
+
     public static String getPageUrl(long gid, int index, String pToken) {
         return getHost() + "s/" + pToken + '/' + gid + '-' + (index + 1);
     }
