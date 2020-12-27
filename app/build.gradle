@@ -3,7 +3,7 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
     ndkVersion "21.3.6528147"
     signingConfigs {
         def keystorePwd = null
@@ -111,7 +111,7 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-thread:0.1.1'
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
-    def appCenterSdkVersion = '4.0.0'
+    def appCenterSdkVersion = '4.1.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
