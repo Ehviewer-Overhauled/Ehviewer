@@ -219,7 +219,12 @@ public class FilterFragment extends BaseFragment {
             Filter filter = new Filter();
             filter.mode = mode;
             filter.text = text;
-            mFilterList.add(filter);
+            if (!mFilterList.add(filter)) {
+                mInputLayout.setError(getString(R.string.label_text_exist));
+                return;
+            } else {
+                mInputLayout.setError(null);
+            }
 
             if (null != mAdapter) {
                 mAdapter.notifyDataSetChanged();
@@ -314,7 +319,12 @@ public class FilterFragment extends BaseFragment {
 
         @Override
         public long getItemId(int position) {
-            return null != mFilterList ? mFilterList.get(position).text.hashCode() : 0;
+            if (mFilterList == null) {
+                return 0;
+            } else {
+                Filter filter = mFilterList.get(position);
+                return filter.text.hashCode() >> filter.mode;
+            }
         }
     }
 
@@ -436,8 +446,8 @@ public class FilterFragment extends BaseFragment {
             throw new IndexOutOfBoundsException();
         }
 
-        public void add(Filter filter) {
-            mEhFilter.addFilter(filter);
+        public boolean add(Filter filter) {
+            return mEhFilter.addFilter(filter);
         }
 
         public void delete(Filter filter) {

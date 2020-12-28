@@ -88,10 +88,10 @@ public final class EhFilter {
         return mTagNamespaceFilterList;
     }
 
-    public synchronized void addFilter(Filter filter) {
+    public synchronized boolean addFilter(Filter filter) {
         // enable filter by default before it is added to database
         filter.enable = true;
-        EhDB.addFilter(filter);
+        if (!EhDB.addFilter(filter)) return false;
 
         switch (filter.mode) {
             case MODE_TITLE:
@@ -113,6 +113,7 @@ public final class EhFilter {
                 Log.d(TAG, "Unknown mode: " + filter.mode);
                 break;
         }
+        return true;
     }
 
     public synchronized void triggerFilter(Filter filter) {

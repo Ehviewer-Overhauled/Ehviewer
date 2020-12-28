@@ -595,9 +595,20 @@ public class EhDB {
         return sDaoSession.getFilterDao().queryBuilder().list();
     }
 
-    public static synchronized void addFilter(Filter filter) {
-        filter.setId(null);
-        filter.setId(sDaoSession.getFilterDao().insert(filter));
+    public static synchronized boolean addFilter(Filter filter) {
+        Filter existFilter;
+        try {
+            existFilter = sDaoSession.getFilterDao().queryBuilder().where(FilterDao.Properties.Text.eq(filter.text), FilterDao.Properties.Mode.eq(filter.mode)).unique();
+        } catch (Exception e) {
+            existFilter = null;
+        }
+        if (existFilter == null) {
+            filter.setId(null);
+            filter.setId(sDaoSession.getFilterDao().insert(filter));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static synchronized void deleteFilter(Filter filter) {
