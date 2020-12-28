@@ -307,7 +307,7 @@ public class DownloadService extends Service implements DownloadManager.Download
 
         mDownloadingBuilder.setContentTitle(EhUtils.getSuitableTitle(info))
                 .setContentText(null)
-                .setContentInfo(null)
+                .setSubText(null)
                 .setProgress(0, 0, true)
                 .setContentIntent(piActivity);
 
@@ -324,7 +324,7 @@ public class DownloadService extends Service implements DownloadManager.Download
         if (speed < 0) {
             speed = 0;
         }
-        String text = FileUtils.humanReadableByteCount(speed, false) + "/S";
+        String text = FileUtils.humanReadableByteCount(speed, false) + "/s";
         long remaining = info.remaining;
         if (remaining >= 0) {
             text = getString(R.string.download_speed_text_2, text, ReadableTime.getShortTimeInterval(remaining));
@@ -333,7 +333,8 @@ public class DownloadService extends Service implements DownloadManager.Download
         }
         mDownloadingBuilder.setContentTitle(EhUtils.getSuitableTitle(info))
                 .setContentText(text)
-                .setContentInfo(info.total == -1 || info.finished == -1 ? null : info.finished + "/" + info.total)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setSubText(info.total == -1 || info.finished == -1 ? null : info.finished + "/" + info.total)
                 .setProgress(info.total, info.finished, false);
 
         mDownloadingDelay.startForeground();
