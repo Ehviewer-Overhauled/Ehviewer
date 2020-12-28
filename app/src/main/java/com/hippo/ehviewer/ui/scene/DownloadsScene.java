@@ -48,6 +48,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -532,7 +533,7 @@ public class DownloadsScene extends ToolbarScene
             case R.id.action_start_all: {
                 Intent intent = new Intent(activity, DownloadService.class);
                 intent.setAction(DownloadService.ACTION_START_ALL);
-                activity.startService(intent);
+                ContextCompat.startForegroundService(activity, intent);
                 return true;
             }
             case R.id.action_stop_all: {
@@ -571,7 +572,7 @@ public class DownloadsScene extends ToolbarScene
                 Intent intent = new Intent(activity, DownloadService.class);
                 intent.setAction(DownloadService.ACTION_START_RANGE);
                 intent.putExtra(DownloadService.KEY_GID_LIST, gidList);
-                activity.startService(intent);
+                ContextCompat.startForegroundService(activity, intent);
                 return true;
             }
         }
@@ -786,7 +787,7 @@ public class DownloadsScene extends ToolbarScene
                     Intent intent = new Intent(activity, DownloadService.class);
                     intent.setAction(DownloadService.ACTION_START_RANGE);
                     intent.putExtra(DownloadService.KEY_GID_LIST, gidList);
-                    activity.startService(intent);
+                    ContextCompat.startForegroundService(activity, intent);
                     // Cancel check mode
                     recyclerView.outOfCustomChoiceMode();
                     break;
@@ -1326,7 +1327,7 @@ public class DownloadsScene extends ToolbarScene
                 Intent intent = new Intent(activity, DownloadService.class);
                 intent.setAction(DownloadService.ACTION_START);
                 intent.putExtra(DownloadService.KEY_GALLERY_INFO, list.get(index));
-                activity.startService(intent);
+                ContextCompat.startForegroundService(activity, intent);
             } else if (stop == v) {
                 if (null != mDownloadManager) {
                     mDownloadManager.stopDownload(list.get(index).gid);

@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.hippo.ehviewer.download.DownloadService;
 
@@ -37,7 +38,7 @@ public class ShortcutsActivity extends AppCompatActivity {
             action = intent.getAction();
             if (action != null && (action.equals(DownloadService.ACTION_START_ALL) ||
                     action.equals(DownloadService.ACTION_STOP_ALL))) {
-                startService(new Intent(this, DownloadService.class).setAction(action));
+                ContextCompat.startForegroundService(this, new Intent(this, DownloadService.class).setAction(action));
             }
         }
         finish();

@@ -19,6 +19,8 @@ package com.hippo.ehviewer.ui;
 import android.app.Activity;
 import android.content.Intent;
 
+import androidx.core.content.ContextCompat;
+
 import com.hippo.app.ListCheckBoxDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -126,14 +128,7 @@ public final class CommonOperations {
             Intent intent = new Intent(activity, DownloadService.class);
             intent.setAction(DownloadService.ACTION_START_RANGE);
             intent.putExtra(DownloadService.KEY_GID_LIST, toStart);
-            try {
-                activity.startService(intent);
-            } catch (Exception e) {
-                // java.lang.IllegalStateException:
-                // Not allowed to start service Intent { act=start cmp=com.hippo.ehviewer/.download.DownloadService (has extras) }: app is in background uid null
-                e.printStackTrace();
-                return;
-            }
+            ContextCompat.startForegroundService(activity, intent);
         }
 
         if (toAdd.isEmpty()) {
@@ -161,14 +156,7 @@ public final class CommonOperations {
                 intent.setAction(DownloadService.ACTION_START);
                 intent.putExtra(DownloadService.KEY_LABEL, label);
                 intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
-                try {
-                    activity.startService(intent);
-                } catch (Exception e) {
-                    // java.lang.IllegalStateException:
-                    // Not allowed to start service Intent { act=start cmp=com.hippo.ehviewer/.download.DownloadService (has extras) }: app is in background uid null
-                    e.printStackTrace();
-                    return;
-                }
+                ContextCompat.startForegroundService(activity, intent);
             }
             // Notify
             activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
@@ -198,7 +186,7 @@ public final class CommonOperations {
                             intent.setAction(DownloadService.ACTION_START);
                             intent.putExtra(DownloadService.KEY_LABEL, label1);
                             intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
-                            activity.startService(intent);
+                            ContextCompat.startForegroundService(activity, intent);
                         }
                         // Save settings
                         if (builder.isChecked()) {
