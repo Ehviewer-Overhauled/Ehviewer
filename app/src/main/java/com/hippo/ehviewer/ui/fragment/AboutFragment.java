@@ -24,6 +24,7 @@ import androidx.preference.Preference;
 import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
+import com.hippo.text.Html;
 import com.hippo.util.AppHelper;
 import com.microsoft.appcenter.distribute.Distribute;
 
@@ -41,7 +42,7 @@ public class AboutFragment extends BasePreferenceFragment {
         //Preference donate = findPreference(KEY_DONATE);
         Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
 
-        author.setSummary(getString(R.string.settings_about_author_summary).replace('$', '@'));
+        author.setSummary(Html.fromHtml(getString(R.string.settings_about_author_summary).replace('$', '@')));
 
         author.setOnPreferenceClickListener(this);
         //donate.setOnPreferenceClickListener(this);
