@@ -99,9 +99,6 @@ public class EhDrawerLayout extends DrawerLayout implements CoordinatorLayout.At
 
         @Override
         public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull EhDrawerLayout child, @NonNull View dependency) {
-            if (child.getAboveSnackViewCount() > 1) {
-                return;
-            }
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {
