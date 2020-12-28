@@ -67,6 +67,7 @@ import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
+import com.hippo.refreshlayout.RefreshLayout;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
@@ -91,7 +92,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class GalleryCommentsScene extends ToolbarScene
-        implements View.OnClickListener {
+        implements View.OnClickListener, RefreshLayout.OnRefreshListener {
 
     public static final String TAG = GalleryCommentsScene.class.getSimpleName();
 
@@ -125,6 +126,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     private CommentAdapter mAdapter;
     @Nullable
     private ViewTransition mViewTransition;
+    private RefreshLayout mRefreshLayout;
     private Drawable mSendDrawable;
     private Drawable mPencilDrawable;
     private long mCommentId;
@@ -170,7 +172,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(KEY_API_UID, mApiUid);
         outState.putString(KEY_API_KEY, mApiKey);
@@ -179,7 +181,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         outState.putParcelable(KEY_COMMENT_LIST, mCommentList);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateView3(LayoutInflater inflater,
                               @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -191,10 +193,25 @@ public final class GalleryCommentsScene extends ToolbarScene
         mEditText = (EditText) ViewUtils.$$(mEditPanel, R.id.edit_text);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
+        mRefreshLayout = (RefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
 
-        Context context = getContext2();
-        AssertUtils.assertNotNull(context);
-        Resources resources = context.getResources();
+        mRefreshLayout.setHeaderColorSchemeResources(
+                R.color.loading_indicator_red,
+                R.color.loading_indicator_purple,
+                R.color.loading_indicator_blue,
+                R.color.loading_indicator_cyan,
+                R.color.loading_indicator_green,
+                R.color.loading_indicator_yellow);
+        mRefreshLayout.setFooterColorSchemeResources(
+                R.color.loading_indicator_red,
+                R.color.loading_indicator_blue,
+                R.color.loading_indicator_green,
+                R.color.loading_indicator_orange);
+        mRefreshLayout.setOnRefreshListener(this);
+        mRefreshLayout.setEnableSwipeFooter(false);
+
+        Context context = requireContext();
+        Resources resources = getResources();
         int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
 
         Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
@@ -213,9 +230,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         mRecyclerView.addItemDecoration(decoration);
-        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         mRecyclerView.setHasFixedSize(true);
-        //mRecyclerView.setOnItemClickListener(this);
         mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(),
                 mRecyclerView.getPaddingRight(), mRecyclerView.getPaddingBottom() + paddingBottomFab);
         // Cancel change animator
@@ -312,13 +327,14 @@ public final class GalleryCommentsScene extends ToolbarScene
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
         rv.setAdapter(new RecyclerView.Adapter<InfoHolder>() {
+            @NonNull
             @Override
-            public InfoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public InfoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 return new InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false));
             }
 
             @Override
-            public void onBindViewHolder(InfoHolder holder, int position) {
+            public void onBindViewHolder(@NonNull InfoHolder holder, int position) {
                 holder.key.setText(userArray[position]);
                 holder.value.setText(voteArray[position]);
             }
@@ -334,7 +350,6 @@ public final class GalleryCommentsScene extends ToolbarScene
                 LayoutUtils.dp2pix(context, 1));
         decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, R.attr.dialogPreferredPadding));
         rv.addItemDecoration(decoration);
-        //rv.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         rv.setClipToPadding(false);
         builder.setView(rv).show();
     }
@@ -370,32 +385,26 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         new MaterialAlertDialogBuilder(context)
-                .setItems(menu.toArray(new String[menu.size()]), (dialog, which) -> {
+                .setItems(menu.toArray(new String[0]), (dialog, which) -> {
                     if (which < 0 || which >= menuId.size()) {
                         return;
                     }
                     int id = menuId.get(which);
-                    switch (id) {
-                        case R.id.copy:
-                            ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                            cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
-                            showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
-                            break;
-                        case R.id.vote_up:
-                            voteComment(comment.id, 1);
-                            break;
-                        case R.id.vote_down:
-                            voteComment(comment.id, -1);
-                            break;
-                        case R.id.check_vote_status:
-                            showVoteStatusDialog(context, comment.voteState);
-                            break;
-                        case R.id.edit_comment:
-                            prepareEditComment(comment.id);
-                            if (!mInAnimation && mEditPanel != null && mEditPanel.getVisibility() != View.VISIBLE) {
-                                showEditPanel(true);
-                            }
-                            break;
+                    if (id == R.id.copy) {
+                        ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
+                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                    } else if (id == R.id.vote_up) {
+                        voteComment(comment.id, 1);
+                    } else if (id == R.id.vote_down) {
+                        voteComment(comment.id, -1);
+                    } else if (id == R.id.check_vote_status) {
+                        showVoteStatusDialog(context, comment.voteState);
+                    } else if (id == R.id.edit_comment) {
+                        prepareEditComment(comment.id);
+                        if (!mInAnimation && mEditPanel != null && mEditPanel.getVisibility() != View.VISIBLE) {
+                            showEditPanel(true);
+                        }
                     }
                 }).show();
     }
@@ -635,6 +644,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
+        mRefreshLayout.setHeaderRefreshing(false);
         mRefreshingComments = false;
         mCommentList = result;
         mAdapter.notifyDataSetChanged();
@@ -651,6 +661,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
+        mRefreshLayout.setHeaderRefreshing(false);
         mRefreshingComments = false;
         int position = mAdapter.getItemCount() - 1;
         if (position >= 0) {
@@ -712,6 +723,29 @@ public final class GalleryCommentsScene extends ToolbarScene
         Bundle re = new Bundle();
         re.putParcelable(KEY_COMMENT_LIST, mCommentList);
         setResult(SceneFragment.RESULT_OK, re);
+    }
+
+    @Override
+    public void onHeaderRefresh() {
+        if (!mRefreshingComments && mAdapter != null) {
+            MainActivity activity = (MainActivity) requireActivity();
+            mRefreshingComments = true;
+
+            String url = getGalleryDetailUrl();
+            if (url != null) {
+                // Request
+                EhRequest request = new EhRequest()
+                        .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
+                        .setArgs(url)
+                        .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
+                EhApplication.getEhClient(activity).execute(request);
+            }
+        }
+    }
+
+    @Override
+    public void onFooterRefresh() {
+
     }
 
     private static class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
@@ -814,7 +848,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
     }
 
-    private class InfoHolder extends RecyclerView.ViewHolder {
+    private static class InfoHolder extends RecyclerView.ViewHolder {
 
         private final TextView key;
         private final TextView value;
@@ -826,13 +860,13 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
     }
 
-    private abstract class CommentHolder extends RecyclerView.ViewHolder {
+    private abstract static class CommentHolder extends RecyclerView.ViewHolder {
         public CommentHolder(LayoutInflater inflater, int resId, ViewGroup parent) {
             super(inflater.inflate(resId, parent, false));
         }
     }
 
-    private class ActualCommentHolder extends CommentHolder {
+    private static class ActualCommentHolder extends CommentHolder {
 
         private final TextView user;
         private final TextView time;
@@ -880,13 +914,13 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
     }
 
-    private class MoreCommentHolder extends CommentHolder {
+    private static class MoreCommentHolder extends CommentHolder {
         public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, R.layout.item_gallery_comment_more, parent);
         }
     }
 
-    private class ProgressCommentHolder extends CommentHolder {
+    private static class ProgressCommentHolder extends CommentHolder {
         public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater, R.layout.item_gallery_comment_progress, parent);
         }
@@ -901,6 +935,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             AssertUtils.assertNotNull(mInflater);
         }
 
+        @NonNull
         @Override
         public CommentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             switch (viewType) {

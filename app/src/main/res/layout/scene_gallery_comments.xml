@@ -20,11 +20,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.hippo.easyrecyclerview.EasyRecyclerView
-        android:id="@+id/recycler_view"
+    <com.hippo.refreshlayout.RefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false" />
+        android:layout_height="match_parent">
+
+        <com.hippo.easyrecyclerview.EasyRecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+    </com.hippo.refreshlayout.RefreshLayout>
 
     <TextView
         android:id="@+id/tip"
