@@ -26,8 +26,8 @@ android {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 128
-        versionName "1.7.19"
+        versionCode 129
+        versionName "1.7.20"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
