@@ -493,7 +493,7 @@ public final class GalleryListScene extends BaseScene
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList;
             recreateDrawerView();
-            mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_dark_x24);
+            mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_x24);
         }
 
         // Update normal search mode
@@ -579,8 +579,8 @@ public final class GalleryListScene extends BaseScene
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
-        mRightDrawable = new AddDeleteDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
+        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
+        mRightDrawable = new AddDeleteDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(mRightDrawable);
         mSearchBar.setHelper(this);

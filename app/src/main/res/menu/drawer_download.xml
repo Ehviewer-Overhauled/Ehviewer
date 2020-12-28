@@ -22,12 +22,12 @@
         android:id="@+id/action_add"
         android:icon="@drawable/v_plus_dark_x24"
         android:title="@string/settings"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_default_download_label"
         android:icon="@drawable/v_download_box_dark_x24"
         android:title="@string/default_download_label"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
 </menu>

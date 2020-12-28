@@ -18,10 +18,11 @@
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:tint="?colorAccent">
 
     <path
-        android:fillColor="?attr/colorAccent"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_chart" />
 
 </vector>

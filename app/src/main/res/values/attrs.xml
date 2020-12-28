@@ -25,10 +25,6 @@
         <attr name="textColorThemePrimary" format="color" />
         <attr name="textColorThemeAccent" format="color" />
 
-        <!-- For light theme, it's primary dark color -->
-        <!-- For dark theme, it's primary light color -->
-        <!-- For black theme, it's primary light color -->
-        <attr name="drawableColorPrimary" format="color" />
         <!-- For light theme, it's secondary dark color -->
         <!-- For dark theme, it's secondary light color -->
         <!-- For black theme, it's secondary light color -->
@@ -178,8 +174,8 @@
     </declare-styleable>
 
     <declare-styleable name="FastScroller">
-        <attr name="handler" format="reference"/>
-        <attr name="draggable" format="boolean"/>
+        <attr name="handler" format="reference" />
+        <attr name="draggable" format="boolean" />
     </declare-styleable>
 
 </resources>

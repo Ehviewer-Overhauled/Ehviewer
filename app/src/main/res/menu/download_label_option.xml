@@ -5,10 +5,10 @@
         android:id="@+id/menu_label_rename"
         android:title="@string/rename_label"
         android:orderInCategory="100"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/menu_label_remove"
         android:title="@string/delete"
         android:orderInCategory="101"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

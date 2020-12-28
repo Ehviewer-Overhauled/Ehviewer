@@ -18,10 +18,11 @@
     android:width="16dp"
     android:height="16dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:tint="@color/yellow_800">
 
     <path
-        android:fillColor="@color/yellow_800"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_star_outline" />
 
 </vector>

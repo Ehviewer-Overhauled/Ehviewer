@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_magnify_dark_x24"
+            app:srcCompat="@drawable/v_magnify_x24"
             app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -96,7 +96,7 @@
             android:scaleY="0"
             android:visibility="invisible"
             app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:srcCompat="@drawable/v_magnify_dark_x24"
+            app:srcCompat="@drawable/v_magnify_x24"
             app:tint="#fff" />
 
     </com.hippo.widget.FabLayout>

@@ -18,10 +18,10 @@
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
-
+    android:viewportHeight="24"
+    android:tint="@color/brown_500">
     <path
-        android:fillColor="@color/brown_500"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_cookie" />
 
 </vector>

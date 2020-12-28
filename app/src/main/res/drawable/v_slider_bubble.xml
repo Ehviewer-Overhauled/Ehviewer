@@ -18,10 +18,11 @@
     android:width="@dimen/slider_bubble_width"
     android:height="@dimen/slider_bubble_height"
     android:viewportWidth="26"
-    android:viewportHeight="32">
+    android:viewportHeight="32"
+    android:tint="?attr/colorControlNormal">
 
     <path
-        android:fillColor="@android:color/black"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_slider_bubble" />
 
 </vector>

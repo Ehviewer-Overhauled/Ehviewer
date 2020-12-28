@@ -279,7 +279,7 @@ public class FavoritesScene extends BaseScene implements
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, R.attr.drawableColorPrimary));
+        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(DrawableManager.getVectorDrawable(context, R.drawable.v_magnify_x24));
         mSearchBar.setHelper(this);

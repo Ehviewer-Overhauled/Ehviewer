@@ -114,6 +114,7 @@
                 android:paddingTop="16dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="16dp"
+                app:tint="@color/primary_drawable_black"
                 app:srcCompat="@drawable/v_dots_vertical_secondary_dark_x24" />
 
         </RelativeLayout>

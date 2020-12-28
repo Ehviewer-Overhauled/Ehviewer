@@ -5,5 +5,5 @@
         android:id="@+id/menu_qs_remove"
         android:title="@string/delete"
         android:orderInCategory="100"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

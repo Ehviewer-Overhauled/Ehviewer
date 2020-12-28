@@ -18,10 +18,11 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:tint="?drawableColorThemePrimary">
 
     <path
-        android:fillColor="?attr/drawableColorThemePrimary"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_adb" />
 
 </vector>

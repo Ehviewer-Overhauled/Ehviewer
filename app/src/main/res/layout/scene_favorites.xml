@@ -74,7 +74,7 @@
             android:visibility="gone"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_download_dark_x24"
+            app:srcCompat="@drawable/v_download_x24"
             app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -94,7 +94,7 @@
             android:visibility="gone"
             app:backgroundTint="?attr/widgetColorThemeAccent"
             app:fabSize="mini"
-            app:srcCompat="@drawable/v_folder_move_dark_x24"
+            app:srcCompat="@drawable/v_folder_move_x24"
             app:tint="#fff" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

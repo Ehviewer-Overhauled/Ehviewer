@@ -18,10 +18,11 @@
     android:width="120dp"
     android:height="120dp"
     android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportHeight="24"
+    android:tint="?drawableColorSecondary">
 
     <path
-        android:fillColor="?attr/drawableColorSecondary"
+        android:fillColor="@android:color/white"
         android:pathData="@string/pd_big_download" />
 
 </vector>

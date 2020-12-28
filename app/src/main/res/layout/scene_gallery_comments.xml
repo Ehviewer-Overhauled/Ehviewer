@@ -81,7 +81,8 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="16dp" />
+                android:padding="16dp"
+                app:tint="#fff" />
 
         </LinearLayout>
     </LinearLayout>

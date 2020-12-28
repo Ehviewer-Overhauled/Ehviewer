@@ -63,6 +63,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="8dp"
+            app:tint="#fff"
             app:srcCompat="@drawable/ic_baseline_brightness_2_24" />
     </FrameLayout>
 
