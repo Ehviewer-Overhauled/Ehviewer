@@ -294,6 +294,7 @@ public abstract class StageActivity extends EhActivity {
 
                     // Remove tag from index i+1
                     mSceneTagList.subList(i + 1, mSceneTagList.size()).clear();
+                    mDelaySceneTagList.subList(i + 1, mDelaySceneTagList.size()).clear();
 
                     // Attach fragment
                     if (fragment.isDetached()) {
