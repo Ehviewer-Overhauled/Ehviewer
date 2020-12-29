@@ -79,11 +79,11 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ViewUtils;
 
+import org.greenrobot.greendao.query.LazyList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import de.greenrobot.dao.query.LazyList;
 
 public class HistoryScene extends ToolbarScene {
 

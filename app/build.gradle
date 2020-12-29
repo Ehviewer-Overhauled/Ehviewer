@@ -122,7 +122,7 @@ dependencies {
     implementation 'com.github.NekoInverter:RefreshLayout:7241e04739'
     implementation 'fadeapp.widgets:scrollless-recyclerView:1.0.2'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
-    implementation 'org.greenrobot:greendao:2.2.1'
+    implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'org.jsoup:jsoup:1.13.1'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.2.1'

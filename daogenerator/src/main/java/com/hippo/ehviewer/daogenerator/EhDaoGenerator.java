@@ -22,9 +22,9 @@ import org.jboss.forge.roaster.model.source.JavaClassSource;
 import java.io.File;
 import java.io.FileWriter;
 
-import de.greenrobot.daogenerator.DaoGenerator;
-import de.greenrobot.daogenerator.Entity;
-import de.greenrobot.daogenerator.Schema;
+import org.greenrobot.greendao.generator.DaoGenerator;
+import org.greenrobot.greendao.generator.Entity;
+import org.greenrobot.greendao.generator.Schema;
 
 public class EhDaoGenerator {
 
@@ -68,7 +68,7 @@ public class EhDaoGenerator {
 
     private static void addDownloads(Schema schema) {
         Entity entity = schema.addEntity("DownloadInfo");
-        entity.setTableName("DOWNLOADS");
+        entity.setDbName("DOWNLOADS");
         entity.setClassNameDao("DownloadsDao");
         entity.setSuperclass("GalleryInfo");
         // GalleryInfo data
@@ -91,7 +91,7 @@ public class EhDaoGenerator {
 
     private static void addDownloadLabel(Schema schema) {
         Entity entity = schema.addEntity("DownloadLabel");
-        entity.setTableName("DOWNLOAD_LABELS");
+        entity.setDbName("DOWNLOAD_LABELS");
         entity.setClassNameDao("DownloadLabelDao");
         entity.addIdProperty();
         entity.addStringProperty("label");
@@ -100,7 +100,7 @@ public class EhDaoGenerator {
 
     private static void addDownloadDirname(Schema schema) {
         Entity entity = schema.addEntity("DownloadDirname");
-        entity.setTableName("DOWNLOAD_DIRNAME");
+        entity.setDbName("DOWNLOAD_DIRNAME");
         entity.setClassNameDao("DownloadDirnameDao");
         entity.addLongProperty("gid").primaryKey().notNull();
         entity.addStringProperty("dirname");
@@ -108,7 +108,7 @@ public class EhDaoGenerator {
 
     private static void addHistoryInfo(Schema schema) {
         Entity entity = schema.addEntity("HistoryInfo");
-        entity.setTableName("HISTORY");
+        entity.setDbName("HISTORY");
         entity.setClassNameDao("HistoryDao");
         entity.setSuperclass("GalleryInfo");
         // GalleryInfo data
@@ -129,7 +129,7 @@ public class EhDaoGenerator {
 
     private static void addQuickSearch(Schema schema) {
         Entity entity = schema.addEntity("QuickSearch");
-        entity.setTableName("QUICK_SEARCH");
+        entity.setDbName("QUICK_SEARCH");
         entity.setClassNameDao("QuickSearchDao");
         entity.addIdProperty();
         entity.addStringProperty("name");
@@ -147,7 +147,7 @@ public class EhDaoGenerator {
 
     private static void addLocalFavorites(Schema schema) {
         Entity entity = schema.addEntity("LocalFavoriteInfo");
-        entity.setTableName("LOCAL_FAVORITES");
+        entity.setDbName("LOCAL_FAVORITES");
         entity.setClassNameDao("LocalFavoritesDao");
         entity.setSuperclass("GalleryInfo");
         // GalleryInfo data
@@ -167,8 +167,8 @@ public class EhDaoGenerator {
 
     private static void addBookmarks(Schema schema) {
         Entity entity = schema.addEntity("BookmarkInfo");
-        entity.setTableName("BOOKMARKS");
-        entity.setClassNameDao("BookmarksBao");
+        entity.setDbName("BOOKMARKS");
+        entity.setClassNameDao("BookmarksDao");
         entity.setSuperclass("GalleryInfo");
         // GalleryInfo data
         entity.addLongProperty("gid").primaryKey().notNull();
@@ -189,7 +189,7 @@ public class EhDaoGenerator {
     // Since 2
     private static void addFilter(Schema schema) {
         Entity entity = schema.addEntity("Filter");
-        entity.setTableName("FILTER");
+        entity.setDbName("FILTER");
         entity.setClassNameDao("FilterDao");
         entity.addIdProperty();
         entity.addIntProperty("mode").notNull();
