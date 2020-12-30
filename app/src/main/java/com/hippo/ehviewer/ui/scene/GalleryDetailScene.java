@@ -54,6 +54,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
@@ -266,7 +267,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private int mState = STATE_INIT;
     private boolean mModifingFavorites;
 
-    private String getRatingText(float rating) {
+    @StringRes
+    private int getRatingText(float rating) {
         int resId;
         switch (Math.round(rating * 2)) {
             case 0:
@@ -307,7 +309,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 break;
         }
 
-        return getString(resId);
+        return resId;
     }
 
     @Nullable
@@ -1040,7 +1042,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private String getAllRatingText(float rating, int ratingCount) {
-        return getString(R.string.rating_text, getRatingText(rating), rating, ratingCount);
+        return getString(R.string.rating_text, getString(getRatingText(rating)), rating, ratingCount);
     }
 
     private void setTransitionName() {
