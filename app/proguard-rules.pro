@@ -18,13 +18,14 @@
 
 -keepattributes SourceFile,LineNumberTable
 -keep class com.hippo.a7zip.* { *; }
--keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { *; }
--keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { *; }
+-keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { }
+-keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { }
+-keepnames class com.hippo.ehviewer.ui.scene.* { }
 -keep class com.hippo.image.* { *; }
 -keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
 public static java.lang.String TABLENAME;
 }
 -keep class **$Properties { *; }
--keep class org.greenrobot.greendao.database.SqlCipherEncryptedHelper { *; }
 -dontwarn net.sqlcipher.database.**
 -dontwarn rx.**
+-dontwarn org.conscrypt.ConscryptHostnameVerifier
