@@ -49,7 +49,7 @@
             android:configChanges="screenSize|uiMode"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.Main"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateAlwaysHidden">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
