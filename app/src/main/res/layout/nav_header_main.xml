@@ -35,7 +35,8 @@
         android:layout_height="64dp"
         android:layout_gravity="bottom"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="48dp" />
+        android:layout_marginBottom="48dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent" />
 
     <TextView
         android:id="@+id/display_name"
