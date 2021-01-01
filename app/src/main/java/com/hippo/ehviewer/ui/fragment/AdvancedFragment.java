@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -75,16 +76,19 @@ public class AdvancedFragment extends BasePreferenceFragment {
                                 .show();
                         IoThreadPoolExecutor.getInstance().execute(() -> {
                             boolean success = EhDB.exportDB(requireActivity(), uri);
-                            requireActivity().runOnUiThread(() -> {
-                                if (alertDialog.isShowing()) {
-                                    alertDialog.dismiss();
-                                }
-                                showTip(
-                                        (success)
-                                                ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
-                                                : GetText.getString(R.string.settings_advanced_export_data_failed),
-                                        BaseScene.LENGTH_SHORT);
-                            });
+                            Activity activity = getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(() -> {
+                                    if (alertDialog.isShowing()) {
+                                        alertDialog.dismiss();
+                                    }
+                                    showTip(
+                                            (success)
+                                                    ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
+                                                    : GetText.getString(R.string.settings_advanced_export_data_failed),
+                                            BaseScene.LENGTH_SHORT);
+                                });
+                            }
                         });
                     } catch (Exception e) {
                         showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
@@ -189,16 +193,20 @@ public class AdvancedFragment extends BasePreferenceFragment {
                                 .show();
                         IoThreadPoolExecutor.getInstance().execute(() -> {
                             final String error = EhDB.importDB(requireActivity(), uri);
-                            requireActivity().runOnUiThread(() -> {
-                                if (alertDialog.isShowing()) {
-                                    alertDialog.dismiss();
-                                }
-                                if (null == error) {
-                                    showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
-                                } else {
-                                    showTip(error, BaseScene.LENGTH_SHORT);
-                                }
-                            });
+                            Activity activity = getActivity();
+                            if (activity != null) {
+                                activity.runOnUiThread(() -> {
+                                    if (alertDialog.isShowing()) {
+                                        alertDialog.dismiss();
+                                    }
+                                    if (null == error) {
+                                        showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
+                                    } else {
+                                        showTip(error, BaseScene.LENGTH_SHORT);
+                                    }
+                                });
+                            }
+
                         });
                     } catch (Exception e) {
                         showTip(e.getLocalizedMessage(), BaseScene.LENGTH_SHORT);

@@ -101,6 +101,7 @@ import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
 import com.hippo.util.DrawableManager;
+import com.hippo.util.ExceptionUtils;
 import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.ContentLayout;
@@ -1426,7 +1427,12 @@ public final class GalleryListScene extends BaseScene
 
     @Override
     public void onSelectImage() {
-        selectImageLauncher.launch(new String[]{"image/*"});
+        try {
+            selectImageLauncher.launch(new String[]{"image/*"});
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+        }
     }
 
     // SearchBarMover.Helper
