@@ -120,7 +120,7 @@ public class HistoryScene extends ToolbarScene {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Context context = getContext2();
+        Context context = getContext();
         assert context != null;
         mDownloadManager = EhApplication.getDownloadManager(context);
         mDownloadManager = EhApplication.getDownloadManager(context);
@@ -183,8 +183,8 @@ public class HistoryScene extends ToolbarScene {
 
     @Nullable
     @Override
-    public View onCreateView3(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateViewWithToolbar(LayoutInflater inflater,
+                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_history, container, false);
         View content = ViewUtils.$$(view, R.id.content);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(content, R.id.recycler_view);
@@ -192,7 +192,7 @@ public class HistoryScene extends ToolbarScene {
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mViewTransition = new ViewTransition(content, tip);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         Resources resources = context.getResources();
 
@@ -246,7 +246,7 @@ public class HistoryScene extends ToolbarScene {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.history);
-        setNavigationIcon(new DrawerArrowDrawable(getContext2(), Color.WHITE));
+        setNavigationIcon(new DrawerArrowDrawable(getContext(), Color.WHITE));
     }
 
     @Override
@@ -301,7 +301,7 @@ public class HistoryScene extends ToolbarScene {
     }
 
     private void showClearAllDialog() {
-        new MaterialAlertDialogBuilder(getContext2())
+        new MaterialAlertDialogBuilder(getContext())
                 .setMessage(R.string.clear_all_history)
                 .setPositiveButton(R.string.clear_all, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
@@ -318,7 +318,7 @@ public class HistoryScene extends ToolbarScene {
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         // Skip when in choice mode
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return false;
         }
@@ -351,8 +351,8 @@ public class HistoryScene extends ToolbarScene {
     }
 
     public boolean onItemLongClick(int position) {
-        final Context context = getContext2();
-        final MainActivity activity = getActivity2();
+        final Context context = getContext();
+        final MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mLazyList) {
             return false;
         }
@@ -465,7 +465,7 @@ public class HistoryScene extends ToolbarScene {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             // Cancel check mode
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context) {
                 return;
             }
@@ -575,7 +575,7 @@ public class HistoryScene extends ToolbarScene {
         private final int mListThumbHeight;
 
         public HistoryAdapter() {
-            mInflater = getLayoutInflater2();
+            mInflater = getLayoutInflater();
 
             View calculator = mInflater.inflate(R.layout.item_gallery_list_thumb_height, null);
             ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT);

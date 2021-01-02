@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -106,8 +107,8 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_cookie_sign_in, container, false);
         mIpbMemberIdLayout = (TextInputLayout) ViewUtils.$$(view, R.id.ipb_member_id_layout);
         mIpbMemberId = mIpbMemberIdLayout.getEditText();
@@ -129,7 +130,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         mFromClipboard.setOnClickListener(this);
 
         // Try to get old version cookie info
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         SharedPreferences sharedPreferences = context.getSharedPreferences("eh_info", 0);
         String ipbMemberId = sharedPreferences.getString("ipb_member_id", null);
@@ -192,7 +193,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     public void enter() {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context || null == mIpbMemberIdLayout || null == mIpbPassHashLayout ||
                 null == mIgneousLayout || null == mIpbMemberId || null == mIpbPassHash ||
                 null == mIgneous) {
@@ -235,7 +236,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     private void storeCookie(String id, String hash, String igneous) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return;
         }

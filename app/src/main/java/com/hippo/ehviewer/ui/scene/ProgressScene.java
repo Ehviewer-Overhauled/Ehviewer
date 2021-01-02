@@ -83,8 +83,8 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     }
 
     private boolean doJobs() {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity) {
             return false;
         }
@@ -143,7 +143,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_VALID, mValid);
         outState.putString(KEY_ERROR, mError);
@@ -157,13 +157,13 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_progress, container, false);
         View progress = ViewUtils.$$(view, R.id.progress);
         mTip = (TextView) ViewUtils.$$(view, R.id.tip);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
@@ -217,7 +217,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     private void onGetGalleryTokenFailure(Exception e) {
         mValid = false;
 
-        Context context = getContext2();
+        Context context = getContext();
 
         if (null != context && null != mViewTransition && null != mTip) {
             // Show tip

@@ -91,7 +91,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         mClient = EhApplication.getEhClient(context);
         if (savedInstanceState == null) {
@@ -131,14 +131,14 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
     @Nullable
     @Override
-    public View onCreateView3(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateViewWithToolbar(LayoutInflater inflater,
+                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ContentLayout contentLayout = (ContentLayout) inflater.inflate(
                 R.layout.scene_gallery_previews, container, false);
         contentLayout.hideFastScroll();
         mRecyclerView = contentLayout.getRecyclerView();
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         Resources resources = context.getResources();
 
@@ -197,7 +197,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return false;
         }
@@ -228,7 +228,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
     }
 
     public boolean onItemClick(int position) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null != context && null != mHelper && null != mGalleryInfo) {
             GalleryPreview p = mHelper.getDataAtEx(position);
             if (p != null) {
@@ -315,7 +315,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
         private final LayoutInflater mInflater;
 
         public GalleryPreviewAdapter() {
-            mInflater = getLayoutInflater2();
+            mInflater = getLayoutInflater();
             AssertUtils.assertNotNull(mInflater);
         }
 
@@ -348,7 +348,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
         @Override
         protected void getPageData(final int taskId, int type, int page) {
-            MainActivity activity = getActivity2();
+            MainActivity activity = getMainActivity();
             if (null == activity || null == mClient || null == mGalleryInfo) {
                 onGetException(taskId, new EhException(getString(R.string.error_cannot_find_gallery)));
                 return;
@@ -365,7 +365,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
         @Override
         protected Context getContext() {
-            return GalleryPreviewsScene.this.getContext2();
+            return GalleryPreviewsScene.this.getContext();
         }
 
         @Override

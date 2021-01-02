@@ -178,7 +178,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     private void initLabels() {
-        final Context context = getContext2();
+        final Context context = getContext();
         if (context == null) {
             return;
         }
@@ -232,7 +232,7 @@ public class DownloadsScene extends ToolbarScene
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         mDownloadManager = EhApplication.getDownloadManager(context);
         mDownloadManager.addDownloadInfoListener(this);
@@ -251,7 +251,7 @@ public class DownloadsScene extends ToolbarScene
 
         DownloadManager manager = mDownloadManager;
         if (null == manager) {
-            Context context = getContext2();
+            Context context = getContext();
             if (null != context) {
                 manager = EhApplication.getDownloadManager(context);
             }
@@ -325,8 +325,8 @@ public class DownloadsScene extends ToolbarScene
 
     @Nullable
     @Override
-    public View onCreateView3(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateViewWithToolbar(LayoutInflater inflater,
+                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_download, container, false);
 
         View content = ViewUtils.$$(view, R.id.content);
@@ -336,7 +336,7 @@ public class DownloadsScene extends ToolbarScene
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mViewTransition = new ViewTransition(content, tip);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(content);
         Resources resources = context.getResources();
 
@@ -413,7 +413,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     private void guideDownloadThumb() {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity || !Settings.getGuideDownloadThumb() || null == mLayoutManager || null == mRecyclerView) {
             guideDownloadLabels();
             return;
@@ -445,7 +445,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     private void guideDownloadLabels() {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity || !Settings.getGuideDownloadLabels()) {
             return;
         }
@@ -477,7 +477,7 @@ public class DownloadsScene extends ToolbarScene
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateTitle();
-        setNavigationIcon(new DrawerArrowDrawable(getContext2(), Color.WHITE));
+        setNavigationIcon(new DrawerArrowDrawable(getContext(), Color.WHITE));
     }
 
     @Override
@@ -512,7 +512,7 @@ public class DownloadsScene extends ToolbarScene
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         // Skip when in choice mode
-        Activity activity = getActivity2();
+        Activity activity = getMainActivity();
         if (null == activity || null == mRecyclerView || mRecyclerView.isInCustomChoice()) {
             return false;
         }
@@ -594,7 +594,7 @@ public class DownloadsScene extends ToolbarScene
                                    @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.drawer_list_rv, container, false);
 
-        final Context context = getContext2();
+        final Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
@@ -694,7 +694,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     public boolean onItemClick(int position) {
-        Activity activity = getActivity2();
+        Activity activity = getMainActivity();
         EasyRecyclerView recyclerView = mRecyclerView;
         if (null == activity || null == recyclerView) {
             return false;
@@ -743,8 +743,8 @@ public class DownloadsScene extends ToolbarScene
 
     @Override
     public void onClickSecondaryFab(FabLayout view, FloatingActionButton fab, int position) {
-        Context context = getContext2();
-        Activity activity = getActivity2();
+        Context context = getContext();
+        Activity activity = getMainActivity();
         EasyRecyclerView recyclerView = mRecyclerView;
         if (null == context || null == activity || null == recyclerView) {
             return;
@@ -906,17 +906,17 @@ public class DownloadsScene extends ToolbarScene
     }
 
     private void bindForState(DownloadHolder holder, DownloadInfo info) {
-        Resources resources = getResources2();
-        if (null == resources) {
+        Context context = getContext();
+        if (null == context) {
             return;
         }
 
         switch (info.state) {
             case DownloadInfo.STATE_NONE:
-                bindState(holder, info, resources.getString(R.string.download_state_none));
+                bindState(holder, info, context.getString(R.string.download_state_none));
                 break;
             case DownloadInfo.STATE_WAIT:
-                bindState(holder, info, resources.getString(R.string.download_state_wait));
+                bindState(holder, info, context.getString(R.string.download_state_wait));
                 break;
             case DownloadInfo.STATE_DOWNLOAD:
                 bindProgress(holder, info);
@@ -924,14 +924,14 @@ public class DownloadsScene extends ToolbarScene
             case DownloadInfo.STATE_FAILED:
                 String text;
                 if (info.legacy <= 0) {
-                    text = resources.getString(R.string.download_state_failed);
+                    text = context.getString(R.string.download_state_failed);
                 } else {
-                    text = resources.getString(R.string.download_state_failed_2, info.legacy);
+                    text = context.getString(R.string.download_state_failed_2, info.legacy);
                 }
                 bindState(holder, info, text);
                 break;
             case DownloadInfo.STATE_FINISH:
-                bindState(holder, info, resources.getString(R.string.download_state_finish));
+                bindState(holder, info, context.getString(R.string.download_state_finish));
                 break;
         }
     }
@@ -1018,7 +1018,7 @@ public class DownloadsScene extends ToolbarScene
         @Override
         public void onBindViewHolder(@NonNull DownloadLabelHolder holder, int position) {
             if (mLabels != null) {
-                Context context = getContext2();
+                Context context = getContext();
                 String label = mLabels.get(position);
                 if (mDownloadManager == null) {
                     if (context != null) {
@@ -1117,7 +1117,7 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onMoveItem(int fromPosition, int toPosition) {
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context || fromPosition == toPosition || toPosition == 0) {
                 return;
             }
@@ -1242,7 +1242,7 @@ public class DownloadsScene extends ToolbarScene
         @Override
         public void onClick(DialogInterface dialog, int which) {
             // Cancel check mode
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context) {
                 return;
             }
@@ -1300,8 +1300,8 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onClick(View v) {
-            Context context = getContext2();
-            Activity activity = getActivity2();
+            Context context = getContext();
+            Activity activity = getMainActivity();
             EasyRecyclerView recyclerView = mRecyclerView;
             if (null == context || null == activity || null == recyclerView || recyclerView.isInCustomChoice()) {
                 return;
@@ -1343,7 +1343,7 @@ public class DownloadsScene extends ToolbarScene
         private final int mListThumbHeight;
 
         public DownloadAdapter() {
-            mInflater = getLayoutInflater2();
+            mInflater = getLayoutInflater();
             AssertUtils.assertNotNull(mInflater);
 
             View calculator = mInflater.inflate(R.layout.item_gallery_list_thumb_height, null);
@@ -1521,7 +1521,7 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onClick(View v) {
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context) {
                 return;
             }
@@ -1561,7 +1561,7 @@ public class DownloadsScene extends ToolbarScene
 
         @Override
         public void onClick(View v) {
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context) {
                 return;
             }

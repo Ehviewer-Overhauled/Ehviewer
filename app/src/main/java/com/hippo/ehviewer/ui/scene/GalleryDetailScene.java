@@ -479,12 +479,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         // Get download state
         long gid = getGid();
         if (gid != -1) {
-            Context context = getContext2();
+            Context context = getContext();
             AssertUtils.assertNotNull(context);
             mDownloadState = EhApplication.getDownloadManager(context).getDownloadState(gid);
         } else {
@@ -499,7 +499,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         View actionsScrollView = ViewUtils.$$(view, R.id.actions_scroll_view);
@@ -629,16 +629,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setWhiteStatusBar(false);
+    public boolean needWhiteStatusBar() {
+        return false;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         EhApplication.getDownloadManager(context).removeDownloadInfoListener(this);
 
@@ -698,7 +697,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private boolean prepareData() {
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         if (mGalleryDetail != null) {
@@ -727,8 +726,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private boolean request() {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         String url = getGalleryDetailUrl(false);
         if (null == context || null == activity || null == url) {
             return false;
@@ -773,7 +772,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         int w = mColorBg.getWidth();
         int h = mColorBg.getHeight();
         if (ViewCompat.isAttachedToWindow(mColorBg) && w != 0 && h != 0) {
-            Resources resources = getContext2().getResources();
+            Resources resources = getContext().getResources();
             int keylineMargin = resources.getDimensionPixelSize(R.dimen.keyline_margin);
             int thumbWidth = resources.getDimensionPixelSize(R.dimen.gallery_detail_thumb_width);
             int thumbHeight = resources.getDimensionPixelSize(R.dimen.gallery_detail_thumb_height);
@@ -831,7 +830,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         if ((oldState == STATE_INIT || oldState == STATE_FAILED || oldState == STATE_REFRESH) &&
-                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && AttrResources.getAttrBoolean(getContext2(), R.attr.isLightTheme)) {
+                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && AttrResources.getAttrBoolean(getContext(), R.attr.isLightTheme)) {
             if (!createCircularReveal()) {
                 SimpleHandler.getInstance().post(this::createCircularReveal);
             }
@@ -891,8 +890,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             return;
         }
 
-        Resources resources = getResources2();
-        AssertUtils.assertNotNull(resources);
+        Resources resources = getResources();
 
         mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
         mTitle.setText(EhUtils.getSuitableTitle(gd));
@@ -924,10 +922,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void bindTags(GalleryTagGroup[] tagGroups) {
-        Context context = getContext2();
-        LayoutInflater inflater = getLayoutInflater2();
-        Resources resources = getResources2();
-        if (null == context || null == inflater || null == resources || null == mTags || null == mNoTags) {
+        Context context = getContext();
+        LayoutInflater inflater = getLayoutInflater();
+        if (null == context || null == inflater || null == mTags || null == mNoTags) {
             return;
         }
 
@@ -984,8 +981,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void bindComments(GalleryComment[] comments) {
-        Context context = getContext2();
-        LayoutInflater inflater = getLayoutInflater2();
+        Context context = getContext();
+        LayoutInflater inflater = getLayoutInflater();
         if (null == context || null == inflater || null == mComments || null == mCommentsText) {
             return;
         }
@@ -1021,8 +1018,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @SuppressLint("SetTextI18n")
     private void bindPreviews(GalleryDetail gd) {
-        LayoutInflater inflater = getLayoutInflater2();
-        Resources resources = getResources2();
+        LayoutInflater inflater = getLayoutInflater();
+        Resources resources = getResourcesOrNull();
         if (null == inflater || null == resources || null == mGridLayout || null == mPreviewText) {
             return;
         }
@@ -1075,7 +1072,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             return;
         }
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         PopupMenu popup = new PopupMenu(context, mOtherActions, Gravity.TOP);
         mPopupMenu = popup;
@@ -1084,7 +1081,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             int itemId = item.getItemId();
             if (itemId == R.id.action_open_in_other_app) {
                 String url = getGalleryDetailUrl(false);
-                Activity activity = getActivity2();
+                Activity activity = getMainActivity();
                 if (null != url && null != activity) {
                     UrlOpener.openUrl(activity, url, false);
                 }
@@ -1140,7 +1137,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void showCoverGalleryList() {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return;
         }
@@ -1174,8 +1171,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity) {
             return;
         }
@@ -1371,7 +1368,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void showFilterUploaderDialog() {
-        Context context = getContext2();
+        Context context = getContext();
         String uploader = getUploader();
         if (context == null || uploader == null) {
             return;
@@ -1394,7 +1391,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void showFilterTagDialog(String tag) {
-        Context context = getContext2();
+        Context context = getContext();
         if (context == null) {
             return;
         }
@@ -1416,7 +1413,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void showTagDialog(final String tag) {
-        final Context context = getContext2();
+        final Context context = getContext();
         if (null == context) {
             return;
         }
@@ -1462,8 +1459,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void voteTag(String tag, int vote) {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity) {
             return;
         }
@@ -1478,7 +1475,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Override
     public boolean onLongClick(View v) {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity) {
             return false;
         }
@@ -1583,7 +1580,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     }
 
     private void updateDownloadState() {
-        Context context = getContext2();
+        Context context = getContext();
         long gid = getGid();
         if (null == context || -1L == gid) {
             return;
@@ -1644,7 +1641,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     private void onGetGalleryDetailFailure(Exception e) {
         e.printStackTrace();
-        Context context = getContext2();
+        Context context = getContext();
         if (null != context && null != mTip) {
             String error = ExceptionUtils.getReadableString(e);
             mTip.setText(error);
@@ -1930,7 +1927,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             mListView = (ListView) ViewUtils.$$(dialog, R.id.list_view);
             mListView.setOnItemClickListener(this);
 
-            Context context = getContext2();
+            Context context = getContext();
             if (context != null) {
                 if (mArchiveList == null) {
                     mErrorText.setVisibility(View.GONE);
@@ -1969,8 +1966,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Context context = getContext2();
-            MainActivity activity = getActivity2();
+            Context context = getContext();
+            MainActivity activity = getMainActivity();
             if (null != context && null != activity && null != mArchiveList && position < mArchiveList.length) {
                 String res = mArchiveList[position].first;
                 EhRequest request = new EhRequest();
@@ -2011,7 +2008,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Override
         public void onFailure(Exception e) {
             mRequest = null;
-            Context context = getContext2();
+            Context context = getContext();
             if (null != context && null != mProgressView && null != mErrorText && null != mListView) {
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.VISIBLE);
@@ -2047,7 +2044,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             mListView = (ListView) ViewUtils.$$(dialog, R.id.list_view);
             mListView.setOnItemClickListener(this);
 
-            Context context = getContext2();
+            Context context = getContext();
             if (context != null) {
                 if (mTorrentList == null) {
                     mErrorText.setVisibility(View.GONE);
@@ -2086,7 +2083,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Context context = getContext2();
+            Context context = getContext();
             if (null != context && null != mTorrentList && position < mTorrentList.length) {
                 String url = mTorrentList[position].first;
                 String name = mTorrentList[position].second;
@@ -2138,7 +2135,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         @Override
         public void onFailure(Exception e) {
             mRequest = null;
-            Context context = getContext2();
+            Context context = getContext();
             if (null != context && null != mProgressView && null != mErrorText && null != mListView) {
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.VISIBLE);
@@ -2178,8 +2175,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Context context = getContext2();
-            MainActivity activity = getActivity2();
+            Context context = getContext();
+            MainActivity activity = getMainActivity();
             if (null == context || null == activity || which != DialogInterface.BUTTON_POSITIVE ||
                     null == mGalleryDetail || null == mRatingBar) {
                 return;

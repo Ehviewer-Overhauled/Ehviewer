@@ -27,6 +27,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -107,15 +108,15 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_REQUEST_ID, mRequestId);
     }
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_login, container, false);
 
         View loginForm = ViewUtils.$$(view, R.id.login_form);
@@ -144,7 +145,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         mSignInViaCookies.setOnClickListener(this);
         mSkipSigningIn.setOnClickListener(this);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         EhApplication application = (EhApplication) context.getApplicationContext();
         if (application.containGlobalStuff(mRequestId)) {
@@ -214,7 +215,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     @Override
     public void onClick(View v) {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity) {
             return;
         }
@@ -251,8 +252,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             return;
         }
 
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mUsername || null == mPassword || null == mUsernameLayout ||
                 null == mPasswordLayout) {
             return;
@@ -294,8 +295,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     private void getProfile() {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity) {
             return;
         }
@@ -314,7 +315,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     private void redirectTo() {
         Settings.putNeedSignIn(false);
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null != activity) {
             startSceneForCheckStep(CHECK_STEP_SIGN_IN, getArguments());
         }
@@ -322,7 +323,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     private void whetherToSkip(Exception e) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return;
         }
@@ -335,7 +336,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     public void onSignInEnd(Exception e) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return;
         }

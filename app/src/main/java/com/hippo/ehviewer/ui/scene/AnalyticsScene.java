@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.Analytics;
@@ -47,8 +48,8 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_analytics, container, false);
 
         mReject = ViewUtils.$$(view, R.id.reject);
@@ -74,8 +75,8 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context) {
             return;
         }
@@ -90,7 +91,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
         Settings.putAskAnalytics(false);
 
         // Start new scene and finish it self
-        if (null != activity) {
+        if (activity != null) {
             startSceneForCheckStep(CHECK_STEP_ANALYTICS, getArguments());
         }
         finish();

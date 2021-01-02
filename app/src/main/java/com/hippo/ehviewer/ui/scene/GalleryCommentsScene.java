@@ -183,8 +183,8 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     @NonNull
     @Override
-    public View onCreateView3(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateViewWithToolbar(LayoutInflater inflater,
+                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_comments, container, false);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
@@ -289,8 +289,8 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void voteComment(long id, int vote) {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity) {
             return;
         }
@@ -355,7 +355,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void showCommentDialog(int position) {
-        final Context context = getContext2();
+        final Context context = getContext();
         if (context == null || mCommentList == null || mCommentList.comments == null || position >= mCommentList.comments.length || position < 0) {
             return;
         }
@@ -410,7 +410,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     public boolean onItemClick(EasyRecyclerView parent, View view, int position) {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity) {
             return false;
         }
@@ -592,8 +592,8 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     @Override
     public void onClick(View v) {
-        Context context = getContext2();
-        MainActivity activity = getActivity2();
+        Context context = getContext();
+        MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mEditText) {
             return;
         }
@@ -931,7 +931,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         private final LayoutInflater mInflater;
 
         public CommentAdapter() {
-            mInflater = getLayoutInflater2();
+            mInflater = getLayoutInflater();
             AssertUtils.assertNotNull(mInflater);
         }
 
@@ -952,7 +952,7 @@ public final class GalleryCommentsScene extends ToolbarScene
 
         @Override
         public void onBindViewHolder(@NonNull CommentHolder holder, int position) {
-            Context context = getContext2();
+            Context context = getContext();
             if (context == null || mCommentList == null) {
                 return;
             }

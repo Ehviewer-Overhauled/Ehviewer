@@ -477,26 +477,15 @@ public final class MainActivity extends StageActivity
     public void onSceneViewCreated(SceneFragment scene, Bundle savedInstanceState) {
         super.onSceneViewCreated(scene, savedInstanceState);
 
-        if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
-            BaseScene baseScene = (BaseScene) scene;
-            mRightDrawer.removeAllViews();
-            View drawerView = baseScene.createDrawerView(
-                    baseScene.getLayoutInflater2(), mRightDrawer, savedInstanceState);
-            if (drawerView != null) {
-                mRightDrawer.addView(drawerView);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
-            } else {
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
-            }
-        }
+        createDrawerView(scene);
     }
 
-    public void recreateDrawerView(SceneFragment scene) {
+    public void createDrawerView(SceneFragment scene) {
         if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
             BaseScene baseScene = (BaseScene) scene;
             mRightDrawer.removeAllViews();
             View drawerView = baseScene.createDrawerView(
-                    baseScene.getLayoutInflater2(), mRightDrawer, null);
+                    baseScene.getLayoutInflater(), mRightDrawer, null);
             if (drawerView != null) {
                 mRightDrawer.addView(drawerView);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);

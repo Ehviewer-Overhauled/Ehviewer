@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.R;
@@ -44,8 +45,8 @@ public final class WarningScene extends SolidScene implements View.OnClickListen
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_warning, container, false);
 
         mReject = ViewUtils.$$(view, R.id.reject);
@@ -74,7 +75,7 @@ public final class WarningScene extends SolidScene implements View.OnClickListen
             Settings.putShowWarning(false);
 
             // Start new scene and finish it self
-            MainActivity activity = getActivity2();
+            MainActivity activity = getMainActivity();
             if (null != activity) {
                 startSceneForCheckStep(CHECK_STEP_WARNING, getArguments());
             }

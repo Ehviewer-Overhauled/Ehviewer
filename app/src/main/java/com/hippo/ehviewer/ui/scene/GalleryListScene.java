@@ -334,7 +334,7 @@ public final class GalleryListScene extends BaseScene
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         mClient = EhApplication.getEhClient(context);
         mDownloadManager = EhApplication.getDownloadManager(context);
@@ -482,7 +482,7 @@ public final class GalleryListScene extends BaseScene
     // Update search bar title, drawer checked item
     private void onUpdateUrlBuilder() {
         ListUrlBuilder builder = mUrlBuilder;
-        Resources resources = getResources2();
+        Resources resources = getResourcesOrNull();
         if (resources == null || builder == null || mSearchLayout == null) {
             return;
         }
@@ -541,11 +541,11 @@ public final class GalleryListScene extends BaseScene
 
     @NonNull
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_list, container, false);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         Resources resources = context.getResources();
 
@@ -627,7 +627,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     private void guideQuickSearch() {
-        Activity activity = getActivity2();
+        Activity activity = getMainActivity();
         if (null == activity || !Settings.getGuideQuickSearch()) {
             return;
         }
@@ -690,7 +690,7 @@ public final class GalleryListScene extends BaseScene
 
     private void showQuickSearchTipDialog(final QsDrawerAdapter adapter,
                                           final EasyRecyclerView recyclerView, final TextView tip) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context) {
             return;
         }
@@ -708,7 +708,7 @@ public final class GalleryListScene extends BaseScene
 
     private void showAddQuickSearchDialog(final QsDrawerAdapter adapter,
                                           final EasyRecyclerView recyclerView, final TextView tip) {
-        Context context = getContext2();
+        Context context = getContext();
         final ListUrlBuilder urlBuilder = mUrlBuilder;
         if (null == context || null == urlBuilder) {
             return;
@@ -775,7 +775,7 @@ public final class GalleryListScene extends BaseScene
         Toolbar toolbar = (Toolbar) ViewUtils.$$(view, R.id.toolbar);
         final TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         RecyclerViewDragDropManager dragDropManager = new RecyclerViewDragDropManager();
@@ -914,7 +914,7 @@ public final class GalleryListScene extends BaseScene
     }
 
     private void showGoToDialog() {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context || null == mHelper) {
             return;
         }
@@ -993,8 +993,8 @@ public final class GalleryListScene extends BaseScene
     }
 
     public boolean onItemLongClick(View view, int position) {
-        final Context context = getContext2();
-        final MainActivity activity = getActivity2();
+        final Context context = getContext();
+        final MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mHelper) {
             return false;
         }
@@ -1091,7 +1091,7 @@ public final class GalleryListScene extends BaseScene
         @Override
         public void onClick(DialogInterface dialog, int which) {
             // Cancel check mode
-            Context context = getContext2();
+            Context context = getContext();
             if (null == context) {
                 return;
             }
@@ -1472,7 +1472,7 @@ public final class GalleryListScene extends BaseScene
     private void onGetGalleryListSuccess(GalleryListParser.Result result, int taskId) {
         if (mHelper != null && mSearchBarMover != null &&
                 mHelper.isCurrentTask(taskId)) {
-            String emptyString = getResources2().getString(mUrlBuilder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags
+            String emptyString = getString(mUrlBuilder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags
                     ? R.string.gallery_list_empty_hit_subscription
                     : R.string.gallery_list_empty_hit);
             mHelper.setEmptyString(emptyString);
@@ -1832,7 +1832,7 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         protected void getPageData(int taskId, int type, int page) {
-            MainActivity activity = getActivity2();
+            MainActivity activity = getMainActivity();
             if (null == activity || null == mClient || null == mUrlBuilder) {
                 return;
             }
@@ -1860,7 +1860,7 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         protected Context getContext() {
-            return GalleryListScene.this.getContext2();
+            return GalleryListScene.this.getContext();
         }
 
         @Override

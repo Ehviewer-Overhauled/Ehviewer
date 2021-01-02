@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui.scene;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -24,7 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.SparseArray;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +34,6 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.annotation.StyleRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
@@ -53,8 +52,6 @@ public abstract class BaseScene extends SceneFragment {
 
     public static final String KEY_DRAWER_VIEW_STATE =
             "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE";
-
-    private Context mThemeContext;
 
     @Nullable
     private View drawerView;
@@ -86,15 +83,6 @@ public abstract class BaseScene extends SceneFragment {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).setDrawerLockMode(lockMode, edgeGravity);
-        }
-    }
-
-    public int getDrawerLockMode(int edgeGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            return ((MainActivity) activity).getDrawerLockMode(edgeGravity);
-        } else {
-            return DrawerLayout.LOCK_MODE_UNLOCKED;
         }
     }
 
@@ -153,6 +141,10 @@ public abstract class BaseScene extends SceneFragment {
         return true;
     }
 
+    public boolean needWhiteStatusBar() {
+        return true;
+    }
+
     public int getNavCheckedItem() {
         return 0;
     }
@@ -168,7 +160,10 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public void recreateDrawerView() {
-        ((MainActivity) requireActivity()).recreateDrawerView(this);
+        MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.createDrawerView(this);
+        }
     }
 
     public final View createDrawerView(LayoutInflater inflater,
@@ -223,19 +218,7 @@ public abstract class BaseScene extends SceneFragment {
     public void onDestroyDrawerView() {
     }
 
-    @Nullable
-    @Override
-    public final View onCreateView(LayoutInflater inflater,
-                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return onCreateView2(LayoutInflater.from(getContext2()), container, savedInstanceState);
-    }
-
-    @Nullable
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return null;
-    }
-
+    @SuppressLint("RtlHardcoded")
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -252,26 +235,13 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         AppHelper.hideSoftInput(getActivity());
-        setWhiteStatusBar(true);
-    }
-
-    public void createThemeContext(@StyleRes int style) {
-        mThemeContext = new ContextThemeWrapper(getContext(), style);
-    }
-
-    public void destroyThemeContext() {
-        mThemeContext = null;
+        setWhiteStatusBar(needWhiteStatusBar());
     }
 
     @Nullable
-    public Context getContext2() {
-        return null != mThemeContext ? mThemeContext : super.getContext();
-    }
-
-    @Nullable
-    public Resources getResources2() {
-        Context context = getContext2();
-        if (null != context) {
+    public Resources getResourcesOrNull() {
+        Context context = getContext();
+        if (context != null) {
             return context.getResources();
         } else {
             return null;
@@ -279,18 +249,13 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     @Nullable
-    public MainActivity getActivity2() {
+    public MainActivity getMainActivity() {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             return (MainActivity) activity;
         } else {
             return null;
         }
-    }
-
-    @Nullable
-    public LayoutInflater getLayoutInflater2() {
-        return LayoutInflater.from(getContext2());
     }
 
     public void hideSoftInput() {

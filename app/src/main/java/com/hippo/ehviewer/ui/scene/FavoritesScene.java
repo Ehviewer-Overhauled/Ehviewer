@@ -72,7 +72,6 @@ import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
-import com.hippo.refreshlayout.RefreshLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
@@ -182,7 +181,7 @@ public class FavoritesScene extends BaseScene implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         mClient = EhApplication.getEhClient(context);
         mFavCatArray = Settings.getFavCat();
@@ -242,20 +241,19 @@ public class FavoritesScene extends BaseScene implements
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
         ContentLayout contentLayout = view.findViewById(R.id.content_layout);
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         AssertUtils.assertNotNull(activity);
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
         mRecyclerView = contentLayout.getRecyclerView();
         FastScroller fastScroller = contentLayout.getFastScroller();
-        RefreshLayout refreshLayout = contentLayout.getRefreshLayout();
         mSearchBar = (SearchBar) ViewUtils.$$(view, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
 
-        Context context = getContext2();
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
         Resources resources = context.getResources();
         int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
@@ -267,12 +265,8 @@ public class FavoritesScene extends BaseScene implements
         contentLayout.setFitPaddingTop(paddingTopSB);
 
         mAdapter = new FavoritesAdapter(inflater, resources, mRecyclerView, Settings.getListMode());
-        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setClipChildren(false);
-        //mRecyclerView.setOnItemClickListener(this);
-        //mRecyclerView.setOnItemLongClickListener(this);
         mRecyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM);
         mRecyclerView.setCustomCheckedListener(this);
 
@@ -314,7 +308,7 @@ public class FavoritesScene extends BaseScene implements
     }
 
     private void guideCollections() {
-        Activity activity = getActivity2();
+        Activity activity = getMainActivity();
         if (null == activity || !Settings.getGuideCollections()) {
             return;
         }
@@ -345,7 +339,7 @@ public class FavoritesScene extends BaseScene implements
     // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
     // They changed, call it
     private void updateSearchBar() {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context || null == mUrlBuilder || null == mSearchBar || null == mFavCatArray) {
             return;
         }
@@ -417,7 +411,7 @@ public class FavoritesScene extends BaseScene implements
     public View onCreateDrawerView(LayoutInflater inflater,
                                    @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.drawer_list_rv, container, false);
-        final Context context = getContext2();
+        final Context context = getContext();
         Toolbar toolbar = (Toolbar) ViewUtils.$$(view, R.id.toolbar);
 
         AssertUtils.assertNotNull(context);
@@ -683,7 +677,7 @@ public class FavoritesScene extends BaseScene implements
     }
 
     private void showGoToDialog() {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context || null == mHelper) {
             return;
         }
@@ -724,7 +718,7 @@ public class FavoritesScene extends BaseScene implements
     @Override
     @Implemented(FabLayout.OnClickFabListener.class)
     public void onClickSecondaryFab(FabLayout view, FloatingActionButton fab, int position) {
-        Context context = getContext2();
+        Context context = getContext();
         if (null == context || null == mRecyclerView || null == mHelper) {
             return;
         }
@@ -760,9 +754,9 @@ public class FavoritesScene extends BaseScene implements
 
         switch (position) {
             case 3: { // Download
-                Activity activity = getActivity2();
+                Activity activity = getMainActivity();
                 if (activity != null) {
-                    CommonOperations.startDownload(getActivity2(), mModifyGiList, false);
+                    CommonOperations.startDownload(getMainActivity(), mModifyGiList, false);
                 }
                 mModifyGiList.clear();
                 if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -1216,7 +1210,7 @@ public class FavoritesScene extends BaseScene implements
 
         @Override
         protected void getPageData(final int taskId, int type, int page) {
-            MainActivity activity = getActivity2();
+            MainActivity activity = getMainActivity();
             if (null == activity || null == mUrlBuilder || null == mClient) {
                 return;
             }
@@ -1291,7 +1285,7 @@ public class FavoritesScene extends BaseScene implements
 
         @Override
         protected Context getContext() {
-            return FavoritesScene.this.getContext2();
+            return FavoritesScene.this.getContext();
         }
 
         @Override

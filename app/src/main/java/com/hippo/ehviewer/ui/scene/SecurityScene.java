@@ -103,7 +103,7 @@ public class SecurityScene extends SolidScene implements
     }
 
     private void startBiometricPrompt() {
-        if (Settings.getEnableFingerprint() && BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+        if (Settings.getEnableFingerprint() && BiometricManager.from(requireContext()).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS) {
             BiometricPrompt biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
@@ -140,15 +140,15 @@ public class SecurityScene extends SolidScene implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_RETRY_TIMES, mRetryTimes);
     }
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_security, container, false);
         view.setOnClickListener(v -> startBiometricPrompt());
 
@@ -178,7 +178,7 @@ public class SecurityScene extends SolidScene implements
 
     @Override
     public void onPatternDetected(List<LockPatternView.Cell> pattern) {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity || null == mPatternView) {
             return;
         }
@@ -201,7 +201,7 @@ public class SecurityScene extends SolidScene implements
     @Override
     public void onShake(int count) {
         if (count == 10) {
-            MainActivity activity = getActivity2();
+            MainActivity activity = getMainActivity();
             if (null == activity) {
                 return;
             }

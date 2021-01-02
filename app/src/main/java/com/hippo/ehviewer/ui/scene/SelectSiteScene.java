@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
@@ -44,8 +45,8 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
 
     @Nullable
     @Override
-    public View onCreateView2(LayoutInflater inflater, @Nullable ViewGroup container,
-                              @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_select_site, container, false);
 
         mButtonGroup = (MaterialButtonToggleGroup) ViewUtils.$$(view, R.id.button_group);
@@ -71,29 +72,25 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        MainActivity activity = getActivity2();
+        MainActivity activity = getMainActivity();
         if (null == activity || null == mButtonGroup) {
             return;
         }
 
         if (v == mOk) {
             int id = mButtonGroup.getCheckedButtonId();
-            switch (id) {
-                case R.id.site_e:
-                    Settings.putSelectSite(false);
-                    Settings.putGallerySite(EhUrl.SITE_E);
-                    startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                    finish();
-                    break;
-                case R.id.site_ex:
-                    Settings.putSelectSite(false);
-                    Settings.putGallerySite(EhUrl.SITE_EX);
-                    startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                    finish();
-                    break;
-                default:
-                    showTip(R.string.no_select, LENGTH_SHORT);
-                    break;
+            if (id == R.id.site_e) {
+                Settings.putSelectSite(false);
+                Settings.putGallerySite(EhUrl.SITE_E);
+                startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
+                finish();
+            } else if (id == R.id.site_ex) {
+                Settings.putSelectSite(false);
+                Settings.putGallerySite(EhUrl.SITE_EX);
+                startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
+                finish();
+            } else {
+                showTip(R.string.no_select, LENGTH_SHORT);
             }
         }
     }

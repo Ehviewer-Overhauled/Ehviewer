@@ -26,6 +26,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.EhApplication;
@@ -58,9 +59,9 @@ public class WebViewSignInScene extends SolidScene {
     @Override
     @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
-    public View onCreateView2(LayoutInflater inflater,
-                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Context context = getContext2();
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Context context = getContext();
         AssertUtils.assertNotNull(context);
 
         EhUtils.signOut(context);
@@ -117,7 +118,7 @@ public class WebViewSignInScene extends SolidScene {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            Context context = getContext2();
+            Context context = getContext();
             if (context == null) {
                 return;
             }
