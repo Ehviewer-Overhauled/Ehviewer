@@ -34,8 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.NumberUtils;
 
-import fadeapp.widgets.ScrollLessRecyclerView;
-
 /**
  * Add setOnItemClickListener, setOnItemLongClickListener and setChoiceMode for
  * RecyclerView
