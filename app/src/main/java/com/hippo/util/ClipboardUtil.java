@@ -27,7 +27,11 @@ public class ClipboardUtil {
 
     public static void addTextToClipboard(String text) {
         if (clipboardManager != null) {
-            clipboardManager.setPrimaryClip(ClipData.newPlainText(null,text));
+            try {
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(null, text));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
