@@ -106,6 +106,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
 
         mLayoutManager = new SearchLayoutManager(context);
         mAdapter = new SearchAdapter();
+        mAdapter.setHasStableIds(true);
         setLayoutManager(mLayoutManager);
         setAdapter(mAdapter);
         setHasFixedSize(true);
@@ -214,11 +215,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         if (buttonView == mEnableAdvanceSwitch) {
             mEnableAdvance = isChecked;
             if (mSearchMode == SEARCH_MODE_NORMAL) {
-                if (isChecked) {
-                    mAdapter.notifyItemInserted(1);
-                } else {
-                    mAdapter.notifyItemRemoved(1);
-                }
+                mAdapter.notifyDataSetChanged();
 
                 if (mHelper != null) {
                     mHelper.onChangeSearchMode();
@@ -277,14 +274,9 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         post(() -> {
-            int oldItemCount = mAdapter.getItemCount();
-
             mSearchMode = tab.getPosition();
 
-            int newItemCount = mAdapter.getItemCount();
-
-            mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
-            mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
+            mAdapter.notifyDataSetChanged();
 
             if (mHelper != null) {
                 mHelper.onChangeSearchMode();
@@ -378,6 +370,15 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
             if (holder.getItemViewType() == ITEM_TYPE_ACTION) {
                 mAction.selectTab(mAction.getTabAt(mSearchMode));
             }
+        }
+
+        @Override
+        public long getItemId(int position) {
+            int type = SEARCH_ITEM_TYPE[mSearchMode][position];
+            if (mSearchMode == SEARCH_MODE_NORMAL && position == 1 && !mEnableAdvance) {
+                type = ITEM_TYPE_ACTION;
+            }
+            return type;
         }
     }
 
