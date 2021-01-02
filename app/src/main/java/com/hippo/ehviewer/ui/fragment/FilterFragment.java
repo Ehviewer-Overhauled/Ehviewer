@@ -323,6 +323,9 @@ public class FilterFragment extends BaseFragment {
                 return 0;
             } else {
                 Filter filter = mFilterList.get(position);
+                if (filter.getId() != null) {
+                    return (filter.text.hashCode() >> filter.mode) + filter.getId();
+                }
                 return filter.text.hashCode() >> filter.mode;
             }
         }
