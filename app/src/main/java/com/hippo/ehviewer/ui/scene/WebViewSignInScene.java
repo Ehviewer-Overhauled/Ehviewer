@@ -29,10 +29,12 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
+import com.hippo.ehviewer.widget.DialogWebChromeClient;
 import com.hippo.yorozuya.AssertUtils;
 
 import java.util.ArrayList;
@@ -72,8 +74,12 @@ public class WebViewSignInScene extends SolidScene {
         cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
+        mWebView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
+        mWebView.getSettings().setBuiltInZoomControls(true);
+        mWebView.getSettings().setDisplayZoomControls(false);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new LoginWebViewClient());
+        mWebView.setWebChromeClient(new DialogWebChromeClient(context));
         mWebView.loadUrl(EhUrl.URL_SIGN_IN);
         return mWebView;
     }
