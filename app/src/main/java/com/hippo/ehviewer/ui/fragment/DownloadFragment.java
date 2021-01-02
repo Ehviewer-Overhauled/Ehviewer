@@ -34,8 +34,6 @@ import com.hippo.util.ExceptionUtils;
 
 public class DownloadFragment extends BasePreferenceFragment {
 
-    public static final int REQUEST_CODE_PICK_IMAGE_DIR_L = 1;
-
     public static final String KEY_DOWNLOAD_LOCATION = "download_location";
 
     @Nullable

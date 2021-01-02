@@ -1535,20 +1535,18 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
     @Override
     protected void onSceneResult(int requestCode, int resultCode, Bundle data) {
-        switch (requestCode) {
-            case REQUEST_CODE_COMMENT_GALLERY:
-                if (resultCode != RESULT_OK || data == null) {
-                    break;
-                }
-                GalleryCommentList comments = data.getParcelable(GalleryCommentsScene.KEY_COMMENT_LIST);
-                if (mGalleryDetail == null && comments == null) {
-                    break;
-                }
-                mGalleryDetail.comments = comments;
-                bindComments(comments.comments);
-                break;
-            default:
-                super.onSceneResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_COMMENT_GALLERY) {
+            if (resultCode != RESULT_OK || data == null) {
+                return;
+            }
+            GalleryCommentList comments = data.getParcelable(GalleryCommentsScene.KEY_COMMENT_LIST);
+            if (mGalleryDetail == null && comments == null) {
+                return;
+            }
+            mGalleryDetail.comments = comments;
+            bindComments(comments.comments);
+        } else {
+            super.onSceneResult(requestCode, resultCode, data);
         }
     }
 

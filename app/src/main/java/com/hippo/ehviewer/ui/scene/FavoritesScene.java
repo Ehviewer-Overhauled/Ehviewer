@@ -90,6 +90,7 @@ import java.util.Collections;
 import java.util.List;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
+@SuppressLint("RtlHardcoded")
 public class FavoritesScene extends BaseScene implements
         FastScroller.OnDragHandlerListener, SearchBarMover.Helper, SearchBar.Helper,
         FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
@@ -509,9 +510,9 @@ public class FavoritesScene extends BaseScene implements
             }
 
             // Ensure outOfCustomChoiceMode to avoid error
-            if (mRecyclerView != null) {
-                mRecyclerView.isInCustomChoice();
-            }
+            //if (mRecyclerView != null) {
+            //    mRecyclerView.isInCustomChoice();
+            //}
 
             exitSearchMode(true);
 
@@ -544,7 +545,7 @@ public class FavoritesScene extends BaseScene implements
         return true;
     }
 
-    public boolean onItemLongClick(View view, int position) {
+    public boolean onItemLongClick(int position) {
         // Can not into
         if (mRecyclerView != null && !mSearchMode) {
             if (!mRecyclerView.isInCustomChoice()) {
@@ -638,9 +639,9 @@ public class FavoritesScene extends BaseScene implements
         }
 
         // Ensure outOfCustomChoiceMode to avoid error
-        if (mRecyclerView != null) {
-            mRecyclerView.isInCustomChoice();
-        }
+        //if (mRecyclerView != null) {
+        //    mRecyclerView.isInCustomChoice();
+        //}
 
         exitSearchMode(true);
 
@@ -1026,7 +1027,7 @@ public class FavoritesScene extends BaseScene implements
         }
     }
 
-    private class FavDrawerHolder extends RecyclerView.ViewHolder {
+    private static class FavDrawerHolder extends RecyclerView.ViewHolder {
 
         private final TextView key;
         private final TextView value;
@@ -1196,7 +1197,7 @@ public class FavoritesScene extends BaseScene implements
 
         @Override
         boolean onItemLongClick(View view, int position) {
-            return FavoritesScene.this.onItemLongClick(view, position);
+            return FavoritesScene.this.onItemLongClick(position);
         }
 
         @Nullable
@@ -1264,12 +1265,7 @@ public class FavoritesScene extends BaseScene implements
                 }
             } else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 final String keyword = mUrlBuilder.getKeyword();
-                SimpleHandler.getInstance().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onGetFavoritesLocal(keyword, taskId);
-                    }
-                });
+                SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
             } else {
                 mUrlBuilder.setIndex(page);
                 String url = mUrlBuilder.build();

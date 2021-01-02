@@ -57,7 +57,6 @@ public class WebViewSignInScene extends SolidScene {
 
     @Nullable
     @Override
-    @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

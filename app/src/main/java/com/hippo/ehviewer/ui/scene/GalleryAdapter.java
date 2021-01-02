@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui.scene;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -77,7 +78,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         mRecyclerView.setAdapter(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        View calculator = inflater.inflate(R.layout.item_gallery_list_thumb_height, null);
+        @SuppressLint("InflateParams") View calculator = inflater.inflate(R.layout.item_gallery_list_thumb_height, null);
         ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT);
         mListThumbHeight = calculator.getMeasuredHeight();
         mListThumbWidth = mListThumbHeight * 2 / 3;
@@ -147,8 +148,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         }
     }
 
+    @NonNull
     @Override
-    public GalleryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GalleryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int layoutId;
         switch (viewType) {
             default:
@@ -184,8 +186,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     @Nullable
     public abstract GalleryInfo getDataAt(int position);
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(GalleryHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GalleryHolder holder, int position) {
         GalleryInfo gi = getDataAt(position);
         if (null == gi) {
             return;
@@ -231,7 +234,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 int color = EhUtils.getCategoryColor(gi.category);
                 if (!(drawable instanceof TriangleDrawable)) {
                     drawable = new TriangleDrawable(color);
-                    category.setBackgroundDrawable(drawable);
+                    category.setBackground(drawable);
                 } else {
                     ((TriangleDrawable) drawable).setColor(color);
                 }

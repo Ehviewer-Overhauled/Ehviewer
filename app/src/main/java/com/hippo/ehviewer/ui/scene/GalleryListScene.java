@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -122,12 +123,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressLint("RtlHardcoded")
 public final class GalleryListScene extends BaseScene
         implements SearchBar.Helper, SearchBar.OnStateChangeListener, FastScroller.OnDragHandlerListener,
         SearchLayout.Helper, SearchBarMover.Helper, View.OnClickListener, FabLayout.OnClickFabListener,
         FabLayout.OnExpandListener {
 
-    public final static int REQUEST_CODE_SELECT_IMAGE = 0;
     public final static String KEY_ACTION = "action";
     public final static String ACTION_HOMEPAGE = "action_homepage";
     public final static String ACTION_SUBSCRIPTION = "action_subscription";
@@ -992,7 +993,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    public boolean onItemLongClick(View view, int position) {
+    public boolean onItemLongClick(int position) {
         final Context context = getContext();
         final MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mHelper) {
@@ -1458,17 +1459,6 @@ public final class GalleryListScene extends BaseScene
         return mState == STATE_SIMPLE_SEARCH || mState == STATE_SEARCH_SHOW_LIST;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (REQUEST_CODE_SELECT_IMAGE == requestCode) {
-            if (Activity.RESULT_OK == resultCode && null != mSearchLayout && null != data) {
-                mSearchLayout.setImageUri(data.getData());
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     private void onGetGalleryListSuccess(GalleryListParser.Result result, int taskId) {
         if (mHelper != null && mSearchBarMover != null &&
                 mHelper.isCurrentTask(taskId)) {
@@ -1818,7 +1808,7 @@ public final class GalleryListScene extends BaseScene
 
         @Override
         boolean onItemLongClick(View view, int position) {
-            return GalleryListScene.this.onItemLongClick(view, position);
+            return GalleryListScene.this.onItemLongClick(position);
         }
 
         @Nullable

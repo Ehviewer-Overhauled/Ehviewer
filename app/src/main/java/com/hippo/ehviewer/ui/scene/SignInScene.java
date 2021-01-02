@@ -356,7 +356,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         redirectTo();
     }
 
-    private class SignInListener extends EhCallback<SignInScene, String> {
+    private static class SignInListener extends EhCallback<SignInScene, String> {
 
         public SignInListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -395,7 +395,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         }
     }
 
-    private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
+    private static class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
 
         public GetProfileListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);

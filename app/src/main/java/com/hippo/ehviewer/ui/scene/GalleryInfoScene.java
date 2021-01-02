@@ -255,14 +255,15 @@ public final class GalleryInfoScene extends ToolbarScene {
             }
         }
 
+        @NonNull
         @Override
-        public InfoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public InfoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             return new InfoHolder(mInflater.inflate(viewType == TYPE_HEADER ?
                     R.layout.item_gallery_info_header : R.layout.item_gallery_info_data, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(InfoHolder holder, int position) {
+        public void onBindViewHolder(@NonNull InfoHolder holder, int position) {
             if (mKeys != null && mValues != null) {
                 holder.key.setText(mKeys.get(position));
                 holder.value.setText(mValues.get(position));

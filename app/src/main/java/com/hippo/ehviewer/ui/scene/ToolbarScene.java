@@ -83,7 +83,6 @@ public abstract class ToolbarScene extends BaseScene {
             if (menuResId != 0) {
                 mToolbar.inflateMenu(menuResId);
                 mToolbar.setOnMenuItemClickListener(ToolbarScene.this::onMenuItemClick);
-                onMenuCreated(mToolbar.getMenu());
             }
             mToolbar.setNavigationOnClickListener(v -> onNavigationClick());
         }
@@ -97,9 +96,6 @@ public abstract class ToolbarScene extends BaseScene {
 
     public int getMenuResId() {
         return 0;
-    }
-
-    public void onMenuCreated(Menu menu) {
     }
 
     public boolean onMenuItemClick(MenuItem item) {
