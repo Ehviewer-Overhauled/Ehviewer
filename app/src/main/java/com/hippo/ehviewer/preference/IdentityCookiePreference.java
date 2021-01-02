@@ -16,9 +16,9 @@
 
 package com.hippo.ehviewer.preference;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -26,6 +26,8 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
+import com.hippo.ehviewer.ui.SettingsActivity;
+import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.preference.MessagePreference;
 import com.hippo.text.Html;
 import com.hippo.util.ClipboardUtil;
@@ -39,19 +41,24 @@ import okhttp3.HttpUrl;
 public class IdentityCookiePreference extends MessagePreference {
 
     private String message;
+    @SuppressLint("StaticFieldLeak")
+    private final SettingsActivity mActivity;
 
     public IdentityCookiePreference(Context context) {
         super(context);
+        mActivity = (SettingsActivity) context;
         init();
     }
 
     public IdentityCookiePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mActivity = (SettingsActivity) context;
         init();
     }
 
     public IdentityCookiePreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mActivity = (SettingsActivity) context;
         init();
     }
 
@@ -98,7 +105,7 @@ public class IdentityCookiePreference extends MessagePreference {
         if (message != null) {
             builder.setPositiveButton(R.string.settings_eh_identity_cookies_copy, (dialog, which) -> {
                 ClipboardUtil.addTextToClipboard(message);
-                Toast.makeText(getContext(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT);
 
                 IdentityCookiePreference.this.onClick(dialog, which);
             });

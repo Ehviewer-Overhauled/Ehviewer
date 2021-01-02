@@ -16,18 +16,16 @@
 
 package com.hippo.ehviewer.preference;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.ehviewer.ui.SettingsActivity;
-import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.NumberUtils;
 
@@ -53,13 +51,10 @@ public class CleanRedundancyPreference extends TaskPreference {
 
     private static class ClearTask extends Task {
 
-        @SuppressLint("StaticFieldLeak")
-        private final SettingsActivity mActivity;
         private final DownloadManager mManager;
 
         public ClearTask(@NonNull Context context) {
             super(context);
-            mActivity = (SettingsActivity) context;
             mManager = EhApplication.getDownloadManager(context.getApplicationContext());
         }
 
@@ -114,9 +109,9 @@ public class CleanRedundancyPreference extends TaskPreference {
                 count = 0;
             }
 
-            mActivity.showTip(0 == count ?
-                    mActivity.getString(R.string.settings_download_clean_redundancy_no_redundancy) :
-                    mActivity.getString(R.string.settings_download_clean_redundancy_done, count), BaseScene.LENGTH_SHORT);
+            showTip(0 == count ?
+                    mApplication.getString(R.string.settings_download_clean_redundancy_no_redundancy) :
+                    mApplication.getString(R.string.settings_download_clean_redundancy_done, count), Snackbar.LENGTH_SHORT);
             super.onPostExecute(o);
         }
     }

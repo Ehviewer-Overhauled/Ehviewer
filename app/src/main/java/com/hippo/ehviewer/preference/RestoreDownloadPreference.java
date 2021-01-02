@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer.preference;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Parcel;
@@ -35,7 +34,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderInfo;
 import com.hippo.ehviewer.spider.SpiderQueen;
-import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
@@ -71,14 +69,11 @@ public class RestoreDownloadPreference extends TaskPreference {
 
     private static class RestoreTask extends Task {
 
-        @SuppressLint("StaticFieldLeak")
-        private final SettingsActivity mActivity;
         private final DownloadManager mManager;
         private final OkHttpClient mHttpClient;
 
         public RestoreTask(@NonNull Context context) {
             super(context);
-            mActivity = (SettingsActivity) context;
             mManager = EhApplication.getDownloadManager(context.getApplicationContext());
             mHttpClient = EhApplication.getOkHttpClient(context.getApplicationContext());
         }
@@ -142,7 +137,7 @@ public class RestoreDownloadPreference extends TaskPreference {
             }
 
             try {
-                return EhEngine.fillGalleryListByApi(null, mHttpClient, new ArrayList<GalleryInfo>(restoreItemList), EhUrl.getReferer());
+                return EhEngine.fillGalleryListByApi(null, mHttpClient, new ArrayList<>(restoreItemList), EhUrl.getReferer());
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
                 e.printStackTrace();
@@ -172,7 +167,7 @@ public class RestoreDownloadPreference extends TaskPreference {
                             count++;
                         }
                     }
-                    mActivity.showTip(
+                    showTip(
                             mActivity.getString(R.string.settings_download_restore_successfully, count),
                             BaseScene.LENGTH_SHORT);
 

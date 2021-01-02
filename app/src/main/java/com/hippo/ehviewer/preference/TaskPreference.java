@@ -16,21 +16,25 @@
 
 package com.hippo.ehviewer.preference;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.widget.Toast;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.customview.view.AbsSavedState;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.preference.DialogPreference;
 import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.yorozuya.IntIdGenerator;
@@ -152,11 +156,14 @@ public abstract class TaskPreference extends DialogPreference {
 
     public abstract static class Task extends AsyncTask<Void, Void, Object> {
 
-        private final EhApplication mApplication;
+        protected final EhApplication mApplication;
+        @SuppressLint("StaticFieldLeak")
+        protected final SettingsActivity mActivity;
         @Nullable
         private TaskPreference mPreference;
 
         public Task(@NonNull Context context) {
+            mActivity = (SettingsActivity) context;
             mApplication = (EhApplication) context.getApplicationContext();
         }
 
@@ -179,6 +186,22 @@ public abstract class TaskPreference extends DialogPreference {
             mApplication.removeGlobalStuff(this);
             if (null != mPreference) {
                 mPreference.onTaskEnd();
+            }
+        }
+
+        protected void showTip(@StringRes int id, int length) {
+            try {
+                mActivity.showTip(id, length);
+            } catch (Exception e) {
+                Toast.makeText(mApplication, id, length).show();
+            }
+        }
+
+        protected void showTip(CharSequence message, int length) {
+            try {
+                mActivity.showTip(message, length);
+            } catch (Exception e) {
+                Toast.makeText(mApplication, message, length).show();
             }
         }
     }
