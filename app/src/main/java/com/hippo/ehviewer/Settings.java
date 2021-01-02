@@ -300,11 +300,10 @@ public class Settings {
         }
         if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            // Probably an E-Ink device?
             if (wm != null) {
                 Display display = wm.getDefaultDisplay();
-                // Someone may install EHViewer on a device with no screen?
-                if (display != null && display.getRefreshRate() < 5.0) {
+                if (display != null && display.getRefreshRate() > 0 && display.getRefreshRate() < 5.0) {
+                    // Probably an E-Ink device
                     putReadTheme(2);
                     putEInkMode(true);
                 }
