@@ -16,9 +16,6 @@
 
 package com.hippo.ehviewer.ui;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -83,6 +80,7 @@ import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
+import com.hippo.util.ClipboardUtil;
 import com.hippo.widget.LoadImageView;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.SimpleHandler;
@@ -410,17 +408,6 @@ public final class MainActivity extends StageActivity
         return topClass == null || SolidScene.class.isAssignableFrom(topClass);
     }
 
-    private String getTextFromClipboard() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard != null) {
-            ClipData clip = clipboard.getPrimaryClip();
-            if (clip != null && clip.getItemCount() > 0 && clip.getItemAt(0).getText() != null) {
-                return clip.getItemAt(0).getText().toString();
-            }
-        }
-        return null;
-    }
-
     @Nullable
     private Announcer createAnnouncerFromClipboardUrl(String url) {
         GalleryDetailUrlParser.Result result1 = GalleryDetailUrlParser.parse(url, false);
@@ -446,7 +433,7 @@ public final class MainActivity extends StageActivity
     }
 
     private void checkClipboardUrlInternal() {
-        String text = getTextFromClipboard();
+        String text = ClipboardUtil.getTextFromClipboard();
         int hashCode = text != null ? text.hashCode() : 0;
 
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {

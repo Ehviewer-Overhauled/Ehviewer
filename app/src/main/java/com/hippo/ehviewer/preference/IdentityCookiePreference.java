@@ -16,8 +16,6 @@
 
 package com.hippo.ehviewer.preference;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Toast;
@@ -30,6 +28,7 @@ import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.preference.MessagePreference;
 import com.hippo.text.Html;
+import com.hippo.util.ClipboardUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -98,8 +97,7 @@ public class IdentityCookiePreference extends MessagePreference {
         super.onPrepareDialogBuilder(builder);
         if (message != null) {
             builder.setPositiveButton(R.string.settings_eh_identity_cookies_copy, (dialog, which) -> {
-                ClipboardManager cmb = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                cmb.setPrimaryClip(ClipData.newPlainText(null, message));
+                ClipboardUtil.addTextToClipboard(message);
                 Toast.makeText(getContext(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
 
                 IdentityCookiePreference.this.onClick(dialog, which);

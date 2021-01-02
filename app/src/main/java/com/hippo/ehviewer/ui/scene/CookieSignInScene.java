@@ -16,8 +16,6 @@
 
 package com.hippo.ehviewer.ui.scene;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -40,6 +38,8 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
+import com.hippo.util.ClipboardUtil;
+import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ViewUtils;
 
@@ -67,8 +67,6 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     private View mOk;
     @Nullable
     private TextView mFromClipboard;
-    @Nullable
-    private ClipboardManager clipboardManager;
 
     // false for error
     private static boolean checkIpbMemberId(String id) {
@@ -159,7 +157,6 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        clipboardManager = (ClipboardManager) requireActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         showSoftInput(mIpbMemberId);
     }
 
@@ -256,65 +253,60 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
 
     private void fillCookiesFromClipboard() {
         hideSoftInput();
+        String text = ClipboardUtil.getTextFromClipboard();
+        if (text == null) {
+            showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+            return;
+        }
         try {
-            String pasteData;
-            if (!clipboardManager.hasPrimaryClip()/* || !clipboardManager.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)*/) {
-                showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+            String[] kvs;
+            if (text.contains(";")) {
+                kvs = text.split(";");
+            } else if (text.contains("\n")) {
+                kvs = text.split("\n");
             } else {
-                ClipData.Item item = clipboardManager.getPrimaryClip().getItemAt(0);
-                pasteData = String.valueOf(item.coerceToText(requireContext()));
-                if (!TextUtils.isEmpty(pasteData)) {
-                    String[] kvs;
-                    if (pasteData.contains(";")) {
-                        kvs = pasteData.split(";");
-                    } else if (pasteData.contains("\n")) {
-                        kvs = pasteData.split("\n");
-                    } else {
-                        showTip(R.string.from_clipboard_error, LENGTH_SHORT);
-                        return;
-                    }
-                    if (kvs.length < 3) {
-                        showTip(R.string.from_clipboard_error, LENGTH_SHORT);
-                        return;
-                    }
-                    for (String s : kvs) {
-                        String[] kv;
-                        if (s.contains("=")) {
-                            kv = s.split("=");
-                        } else if (s.contains(":")) {
-                            kv = s.split(":");
-                        } else {
-                            continue;
-                        }
-                        if (kv.length != 2) {
-                            continue;
-                        }
-                        switch (kv[0].trim().toLowerCase()) {
-                            case "ipb_member_id":
-                                if (mIpbMemberId != null) {
-                                    mIpbMemberId.setText(kv[1].trim());
-                                }
-                                break;
-                            case "ipb_pass_hash":
-                                if (mIpbPassHash != null) {
-                                    mIpbPassHash.setText(kv[1].trim());
-                                }
-                                break;
-                            case "igneous":
-                                if (mIgneous != null) {
-                                    mIgneous.setText(kv[1].trim());
-                                }
-                                break;
-                        }
-                    }
-                    enter();
+                showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+                return;
+            }
+            if (kvs.length < 3) {
+                showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+                return;
+            }
+            for (String s : kvs) {
+                String[] kv;
+                if (s.contains("=")) {
+                    kv = s.split("=");
+                } else if (s.contains(":")) {
+                    kv = s.split(":");
                 } else {
-                    showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+                    continue;
+                }
+                if (kv.length != 2) {
+                    continue;
+                }
+                switch (kv[0].trim().toLowerCase()) {
+                    case "ipb_member_id":
+                        if (mIpbMemberId != null) {
+                            mIpbMemberId.setText(kv[1].trim());
+                        }
+                        break;
+                    case "ipb_pass_hash":
+                        if (mIpbPassHash != null) {
+                            mIpbPassHash.setText(kv[1].trim());
+                        }
+                        break;
+                    case "igneous":
+                        if (mIgneous != null) {
+                            mIgneous.setText(kv[1].trim());
+                        }
+                        break;
                 }
             }
+            enter();
         } catch (Exception e) {
-            showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+            ExceptionUtils.throwIfFatal(e);
             e.printStackTrace();
+            showTip(R.string.from_clipboard_error, LENGTH_SHORT);
         }
     }
 }

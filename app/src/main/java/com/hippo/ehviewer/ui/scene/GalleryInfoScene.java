@@ -16,8 +16,6 @@
 
 package com.hippo.ehviewer.ui.scene;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -39,6 +37,7 @@ import com.hippo.ehviewer.UrlOpener;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryDetail;
+import com.hippo.util.ClipboardUtil;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
@@ -200,8 +199,7 @@ public final class GalleryInfoScene extends ToolbarScene {
             if (position == INDEX_PARENT) {
                 UrlOpener.openUrl(context, mValues.get(position), true);
             } else {
-                ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                cmb.setPrimaryClip(ClipData.newPlainText(null, mValues.get(position)));
+                ClipboardUtil.addTextToClipboard(mValues.get(position));
 
                 if (position == INDEX_URL) {
                     // Save it to avoid detect the gallery

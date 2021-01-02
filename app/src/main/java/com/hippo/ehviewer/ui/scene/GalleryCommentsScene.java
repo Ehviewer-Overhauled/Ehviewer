@@ -18,8 +18,6 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
@@ -71,6 +69,7 @@ import com.hippo.refreshlayout.RefreshLayout;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
+import com.hippo.util.ClipboardUtil;
 import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
@@ -391,8 +390,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                     }
                     int id = menuId.get(which);
                     if (id == R.id.copy) {
-                        ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        cmb.setPrimaryClip(ClipData.newPlainText(null, comment.comment));
+                        ClipboardUtil.addTextToClipboard(comment.comment);
                         showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
                     } else if (id == R.id.vote_up) {
                         voteComment(comment.id, 1);
