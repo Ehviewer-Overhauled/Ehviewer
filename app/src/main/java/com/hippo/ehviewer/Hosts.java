@@ -35,7 +35,6 @@ import com.hippo.util.SqlUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Hosts {
@@ -118,13 +117,14 @@ public class Hosts {
     }
 
     /**
-     * Returns true if the ip is valid.
+     * Returns true if ips are valid.
      */
-    public static boolean isValidIp(String ip_list) {
-        if (ip_list == null) {
+    public static boolean isValidIp(String ips) {
+        if (ips == null) {
             return false;
         }
-        for (String ip : ip_list.split("\\+")) {
+        String[] list = ips.split("\\+");
+        for (String ip : list) {
             if (parseV4(ip) == null && parseV6(ip) == null) {
                 return false;
             }
@@ -279,12 +279,12 @@ public class Hosts {
         }
         try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
             if (cursor.moveToNext()) {
-                String[] ip_l = SqlUtils.getString(cursor, COLUMN_IP, null).split("\\+");
-                InetAddress[] addr_l = new InetAddress[ip_l.length];
-                for (int i = 0; i < ip_l.length; i++) {
-                    addr_l[i] = toInetAddress(host, ip_l[i]);
+                String[] ips = SqlUtils.getString(cursor, COLUMN_IP, null).split("\\+");
+                List<InetAddress> addresses = new ArrayList<>();
+                for (String ip: ips) {
+                    addresses.add(toInetAddress(host, ip));
                 }
-                return Arrays.asList(addr_l);
+                return addresses;
             } else {
                 return null;
             }
