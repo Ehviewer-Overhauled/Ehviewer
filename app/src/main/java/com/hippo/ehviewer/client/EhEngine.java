@@ -40,6 +40,7 @@ import com.hippo.ehviewer.client.parser.ForumsParser;
 import com.hippo.ehviewer.client.parser.GalleryApiParser;
 import com.hippo.ehviewer.client.parser.GalleryDetailParser;
 import com.hippo.ehviewer.client.parser.GalleryListParser;
+import com.hippo.ehviewer.client.parser.GalleryNotAvailableParser;
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryTokenApiParser;
@@ -106,9 +107,22 @@ public class EhEngine {
             throw new EhException("Sad Panda");
         }
 
+        // Check sad panda(without panda)
+        if (headers != null && "text/html; charset=UTF-8".equals(headers.get("Content-Type")) &&
+                "0".equals(headers.get("Content-Length"))) {
+            throw new EhException("Sad Panda\n(without panda)");
+        }
+
         // Check kokomade
         if (body != null && body.contains(KOKOMADE_URL)) {
             throw new EhException("今回はここまで\n\n" + GetText.getString(R.string.kokomade_tip));
+        }
+
+        if (body != null && body.contains("Gallery Not Available - ")) {
+            String error = GalleryNotAvailableParser.parse(body);
+            if (!TextUtils.isEmpty(error)) {
+                throw new EhException(error);
+            }
         }
 
         if (e instanceof ParseException) {
