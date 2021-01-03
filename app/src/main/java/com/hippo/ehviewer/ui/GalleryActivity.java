@@ -862,7 +862,11 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
         if (!mGalleryProvider.save(page, UniFile.fromMediaUri(this, imageUri))) {
-            resolver.delete(imageUri, null, null);
+            try {
+                resolver.delete(imageUri, null, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
             return;
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
