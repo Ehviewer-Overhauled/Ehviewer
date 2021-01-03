@@ -42,7 +42,9 @@ import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhDns;
 import com.hippo.ehviewer.client.EhEngine;
+import com.hippo.ehviewer.client.EhRequestBuilder;
 import com.hippo.ehviewer.client.EhSSLSocketFactory;
+import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhX509TrustManager;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.download.DownloadManager;
@@ -78,7 +80,10 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class EhApplication extends RecordingApplication {
 
@@ -380,6 +385,25 @@ public class EhApplication extends RecordingApplication {
         }
 
         initialized = true;
+        theDawnOfNewDay();
+    }
+
+    private void theDawnOfNewDay() {
+        EhCookieStore store = getEhCookieStore(this);
+        HttpUrl eh = HttpUrl.get(EhUrl.HOST_E);
+
+        if (store.contains(eh, EhCookieStore.KEY_IPD_MEMBER_ID) || store.contains(eh, EhCookieStore.KEY_IPD_PASS_HASH)) {
+            IoThreadPoolExecutor.getInstance().execute(() -> {
+                String referer = EhUrl.REFERER_E;
+                Request request = new EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build();
+                Call call = getOkHttpClient(this).newCall(request);
+                try {
+                    call.execute();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void clearTempDir() {
