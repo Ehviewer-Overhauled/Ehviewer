@@ -34,6 +34,7 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
+import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.widget.DialogWebChromeClient;
 import com.hippo.yorozuya.AssertUtils;
 
@@ -74,6 +75,7 @@ public class WebViewSignInScene extends SolidScene {
         cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
+        ((MainActivity) context).getDelegate().applyDayNight();
         mWebView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setDisplayZoomControls(false);
