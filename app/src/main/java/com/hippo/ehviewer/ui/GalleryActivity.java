@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -304,6 +305,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         switch (Settings.getReadTheme()) {
             case 0:
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_UNSPECIFIED);
                 break;
             case 1:
                 getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -321,7 +323,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         super.onCreate(savedInstanceState);
-
         if (savedInstanceState == null) {
             onInit();
         } else {
@@ -1021,7 +1022,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             boolean customScreenLightness = mCustomScreenLightness.isChecked();
             int screenLightness = mScreenLightness.getProgress();
 
-            int oldReadTheme = Settings.getReadTheme();
             boolean oldReadingFullscreen = Settings.getReadingFullscreen();
 
             Settings.putScreenRotation(screenRotation);
@@ -1092,7 +1092,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mLayoutMode = layoutMode;
             updateSlider();
 
-            if (oldReadingFullscreen != readingFullscreen || oldReadTheme != readTheme) {
+            if (oldReadingFullscreen != readingFullscreen) {
                 recreate();
             }
         }
@@ -1203,5 +1203,26 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 SimpleHandler.getInstance().post(task);
             }
         }
+    }
+
+    @Override
+    public void applyOverrideConfiguration(Configuration newConfig) {
+        // **Magic**
+        super.applyOverrideConfiguration(updateConfigurationIfSupported(newConfig));
+    }
+
+    private Configuration updateConfigurationIfSupported(Configuration config) {
+        switch (Settings.getReadTheme()) {
+            case 0:
+                config.uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED | Configuration.UI_MODE_NIGHT_MASK;
+                break;
+            case 1:
+                config.uiMode = Configuration.UI_MODE_NIGHT_YES | Configuration.UI_MODE_NIGHT_MASK;
+                break;
+            case 2:
+                config.uiMode = Configuration.UI_MODE_NIGHT_NO | Configuration.UI_MODE_NIGHT_MASK;
+                break;
+        }
+        return config;
     }
 }
