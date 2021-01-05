@@ -63,7 +63,6 @@ public class EhFragment extends BasePreferenceFragment {
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
             AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
-            ((EhApplication) requireActivity().getApplication()).recreate();
             return true;
         } else if (Settings.KEY_GALLERY_SITE.equals(key)) {
             requireActivity().setResult(Activity.RESULT_OK);

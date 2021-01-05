@@ -45,7 +45,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
@@ -315,7 +314,6 @@ public final class MainActivity extends StageActivity
         ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
             int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
             AppCompatDelegate.setDefaultNightMode(theme);
-            ((EhApplication) getApplication()).recreate();
             Settings.putTheme(theme);
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

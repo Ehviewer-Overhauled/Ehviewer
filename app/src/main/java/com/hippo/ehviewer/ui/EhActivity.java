@@ -32,13 +32,11 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 
 import java.util.Locale;
-import java.util.Objects;
 
 public abstract class EhActivity extends AppCompatActivity {
 
     private static final String THEME_DEFAULT = "DEFAULT";
     private static final String THEME_BLACK = "BLACK";
-    private String mTheme;
 
     public static boolean isBlackNightTheme() {
         return Settings.getBoolean("black_dark_theme", false);
@@ -86,12 +84,15 @@ public abstract class EhActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNightModeChanged(int mode) {
+        getTheme().applyStyle(getThemeStyleRes(this), true);
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ((EhApplication) getApplication()).registerActivity(this);
-
-        mTheme = getTheme(this);
     }
 
     @Override
@@ -109,9 +110,6 @@ public abstract class EhActivity extends AppCompatActivity {
                     WindowManager.LayoutParams.FLAG_SECURE);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-        }
-        if (!Objects.equals(mTheme, getTheme(this))) {
-            recreate();
         }
     }
 

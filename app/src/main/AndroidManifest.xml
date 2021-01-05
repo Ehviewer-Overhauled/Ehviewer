@@ -46,7 +46,7 @@
 
         <activity
             android:name="com.hippo.ehviewer.ui.MainActivity"
-            android:configChanges="screenSize|uiMode"
+            android:configChanges="screenSize"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.Main"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -89,7 +89,7 @@
 
         <activity
             android:name="com.hippo.ehviewer.ui.GalleryActivity"
-            android:configChanges="screenSize|uiMode"
+            android:configChanges="screenSize"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.Gallery">
 
@@ -143,7 +143,7 @@
 
         <activity
             android:name="com.hippo.ehviewer.ui.SettingsActivity"
-            android:configChanges="screenSize|uiMode"
+            android:configChanges="screenSize"
             android:label="@string/settings"
             android:theme="@style/AppTheme.Toolbar" />
 
