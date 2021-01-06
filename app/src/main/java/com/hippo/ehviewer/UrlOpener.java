@@ -19,6 +19,7 @@ package com.hippo.ehviewer;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -59,12 +60,14 @@ public final class UrlOpener {
             }
         }
 
+        boolean isNight = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0;
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
         customTabsIntent.setShowTitle(true);
-        CustomTabColorSchemeParams darkParams = new CustomTabColorSchemeParams.Builder()
-                .setToolbarColor(AttrResources.getAttrColor(context, R.attr.colorPrimary))
+        CustomTabColorSchemeParams params = new CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(AttrResources.getAttrColor(context, R.attr.toolbarColor))
                 .build();
-        customTabsIntent.setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_LIGHT, darkParams);
+        customTabsIntent.setDefaultColorSchemeParams(params);
+        customTabsIntent.setColorScheme(isNight ? CustomTabsIntent.COLOR_SCHEME_DARK : CustomTabsIntent.COLOR_SCHEME_LIGHT);
         try {
             customTabsIntent.build().launchUrl(context, uri);
         } catch (ActivityNotFoundException e) {
