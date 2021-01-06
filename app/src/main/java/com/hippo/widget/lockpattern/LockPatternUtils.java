@@ -34,8 +34,7 @@ public class LockPatternUtils {
         List<LockPatternView.Cell> result = new ArrayList<>();
 
         final byte[] bytes = string.getBytes();
-        for (int i = 0; i < bytes.length; i++) {
-            byte b = bytes[i];
+        for (byte b : bytes) {
             result.add(LockPatternView.Cell.of(b / 3, b % 3));
         }
         return result;
@@ -61,17 +60,4 @@ public class LockPatternUtils {
         return new String(res);
     }
 
-    public static boolean isPatternVaild(String pattern) {
-        byte[] bytes = pattern.getBytes();
-        if (bytes.length <= 9 && bytes.length >= 2) {
-            for (byte b : bytes) {
-                if (b >= 9 || b < 0) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
