@@ -213,14 +213,21 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView == mEnableAdvanceSwitch) {
-            mEnableAdvance = isChecked;
-            if (mSearchMode == SEARCH_MODE_NORMAL) {
-                mAdapter.notifyDataSetChanged();
+            post(() -> {
+                mEnableAdvance = isChecked;
+                if (mSearchMode == SEARCH_MODE_NORMAL) {
+                    if (mEnableAdvance) {
+                        mAdapter.notifyItemInserted(1);
+                    } else {
+                        mAdapter.notifyItemRemoved(1);
+                    }
 
-                if (mHelper != null) {
-                    mHelper.onChangeSearchMode();
+                    if (mHelper != null) {
+                        mHelper.onChangeSearchMode();
+                    }
                 }
-            }
+            });
+
         }
     }
 
@@ -274,9 +281,14 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         post(() -> {
+            int oldItemCount = mAdapter.getItemCount();
+
             mSearchMode = tab.getPosition();
 
-            mAdapter.notifyDataSetChanged();
+            int newItemCount = mAdapter.getItemCount();
+
+            mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
+            mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
 
             if (mHelper != null) {
                 mHelper.onChangeSearchMode();
