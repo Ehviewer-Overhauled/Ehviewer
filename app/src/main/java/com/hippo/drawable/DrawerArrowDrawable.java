@@ -26,9 +26,9 @@ import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.Keep;
 
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.MathUtils;
@@ -175,12 +175,12 @@ public class DrawerArrowDrawable extends Drawable {
         return PixelFormat.TRANSLUCENT;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public float getProgress() {
         return mProgress;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setProgress(float progress) {
         if (progress == 1f) {
             setVerticalMirror(true);
@@ -207,9 +207,7 @@ public class DrawerArrowDrawable extends Drawable {
             } else {
                 ObjectAnimator oa = ObjectAnimator.ofFloat(this, "progress", endProgress);
                 oa.setDuration(duration);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    oa.setAutoCancel(true);
-                }
+                oa.setAutoCancel(true);
                 oa.start();
             }
         }

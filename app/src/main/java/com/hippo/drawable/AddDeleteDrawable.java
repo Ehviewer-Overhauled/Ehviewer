@@ -119,6 +119,7 @@ public class AddDeleteDrawable extends Drawable {
         mAutoUpdateMirror = autoUpdateMirror;
     }
 
+    @Keep
     public float getProgress() {
         return mProgress;
     }
