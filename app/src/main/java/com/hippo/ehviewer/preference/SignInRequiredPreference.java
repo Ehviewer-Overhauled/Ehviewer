@@ -28,6 +28,7 @@ import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
+import com.hippo.util.WebViewUtil;
 
 import okhttp3.HttpUrl;
 
@@ -58,6 +59,10 @@ public class SignInRequiredPreference extends Preference implements Preference.O
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
+        if (!WebViewUtil.available(getContext())) {
+            mActivity.showTip(R.string.error_no_webview, BaseScene.LENGTH_SHORT);
+            return true;
+        }
         EhCookieStore store = EhApplication.getEhCookieStore(getContext());
         HttpUrl e = HttpUrl.get(EhUrl.HOST_E);
         HttpUrl ex = HttpUrl.get(EhUrl.HOST_EX);

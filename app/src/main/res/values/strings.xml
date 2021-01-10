@@ -809,4 +809,5 @@
     <string name="settings_advanced_clear_memory_cache_done">Memory cache cleaning completed</string>
     <string name="action_add_tag">Add tag</string>
     <string name="action_add_tag_tip">Enter new tags, separated with comma</string>
+    <string name="error_no_webview">WebView is not available.</string>
 </resources>

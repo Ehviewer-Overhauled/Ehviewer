@@ -45,6 +45,7 @@ import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.util.WebViewUtil;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
@@ -225,6 +226,10 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         } else if (mSignIn == v) {
             signIn();
         } else if (mSignInViaWebView == v) {
+            if (!WebViewUtil.available(getContext())) {
+                showTip(R.string.error_no_webview, BaseScene.LENGTH_SHORT);
+                return;
+            }
             startScene(new Announcer(WebViewSignInScene.class).setRequestCode(this, REQUEST_CODE_WEBVIEW));
         } else if (mSignInViaCookies == v) {
             startScene(new Announcer(CookieSignInScene.class).setRequestCode(this, REQUEST_CODE_COOKIE));
