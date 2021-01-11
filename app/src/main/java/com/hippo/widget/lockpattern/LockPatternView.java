@@ -30,6 +30,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -366,6 +367,10 @@ public class LockPatternView extends View {
                 }
             }
             addCellToPattern(cell);
+            performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING
+                            | HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+
             return cell;
         }
         return null;
@@ -1082,7 +1087,6 @@ public class LockPatternView extends View {
         /**
          * Constructor called from {@link #CREATOR}
          */
-        @SuppressWarnings("ConstantConditions")
         @SuppressLint("ParcelClassLoader")
         private SavedState(Parcel in) {
             super(in);
