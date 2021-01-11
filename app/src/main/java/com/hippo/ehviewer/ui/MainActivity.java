@@ -16,8 +16,9 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -32,6 +33,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,7 +42,6 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.WindowCompat;
 
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -73,13 +75,13 @@ import com.hippo.ehviewer.ui.scene.WarningScene;
 import com.hippo.ehviewer.ui.scene.WebViewSignInScene;
 import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.io.UniFileInputStreamPipe;
-import com.hippo.network.Network;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
 import com.hippo.util.ClipboardUtil;
+import com.hippo.widget.DrawerView;
 import com.hippo.widget.LoadImageView;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.SimpleHandler;
@@ -93,12 +95,7 @@ import java.io.OutputStream;
 public final class MainActivity extends StageActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
-
-    private static final int REQUEST_CODE_SETTINGS = 0;
-
     private static final String KEY_NAV_CHECKED_ITEM = "nav_checked_item";
-    private static final String KEY_CLIP_TEXT_HASH_CODE = "clip_text_hash_code";
 
     static {
         registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -119,6 +116,13 @@ public final class MainActivity extends StageActivity
         registerLaunchMode(ProgressScene.class, SceneFragment.LAUNCH_MODE_STANDARD);
     }
 
+    ActivityResultLauncher<Intent> settingsLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    refreshTopScene();
+                }
+            });
+
     /*---------------
      Whole life cycle
      ---------------*/
@@ -127,7 +131,7 @@ public final class MainActivity extends StageActivity
     @Nullable
     private NavigationView mNavView;
     @Nullable
-    private MaterialCardView mRightDrawer;
+    private DrawerView mRightDrawer;
     @Nullable
     private LoadImageView mAvatar;
     @Nullable
@@ -139,7 +143,7 @@ public final class MainActivity extends StageActivity
         return R.id.fragment_container;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Announcer getLaunchAnnouncer() {
         if (!TextUtils.isEmpty(Settings.getSecurity())) {
@@ -247,7 +251,7 @@ public final class MainActivity extends StageActivity
                 builder.setKeyword(intent.getStringExtra(Intent.EXTRA_TEXT));
                 startScene(processAnnouncer(GalleryListScene.getStartAnnouncer(builder)));
                 return true;
-            } else if (type.startsWith("image/")) {
+            } else if (type != null && type.startsWith("image/")) {
                 Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
                 if (null != uri) {
                     UniFile file = UniFile.fromUri(this, uri);
@@ -307,17 +311,21 @@ public final class MainActivity extends StageActivity
 
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(this, R.id.draw_view);
         mNavView = (NavigationView) ViewUtils.$$(this, R.id.nav_view);
-        mRightDrawer = (MaterialCardView) ViewUtils.$$(this, R.id.right_drawer);
+        mRightDrawer = (DrawerView) ViewUtils.$$(this, R.id.right_drawer);
         View headerLayout = mNavView.getHeaderView(0);
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
         ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
             int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
             AppCompatDelegate.setDefaultNightMode(theme);
-            Settings.putTheme(theme);
+            if (Settings.getTheme() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+                Settings.putTheme(theme);
+            }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            findViewById(R.id.fragment_container).setFitsSystemWindows(true);
+        }
 
         updateProfile();
 
@@ -327,8 +335,8 @@ public final class MainActivity extends StageActivity
 
         if (savedInstanceState == null) {
             checkDownloadLocation();
-            if (Settings.getCellularNetworkWarning()) {
-                checkCellularNetwork();
+            if (Settings.getMeteredNetworkWarning()) {
+                checkMeteredNetwork();
             }
         } else {
             onRestore(savedInstanceState);
@@ -350,9 +358,19 @@ public final class MainActivity extends StageActivity
                 .show();
     }
 
-    private void checkCellularNetwork() {
-        if (Network.getActiveNetworkType(this) == ConnectivityManager.TYPE_MOBILE) {
-            showTip(R.string.cellular_network_warning, BaseScene.LENGTH_SHORT);
+    private void checkMeteredNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.isActiveNetworkMetered()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && mDrawerLayout != null) {
+                Snackbar.make(mDrawerLayout, R.string.metered_network_warning, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.settings, v -> {
+                            Intent panelIntent = new Intent(android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY);
+                            startActivity(panelIntent);
+                        })
+                        .show();
+            } else {
+                showTip(R.string.metered_network_warning, BaseScene.LENGTH_LONG);
+            }
         }
     }
 
@@ -361,7 +379,7 @@ public final class MainActivity extends StageActivity
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         outState.putInt(KEY_NAV_CHECKED_ITEM, mNavCheckedItem);
     }
@@ -447,24 +465,13 @@ public final class MainActivity extends StageActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
-            if (grantResults.length == 1 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, R.string.you_rejected_me, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
     public void onSceneViewCreated(SceneFragment scene, Bundle savedInstanceState) {
         super.onSceneViewCreated(scene, savedInstanceState);
 
         createDrawerView(scene);
     }
 
+    @SuppressLint("RtlHardcoded")
     public void createDrawerView(SceneFragment scene) {
         if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
             BaseScene baseScene = (BaseScene) scene;
@@ -518,14 +525,6 @@ public final class MainActivity extends StageActivity
     public void removeAboveSnackView(View view) {
         if (mDrawerLayout != null) {
             mDrawerLayout.removeAboveSnackView(view);
-        }
-    }
-
-    public int getDrawerLockMode(int edgeGravity) {
-        if (mDrawerLayout != null) {
-            return mDrawerLayout.getDrawerLockMode(edgeGravity);
-        } else {
-            return DrawerLayout.LOCK_MODE_UNLOCKED;
         }
     }
 
@@ -585,6 +584,7 @@ public final class MainActivity extends StageActivity
         }
     }
 
+    @SuppressLint("RtlHardcoded")
     @Override
     public void onBackPressed() {
         if (mDrawerLayout != null && (mDrawerLayout.isDrawerOpen(Gravity.LEFT) ||
@@ -632,7 +632,7 @@ public final class MainActivity extends StageActivity
             startScene(new Announcer(DownloadsScene.class));
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+            settingsLauncher.launch(intent);
         }
 
         if (id != R.id.nav_stub && mDrawerLayout != null) {
@@ -640,20 +640,6 @@ public final class MainActivity extends StageActivity
         }
 
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_SETTINGS:
-                if (RESULT_OK == resultCode) {
-                    refreshTopScene();
-                }
-                break;
-            default:
-                super.onActivityResult(requestCode, resultCode, data);
-                break;
-        }
     }
 
     public void setDrawerGestureBlocker(EhDrawerLayout.GestureBlocker gestureBlocker) {

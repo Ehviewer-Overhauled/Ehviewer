@@ -81,9 +81,7 @@ public final class LayoutManagerUtils {
                     int direction = 0;
                     try {
                         direction = (Integer) sCsdfp.invoke(staggeredGridLayoutManager, targetPosition);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                    } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
 
@@ -108,21 +106,18 @@ public final class LayoutManagerUtils {
 
     public static void scrollToPositionProperly(final RecyclerView.LayoutManager layoutManager,
                                                 final Context context, final int position, final OnScrollToPositionListener listener) {
-        SimpleHandler.getInstance().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int first = getFirstVisibleItemPosition(layoutManager);
-                int last = getLastVisibleItemPosition(layoutManager);
-                int offset = Math.abs(position - first);
-                int max = last - first;
-                if (offset < max && max > 0) {
-                    smoothScrollToPosition(layoutManager, context, position,
-                            MathUtils.lerp(100, 25, (offset / max)));
-                } else {
-                    scrollToPositionWithOffset(layoutManager, position, 0);
-                    if (listener != null) {
-                        listener.onScrollToPosition(position);
-                    }
+        SimpleHandler.getInstance().postDelayed(() -> {
+            int first = getFirstVisibleItemPosition(layoutManager);
+            int last = getLastVisibleItemPosition(layoutManager);
+            int offset = Math.abs(position - first);
+            int max = last - first;
+            if (offset < max && max > 0) {
+                smoothScrollToPosition(layoutManager, context, position,
+                        MathUtils.lerp(100, 25, (offset / max)));
+            } else {
+                scrollToPositionWithOffset(layoutManager, position, 0);
+                if (listener != null) {
+                    listener.onScrollToPosition(position);
                 }
             }
         }, 200);

@@ -33,8 +33,6 @@ import javax.net.ssl.SSLException;
 
 public final class ExceptionUtils {
 
-    private static final String TAG = ExceptionUtils.class.getSimpleName();
-
     @NonNull
     public static String getReadableString(@NonNull Throwable e) {
         e.printStackTrace();

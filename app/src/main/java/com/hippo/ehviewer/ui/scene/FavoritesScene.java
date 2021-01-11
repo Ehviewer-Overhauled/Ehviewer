@@ -38,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,7 +76,6 @@ import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
-import com.hippo.util.DrawableManager;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
@@ -276,7 +276,7 @@ public class FavoritesScene extends BaseScene implements
 
         mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
-        mSearchBar.setRightDrawable(DrawableManager.getVectorDrawable(context, R.drawable.v_magnify_x24));
+        mSearchBar.setRightDrawable(ContextCompat.getDrawable(context, R.drawable.v_magnify_x24));
         mSearchBar.setHelper(this);
         mSearchBar.setAllowEmptySearch(false);
         updateSearchBar();

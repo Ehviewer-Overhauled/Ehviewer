@@ -78,7 +78,7 @@ public abstract class DialogPreference extends Preference implements
 
     public DialogPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs, defStyleAttr, 0);
+        init(context, attrs, defStyleAttr, defStyleAttr);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {

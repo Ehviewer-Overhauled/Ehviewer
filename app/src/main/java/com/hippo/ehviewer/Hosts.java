@@ -281,7 +281,7 @@ public class Hosts {
             if (cursor.moveToNext()) {
                 String[] ips = SqlUtils.getString(cursor, COLUMN_IP, null).split("\\+");
                 List<InetAddress> addresses = new ArrayList<>();
-                for (String ip: ips) {
+                for (String ip : ips) {
                     addresses.add(toInetAddress(host, ip));
                 }
                 return addresses;

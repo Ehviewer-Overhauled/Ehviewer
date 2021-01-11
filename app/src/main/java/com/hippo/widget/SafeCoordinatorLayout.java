@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -48,6 +49,7 @@ public class SafeCoordinatorLayout extends CoordinatorLayout {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         try {

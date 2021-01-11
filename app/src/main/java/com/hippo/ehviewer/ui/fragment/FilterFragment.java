@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +33,6 @@ import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhFilter;
 import com.hippo.ehviewer.dao.Filter;
-import com.hippo.util.DrawableManager;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
@@ -66,7 +66,7 @@ public class FilterFragment extends BaseFragment {
         mViewTransition = new ViewTransition(recyclerView, tip);
         FloatingActionButton fab = view.findViewById(R.id.fab);
 
-        Drawable drawable = DrawableManager.getVectorDrawable(requireActivity(), R.drawable.big_filter);
+        Drawable drawable = ContextCompat.getDrawable(requireActivity(), R.drawable.big_filter);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         tip.setCompoundDrawables(null, drawable, null, null);
 

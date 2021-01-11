@@ -29,21 +29,19 @@ import com.hippo.yorozuya.MathUtils;
 import java.io.IOException;
 
 public final class BitmapUtils {
-    public static Context sContext;
+    public static ActivityManager activityManager;
 
     private BitmapUtils() {
     }
 
     public static void initialize(Context context) {
-        sContext = context.getApplicationContext();
+        activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     }
 
     public static long availableMemory() {
         final Runtime runtime = Runtime.getRuntime();
         final long used = runtime.totalMemory() - runtime.freeMemory();
 
-        final ActivityManager activityManager = (ActivityManager) sContext.
-                getSystemService(Context.ACTIVITY_SERVICE);
         final long total = activityManager.getMemoryClass() * 1024 * 1024;
 
         return total - used;

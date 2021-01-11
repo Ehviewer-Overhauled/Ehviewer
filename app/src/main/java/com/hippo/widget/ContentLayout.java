@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hippo.android.resource.AttrResources;
@@ -41,7 +42,6 @@ import com.hippo.easyrecyclerview.LayoutManagerUtils;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.refreshlayout.RefreshLayout;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.IntIdGenerator;
@@ -195,13 +195,7 @@ public class ContentLayout extends FrameLayout {
          * Generate task id
          */
         private final IntIdGenerator mIdGenerator = new IntIdGenerator();
-        private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener =
-                new LayoutManagerUtils.OnScrollToPositionListener() {
-                    @Override
-                    public void onScrollToPosition(int position) {
-                        ContentHelper.this.onScrollToPosition(position);
-                    }
-                };
+        private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener = ContentHelper.this::onScrollToPosition;
         private ProgressView mProgressView;
         private TextView mTipView;
         private ViewGroup mContentView;
@@ -280,7 +274,7 @@ public class ContentLayout extends FrameLayout {
         };
         private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (!mRefreshLayout.isRefreshing() && mRefreshLayout.isAlmostBottom() && mEndPage < mPages) {
                     // Get next page
                     mRefreshLayout.setFooterRefreshing(true);
@@ -300,7 +294,7 @@ public class ContentLayout extends FrameLayout {
             mRefreshLayout = contentLayout.mRefreshLayout;
             mRecyclerView = contentLayout.mRecyclerView;
 
-            Drawable drawable = DrawableManager.getVectorDrawable(getContext(), R.drawable.big_sad_pandroid);
+            Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.big_sad_pandroid);
             drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             mTipView.setCompoundDrawables(null, drawable, null, null);
 

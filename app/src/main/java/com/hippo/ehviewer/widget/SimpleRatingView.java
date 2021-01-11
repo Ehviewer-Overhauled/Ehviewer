@@ -23,8 +23,9 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
 import com.hippo.ehviewer.R;
-import com.hippo.util.DrawableManager;
 import com.hippo.yorozuya.MathUtils;
 
 /**
@@ -58,9 +59,9 @@ public class SimpleRatingView extends View {
 
     private void init(Context context) {
         Resources resources = context.getResources();
-        mStarDrawable = DrawableManager.getVectorDrawable(context, R.drawable.v_star_x16);
-        mStarHalfDrawable = DrawableManager.getVectorDrawable(context, R.drawable.v_star_half_x16);
-        mStarOutlineDrawable = DrawableManager.getVectorDrawable(context, R.drawable.v_star_outline_x16);
+        mStarDrawable = ContextCompat.getDrawable(context, R.drawable.v_star_x16);
+        mStarHalfDrawable = ContextCompat.getDrawable(context, R.drawable.v_star_half_x16);
+        mStarOutlineDrawable = ContextCompat.getDrawable(context, R.drawable.v_star_outline_x16);
         mRatingSize = resources.getDimensionPixelOffset(R.dimen.rating_size);
         mRatingInterval = resources.getDimensionPixelOffset(R.dimen.rating_interval);
 

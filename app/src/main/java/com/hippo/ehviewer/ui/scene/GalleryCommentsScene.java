@@ -33,6 +33,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.text.util.LinkifyCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,10 +73,8 @@ import com.hippo.scene.SceneFragment;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.ClipboardUtil;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
-import com.hippo.util.TextUrl;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.FabLayout;
 import com.hippo.widget.LinkifyTextView;
@@ -213,12 +214,12 @@ public final class GalleryCommentsScene extends ToolbarScene
         Resources resources = getResources();
         int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
 
-        Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         tip.setCompoundDrawables(null, drawable, null, null);
 
-        mSendDrawable = DrawableManager.getVectorDrawable(context, R.drawable.v_send_dark_x24);
-        mPencilDrawable = DrawableManager.getVectorDrawable(context, R.drawable.v_pencil_dark_x24);
+        mSendDrawable = ContextCompat.getDrawable(context, R.drawable.v_send_dark_x24);
+        mPencilDrawable = ContextCompat.getDrawable(context, R.drawable.v_pencil_dark_x24);
 
         mAdapter = new CommentAdapter();
         mRecyclerView.setAdapter(mAdapter);
@@ -902,7 +903,9 @@ public final class GalleryCommentsScene extends ToolbarScene
                 ssb.append("\n\n").append(ss);
             }
 
-            return TextUrl.handleTextUrl(ssb);
+            LinkifyCompat.addLinks(ssb, Linkify.WEB_URLS);
+
+            return ssb;
         }
 
         public void bind(GalleryComment value) {

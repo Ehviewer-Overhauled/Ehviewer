@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -73,7 +74,6 @@ import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.util.DrawableManager;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.LoadImageView;
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
@@ -197,7 +197,7 @@ public class HistoryScene extends ToolbarScene {
         AssertUtils.assertNotNull(context);
         Resources resources = context.getResources();
 
-        Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_history);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_history);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         tip.setCompoundDrawables(null, drawable, null, null);
 

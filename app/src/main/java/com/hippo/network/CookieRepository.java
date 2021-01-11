@@ -22,11 +22,12 @@ package com.hippo.network;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.hippo.yorozuya.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -153,12 +154,7 @@ public class CookieRepository implements CookieJar {
         // RFC 6265 Section-5.4 step 2, sort the cookie-list
         // Cookies with longer paths are listed before cookies with shorter paths.
         // Ignore creation-time, we don't store them.
-        Collections.sort(accepted, new Comparator<Cookie>() {
-            @Override
-            public int compare(Cookie o1, Cookie o2) {
-                return o2.path().length() - o1.path().length();
-            }
-        });
+        Collections.sort(accepted, (o1, o2) -> o2.path().length() - o1.path().length());
 
         return accepted;
     }
@@ -185,14 +181,15 @@ public class CookieRepository implements CookieJar {
     }
 
     @Override
-    public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
+    public void saveFromResponse(@NonNull HttpUrl httpUrl, List<Cookie> list) {
         for (Cookie cookie : list) {
             addCookie(cookie);
         }
     }
 
+    @NonNull
     @Override
-    public List<Cookie> loadForRequest(HttpUrl httpUrl) {
+    public List<Cookie> loadForRequest(@NonNull HttpUrl httpUrl) {
         return getCookies(httpUrl);
     }
 }

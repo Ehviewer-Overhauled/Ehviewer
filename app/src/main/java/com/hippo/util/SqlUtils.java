@@ -38,7 +38,7 @@ public class SqlUtils {
     }
 
     public static void dropAllTable(SQLiteDatabase db) {
-        List<String> tables = new ArrayList<String>();
+        List<String> tables = new ArrayList<>();
         Cursor cursor = db.rawQuery("SELECT * FROM sqlite_master WHERE type='table';", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

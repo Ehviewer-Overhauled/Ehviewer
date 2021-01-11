@@ -18,6 +18,7 @@ package com.hippo.easyrecyclerview;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -28,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hippo.ehviewer.R;
@@ -223,11 +225,11 @@ public class FastScroller extends View {
         mOnScrollChangeListener = new RecyclerView.OnScrollListener() {
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             }
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 updatePosition(true);
                 invalidate();
             }
@@ -314,6 +316,7 @@ public class FastScroller extends View {
         canvas.restoreToCount(saved);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!mDraggable || getVisibility() != VISIBLE || mRecyclerView == null || mHandlerHeight == INVALID) {

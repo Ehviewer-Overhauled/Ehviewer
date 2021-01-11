@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.Layout;
 import android.text.Spanned;
@@ -49,6 +50,7 @@ public class LinkifyTextView extends ObservedTextView {
         mCurrentSpan = null;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Let the parent or grandparent of TextView to handles click aciton.

@@ -29,7 +29,7 @@ public class ClipboardUtil {
         if (clipboardManager != null) {
             try {
                 clipboardManager.setPrimaryClip(ClipData.newPlainText(null, text));
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

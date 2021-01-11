@@ -27,7 +27,6 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
-import com.hippo.util.TextUrl;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 
@@ -37,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -85,13 +85,13 @@ public class EhTagDatabase {
             buffer.append(tmp[0]);
             buffer.append("\r");
             try {
-                buffer.append(new String(Base64.decode(tmp[1], Base64.DEFAULT), TextUrl.UTF_8));
+                buffer.append(new String(Base64.decode(tmp[1], Base64.DEFAULT), StandardCharsets.UTF_8));
             } catch (Exception e) {
                 buffer.append(tmp[1]);
             }
             buffer.append("\n");
         }
-        byte[] b = buffer.toString().getBytes(TextUrl.UTF_8);
+        byte[] b = buffer.toString().getBytes(StandardCharsets.UTF_8);
         int totalBytes = b.length;
         tags = new byte[totalBytes];
         System.arraycopy(b, 0, tags, 0, totalBytes);
@@ -146,9 +146,7 @@ public class EhTagDatabase {
                 digest.update(buffer, 0, n);
             }
             return digest.digest();
-        } catch (IOException e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
             return null;
         }
     }
@@ -309,7 +307,7 @@ public class EhTagDatabase {
     }
 
     public String getTranslation(String tag) {
-        return search(tags, tag.getBytes(TextUrl.UTF_8));
+        return search(tags, tag.getBytes(StandardCharsets.UTF_8));
     }
 
     @Nullable
@@ -368,7 +366,7 @@ public class EhTagDatabase {
             } else if (compare > 0) {
                 low = start + end + 1;
             } else {
-                return new String(tags, start + middle + 1, end - middle - 1, TextUrl.UTF_8);
+                return new String(tags, start + middle + 1, end - middle - 1, StandardCharsets.UTF_8);
             }
         }
         return null;
@@ -404,10 +402,10 @@ public class EhTagDatabase {
 
             byte[] hintBytes = new byte[end - middle - 1];
             System.arraycopy(tags, start + middle + 1, hintBytes, 0, end - middle - 1);
-            String hint = new String(hintBytes, TextUrl.UTF_8);
+            String hint = new String(hintBytes, StandardCharsets.UTF_8);
             byte[] tagBytes = new byte[middle];
             System.arraycopy(tags, start + 1, tagBytes, 0, middle);
-            String tag = new String(tagBytes, TextUrl.UTF_8);
+            String tag = new String(tagBytes, StandardCharsets.UTF_8);
             int index = tag.indexOf(':');
             boolean keywordMatches;
             if (index == -1 || index >= tag.length() - 1 || keyword.length() > 2) {

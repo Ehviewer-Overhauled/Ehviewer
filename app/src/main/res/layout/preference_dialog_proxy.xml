@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/proxy_host_or_ip">
 
-        <com.hippo.widget.HackyTextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/proxy_port">
 
-        <com.hippo.widget.HackyTextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/port"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

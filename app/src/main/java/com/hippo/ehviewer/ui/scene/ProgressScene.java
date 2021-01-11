@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -34,7 +35,6 @@ import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AssertUtils;
@@ -166,7 +166,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         Context context = getContext();
         AssertUtils.assertNotNull(context);
 
-        Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         mTip.setCompoundDrawables(null, drawable, null, null);
         mTip.setOnClickListener(this);

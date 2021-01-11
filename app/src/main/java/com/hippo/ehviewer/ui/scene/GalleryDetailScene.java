@@ -106,7 +106,6 @@ import com.hippo.scene.TransitionHelper;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.AppHelper;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.view.ViewTransition;
@@ -531,7 +530,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             }
         });
 
-        Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_sad_pandroid);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         mTip.setCompoundDrawables(null, drawable, null, null);
         mTip.setOnClickListener(this);
@@ -748,7 +747,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private void setActionDrawable(@Nullable TextView text, @DrawableRes int resId) {
         if (text == null) return;
         Context context = text.getContext();
-        Drawable drawable = DrawableManager.getVectorDrawable(context, resId);
+        Drawable drawable = ContextCompat.getDrawable(context, resId);
         if (drawable == null) return;
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         text.setCompoundDrawables(null, drawable, null, null);

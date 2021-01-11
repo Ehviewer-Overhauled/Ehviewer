@@ -18,6 +18,8 @@ package com.hippo.ehviewer.client;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.hippo.network.CookieRepository;
 
 import java.util.ArrayList;
@@ -84,8 +86,9 @@ public class EhCookieStore extends CookieRepository {
                 contains(url, KEY_IPD_PASS_HASH);
     }
 
+    @NonNull
     @Override
-    public List<Cookie> loadForRequest(HttpUrl url) {
+    public List<Cookie> loadForRequest(@NonNull HttpUrl url) {
         List<Cookie> cookies = super.loadForRequest(url);
 
         boolean checkTips = domainMatch(url, EhUrl.DOMAIN_E);

@@ -59,7 +59,7 @@
                 android:hint="ipb_member_id"
                 android:minWidth="@dimen/single_max_width">
 
-                <com.hippo.widget.HackyTextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ipb_member_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                 android:hint="ipb_pass_hash"
                 android:minWidth="@dimen/single_max_width">
 
-                <com.hippo.widget.HackyTextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ipb_pass_hash"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
                 android:hint="igneous"
                 android:minWidth="@dimen/single_max_width">
 
-                <com.hippo.widget.HackyTextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/igneous"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

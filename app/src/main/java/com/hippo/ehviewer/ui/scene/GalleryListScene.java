@@ -50,6 +50,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -101,7 +102,6 @@ import com.hippo.ehviewer.widget.SearchLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
@@ -1719,7 +1719,7 @@ public final class GalleryListScene extends BaseScene
         @Override
         public CharSequence getText(TextView textView) {
             if (textView.getId() == android.R.id.text1) {
-                Drawable bookImage = DrawableManager.getVectorDrawable(textView.getContext(), R.drawable.v_book_open_x24);
+                Drawable bookImage = ContextCompat.getDrawable(textView.getContext(), R.drawable.v_book_open_x24);
                 SpannableStringBuilder ssb = new SpannableStringBuilder("    ");
                 ssb.append(getString(R.string.gallery_list_search_bar_open_gallery));
                 int imageSize = (int) (textView.getTextSize() * 1.25);

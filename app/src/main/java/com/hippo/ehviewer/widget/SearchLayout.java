@@ -43,6 +43,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
+import com.hippo.easyrecyclerview.SimpleHolder;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
@@ -315,12 +316,6 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         void onChangeSearchMode();
 
         void onSelectImage();
-    }
-
-    private static class SimpleHolder extends RecyclerView.ViewHolder {
-        public SimpleHolder(View itemView) {
-            super(itemView);
-        }
     }
 
     private class SearchAdapter extends EasyRecyclerView.Adapter<SimpleHolder> {

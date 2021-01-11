@@ -22,7 +22,7 @@
     android:paddingTop="@dimen/abc_dialog_padding_top_material"
     android:paddingRight="?attr/dialogPreferredPadding">
 
-    <com.hippo.widget.HackyTextInputEditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

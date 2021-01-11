@@ -78,7 +78,7 @@ public class MessagePreference extends DialogPreference {
 
         if (mDialogMessageLinkify) {
             final View messageView = dialog.findViewById(android.R.id.message);
-            if (null != messageView && messageView instanceof TextView) {
+            if (messageView instanceof TextView) {
                 ((TextView) messageView).setMovementMethod(LinkMovementMethod.getInstance());
             }
         }

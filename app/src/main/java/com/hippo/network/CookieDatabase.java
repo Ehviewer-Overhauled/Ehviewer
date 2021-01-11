@@ -121,8 +121,7 @@ class CookieDatabase {
         Map<String, CookieSet> map = new HashMap<>();
         List<Long> toRemove = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_COOKIE + ";", null);
-        try {
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_COOKIE + ";", null)) {
             while (cursor.moveToNext()) {
                 long id = SqlUtils.getLong(cursor, COLUMN_ID, 0);
                 Cookie cookie = getCookie(cursor, now);
@@ -143,8 +142,6 @@ class CookieDatabase {
                     toRemove.add(id);
                 }
             }
-        } finally {
-            cursor.close();
         }
 
         // Remove invalid or expired cookie

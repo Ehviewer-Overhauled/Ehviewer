@@ -31,6 +31,7 @@ import android.view.animation.Animation;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.animation.PathInterpolatorCompat;
@@ -163,45 +164,45 @@ public class ProgressView extends View {
         return false;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public float getTrimStart() {
         return mTrimStart;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setTrimStart(float trimStart) {
         mTrimStart = trimStart;
         invalidate();
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public float getTrimEnd() {
         return mTrimEnd;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setTrimEnd(float trimEnd) {
         mTrimEnd = trimEnd;
         invalidate();
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public float getTrimOffset() {
         return mTrimOffset;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setTrimOffset(float trimOffset) {
         mTrimOffset = trimOffset;
         invalidate();
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public float getTrimRotation() {
         return mTrimRotation;
     }
 
-    @SuppressWarnings("unused")
+    @Keep
     public void setTrimRotation(float trimRotation) {
         mTrimRotation = trimRotation;
         invalidate();

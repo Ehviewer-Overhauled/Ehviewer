@@ -95,7 +95,6 @@ import com.hippo.io.UniFileInputStreamPipe;
 import com.hippo.scene.Announcer;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.unifile.UniFile;
-import com.hippo.util.DrawableManager;
 import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.FabLayout;
@@ -341,7 +340,7 @@ public class DownloadsScene extends ToolbarScene
         AssertUtils.assertNotNull(content);
         Resources resources = context.getResources();
 
-        Drawable drawable = DrawableManager.getVectorDrawable(context, R.drawable.big_download);
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_download);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         tip.setCompoundDrawables(null, drawable, null, null);
 

@@ -24,6 +24,8 @@ import android.graphics.PixelFormat;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
+
 public class HandlerDrawable extends Drawable {
 
     private int mColor = Color.BLACK;
@@ -37,7 +39,7 @@ public class HandlerDrawable extends Drawable {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NonNull Canvas canvas) {
         int width = getBounds().width();
         int height = getBounds().height();
 

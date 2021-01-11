@@ -18,6 +18,7 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,6 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.text.Html;
-import com.hippo.text.LinkMovementMethod2;
 import com.hippo.yorozuya.ViewUtils;
 
 public class AnalyticsScene extends SolidScene implements View.OnClickListener {
@@ -57,7 +57,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
         TextView text = (TextView) ViewUtils.$$(view, R.id.text);
 
         text.setText(Html.fromHtml(getString(R.string.analytics_explain)));
-        text.setMovementMethod(LinkMovementMethod2.getInstance());
+        text.setMovementMethod(LinkMovementMethod.getInstance());
 
         mReject.setOnClickListener(this);
         mAccept.setOnClickListener(this);

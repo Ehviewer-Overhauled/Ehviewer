@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,14 +51,14 @@ public class SearchBarMover extends RecyclerView.OnScrollListener {
     }
 
     @Override
-    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
         if (newState == RecyclerView.SCROLL_STATE_IDLE && mHelper.isValidView(recyclerView)) {
             returnSearchBarPosition();
         }
     }
 
     @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         if (mHelper.isValidView(recyclerView)) {
             int oldBottom = (int) ViewUtils.getY2(mSearchBar);
             int offsetYStep = MathUtils.clamp(-dy, -oldBottom, -(int) mSearchBar.getTranslationY());
