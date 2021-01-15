@@ -23,11 +23,12 @@
     android:paddingRight="?attr/dialogPreferredPadding"
     android:paddingBottom="@dimen/abc_dialog_padding_top_material">
 
-    <com.hippo.widget.ProgressView
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         style="@style/ProgressView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/abc_dialog_padding_top_material" />
 
     <TextView
         android:layout_width="match_parent"

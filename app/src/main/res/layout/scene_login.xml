@@ -161,7 +161,7 @@
         android:clickable="true"
         android:visibility="gone">
 
-        <com.hippo.widget.ProgressView
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             style="@style/ProgressView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

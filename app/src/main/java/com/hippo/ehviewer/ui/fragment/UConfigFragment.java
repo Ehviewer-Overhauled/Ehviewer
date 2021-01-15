@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -24,7 +25,6 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.ehviewer.widget.DialogWebChromeClient;
-import com.hippo.widget.ProgressView;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
@@ -32,7 +32,7 @@ import okhttp3.HttpUrl;
 public class UConfigFragment extends BaseFragment {
 
     private WebView webView;
-    private ProgressView progress;
+    private CircularProgressIndicator progress;
     private String url;
     private boolean loaded;
 

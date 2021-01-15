@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
@@ -55,7 +56,7 @@ import java.util.List;
 
 public class ContentLayout extends FrameLayout {
 
-    private ProgressView mProgressView;
+    private CircularProgressIndicator mProgressView;
     private TextView mTipView;
     private ViewGroup mContentView;
 
@@ -196,7 +197,7 @@ public class ContentLayout extends FrameLayout {
          */
         private final IntIdGenerator mIdGenerator = new IntIdGenerator();
         private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener = ContentHelper.this::onScrollToPosition;
-        private ProgressView mProgressView;
+        private CircularProgressIndicator mProgressView;
         private TextView mTipView;
         private ViewGroup mContentView;
         private RefreshLayout mRefreshLayout;

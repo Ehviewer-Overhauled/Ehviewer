@@ -66,6 +66,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
@@ -112,7 +113,6 @@ import com.hippo.view.ViewTransition;
 import com.hippo.widget.AutoWrapLayout;
 import com.hippo.widget.LoadImageView;
 import com.hippo.widget.ObservedTextView;
-import com.hippo.widget.ProgressView;
 import com.hippo.widget.SimpleGridAutoSpanLayout;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.FileUtils;
@@ -1907,7 +1907,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             DialogInterface.OnDismissListener, EhClient.Callback<Pair<String, Pair<String, String>[]>> {
 
         @Nullable
-        private ProgressView mProgressView;
+        private CircularProgressIndicator mProgressView;
         @Nullable
         private TextView mErrorText;
         @Nullable
@@ -1919,7 +1919,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         public void setDialog(@Nullable Dialog dialog, String url) {
             mDialog = dialog;
-            mProgressView = (ProgressView) ViewUtils.$$(dialog, R.id.progress);
+            mProgressView = (CircularProgressIndicator) ViewUtils.$$(dialog, R.id.progress);
             mErrorText = (TextView) ViewUtils.$$(dialog, R.id.text);
             mListView = (ListView) ViewUtils.$$(dialog, R.id.list_view);
             mListView.setOnItemClickListener(this);
@@ -2024,7 +2024,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             DialogInterface.OnDismissListener, EhClient.Callback<Pair<String, String>[]> {
 
         @Nullable
-        private ProgressView mProgressView;
+        private CircularProgressIndicator mProgressView;
         @Nullable
         private TextView mErrorText;
         @Nullable
@@ -2036,7 +2036,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         public void setDialog(@Nullable Dialog dialog, String url) {
             mDialog = dialog;
-            mProgressView = (ProgressView) ViewUtils.$$(dialog, R.id.progress);
+            mProgressView = (CircularProgressIndicator) ViewUtils.$$(dialog, R.id.progress);
             mErrorText = (TextView) ViewUtils.$$(dialog, R.id.text);
             mListView = (ListView) ViewUtils.$$(dialog, R.id.list_view);
             mListView.setOnItemClickListener(this);
