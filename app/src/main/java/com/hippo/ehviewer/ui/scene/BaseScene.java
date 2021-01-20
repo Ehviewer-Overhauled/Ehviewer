@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
@@ -199,20 +200,18 @@ public abstract class BaseScene extends SceneFragment {
         drawerView = null;
     }
 
-    public void setWhiteStatusBar(boolean set) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decorView = requireActivity().getWindow().getDecorView();
-            int flags = decorView.getSystemUiVisibility();
-            if (set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
-                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            } else {
-                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            }
-            decorView.setSystemUiVisibility(flags);
-            ((EhDrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(set ? Color.TRANSPARENT : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void setLightStatusBar(boolean set) {
+        View decorView = requireActivity().getWindow().getDecorView();
+        int flags = decorView.getSystemUiVisibility();
+        if (set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         } else {
-            ((EhDrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         }
+        decorView.setSystemUiVisibility(flags);
+        int color = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || set ? Color.TRANSPARENT : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark);
+        ((EhDrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(color);
     }
 
     public void onDestroyDrawerView() {
@@ -220,7 +219,7 @@ public abstract class BaseScene extends SceneFragment {
 
     @SuppressLint("RtlHardcoded")
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Update left drawer locked state
@@ -235,7 +234,9 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         AppHelper.hideSoftInput(getActivity());
-        setWhiteStatusBar(needWhiteStatusBar());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setLightStatusBar(needWhiteStatusBar());
+        }
     }
 
     @Nullable

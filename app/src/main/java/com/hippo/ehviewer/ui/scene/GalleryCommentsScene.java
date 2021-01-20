@@ -251,7 +251,17 @@ public final class GalleryCommentsScene extends ToolbarScene
 
                 @Override
                 public void onEnd(@NonNull WindowInsetsAnimation animation) {
-                    super.onEnd(animation);
+                    startBottomEditPanel = 0;
+                    startBottomFabLayout = 0;
+                    endBottomEditPanel = 0;
+                    endBottomFabLayout = 0;
+                    this.animation = null;
+                    if (mEditPanel != null) {
+                        mEditPanel.setTranslationY(0);
+                    }
+                    if (mFabLayout != null) {
+                        mFabLayout.setTranslationY(0);
+                    }
                 }
             });
         }
@@ -332,7 +342,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_comments);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -1043,12 +1053,13 @@ public final class GalleryCommentsScene extends ToolbarScene
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, 0);
         View statusBarBackground = v.findViewById(R.id.status_bar_background);
         statusBarBackground.getLayoutParams().height = insets1.top;
         statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
         if (mFabLayout != null) {
             int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
         }
         if (mEditPanel != null) {
             mEditPanel.setPadding(mEditPanel.getPaddingLeft(), mEditPanel.getPaddingTop(), mEditPanel.getPaddingRight(), insets1.bottom);

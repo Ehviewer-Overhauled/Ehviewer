@@ -77,7 +77,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
     public void onClick(View v) {
         Context context = getContext();
         MainActivity activity = getMainActivity();
-        if (null == context) {
+        if (context == null || activity == null) {
             return;
         }
 
@@ -91,9 +91,7 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
         Settings.putAskAnalytics(false);
 
         // Start new scene and finish it self
-        if (activity != null) {
-            startSceneForCheckStep(CHECK_STEP_ANALYTICS, getArguments());
-        }
+        startSceneForCheckStep(CHECK_STEP_ANALYTICS, getArguments());
         finish();
     }
 }

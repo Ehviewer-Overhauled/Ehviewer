@@ -53,30 +53,30 @@
         android:orientation="horizontal"
         android:visibility="invisible">
 
-            <EditText
-                android:id="@+id/edit_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@null"
-                android:gravity="left|center_vertical"
-                android:inputType="textMultiLine"
-                android:maxHeight="112dp"
-                android:minHeight="56dp"
-                android:padding="@dimen/keyline_margin"
-                android:textColor="?colorOnPrimarySurface"
-                android:theme="@style/CommentEditText" />
+        <EditText
+            android:id="@+id/edit_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="left|center_vertical"
+            android:inputType="textMultiLine"
+            android:maxHeight="112dp"
+            android:minHeight="56dp"
+            android:padding="@dimen/keyline_margin"
+            android:textColor="?colorOnPrimarySurface"
+            android:theme="@style/CommentEditText" />
 
-            <ImageView
-                android:id="@+id/send"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="bottom"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="16dp"
-                app:tint="#fff" />
+        <ImageView
+            android:id="@+id/send"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            app:tint="#fff" />
 
     </LinearLayout>
 

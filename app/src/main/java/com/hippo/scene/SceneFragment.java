@@ -54,6 +54,10 @@ public class SceneFragment extends Fragment implements OnApplyWindowInsetsListen
     Bundle result = null;
     List<String> mRequestSceneTagList = new ArrayList<>(0);
     IntList mRequestCodeList = new IntList(0);
+    private int paddingTop = 0;
+    private int paddingBottom = 0;
+    private int paddingLeft = 0;
+    private int paddingRight = 0;
 
     public void onNewArguments(@NonNull Bundle args) {
     }
@@ -107,12 +111,15 @@ public class SceneFragment extends Fragment implements OnApplyWindowInsetsListen
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        paddingTop = view.getPaddingTop();
+        paddingBottom = view.getPaddingBottom();
+        paddingLeft = view.getPaddingLeft();
+        paddingRight = view.getPaddingRight();
 
         view.setTag(R.id.fragment_tag, getTag());
-        view.setBackgroundDrawable(AttrResources.getAttrDrawable(getContext(), android.R.attr.windowBackground));
+        view.setBackground(AttrResources.getAttrDrawable(getContext(), android.R.attr.windowBackground));
 
         // Notify
         FragmentActivity activity = getActivity();
@@ -171,7 +178,7 @@ public class SceneFragment extends Fragment implements OnApplyWindowInsetsListen
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, insets1.top, insets1.right, insets1.bottom);
+        v.setPadding(paddingLeft + insets1.left, insets1.top + paddingTop, paddingRight + insets1.right, insets1.bottom + paddingBottom);
         return WindowInsetsCompat.CONSUMED;
     }
 

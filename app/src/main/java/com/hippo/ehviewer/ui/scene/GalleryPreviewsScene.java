@@ -189,7 +189,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_previews);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
@@ -457,6 +457,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, 0);
         View statusBarBackground = v.findViewById(R.id.status_bar_background);
         statusBarBackground.getLayoutParams().height = insets1.top;
         statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));

@@ -177,7 +177,7 @@ public final class GalleryInfoScene extends ToolbarScene {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_info);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);

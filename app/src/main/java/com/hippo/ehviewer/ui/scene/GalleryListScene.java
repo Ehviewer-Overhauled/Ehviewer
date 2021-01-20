@@ -627,6 +627,13 @@ public final class GalleryListScene extends BaseScene
                     endBottomSearchFab = 0;
                     endBottomFabLayout = 0;
                     this.animation = null;
+                    if (mSearchFab != null) {
+                        FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
+                        fabLayout.setTranslationY(0);
+                    }
+                    if (mFabLayout != null) {
+                        mFabLayout.setTranslationY(0);
+                    }
                 }
             });
         }
@@ -1970,6 +1977,7 @@ public final class GalleryListScene extends BaseScene
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, 0);
         int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
         if (mSearchBar != null) {
             int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
@@ -1982,10 +1990,10 @@ public final class GalleryListScene extends BaseScene
         }
         if (mSearchFab != null) {
             FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-            fabLayout.setPadding(mSearchFab.getPaddingLeft(), mSearchFab.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+            fabLayout.setPadding(mSearchFab.getPaddingLeft(), mSearchFab.getPaddingTop(), fabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
         }
         if (mFabLayout != null) {
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
         }
         if (mSearchLayout != null) {
             int paddingTopSB = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);

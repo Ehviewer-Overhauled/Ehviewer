@@ -49,6 +49,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -496,7 +497,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         View view = inflater.inflate(R.layout.scene_gallery_detail, container, false);
 
         ViewGroup main = (ViewGroup) ViewUtils.$$(view, R.id.main);
-        View mainView = ViewUtils.$$(main, R.id.scroll_view);
+        ScrollView mainView = (ScrollView) ViewUtils.$$(main, R.id.scroll_view);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            mainView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                if (mActionGroup != null && mHeader != null) {
+                    //noinspection IntegerDivisionInFloatingPointContext
+                    setLightStatusBar(mActionGroup.getY() - mHeader.findViewById(R.id.header_content).getPaddingTop() / 2 < scrollY);
+                }
+            });
+        }
         View progressView = ViewUtils.$$(main, R.id.progress_view);
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);
@@ -808,16 +817,25 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         switch (state) {
             case STATE_NORMAL:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setLightStatusBar(false);
+                }
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mBelowHeader
                 mViewTransition2.showView(0, animation);
                 break;
             case STATE_REFRESH:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setLightStatusBar(true);
+                }
                 // Show mProgressView
                 mViewTransition.showView(1, animation);
                 break;
             case STATE_REFRESH_HEADER:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setLightStatusBar(false);
+                }
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mProgress
@@ -826,6 +844,9 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             default:
             case STATE_INIT:
             case STATE_FAILED:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setLightStatusBar(true);
+                }
                 // Show mFailedView
                 mViewTransition.showView(2, animation);
                 break;
@@ -2195,12 +2216,19 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, 0);
         if (mHeader != null) {
             mHeader.findViewById(R.id.header_content).setPadding(0, insets1.top, 0, 0);
         }
         if (mPreviews != null) {
             int keylineMargin = getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
             mPreviews.setPadding(keylineMargin, keylineMargin, keylineMargin, keylineMargin + insets1.bottom);
+        }
+        if (mTip != null) {
+            mTip.setPadding(mTip.getPaddingLeft(), mTip.getPaddingTop(), mTip.getPaddingRight(), insets1.bottom);
+        }
+        if (mProgress != null) {
+            mProgress.setPadding(mProgress.getPaddingLeft(), mProgress.getPaddingTop(), mProgress.getPaddingRight(), insets1.bottom);
         }
         return WindowInsetsCompat.CONSUMED;
     }

@@ -89,6 +89,8 @@ public class ContentLayout extends FrameLayout {
 
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_content_layout, this);
+        setClipChildren(false);
+        setClipToPadding(false);
 
         mProgressView = findViewById(R.id.progress);
         mTipView = findViewById(R.id.tip);
@@ -171,7 +173,7 @@ public class ContentLayout extends FrameLayout {
                 mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(),
                 mRecyclerViewOriginBottom + fitPaddingBottom);
         mTipView.setPadding(mTipView.getPaddingLeft(), mTipView.getPaddingTop(), mTipView.getPaddingRight(), fitPaddingBottom);
-        mProgressView.setPadding(mTipView.getPaddingLeft(), mTipView.getPaddingTop(), mTipView.getPaddingRight(), fitPaddingBottom);
+        mProgressView.setPadding(mProgressView.getPaddingLeft(), mProgressView.getPaddingTop(), mProgressView.getPaddingRight(), fitPaddingBottom);
         mFastScroller.setPadding(mFastScroller.getPaddingLeft(), mFastScroller.getPaddingTop(), mFastScroller.getPaddingRight(), fitPaddingBottom);
         if (fitPaddingBottom > LayoutUtils.dp2pix(getContext(), 16)) {
             mBottomProgress.setPadding(0, 0, 0, fitPaddingBottom);

@@ -43,7 +43,7 @@ public final class WarningScene extends SolidScene implements View.OnClickListen
         return false;
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {

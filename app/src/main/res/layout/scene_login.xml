@@ -95,7 +95,8 @@
                 android:paddingLeft="12dp"
                 android:paddingTop="4dp"
                 android:paddingRight="12dp"
-                android:paddingBottom="4dp">
+                android:paddingBottom="4dp"
+                android:clipToPadding="false">
 
                 <Button
                     android:id="@+id/sign_in"

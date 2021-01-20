@@ -19,7 +19,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/keyline_margin">
+    android:paddingHorizontal="@dimen/keyline_margin"
+    android:paddingTop="@dimen/keyline_margin">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -56,7 +57,7 @@
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
-        android:paddingBottom="4dp">
+        android:paddingBottom="20dp">
 
         <Button
             android:id="@+id/reject"

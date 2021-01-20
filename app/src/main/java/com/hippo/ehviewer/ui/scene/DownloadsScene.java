@@ -141,6 +141,10 @@ public class DownloadsScene extends ToolbarScene
      View life cycle
      ---------------*/
     @Nullable
+    private TextView mTip;
+    @Nullable
+    private FastScroller mFastScroller;
+    @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
     private ViewTransition mViewTransition;
@@ -333,10 +337,10 @@ public class DownloadsScene extends ToolbarScene
 
         View content = ViewUtils.$$(view, R.id.content);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(content, R.id.recycler_view);
-        FastScroller fastScroller = (FastScroller) ViewUtils.$$(content, R.id.fast_scroller);
+        mFastScroller = (FastScroller) ViewUtils.$$(content, R.id.fast_scroller);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
-        TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
-        mViewTransition = new ViewTransition(content, tip);
+        mTip = (TextView) ViewUtils.$$(view, R.id.tip);
+        mViewTransition = new ViewTransition(content, mTip);
 
         Context context = getContext();
         AssertUtils.assertNotNull(content);
@@ -344,7 +348,7 @@ public class DownloadsScene extends ToolbarScene
 
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_download);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        tip.setCompoundDrawables(null, drawable, null, null);
+        mTip.setCompoundDrawables(null, drawable, null, null);
 
         mAdapter = new DownloadAdapter();
         mAdapter.setHasStableIds(true);
@@ -377,11 +381,11 @@ public class DownloadsScene extends ToolbarScene
             mInitPosition = -1;
         }
 
-        fastScroller.attachToRecyclerView(mRecyclerView);
+        mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
         handlerDrawable.setColor(AttrResources.getAttrColor(context, R.attr.widgetColorThemeAccent));
-        fastScroller.setHandlerDrawable(handlerDrawable);
-        fastScroller.setOnDragHandlerListener(this);
+        mFastScroller.setHandlerDrawable(handlerDrawable);
+        mFastScroller.setOnDragHandlerListener(this);
 
         mFabLayout.setExpanded(false, false);
         mFabLayout.setHidePrimaryFab(true);
@@ -476,7 +480,7 @@ public class DownloadsScene extends ToolbarScene
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateTitle();
         setNavigationIcon(new DrawerArrowDrawable(getContext(), Color.WHITE));
@@ -1540,15 +1544,24 @@ public class DownloadsScene extends ToolbarScene
     @Override
     public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
         Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, 0);
         View statusBarBackground = v.findViewById(R.id.status_bar_background);
         statusBarBackground.getLayoutParams().height = insets1.top;
         statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
         if (mRecyclerView != null) {
-            mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(), insets1.bottom);
+            int paddingH = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
+            int paddingV = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
+            mRecyclerView.setPadding(paddingH, paddingV, paddingH, paddingV + insets1.bottom);
+        }
+        if (mFastScroller != null) {
+            mFastScroller.setPadding(mFastScroller.getPaddingLeft(), mFastScroller.getPaddingTop(), mFastScroller.getPaddingRight(), insets1.bottom);
+        }
+        if (mTip != null) {
+            mTip.setPadding(mTip.getPaddingLeft(), mTip.getPaddingTop(), mTip.getPaddingRight(), insets1.bottom);
         }
         if (mFabLayout != null) {
             int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
         }
         return WindowInsetsCompat.CONSUMED;
     }
