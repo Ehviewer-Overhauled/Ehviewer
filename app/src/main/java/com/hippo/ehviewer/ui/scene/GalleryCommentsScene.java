@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.Spannable;
@@ -39,6 +40,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,7 +50,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.text.util.LinkifyCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -82,6 +87,7 @@ import com.hippo.widget.ObservedTextView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
+import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.ResourcesUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
@@ -194,6 +200,61 @@ public final class GalleryCommentsScene extends ToolbarScene
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
         mRefreshLayout = (SwipeRefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            view.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(WindowInsetsAnimation.Callback.DISPATCH_MODE_STOP) {
+                int startBottomEditPanel = 0;
+                int startBottomFabLayout = 0;
+                int endBottomEditPanel = 0;
+                int endBottomFabLayout = 0;
+                WindowInsetsAnimation animation;
+
+                @Override
+                public void onPrepare(@NonNull WindowInsetsAnimation animation) {
+                    this.animation = animation;
+                    if (mEditPanel != null) {
+                        startBottomEditPanel = mEditPanel.getPaddingBottom();
+                    }
+                    if (mFabLayout != null) {
+                        startBottomFabLayout = mFabLayout.getPaddingBottom();
+                    }
+                    super.onPrepare(animation);
+                }
+
+                @NonNull
+                @Override
+                public WindowInsetsAnimation.Bounds onStart(@NonNull WindowInsetsAnimation animation, @NonNull WindowInsetsAnimation.Bounds bounds) {
+                    this.animation = animation;
+                    if (mEditPanel != null) {
+                        endBottomEditPanel = mEditPanel.getPaddingBottom();
+                        mEditPanel.setTranslationY(-(startBottomEditPanel - endBottomEditPanel));
+                    }
+                    if (mFabLayout != null) {
+                        endBottomFabLayout = mFabLayout.getPaddingBottom();
+                        mFabLayout.setTranslationY(-(startBottomFabLayout - endBottomFabLayout));
+                    }
+                    return bounds;
+                }
+
+                @NonNull
+                @Override
+                public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
+                    if (mEditPanel != null) {
+                        int offset = MathUtils.lerp(-(startBottomEditPanel - endBottomEditPanel), 0, animation.getInterpolatedFraction());
+                        mEditPanel.setTranslationY(offset);
+                    }
+                    if (mFabLayout != null) {
+                        int offset = MathUtils.lerp(-(startBottomFabLayout - endBottomFabLayout), 0, animation.getInterpolatedFraction());
+                        mFabLayout.setTranslationY(offset);
+                    }
+                    return insets;
+                }
+
+                @Override
+                public void onEnd(@NonNull WindowInsetsAnimation animation) {
+                    super.onEnd(animation);
+                }
+            });
+        }
 
         mRefreshLayout.setColorSchemeResources(
                 R.color.loading_indicator_red,
@@ -562,6 +623,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void hideEditPanel(boolean animation) {
+        hideSoftInput();
         if (animation) {
             hideEditPanelWithAnimation();
         } else {
@@ -976,5 +1038,25 @@ public final class GalleryCommentsScene extends ToolbarScene
                 return TYPE_COMMENT;
             }
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        View statusBarBackground = v.findViewById(R.id.status_bar_background);
+        statusBarBackground.getLayoutParams().height = insets1.top;
+        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        if (mFabLayout != null) {
+            int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+        }
+        if (mEditPanel != null) {
+            mEditPanel.setPadding(mEditPanel.getPaddingLeft(), mEditPanel.getPaddingTop(), mEditPanel.getPaddingRight(), insets1.bottom);
+        }
+        if (mRecyclerView != null) {
+            int paddingBottomFab = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
+            mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(), paddingBottomFab + insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

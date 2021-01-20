@@ -48,16 +48,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@android:color/transparent"
-        android:orientation="vertical"
+        android:background="?colorPrimarySurface"
+        android:elevation="4dp"
+        android:orientation="horizontal"
         android:visibility="invisible">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?colorPrimarySurface"
-            android:elevation="4dp"
-            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/edit_text"
@@ -84,7 +78,6 @@
                 android:padding="16dp"
                 app:tint="#fff" />
 
-        </LinearLayout>
     </LinearLayout>
 
     <com.hippo.widget.FabLayout
