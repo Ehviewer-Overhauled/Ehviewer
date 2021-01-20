@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.ui.scene;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -29,7 +30,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
+import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.R;
 
 public abstract class ToolbarScene extends BaseScene {
@@ -52,6 +57,16 @@ public abstract class ToolbarScene extends BaseScene {
         View view = inflater.inflate(R.layout.scene_toolbar, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         FrameLayout contentPanel = view.findViewById(R.id.content_panel);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !(this instanceof GalleryCommentsScene)) {
+            ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+                Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+                view.setPadding(insets1.left, 0, insets1.right, insets1.bottom);
+                View statusBarBackground = view.findViewById(R.id.status_bar_background);
+                statusBarBackground.getLayoutParams().height = insets1.top;
+                statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+                return WindowInsetsCompat.CONSUMED;
+            });
+        }
 
         View contentView = onCreateViewWithToolbar(inflater, contentPanel, savedInstanceState);
         if (contentView == null) {
@@ -126,5 +141,15 @@ public abstract class ToolbarScene extends BaseScene {
         } else {
             mTempTitle = title;
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        v.setPadding(insets1.left, 0, insets1.right, insets1.bottom);
+        View statusBarBackground = v.findViewById(R.id.status_bar_background);
+        statusBarBackground.getLayoutParams().height = insets1.top;
+        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        return WindowInsetsCompat.CONSUMED;
     }
 }

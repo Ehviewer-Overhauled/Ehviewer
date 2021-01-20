@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.widget.FrameLayout;
 
 import com.hippo.ehviewer.R;
@@ -152,5 +153,10 @@ public class StageLayout extends FrameLayout {
         }
 
         return super.drawChild(canvas, child, drawingTime);
+    }
+
+    @Override
+    public WindowInsets onApplyWindowInsets(WindowInsets insets) {
+        return insets;
     }
 }

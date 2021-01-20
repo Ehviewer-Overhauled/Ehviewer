@@ -35,12 +35,16 @@
     <FrameLayout
         android:id="@+id/content_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:clipChildren="false">
 
-        <com.hippo.refreshlayout.RefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <com.hippo.easyrecyclerview.EasyRecyclerView
                 android:id="@+id/recycler_view"
@@ -48,7 +52,14 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false" />
 
-        </com.hippo.refreshlayout.RefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/bottom_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="bottom" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"

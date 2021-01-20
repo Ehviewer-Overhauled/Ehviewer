@@ -44,6 +44,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -60,7 +61,9 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
@@ -162,7 +165,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private ViewTransition mViewTransition;
     // Header
     @Nullable
-    private View mHeader;
+    private FrameLayout mHeader;
     @Nullable
     private View mColorBg;
     @Nullable
@@ -535,7 +538,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTip.setCompoundDrawables(null, drawable, null, null);
         mTip.setOnClickListener(this);
 
-        mHeader = ViewUtils.$$(mainView, R.id.header);
+        mHeader = (FrameLayout) ViewUtils.$$(mainView, R.id.header);
         mColorBg = ViewUtils.$$(mHeader, R.id.color_bg);
         mThumb = (LoadImageView) ViewUtils.$$(mHeader, R.id.thumb);
         mTitle = (TextView) ViewUtils.$$(mHeader, R.id.title);
@@ -2187,5 +2190,18 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             EhApplication.getEhClient(context).execute(request);
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        if (mHeader != null) {
+            mHeader.findViewById(R.id.header_content).setPadding(0, insets1.top, 0, 0);
+        }
+        if (mPreviews != null) {
+            int keylineMargin = getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
+            mPreviews.setPadding(keylineMargin, keylineMargin, keylineMargin, keylineMargin + insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

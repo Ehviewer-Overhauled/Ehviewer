@@ -49,7 +49,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1533,5 +1535,21 @@ public class DownloadsScene extends ToolbarScene
                 }
             }
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        View statusBarBackground = v.findViewById(R.id.status_bar_background);
+        statusBarBackground.getLayoutParams().height = insets1.top;
+        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        if (mRecyclerView != null) {
+            mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(), insets1.bottom);
+        }
+        if (mFabLayout != null) {
+            int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

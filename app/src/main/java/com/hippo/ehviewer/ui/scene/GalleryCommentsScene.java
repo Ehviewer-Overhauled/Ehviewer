@@ -51,6 +51,7 @@ import androidx.core.text.util.LinkifyCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -68,7 +69,6 @@ import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.refreshlayout.RefreshLayout;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
@@ -92,7 +92,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class GalleryCommentsScene extends ToolbarScene
-        implements View.OnClickListener, RefreshLayout.OnRefreshListener {
+        implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String TAG = GalleryCommentsScene.class.getSimpleName();
 
@@ -126,7 +126,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     private CommentAdapter mAdapter;
     @Nullable
     private ViewTransition mViewTransition;
-    private RefreshLayout mRefreshLayout;
+    private SwipeRefreshLayout mRefreshLayout;
     private Drawable mSendDrawable;
     private Drawable mPencilDrawable;
     private long mCommentId;
@@ -193,22 +193,16 @@ public final class GalleryCommentsScene extends ToolbarScene
         mEditText = (EditText) ViewUtils.$$(mEditPanel, R.id.edit_text);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
-        mRefreshLayout = (RefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
+        mRefreshLayout = (SwipeRefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
 
-        mRefreshLayout.setHeaderColorSchemeResources(
+        mRefreshLayout.setColorSchemeResources(
                 R.color.loading_indicator_red,
                 R.color.loading_indicator_purple,
                 R.color.loading_indicator_blue,
                 R.color.loading_indicator_cyan,
                 R.color.loading_indicator_green,
                 R.color.loading_indicator_yellow);
-        mRefreshLayout.setFooterColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_orange);
         mRefreshLayout.setOnRefreshListener(this);
-        mRefreshLayout.setEnableSwipeFooter(false);
 
         Context context = requireContext();
         Resources resources = getResources();
@@ -643,7 +637,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
-        mRefreshLayout.setHeaderRefreshing(false);
+        mRefreshLayout.setRefreshing(false);
         mRefreshingComments = false;
         mCommentList = result;
         mAdapter.notifyDataSetChanged();
@@ -660,7 +654,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
-        mRefreshLayout.setHeaderRefreshing(false);
+        mRefreshLayout.setRefreshing(false);
         mRefreshingComments = false;
         int position = mAdapter.getItemCount() - 1;
         if (position >= 0) {
@@ -725,7 +719,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     @Override
-    public void onHeaderRefresh() {
+    public void onRefresh() {
         if (!mRefreshingComments && mAdapter != null) {
             MainActivity activity = (MainActivity) requireActivity();
             mRefreshingComments = true;
@@ -740,11 +734,6 @@ public final class GalleryCommentsScene extends ToolbarScene
                 EhApplication.getEhClient(activity).execute(request);
             }
         }
-    }
-
-    @Override
-    public void onFooterRefresh() {
-
     }
 
     private static class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {

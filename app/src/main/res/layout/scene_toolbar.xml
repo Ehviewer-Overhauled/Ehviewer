@@ -19,6 +19,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <View
+        android:id="@+id/status_bar_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:elevation="4dp"/>
+
     <androidx.appcompat.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"

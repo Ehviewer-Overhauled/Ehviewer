@@ -33,9 +33,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -78,6 +81,8 @@ public class GalleryPreviewsScene extends ToolbarScene {
     /*---------------
      View life cycle
      ---------------*/
+    @Nullable
+    private ContentLayout mContentLayout;
     @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
@@ -133,10 +138,10 @@ public class GalleryPreviewsScene extends ToolbarScene {
     @Override
     public View onCreateViewWithToolbar(LayoutInflater inflater,
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ContentLayout contentLayout = (ContentLayout) inflater.inflate(
+        mContentLayout = (ContentLayout) inflater.inflate(
                 R.layout.scene_gallery_previews, container, false);
-        contentLayout.hideFastScroll();
-        mRecyclerView = contentLayout.getRecyclerView();
+        mContentLayout.hideFastScroll();
+        mRecyclerView = mContentLayout.getRecyclerView();
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
@@ -155,7 +160,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
         decoration.applyPaddings(mRecyclerView);
 
         mHelper = new GalleryPreviewHelper();
-        contentLayout.setHelper(mHelper);
+        mContentLayout.setHelper(mHelper);
 
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
@@ -163,7 +168,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
             mHelper.firstRefresh();
         }
 
-        return contentLayout;
+        return mContentLayout;
     }
 
     @Override
@@ -447,5 +452,17 @@ public class GalleryPreviewsScene extends ToolbarScene {
             mDialog = null;
             mSlider = null;
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        View statusBarBackground = v.findViewById(R.id.status_bar_background);
+        statusBarBackground.getLayoutParams().height = insets1.top;
+        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        if (mContentLayout != null) {
+            mContentLayout.setFitPaddingBottom(insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

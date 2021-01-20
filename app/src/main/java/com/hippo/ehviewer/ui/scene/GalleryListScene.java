@@ -39,6 +39,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,6 +52,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -154,6 +157,8 @@ public final class GalleryListScene extends BaseScene
     /*---------------
      View life cycle
      ---------------*/
+    @Nullable
+    private ContentLayout mContentLayout;
     @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
@@ -554,9 +559,9 @@ public final class GalleryListScene extends BaseScene
         mShowActionFab = true;
 
         View mainLayout = ViewUtils.$$(view, R.id.main_layout);
-        ContentLayout contentLayout = (ContentLayout) ViewUtils.$$(mainLayout, R.id.content_layout);
-        mRecyclerView = contentLayout.getRecyclerView();
-        FastScroller fastScroller = contentLayout.getFastScroller();
+        mContentLayout = (ContentLayout) ViewUtils.$$(mainLayout, R.id.content_layout);
+        mRecyclerView = mContentLayout.getRecyclerView();
+        FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchLayout = (SearchLayout) ViewUtils.$$(mainLayout, R.id.search_layout);
         mSearchBar = (SearchBar) ViewUtils.$$(mainLayout, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(mainLayout, R.id.fab_layout);
@@ -565,12 +570,12 @@ public final class GalleryListScene extends BaseScene
         int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
         int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
 
-        mViewTransition = new BringOutTransition(contentLayout, mSearchLayout);
+        mViewTransition = new BringOutTransition(mContentLayout, mSearchLayout);
 
         mHelper = new GalleryListHelper();
-        contentLayout.setHelper(mHelper);
-        contentLayout.getFastScroller().setOnDragHandlerListener(this);
-        contentLayout.setFitPaddingTop(paddingTopSB);
+        mContentLayout.setHelper(mHelper);
+        mContentLayout.getFastScroller().setOnDragHandlerListener(this);
+        mContentLayout.setFitPaddingTop(paddingTopSB);
 
         mAdapter = new GalleryListAdapter(inflater, resources,
                 mRecyclerView, Settings.getListMode());
@@ -1896,5 +1901,34 @@ public final class GalleryListScene extends BaseScene
                 showActionFab();
             }
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
+        if (mSearchBar != null) {
+            int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mSearchBar.getLayoutParams();
+            layoutParams.topMargin = insets1.top + gallery_search_bar_margin_v;
+        }
+        if (mContentLayout != null) {
+            mContentLayout.setTopInsets(insets1.top);
+            mContentLayout.setFitPaddingBottom(insets1.bottom);
+        }
+        if (mSearchFab != null) {
+            FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
+            fabLayout.setPadding(mSearchFab.getPaddingLeft(), mSearchFab.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+        }
+        if (mFabLayout != null) {
+            mFabLayout.setPadding(mSearchFab.getPaddingLeft(), mSearchFab.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+        }
+        if (mSearchLayout != null) {
+            int paddingTopSB = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
+            int paddingBottomFab = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
+            mSearchLayout.setPadding(mSearchLayout.getPaddingLeft(), paddingTopSB + insets1.top,
+                    mSearchLayout.getPaddingRight(), paddingBottomFab + insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -32,6 +33,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsAnimation;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,6 +43,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,6 +87,7 @@ import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
+import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
@@ -106,6 +113,8 @@ public class FavoritesScene extends BaseScene implements
     private final List<GalleryInfo> mModifyGiList = new ArrayList<>();
     public int current; // -1 for error
     public int limit; // -1 for error
+    @Nullable
+    private ContentLayout mContentLayout;
     @Nullable
     @ViewLifeCircle
     private EasyRecyclerView mRecyclerView;
@@ -245,14 +254,57 @@ public class FavoritesScene extends BaseScene implements
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
-        ContentLayout contentLayout = view.findViewById(R.id.content_layout);
+        mContentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getMainActivity();
         AssertUtils.assertNotNull(activity);
         mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
-        mRecyclerView = contentLayout.getRecyclerView();
-        FastScroller fastScroller = contentLayout.getFastScroller();
+        mRecyclerView = mContentLayout.getRecyclerView();
+        FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchBar = (SearchBar) ViewUtils.$$(view, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            view.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(WindowInsetsAnimation.Callback.DISPATCH_MODE_STOP) {
+                int startBottomFabLayout = 0;
+                int endBottomFabLayout = 0;
+                WindowInsetsAnimation animation;
+
+                @Override
+                public void onPrepare(@NonNull WindowInsetsAnimation animation) {
+                    this.animation = animation;
+                    if (mFabLayout != null) {
+                        startBottomFabLayout = mFabLayout.getPaddingBottom();
+                    }
+                }
+
+                @NonNull
+                @Override
+                public WindowInsetsAnimation.Bounds onStart(@NonNull WindowInsetsAnimation animation, @NonNull WindowInsetsAnimation.Bounds bounds) {
+                    this.animation = animation;
+                    if (mFabLayout != null) {
+                        endBottomFabLayout = mFabLayout.getPaddingBottom();
+                        mFabLayout.setTranslationY(-(startBottomFabLayout - endBottomFabLayout));
+                    }
+                    return bounds;
+                }
+
+                @NonNull
+                @Override
+                public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
+                    if (mFabLayout != null) {
+                        int offset = MathUtils.lerp(-(startBottomFabLayout - endBottomFabLayout), 0, animation.getInterpolatedFraction());
+                        mFabLayout.setTranslationY(offset);
+                    }
+                    return insets;
+                }
+
+                @Override
+                public void onEnd(@NonNull WindowInsetsAnimation animation) {
+                    startBottomFabLayout = 0;
+                    endBottomFabLayout = 0;
+                    this.animation = null;
+                }
+            });
+        }
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
@@ -261,9 +313,9 @@ public class FavoritesScene extends BaseScene implements
 
         mHelper = new FavoritesHelper();
         mHelper.setEmptyString(resources.getString(R.string.gallery_list_empty_hit));
-        contentLayout.setHelper(mHelper);
-        contentLayout.getFastScroller().setOnDragHandlerListener(this);
-        contentLayout.setFitPaddingTop(paddingTopSB);
+        mContentLayout.setHelper(mHelper);
+        mContentLayout.getFastScroller().setOnDragHandlerListener(this);
+        mContentLayout.setFitPaddingTop(paddingTopSB);
 
         mAdapter = new FavoritesAdapter(inflater, resources, mRecyclerView, Settings.getListMode());
         mRecyclerView.setClipToPadding(false);
@@ -1330,5 +1382,24 @@ public class FavoritesScene extends BaseScene implements
                 }
             }
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        if (mSearchBar != null) {
+            int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mSearchBar.getLayoutParams();
+            layoutParams.topMargin = insets1.top + gallery_search_bar_margin_v;
+        }
+        if (mContentLayout != null) {
+            mContentLayout.setTopInsets(insets1.top);
+            mContentLayout.setFitPaddingBottom(insets1.bottom);
+        }
+        if (mFabLayout != null) {
+            int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
+            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), corner_fab_margin + insets1.right, corner_fab_margin + insets1.bottom);
+        }
+        return WindowInsetsCompat.CONSUMED;
     }
 }

@@ -34,7 +34,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -691,5 +693,19 @@ public class HistoryScene extends ToolbarScene {
             mAdapter.notifyDataSetChanged();
             updateView(true);
         }
+    }
+
+    @Override
+    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+        if (mRecyclerView != null) {
+            int paddingH = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
+            int paddingV = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
+            mRecyclerView.setPadding(paddingH, paddingV, paddingH, paddingV + insets1.bottom);
+        }
+        View statusBarBackground = v.findViewById(R.id.status_bar_background);
+        statusBarBackground.getLayoutParams().height = insets1.top;
+        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
+        return WindowInsetsCompat.CONSUMED;
     }
 }
