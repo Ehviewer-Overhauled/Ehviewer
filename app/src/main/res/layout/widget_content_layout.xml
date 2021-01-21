@@ -57,7 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:layout_gravity="bottom" />
+            android:layout_gravity="bottom"
+            android:visibility="gone" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"

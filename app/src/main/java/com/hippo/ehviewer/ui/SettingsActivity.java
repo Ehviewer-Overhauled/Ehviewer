@@ -16,29 +16,46 @@
 
 package com.hippo.ehviewer.ui;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.fragment.SettingsFragment;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 
-public final class SettingsActivity extends ToolbarActivity {
+public final class SettingsActivity extends EhActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
-        setTitle(R.string.settings);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
+        setSupportActionBar(findViewById(R.id.toolbar));
+        ActionBar bar = getSupportActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment, new SettingsFragment())
                     .commitAllowingStateLoss();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.snackbar), (v, insets) -> {
+                Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+                v.setPadding(insets1.left, insets1.top, insets1.right, 0);
+                return insets;
+            });
         }
     }
 

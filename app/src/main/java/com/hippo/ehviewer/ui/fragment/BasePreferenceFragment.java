@@ -1,11 +1,22 @@
 package com.hippo.ehviewer.ui.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.Preference;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
@@ -47,5 +58,20 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
 
     public void showTip(CharSequence message, int length) {
         ((SettingsActivity) requireActivity()).showTip(message, length);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            RecyclerView recyclerView = getListView();
+            recyclerView.setClipToPadding(false);
+            recyclerView.setClipChildren(false);
+            ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, insets) -> {
+                Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+                v.setPadding(0, 0, 0, insets1.bottom);
+                return WindowInsetsCompat.CONSUMED;
+            });
+        }
     }
 }
