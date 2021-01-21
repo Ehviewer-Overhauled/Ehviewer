@@ -61,7 +61,7 @@ public final class SpiderDen {
 
     public static void initialize(Context context) {
         sCache = new SimpleDiskCache(new File(context.getCacheDir(), "image"),
-                MathUtils.clamp(Settings.getReadCacheSize(), 40, 640) * 1024 * 1024);
+                MathUtils.clamp(Settings.getReadCacheSize(), 40, 1280) * 1024 * 1024);
     }
 
     public static UniFile getGalleryDownloadDir(GalleryInfo galleryInfo) {

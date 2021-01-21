@@ -63,7 +63,6 @@ public class AppConfig {
      */
     @Nullable
     public static File getDirInExternalAppDir(String filename) {
-
         File appFolder = getExternalAppDir();
         if (appFolder != null) {
             File dir = new File(appFolder, filename);

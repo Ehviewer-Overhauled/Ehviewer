@@ -92,7 +92,7 @@ public class Settings {
     public static final String DEFAULT_SECURITY = "";
     public static final String KEY_ENABLE_FINGERPRINT = "enable_fingerprint";
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
-    public static final int DEFAULT_READ_CACHE_SIZE = 160;
+    public static final int DEFAULT_READ_CACHE_SIZE = 320;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
     public static final String KEY_DOH = "dns_over_https";
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";

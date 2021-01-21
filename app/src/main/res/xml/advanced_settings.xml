@@ -50,7 +50,7 @@
         app:iconSpaceReserved="false" />
 
     <com.takisoft.preferencex.SimpleMenuPreference
-        android:defaultValue="160"
+        android:defaultValue="320"
         android:key="read_cache_size"
         android:summary="%s"
         android:title="@string/settings_advanced_read_cache_size"

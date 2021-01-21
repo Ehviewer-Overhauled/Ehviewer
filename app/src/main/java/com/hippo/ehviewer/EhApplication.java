@@ -217,7 +217,7 @@ public class EhApplication extends RecordingApplication {
             builder.memoryCacheMaxSize = getMemoryCacheMaxSize();
             builder.hasDiskCache = true;
             builder.diskCacheDir = new File(context.getCacheDir(), "thumb");
-            builder.diskCacheMaxSize = 80 * 1024 * 1024; // 80MB
+            builder.diskCacheMaxSize = 320 * 1024 * 1024; // 320MB
             builder.okHttpClient = getOkHttpClient(context);
             builder.objectHelper = getImageBitmapHelper(context);
             builder.debug = DEBUG_CONACO;
@@ -247,7 +247,7 @@ public class EhApplication extends RecordingApplication {
         EhApplication application = ((EhApplication) context.getApplicationContext());
         if (null == application.mSpiderInfoCache) {
             application.mSpiderInfoCache = new SimpleDiskCache(
-                    new File(context.getCacheDir(), "spider_info"), 5 * 1024 * 1024); // 5M
+                    new File(context.getCacheDir(), "spider_info"), 20 * 1024 * 1024); // 20M
         }
         return application.mSpiderInfoCache;
     }
@@ -418,9 +418,6 @@ public class EhApplication extends RecordingApplication {
         if (null != dir) {
             FileUtils.deleteContent(dir);
         }
-
-        // Add .nomedia to external temp dir
-        CommonOperations.ensureNoMediaFile(UniFile.fromFile(AppConfig.getExternalTempDir()));
     }
 
     private void update() {

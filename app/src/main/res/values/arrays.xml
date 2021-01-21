@@ -227,6 +227,7 @@
         <item>160 MB</item>
         <item>320 MB</item>
         <item>640 MB</item>
+        <item>1280 MB</item>
     </string-array>
 
     <string-array name="read_cache_size_entry_values" translatable="false">
@@ -235,6 +236,7 @@
         <item>160</item>
         <item>320</item>
         <item>640</item>
+        <item>1280</item>
     </string-array>
 
     <string-array name="filter_entries">
