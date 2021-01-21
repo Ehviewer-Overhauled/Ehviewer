@@ -358,6 +358,10 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     }
 
     public void addDownload(List<DownloadInfo> downloadInfoList) {
+        addDownload(downloadInfoList, true);
+    }
+
+    public void addDownload(List<DownloadInfo> downloadInfoList, boolean notify) {
         for (DownloadInfo info : downloadInfoList) {
             if (containDownloadInfo(info.gid)) {
                 // Contain
@@ -397,8 +401,10 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         Collections.sort(mAllInfoList, DATE_DESC_COMPARATOR);
 
         // Notify
-        for (DownloadInfoListener l : mDownloadInfoListeners) {
-            l.onReload();
+        if (notify) {
+            for (DownloadInfoListener l : mDownloadInfoListeners) {
+                l.onReload();
+            }
         }
     }
 

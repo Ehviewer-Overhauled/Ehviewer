@@ -728,7 +728,7 @@ public class EhDB {
             // Downloads
             DownloadManager manager = EhApplication.getDownloadManager(context);
             List<DownloadInfo> downloadInfoList = session.getDownloadsDao().queryBuilder().list();
-            manager.addDownload(downloadInfoList);
+            manager.addDownload(downloadInfoList, false);
 
             // Download label
             List<DownloadLabel> downloadLabelList = session.getDownloadLabelDao().queryBuilder().list();
