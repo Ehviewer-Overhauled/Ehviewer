@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hippo.ehviewer.ui.SettingsActivity;
 
 public class BaseFragment extends Fragment {
+    private int paddingBottom = 0;
+
     @Override
     public void onStart() {
         super.onStart();
@@ -42,10 +44,11 @@ public class BaseFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        paddingBottom = view.getPaddingBottom();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
                 Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-                v.setPadding(0, 0, 0, insets1.bottom);
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), paddingBottom + insets1.bottom);
                 return WindowInsetsCompat.CONSUMED;
             });
         }

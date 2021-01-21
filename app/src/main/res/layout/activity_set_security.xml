@@ -17,7 +17,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/keyline_margin">
 
     <TextView
         android:layout_width="match_parent"
@@ -68,7 +69,7 @@
         android:paddingLeft="12dp"
         android:paddingTop="4dp"
         android:paddingRight="12dp"
-        android:paddingBottom="4dp">
+        android:paddingBottom="20dp">
 
         <Button
             android:id="@+id/cancel"
