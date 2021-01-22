@@ -58,6 +58,7 @@ public abstract class BaseScene extends SceneFragment {
     private View drawerView;
     @Nullable
     private SparseArray<Parcelable> drawerViewState;
+    private boolean needWhiteStatusBar = needWhiteStatusBar();
 
     public void updateAvatar() {
         FragmentActivity activity = getActivity();
@@ -212,6 +213,7 @@ public abstract class BaseScene extends SceneFragment {
         decorView.setSystemUiVisibility(flags);
         int color = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || set ? Color.TRANSPARENT : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark);
         ((EhDrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(color);
+        needWhiteStatusBar = set;
     }
 
     public void onDestroyDrawerView() {
@@ -235,7 +237,7 @@ public abstract class BaseScene extends SceneFragment {
         // Hide soft ime
         AppHelper.hideSoftInput(getActivity());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setLightStatusBar(needWhiteStatusBar());
+            setLightStatusBar(needWhiteStatusBar);
         }
     }
 
