@@ -53,6 +53,9 @@ public class SecurityScene extends SolidScene implements
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
+    private BiometricPrompt.PromptInfo promptInfo;
+    private BiometricPrompt biometricPrompt;
+    private boolean canAuthenticate = false;
 
     private int mRetryTimes;
 
@@ -80,6 +83,31 @@ public class SecurityScene extends SolidScene implements
         } else {
             mRetryTimes = savedInstanceState.getInt(KEY_RETRY_TIMES);
         }
+
+        canAuthenticate = Settings.getEnableFingerprint() &&
+                BiometricManager.from(requireContext()).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS;
+        biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                startSceneForCheckStep(CHECK_STEP_SECURITY, getArguments());
+                finish();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.app_name))
+                .setNegativeButtonText(getString(android.R.string.cancel))
+                .setConfirmationRequired(false)
+                .build();
     }
 
     @Override
@@ -99,35 +127,13 @@ public class SecurityScene extends SolidScene implements
             mSensorManager.registerListener(mShakeDetector, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
         }
 
-        startBiometricPrompt();
+        if (canAuthenticate) {
+            startBiometricPrompt();
+        }
     }
 
     private void startBiometricPrompt() {
-        if (Settings.getEnableFingerprint() && BiometricManager.from(requireContext()).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS) {
-            BiometricPrompt biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), new BiometricPrompt.AuthenticationCallback() {
-                @Override
-                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                    super.onAuthenticationError(errorCode, errString);
-                }
-
-                @Override
-                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                    startSceneForCheckStep(CHECK_STEP_SECURITY, getArguments());
-                    finish();
-                    super.onAuthenticationSucceeded(result);
-                }
-
-                @Override
-                public void onAuthenticationFailed() {
-                    super.onAuthenticationFailed();
-                }
-            });
-            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                    .setTitle(getString(R.string.app_name))
-                    .setNegativeButtonText(getString(android.R.string.cancel))
-                    .build();
-            biometricPrompt.authenticate(promptInfo);
-        }
+        biometricPrompt.authenticate(promptInfo);
     }
 
     @Override
@@ -150,7 +156,9 @@ public class SecurityScene extends SolidScene implements
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_security, container, false);
-        view.setOnClickListener(v -> startBiometricPrompt());
+        if (canAuthenticate) {
+            view.setOnClickListener(v -> startBiometricPrompt());
+        }
 
         mPatternView = (LockPatternView) ViewUtils.$$(view, R.id.pattern_view);
         mPatternView.setOnPatternListener(this);
