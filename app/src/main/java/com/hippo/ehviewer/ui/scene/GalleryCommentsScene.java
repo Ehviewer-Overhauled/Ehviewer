@@ -72,6 +72,7 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.data.GalleryComment;
 import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
+import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
@@ -926,7 +927,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
     }
 
-    private static class ActualCommentHolder extends CommentHolder {
+    private class ActualCommentHolder extends CommentHolder {
 
         private final TextView user;
         private final TextView time;
@@ -970,7 +971,13 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         public void bind(GalleryComment value) {
-            user.setText(value.user);
+            user.setText(value.uploader ? getString(R.string.comment_user_uploader, value.user) : value.user);
+            user.setOnClickListener(v -> {
+                ListUrlBuilder lub = new ListUrlBuilder();
+                lub.setMode(ListUrlBuilder.MODE_UPLOADER);
+                lub.setKeyword(value.user);
+                GalleryListScene.startScene(GalleryCommentsScene.this, lub);
+            });
             time.setText(ReadableTime.getTimeAgo(value.time));
             comment.setText(generateComment(comment.getContext(), comment, value));
         }

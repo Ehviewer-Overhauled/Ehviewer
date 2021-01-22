@@ -1029,6 +1029,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             mComments.addView(v, i);
             TextView user = v.findViewById(R.id.user);
             user.setText(comment.user);
+            user.setBackgroundColor(Color.TRANSPARENT);
             TextView time = v.findViewById(R.id.time);
             time.setText(ReadableTime.getTimeAgo(comment.time));
             ObservedTextView c = v.findViewById(R.id.comment);

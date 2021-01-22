@@ -40,6 +40,7 @@ public class GalleryComment implements Parcelable {
     public boolean voteUpEd;
     public boolean voteDownAble;
     public boolean voteDownEd;
+    public boolean uploader;
     public String voteState;
     public long time;
     public String user;
@@ -57,6 +58,7 @@ public class GalleryComment implements Parcelable {
         this.voteUpEd = in.readByte() != 0;
         this.voteDownAble = in.readByte() != 0;
         this.voteDownEd = in.readByte() != 0;
+        this.uploader = in.readByte() != 0;
         this.voteState = in.readString();
         this.time = in.readLong();
         this.user = in.readString();
@@ -78,6 +80,7 @@ public class GalleryComment implements Parcelable {
         dest.writeByte(voteUpEd ? (byte) 1 : (byte) 0);
         dest.writeByte(voteDownAble ? (byte) 1 : (byte) 0);
         dest.writeByte(voteDownEd ? (byte) 1 : (byte) 0);
+        dest.writeByte(uploader ? (byte) 1 : (byte) 0);
         dest.writeString(this.voteState);
         dest.writeLong(this.time);
         dest.writeString(this.user);

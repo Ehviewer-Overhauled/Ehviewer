@@ -16,6 +16,8 @@
 
 package com.hippo.ehviewer.client.parser;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -440,6 +442,9 @@ public class GalleryDetailParser {
             // Editable, vote up and vote down
             Element c4 = JsoupUtils.getElementByClass(element, "c4");
             if (null != c4) {
+                if ("Uploader Comment".equals(c4.text())) {
+                    comment.uploader = true;
+                }
                 for (Element e : c4.children()) {
                     switch (e.text()) {
                         case "Vote+":
