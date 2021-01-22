@@ -117,11 +117,9 @@ public class ContentLayout extends FrameLayout {
         Resources resources = getResources();
         mBottomProgress.setIndicatorColor(
                 resources.getColor(R.color.loading_indicator_red),
-                resources.getColor(R.color.loading_indicator_purple),
                 resources.getColor(R.color.loading_indicator_blue),
-                resources.getColor(R.color.loading_indicator_cyan),
                 resources.getColor(R.color.loading_indicator_green),
-                resources.getColor(R.color.loading_indicator_yellow));
+                resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
 
         mRecyclerViewOriginTop = mRecyclerView.getPaddingTop();
@@ -177,6 +175,8 @@ public class ContentLayout extends FrameLayout {
         mFastScroller.setPadding(mFastScroller.getPaddingLeft(), mFastScroller.getPaddingTop(), mFastScroller.getPaddingRight(), fitPaddingBottom);
         if (fitPaddingBottom > LayoutUtils.dp2pix(getContext(), 16)) {
             mBottomProgress.setPadding(0, 0, 0, fitPaddingBottom);
+        } else {
+            mBottomProgress.setPadding(0, 0, 0, 0);
         }
     }
 

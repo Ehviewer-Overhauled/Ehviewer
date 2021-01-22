@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress"
@@ -58,7 +59,9 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:layout_gravity="bottom"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:hideAnimationBehavior="inward"
+            app:showAnimationBehavior="outward" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"
