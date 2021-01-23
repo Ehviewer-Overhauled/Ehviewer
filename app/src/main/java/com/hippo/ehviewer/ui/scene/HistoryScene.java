@@ -21,14 +21,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -52,7 +53,6 @@ import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAct
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.hippo.android.resource.AttrResources;
-import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -253,7 +253,7 @@ public class HistoryScene extends ToolbarScene {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.history);
-        setNavigationIcon(new DrawerArrowDrawable(getContext(), Color.WHITE));
+        setNavigationIcon(R.drawable.ic_baseline_menu_24);
     }
 
     @Override
@@ -309,7 +309,7 @@ public class HistoryScene extends ToolbarScene {
     }
 
     private void showClearAllDialog() {
-        new MaterialAlertDialogBuilder(getContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setMessage(R.string.clear_all_history)
                 .setPositiveButton(R.string.clear_all, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
@@ -555,6 +555,8 @@ public class HistoryScene extends ToolbarScene {
         public final TextView category;
         public final TextView posted;
         public final TextView simpleLanguage;
+        public final TextView pages;
+        public final ImageView downloaded;
 
         public HistoryHolder(View itemView) {
             super(itemView);
@@ -567,6 +569,8 @@ public class HistoryScene extends ToolbarScene {
             category = itemView.findViewById(R.id.category);
             posted = itemView.findViewById(R.id.posted);
             simpleLanguage = itemView.findViewById(R.id.simple_language);
+            pages = itemView.findViewById(R.id.pages);
+            downloaded = itemView.findViewById(R.id.downloaded);
         }
 
         @NonNull
@@ -632,7 +636,16 @@ public class HistoryScene extends ToolbarScene {
                 category.setBackgroundColor(EhUtils.getCategoryColor(gi.category));
             }
             holder.posted.setText(gi.posted);
-            holder.simpleLanguage.setText(gi.simpleLanguage);
+            holder.pages.setText(null);
+            holder.pages.setVisibility(View.GONE);
+            if (TextUtils.isEmpty(gi.simpleLanguage)) {
+                holder.simpleLanguage.setText(null);
+                holder.simpleLanguage.setVisibility(View.GONE);
+            } else {
+                holder.simpleLanguage.setText(gi.simpleLanguage);
+                holder.simpleLanguage.setVisibility(View.VISIBLE);
+            }
+            holder.downloaded.setVisibility(mDownloadManager.containDownloadInfo(gi.gid) ? View.VISIBLE : View.GONE);
 
             // Update transition name
             long gid = gi.gid;
