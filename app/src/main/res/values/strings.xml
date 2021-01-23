@@ -811,4 +811,6 @@
     <string name="action_add_tag_tip">Enter new tags, separated with comma</string>
     <string name="error_no_webview">WebView is not available.</string>
     <string name="comment_user_uploader">%s (Uploader)</string>
+    <string name="settings_eh_metered_network_warning">Metered network warning</string>
+    <string name="metered_network_warning">Connected to metered networks</string>
 </resources>

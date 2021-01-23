@@ -746,4 +746,6 @@
     <string name="action_add_tag">添加标签</string>
     <string name="action_add_tag_tip">添加新标签，用逗号「，」分割</string>
     <string name="comment_user_uploader">%s （上传者）</string>
+    <string name="settings_eh_metered_network_warning">流量计费网络警告</string>
+    <string name="metered_network_warning">正在使用流量计费网络</string>
 </resources>

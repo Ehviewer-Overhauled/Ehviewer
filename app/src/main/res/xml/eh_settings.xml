@@ -154,7 +154,7 @@
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="cellular_network_warning"
-        android:title="@string/settings_eh_cellular_network_warning"
+        android:title="@string/settings_eh_metered_network_warning"
         app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

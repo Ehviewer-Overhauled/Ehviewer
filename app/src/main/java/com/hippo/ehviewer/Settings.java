@@ -132,8 +132,8 @@ public class Settings {
     private static final boolean DEFAULT_SHOW_TAG_TRANSLATIONS = false;
     private static final int DEFAULT_EXCLUDED_TAG_NAMESPACES = 0;
     private static final String DEFAULT_EXCLUDED_LANGUAGES = null;
-    private static final String KEY_CELLULAR_NETWORK_WARNING = "cellular_network_warning";
-    private static final boolean DEFAULT_CELLULAR_NETWORK_WARNING = false;
+    private static final String KEY_METERED_NETWORK_WARNING = "cellular_network_warning";
+    private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
     private static final String KEY_NIGHT_MODE = "night_mode";
     private static final String DEFAULT_NIGHT_MODE = "-1";
     private static final String KEY_E_INK_MODE = "e_ink_mode";
@@ -600,8 +600,8 @@ public class Settings {
         return getBoolean(KEY_E_INK_MODE, DEFAULT_E_INK_MODE);
     }
 
-    public static boolean getCellularNetworkWarning() {
-        return getBoolean(KEY_CELLULAR_NETWORK_WARNING, DEFAULT_CELLULAR_NETWORK_WARNING);
+    public static boolean getMeteredNetworkWarning() {
+        return getBoolean(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING);
     }
 
     public static int getScreenRotation() {
