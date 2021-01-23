@@ -85,9 +85,8 @@ public class AnalyticsScene extends SolidScene implements View.OnClickListener {
             Settings.putEnableAnalytics(false);
         } else if (mAccept == v) {
             Settings.putEnableAnalytics(true);
-            // Start Analytics
-            Analytics.start(activity.getApplication());
         }
+        Analytics.setEnabled(Settings.getEnableAnalytics());
         Settings.putAskAnalytics(false);
 
         // Start new scene and finish it self

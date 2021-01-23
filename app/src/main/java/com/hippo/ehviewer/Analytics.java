@@ -31,12 +31,17 @@ public final class Analytics {
     public static void start(Application application) {
         AppCenter.start(application, "1aa06805-037c-4f3c-8aaa-e23d1433986d", com.microsoft.appcenter.analytics.Analytics.class, Crashes.class, Distribute.class);
         AppCenter.setUserId(Settings.getUserID());
+        com.microsoft.appcenter.analytics.Analytics.setEnabled(Settings.getEnableAnalytics());
         Crashes.setEnabled(!BuildConfig.DEBUG);
         Distribute.setEnabledForDebuggableBuild(false);
     }
 
     public static boolean isEnabled() {
         return AppCenter.isConfigured() && Settings.getEnableAnalytics();
+    }
+
+    public static void setEnabled(boolean enabled) {
+        com.microsoft.appcenter.analytics.Analytics.setEnabled(enabled);
     }
 
     public static void onSceneView(SceneFragment scene) {

@@ -334,9 +334,7 @@ public class EhApplication extends RecordingApplication {
             EhDB.mergeOldDB(this);
         }
 
-        if (Settings.getEnableAnalytics()) {
-            Analytics.start(this);
-        }
+        Analytics.start(this);
 
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
 
