@@ -20,8 +20,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
-import android.view.Display;
-import android.view.WindowManager;
 
 import androidx.annotation.DimenRes;
 import androidx.annotation.NonNull;
@@ -136,7 +134,7 @@ public class Settings {
     private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
     private static final String KEY_NIGHT_MODE = "night_mode";
     private static final String DEFAULT_NIGHT_MODE = "-1";
-    private static final String KEY_E_INK_MODE = "e_ink_mode";
+    private static final String KEY_E_INK_MODE = "e_ink_mode_2";
     private static final boolean DEFAULT_E_INK_MODE = false;
     /********************
      ****** Read
@@ -281,34 +279,33 @@ public class Settings {
     }
 
     private static void fixDefaultValue(Context context) {
-        // Enable DoH if the country is CN
-        if (!sSettingsPre.contains(KEY_DOH)) {
-            if ("CN".equals(Locale.getDefault().getCountry())) {
+        if ("CN".equals(Locale.getDefault().getCountry())) {
+            // Enable DoH and domain fronting if the country is CN
+            if (!sSettingsPre.contains(KEY_DOH)) {
                 putDoH(true);
             }
-        }
-        if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
-            if ("CN".equals(Locale.getDefault().getCountry())) {
+            if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
                 putDF(true);
             }
-        }
-        // Enable show tag translations if the country is CN
-        if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
-            if ("CN".equals(Locale.getDefault().getCountry())) {
+            // Enable show tag translations if the country is CN
+            if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
                 putShowTagTranslations(true);
+
             }
         }
-        if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
-            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (wm != null) {
-                Display display = wm.getDefaultDisplay();
-                if (display != null && display.getRefreshRate() > 0 && display.getRefreshRate() < 5.0) {
-                    // Probably an E-Ink device
-                    putReadTheme(2);
-                    putEInkMode(true);
-                }
-            }
-        }
+        // Xiaomi (and Huawei?) devices have some kind of "dynamic refresh rate" thing,
+        // which will report a low refresh rate causing false positive reports
+        //if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
+        //    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        //    if (wm != null) {
+        //        Display display = wm.getDefaultDisplay();
+        //        if (display != null && display.getRefreshRate() > 0 && display.getRefreshRate() < 5.0) {
+        //            // Probably an E-Ink device
+        //            putReadTheme(2);
+        //            putEInkMode(true);
+        //        }
+        //    }
+        //}
     }
 
     private static EhConfig loadEhConfig() {
