@@ -1115,17 +1115,22 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     request();
                 }
             } else if (itemId == R.id.action_add_tag) {
-                if (mGalleryDetail != null) {
-                    EditTextDialogBuilder builder = new EditTextDialogBuilder(context, "", getString(R.string.action_add_tag_tip));
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.setTitle(R.string.action_add_tag)
-                            .show();
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                            .setOnClickListener(v -> {
-                                voteTag(builder.getText().trim(), 1);
-                                dialog.dismiss();
-                            });
+                if (mGalleryDetail == null) {
+                    return false;
                 }
+                if (mGalleryDetail.apiUid < 0) {
+                    showTip(R.string.sign_in_first, LENGTH_LONG);
+                    return false;
+                }
+                EditTextDialogBuilder builder = new EditTextDialogBuilder(context, "", getString(R.string.action_add_tag_tip));
+                builder.setPositiveButton(android.R.string.ok, null);
+                AlertDialog dialog = builder.setTitle(R.string.action_add_tag)
+                        .show();
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                        .setOnClickListener(v -> {
+                            voteTag(builder.getText().trim(), 1);
+                            dialog.dismiss();
+                        });
             }
             return true;
         });
@@ -1401,17 +1406,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         new MaterialAlertDialogBuilder(context)
                 .setMessage(getString(R.string.filter_the_uploader, uploader))
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    if (which != DialogInterface.BUTTON_POSITIVE) {
-                        return;
-                    }
-
                     Filter filter = new Filter();
                     filter.mode = EhFilter.MODE_UPLOADER;
                     filter.text = uploader;
                     EhFilter.getInstance().addFilter(filter);
 
                     showTip(R.string.filter_added, LENGTH_SHORT);
-                }).show();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void showFilterTagDialog(String tag) {
@@ -1423,17 +1426,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         new MaterialAlertDialogBuilder(context)
                 .setMessage(getString(R.string.filter_the_tag, tag))
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    if (which != DialogInterface.BUTTON_POSITIVE) {
-                        return;
-                    }
-
                     Filter filter = new Filter();
                     filter.mode = EhFilter.MODE_TAG;
                     filter.text = tag;
                     EhFilter.getInstance().addFilter(filter);
 
                     showTip(R.string.filter_added, LENGTH_SHORT);
-                }).show();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void showTagDialog(final String tag) {
@@ -1458,10 +1459,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         menuId.add(R.id.show_definition);
         menu.add(resources.getString(R.string.add_filter));
         menuId.add(R.id.add_filter);
-        menu.add(resources.getString(R.string.tag_vote_up));
-        menuId.add(R.id.vote_up);
-        menu.add(resources.getString(R.string.tag_vote_down));
-        menuId.add(R.id.vote_down);
+        if (mGalleryDetail != null && mGalleryDetail.apiUid >= 0) {
+            menu.add(resources.getString(R.string.tag_vote_up));
+            menuId.add(R.id.vote_up);
+            menu.add(resources.getString(R.string.tag_vote_down));
+            menuId.add(R.id.vote_down);
+        }
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle(tag)
