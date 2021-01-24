@@ -244,8 +244,10 @@ public class EhEngine {
             }
         }
 
-        for (GalleryInfo info : list) {
-            info.thumb = EhUrl.getFixedPreviewThumbUrl(info.thumb);
+        if (Settings.getFixThumbUrl()) {
+            for (GalleryInfo info : list) {
+                info.thumb = EhUrl.getFixedPreviewThumbUrl(info.thumb);
+            }
         }
     }
 
