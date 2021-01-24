@@ -132,6 +132,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:text="@string/sign_in_via_webview"
+                    android:background="?selectableItemBackground"
                     android:textColor="?attr/textColorThemeAccent" />
 
                 <TextView
@@ -140,6 +141,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:text="@string/sign_in_via_cookies"
+                    android:background="?selectableItemBackground"
                     android:textColor="?attr/textColorThemeAccent" />
 
             </LinearLayout>
@@ -151,6 +153,7 @@
                 android:paddingHorizontal="8dp"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/skip_signing_in"
+                android:background="?selectableItemBackground"
                 android:textColor="?attr/textColorThemeAccent" />
         </LinearLayout>
     </ScrollView>
