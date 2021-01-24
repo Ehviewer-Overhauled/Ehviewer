@@ -226,7 +226,7 @@ public class DownloadService extends Service implements DownloadManager.Download
                 .setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setColorized(true)
-                .addAction(R.drawable.ic_baseline_pause_24, getString(R.string.stat_download_action_stop_all), piStopAll)
+                .addAction(R.drawable.v_pause_x24, getString(R.string.stat_download_action_stop_all), piStopAll)
                 .setShowWhen(false)
                 .setChannelId(CHANNEL_ID);
 
