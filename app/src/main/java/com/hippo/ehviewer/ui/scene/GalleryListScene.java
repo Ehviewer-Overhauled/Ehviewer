@@ -608,6 +608,9 @@ public final class GalleryListScene extends BaseScene
                 @NonNull
                 @Override
                 public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
+                    if (animation == null) {
+                        return insets;
+                    }
                     if (mSearchFab != null) {
                         FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
                         int offset = MathUtils.lerp(-(startBottomSearchFab - endBottomSearchFab), 0, animation.getInterpolatedFraction());
