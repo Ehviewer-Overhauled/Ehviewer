@@ -49,7 +49,7 @@
         android:title="@string/settings_advanced_clear_memory_cache"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="320"
         android:key="read_cache_size"
         android:summary="%s"
@@ -58,7 +58,7 @@
         app:entryValues="@array/read_cache_size_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="system"
         android:key="app_language"
         android:summary="%s"

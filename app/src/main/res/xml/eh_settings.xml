@@ -29,7 +29,7 @@
         android:title="@string/settings_eh_identity_cookies"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="1"
         android:key="gallery_site"
         android:summary="%s"
@@ -52,7 +52,7 @@
         android:fragment="com.hippo.ehviewer.ui.fragment.MyTagsFragment"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="-1"
         android:entries="@array/night_mode_entries"
         android:entryValues="@array/night_mode_values"
@@ -66,7 +66,7 @@
         android:title="@string/black_dark_theme"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="launch_page"
         android:summary="%s"
@@ -75,7 +75,7 @@
         app:entryValues="@array/launch_page_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="list_mode"
         android:summary="%s"
@@ -84,7 +84,7 @@
         app:entryValues="@array/list_mode_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="detail_size"
         android:summary="%s"
@@ -93,7 +93,7 @@
         app:entryValues="@array/detail_size_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="1"
         android:key="thumb_size"
         android:summary="%s"
@@ -102,7 +102,7 @@
         app:entryValues="@array/thumb_size_entry_values"
         app:iconSpaceReserved="false" />
 
-    <com.takisoft.preferencex.SimpleMenuPreference
+    <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="thumb_resolution"
         android:summary="@string/settings_eh_thumb_resolution_summary"
