@@ -239,6 +239,9 @@ public final class GalleryCommentsScene extends ToolbarScene
                 @NonNull
                 @Override
                 public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
+                    if (animation == null) {
+                        return insets;
+                    }
                     if (mEditPanel != null) {
                         int offset = MathUtils.lerp(-(startBottomEditPanel - endBottomEditPanel), 0, animation.getInterpolatedFraction());
                         mEditPanel.setTranslationY(offset);

@@ -290,6 +290,9 @@ public class FavoritesScene extends BaseScene implements
                 @NonNull
                 @Override
                 public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
+                    if (animation == null) {
+                        return insets;
+                    }
                     if (mFabLayout != null) {
                         int offset = MathUtils.lerp(-(startBottomFabLayout - endBottomFabLayout), 0, animation.getInterpolatedFraction());
                         mFabLayout.setTranslationY(offset);
