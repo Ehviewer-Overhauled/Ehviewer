@@ -46,7 +46,7 @@ public class EhDns implements Dns {
 
     static {
         Map<String, List<InetAddress>> map = new HashMap<>();
-        put(map, "e-hentai.org", "104.20.26.25", "104.20.26.25");
+        put(map, "e-hentai.org", "104.20.134.21", "104.20.135.21", "172.67.0.127");
         put(map, "exhentai.org", "178.175.128.252", "178.175.129.252", "178.175.129.254", "178.175.128.254",
                 "178.175.132.20", "178.175.132.22");
         put(map, "repo.e-hentai.org", "94.100.28.57", "94.100.29.73");
