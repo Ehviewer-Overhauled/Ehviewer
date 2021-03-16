@@ -25,23 +25,18 @@ import java.util.regex.Pattern;
 
 public class TorrentParser {
 
-    private static final Pattern PATTERN_TORRENT = Pattern.compile("<td colspan=\"5\"> &nbsp; <a href=\"([^\"]+)\"[^<]+>([^<]+)</a></td>");
+    private static final Pattern PATTERN_TORRENT = Pattern.compile("<td colspan=\"5\"> &nbsp; <a href=\".*\" onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a></td>");
 
     @SuppressWarnings("unchecked")
     public static Pair<String, String>[] parse(String body) {
         List<Pair<String, String>> torrentList = new ArrayList<>();
         Matcher m = PATTERN_TORRENT.matcher(body);
         while (m.find()) {
-            // Remove ?p= to make torrent redistributable
             String url = ParserUtils.trim(m.group(1));
-            int index = url.indexOf("?p=");
-            if (index != -1) {
-                url = url.substring(0, index);
-            }
             String name = ParserUtils.trim(m.group(2));
             Pair<String, String> item = new Pair<>(url, name);
             torrentList.add(item);
         }
-        return torrentList.toArray(new Pair[torrentList.size()]);
+        return torrentList.toArray(new Pair[0]);
     }
 }
