@@ -284,6 +284,9 @@ public class Settings {
             if (!sSettingsPre.contains(KEY_DOH)) {
                 putDoH(true);
             }
+            if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
+                putBuiltInHosts(true);
+            }
             if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
                 putDF(true);
             }
