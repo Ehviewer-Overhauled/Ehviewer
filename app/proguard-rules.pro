@@ -25,7 +25,7 @@
 -keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
 public static java.lang.String TABLENAME;
 }
--keep class **$Properties { *; }
+-keep class com.hippo.ehviewer.dao.* { *; }
 -dontwarn net.sqlcipher.database.**
 -dontwarn rx.**
 -dontwarn org.conscrypt.ConscryptHostnameVerifier
