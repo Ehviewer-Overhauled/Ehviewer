@@ -23,12 +23,18 @@
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="false">
 
-        <com.hippo.scene.StageLayout
-            android:id="@+id/fragment_container"
+        <com.drakeet.drawer.FullDraggableContainer
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <com.hippo.scene.StageLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.drakeet.drawer.FullDraggableContainer>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
@@ -47,6 +53,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:background="@android:color/transparent"
+            android:fitsSystemWindows="true"
             android:maxWidth="@dimen/drawer_max_width" />
 
     </com.hippo.ehviewer.widget.EhDrawerLayout>
