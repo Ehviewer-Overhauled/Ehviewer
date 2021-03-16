@@ -151,7 +151,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     }
 
     public String getKeyword() {
-        return mKeyword;
+        return MODE_UPLOADER == mMode ? "uploader:" + mKeyword :mKeyword;
     }
 
     public void setKeyword(String keyword) {
