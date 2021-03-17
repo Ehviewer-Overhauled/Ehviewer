@@ -112,15 +112,6 @@
 
     <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Light" />
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar.Translucent">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-
     <!-- =============== -->
     <!-- Base Black Theme -->
     <!-- =============== -->
@@ -132,7 +123,6 @@
 
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
-        <item name="colorBackgroundFloating">@android:color/black</item>
 
         <item name="android:textColorPrimary">@color/primary_text_material_black</item>
 
@@ -159,14 +149,7 @@
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 
-    <!-- ========= -->
-    <!-- App Theme -->
-    <!-- ========= -->
-    <style name="AppTheme.Main" parent="AppTheme.NoActionBar.Translucent" />
-
-    <style name="AppTheme.Toolbar" parent="AppTheme.NoActionBar" />
-
-    <style name="AppTheme.Gallery" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.Gallery" parent="AppTheme">
         <item name="gallerySliderBackgroundColor">@color/gallery_slider_background</item>
     </style>
 

@@ -122,6 +122,5 @@ public abstract class EhActivity extends MaterialActivity {
                 }
             }
         });
-
     }
 }

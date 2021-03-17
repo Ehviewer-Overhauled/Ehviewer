@@ -41,7 +41,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.view.WindowCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
@@ -574,8 +573,9 @@ public final class MainActivity extends StageActivity
      * If activity is running, show snack bar, otherwise show toast
      */
     public void showTip(CharSequence message, int length) {
-        if (null != mDrawerLayout) {
-            Snackbar.make(mDrawerLayout, message,
+        View view = findViewById(R.id.snackbar);
+        if (null != view) {
+            Snackbar.make(view, message,
                     length == BaseScene.LENGTH_LONG ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, message,

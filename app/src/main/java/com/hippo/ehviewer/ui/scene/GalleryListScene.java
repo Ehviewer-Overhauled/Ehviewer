@@ -125,8 +125,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import rikka.recyclerview.RecyclerViewKt;
-
 @SuppressLint("RtlHardcoded")
 public final class GalleryListScene extends BaseScene
         implements SearchBar.Helper, SearchBar.OnStateChangeListener, FastScroller.OnDragHandlerListener,

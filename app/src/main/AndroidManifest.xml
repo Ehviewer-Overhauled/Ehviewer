@@ -48,8 +48,8 @@
             android:name="com.hippo.ehviewer.ui.MainActivity"
             android:configChanges="screenSize"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.Main"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -145,7 +145,7 @@
             android:name="com.hippo.ehviewer.ui.SettingsActivity"
             android:configChanges="screenSize"
             android:label="@string/settings"
-            android:theme="@style/AppTheme.Toolbar" />
+            android:theme="@style/AppTheme" />
 
         <activity
             android:name="com.hippo.ehviewer.shortcuts.ShortcutsActivity"
