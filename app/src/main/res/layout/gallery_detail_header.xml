@@ -15,6 +15,7 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -30,7 +31,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="?attr/galleryDetailHeaderBackgroundColor"
-            android:elevation="4dp" />
+            android:elevation="4dp"
+            app:fitSystemWindowsInsets="top" />
 
         <Space
             android:layout_width="match_parent"
@@ -47,7 +49,8 @@
             android:id="@+id/header_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
+            android:background="@android:color/transparent"
+            app:fitSystemWindowsInsets="top">
 
             <com.hippo.widget.LoadImageView
                 android:id="@+id/thumb"

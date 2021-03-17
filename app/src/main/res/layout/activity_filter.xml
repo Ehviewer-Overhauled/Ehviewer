@@ -16,12 +16,14 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.hippo.easyrecyclerview.EasyRecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:fitSystemWindowsInsets="bottom" />
 
     <TextView
         android:id="@+id/tip"
@@ -31,14 +33,16 @@
         android:layout_gravity="center"
         android:drawablePadding="16dp"
         android:gravity="center_horizontal"
-        android:text="@string/no_filter" />
+        android:text="@string/no_filter"
+        app:fitSystemWindowsInsets="bottom" />
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
-        android:paddingBottom="@dimen/corner_fab_margin">
+        android:paddingBottom="@dimen/corner_fab_margin"
+        app:fitSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fab"

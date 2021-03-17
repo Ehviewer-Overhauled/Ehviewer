@@ -73,11 +73,6 @@ public class HostsFragment extends BaseFragment
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setPadding(
-                recyclerView.getPaddingLeft(),
-                recyclerView.getPaddingTop(),
-                recyclerView.getPaddingRight(),
-                recyclerView.getPaddingBottom() + getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab));
 
         fab.setOnClickListener(this);
 

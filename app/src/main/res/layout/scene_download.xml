@@ -16,7 +16,8 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/content"
@@ -26,7 +27,8 @@
         <com.hippo.easyrecyclerview.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:fitSystemWindowsInsets="bottom" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"

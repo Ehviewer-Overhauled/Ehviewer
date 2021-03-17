@@ -2,23 +2,23 @@ package com.hippo.ehviewer.ui.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.Preference;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public class BasePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -73,5 +73,12 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
                 return WindowInsetsCompat.CONSUMED;
             });
         }
+    }
+
+    @Override
+    public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        RecyclerViewKt.fixEdgeEffect(recyclerView, false, true);
+        return recyclerView;
     }
 }

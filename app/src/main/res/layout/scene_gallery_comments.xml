@@ -29,7 +29,8 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            app:fitSystemWindowsInsets="bottom" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -41,7 +42,8 @@
         android:layout_gravity="center"
         android:drawablePadding="8dp"
         android:gravity="center_horizontal"
-        android:text="@string/no_one_comments_gallery" />
+        android:text="@string/no_one_comments_gallery"
+        app:fitSystemWindowsInsets="bottom" />
 
     <LinearLayout
         android:id="@+id/edit_panel"
@@ -51,7 +53,8 @@
         android:background="?colorPrimarySurface"
         android:elevation="4dp"
         android:orientation="horizontal"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        app:fitSystemWindowsInsets="bottom">
 
         <EditText
             android:id="@+id/edit_text"
@@ -85,7 +88,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
-        android:paddingBottom="@dimen/corner_fab_margin">
+        android:paddingBottom="@dimen/corner_fab_margin"
+        app:fitSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

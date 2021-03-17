@@ -87,11 +87,6 @@ public class FilterFragment extends BaseFragment {
         if (defaultItemAnimator != null) {
             defaultItemAnimator.setSupportsChangeAnimations(false);
         }
-        recyclerView.setPadding(
-                recyclerView.getPaddingLeft(),
-                recyclerView.getPaddingTop(),
-                recyclerView.getPaddingRight(),
-                recyclerView.getPaddingBottom() + getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab));
 
         fab.setOnClickListener(v -> showAddFilterDialog());
 

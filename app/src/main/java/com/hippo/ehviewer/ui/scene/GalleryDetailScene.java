@@ -60,9 +60,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
@@ -2181,25 +2179,5 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             EhApplication.getEhClient(context).execute(request);
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        if (mHeader != null) {
-            mHeader.findViewById(R.id.header_content).setPadding(0, insets1.top, 0, 0);
-        }
-        if (mPreviews != null) {
-            int keylineMargin = getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
-            mPreviews.setPadding(keylineMargin, keylineMargin, keylineMargin, keylineMargin + insets1.bottom);
-        }
-        if (mTip != null) {
-            mTip.setPadding(mTip.getPaddingLeft(), mTip.getPaddingTop(), mTip.getPaddingRight(), insets1.bottom);
-        }
-        if (mProgress != null) {
-            mProgress.setPadding(mProgress.getPaddingLeft(), mProgress.getPaddingTop(), mProgress.getPaddingRight(), insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/previews"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,9 +25,10 @@
     android:focusable="true"
     android:orientation="vertical"
     android:padding="@dimen/keyline_margin"
-    android:showDividers="middle">
+    android:showDividers="middle"
+    app:fitSystemWindowsInsets="bottom">
 
-    <com.hippo.widget.SimpleGridAutoSpanLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <com.hippo.widget.SimpleGridAutoSpanLayout
         android:id="@+id/grid_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

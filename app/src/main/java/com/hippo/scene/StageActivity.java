@@ -24,7 +24,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -196,10 +195,6 @@ public abstract class StageActivity extends EhActivity {
     }
 
     public void onSceneViewCreated(SceneFragment scene, Bundle savedInstanceState) {
-        View view = scene.getView();
-        if (view != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(view, scene);
-        }
     }
 
     public void onSceneViewDestroyed(SceneFragment scene) {

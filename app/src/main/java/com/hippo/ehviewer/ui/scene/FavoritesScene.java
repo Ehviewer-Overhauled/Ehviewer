@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowInsetsAnimation;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -43,8 +42,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -95,6 +92,8 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")
@@ -1385,26 +1384,5 @@ public class FavoritesScene extends BaseScene implements
                 }
             }
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        if (mSearchBar != null) {
-            int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mSearchBar.getLayoutParams();
-            layoutParams.topMargin = insets1.top + gallery_search_bar_margin_v;
-            layoutParams.bottomMargin = insets1.bottom + gallery_search_bar_margin_v;
-        }
-        if (mContentLayout != null) {
-            mContentLayout.setTopInsets(insets1.top);
-            mContentLayout.setFitPaddingBottom(insets1.bottom);
-        }
-        if (mFabLayout != null) {
-            int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

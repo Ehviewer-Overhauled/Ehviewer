@@ -16,6 +16,7 @@
 
 package com.hippo.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -23,7 +24,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -55,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public class ContentLayout extends FrameLayout {
 
@@ -88,7 +90,7 @@ public class ContentLayout extends FrameLayout {
     }
 
     private void init(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.widget_content_layout, this);
+        ((Activity) context).getLayoutInflater().inflate(R.layout.widget_content_layout, this);
         setClipChildren(false);
         setClipToPadding(false);
 
@@ -122,7 +124,11 @@ public class ContentLayout extends FrameLayout {
                 resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
 
-        mRecyclerViewOriginTop = mRecyclerView.getPaddingTop();
+        int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
+
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, paddingV / 2, paddingV / 2);
+        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
+
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();
     }
 
@@ -154,15 +160,15 @@ public class ContentLayout extends FrameLayout {
         mFastScroller.detachedFromRecyclerView();
     }
 
-    public void setFitPaddingTop(int fitPaddingTop) {
-        // RecyclerView
-        mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerViewOriginTop + fitPaddingTop, mRecyclerView.getPaddingRight(), mRecyclerView.getPaddingBottom());
-        // RefreshLayout
-        mRefreshLayout.setProgressViewOffset(true, 0, fitPaddingTop + LayoutUtils.dp2pix(getContext(), 32)); // TODO
+    @Override
+    public void setPadding(int left, int top, int right, int bottom) {
+        super.setPadding(left, top, right, 0);
+        setFitPaddingBottom(bottom);
     }
 
-    public void setTopInsets(int topInsets) {
-        setPadding(0, topInsets, 0, 0);
+    public void setFitPaddingTop(int fitPaddingTop) {
+        // RefreshLayout
+        mRefreshLayout.setProgressViewOffset(true, 0, fitPaddingTop + LayoutUtils.dp2pix(getContext(), 32)); // TODO
     }
 
     public void setFitPaddingBottom(int fitPaddingBottom) {

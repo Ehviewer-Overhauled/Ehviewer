@@ -1,22 +1,11 @@
 package com.hippo.ehviewer.ui.fragment;
 
-import android.os.Build;
-import android.os.Bundle;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.hippo.ehviewer.ui.SettingsActivity;
 
 public class BaseFragment extends Fragment {
-    private int paddingBottom = 0;
 
     @Override
     public void onStart() {
@@ -39,18 +28,5 @@ public class BaseFragment extends Fragment {
 
     public void showTip(CharSequence message, int length) {
         ((SettingsActivity) requireActivity()).showTip(message, length);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        paddingBottom = view.getPaddingBottom();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-                Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), paddingBottom + insets1.bottom);
-                return WindowInsetsCompat.CONSUMED;
-            });
-        }
     }
 }

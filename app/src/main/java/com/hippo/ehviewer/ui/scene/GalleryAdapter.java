@@ -121,7 +121,6 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                     mListDecoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
                 }
                 recyclerView.addItemDecoration(mListDecoration);
-                mListDecoration.applyPaddings(recyclerView);
                 adjustPaddings();
                 notifyDataSetChanged();
                 break;
@@ -140,7 +139,6 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                     mGirdDecoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
                 }
                 recyclerView.addItemDecoration(mGirdDecoration);
-                mGirdDecoration.applyPaddings(recyclerView);
                 adjustPaddings();
                 notifyDataSetChanged();
                 break;
@@ -155,7 +153,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         switch (viewType) {
             default:
             case TYPE_LIST:
-                layoutId = R.layout.item_gallery_list;
+                layoutId = R.layout.item_history;
                 break;
             case TYPE_GRID:
                 layoutId = R.layout.item_gallery_grid;

@@ -33,12 +33,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.graphics.Insets;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -64,6 +61,8 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public class GalleryPreviewsScene extends ToolbarScene {
 
@@ -157,7 +156,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
         int padding = LayoutUtils.dp2pix(context, 4);
         MarginItemDecoration decoration = new MarginItemDecoration(padding, padding, padding, padding, padding);
         mRecyclerView.addItemDecoration(decoration);
-        decoration.applyPaddings(mRecyclerView);
 
         mHelper = new GalleryPreviewHelper();
         mContentLayout.setHelper(mHelper);
@@ -452,18 +450,5 @@ public class GalleryPreviewsScene extends ToolbarScene {
             mDialog = null;
             mSlider = null;
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        View statusBarBackground = v.findViewById(R.id.status_bar_background);
-        statusBarBackground.getLayoutParams().height = insets1.top;
-        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
-        if (mContentLayout != null) {
-            mContentLayout.setFitPaddingBottom(insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

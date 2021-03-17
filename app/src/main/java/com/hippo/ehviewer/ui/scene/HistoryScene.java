@@ -35,9 +35,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -87,6 +85,8 @@ import org.greenrobot.greendao.query.LazyList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public class HistoryScene extends ToolbarScene {
 
@@ -223,20 +223,17 @@ public class HistoryScene extends ToolbarScene {
         layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.getDetailSizeResId()));
         layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
         mRecyclerView.setLayoutManager(layoutManager);
-        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setClipChildren(false);
-        //mRecyclerView.setOnItemClickListener(this);
-        //mRecyclerView.setOnItemLongClickListener(this);
         int interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval);
         int paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
         int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
         MarginItemDecoration decoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
         mRecyclerView.addItemDecoration(decoration);
-        decoration.applyPaddings(mRecyclerView);
         guardManager.attachRecyclerView(mRecyclerView);
         swipeManager.attachRecyclerView(mRecyclerView);
+        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, paddingV / 2, 0);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
@@ -710,26 +707,5 @@ public class HistoryScene extends ToolbarScene {
             mAdapter.notifyDataSetChanged();
             updateView(true);
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        View statusBarBackground = v.findViewById(R.id.status_bar_background);
-        statusBarBackground.getLayoutParams().height = insets1.top;
-        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
-        if (mRecyclerView != null) {
-            int paddingH = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
-            int paddingV = getResources().getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
-            mRecyclerView.setPadding(paddingH, paddingV, paddingH, paddingV + insets1.bottom);
-        }
-        if (mFastScroller != null) {
-            mFastScroller.setPadding(mFastScroller.getPaddingLeft(), mFastScroller.getPaddingTop(), mFastScroller.getPaddingRight(), insets1.bottom);
-        }
-        if (mTip != null) {
-            mTip.setPadding(mTip.getPaddingLeft(), mTip.getPaddingTop(), mTip.getPaddingRight(), insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

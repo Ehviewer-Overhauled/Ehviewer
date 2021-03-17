@@ -18,17 +18,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
     <com.hippo.widget.ContentLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:fitSystemWindowsInsets="top|bottom" />
 
     <com.hippo.ehviewer.widget.SearchLayout
         android:id="@+id/search_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_fitSystemWindowsInsets="top|bottom" />
 
     <com.hippo.ehviewer.widget.SearchBar
         android:id="@+id/search_bar"
@@ -36,14 +39,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/gallery_search_bar_margin_h"
-        android:layout_marginVertical="@dimen/gallery_search_bar_margin_v" />
+        android:layout_marginVertical="@dimen/gallery_search_bar_margin_v"
+        app:layout_fitSystemWindowsInsets="top|bottom" />
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
-        android:paddingBottom="@dimen/corner_fab_margin">
+        android:paddingBottom="@dimen/corner_fab_margin"
+        app:fitSystemWindowsInsets="top|bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -85,7 +90,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
-        android:paddingBottom="@dimen/corner_fab_margin">
+        android:paddingBottom="@dimen/corner_fab_margin"
+        app:fitSystemWindowsInsets="top|bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/search_fab"

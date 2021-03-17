@@ -25,8 +25,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.Insets;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +43,8 @@ import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public final class GalleryInfoScene extends ToolbarScene {
 
@@ -169,10 +169,12 @@ public final class GalleryInfoScene extends ToolbarScene {
                 LinearDividerItemDecoration.VERTICAL,
                 AttrResources.getAttrColor(context, R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
-        decoration.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.keyline_margin));
+        int keylineMargin = context.getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
+        decoration.setPadding(keylineMargin);
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setHasFixedSize(true);
+        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
         return view;
     }
 
@@ -274,19 +276,5 @@ public final class GalleryInfoScene extends ToolbarScene {
         public int getItemCount() {
             return mKeys == null || mValues == null ? 0 : Math.min(mKeys.size(), mValues.size());
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        View statusBarBackground = v.findViewById(R.id.status_bar_background);
-        statusBarBackground.getLayoutParams().height = insets1.top;
-        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
-        if (mRecyclerView != null) {
-            int keyline_margin = getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
-            mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(), keyline_margin + insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

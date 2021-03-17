@@ -42,7 +42,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowInsetsAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -55,8 +54,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -128,6 +125,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 @SuppressLint("RtlHardcoded")
 public final class GalleryListScene extends BaseScene
@@ -1975,36 +1974,5 @@ public final class GalleryListScene extends BaseScene
                 showActionFab();
             }
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
-        if (mSearchBar != null) {
-            int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mSearchBar.getLayoutParams();
-            layoutParams.topMargin = insets1.top + gallery_search_bar_margin_v;
-            layoutParams.bottomMargin = insets1.bottom + gallery_search_bar_margin_v;
-        }
-        if (mContentLayout != null) {
-            mContentLayout.setTopInsets(insets1.top);
-            mContentLayout.setFitPaddingBottom(insets1.bottom);
-        }
-        if (mSearchFab != null) {
-            FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-            fabLayout.setPadding(mSearchFab.getPaddingLeft(), mSearchFab.getPaddingTop(), fabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
-        }
-        if (mFabLayout != null) {
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
-        }
-        if (mSearchLayout != null) {
-            int paddingTopSB = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
-            int paddingBottomFab = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
-            mSearchLayout.setPadding(mSearchLayout.getPaddingLeft(), paddingTopSB + insets1.top,
-                    mSearchLayout.getPaddingRight(), paddingBottomFab + insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }

@@ -50,9 +50,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
 import androidx.core.text.util.LinkifyCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -97,6 +95,8 @@ import com.hippo.yorozuya.collect.IntList;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rikka.recyclerview.RecyclerViewKt;
 
 public final class GalleryCommentsScene extends ToolbarScene
         implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -194,6 +194,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_comments, container, false);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
+        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mEditPanel = ViewUtils.$$(view, R.id.edit_panel);
         mSendImage = (ImageView) ViewUtils.$$(mEditPanel, R.id.send);
@@ -1058,26 +1059,5 @@ public final class GalleryCommentsScene extends ToolbarScene
                 return TYPE_COMMENT;
             }
         }
-    }
-
-    @Override
-    public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-        Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-        v.setPadding(insets1.left, 0, insets1.right, 0);
-        View statusBarBackground = v.findViewById(R.id.status_bar_background);
-        statusBarBackground.getLayoutParams().height = insets1.top;
-        statusBarBackground.setBackgroundColor(AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark));
-        if (mFabLayout != null) {
-            int corner_fab_margin = getResources().getDimensionPixelOffset(R.dimen.corner_fab_margin);
-            mFabLayout.setPadding(mFabLayout.getPaddingLeft(), mFabLayout.getPaddingTop(), mFabLayout.getPaddingRight(), corner_fab_margin + insets1.bottom);
-        }
-        if (mEditPanel != null) {
-            mEditPanel.setPadding(mEditPanel.getPaddingLeft(), mEditPanel.getPaddingTop(), mEditPanel.getPaddingRight(), insets1.bottom);
-        }
-        if (mRecyclerView != null) {
-            int paddingBottomFab = getResources().getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
-            mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(), paddingBottomFab + insets1.bottom);
-        }
-        return WindowInsetsCompat.CONSUMED;
     }
 }
