@@ -1986,6 +1986,7 @@ public final class GalleryListScene extends BaseScene
             int gallery_search_bar_margin_v = getResources().getDimensionPixelOffset(R.dimen.gallery_search_bar_margin_v);
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mSearchBar.getLayoutParams();
             layoutParams.topMargin = insets1.top + gallery_search_bar_margin_v;
+            layoutParams.bottomMargin = insets1.bottom + gallery_search_bar_margin_v;
         }
         if (mContentLayout != null) {
             mContentLayout.setTopInsets(insets1.top);
