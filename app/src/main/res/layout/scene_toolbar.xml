@@ -26,7 +26,7 @@
         android:fitsSystemWindows="true"
         android:background="?attr/toolbarColor"
         android:elevation="4dp"
-        app:statusBarForeground="@color/colorPrimaryDark">
+        app:statusBarForeground="?colorPrimaryDark">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"

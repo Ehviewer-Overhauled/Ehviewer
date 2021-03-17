@@ -325,10 +325,6 @@ public final class MainActivity extends StageActivity
                 Settings.putTheme(theme);
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-            findViewById(R.id.fragment_container).setFitsSystemWindows(true);
-        }
 
         updateProfile();
 

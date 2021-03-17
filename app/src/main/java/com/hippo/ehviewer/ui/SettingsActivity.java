@@ -16,16 +16,11 @@
 
 package com.hippo.ehviewer.ui;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.R;
@@ -48,14 +43,6 @@ public final class SettingsActivity extends EhActivity {
                     .beginTransaction()
                     .replace(R.id.fragment, new SettingsFragment())
                     .commitAllowingStateLoss();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.snackbar), (v, insets) -> {
-                Insets insets1 = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-                v.setPadding(insets1.left, insets1.top, insets1.right, 0);
-                return insets;
-            });
         }
     }
 

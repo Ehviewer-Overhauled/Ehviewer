@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <style name="AppTheme" parent="Base.AppTheme.Light" />
 
     <style name="ActionBarStyle" parent="@style/Widget.MaterialComponents.ActionBar.Solid">
         <item name="background">?attr/toolbarColor</item>

@@ -3,17 +3,22 @@
     android:id="@+id/snackbar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false">
+    android:clipChildren="false"
+    app:consumeSystemWindowsInsets="start|end"
+    app:edgeToEdge="true"
+    app:fitSystemWindowsInsets="start|end">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="?attr/toolbarColor"
-        android:elevation="4dp">
+        android:elevation="4dp"
+        android:fitsSystemWindows="true"
+        app:statusBarForeground="?colorPrimaryDark">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_height="match_parent"
+            android:layout_height="?attr/actionBarSize"
             android:layout_width="match_parent"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
             app:popupTheme="?attr/toolbarPopupTheme" />

@@ -19,7 +19,10 @@ package com.hippo.ehviewer.ui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
@@ -30,6 +33,7 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 
+import rikka.core.res.ResourcesKt;
 import rikka.material.app.MaterialActivity;
 
 public abstract class EhActivity extends MaterialActivity {
@@ -97,5 +101,27 @@ public abstract class EhActivity extends MaterialActivity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
+    }
+
+    @Override
+    public void onApplyTranslucentSystemBars() {
+        super.onApplyTranslucentSystemBars();
+        Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        window.getDecorView().post(() -> {
+            if (window.getDecorView().getRootWindowInsets().getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
+                window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.setNavigationBarContrastEnforced(false);
+                }
+            } else {
+                window.setNavigationBarColor(Color.TRANSPARENT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.setNavigationBarContrastEnforced(true);
+                }
+            }
+        });
+
     }
 }

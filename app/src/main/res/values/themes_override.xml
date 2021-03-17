@@ -1,0 +1,32 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Add android:colorControlNormal -->
+    <style name="Base.ThemeOverlay.AppCompat.ActionBar" tools:override="true">
+        <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
+    </style>
+
+    <style name="Base.ThemeOverlay.AppCompat.Dark.ActionBar" tools:override="true">
+        <item name="android:colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="colorControlNormal">?android:attr/textColorPrimary</item>
+        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView.ActionBar</item>
+    </style>
+
+    <style name="Widget.MaterialComponents.CompoundButton.CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox" tools:override="true">
+        <item name="enforceMaterialTheme">true</item>
+        <item name="useMaterialThemeColors">true</item>
+    </style>
+
+    <style name="Widget.MaterialComponents.CompoundButton.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton" tools:override="true">
+        <item name="enforceMaterialTheme">true</item>
+        <item name="useMaterialThemeColors">true</item>
+    </style>
+
+    <style name="PreferenceSummaryTextStyle" tools:override="true">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+</resources>
