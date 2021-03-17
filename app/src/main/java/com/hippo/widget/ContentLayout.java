@@ -124,9 +124,7 @@ public class ContentLayout extends FrameLayout {
                 resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
 
-        int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
-
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, paddingV / 2, paddingV / 2);
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();

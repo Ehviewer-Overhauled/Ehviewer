@@ -377,7 +377,7 @@ public class DownloadsScene extends ToolbarScene
             mRecyclerView.scrollToPosition(mInitPosition);
             mInitPosition = -1;
         }
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, paddingV / 2, 0);
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);

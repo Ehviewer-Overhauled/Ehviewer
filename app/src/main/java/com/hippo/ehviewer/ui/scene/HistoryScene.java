@@ -233,7 +233,7 @@ public class HistoryScene extends ToolbarScene {
         guardManager.attachRecyclerView(mRecyclerView);
         swipeManager.attachRecyclerView(mRecyclerView);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, paddingV / 2, 0);
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
