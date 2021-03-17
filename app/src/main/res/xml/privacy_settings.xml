@@ -8,7 +8,7 @@
         android:fragment="com.hippo.ehviewer.ui.fragment.SetSecurityFragment"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="false"
         android:key="enable_secure"
         android:title="@string/settings_privacy_secure"
@@ -16,7 +16,7 @@
         app:summaryOff="@string/settings_privacy_secure_summary"
         app:summaryOn="@string/settings_privacy_secure_summary" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         app:iconSpaceReserved="false"
         android:key="enable_analytics"
         android:title="@string/settings_privacy_enable_analytics"

@@ -17,14 +17,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="true"
         android:key="save_parse_error_body"
         android:summary="@string/settings_advanced_save_parse_error_body_summary"
         android:title="@string/settings_advanced_save_parse_error_body"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="true"
         android:key="save_crash_log"
         android:summary="@string/settings_advanced_save_crash_log_summary"
@@ -72,7 +72,7 @@
         android:title="@string/settings_advanced_proxy"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="false"
         android:key="built_in_hosts_2"
         android:summary="@string/settings_advanced_built_in_hosts_summary"
@@ -86,21 +86,21 @@
         android:fragment="com.hippo.ehviewer.ui.fragment.HostsFragment"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="false"
         android:key="dns_over_https"
         android:summary="@string/settings_advanced_dns_over_http_summary"
         android:title="@string/settings_advanced_dns_over_http_title"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="false"
         android:key="domain_fronting"
         android:summary="@string/settings_advanced_domain_fronting_summary"
         android:title="@string/settings_advanced_domain_fronting_title"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <SwitchPreference
         android:defaultValue="false"
         android:key="e_ink_mode_2"
         android:summary="@string/settings_e_ink_mode_summary"

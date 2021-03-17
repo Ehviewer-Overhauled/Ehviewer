@@ -30,11 +30,11 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -80,7 +80,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     private CategoryTable mCategoryTable;
     private RadioGridGroup mNormalSearchMode;
     private ImageView mNormalSearchModeHelp;
-    private SwitchCompat mEnableAdvanceSwitch;
+    private Switch mEnableAdvanceSwitch;
     private View mAdvanceView;
     private AdvanceSearchTable mTableAdvanceSearch;
     private ImageSearchLayout mImageView;

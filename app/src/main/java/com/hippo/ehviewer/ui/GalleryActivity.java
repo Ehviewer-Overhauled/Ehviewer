@@ -46,6 +46,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +55,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -980,14 +980,14 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         private final Spinner mScaleMode;
         private final Spinner mStartPosition;
         private final Spinner mReadTheme;
-        private final SwitchCompat mKeepScreenOn;
-        private final SwitchCompat mShowClock;
-        private final SwitchCompat mShowProgress;
-        private final SwitchCompat mShowBattery;
-        private final SwitchCompat mShowPageInterval;
-        private final SwitchCompat mVolumePage;
-        private final SwitchCompat mReadingFullscreen;
-        private final SwitchCompat mCustomScreenLightness;
+        private final Switch mKeepScreenOn;
+        private final Switch mShowClock;
+        private final Switch mShowProgress;
+        private final Switch mShowBattery;
+        private final Switch mShowPageInterval;
+        private final Switch mVolumePage;
+        private final Switch mReadingFullscreen;
+        private final Switch mCustomScreenLightness;
         private final SeekBar mScreenLightness;
 
         @SuppressLint("InflateParams")
