@@ -30,8 +30,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -217,7 +217,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         hideSoftInput();
 
         if (!checkIpbMemberId(ipbMemberId) || !(checkIpbPassHash(ipbPassHash))) {
-            new MaterialAlertDialogBuilder(context).setTitle(R.string.waring)
+            new AlertDialog.Builder(context).setTitle(R.string.waring)
                     .setMessage(R.string.wrong_cookie_warning)
                     .setPositiveButton(R.string.i_will_check_it, null)
                     .setNegativeButton(R.string.i_dont_think_so, (dialog, which) -> {

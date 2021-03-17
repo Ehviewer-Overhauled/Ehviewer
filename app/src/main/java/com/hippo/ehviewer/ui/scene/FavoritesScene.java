@@ -48,7 +48,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.annotation.Implemented;
@@ -481,7 +480,7 @@ public class FavoritesScene extends BaseScene implements
                 items[1] = getString(R.string.local_favorites);
                 String[] favCat = Settings.getFavCat();
                 System.arraycopy(favCat, 0, items, 2, 10);
-                new MaterialAlertDialogBuilder(context)
+                new AlertDialog.Builder(context)
                         .setTitle(R.string.default_favorites_collection)
                         .setItems(items, (dialog, which) -> Settings.putDefaultFavSlot(which - 2)).show();
                 return true;
@@ -821,7 +820,7 @@ public class FavoritesScene extends BaseScene implements
             }
             case 4: { // Delete
                 DeleteDialogHelper helper = new DeleteDialogHelper();
-                new MaterialAlertDialogBuilder(context)
+                new AlertDialog.Builder(context)
                         .setTitle(R.string.delete_favorites_dialog_title)
                         .setMessage(getString(R.string.delete_favorites_dialog_message, mModifyGiList.size()))
                         .setPositiveButton(android.R.string.ok, helper)
@@ -835,7 +834,7 @@ public class FavoritesScene extends BaseScene implements
                 String[] array = new String[11];
                 array[0] = getString(R.string.local_favorites);
                 System.arraycopy(Settings.getFavCat(), 0, array, 1, 10);
-                new MaterialAlertDialogBuilder(context)
+                new AlertDialog.Builder(context)
                         .setTitle(R.string.move_favorites_dialog_title)
                         .setItems(array, helper)
                         .setOnCancelListener(helper)

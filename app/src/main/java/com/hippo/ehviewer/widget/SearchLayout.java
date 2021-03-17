@@ -35,11 +35,11 @@ import android.widget.TextView;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
@@ -52,6 +52,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnCheckedChangeListener,
         View.OnClickListener, ImageSearchLayout.Helper, TabLayout.OnTabSelectedListener {
@@ -112,7 +113,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         setAdapter(mAdapter);
         setHasFixedSize(true);
         setClipToPadding(false);
-        ((DefaultItemAnimator) getItemAnimator()).setSupportsChangeAnimations(false);
+        ((DefaultItemAnimator) Objects.requireNonNull(getItemAnimator())).setSupportsChangeAnimations(false);
         int interval = resources.getDimensionPixelOffset(R.dimen.search_layout_interval);
         int paddingH = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_h);
         int paddingV = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_v);
@@ -273,7 +274,7 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
     @Override
     public void onClick(View v) {
         if (mNormalSearchModeHelp == v) {
-            new MaterialAlertDialogBuilder(getContext())
+            new AlertDialog.Builder(getContext())
                     .setMessage(R.string.search_tip)
                     .show();
         }

@@ -39,11 +39,11 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.WindowCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.AppConfig;
@@ -350,7 +350,7 @@ public final class MainActivity extends StageActivity
         if (null == uniFile || uniFile.ensureDir()) {
             return;
         }
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.waring)
                 .setMessage(R.string.invalid_download_location)
                 .setPositiveButton(R.string.get_it, null)

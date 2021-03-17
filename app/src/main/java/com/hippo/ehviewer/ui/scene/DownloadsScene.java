@@ -57,7 +57,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -524,7 +523,7 @@ public class DownloadsScene extends ToolbarScene
 
         int id = item.getItemId();
         if (id == R.id.action_filter) {
-            new MaterialAlertDialogBuilder(requireActivity())
+            new AlertDialog.Builder(requireActivity())
                     .setSingleChoiceItems(R.array.download_state, mType + 1, (dialog, which) -> {
                         mType = which - 1;
                         updateForLabel();
@@ -547,7 +546,7 @@ public class DownloadsScene extends ToolbarScene
             openDrawer(Gravity.RIGHT);
             return true;
         } else if (id == R.id.action_reset_reading_progress) {
-            new MaterialAlertDialogBuilder(getContext())
+            new AlertDialog.Builder(getContext())
                     .setMessage(R.string.reset_reading_progress_message)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -620,7 +619,7 @@ public class DownloadsScene extends ToolbarScene
                 for (int i = 0, n = list.size(); i < n; i++) {
                     items[i + 2] = list.get(i).getLabel();
                 }
-                new MaterialAlertDialogBuilder(context)
+                new AlertDialog.Builder(context)
                         .setTitle(R.string.default_download_label)
                         .setItems(items, (dialog1, which) -> {
                             if (which == 0) {
@@ -820,7 +819,7 @@ public class DownloadsScene extends ToolbarScene
 
                     MoveDialogHelper helper = new MoveDialogHelper(labels, downloadInfoList);
 
-                    new MaterialAlertDialogBuilder(context)
+                    new AlertDialog.Builder(context)
                             .setTitle(R.string.download_move_dialog_title)
                             .setItems(labels, helper)
                             .show();
@@ -1066,7 +1065,7 @@ public class DownloadsScene extends ToolbarScene
                                     AlertDialog dialog = builder.show();
                                     new RenameLabelDialogHelper(builder, dialog, label);
                                 } else if (itemId == R.id.menu_label_remove) {
-                                    new MaterialAlertDialogBuilder(requireContext())
+                                    new AlertDialog.Builder(requireContext())
                                             .setTitle(getString(R.string.delete_label_title))
                                             .setMessage(getString(R.string.delete_label_message, label))
                                             .setPositiveButton(R.string.delete, (dialog, which) -> {

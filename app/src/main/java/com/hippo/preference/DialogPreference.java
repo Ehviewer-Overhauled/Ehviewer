@@ -37,7 +37,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
 
 /**
@@ -255,7 +254,7 @@ public abstract class DialogPreference extends Preference implements
 
         mWhichButtonClicked = DialogInterface.BUTTON_NEGATIVE;
 
-        mBuilder = new MaterialAlertDialogBuilder(context)
+        mBuilder = new AlertDialog.Builder(context)
                 .setTitle(mDialogTitle)
                 .setIcon(mDialogIcon)
                 .setPositiveButton(mPositiveButtonText, this)

@@ -26,7 +26,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.EhApplication;
@@ -73,7 +72,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                         e.printStackTrace();
                     }
                     try {
-                        AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
+                        AlertDialog alertDialog = new AlertDialog.Builder(requireActivity())
                                 .setCancelable(false)
                                 .setView(R.layout.preference_dialog_task)
                                 .show();
@@ -190,7 +189,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                         e.printStackTrace();
                     }
                     try {
-                        AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
+                        AlertDialog alertDialog = new AlertDialog.Builder(requireActivity())
                                 .setCancelable(false)
                                 .setView(R.layout.preference_dialog_task)
                                 .show();

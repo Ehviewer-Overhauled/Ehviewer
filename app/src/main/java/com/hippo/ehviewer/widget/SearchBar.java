@@ -39,12 +39,12 @@ import android.widget.TextView;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
@@ -642,7 +642,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
         @Override
         public boolean onLongClick() {
-            new MaterialAlertDialogBuilder(getContext())
+            new AlertDialog.Builder(getContext())
                     .setMessage(getContext().getString(R.string.delete_search_history, mKeyword))
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(R.string.delete, (dialog, which) -> {

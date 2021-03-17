@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.android.resource.AttrResources;
@@ -137,7 +136,7 @@ public class FilterFragment extends BaseFragment {
     }
 
     private void showTipDialog() {
-        new MaterialAlertDialogBuilder(requireActivity())
+        new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.filter)
                 .setMessage(R.string.filter_tip)
                 .setPositiveButton(android.R.string.ok, null)
@@ -145,7 +144,7 @@ public class FilterFragment extends BaseFragment {
     }
 
     private void showAddFilterDialog() {
-        AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
+        AlertDialog dialog = new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.add_filter)
                 .setView(R.layout.dialog_add_filter)
                 .setPositiveButton(R.string.add, null)
@@ -157,7 +156,7 @@ public class FilterFragment extends BaseFragment {
 
     private void showDeleteFilterDialog(final Filter filter) {
         String message = getString(R.string.delete_filter, filter.text);
-        new MaterialAlertDialogBuilder(requireActivity())
+        new AlertDialog.Builder(requireActivity())
                 .setMessage(message)
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mFilterList) {

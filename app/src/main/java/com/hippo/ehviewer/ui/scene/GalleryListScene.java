@@ -60,7 +60,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -1108,7 +1107,7 @@ public final class GalleryListScene extends BaseScene
                 favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
         };
 
-        new MaterialAlertDialogBuilder(context)
+        new AlertDialog.Builder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
                 .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
                     switch (which) {
@@ -1120,7 +1119,7 @@ public final class GalleryListScene extends BaseScene
                             break;
                         case 1: // Download
                             if (downloaded) {
-                                new MaterialAlertDialogBuilder(context)
+                                new AlertDialog.Builder(context)
                                         .setTitle(R.string.download_remove_dialog_title)
                                         .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
                                         .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
@@ -1147,7 +1146,7 @@ public final class GalleryListScene extends BaseScene
 
                             MoveDialogHelper helper = new MoveDialogHelper(labels, gi);
 
-                            new MaterialAlertDialogBuilder(context)
+                            new AlertDialog.Builder(context)
                                     .setTitle(R.string.download_move_dialog_title)
                                     .setItems(labels, helper)
                                     .show();
@@ -1701,7 +1700,7 @@ public final class GalleryListScene extends BaseScene
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             if (item.getItemId() == R.id.menu_qs_remove) {
-                                new MaterialAlertDialogBuilder(requireContext())
+                                new AlertDialog.Builder(requireContext())
                                         .setTitle(getString(R.string.delete_quick_search_title))
                                         .setMessage(getString(R.string.delete_quick_search_message, quickSearch.name))
                                         .setPositiveButton(R.string.delete, (dialog, which) -> {

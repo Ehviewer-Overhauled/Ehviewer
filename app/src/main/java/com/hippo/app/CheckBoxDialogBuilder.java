@@ -22,10 +22,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import androidx.appcompat.app.AlertDialog;
+
 import com.hippo.ehviewer.R;
 
-public class CheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
+public class CheckBoxDialogBuilder extends AlertDialog.Builder {
 
     private final CheckBox mCheckBox;
 

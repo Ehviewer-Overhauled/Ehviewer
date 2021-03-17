@@ -35,7 +35,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -213,7 +212,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
             int pages = mHelper.getPages();
             if (pages > 0 && mHelper.canGoTo()) {
                 GoToDialogHelper helper = new GoToDialogHelper(pages, mHelper.getPageForTop());
-                AlertDialog dialog = new MaterialAlertDialogBuilder(context).setTitle(R.string.go_to)
+                AlertDialog dialog = new AlertDialog.Builder(context).setTitle(R.string.go_to)
                         .setView(R.layout.dialog_go_to)
                         .setPositiveButton(android.R.string.ok, null)
                         .create();
