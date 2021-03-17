@@ -31,7 +31,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.collection.LruCache;
 
 import com.hippo.a7zip.A7Zip;
@@ -84,6 +83,8 @@ import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import rikka.material.app.DayNightDelegate;
+import rikka.material.app.LocaleDelegate;
 
 public class EhApplication extends RecordingApplication {
 
@@ -336,7 +337,9 @@ public class EhApplication extends RecordingApplication {
 
         Analytics.start(this);
 
-        AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
+        LocaleDelegate.setDefaultLocale(Settings.getLocale());
+        DayNightDelegate.setApplicationContext(this);
+        DayNightDelegate.setDefaultNightMode(Settings.getTheme());
 
         // Do io tasks in new thread
         //noinspection deprecation

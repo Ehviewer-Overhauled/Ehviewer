@@ -92,6 +92,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import rikka.material.app.DayNightDelegate;
+
 public final class MainActivity extends StageActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -317,7 +319,8 @@ public final class MainActivity extends StageActivity
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
         ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
             int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
-            AppCompatDelegate.setDefaultNightMode(theme);
+            DayNightDelegate.setDefaultNightMode(theme);
+            recreate();
             if (Settings.getTheme() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
                 Settings.putTheme(theme);
             }

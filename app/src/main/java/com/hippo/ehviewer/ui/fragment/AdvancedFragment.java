@@ -47,8 +47,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import rikka.material.app.LocaleDelegate;
 
 public class AdvancedFragment extends BasePreferenceFragment {
 
@@ -271,7 +274,12 @@ public class AdvancedFragment extends BasePreferenceFragment {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         if (KEY_APP_LANGUAGE.equals(key)) {
-            ((EhApplication) getActivity().getApplication()).recreate();
+            if ("system".equals(newValue)) {
+                LocaleDelegate.setDefaultLocale(LocaleDelegate.getSystemLocale());
+            } else {
+                LocaleDelegate.setDefaultLocale(Locale.forLanguageTag((String) newValue));
+            }
+            requireActivity().recreate();
             return true;
         }
         return false;

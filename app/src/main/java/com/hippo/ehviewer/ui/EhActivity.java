@@ -19,21 +19,20 @@ package com.hippo.ehviewer.ui;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 
-import java.util.Locale;
+import rikka.material.app.MaterialActivity;
 
-public abstract class EhActivity extends AppCompatActivity {
+public abstract class EhActivity extends MaterialActivity {
 
     private static final String THEME_DEFAULT = "DEFAULT";
     private static final String THEME_BLACK = "BLACK";
@@ -55,21 +54,13 @@ public abstract class EhActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onApplyThemeResource(Resources.Theme theme, int resid, boolean first) {
-        // apply real style and our custom style
-        if (getParent() == null) {
-            theme.applyStyle(resid, true);
-        } else {
-            try {
-                theme.setTo(getParent().getTheme());
-            } catch (Exception e) {
-                // Empty
-            }
-            theme.applyStyle(resid, false);
-        }
+    public void onApplyUserThemeResource(@NonNull Resources.Theme theme, boolean isDecorView) {
         theme.applyStyle(getThemeStyleRes(this), true);
-        // only pass theme style to super, so styled theme will not be overwritten
-        super.onApplyThemeResource(theme, R.style.ThemeOverlay, first);
+    }
+
+    @Override
+    public String computeUserThemeKey() {
+        return getTheme(this);
     }
 
     @StyleRes
@@ -81,11 +72,6 @@ public abstract class EhActivity extends AppCompatActivity {
             default:
                 return R.style.ThemeOverlay;
         }
-    }
-
-    @Override
-    protected void onNightModeChanged(int mode) {
-        getTheme().applyStyle(getThemeStyleRes(this), true);
     }
 
     @Override
@@ -111,49 +97,5 @@ public abstract class EhActivity extends AppCompatActivity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(newBase);
-        applyOverrideConfiguration(new Configuration());
-    }
-
-    @Override
-    public void applyOverrideConfiguration(Configuration newConfig) {
-        super.applyOverrideConfiguration(updateConfigurationIfSupported(newConfig));
-    }
-
-    private Configuration updateConfigurationIfSupported(Configuration config) {
-        // Configuration.getLocales is added after 24 and Configuration.locale is deprecated in 24
-        if (Build.VERSION.SDK_INT >= 24) {
-            if (!config.getLocales().isEmpty()) {
-                return config;
-            }
-        } else {
-            if (config.locale != null) {
-                return config;
-            }
-        }
-        Locale locale = null;
-        String language = Settings.getAppLanguage();
-        if (language != null && !language.equals("system")) {
-            String[] split = language.split("-");
-            if (split.length == 1) {
-                locale = new Locale(split[0]);
-            } else if (split.length == 2) {
-                locale = new Locale(split[0], split[1]);
-            } else if (split.length == 3) {
-                locale = new Locale(split[0], split[1], split[2]);
-            }
-        } else {
-            Resources res = EhApplication.getInstance().getResources();
-            Configuration configuration = res.getConfiguration();
-            locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? configuration.getLocales().get(0) : configuration.locale;
-        }
-        if (locale != null) {
-            config.setLocale(locale);
-        }
-        return config;
     }
 }

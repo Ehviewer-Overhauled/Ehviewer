@@ -54,7 +54,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -98,6 +97,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import rikka.material.app.DayNightDelegate;
 
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
         GalleryView.Listener {
@@ -302,19 +303,30 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    @SuppressWarnings({"WrongConstant"})
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void attachBaseContext(@NonNull Context newBase) {
         switch (Settings.getReadTheme()) {
             case 0:
-                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_UNSPECIFIED);
+                DayNightDelegate.setDefaultNightMode(Settings.getTheme());
                 break;
             case 1:
-                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                DayNightDelegate.setDefaultNightMode(DayNightDelegate.MODE_NIGHT_YES);
                 break;
             case 2:
-                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                DayNightDelegate.setDefaultNightMode(DayNightDelegate.MODE_NIGHT_NO);
                 break;
         }
+        super.attachBaseContext(newBase);
+    }
+
+    @Override
+    public void finish() {
+        DayNightDelegate.setDefaultNightMode(Settings.getTheme());
+        super.finish();
+    }
+
+    @Override
+    @SuppressWarnings({"WrongConstant"})
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
@@ -1041,6 +1053,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             int screenLightness = mScreenLightness.getProgress();
 
             boolean oldReadingFullscreen = Settings.getReadingFullscreen();
+            int oldReadTheme = Settings.getReadTheme();
 
             Settings.putScreenRotation(screenRotation);
             Settings.putReadingDirection(layoutMode);
@@ -1074,17 +1087,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     break;
             }
             setRequestedOrientation(orientation);
-            switch (Settings.getReadTheme()) {
-                case 0:
-                    getDelegate().setLocalNightMode(AppCompatDelegate.getDefaultNightMode());
-                    break;
-                case 1:
-                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    break;
-                case 2:
-                    getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    break;
-            }
             mGalleryView.setLayoutMode(layoutMode);
             mGalleryView.setScaleMode(scaleMode);
             mGalleryView.setStartPosition(startPosition);
@@ -1110,7 +1112,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mLayoutMode = layoutMode;
             updateSlider();
 
-            if (oldReadingFullscreen != readingFullscreen) {
+            if (oldReadingFullscreen != readingFullscreen || oldReadTheme != readTheme) {
                 recreate();
             }
         }
@@ -1221,26 +1223,5 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 SimpleHandler.getInstance().post(task);
             }
         }
-    }
-
-    @Override
-    public void applyOverrideConfiguration(Configuration newConfig) {
-        // **Magic**
-        super.applyOverrideConfiguration(updateConfigurationIfSupported(newConfig));
-    }
-
-    private Configuration updateConfigurationIfSupported(Configuration config) {
-        switch (Settings.getReadTheme()) {
-            case 0:
-                config.uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED | Configuration.UI_MODE_NIGHT_MASK;
-                break;
-            case 1:
-                config.uiMode = Configuration.UI_MODE_NIGHT_YES | Configuration.UI_MODE_NIGHT_MASK;
-                break;
-            case 2:
-                config.uiMode = Configuration.UI_MODE_NIGHT_NO | Configuration.UI_MODE_NIGHT_MASK;
-                break;
-        }
-        return config;
     }
 }

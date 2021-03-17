@@ -1,44 +1,7 @@
 <resources>
 
-    <style name="BaseTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/grey_875</item>
-        <item name="colorAccent">@color/colorPrimary</item>
-        <item name="colorControlActivated">@color/colorPrimary</item>
-        <item name="actionBarStyle">@style/ActionBarStyle</item>
-
-        <item name="android:windowBackground">@color/grey_850</item>
-        <item name="android:colorBackground">@color/grey_850</item>
-        <item name="colorBackgroundFloating">@color/grey_850</item>
-
-        <item name="colorEdgeEffect">@color/grey_500</item>
-        <item name="dividerColor">@color/divider</item>
-        <item name="toolbarColor">?android:attr/colorBackground</item>
-        <item name="textColorThemePrimary">?android:attr/textColorSecondary</item>
-        <item name="textColorThemeAccent">?android:attr/textColorSecondary</item>
-        <item name="colorControlNormal">@color/primary_drawable</item>
-        <item name="drawableColorSecondary">@color/secondary_drawable</item>
-        <item name="drawableColorThemePrimary">@color/primary_drawable</item>
-        <item name="contentColorPrimary">@color/content</item>
-        <item name="contentColorThemePrimary">?attr/contentColorPrimary</item>
-        <item name="contentColorThemeAccent">?attr/contentColorPrimary</item>
-        <item name="contentColorReactive">@color/content_reactive</item>
-        <item name="widgetColorThemePrimary">@color/widget</item>
-        <item name="widgetColorThemeAccent">@color/widget</item>
-        <item name="progressColor">@color/progress</item>
-        <item name="guideBackgroundColor">#e5303030</item>
-        <item name="guideTitleColor">?android:attr/textColorPrimary</item>
-        <item name="guideTextColor">?android:attr/textColorSecondary</item>
-        <item name="tagGroupBackgroundColor">@color/tag_group_background</item>
-        <item name="tagBackgroundColor">@color/tag_background</item>
-        <item name="galleryDetailHeaderTitleColor">?android:attr/textColorPrimary</item>
-        <item name="galleryDetailHeaderBackgroundColor">?attr/contentColorThemePrimary</item>
-        <item name="galleryDetailButtonBackgroundColor">@color/gallery_detail_button_background
-        </item>
-
-        <item name="toolbarPopupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
-        <item name="galleryDetailDivider">@drawable/divider_gallery_detail_dark</item>
-        <item name="android:navigationBarColor">@color/colorNavigationBar</item>
+    <style name="AppTheme" parent="BaseTheme">
+        <item name="android:colorEdgeEffect">?attr/colorEdgeEffect</item>
     </style>
 
     <style name="ToolbarPopupTheme" parent="ThemeOverlay.MaterialComponents.Dark" />

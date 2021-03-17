@@ -311,6 +311,16 @@ public class Settings {
         //}
     }
 
+    public static Locale getLocale() {
+        Locale locale = null;
+        String language = Settings.getAppLanguage();
+        if (language != null && !language.equals("system")) {
+            return Locale.forLanguageTag(language);
+        } else {
+            return Locale.getDefault();
+        }
+    }
+
     private static EhConfig loadEhConfig() {
         EhConfig ehConfig = new EhConfig();
         ehConfig.imageSize = getImageResolution();
