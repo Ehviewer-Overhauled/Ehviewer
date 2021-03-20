@@ -187,6 +187,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     private int mSavingPage = -1;
 
+    private static int defaultNightMode = DayNightDelegate.MODE_NIGHT_UNSPECIFIED;
+
     ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -303,9 +305,10 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     protected void attachBaseContext(@NonNull Context newBase) {
+        if (defaultNightMode == DayNightDelegate.MODE_NIGHT_UNSPECIFIED) defaultNightMode = DayNightDelegate.getDefaultNightMode();
         switch (Settings.getReadTheme()) {
             case 0:
-                DayNightDelegate.setDefaultNightMode(Settings.getTheme());
+                DayNightDelegate.setDefaultNightMode(defaultNightMode);
                 break;
             case 1:
                 DayNightDelegate.setDefaultNightMode(DayNightDelegate.MODE_NIGHT_YES);
@@ -319,7 +322,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     public void finish() {
-        DayNightDelegate.setDefaultNightMode(Settings.getTheme());
+        DayNightDelegate.setDefaultNightMode(defaultNightMode);
+        defaultNightMode = DayNightDelegate.MODE_NIGHT_UNSPECIFIED;
         super.finish();
     }
 
@@ -393,23 +397,15 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mShowSystemUi = false;
         } else {
             Window window = getWindow();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                View decorView = window.getDecorView();
-                int flags = decorView.getSystemUiVisibility();
-                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
-                    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                } else {
-                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                }
-                decorView.setSystemUiVisibility(flags);
-                window.setStatusBarColor(AttrResources.getAttrColor(this, android.R.attr.colorBackground));
+            View decorView = window.getDecorView();
+            int flags = decorView.getSystemUiVisibility();
+            if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             } else {
-                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
-                    window.setStatusBarColor(AttrResources.getAttrColor(this, R.attr.colorPrimaryDark));
-                } else {
-                    window.setStatusBarColor(AttrResources.getAttrColor(this, android.R.attr.colorBackground));
-                }
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             }
+            decorView.setSystemUiVisibility(flags);
+            window.setStatusBarColor(AttrResources.getAttrColor(this, android.R.attr.colorBackground));
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);
