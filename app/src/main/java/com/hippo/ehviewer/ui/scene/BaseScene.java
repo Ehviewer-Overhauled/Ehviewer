@@ -253,10 +253,4 @@ public abstract class BaseScene extends SceneFragment {
         super.onResume();
         Analytics.onSceneView(this);
     }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-    }
 }
