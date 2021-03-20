@@ -15,7 +15,10 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    public static void check*(...);
+    public static void throw*(...);
+}
 -keepattributes SourceFile,LineNumberTable
 -keep class com.hippo.a7zip.* { *; }
 -keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { }
