@@ -32,11 +32,13 @@ public class AutoGridLayoutManager extends GridLayoutManager {
     private int mColumnSize = -1;
     private boolean mColumnSizeChanged = true;
     private int mStrategy;
+    private int fakePadding;
 
     private List<OnUpdateSpanCountListener> mListeners;
 
-    public AutoGridLayoutManager(Context context, int columnSize) {
+    public AutoGridLayoutManager(Context context, int columnSize, int fakePadding) {
         super(context, 1);
+        this.fakePadding = fakePadding;
         setColumnSize(columnSize);
     }
 
@@ -81,9 +83,9 @@ public class AutoGridLayoutManager extends GridLayoutManager {
         if (mColumnSizeChanged && mColumnSize > 0) {
             int totalSpace;
             if (getOrientation() == RecyclerView.VERTICAL) {
-                totalSpace = getWidth() - getPaddingRight() - getPaddingLeft();
+                totalSpace = getWidth() - getPaddingRight() - getPaddingLeft() - fakePadding;
             } else {
-                totalSpace = getHeight() - getPaddingTop() - getPaddingBottom();
+                totalSpace = getHeight() - getPaddingTop() - getPaddingBottom() - fakePadding;
             }
 
             int spanCount;

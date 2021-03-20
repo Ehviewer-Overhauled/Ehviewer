@@ -61,8 +61,6 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import rikka.recyclerview.RecyclerViewKt;
-
 public class GalleryPreviewsScene extends ToolbarScene {
 
     public static final String KEY_GALLERY_INFO = "gallery_info";
@@ -148,7 +146,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
         mAdapter = new GalleryPreviewAdapter();
         mRecyclerView.setAdapter(mAdapter);
         int columnWidth = resources.getDimensionPixelOffset(Settings.getThumbSizeResId());
-        AutoGridLayoutManager layoutManager = new AutoGridLayoutManager(context, columnWidth);
+        AutoGridLayoutManager layoutManager = new AutoGridLayoutManager(context, columnWidth, LayoutUtils.dp2pix(context, 16));
         layoutManager.setStrategy(AutoGridLayoutManager.STRATEGY_SUITABLE_SIZE);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setClipToPadding(false);
