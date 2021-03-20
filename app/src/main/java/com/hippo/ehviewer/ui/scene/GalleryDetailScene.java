@@ -788,25 +788,19 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         switch (state) {
             case STATE_NORMAL:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    setLightStatusBar(false);
-                }
+                setLightStatusBar(false);
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mBelowHeader
                 mViewTransition2.showView(0, animation);
                 break;
             case STATE_REFRESH:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    setLightStatusBar(true);
-                }
+                setLightStatusBar(true);
                 // Show mProgressView
                 mViewTransition.showView(1, animation);
                 break;
             case STATE_REFRESH_HEADER:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    setLightStatusBar(false);
-                }
+                setLightStatusBar(false);
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mProgress
@@ -815,9 +809,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             default:
             case STATE_INIT:
             case STATE_FAILED:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    setLightStatusBar(true);
-                }
+                setLightStatusBar(true);
                 // Show mFailedView
                 mViewTransition.showView(2, animation);
                 break;

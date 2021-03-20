@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.SparseArray;
@@ -32,7 +31,6 @@ import android.view.ViewGroup;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
@@ -181,7 +179,6 @@ public abstract class BaseScene extends SceneFragment {
         drawerView = null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void setLightStatusBar(boolean set) {
         View decorView = requireActivity().getWindow().getDecorView();
         int flags = decorView.getSystemUiVisibility();
@@ -214,9 +211,7 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         AppHelper.hideSoftInput(getActivity());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setLightStatusBar(needWhiteStatusBar);
-        }
+        setLightStatusBar(needWhiteStatusBar);
     }
 
     @Nullable
@@ -263,10 +258,5 @@ public abstract class BaseScene extends SceneFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (drawerView != null) {
-            drawerViewState = new SparseArray<>();
-            drawerView.saveHierarchyState(drawerViewState);
-            outState.putSparseParcelableArray(KEY_DRAWER_VIEW_STATE, drawerViewState);
-        }
     }
 }
