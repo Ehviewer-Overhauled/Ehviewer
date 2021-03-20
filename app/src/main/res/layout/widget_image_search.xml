@@ -26,7 +26,7 @@
         android:maxHeight="@dimen/image_search_max_size"
         android:visibility="gone" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/select_image"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"

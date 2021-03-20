@@ -25,7 +25,9 @@
         android:orientation="vertical"
         android:paddingLeft="@dimen/search_category_padding_h"
         android:paddingRight="@dimen/search_category_padding_h"
-        android:paddingBottom="@dimen/search_category_padding_v">
+        android:paddingBottom="@dimen/search_category_padding_v"
+        android:clipToPadding="false"
+        android:clipChildren="false">
 
         <TextView
             android:id="@+id/category_title"
@@ -37,7 +39,8 @@
         <FrameLayout
             android:id="@+id/category_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:clipChildren="false" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
