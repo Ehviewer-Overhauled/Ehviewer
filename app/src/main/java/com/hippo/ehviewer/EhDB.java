@@ -515,6 +515,13 @@ public class EhDB {
         quickSearch.id = dao.insert(quickSearch);
     }
 
+    public static synchronized void importQuickSearch(List<QuickSearch> quickSearchList) {
+        QuickSearchDao dao = sDaoSession.getQuickSearchDao();
+        for (QuickSearch quickSearch : quickSearchList) {
+            dao.insert(quickSearch);
+        }
+    }
+
     public static synchronized void updateQuickSearch(QuickSearch quickSearch) {
         QuickSearchDao dao = sDaoSession.getQuickSearchDao();
         dao.update(quickSearch);
@@ -747,6 +754,7 @@ public class EhDB {
             // QuickSearch
             List<QuickSearch> quickSearchList = session.getQuickSearchDao().queryBuilder().list();
             List<QuickSearch> currentQuickSearchList = sDaoSession.getQuickSearchDao().queryBuilder().list();
+            List<QuickSearch> importList = new ArrayList<>();
             for (QuickSearch quickSearch : quickSearchList) {
                 String name = quickSearch.name;
                 for (QuickSearch q : currentQuickSearchList) {
@@ -759,8 +767,9 @@ public class EhDB {
                 if (null == name) {
                     continue;
                 }
-                insertQuickSearch(quickSearch);
+                importList.add(quickSearch);
             }
+            importQuickSearch(importList);
 
             // LocalFavorites
             List<LocalFavoriteInfo> localFavoriteInfoList = session.getLocalFavoritesDao().queryBuilder().list();
