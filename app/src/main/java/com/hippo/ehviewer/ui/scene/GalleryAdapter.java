@@ -153,7 +153,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         switch (viewType) {
             default:
             case TYPE_LIST:
-                layoutId = R.layout.item_history;
+                layoutId = R.layout.item_gallery_list;
                 break;
             case TYPE_GRID:
                 layoutId = R.layout.item_gallery_grid;

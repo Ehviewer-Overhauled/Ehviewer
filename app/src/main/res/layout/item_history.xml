@@ -18,8 +18,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false"
-    android:clipToPadding="false"
-    android:paddingHorizontal="@dimen/gallery_list_margin_v">
+    android:clipToPadding="false">
 
     <include layout="@layout/item_gallery_list" />
 
