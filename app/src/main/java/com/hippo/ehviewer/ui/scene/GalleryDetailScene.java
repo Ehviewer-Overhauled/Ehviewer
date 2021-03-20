@@ -443,6 +443,19 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mRead != null) {
+            GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+            galleryProvider.start();
+            int startPage = galleryProvider.getStartPage();
+            if (startPage != 0) {
+                mRead.setText(getString(R.string.read_from, startPage + 1));
+            }
+        }
+    }
+
     private void onInit() {
         handleArgs(getArguments());
     }
@@ -528,7 +541,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         galleryProvider.start();
         int startPage = galleryProvider.getStartPage();
         if (startPage != 0) {
-            mRead.setText(getString(R.string.read_from, startPage));
+            mRead.setText(getString(R.string.read_from, startPage + 1));
         }
         mUploader.setOnClickListener(this);
         mCategory.setOnClickListener(this);
