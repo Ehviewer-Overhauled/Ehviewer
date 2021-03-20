@@ -119,7 +119,7 @@ public class EasyRecyclerView extends ScrollLessRecyclerView {
      */
     private LongSparseArray<Integer> mCheckedIdStates;
 
-    private Adapter mAdapter;
+    private Adapter<?> mAdapter;
 
     public EasyRecyclerView(Context context) {
         super(context);
@@ -158,6 +158,18 @@ public class EasyRecyclerView extends ScrollLessRecyclerView {
 
         if (mCheckedIdStates != null) {
             mCheckedIdStates.clear();
+        }
+    }
+
+    @Override
+    public void onChildAttachedToWindow(@NonNull View child) {
+        super.onChildAttachedToWindow(child);
+
+        if (mCheckStates != null) {
+            int position = getChildAdapterPosition(child);
+            if (position >= 0) {
+                setViewChecked(child, mCheckStates.get(position));
+            }
         }
     }
 
