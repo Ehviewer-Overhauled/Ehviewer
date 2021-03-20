@@ -129,6 +129,5 @@
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
-    <color name="colorNavigationBar">@color/colorPrimaryDark</color>
     <color name="colorBackground">#fff</color>
 </resources>

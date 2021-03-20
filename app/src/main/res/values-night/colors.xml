@@ -39,6 +39,5 @@
     <color name="lock_pattern_view_regular_color">#8affffff</color>
 
     <!--Shortcut background-->
-    <color name="colorNavigationBar">@color/colorBackground</color>
     <color name="colorBackground">#303030</color>
 </resources>

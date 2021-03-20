@@ -17,6 +17,5 @@
 <resources>
 
     <!-- Custom preference -->
-    <dimen name="preference_widget_width">64dp</dimen>
 
 </resources>

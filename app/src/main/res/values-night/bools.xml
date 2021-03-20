@@ -16,6 +16,4 @@
 
 <resources>
 
-    <bool name="lightNavigationBar">false</bool>
-
 </resources>

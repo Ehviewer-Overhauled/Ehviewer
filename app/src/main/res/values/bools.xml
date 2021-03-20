@@ -17,6 +17,5 @@
 <resources>
 
     <bool name="dad_spin_bars">true</bool>
-    <bool name="lightNavigationBar">true</bool>
 
 </resources>
