@@ -73,7 +73,7 @@ public class EhDns implements Dns {
         hosts = EhApplication.getHosts(context);
         DnsOverHttps.Builder builder = new DnsOverHttps.Builder()
                 .client(new OkHttpClient.Builder().cache(EhApplication.getOkHttpCache(context)).build())
-                .url(HttpUrl.get("https://1.1.1.1/dns-query"));
+                .url(HttpUrl.get("https://101.6.6.6:8443/dns-query"));
         dnsOverHttps = builder.post(true).build();
     }
 
