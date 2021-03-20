@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<rikka.widget.borderview.BorderRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.hippo.easyrecyclerview.EasyRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Indicating"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
