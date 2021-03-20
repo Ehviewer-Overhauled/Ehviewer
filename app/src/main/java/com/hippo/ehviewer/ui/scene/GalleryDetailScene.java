@@ -1016,7 +1016,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
             mPreviewText.setText(R.string.no_previews);
             return;
-        } else if (gd.previewPages == 1) {
+        } else if (gd.previewPages == 1 && previewSet.size() <= 60) {
             mPreviewText.setText(R.string.no_more_previews);
         } else {
             mPreviewText.setText(R.string.more_previews);
@@ -1025,7 +1025,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         int columnWidth = resources.getDimensionPixelOffset(Settings.getThumbSizeResId());
         mGridLayout.setColumnSize(columnWidth);
         mGridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE);
-        for (int i = 0, size = previewSet.size(); i < size; i++) {
+        int size = Math.min(60, previewSet.size());
+        for (int i = 0; i < size; i++) {
             View view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false);
             mGridLayout.addView(view);
 
