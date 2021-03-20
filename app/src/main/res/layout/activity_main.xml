@@ -14,9 +14,8 @@
   ~ limitations under the License.
   -->
 
-<com.hippo.widget.SafeCoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/snackbar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
@@ -24,22 +23,29 @@
     app:edgeToEdge="true"
     app:fitSystemWindowsInsets="start|end">
 
-    <com.hippo.ehviewer.widget.EhDrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="false">
+        android:fitsSystemWindows="true">
 
-        <com.drakeet.drawer.FullDraggableContainer
+        <com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
 
-            <com.hippo.scene.StageLayout
-                android:id="@+id/fragment_container"
+            <com.hippo.widget.SafeCoordinatorLayout
+                android:id="@+id/snackbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
 
-        </com.drakeet.drawer.FullDraggableContainer>
+                <com.hippo.ehviewer.widget.EhStageLayout
+                    android:id="@+id/fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.hippo.widget.SafeCoordinatorLayout>
+
+        </com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
@@ -58,8 +64,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:background="@android:color/transparent"
-            android:fitsSystemWindows="true"
+            android:fitsSystemWindows="false"
             android:maxWidth="@dimen/drawer_max_width" />
 
-    </com.hippo.ehviewer.widget.EhDrawerLayout>
-</com.hippo.widget.SafeCoordinatorLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</FrameLayout>

@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -38,11 +37,8 @@ import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.Analytics;
-import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.scene.SceneFragment;
 import com.hippo.util.AppHelper;
 
@@ -195,8 +191,6 @@ public abstract class BaseScene extends SceneFragment {
             flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         }
         decorView.setSystemUiVisibility(flags);
-        int color = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || set ? Color.TRANSPARENT : AttrResources.getAttrColor(requireContext(), R.attr.colorPrimaryDark);
-        ((EhDrawerLayout) requireActivity().findViewById(R.id.draw_view)).setStatusBarBackgroundColor(color);
         needWhiteStatusBar = set;
     }
 

@@ -72,7 +72,6 @@ import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
 import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
-import com.hippo.ehviewer.widget.EhDrawerLayout;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.scene.Announcer;
@@ -91,8 +90,6 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import rikka.recyclerview.RecyclerViewKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")
@@ -136,7 +133,7 @@ public class FavoritesScene extends BaseScene implements
     private DrawerArrowDrawable mLeftDrawable;
     private AddDeleteDrawable mActionFabDrawable;
     @Nullable
-    private EhDrawerLayout mDrawerLayout;
+    private DrawerLayout mDrawerLayout;
     @Nullable
     @DrawerLifeCircle
     private FavDrawerAdapter mDrawerAdapter;
@@ -255,7 +252,7 @@ public class FavoritesScene extends BaseScene implements
         mContentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getMainActivity();
         AssertUtils.assertNotNull(activity);
-        mDrawerLayout = (EhDrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
+        mDrawerLayout = (DrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchBar = (SearchBar) ViewUtils.$$(view, R.id.search_bar);
