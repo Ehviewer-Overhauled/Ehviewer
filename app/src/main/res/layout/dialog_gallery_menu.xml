@@ -185,6 +185,13 @@
             android:textColor="?android:attr/textColorPrimary" />
 
         <Switch
+            android:id="@+id/reverse_volume_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_read_reverse_volume"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <Switch
             android:id="@+id/reading_fullscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

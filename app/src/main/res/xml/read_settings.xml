@@ -99,6 +99,13 @@
         app:iconSpaceReserved="false" />
 
     <SwitchPreference
+        android:defaultValue="false"
+        android:key="reserve_volume_page"
+        android:title="@string/settings_read_reverse_volume"
+        android:dependency="volume_page"
+        app:iconSpaceReserved="false" />
+
+    <SwitchPreference
         android:defaultValue="true"
         android:key="reading_fullscreen"
         android:title="@string/settings_read_reading_fullscreen"

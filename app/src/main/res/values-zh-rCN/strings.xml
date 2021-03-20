@@ -498,6 +498,7 @@
     <string name="settings_read_reading_fullscreen">全屏</string>
     <string name="settings_read_custom_screen_lightness">自定义屏幕亮度</string>
     <string name="settings_read_screen_lightness">屏幕亮度</string>
+    <string name="settings_read_reverse_volume">翻转音量键</string>
 
     <string name="settings_download">下载</string>
     <string name="settings_download_download_location">下载路径</string>

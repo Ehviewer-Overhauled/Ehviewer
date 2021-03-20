@@ -305,7 +305,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     protected void attachBaseContext(@NonNull Context newBase) {
-        if (defaultNightMode == DayNightDelegate.MODE_NIGHT_UNSPECIFIED) defaultNightMode = DayNightDelegate.getDefaultNightMode();
+        if (defaultNightMode == DayNightDelegate.MODE_NIGHT_UNSPECIFIED)
+            defaultNightMode = DayNightDelegate.getDefaultNightMode();
         switch (Settings.getReadTheme()) {
             case 0:
                 DayNightDelegate.setDefaultNightMode(defaultNightMode);
@@ -543,6 +544,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
         // Check volume
         if (Settings.getVolumePage()) {
+            if (Settings.getReverseVolumePage()) {
+                if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                    keyCode = KeyEvent.KEYCODE_VOLUME_DOWN;
+                } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                    keyCode = KeyEvent.KEYCODE_VOLUME_UP;
+                }
+            }
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                 if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
                     mGalleryView.pageRight();
@@ -981,6 +989,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         private final Switch mShowBattery;
         private final Switch mShowPageInterval;
         private final Switch mVolumePage;
+        private final Switch mReverseVolumePage;
         private final Switch mReadingFullscreen;
         private final Switch mCustomScreenLightness;
         private final SeekBar mScreenLightness;
@@ -999,6 +1008,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mShowBattery = mView.findViewById(R.id.show_battery);
             mShowPageInterval = mView.findViewById(R.id.show_page_interval);
             mVolumePage = mView.findViewById(R.id.volume_page);
+            mReverseVolumePage = mView.findViewById(R.id.reverse_volume_page);
             mReadingFullscreen = mView.findViewById(R.id.reading_fullscreen);
             mCustomScreenLightness = mView.findViewById(R.id.custom_screen_lightness);
             mScreenLightness = mView.findViewById(R.id.screen_lightness);
@@ -1014,6 +1024,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mShowBattery.setChecked(Settings.getShowBattery());
             mShowPageInterval.setChecked(Settings.getShowPageInterval());
             mVolumePage.setChecked(Settings.getVolumePage());
+            mVolumePage.setOnCheckedChangeListener((buttonView, isChecked) -> mReverseVolumePage.setEnabled(isChecked));
+            mReverseVolumePage.setEnabled(mVolumePage.isChecked());
+            mReverseVolumePage.setChecked(Settings.getReverseVolumePage());
             mReadingFullscreen.setChecked(Settings.getReadingFullscreen());
             mCustomScreenLightness.setChecked(Settings.getCustomScreenLightness());
             mScreenLightness.setProgress(Settings.getScreenLightness());
@@ -1043,6 +1056,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             boolean showBattery = mShowBattery.isChecked();
             boolean showPageInterval = mShowPageInterval.isChecked();
             boolean volumePage = mVolumePage.isChecked();
+            boolean reverseVolumePage = mReverseVolumePage.isChecked();
             boolean readingFullscreen = mReadingFullscreen.isChecked();
             boolean customScreenLightness = mCustomScreenLightness.isChecked();
             int screenLightness = mScreenLightness.getProgress();
@@ -1061,6 +1075,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             Settings.putShowBattery(showBattery);
             Settings.putShowPageInterval(showPageInterval);
             Settings.putVolumePage(volumePage);
+            Settings.putReverseVolumePage(reverseVolumePage);
             Settings.putReadingFullscreen(readingFullscreen);
             Settings.putCustomScreenLightness(customScreenLightness);
             Settings.putScreenLightness(screenLightness);

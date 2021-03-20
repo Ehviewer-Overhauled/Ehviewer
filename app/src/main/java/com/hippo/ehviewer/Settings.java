@@ -159,6 +159,8 @@ public class Settings {
     private static final boolean DEFAULT_SHOW_PAGE_INTERVAL = true;
     private static final String KEY_VOLUME_PAGE = "volume_page";
     private static final boolean DEFAULT_VOLUME_PAGE = false;
+    private static final String KEY_REVERSE_VOLUME_PAGE = "reserve_volume_page";
+    private static final boolean DEFAULT_REVERSE_VOLUME_PAGE = false;
     private static final String KEY_READING_FULLSCREEN = "reading_fullscreen";
     private static final boolean VALUE_READING_FULLSCREEN = true;
     private static final String KEY_CUSTOM_SCREEN_LIGHTNESS = "custom_screen_lightness";
@@ -695,6 +697,14 @@ public class Settings {
 
     public static void putVolumePage(boolean value) {
         putBoolean(KEY_VOLUME_PAGE, value);
+    }
+
+    public static boolean getReverseVolumePage() {
+        return getBoolean(KEY_REVERSE_VOLUME_PAGE, DEFAULT_REVERSE_VOLUME_PAGE);
+    }
+
+    public static void putReverseVolumePage(boolean value) {
+        putBoolean(KEY_REVERSE_VOLUME_PAGE, value);
     }
 
     public static boolean getReadingFullscreen() {

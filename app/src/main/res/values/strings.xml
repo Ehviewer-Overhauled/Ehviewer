@@ -543,6 +543,7 @@
     <string name="settings_read_reading_fullscreen">Fullscreen</string>
     <string name="settings_read_custom_screen_lightness">Custom screen lightness</string>
     <string name="settings_read_screen_lightness">Screen lightness</string>
+    <string name="settings_read_reverse_volume">Reverse volume key</string>
 
     <string name="settings_download">Download</string>
     <string name="settings_download_download_location">Download location</string>
