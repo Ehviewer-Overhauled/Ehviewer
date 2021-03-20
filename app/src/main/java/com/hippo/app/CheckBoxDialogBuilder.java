@@ -39,6 +39,7 @@ public class CheckBoxDialogBuilder extends AlertDialog.Builder {
         mCheckBox = view.findViewById(R.id.checkbox);
         mCheckBox.setText(checkText);
         mCheckBox.setChecked(checked);
+        view.setOnClickListener(v -> mCheckBox.toggle());
     }
 
     public boolean isChecked() {
