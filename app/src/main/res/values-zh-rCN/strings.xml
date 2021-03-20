@@ -749,4 +749,5 @@
     <string name="comment_user_uploader">%s （上传者）</string>
     <string name="settings_eh_metered_network_warning">流量计费网络警告</string>
     <string name="metered_network_warning">正在使用流量计费网络</string>
+    <string name="read_from">从第 %d 页阅读</string>
 </resources>

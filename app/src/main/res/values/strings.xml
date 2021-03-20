@@ -813,4 +813,5 @@
     <string name="comment_user_uploader">%s (Uploader)</string>
     <string name="settings_eh_metered_network_warning">Metered network warning</string>
     <string name="metered_network_warning">Connected to metered networks</string>
+    <string name="read_from">Read page %d</string>
 </resources>

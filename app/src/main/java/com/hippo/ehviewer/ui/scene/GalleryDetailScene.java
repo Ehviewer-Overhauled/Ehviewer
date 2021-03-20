@@ -94,6 +94,8 @@ import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
+import com.hippo.ehviewer.gallery.EhGalleryProvider;
+import com.hippo.ehviewer.gallery.GalleryProvider2;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -178,7 +180,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     @Nullable
     private TextView mDownload;
     @Nullable
-    private View mRead;
+    private TextView mRead;
     // Below header
     @Nullable
     private View mBelowHeader;
@@ -521,7 +523,13 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mOtherActions = (ImageView) ViewUtils.$$(mHeader, R.id.other_actions);
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
         mDownload = (TextView) ViewUtils.$$(mActionGroup, R.id.download);
-        mRead = ViewUtils.$$(mActionGroup, R.id.read);
+        mRead = (TextView) ViewUtils.$$(mActionGroup, R.id.read);
+        GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+        galleryProvider.start();
+        int startPage = galleryProvider.getStartPage();
+        if (startPage != 0) {
+            mRead.setText(getString(R.string.read_from, startPage));
+        }
         mUploader.setOnClickListener(this);
         mCategory.setOnClickListener(this);
         mOtherActions.setOnClickListener(this);
