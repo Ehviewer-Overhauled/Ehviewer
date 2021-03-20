@@ -253,4 +253,15 @@ public abstract class BaseScene extends SceneFragment {
         super.onResume();
         Analytics.onSceneView(this);
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (drawerView != null) {
+            drawerViewState = new SparseArray<>();
+            drawerView.saveHierarchyState(drawerViewState);
+            outState.putSparseParcelableArray(KEY_DRAWER_VIEW_STATE, drawerViewState);
+        }
+    }
 }
