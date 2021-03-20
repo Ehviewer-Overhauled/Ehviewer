@@ -280,8 +280,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         mRefreshLayout.setOnRefreshListener(this);
 
         Context context = requireContext();
-        Resources resources = getResources();
-        int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
 
         Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
@@ -300,8 +298,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         decoration.setShowLastDivider(true);
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(), mRecyclerView.getPaddingTop(),
-                mRecyclerView.getPaddingRight(), mRecyclerView.getPaddingBottom() + paddingBottomFab);
         // Cancel change animator
         RecyclerView.ItemAnimator itemAnimator = mRecyclerView.getItemAnimator();
         if (itemAnimator instanceof DefaultItemAnimator) {
