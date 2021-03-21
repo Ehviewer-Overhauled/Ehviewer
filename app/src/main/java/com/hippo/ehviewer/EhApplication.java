@@ -36,7 +36,6 @@ import androidx.collection.LruCache;
 import com.hippo.a7zip.A7Zip;
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.conaco.Conaco;
-import com.hippo.content.RecordingApplication;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhDns;
@@ -52,6 +51,7 @@ import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.image.Image;
 import com.hippo.image.ImageBitmap;
 import com.hippo.network.StatusCodeException;
+import com.hippo.scene.SceneApplication;
 import com.hippo.text.Html;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
@@ -86,7 +86,7 @@ import okhttp3.Request;
 import rikka.material.app.DayNightDelegate;
 import rikka.material.app.LocaleDelegate;
 
-public class EhApplication extends RecordingApplication {
+public class EhApplication extends SceneApplication {
 
     public static final boolean BETA = false;
     private static final String TAG = EhApplication.class.getSimpleName();

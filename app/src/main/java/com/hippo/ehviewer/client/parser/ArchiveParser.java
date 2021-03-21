@@ -43,6 +43,6 @@ public class ArchiveParser {
             Pair<String, String> item = new Pair<>(res, name);
             archiveList.add(item);
         }
-        return new Pair<String, Pair<String, String>[]>(paramOr, archiveList.toArray(new Pair[archiveList.size()]));
+        return new Pair<>(paramOr, archiveList.toArray(new Pair[0]));
     }
 }

@@ -19,7 +19,6 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.ui.SettingsActivity;
 import com.hippo.ehviewer.widget.DialogWebChromeClient;
 
 import okhttp3.Cookie;
@@ -36,7 +35,6 @@ public class MyTagsFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_webview, container, false);
-        ((SettingsActivity) requireActivity()).getDelegate().applyDayNight();
         webView = view.findViewById(R.id.webview);
         webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
         webView.getSettings().setBuiltInZoomControls(true);
