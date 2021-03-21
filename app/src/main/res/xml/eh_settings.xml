@@ -58,7 +58,7 @@
         android:entryValues="@array/night_mode_values"
         android:key="theme"
         android:summary="%s"
-        android:title="@string/settings_eh_theme"
+        android:title="@string/dark_theme"
         app:iconSpaceReserved="false" />
 
     <SwitchPreference

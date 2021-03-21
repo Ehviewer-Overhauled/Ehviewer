@@ -18,14 +18,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="160dp"
-    android:drawSelectorOnTop="true"
     android:orientation="vertical">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"
-        android:drawSelectorOnTop="true"
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/sadpanda_low_poly" />
 
@@ -58,14 +56,14 @@
 
         <ImageView
             android:id="@+id/night_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:padding="8dp"
+            android:padding="6dp"
             app:tint="#fff"
-            app:srcCompat="@drawable/ic_baseline_brightness_2_24" />
+            app:srcCompat="@drawable/ic_baseline_dark_mode_24" />
     </FrameLayout>
 
 </FrameLayout>
