@@ -720,6 +720,7 @@ public final class GalleryListScene extends BaseScene
                 TapTarget.forBounds(bounds,
                         getString(R.string.guide_quick_search_title),
                         getString(R.string.guide_quick_search_text))
+                        .outerCircleColor(R.color.colorPrimary)
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
                     @Override

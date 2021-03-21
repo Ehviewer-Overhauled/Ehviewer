@@ -447,11 +447,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     public void onResume() {
         super.onResume();
         if (mRead != null) {
-            GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
-            galleryProvider.start();
-            int startPage = galleryProvider.getStartPage();
-            if (startPage != 0) {
-                mRead.setText(getString(R.string.read_from, startPage + 1));
+            try {
+                GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+                galleryProvider.start();
+                int startPage = galleryProvider.getStartPage();
+                if (startPage != 0) {
+                    mRead.setText(getString(R.string.read_from, startPage + 1));
+                }
+            } catch (Exception ignore) {
+
             }
         }
     }
@@ -537,11 +541,15 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
         mDownload = (TextView) ViewUtils.$$(mActionGroup, R.id.download);
         mRead = (TextView) ViewUtils.$$(mActionGroup, R.id.read);
-        GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
-        galleryProvider.start();
-        int startPage = galleryProvider.getStartPage();
-        if (startPage != 0) {
-            mRead.setText(getString(R.string.read_from, startPage + 1));
+        try {
+            GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+            galleryProvider.start();
+            int startPage = galleryProvider.getStartPage();
+            if (startPage != 0) {
+                mRead.setText(getString(R.string.read_from, startPage + 1));
+            }
+        } catch (Exception ignore) {
+
         }
         mUploader.setOnClickListener(this);
         mCategory.setOnClickListener(this);

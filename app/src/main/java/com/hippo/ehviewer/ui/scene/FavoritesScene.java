@@ -376,6 +376,7 @@ public class FavoritesScene extends BaseScene implements
                 TapTarget.forBounds(bounds,
                         getString(R.string.guide_collections_title),
                         getString(R.string.guide_collections_text))
+                        .outerCircleColor(R.color.colorPrimary)
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
                     @Override

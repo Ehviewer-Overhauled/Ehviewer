@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
@@ -110,7 +111,8 @@ public abstract class EhActivity extends MaterialActivity {
         window.setStatusBarColor(Color.TRANSPARENT);
 
         window.getDecorView().post(() -> {
-            if (window.getDecorView().getRootWindowInsets().getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
+            WindowInsets rootWindowInsets = window.getDecorView().getRootWindowInsets();
+            if (rootWindowInsets != null && rootWindowInsets.getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
                 window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     window.setNavigationBarContrastEnforced(false);
