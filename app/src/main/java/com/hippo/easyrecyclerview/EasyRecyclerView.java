@@ -35,8 +35,7 @@ import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.NumberUtils;
 
 /**
- * Add setOnItemClickListener, setOnItemLongClickListener and setChoiceMode for
- * RecyclerView
+ * Add setChoiceMode for RecyclerView
  */
 // Get some code from twoway-view and AbsListView.
 public class EasyRecyclerView extends ScrollLessRecyclerView {

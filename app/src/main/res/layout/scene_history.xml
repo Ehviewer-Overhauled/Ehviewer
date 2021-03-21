@@ -38,7 +38,8 @@
             android:paddingLeft="20dp"
             android:paddingTop="8dp"
             android:paddingRight="4dp"
-            android:paddingBottom="8dp" />
+            android:paddingBottom="8dp"
+            app:fitSystemWindowsInsets="bottom" />
 
     </FrameLayout>
 

@@ -71,8 +71,8 @@ public class ContentLayout extends FrameLayout {
 
     private ContentHelper<?> mContentHelper;
 
-    private int mRecyclerViewOriginTop;
     private int mRecyclerViewOriginBottom;
+    private int mFastScrollerOriginBottom;
 
     public ContentLayout(Context context) {
         super(context);
@@ -128,6 +128,7 @@ public class ContentLayout extends FrameLayout {
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();
+        mFastScrollerOriginBottom = mFastScroller.getPaddingBottom();
     }
 
     @NonNull
@@ -172,11 +173,15 @@ public class ContentLayout extends FrameLayout {
     public void setFitPaddingBottom(int fitPaddingBottom) {
         // RecyclerView
         mRecyclerView.setPadding(mRecyclerView.getPaddingLeft(),
-                mRecyclerView.getPaddingTop(), mRecyclerView.getPaddingRight(),
+                mRecyclerView.getPaddingTop(),
+                mRecyclerView.getPaddingRight(),
                 mRecyclerViewOriginBottom + fitPaddingBottom);
         mTipView.setPadding(mTipView.getPaddingLeft(), mTipView.getPaddingTop(), mTipView.getPaddingRight(), fitPaddingBottom);
         mProgressView.setPadding(mProgressView.getPaddingLeft(), mProgressView.getPaddingTop(), mProgressView.getPaddingRight(), fitPaddingBottom);
-        mFastScroller.setPadding(mFastScroller.getPaddingLeft(), mFastScroller.getPaddingTop(), mFastScroller.getPaddingRight(), fitPaddingBottom);
+        mFastScroller.setPadding(mFastScroller.getPaddingLeft(),
+                mFastScroller.getPaddingTop(),
+                mFastScroller.getPaddingRight(),
+                mFastScrollerOriginBottom + fitPaddingBottom);
         if (fitPaddingBottom > LayoutUtils.dp2pix(getContext(), 16)) {
             mBottomProgress.setPadding(0, 0, 0, fitPaddingBottom);
         } else {

@@ -56,7 +56,7 @@ public class FastScroller extends View {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.OnScrollListener mOnScrollChangeListener;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter<?> mAdapter;
     private RecyclerView.AdapterDataObserver mAdapterDataObserver;
 
     private Drawable mHandler;
