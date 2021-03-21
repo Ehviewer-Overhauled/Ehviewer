@@ -26,9 +26,8 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:fadeScrollbars="true"
-    android:paddingTop="?actionBarSize"
     android:scrollbarStyle="outsideOverlay"
     android:scrollbars="vertical"
-    app:fitSystemWindowsInsets="bottom|top"
+    app:fitSystemWindowsInsets="bottom"
     tools:ignore="UnusedResources"
     tools:viewBindingIgnore="true" />
