@@ -114,4 +114,10 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="ShapeAppearanceOverlay.MaterialComponents.NavigationView" parent="">
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

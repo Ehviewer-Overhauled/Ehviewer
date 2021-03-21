@@ -53,8 +53,11 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:background="?android:attr/colorBackground"
-            android:fitsSystemWindows="true"
             app:headerLayout="@layout/nav_header_main"
+            app:itemShapeInsetStart="0dp"
+            app:itemShapeInsetTop="0dp"
+            app:itemShapeInsetBottom="0dp"
+            app:itemShapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.NavigationView"
             app:insetForeground="@null"
             app:menu="@menu/nav_drawer_main" />
 
