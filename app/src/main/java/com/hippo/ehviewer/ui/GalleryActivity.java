@@ -187,8 +187,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     private int mSavingPage = -1;
 
-    private static int defaultNightMode = DayNightDelegate.MODE_NIGHT_UNSPECIFIED;
-
     ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -305,27 +303,20 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     protected void attachBaseContext(@NonNull Context newBase) {
-        if (defaultNightMode == DayNightDelegate.MODE_NIGHT_UNSPECIFIED)
-            defaultNightMode = DayNightDelegate.getDefaultNightMode();
         switch (Settings.getReadTheme()) {
-            case 0:
-                DayNightDelegate.setDefaultNightMode(defaultNightMode);
-                break;
             case 1:
-                DayNightDelegate.setDefaultNightMode(DayNightDelegate.MODE_NIGHT_YES);
+                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_YES, false);
                 break;
             case 2:
-                DayNightDelegate.setDefaultNightMode(DayNightDelegate.MODE_NIGHT_NO);
+                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_NO, false);
                 break;
         }
         super.attachBaseContext(newBase);
     }
 
     @Override
-    public void finish() {
-        DayNightDelegate.setDefaultNightMode(defaultNightMode);
-        defaultNightMode = DayNightDelegate.MODE_NIGHT_UNSPECIFIED;
-        super.finish();
+    public boolean respectDefaultNightMode() {
+        return Settings.getReadTheme() == 0;
     }
 
     @Override
