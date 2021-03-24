@@ -454,6 +454,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 if (startPage != 0) {
                     mRead.setText(getString(R.string.read_from, startPage + 1));
                 }
+                galleryProvider.stop();
             } catch (Exception ignore) {
 
             }
@@ -548,6 +549,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             if (startPage != 0) {
                 mRead.setText(getString(R.string.read_from, startPage + 1));
             }
+            galleryProvider.stop();
         } catch (Exception ignore) {
 
         }
