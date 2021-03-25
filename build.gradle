@@ -8,7 +8,7 @@ buildscript {
         maven { url "https://storage.googleapis.com/r8-releases/raw" }
     }
     dependencies {
-        classpath 'com.android.tools:r8:3.0.27-dev'
+        classpath 'com.android.tools:r8:3.0.28-dev'
         classpath 'com.android.tools.build:gradle:7.0.0-alpha11'
 
         // NOTE: Do not place your application dependencies here; they belong
