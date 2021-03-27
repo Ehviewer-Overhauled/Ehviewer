@@ -55,6 +55,8 @@
         android:elevation="4dp"
         android:orientation="horizontal"
         android:visibility="invisible"
+        android:outlineAmbientShadowColor="?attr/widgetColorThemePrimary"
+        android:outlineSpotShadowColor="?attr/widgetColorThemePrimary"
         app:fitSystemWindowsInsets="bottom">
 
         <EditText
@@ -94,12 +96,10 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:backgroundTint="?attr/widgetColorThemePrimary"
-            app:srcCompat="@drawable/v_reply_dark_x24"
-            app:tint="#fff" />
+            app:srcCompat="@drawable/v_reply_dark_x24" />
 
     </com.hippo.widget.FabLayout>
 </FrameLayout>

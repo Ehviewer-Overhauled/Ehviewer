@@ -51,38 +51,27 @@
         app:fitSystemWindowsInsets="top|bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/v_magnify_x24"
-            app:tint="#fff" />
+            app:srcCompat="@drawable/v_magnify_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/v_go_to_dark_x24"
-            app:tint="#fff" />
+            app:srcCompat="@drawable/v_go_to_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/v_refresh_dark_x24"
-            app:tint="#fff" />
+            app:srcCompat="@drawable/v_refresh_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:backgroundTint="?attr/widgetColorThemePrimary"
-            app:tint="#fff" />
+            android:layout_height="wrap_content" />
 
     </com.hippo.widget.FabLayout>
 
@@ -95,15 +84,13 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/search_fab"
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            style="@style/Widget.FloatingActionButton.Accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleX="0"
             android:scaleY="0"
             android:visibility="invisible"
-            app:backgroundTint="?attr/widgetColorThemeAccent"
-            app:srcCompat="@drawable/v_magnify_x24"
-            app:tint="#fff" />
+            app:srcCompat="@drawable/v_magnify_x24" />
 
     </com.hippo.widget.FabLayout>
 </FrameLayout>

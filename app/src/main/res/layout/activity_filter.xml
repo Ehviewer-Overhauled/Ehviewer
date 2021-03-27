@@ -38,15 +38,13 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fab"
-        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        style="@style/Widget.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/corner_fab_margin"
         android:layout_marginBottom="@dimen/corner_fab_margin"
         android:layout_gravity="bottom|end"
-        app:backgroundTint="?attr/widgetColorThemePrimary"
         app:srcCompat="@drawable/v_plus_dark_x24"
-        app:tint="#fff"
         app:layout_fitSystemWindowsInsets="bottom" />
 
 </FrameLayout>

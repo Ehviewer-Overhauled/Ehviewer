@@ -153,4 +153,22 @@
         <item name="colorControlActivated">@color/yellow_800</item>
     </style>
 
+    <style name="Widget.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="android:outlineAmbientShadowColor">?attr/widgetColorThemePrimary</item>
+        <item name="android:outlineSpotShadowColor">?attr/widgetColorThemePrimary</item>
+        <item name="backgroundTint">?attr/widgetColorThemePrimary</item>
+        <item name="tint">#fff</item>
+    </style>
+
+    <style name="Widget.FloatingActionButton.Accent" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="android:outlineAmbientShadowColor">?attr/widgetColorThemeAccent</item>
+        <item name="android:outlineSpotShadowColor">?attr/widgetColorThemeAccent</item>
+        <item name="backgroundTint">?attr/widgetColorThemeAccent</item>
+        <item name="tint">#fff</item>
+    </style>
+
+    <style name="Widget.FloatingActionButton.Accent.Mini" parent="Widget.FloatingActionButton.Accent">
+        <item name="fabSize">mini</item>
+    </style>
+
 </resources>
