@@ -82,7 +82,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="16dp"
-            app:tint="#fff" />
+            app:tint="?colorOnPrimarySurface" />
 
     </LinearLayout>
 
