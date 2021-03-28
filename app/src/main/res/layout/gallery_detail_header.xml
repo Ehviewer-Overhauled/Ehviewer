@@ -36,7 +36,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="24dp" />
+            android:layout_height="28dp" />
 
     </LinearLayout>
 
@@ -105,7 +105,7 @@
                 android:textAllCaps="true"
                 android:textStyle="bold" />
 
-            <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            <ImageView
                 android:id="@+id/other_actions"
                 android:layout_width="48dp"
                 android:layout_height="56dp"
@@ -123,7 +123,7 @@
 
         </RelativeLayout>
 
-        <com.google.android.material.card.MaterialCardView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/action_card"
             style="@style/CardView.Normal"
             android:layout_width="match_parent"

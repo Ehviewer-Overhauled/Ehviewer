@@ -46,7 +46,13 @@
 
         </LinearLayout>
 
-        <include layout="@layout/gallery_detail_progress" />
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/ProgressView"
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/keyline_margin" />
 
     </FrameLayout>
 </LinearLayout>
