@@ -156,7 +156,6 @@ public class EhApplication extends SceneApplication {
                     .callTimeout(10, TimeUnit.SECONDS)
                     .cookieJar(getEhCookieStore(application))
                     .cache(getOkHttpCache(application))
-                    .hostnameVerifier((hostname, session) -> true)
                     .dns(new EhDns(application))
                     .addNetworkInterceptor(chain -> {
                         try {
