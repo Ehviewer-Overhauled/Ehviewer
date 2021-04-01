@@ -512,14 +512,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
 
         ViewGroup main = (ViewGroup) ViewUtils.$$(view, R.id.main);
         ScrollView mainView = (ScrollView) ViewUtils.$$(main, R.id.scroll_view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            mainView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                if (mActionGroup != null && mHeader != null) {
-                    //noinspection IntegerDivisionInFloatingPointContext
-                    setLightStatusBar(mActionGroup.getY() - mHeader.findViewById(R.id.header_content).getPaddingTop() / 2 < scrollY);
-                }
-            });
-        }
+        mainView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (mActionGroup != null && mHeader != null) {
+                //noinspection IntegerDivisionInFloatingPointContext
+                setLightStatusBar(mActionGroup.getY() - mHeader.findViewById(R.id.header_content).getPaddingTop() / 2 < scrollY);
+            }
+        });
         View progressView = ViewUtils.$$(main, R.id.progress_view);
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);
@@ -542,17 +540,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
         mDownload = (TextView) ViewUtils.$$(mActionGroup, R.id.download);
         mRead = (TextView) ViewUtils.$$(mActionGroup, R.id.read);
-        try {
-            GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
-            galleryProvider.start();
-            int startPage = galleryProvider.getStartPage();
-            if (startPage != 0) {
-                mRead.setText(getString(R.string.read_from, startPage + 1));
-            }
-            galleryProvider.stop();
-        } catch (Exception ignore) {
 
-        }
         mUploader.setOnClickListener(this);
         mCategory.setOnClickListener(this);
         mOtherActions.setOnClickListener(this);
