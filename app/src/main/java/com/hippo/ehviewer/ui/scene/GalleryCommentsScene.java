@@ -303,6 +303,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         if (itemAnimator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
+        RecyclerViewKt.addVerticalPadding(mRecyclerView, 0, 80);
 
         mSendImage.setOnClickListener(this);
         mFab.setOnClickListener(this);

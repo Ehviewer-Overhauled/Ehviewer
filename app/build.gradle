@@ -79,19 +79,18 @@ tasks.withType(JavaCompile) {
     task -> task.dependsOn ":daogenerator:executeDaoGenerator"
 }
 
-def optimizeReleaseResources = task('optimizeReleaseResources').doLast {
+def optimizeReleaseRes = task('optimizeReleaseRes').doLast {
     def aapt2 = Paths.get(project.android.sdkDirectory.path, 'build-tools', project.android.buildToolsVersion, 'aapt2')
     def zip = Paths.get(
             project.buildDir.path,
             "intermediates",
-            "shrunk_processed_res",
+            "optimized_processed_res",
             "release",
-            "resources-release-stripped.ap_"
+            "resources-release-optimize.ap_"
     )
     def optimized = new File("${zip}.opt")
     def cmd = exec {
         commandLine aapt2, 'optimize', '--collapse-resource-names',
-                '--shorten-resource-paths',
                 '-o', optimized, zip
         ignoreExitValue false
     }
@@ -102,8 +101,8 @@ def optimizeReleaseResources = task('optimizeReleaseResources').doLast {
 }
 
 tasks.whenTaskAdded { task ->
-    if (task.name == 'shrinkReleaseRes') {
-        task.finalizedBy optimizeReleaseResources
+    if (task.name == 'optimizeReleaseResources') {
+        task.finalizedBy optimizeReleaseRes
     }
 }
 
