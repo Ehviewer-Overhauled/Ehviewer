@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.WindowInsets;
 import android.view.WindowInsetsAnimation;
 import android.widget.ImageView;
@@ -187,6 +188,8 @@ public final class GalleryListScene extends BaseScene
             }
         }
     };
+    @Nullable
+    private ViewPropertyAnimator fabAnimator;
     @Nullable
     private ViewTransition mViewTransition;
     @Nullable
@@ -1193,11 +1196,15 @@ public final class GalleryListScene extends BaseScene
         if (null != mFabLayout && STATE_NORMAL == mState && !mShowActionFab) {
             mShowActionFab = true;
             View fab = mFabLayout.getPrimaryFab();
+            if (fabAnimator != null) {
+                fabAnimator.cancel();
+            }
             fab.setVisibility(View.VISIBLE);
             fab.setRotation(-45.0f);
-            fab.animate().scaleX(1.0f).scaleY(1.0f).rotation(0.0f).setListener(null)
+            fabAnimator = fab.animate().scaleX(1.0f).scaleY(1.0f).rotation(0.0f).setListener(null)
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
-                    .setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR).start();
+                    .setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR);
+            fabAnimator.start();
         }
     }
 
@@ -1205,9 +1212,13 @@ public final class GalleryListScene extends BaseScene
         if (null != mFabLayout && STATE_NORMAL == mState && mShowActionFab) {
             mShowActionFab = false;
             View fab = mFabLayout.getPrimaryFab();
-            fab.animate().scaleX(0.0f).scaleY(0.0f).setListener(mActionFabAnimatorListener)
+            if (fabAnimator != null) {
+                fabAnimator.cancel();
+            }
+            fabAnimator = fab.animate().scaleX(0.0f).scaleY(0.0f).setListener(mActionFabAnimatorListener)
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
-                    .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start();
+                    .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR);
+            fabAnimator.start();
         }
     }
 
