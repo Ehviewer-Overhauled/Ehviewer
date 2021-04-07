@@ -50,7 +50,6 @@ import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAct
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionRemoveItem;
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -86,6 +85,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 public class HistoryScene extends ToolbarScene {
@@ -237,7 +237,7 @@ public class HistoryScene extends ToolbarScene {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
-        handlerDrawable.setColor(AttrResources.getAttrColor(context, R.attr.widgetColorThemeAccent));
+        handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), R.attr.widgetColorThemeAccent));
         mFastScroller.setHandlerDrawable(handlerDrawable);
 
         updateLazyList();

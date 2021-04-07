@@ -67,7 +67,6 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
@@ -124,6 +123,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import rikka.core.res.ResourcesKt;
 
 @SuppressLint("RtlHardcoded")
 public final class GalleryListScene extends BaseScene
@@ -656,8 +657,8 @@ public final class GalleryListScene extends BaseScene
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
-        mRightDrawable = new AddDeleteDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
+        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
+        mRightDrawable = new AddDeleteDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(mRightDrawable);
         mSearchBar.setHelper(this);
@@ -864,7 +865,7 @@ public final class GalleryListScene extends BaseScene
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(context, R.attr.dividerColor),
+                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

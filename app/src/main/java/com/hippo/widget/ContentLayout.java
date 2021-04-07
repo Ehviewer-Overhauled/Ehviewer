@@ -38,7 +38,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -56,6 +55,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 public class ContentLayout extends FrameLayout {
@@ -105,7 +105,7 @@ public class ContentLayout extends FrameLayout {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
-        drawable.setColor(AttrResources.getAttrColor(context, R.attr.widgetColorThemeAccent));
+        drawable.setColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.widgetColorThemeAccent));
         mFastScroller.setHandlerDrawable(drawable);
 
         mRefreshLayout.setColorSchemeResources(

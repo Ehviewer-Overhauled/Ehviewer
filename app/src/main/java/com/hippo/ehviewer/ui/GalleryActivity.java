@@ -58,7 +58,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.R;
@@ -97,6 +96,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import rikka.core.res.ResourcesKt;
 import rikka.material.app.DayNightDelegate;
 
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
@@ -361,15 +361,15 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 .setScaleMode(Settings.getPageScaling())
                 .setStartPosition(Settings.getStartPosition())
                 .setStartPage(startPage)
-                .setBackgroundColor(AttrResources.getAttrColor(this, android.R.attr.colorBackground))
-                .setEdgeColor(AttrResources.getAttrColor(this, R.attr.colorEdgeEffect) & 0xffffff | 0x33000000)
+                .setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground))
+                .setEdgeColor(ResourcesKt.resolveColor(getTheme(), R.attr.colorEdgeEffect) & 0xffffff | 0x33000000)
                 .setPagerInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_pager_interval) : 0)
                 .setScrollInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_scroll_interval) : 0)
                 .setPageMinHeight(resources.getDimensionPixelOffset(R.dimen.gallery_page_min_height))
                 .setPageInfoInterval(resources.getDimensionPixelOffset(R.dimen.gallery_page_info_interval))
                 .setProgressColor(ResourcesUtils.getAttrColor(this, R.attr.colorPrimary))
                 .setProgressSize(resources.getDimensionPixelOffset(R.dimen.gallery_progress_size))
-                .setPageTextColor(AttrResources.getAttrColor(this, android.R.attr.textColorSecondary))
+                .setPageTextColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary))
                 .setPageTextSize(resources.getDimensionPixelOffset(R.dimen.gallery_page_text_size))
                 .setPageTextTypeface(Typeface.DEFAULT)
                 .setErrorTextColor(resources.getColor(R.color.red_500))
@@ -397,7 +397,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             }
             decorView.setSystemUiVisibility(flags);
-            window.setStatusBarColor(AttrResources.getAttrColor(this, android.R.attr.colorBackground));
+            window.setStatusBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground));
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);

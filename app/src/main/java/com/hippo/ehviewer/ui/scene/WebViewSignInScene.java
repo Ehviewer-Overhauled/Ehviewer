@@ -29,7 +29,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
@@ -43,6 +42,7 @@ import java.util.List;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import rikka.core.res.ResourcesKt;
 
 public class WebViewSignInScene extends SolidScene {
 
@@ -74,7 +74,7 @@ public class WebViewSignInScene extends SolidScene {
         cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
-        mWebView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
+        mWebView.setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground));
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setDisplayZoomControls(false);
         mWebView.getSettings().setJavaScriptEnabled(true);

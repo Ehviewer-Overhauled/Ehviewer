@@ -28,11 +28,12 @@ import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
+
+import rikka.core.res.ResourcesKt;
 
 public final class UrlOpener {
 
@@ -64,7 +65,7 @@ public final class UrlOpener {
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
         customTabsIntent.setShowTitle(true);
         CustomTabColorSchemeParams params = new CustomTabColorSchemeParams.Builder()
-                .setToolbarColor(AttrResources.getAttrColor(context, R.attr.toolbarColor))
+                .setToolbarColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.toolbarColor))
                 .build();
         customTabsIntent.setDefaultColorSchemeParams(params);
         customTabsIntent.setColorScheme(isNight ? CustomTabsIntent.COLOR_SCHEME_DARK : CustomTabsIntent.COLOR_SCHEME_LIGHT);

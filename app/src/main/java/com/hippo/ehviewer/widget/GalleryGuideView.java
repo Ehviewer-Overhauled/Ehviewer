@@ -25,10 +25,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.ViewUtils;
+
+import rikka.core.res.ResourcesKt;
 
 public class GalleryGuideView extends ViewGroup implements View.OnClickListener {
 
@@ -59,9 +60,9 @@ public class GalleryGuideView extends ViewGroup implements View.OnClickListener 
     }
 
     private void init(Context context) {
-        mBgColor = AttrResources.getAttrColor(context, R.attr.guideBackgroundColor);
+        mBgColor = ResourcesKt.resolveColor(context.getTheme(), R.attr.guideBackgroundColor);
         mPaint = new Paint();
-        mPaint.setColor(AttrResources.getAttrColor(context, R.attr.guideTitleColor));
+        mPaint.setColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.guideTitleColor));
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(context.getResources().getDimension(R.dimen.gallery_guide_divider_width));
         setOnClickListener(this);

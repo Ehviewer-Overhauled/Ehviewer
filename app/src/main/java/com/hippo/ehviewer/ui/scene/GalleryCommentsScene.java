@@ -57,7 +57,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -95,6 +94,7 @@ import com.hippo.yorozuya.collect.IntList;
 import java.util.ArrayList;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 public final class GalleryCommentsScene extends ToolbarScene
@@ -293,7 +293,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context,
                 RecyclerView.VERTICAL, false));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL, AttrResources.getAttrColor(context, R.attr.dividerColor),
+                LinearDividerItemDecoration.VERTICAL, ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         mRecyclerView.addItemDecoration(decoration);
@@ -412,7 +412,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         });
         rv.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL, AttrResources.getAttrColor(context, R.attr.dividerColor),
+                LinearDividerItemDecoration.VERTICAL, ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, R.attr.dialogPreferredPadding));
         rv.addItemDecoration(decoration);
@@ -950,7 +950,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 SpannableString ss = new SpannableString(scoreString);
                 ss.setSpan(new RelativeSizeSpan(0.8f), 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ss.setSpan(new StyleSpan(Typeface.BOLD), 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new ForegroundColorSpan(AttrResources.getAttrColor(context, android.R.attr.textColorSecondary))
+                ss.setSpan(new ForegroundColorSpan(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary))
                         , 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ssb.append("  ").append(ss);
             }
@@ -960,7 +960,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 SpannableString ss = new SpannableString(str);
                 ss.setSpan(new RelativeSizeSpan(0.8f), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ss.setSpan(new StyleSpan(Typeface.BOLD), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new ForegroundColorSpan(AttrResources.getAttrColor(context, android.R.attr.textColorSecondary)),
+                ss.setSpan(new ForegroundColorSpan(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary)),
                         0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ssb.append("\n\n").append(ss);
             }

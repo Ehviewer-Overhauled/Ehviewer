@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
@@ -37,6 +36,8 @@ import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
+
+import rikka.core.res.ResourcesKt;
 
 public class FilterFragment extends BaseFragment {
 
@@ -76,7 +77,7 @@ public class FilterFragment extends BaseFragment {
         recyclerView.setClipChildren(false);
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(requireActivity(), R.attr.dividerColor),
+                ResourcesKt.resolveColor(requireActivity().getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(requireActivity(), 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

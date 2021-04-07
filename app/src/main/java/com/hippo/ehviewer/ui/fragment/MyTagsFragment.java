@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
@@ -23,6 +22,7 @@ import com.hippo.ehviewer.widget.DialogWebChromeClient;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import rikka.core.res.ResourcesKt;
 
 public class MyTagsFragment extends BaseFragment {
 
@@ -36,7 +36,7 @@ public class MyTagsFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_webview, container, false);
         webView = view.findViewById(R.id.webview);
-        webView.setBackgroundColor(AttrResources.getAttrColor(requireActivity(), android.R.attr.colorBackground));
+        webView.setBackgroundColor(ResourcesKt.resolveColor(requireActivity().getTheme(), android.R.attr.colorBackground));
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
         webView.getSettings().setJavaScriptEnabled(true);

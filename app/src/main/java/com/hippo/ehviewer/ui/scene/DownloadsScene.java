@@ -64,7 +64,6 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.conaco.DataContainer;
@@ -112,6 +111,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 @SuppressLint("RtlHardcoded")
@@ -354,7 +354,7 @@ public class DownloadsScene extends ToolbarScene
         mLayoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.getDetailSizeResId()));
         mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !AttrResources.getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
+        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !ResourcesKt.resolveColor(getTheme(), .getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
         //mRecyclerView.setDrawSelectorOnTop(true);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setClipChildren(false);
@@ -381,7 +381,7 @@ public class DownloadsScene extends ToolbarScene
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
-        handlerDrawable.setColor(AttrResources.getAttrColor(context, R.attr.widgetColorThemeAccent));
+        handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), R.attr.widgetColorThemeAccent));
         mFastScroller.setHandlerDrawable(handlerDrawable);
         mFastScroller.setOnDragHandlerListener(this);
 
@@ -653,7 +653,7 @@ public class DownloadsScene extends ToolbarScene
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(context, R.attr.dividerColor),
+                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

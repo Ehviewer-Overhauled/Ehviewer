@@ -49,7 +49,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.annotation.Implemented;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
@@ -90,6 +89,8 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import rikka.core.res.ResourcesKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")
@@ -324,7 +325,7 @@ public class FavoritesScene extends BaseScene implements
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, AttrResources.getAttrColor(context, android.R.attr.colorControlNormal));
+        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(ContextCompat.getDrawable(context, R.drawable.v_magnify_x24));
         mSearchBar.setHelper(this);
@@ -490,7 +491,7 @@ public class FavoritesScene extends BaseScene implements
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(context, R.attr.dividerColor),
+                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

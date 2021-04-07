@@ -264,4 +264,8 @@ public abstract class BaseScene extends SceneFragment {
             outState.putSparseParcelableArray(KEY_DRAWER_VIEW_STATE, drawerViewState);
         }
     }
+
+    public Resources.Theme getTheme() {
+        return requireActivity().getTheme();
+    }
 }

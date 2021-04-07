@@ -66,7 +66,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
@@ -132,6 +131,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.HttpUrl;
+import rikka.core.res.ResourcesKt;
 
 public class GalleryDetailScene extends BaseScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
@@ -827,7 +827,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         if ((oldState == STATE_INIT || oldState == STATE_FAILED || oldState == STATE_REFRESH) &&
-                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && AttrResources.getAttrBoolean(getContext(), R.attr.isLightTheme)) {
+                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && ResourcesKt.resolveBoolean(getTheme(), R.attr.isLightTheme, false)) {
             if (!createCircularReveal()) {
                 SimpleHandler.getInstance().post(this::createCircularReveal);
             }
@@ -934,8 +934,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance(context) : null;
-        int colorTag = AttrResources.getAttrColor(context, R.attr.tagBackgroundColor);
-        int colorName = AttrResources.getAttrColor(context, R.attr.tagGroupBackgroundColor);
+        int colorTag = ResourcesKt.resolveColor(getTheme(), R.attr.tagBackgroundColor);
+        int colorName = ResourcesKt.resolveColor(getTheme(), R.attr.tagGroupBackgroundColor);
         for (GalleryTagGroup tg : tagGroups) {
             LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.gallery_tag_group, mTags, false);
             ll.setOrientation(LinearLayout.HORIZONTAL);

@@ -45,7 +45,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
@@ -59,6 +58,8 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rikka.core.res.ResourcesKt;
 
 public class SearchBar extends MaterialCardView implements View.OnClickListener,
         TextView.OnEditorActionListener, TextWatcher,
@@ -146,7 +147,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                AttrResources.getAttrColor(context, R.attr.dividerColor),
+                ResourcesKt.resolveColor(context.getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(false);
         mListView.addItemDecoration(decoration);
