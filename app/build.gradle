@@ -121,8 +121,8 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.4.0'
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.3.0'
-    implementation 'com.getkeepsafe.relinker:relinker:1.4.1'
-    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.0'
+    implementation 'com.getkeepsafe.relinker:relinker:1.4.3'
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.2'
     implementation 'com.github.seven332.a7zip:extract-lite:cba0ce9586'
     implementation 'com.github.seven332:beerbelly:0.1.4'
     implementation 'com.github.seven332:glgallery:0.1.2'
@@ -135,9 +135,9 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     def appCenterSdkVersion = '4.1.0'
-    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
-    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
-    implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-analytics:4.1.1"
+    implementation "com.microsoft.appcenter:appcenter-crashes:4.1.1"
+    implementation "com.microsoft.appcenter:appcenter-distribute:4.1.1"
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.1'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
