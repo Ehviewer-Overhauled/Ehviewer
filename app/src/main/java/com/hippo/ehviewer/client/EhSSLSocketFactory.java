@@ -25,15 +25,14 @@ public class EhSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+        SSLSocketFactory defaultFactory = (SSLSocketFactory) getDefault();
         if (!Settings.getDF()) {
-            return ((SSLSocketFactory) getDefault()).createSocket(s, host, port, autoClose);
+            return defaultFactory.createSocket(s, host, port, autoClose);
         }
-        InetAddress address = s.getInetAddress();
-        // okhttp 4.9 don't like this
-        //if (autoClose) s.close();
-        SSLSocket socket = (SSLSocket) getDefault().createSocket(address, port);
+        String address = s.getInetAddress().getHostAddress();
+        SSLSocket socket = (SSLSocket) defaultFactory.createSocket(s, address, port, autoClose);
         SSLSession sslSession = socket.getSession();
-        Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address.getHostAddress() + " Protocol:" + sslSession.getProtocol() + " CipherSuite:" + sslSession.getCipherSuite());
+        Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address + " Protocol:" + sslSession.getProtocol() + " CipherSuite:" + sslSession.getCipherSuite());
         socket.setEnabledProtocols(socket.getSupportedProtocols());
         return socket;
     }

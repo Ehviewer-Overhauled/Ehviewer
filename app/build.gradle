@@ -134,7 +134,6 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-thread:0.1.1'
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
-    def appCenterSdkVersion = '4.1.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:4.1.1"
     implementation "com.microsoft.appcenter:appcenter-crashes:4.1.1"
     implementation "com.microsoft.appcenter:appcenter-distribute:4.1.1"
