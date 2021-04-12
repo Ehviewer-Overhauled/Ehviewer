@@ -30,12 +30,6 @@
         app:enableCopying="true" />
 
     <com.hippo.preference.UrlPreference
-        android:key="telegram"
-        android:title="@string/settings_about_telegram"
-        app:iconSpaceReserved="false"
-        app:url="https://t.me/ehviewer" />
-
-    <com.hippo.preference.UrlPreference
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
         app:iconSpaceReserved="false"
