@@ -92,7 +92,6 @@ public class Settings {
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
     public static final int DEFAULT_READ_CACHE_SIZE = 320;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
-    public static final String KEY_DOH = "dns_over_https";
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_APP_LANGUAGE = "app_language";
     private static final String TAG = Settings.class.getSimpleName();
@@ -243,7 +242,6 @@ public class Settings {
     private static final String KEY_SAVE_CRASH_LOG = "save_crash_log";
     private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
-    private static final boolean DEFAULT_DOH = false;
     private static final boolean DEFAULT_FRONTING = false;
     private static final String DEFAULT_APP_LANGUAGE = "system";
     private static final String KEY_PROXY_TYPE = "proxy_type";
@@ -282,10 +280,7 @@ public class Settings {
 
     private static void fixDefaultValue(Context context) {
         if ("CN".equals(Locale.getDefault().getCountry())) {
-            // Enable DoH and domain fronting if the country is CN
-            if (!sSettingsPre.contains(KEY_DOH)) {
-                putDoH(true);
-            }
+            // Enable domain fronting if the country is CN
             if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
                 putBuiltInHosts(true);
             }
@@ -1072,14 +1067,6 @@ public class Settings {
 
     public static void putBuiltInHosts(boolean value) {
         putBoolean(KEY_BUILT_IN_HOSTS, value);
-    }
-
-    public static boolean getDoH() {
-        return getBoolean(KEY_DOH, DEFAULT_DOH);
-    }
-
-    public static void putDoH(boolean value) {
-        putBoolean(KEY_DOH, value);
     }
 
     public static boolean getDF() {

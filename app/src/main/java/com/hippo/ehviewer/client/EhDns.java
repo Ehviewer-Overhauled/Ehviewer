@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.Dns;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class EhDns implements Dns {
 
@@ -67,14 +64,9 @@ public class EhDns implements Dns {
     }
 
     private final Hosts hosts;
-    private static DnsOverHttps dnsOverHttps;
 
     public EhDns(Context context) {
         hosts = EhApplication.getHosts(context);
-        DnsOverHttps.Builder builder = new DnsOverHttps.Builder()
-                .client(new OkHttpClient.Builder().cache(EhApplication.getOkHttpCache(context)).build())
-                .url(HttpUrl.get("https://101.6.6.6:8443/dns-query"));
-        dnsOverHttps = builder.post(true).build();
     }
 
     private static void put(Map<String, List<InetAddress>> map, String host, String... ips) {
@@ -96,15 +88,6 @@ public class EhDns implements Dns {
             inetAddresses = builtInHosts.get(hostname);
             if (inetAddresses != null) {
                 return inetAddresses;
-            }
-        }
-        if (Settings.getDoH()) {
-            try {
-                inetAddresses = dnsOverHttps.lookup(hostname);
-                if (inetAddresses.size() > 0) {
-                    return inetAddresses;
-                }
-            } catch (UnknownHostException ignore) {
             }
         }
         return SYSTEM.lookup(hostname);
