@@ -267,6 +267,8 @@ public class Settings {
     private static final int DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0;
     private static final String KEY_DOWNLOAD_DELAY = "download_delay";
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
+    private static final String KEY_REQUEST_NEWS = "request_news";
+    private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static Context sContext;
     private static SharedPreferences sSettingsPre;
     private static EhConfig sEhConfig;
@@ -293,19 +295,6 @@ public class Settings {
 
             }
         }
-        // Xiaomi (and Huawei?) devices have some kind of "dynamic refresh rate" thing,
-        // which will report a low refresh rate causing false positive reports
-        //if (!sSettingsPre.contains(KEY_E_INK_MODE)) {
-        //    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        //    if (wm != null) {
-        //        Display display = wm.getDefaultDisplay();
-        //        if (display != null && display.getRefreshRate() > 0 && display.getRefreshRate() < 5.0) {
-        //            // Probably an E-Ink device
-        //            putReadTheme(2);
-        //            putEInkMode(true);
-        //        }
-        //    }
-        //}
     }
 
     public static Locale getLocale() {
@@ -551,6 +540,10 @@ public class Settings {
 
     public static boolean getFixThumbUrl() {
         return getBoolean(KEY_FIX_THUMB_URL, DEFAULT_FIX_THUMB_URL);
+    }
+
+    public static boolean getRequestNews() {
+        return getBoolean(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS);
     }
 
     public static boolean getShowJpnTitle() {

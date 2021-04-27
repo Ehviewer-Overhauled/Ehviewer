@@ -157,4 +157,10 @@
         android:title="@string/settings_eh_metered_network_warning"
         app:iconSpaceReserved="false" />
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="request_news"
+        android:title="@string/settings_request_news_title"
+        app:iconSpaceReserved="false" />
+
 </PreferenceScreen>

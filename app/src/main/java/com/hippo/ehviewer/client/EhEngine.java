@@ -23,6 +23,7 @@ import android.util.Pair;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -47,6 +48,7 @@ import com.hippo.ehviewer.client.parser.GalleryTokenApiParser;
 import com.hippo.ehviewer.client.parser.ProfileParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.SignInParser;
+import com.hippo.ehviewer.client.parser.EventPaneParser;
 import com.hippo.ehviewer.client.parser.TorrentParser;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
@@ -363,6 +365,10 @@ public class EhEngine {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
+            String html = EventPaneParser.parse(body);
+            if (html != null) {
+                EhApplication.getInstance().showEventPane(html);
+            }
             return GalleryDetailParser.parse(body);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);

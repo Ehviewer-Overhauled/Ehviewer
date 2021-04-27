@@ -27,11 +27,16 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Debug;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.collection.LruCache;
+import androidx.core.text.HtmlCompat;
 
 import com.hippo.a7zip.A7Zip;
 import com.hippo.beerbelly.SimpleDiskCache;
@@ -45,6 +50,7 @@ import com.hippo.ehviewer.client.EhSSLSocketFactory;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhX509TrustManager;
 import com.hippo.ehviewer.client.data.GalleryDetail;
+import com.hippo.ehviewer.client.parser.EventPaneParser;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
@@ -83,6 +89,8 @@ import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import rikka.material.app.DayNightDelegate;
 import rikka.material.app.LocaleDelegate;
 
@@ -392,6 +400,9 @@ public class EhApplication extends SceneApplication {
     }
 
     private void theDawnOfNewDay() {
+        if (!Settings.getRequestNews()) {
+            return;
+        }
         EhCookieStore store = getEhCookieStore(this);
         HttpUrl eh = HttpUrl.get(EhUrl.HOST_E);
 
@@ -401,9 +412,39 @@ public class EhApplication extends SceneApplication {
                 Request request = new EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build();
                 Call call = getOkHttpClient(this).newCall(request);
                 try {
-                    call.execute();
+                    Response response = call.execute();
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) {
+                        return;
+                    }
+                    String body = responseBody.string();
+                    String html = EventPaneParser.parse(body);
+                    if (html != null) {
+                        showEventPane(html);
+                    }
                 } catch (Throwable e) {
                     e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    public void showEventPane(String html) {
+        Activity activity = getTopActivity();
+        if (activity != null) {
+            activity.runOnUiThread(() -> {
+                AlertDialog dialog = new AlertDialog.Builder(activity)
+                        .setMessage(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create();
+                final View messageView = dialog.findViewById(android.R.id.message);
+                if (messageView instanceof TextView) {
+                    ((TextView) messageView).setMovementMethod(LinkMovementMethod.getInstance());
+                }
+                try {
+                    dialog.show();
+                } catch (Throwable t) {
+                    // ignore
                 }
             });
         }
