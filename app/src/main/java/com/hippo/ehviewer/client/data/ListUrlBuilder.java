@@ -68,6 +68,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
 
     private int mCategory = EhUtils.NONE;
     private String mKeyword = null;
+    private String mSHash = null;
 
     private int mAdvanceSearch = -1;
     private int mMinRating = -1;
@@ -96,6 +97,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         this.mUseSimilarityScan = in.readByte() != 0;
         this.mOnlySearchCovers = in.readByte() != 0;
         this.mShowExpunged = in.readByte() != 0;
+        this.mSHash = in.readString();
     }
 
     /**
@@ -114,6 +116,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         mUseSimilarityScan = false;
         mOnlySearchCovers = false;
         mShowExpunged = false;
+        mSHash = null;
     }
 
     @Override
@@ -241,6 +244,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         mUseSimilarityScan = lub.mUseSimilarityScan;
         mOnlySearchCovers = lub.mOnlySearchCovers;
         mShowExpunged = lub.mShowExpunged;
+        mSHash = lub.mSHash;
     }
 
     public void set(QuickSearch q) {
@@ -305,7 +309,6 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         if (TextUtils.isEmpty(query)) {
             return;
         }
-
         String[] querys = StringUtils.split(query, '&');
         int category = 0;
         String keyword = null;
@@ -464,6 +467,9 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 case "f_spt":
                     pageTo = NumberUtils.parseIntSafely(value, -1);
                     break;
+                case "f_shash":
+                    mSHash = value;
+                    break;
             }
         }
 
@@ -514,6 +520,9 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                             // Empty
                         }
                     }
+                }
+                if (mSHash != null) {
+                    ub.addQuery("f_shash", mSHash);
                 }
                 // Page index
                 if (mPageIndex != 0) {
@@ -617,6 +626,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         dest.writeByte(mUseSimilarityScan ? (byte) 1 : (byte) 0);
         dest.writeByte(mOnlySearchCovers ? (byte) 1 : (byte) 0);
         dest.writeByte(mShowExpunged ? (byte) 1 : (byte) 0);
+        dest.writeString(this.mSHash);
     }
 
     @IntDef({MODE_NORMAL, MODE_UPLOADER, MODE_TAG, MODE_WHATS_HOT, MODE_IMAGE_SEARCH, MODE_SUBSCRIPTION, MODE_TOPLIST})
