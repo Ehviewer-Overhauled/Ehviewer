@@ -77,6 +77,7 @@ import com.hippo.text.URLImageGetter;
 import com.hippo.util.ClipboardUtil;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
+import com.hippo.util.TextUrl;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.FabLayout;
 import com.hippo.widget.LinkifyTextView;
@@ -965,9 +966,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 ssb.append("\n\n").append(ss);
             }
 
-            LinkifyCompat.addLinks(ssb, Linkify.WEB_URLS);
-
-            return ssb;
+            return TextUrl.handleTextUrl(ssb);
         }
 
         public void bind(GalleryComment value) {

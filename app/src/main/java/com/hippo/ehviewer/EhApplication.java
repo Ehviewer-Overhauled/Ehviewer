@@ -36,7 +36,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.collection.LruCache;
-import androidx.core.text.HtmlCompat;
 
 import com.hippo.a7zip.A7Zip;
 import com.hippo.beerbelly.SimpleDiskCache;
@@ -434,13 +433,15 @@ public class EhApplication extends SceneApplication {
         if (activity != null) {
             activity.runOnUiThread(() -> {
                 AlertDialog dialog = new AlertDialog.Builder(activity)
-                        .setMessage(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                        .setMessage(Html.fromHtml(html))
                         .setPositiveButton(android.R.string.ok, null)
                         .create();
-                final View messageView = dialog.findViewById(android.R.id.message);
-                if (messageView instanceof TextView) {
-                    ((TextView) messageView).setMovementMethod(LinkMovementMethod.getInstance());
-                }
+                dialog.setOnShowListener(d -> {
+                    final View messageView = dialog.findViewById(android.R.id.message);
+                    if (messageView instanceof TextView) {
+                        ((TextView) messageView).setMovementMethod(LinkMovementMethod.getInstance());
+                    }
+                });
                 try {
                     dialog.show();
                 } catch (Throwable t) {
