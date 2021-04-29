@@ -66,6 +66,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.Snackbar;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
@@ -256,6 +257,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private GalleryInfo mGalleryInfo;
     private long mGid;
     private String mToken;
+    private int mPage;
     @Nullable
     private GalleryDetail mGalleryDetail;
     private int mRequestId = IntIdGenerator.INVALID_ID;
@@ -354,6 +356,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         } else if (ACTION_GID_TOKEN.equals(action)) {
             mGid = args.getLong(KEY_GID);
             mToken = args.getString(KEY_TOKEN);
+            mPage = args.getInt(KEY_PAGE);
         }
     }
 
@@ -881,6 +884,17 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (gd == null) {
             return;
         }
+        if (mPage != 0) {
+            Snackbar.make(requireActivity().findViewById(R.id.snackbar), getString(R.string.read_from, mPage), Snackbar.LENGTH_LONG)
+                    .setAction(R.string.read, v -> {
+                        Intent intent = new Intent(requireContext(), GalleryActivity.class);
+                        intent.setAction(GalleryActivity.ACTION_EH);
+                        intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, mGalleryDetail);
+                        intent.putExtra(GalleryActivity.KEY_PAGE, mPage);
+                        startActivity(intent);
+                    })
+                    .show();
+        }
         if (mThumb == null || mTitle == null || mUploader == null || mCategory == null ||
                 mLanguage == null || mPages == null || mSize == null || mPosted == null ||
                 mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null || mNewerVersion == null) {
@@ -1338,6 +1352,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             args.putLong(GalleryCommentsScene.KEY_GID, mGalleryDetail.gid);
             args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail.token);
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail.comments);
+            args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail);
             startScene(new Announcer(GalleryCommentsScene.class)
                     .setArgs(args)
                     .setRequestCode(this, REQUEST_CODE_COMMENT_GALLERY));

@@ -34,7 +34,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +49,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-import androidx.core.text.util.LinkifyCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -108,15 +106,11 @@ public final class GalleryCommentsScene extends ToolbarScene
     public static final String KEY_GID = "gid";
     public static final String KEY_TOKEN = "token";
     public static final String KEY_COMMENT_LIST = "comment_list";
+    public static final String KEY_GALLERY_DETAIL = "gallery_detail";
     private static final int TYPE_COMMENT = 0;
     private static final int TYPE_MORE = 1;
     private static final int TYPE_PROGRESS = 2;
-    private long mApiUid;
-    private String mApiKey;
-    private long mGid;
-    private String mToken;
-    @Nullable
-    private GalleryCommentList mCommentList;
+    private GalleryDetail mGalleryDetail;
     @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
@@ -157,12 +151,8 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
-        mApiUid = args.getLong(KEY_API_UID, -1L);
-        mApiKey = args.getString(KEY_API_KEY);
-        mGid = args.getLong(KEY_GID, -1L);
-        mToken = args.getString(KEY_TOKEN, null);
-        mCommentList = args.getParcelable(KEY_COMMENT_LIST);
-        mShowAllComments = mCommentList != null && !mCommentList.hasMore;
+        mGalleryDetail = args.getParcelable(KEY_GALLERY_DETAIL);
+        mShowAllComments = mGalleryDetail != null && mGalleryDetail.comments != null && !mGalleryDetail.comments.hasMore;
     }
 
     private void onInit() {
@@ -170,22 +160,14 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void onRestore(@NonNull Bundle savedInstanceState) {
-        mApiUid = savedInstanceState.getLong(KEY_API_UID, -1L);
-        mApiKey = savedInstanceState.getString(KEY_API_KEY);
-        mGid = savedInstanceState.getLong(KEY_GID, -1L);
-        mToken = savedInstanceState.getString(KEY_TOKEN, null);
-        mCommentList = savedInstanceState.getParcelable(KEY_COMMENT_LIST);
-        mShowAllComments = mCommentList != null && !mCommentList.hasMore;
+        mGalleryDetail = savedInstanceState.getParcelable(KEY_GALLERY_DETAIL);
+        mShowAllComments = mGalleryDetail != null && mGalleryDetail.comments != null && !mGalleryDetail.comments.hasMore;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(KEY_API_UID, mApiUid);
-        outState.putString(KEY_API_KEY, mApiKey);
-        outState.putLong(KEY_GID, mGid);
-        outState.putString(KEY_TOKEN, mToken);
-        outState.putParcelable(KEY_COMMENT_LIST, mCommentList);
+        outState.putParcelable(KEY_GALLERY_DETAIL, mGalleryDetail);
     }
 
     @NonNull
@@ -364,7 +346,7 @@ public final class GalleryCommentsScene extends ToolbarScene
 
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_COMMENT)
-                .setArgs(mApiUid, mApiKey, mGid, mToken, id, vote)
+                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, id, vote)
                 .setCallback(new VoteCommentListener(context,
                         activity.getStageId(), getTag()));
         EhApplication.getEhClient(context).execute(request);
@@ -423,11 +405,11 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     private void showCommentDialog(int position) {
         final Context context = getContext();
-        if (context == null || mCommentList == null || mCommentList.comments == null || position >= mCommentList.comments.length || position < 0) {
+        if (context == null || mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null || position >= mGalleryDetail.comments.comments.length || position < 0) {
             return;
         }
 
-        final GalleryComment comment = mCommentList.comments[position];
+        final GalleryComment comment = mGalleryDetail.comments.comments[position];
         List<String> menu = new ArrayList<>();
         final IntList menuId = new IntList();
         Resources resources = context.getResources();
@@ -488,7 +470,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             commentHolder.comment.clearCurrentSpan();
 
             if (span instanceof URLSpan) {
-                UrlOpener.openUrl(activity, ((URLSpan) span).getURL(), true);
+                UrlOpener.openUrl(activity, ((URLSpan) span).getURL(), true, mGalleryDetail);
             } else {
                 showCommentDialog(position);
             }
@@ -516,7 +498,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             return;
         }
 
-        if (mCommentList == null || mCommentList.comments == null || mCommentList.comments.length <= 0) {
+        if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null || mGalleryDetail.comments.comments.length <= 0) {
             mViewTransition.showView(1, animation);
         } else {
             mViewTransition.showView(0, animation);
@@ -650,8 +632,8 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     @Nullable
     private String getGalleryDetailUrl() {
-        if (mGid != -1 && mToken != null) {
-            return EhUrl.getGalleryDetailUrl(mGid, mToken, 0, mShowAllComments);
+        if (mGalleryDetail != null && mGalleryDetail.gid != -1 && mGalleryDetail.token != null) {
+            return EhUrl.getGalleryDetailUrl(mGalleryDetail.gid, mGalleryDetail.token, 0, mShowAllComments);
         } else {
             return null;
         }
@@ -707,13 +689,13 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void onRefreshGallerySuccess(GalleryCommentList result) {
-        if (mAdapter == null) {
+        if (mGalleryDetail == null || mAdapter == null) {
             return;
         }
 
         mRefreshLayout.setRefreshing(false);
         mRefreshingComments = false;
-        mCommentList = result;
+        mGalleryDetail.comments = result;
         mAdapter.notifyDataSetChanged();
 
         updateView(true);
@@ -737,11 +719,11 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void onCommentGallerySuccess(GalleryCommentList result) {
-        if (mAdapter == null) {
+        if (mGalleryDetail == null || mAdapter == null) {
             return;
         }
 
-        mCommentList = result;
+        mGalleryDetail.comments = result;
         mAdapter.notifyDataSetChanged();
         Bundle re = new Bundle();
         re.putParcelable(KEY_COMMENT_LIST, result);
@@ -756,13 +738,13 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void onVoteCommentSuccess(VoteCommentParser.Result result) {
-        if (mAdapter == null || mCommentList == null || mCommentList.comments == null) {
+        if (mAdapter == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
             return;
         }
 
         int position = -1;
-        for (int i = 0, n = mCommentList.comments.length; i < n; i++) {
-            GalleryComment comment = mCommentList.comments[i];
+        for (int i = 0, n = mGalleryDetail.comments.comments.length; i < n; i++) {
+            GalleryComment comment = mGalleryDetail.comments.comments[i];
             if (comment.id == result.id) {
                 position = i;
                 break;
@@ -775,7 +757,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         // Update comment
-        GalleryComment comment = mCommentList.comments[position];
+        GalleryComment comment = mGalleryDetail.comments.comments[position];
         comment.score = result.score;
         if (result.expectVote > 0) {
             comment.voteUpEd = 0 != result.vote;
@@ -788,7 +770,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         mAdapter.notifyItemChanged(position);
 
         Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, mCommentList);
+        re.putParcelable(KEY_COMMENT_LIST, mGalleryDetail.comments);
         setResult(SceneFragment.RESULT_OK, re);
     }
 
@@ -1021,7 +1003,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         @Override
         public void onBindViewHolder(@NonNull CommentHolder holder, int position) {
             Context context = getContext();
-            if (context == null || mCommentList == null) {
+            if (context == null || mGalleryDetail == null || mGalleryDetail.comments == null) {
                 return;
             }
 
@@ -1031,24 +1013,24 @@ public final class GalleryCommentsScene extends ToolbarScene
 
 
             if (holder instanceof ActualCommentHolder) {
-                ((ActualCommentHolder) holder).bind(mCommentList.comments[position]);
+                ((ActualCommentHolder) holder).bind(mGalleryDetail.comments.comments[position]);
             }
         }
 
         @Override
         public int getItemCount() {
-            if (mCommentList == null || mCommentList.comments == null) {
+            if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
                 return 0;
-            } else if (mCommentList.hasMore) {
-                return mCommentList.comments.length + 1;
+            } else if (mGalleryDetail.comments.hasMore) {
+                return mGalleryDetail.comments.comments.length + 1;
             } else {
-                return mCommentList.comments.length;
+                return mGalleryDetail.comments.comments.length;
             }
         }
 
         @Override
         public int getItemViewType(int position) {
-            if (position >= mCommentList.comments.length) {
+            if (position >= mGalleryDetail.comments.comments.length) {
                 return mRefreshingComments ? TYPE_PROGRESS : TYPE_MORE;
             } else {
                 return TYPE_COMMENT;
