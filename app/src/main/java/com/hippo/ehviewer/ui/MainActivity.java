@@ -45,6 +45,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -287,7 +288,13 @@ public final class MainActivity extends StageActivity
             boolean handleUrl = false;
             if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
                 handleUrl = true;
-                Toast.makeText(this, R.string.error_cannot_parse_the_url, Toast.LENGTH_SHORT).show();
+                if (intent.getData() != null) {
+                    String url = intent.getData().toString();
+                    new EditTextDialogBuilder(this, url, "")
+                            .setTitle(R.string.error_cannot_parse_the_url)
+                            .setPositiveButton(android.R.string.copy, (dialog, which) -> ClipboardUtil.addTextToClipboard(url))
+                            .show();
+                }
             }
 
             if (0 == getSceneCount()) {
