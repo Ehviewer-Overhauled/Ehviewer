@@ -28,7 +28,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:fitSystemWindowsInsets="bottom" />
+            app:fitsSystemWindowsInsets="bottom" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"
@@ -39,7 +39,7 @@
             android:paddingTop="8dp"
             android:paddingRight="4dp"
             android:paddingBottom="8dp"
-            app:fitSystemWindowsInsets="bottom" />
+            app:fitsSystemWindowsInsets="bottom" />
 
     </FrameLayout>
 
@@ -52,6 +52,6 @@
         android:drawablePadding="16dp"
         android:gravity="center_horizontal"
         android:text="@string/no_history"
-        app:fitSystemWindowsInsets="bottom" />
+        app:fitsSystemWindowsInsets="bottom" />
 
 </FrameLayout>

@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            app:fitSystemWindowsInsets="bottom" />
+            app:fitsSystemWindowsInsets="bottom" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -43,7 +43,7 @@
         android:drawablePadding="8dp"
         android:gravity="center_horizontal"
         android:text="@string/no_one_comments_gallery"
-        app:fitSystemWindowsInsets="bottom" />
+        app:fitsSystemWindowsInsets="bottom" />
 
     <LinearLayout
         android:id="@+id/edit_panel"
@@ -56,7 +56,7 @@
         android:visibility="invisible"
         android:outlineAmbientShadowColor="?attr/widgetColorThemePrimary"
         android:outlineSpotShadowColor="?attr/widgetColorThemePrimary"
-        app:fitSystemWindowsInsets="bottom">
+        app:fitsSystemWindowsInsets="bottom">
 
         <EditText
             android:id="@+id/edit_text"
@@ -91,7 +91,7 @@
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
-        app:fitSystemWindowsInsets="bottom">
+        app:fitsSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

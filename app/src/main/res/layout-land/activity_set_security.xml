@@ -21,7 +21,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/keyline_margin"
     android:baselineAligned="true"
-    app:fitSystemWindowsInsets="bottom">
+    app:fitsSystemWindowsInsets="bottom">
 
     <FrameLayout
         android:layout_width="0dp"

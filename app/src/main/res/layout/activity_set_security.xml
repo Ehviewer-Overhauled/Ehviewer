@@ -20,7 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/keyline_margin"
-    app:fitSystemWindowsInsets="bottom">
+    app:fitsSystemWindowsInsets="bottom">
 
     <TextView
         android:layout_width="match_parent"

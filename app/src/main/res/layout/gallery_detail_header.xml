@@ -32,7 +32,7 @@
             android:layout_weight="1"
             android:background="?attr/galleryDetailHeaderBackgroundColor"
             android:elevation="4dp"
-            app:fitSystemWindowsInsets="top" />
+            app:fitsSystemWindowsInsets="top" />
 
         <Space
             android:layout_width="match_parent"
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:fitSystemWindowsInsets="top">
+            app:fitsSystemWindowsInsets="top">
 
             <com.hippo.widget.LoadImageView
                 android:id="@+id/thumb"

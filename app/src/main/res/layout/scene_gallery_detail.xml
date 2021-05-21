@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:fitSystemWindowsInsets="top|bottom" />
+        app:fitsSystemWindowsInsets="top|bottom" />
 
     <TextView
         android:id="@+id/tip"
@@ -47,6 +47,6 @@
         android:layout_gravity="center"
         android:drawablePadding="8dp"
         android:gravity="center_horizontal"
-        app:fitSystemWindowsInsets="top|bottom" />
+        app:fitsSystemWindowsInsets="top|bottom" />
 
 </FrameLayout>

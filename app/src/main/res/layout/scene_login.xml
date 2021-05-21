@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    app:fitSystemWindowsInsets="top|bottom">
+    app:fitsSystemWindowsInsets="top|bottom">
 
     <ScrollView
         android:id="@+id/login_form"

@@ -24,7 +24,7 @@
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fitSystemWindowsInsets="top|bottom" />
+        app:fitsSystemWindowsInsets="top|bottom" />
 
     <com.hippo.ehviewer.widget.SearchBar
         android:id="@+id/search_bar"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/gallery_search_bar_margin_h"
         android:layout_marginVertical="@dimen/gallery_search_bar_margin_v"
-        app:layout_fitSystemWindowsInsets="top|bottom" />
+        app:layout_fitsSystemWindowsInsets="top|bottom" />
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
-        app:fitSystemWindowsInsets="top|bottom">
+        app:fitsSystemWindowsInsets="top|bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             style="@style/Widget.FloatingActionButton.Accent.Mini"

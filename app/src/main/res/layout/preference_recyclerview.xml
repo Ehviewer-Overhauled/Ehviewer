@@ -28,6 +28,6 @@
     android:fadeScrollbars="true"
     android:scrollbarStyle="outsideOverlay"
     android:scrollbars="vertical"
-    app:fitSystemWindowsInsets="bottom"
+    app:fitsSystemWindowsInsets="bottom"
     tools:ignore="UnusedResources"
     tools:viewBindingIgnore="true" />

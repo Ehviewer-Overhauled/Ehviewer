@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        app:fitSystemWindowsInsets="bottom" />
+        app:fitsSystemWindowsInsets="bottom" />
 
     <TextView
         android:id="@+id/tip"
@@ -35,7 +35,7 @@
         android:gravity="center"
         android:text="@string/hosts_tip"
         android:textSize="@dimen/text_super_large"
-        app:fitSystemWindowsInsets="bottom" />
+        app:fitsSystemWindowsInsets="bottom" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fab"
@@ -46,6 +46,6 @@
         android:layout_marginBottom="@dimen/corner_fab_margin"
         android:layout_gravity="bottom|end"
         app:srcCompat="@drawable/v_plus_dark_x24"
-        app:layout_fitSystemWindowsInsets="bottom" />
+        app:layout_fitsSystemWindowsInsets="bottom" />
 
 </FrameLayout>

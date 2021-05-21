@@ -21,7 +21,7 @@
     android:clipChildren="false"
     app:consumeSystemWindowsInsets="start|end"
     app:edgeToEdge="true"
-    app:fitSystemWindowsInsets="start|end">
+    app:fitsSystemWindowsInsets="start|end">
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/draw_view"
