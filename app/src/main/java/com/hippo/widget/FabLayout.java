@@ -30,7 +30,6 @@ import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.AnimationUtils;
-import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 
 public class FabLayout extends ViewGroup implements View.OnClickListener {
@@ -120,27 +119,54 @@ public class FabLayout extends ViewGroup implements View.OnClickListener {
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        AssertUtils.assertEquals("Measure mode must be MeasureSpec.EXACTLY",
-                MeasureSpec.getMode(widthMeasureSpec), MeasureSpec.EXACTLY);
-        AssertUtils.assertEquals("Measure mode must be MeasureSpec.EXACTLY",
-                MeasureSpec.getMode(heightMeasureSpec), MeasureSpec.EXACTLY);
-
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-
-        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
-                width - getPaddingLeft() - getPaddingRight(), MeasureSpec.AT_MOST);
-        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                height - getPaddingTop() - getPaddingBottom(), MeasureSpec.AT_MOST);
-        measureChildren(childWidthMeasureSpec, childHeightMeasureSpec);
-
-        setMeasuredDimension(width, height);
+    private int getChildMeasureSpec(int parentMeasureSpec) {
+        int parentMode = MeasureSpec.getMode(parentMeasureSpec);
+        int parentSize = MeasureSpec.getSize(parentMeasureSpec);
+        int childMode;
+        int childSize;
+        switch (parentMode) {
+            default:
+            case MeasureSpec.AT_MOST:
+            case MeasureSpec.EXACTLY:
+                childMode = MeasureSpec.AT_MOST;
+                childSize = parentSize;
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                childMode = MeasureSpec.UNSPECIFIED;
+                childSize = parentSize;
+        }
+        return MeasureSpec.makeMeasureSpec(childSize, childMode);
     }
 
-    // For pre-L, FloatActionButton use padding to show shadow, so its position looks wrong.
-    // We use it default size to make it position right
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec);
+        int childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec);
+        measureChildren(childWidthMeasureSpec, childHeightMeasureSpec);
+
+        int maxWidth = 0;
+        int maxHeight = 0;
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            if (child.getVisibility() == View.GONE) {
+                continue;
+            }
+
+            maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
+            maxHeight = maxHeight + child.getMeasuredHeight();
+        }
+
+        maxWidth += getPaddingLeft() + getPaddingRight();
+        maxHeight += getPaddingTop() + getPaddingBottom();
+
+        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+
+        setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
+                resolveSizeAndState(maxHeight, heightMeasureSpec, 0));
+    }
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int centerX = 0;

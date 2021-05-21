@@ -1236,6 +1236,7 @@ public final class GalleryListScene extends BaseScene
                 delay = 0L;
             } else {
                 delay = ANIMATE_TIME;
+                mFabLayout.setExpanded(false, true);
                 fab.animate().scaleX(0.0f).scaleY(0.0f).setListener(mActionFabAnimatorListener)
                         .setDuration(ANIMATE_TIME).setStartDelay(0L)
                         .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start();
