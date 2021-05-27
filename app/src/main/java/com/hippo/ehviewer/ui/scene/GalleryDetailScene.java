@@ -107,6 +107,7 @@ import com.hippo.scene.TransitionHelper;
 import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.AppHelper;
+import com.hippo.util.ClipboardUtil;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.view.ViewTransition;
@@ -1427,7 +1428,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 .show();
     }
 
-    private void showTagDialog(final String tag) {
+    private void showTagDialog(TextView tv, final String tag) {
         final Context context = getContext();
         if (null == context) {
             return;
@@ -1445,6 +1446,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         final IntList menuId = new IntList();
         Resources resources = context.getResources();
 
+        menu.add(resources.getString(android.R.string.copy));
+        menuId.add(R.id.copy);
+        if (!tag.equals(tv.getText().toString())) {
+            menu.add(resources.getString(R.string.copy_trans));
+            menuId.add(R.id.copy_trans);
+        }
         menu.add(resources.getString(R.string.show_definition));
         menuId.add(R.id.show_definition);
         menu.add(resources.getString(R.string.add_filter));
@@ -1471,6 +1478,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                         UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(tag2), false);
                     } else if (id == R.id.add_filter) {
                         showFilterTagDialog(tag);
+                    } else if (id == R.id.copy) {
+                        ClipboardUtil.addTextToClipboard(tag);
+                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                    } else if (id == R.id.copy_trans) {
+                        ClipboardUtil.addTextToClipboard(tv.getText().toString());
+                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
                     }
                 }).show();
     }
@@ -1527,7 +1540,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         } else {
             String tag = (String) v.getTag(R.id.tag);
             if (null != tag) {
-                showTagDialog(tag);
+                showTagDialog((TextView) v, tag);
                 return true;
             }
         }

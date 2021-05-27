@@ -815,4 +815,5 @@
     <string name="metered_network_warning">Connected to metered networks</string>
     <string name="read_from">Read page %d</string>
     <string name="settings_request_news_title">Request news page on start</string>
+    <string name="copy_trans">Copy translation</string>
 </resources>
