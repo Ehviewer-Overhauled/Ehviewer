@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.Spannable;
@@ -39,8 +38,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowInsetsAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,6 +46,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,6 +59,7 @@ import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.UrlOpener;
+import com.hippo.ehviewer.WindowInsetsAnimationHelper;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.client.EhUrl;
@@ -83,7 +83,6 @@ import com.hippo.widget.ObservedTextView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
-import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.ResourcesUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
@@ -184,74 +183,11 @@ public final class GalleryCommentsScene extends ToolbarScene
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
         mRefreshLayout = (SwipeRefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            view.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(WindowInsetsAnimation.Callback.DISPATCH_MODE_STOP) {
-                int startBottomEditPanel = 0;
-                int startBottomFabLayout = 0;
-                int endBottomEditPanel = 0;
-                int endBottomFabLayout = 0;
-                WindowInsetsAnimation animation;
-
-                @Override
-                public void onPrepare(@NonNull WindowInsetsAnimation animation) {
-                    this.animation = animation;
-                    if (mEditPanel != null) {
-                        startBottomEditPanel = mEditPanel.getPaddingBottom();
-                    }
-                    if (mFabLayout != null) {
-                        startBottomFabLayout = mFabLayout.getPaddingBottom();
-                    }
-                    super.onPrepare(animation);
-                }
-
-                @NonNull
-                @Override
-                public WindowInsetsAnimation.Bounds onStart(@NonNull WindowInsetsAnimation animation, @NonNull WindowInsetsAnimation.Bounds bounds) {
-                    this.animation = animation;
-                    if (mEditPanel != null) {
-                        endBottomEditPanel = mEditPanel.getPaddingBottom();
-                        mEditPanel.setTranslationY(-(startBottomEditPanel - endBottomEditPanel));
-                    }
-                    if (mFabLayout != null) {
-                        endBottomFabLayout = mFabLayout.getPaddingBottom();
-                        mFabLayout.setTranslationY(-(startBottomFabLayout - endBottomFabLayout));
-                    }
-                    return bounds;
-                }
-
-                @NonNull
-                @Override
-                public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
-                    if (animation == null) {
-                        return insets;
-                    }
-                    if (mEditPanel != null) {
-                        int offset = MathUtils.lerp(-(startBottomEditPanel - endBottomEditPanel), 0, animation.getInterpolatedFraction());
-                        mEditPanel.setTranslationY(offset);
-                    }
-                    if (mFabLayout != null) {
-                        int offset = MathUtils.lerp(-(startBottomFabLayout - endBottomFabLayout), 0, animation.getInterpolatedFraction());
-                        mFabLayout.setTranslationY(offset);
-                    }
-                    return insets;
-                }
-
-                @Override
-                public void onEnd(@NonNull WindowInsetsAnimation animation) {
-                    startBottomEditPanel = 0;
-                    startBottomFabLayout = 0;
-                    endBottomEditPanel = 0;
-                    endBottomFabLayout = 0;
-                    this.animation = null;
-                    if (mEditPanel != null) {
-                        mEditPanel.setTranslationY(0);
-                    }
-                    if (mFabLayout != null) {
-                        mFabLayout.setTranslationY(0);
-                    }
-                }
-            });
-        }
+        ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
+                WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
+                mEditPanel,
+                mFabLayout
+        ));
 
         mRefreshLayout.setColorSchemeResources(
                 R.color.loading_indicator_red,

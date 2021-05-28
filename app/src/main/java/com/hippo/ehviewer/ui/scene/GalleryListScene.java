@@ -26,7 +26,6 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.Spannable;
@@ -41,8 +40,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
-import android.view.WindowInsets;
-import android.view.WindowInsetsAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -55,6 +52,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -80,6 +79,7 @@ import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.FavouriteStatusRouter;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
+import com.hippo.ehviewer.WindowInsetsAnimationHelper;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.client.EhUrl;
@@ -569,77 +569,11 @@ public final class GalleryListScene extends BaseScene
         mSearchBar = (SearchBar) ViewUtils.$$(mainLayout, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(mainLayout, R.id.fab_layout);
         mSearchFab = ViewUtils.$$(mainLayout, R.id.search_fab);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            view.setWindowInsetsAnimationCallback(new WindowInsetsAnimation.Callback(WindowInsetsAnimation.Callback.DISPATCH_MODE_STOP) {
-                int startBottomSearchFab = 0;
-                int startBottomFabLayout = 0;
-                int endBottomSearchFab = 0;
-                int endBottomFabLayout = 0;
-                WindowInsetsAnimation animation;
-
-                @Override
-                public void onPrepare(@NonNull WindowInsetsAnimation animation) {
-                    this.animation = animation;
-                    if (mSearchFab != null) {
-                        FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-                        startBottomSearchFab = fabLayout.getPaddingBottom();
-                    }
-                    if (mFabLayout != null) {
-                        startBottomFabLayout = mFabLayout.getPaddingBottom();
-                    }
-                }
-
-                @NonNull
-                @Override
-                public WindowInsetsAnimation.Bounds onStart(@NonNull WindowInsetsAnimation animation, @NonNull WindowInsetsAnimation.Bounds bounds) {
-                    this.animation = animation;
-                    if (mSearchFab != null) {
-                        FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-                        endBottomSearchFab = fabLayout.getPaddingBottom();
-                        fabLayout.setTranslationY(-(startBottomSearchFab - endBottomSearchFab));
-                    }
-                    if (mFabLayout != null) {
-                        endBottomFabLayout = mFabLayout.getPaddingBottom();
-                        mFabLayout.setTranslationY(-(startBottomFabLayout - endBottomFabLayout));
-                    }
-                    return bounds;
-                }
-
-                @NonNull
-                @Override
-                public WindowInsets onProgress(@NonNull WindowInsets insets, @NonNull List<WindowInsetsAnimation> runningAnimations) {
-                    if (animation == null) {
-                        return insets;
-                    }
-                    if (mSearchFab != null) {
-                        FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-                        int offset = MathUtils.lerp(-(startBottomSearchFab - endBottomSearchFab), 0, animation.getInterpolatedFraction());
-                        fabLayout.setTranslationY(offset);
-                    }
-                    if (mFabLayout != null) {
-                        int offset = MathUtils.lerp(-(startBottomFabLayout - endBottomFabLayout), 0, animation.getInterpolatedFraction());
-                        mFabLayout.setTranslationY(offset);
-                    }
-                    return insets;
-                }
-
-                @Override
-                public void onEnd(@NonNull WindowInsetsAnimation animation) {
-                    startBottomSearchFab = 0;
-                    startBottomFabLayout = 0;
-                    endBottomSearchFab = 0;
-                    endBottomFabLayout = 0;
-                    this.animation = null;
-                    if (mSearchFab != null) {
-                        FabLayout fabLayout = (FabLayout) mSearchFab.getParent();
-                        fabLayout.setTranslationY(0);
-                    }
-                    if (mFabLayout != null) {
-                        mFabLayout.setTranslationY(0);
-                    }
-                }
-            });
-        }
+        ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
+                WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
+                mFabLayout,
+                (View) mSearchFab.getParent()
+        ));
 
         int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
         int paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab);
