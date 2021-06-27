@@ -39,6 +39,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -401,6 +402,28 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);
+        mMaskView.setOnGenericMotionListener((view, event) -> {
+            if (mGalleryView == null) {
+                return false;
+            }
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_SCROLL:
+                    if (event.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f) {
+                        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
+                            mGalleryView.pageLeft();
+                        } else {
+                            mGalleryView.pageRight();
+                        }
+                    } else {
+                        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
+                            mGalleryView.pageRight();
+                        } else {
+                            mGalleryView.pageLeft();
+                        }
+                    }
+            }
+            return false;
+        });
         mClock = ViewUtils.$$(this, R.id.clock);
         mProgress = (TextView) ViewUtils.$$(this, R.id.progress);
         mBattery = ViewUtils.$$(this, R.id.battery);
