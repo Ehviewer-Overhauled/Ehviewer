@@ -458,7 +458,7 @@ public final class MainActivity extends StageActivity
     }
 
     private void checkClipboardUrlInternal() {
-        String text = ClipboardUtil.getTextFromClipboard();
+        String text = ClipboardUtil.getUrlFromClipboard();
         int hashCode = text != null ? text.hashCode() : 0;
 
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
