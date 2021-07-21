@@ -16,6 +16,7 @@
 
 package com.hippo.scene;
 
+import android.app.assist.AssistContent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -102,6 +103,10 @@ public class SceneFragment extends Fragment {
 
     public void onBackPressed() {
         finish();
+    }
+
+    public void onProvideAssistContent(AssistContent outContent) {
+
     }
 
     @Override

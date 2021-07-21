@@ -16,6 +16,7 @@
 
 package com.hippo.scene;
 
+import android.app.assist.AssistContent;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -587,6 +588,26 @@ public abstract class StageActivity extends EhActivity {
 
         scene = (SceneFragment) fragment;
         scene.onBackPressed();
+    }
+
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        super.onProvideAssistContent(outContent);
+        int size = mSceneTagList.size();
+        String tag = mSceneTagList.get(size - 1);
+        SceneFragment scene;
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment == null) {
+            Log.e(TAG, "onProvideAssistContent: Can't find scene by tag: " + tag);
+            return;
+        }
+        if (!(fragment instanceof SceneFragment)) {
+            Log.e(TAG, "onProvideAssistContent: The fragment is not SceneFragment");
+            return;
+        }
+
+        scene = (SceneFragment) fragment;
+        scene.onProvideAssistContent(outContent);
     }
 
     public SceneFragment findSceneByTag(String tag) {

@@ -21,6 +21,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.assist.AssistContent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -1246,6 +1247,29 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 task.setData(NotifyTask.KEY_SIZE, size);
                 SimpleHandler.getInstance().post(task);
             }
+        }
+    }
+
+    @Nullable
+    private String getGalleryDetailUrl() {
+        long gid;
+        String token;
+        if (mGalleryInfo != null) {
+            gid = mGalleryInfo.gid;
+            token = mGalleryInfo.token;
+        } else {
+            return null;
+        }
+        return EhUrl.getGalleryDetailUrl(gid, token, 0, false);
+    }
+
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        super.onProvideAssistContent(outContent);
+
+        String url = getGalleryDetailUrl();
+        if (url != null) {
+            outContent.setWebUri(Uri.parse(url));
         }
     }
 }

@@ -21,6 +21,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DownloadManager;
+import android.app.assist.AssistContent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -2217,6 +2218,16 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             EhApplication.getEhClient(context).execute(request);
+        }
+    }
+
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        super.onProvideAssistContent(outContent);
+
+        String url = getGalleryDetailUrl(false);
+        if (url != null) {
+            outContent.setWebUri(Uri.parse(url));
         }
     }
 }
