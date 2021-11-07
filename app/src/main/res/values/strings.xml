@@ -816,4 +816,7 @@
     <string name="read_from">Read page %d</string>
     <string name="settings_request_news_title">Request news page on start</string>
     <string name="copy_trans">Copy translation</string>
+
+    <string name="tampered_warning">The version of EhViewer you are using has been maliciously tampered with.</string>
+    <string name="tampered_get">Get original version</string>
 </resources>

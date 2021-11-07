@@ -27,8 +27,8 @@ android {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 154
-        versionName "1.7.24.2"
+        versionCode 100000
+        versionName "1.7.24.3"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
@@ -119,6 +119,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation 'androidx.webkit:webkit:1.4.0'
+    implementation 'com.android.tools.build:apksig:7.0.3'
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.getkeepsafe.relinker:relinker:1.4.4'
