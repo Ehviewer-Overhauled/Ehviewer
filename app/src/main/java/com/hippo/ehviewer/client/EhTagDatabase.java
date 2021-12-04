@@ -62,12 +62,14 @@ public class EhTagDatabase {
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
+        NAMESPACE_TO_PREFIX.put("cosplayer", "cos:");
         NAMESPACE_TO_PREFIX.put("character", "c:");
         NAMESPACE_TO_PREFIX.put("female", "f:");
         NAMESPACE_TO_PREFIX.put("group", "g:");
         NAMESPACE_TO_PREFIX.put("language", "l:");
         NAMESPACE_TO_PREFIX.put("male", "m:");
-        NAMESPACE_TO_PREFIX.put("misc", "");
+        NAMESPACE_TO_PREFIX.put("mixed", "x:");
+        NAMESPACE_TO_PREFIX.put("other", "o:");
         NAMESPACE_TO_PREFIX.put("parody", "p:");
         NAMESPACE_TO_PREFIX.put("reclass", "r:");
     }
