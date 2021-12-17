@@ -23,8 +23,10 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.CommonOperations;
@@ -95,7 +97,26 @@ public class DownloadFragment extends BasePreferenceFragment {
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         if (KEY_DOWNLOAD_LOCATION.equals(key)) {
-            openDirPickerL();
+            UniFile file = Settings.getDownloadLocation();
+            if (file != null && !UniFile.isFileUri(Settings.getDownloadLocation().getUri())) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.settings_download_download_location)
+                        .setMessage(file.getUri().toString())
+                        .setPositiveButton(R.string.pick_new_download_location, (dialogInterface, i) -> openDirPickerL())
+                        .setNeutralButton(R.string.reset_download_location, (dialogInterface, i) -> {
+                            UniFile uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir());
+                            if (uniFile != null) {
+                                Settings.putDownloadLocation(uniFile);
+                                onUpdateDownloadLocation();
+                            } else {
+                                showTip(R.string.settings_download_cant_get_download_location,
+                                        BaseScene.LENGTH_SHORT);
+                            }
+                        })
+                        .show();
+            } else {
+                openDirPickerL();
+            }
             return true;
         }
         return false;

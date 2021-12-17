@@ -752,6 +752,8 @@
     <string name="read_from">从第 %d 页阅读</string>
     <string name="settings_request_news_title">启动时请求新闻页面</string>
     <string name="copy_trans">复制翻译</string>
+    <string name="reset_download_location">恢复默认路径</string>
+    <string name="pick_new_download_location">选择新路径</string>
 
     <string name="tampered_warning">您所使用的 EhViewer 版本遭到了恶意篡改。</string>
     <string name="tampered_get">下载原版</string>
