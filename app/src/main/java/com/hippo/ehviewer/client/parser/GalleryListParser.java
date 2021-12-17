@@ -262,9 +262,13 @@ public class GalleryListParser {
         if (gl != null) {
             Elements children = gl.children();
             if (children.size() > uploaderIndex) {
-                Element a = children.get(uploaderIndex).children().first();
-                if (a != null) {
-                    gi.uploader = a.text().trim();
+                Element div = children.get(uploaderIndex);
+                if (div != null) {
+                    gi.disowned = "opacity:0.5".equals(div.attr("style"));
+                    Element a = div.children().first();
+                    if (a != null) {
+                        gi.uploader = a.text().trim();
+                    }
                 }
             }
             if (children.size() > pagesIndex) {

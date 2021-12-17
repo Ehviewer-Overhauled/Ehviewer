@@ -116,6 +116,7 @@ public class GalleryInfo implements Parcelable {
     public int category;
     public String posted;
     public String uploader;
+    public boolean disowned;
     public float rating;
     public boolean rated;
     @Nullable
@@ -156,6 +157,7 @@ public class GalleryInfo implements Parcelable {
         this.spanGroupIndex = in.readInt();
         this.favoriteSlot = in.readInt();
         this.favoriteName = in.readString();
+        this.disowned = in.readByte() != 0;
     }
 
     public final void generateSLang() {
@@ -214,5 +216,6 @@ public class GalleryInfo implements Parcelable {
         dest.writeInt(this.spanGroupIndex);
         dest.writeInt(this.favoriteSlot);
         dest.writeString(this.favoriteName);
+        dest.writeByte(this.disowned ? (byte) 1 : (byte) 0);
     }
 }

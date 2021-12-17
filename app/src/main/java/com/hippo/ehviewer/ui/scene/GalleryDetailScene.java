@@ -852,6 +852,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             mThumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
             mTitle.setText(EhUtils.getSuitableTitle(gi));
             mUploader.setText(gi.uploader);
+            mUploader.setAlpha(gi.disowned ? .5f : 1f);
             mCategory.setText(EhUtils.getCategory(gi.category));
             mCategory.setTextColor(EhUtils.getCategoryColor(gi.category));
             updateDownloadText();
@@ -908,6 +909,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
         mTitle.setText(EhUtils.getSuitableTitle(gd));
         mUploader.setText(gd.uploader);
+        mUploader.setAlpha(gd.disowned ? .5f : 1f);
         mCategory.setText(EhUtils.getCategory(gd.category));
         mCategory.setTextColor(EhUtils.getCategoryColor(gd.category));
         updateDownloadText();

@@ -198,6 +198,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
                 holder.title.setText(EhUtils.getSuitableTitle(gi));
                 holder.uploader.setText(gi.uploader);
+                holder.uploader.setAlpha(gi.disowned ? .5f : 1f);
                 holder.rating.setRating(gi.rating);
                 TextView category = holder.category;
                 String newCategoryText = EhUtils.getCategory(gi.category);

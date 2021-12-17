@@ -188,6 +188,7 @@ public class GalleryDetailParser {
             // Uploader
             Element gdn = gm.getElementById("gdn");
             if (null != gdn) {
+                gd.disowned = "opacity:0.5".equals(gdn.attr("style"));
                 gd.uploader = StringUtils.trim(gdn.text());
             } else {
                 gd.uploader = "";
