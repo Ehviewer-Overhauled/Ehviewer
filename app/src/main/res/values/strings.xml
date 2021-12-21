@@ -818,7 +818,4 @@
     <string name="copy_trans">Copy translation</string>
     <string name="reset_download_location">Reset to default</string>
     <string name="pick_new_download_location">Pick a new location</string>
-
-    <string name="tampered_warning">The version of EhViewer you are using has been maliciously tampered with.</string>
-    <string name="tampered_get">Get original version</string>
 </resources>
