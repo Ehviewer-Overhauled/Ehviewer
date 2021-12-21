@@ -27,7 +27,7 @@ android {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 100002
+        versionCode 100003
         versionName "1.7.25"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
@@ -133,9 +133,9 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-thread:0.1.1'
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
-    implementation 'com.microsoft.appcenter:appcenter-analytics:4.4.1'
-    implementation 'com.microsoft.appcenter:appcenter-crashes:4.4.1'
-    implementation 'com.microsoft.appcenter:appcenter-distribute:4.4.1'
+    implementation 'com.microsoft.appcenter:appcenter-analytics:4.4.2'
+    implementation 'com.microsoft.appcenter:appcenter-crashes:4.4.2'
+    implementation 'com.microsoft.appcenter:appcenter-distribute:4.4.2'
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.2'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
