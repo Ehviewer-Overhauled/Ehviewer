@@ -27,8 +27,8 @@ android {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 100001
-        versionName "1.7.24.4"
+        versionCode 100002
+        versionName "1.7.25"
         resConfigs "zh", "zh-rCN", "zh-rHK", "zh-rTW",
                 "es", "ja", "ko", "fr", "de", "th"
         testOptions.unitTests.includeAndroidResources = true
@@ -46,11 +46,9 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/**'
-        exclude 'kotlin/**'
-        exclude 'org/**'
-        exclude '**.properties'
-        exclude '**.bin'
+        resources {
+            excludes += '**'
+        }
     }
 
     dependenciesInfo.includeInApk false
