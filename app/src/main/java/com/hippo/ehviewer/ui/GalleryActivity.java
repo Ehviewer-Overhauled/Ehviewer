@@ -22,6 +22,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.assist.AssistContent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -834,7 +836,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        File dir = AppConfig.getExternalTempDir();
+        File dir = getCacheDir();
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show();
             return;
@@ -864,6 +866,37 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             Toast.makeText(this, R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void copyImage(int page) {
+        if (null == mGalleryProvider) {
+            return;
+        }
+
+        File dir = getCacheDir();
+        if (null == dir) {
+            Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        UniFile file;
+        if (null == (file = mGalleryProvider.save(page, UniFile.fromFile(dir), mGalleryProvider.getImageFilename(page)))) {
+            Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String filename = file.getName();
+        if (filename == null) {
+            Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", new File(dir, filename));
+
+        var clipboardManager = getSystemService(ClipboardManager.class);
+        if (clipboardManager != null) {
+            var clipData = ClipData.newUri(getContentResolver(), "ehviewer", uri);
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(this, getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -931,7 +964,11 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         if (null == mGalleryProvider) {
             return;
         }
-        File dir = getCacheDir();
+        File dir = AppConfig.getExternalTempDir();
+        if (null == dir) {
+            Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show();
+            return;
+        }
         UniFile file;
         if (null == (file = mGalleryProvider.save(page, UniFile.fromFile(dir), mGalleryProvider.getImageFilename(page)))) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
@@ -960,6 +997,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         items = new CharSequence[]{
                 getString(R.string.page_menu_refresh),
                 getString(R.string.page_menu_share),
+                getString(android.R.string.copy),
                 getString(R.string.page_menu_save),
                 getString(R.string.page_menu_save_to)};
         pageDialogListener(builder, items, page);
@@ -980,10 +1018,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 case 1: // Share
                     shareImage(page);
                     break;
-                case 2: // Save
+                case 2: // Copy
+                    copyImage(page);
+                    break;
+                case 3: // Save
                     saveImage(page);
                     break;
-                case 3: // Save to
+                case 4: // Save to
                     saveImageTo(page);
                     break;
             }

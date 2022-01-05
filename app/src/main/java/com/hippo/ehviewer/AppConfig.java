@@ -88,7 +88,13 @@ public class AppConfig {
 
     @Nullable
     public static File getExternalTempDir() {
-        return sContext.getExternalCacheDir();
+        File dir = sContext.getExternalCacheDir();
+        File file;
+        if (null != dir && FileUtils.ensureDirectory(file = new File(dir, TEMP))) {
+            return file;
+        } else {
+            return null;
+        }
     }
 
     @Nullable
