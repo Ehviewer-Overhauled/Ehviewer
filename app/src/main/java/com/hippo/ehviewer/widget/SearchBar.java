@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -468,6 +469,11 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
     }
 
     @Override
+    public void onReceiveContent(Uri uri) {
+        mHelper.onReceiveContent(uri);
+    }
+
+    @Override
     public Parcelable onSaveInstanceState() {
         final Bundle state = new Bundle();
         state.putParcelable(STATE_KEY_SUPER, super.onSaveInstanceState());
@@ -496,6 +502,11 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         void onApplySearch(String query);
 
         void onSearchEditTextBackPressed();
+
+        default void onReceiveContent(Uri uri) {
+
+        }
+
     }
 
     public interface OnStateChangeListener {

@@ -282,20 +282,22 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        post(() -> {
-            int oldItemCount = mAdapter.getItemCount();
+        post(() -> setSearchMode(tab.getPosition()));
+    }
 
-            mSearchMode = tab.getPosition();
+    public void setSearchMode(@SearchMode int mode) {
+        int oldItemCount = mAdapter.getItemCount();
 
-            int newItemCount = mAdapter.getItemCount();
+        mSearchMode = mode;
 
-            mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
-            mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
+        int newItemCount = mAdapter.getItemCount();
 
-            if (mHelper != null) {
-                mHelper.onChangeSearchMode();
-            }
-        });
+        mAdapter.notifyItemRangeRemoved(0, oldItemCount - 1);
+        mAdapter.notifyItemRangeInserted(0, newItemCount - 1);
+
+        if (mHelper != null) {
+            mHelper.onChangeSearchMode();
+        }
     }
 
     @Override

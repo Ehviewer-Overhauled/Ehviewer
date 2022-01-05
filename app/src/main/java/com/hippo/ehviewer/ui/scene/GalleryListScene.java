@@ -26,6 +26,7 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.Spannable;
@@ -1389,6 +1390,16 @@ public final class GalleryListScene extends BaseScene
     @Override
     public void onSearchEditTextBackPressed() {
         onBackPressed();
+    }
+
+    @Override
+    public void onReceiveContent(Uri uri) {
+        if (mSearchLayout == null || uri == null) {
+            return;
+        }
+        mSearchLayout.setSearchMode(SearchLayout.SEARCH_MODE_IMAGE);
+        mSearchLayout.setImageUri(uri);
+        setState(STATE_SEARCH);
     }
 
     @Override

@@ -16,12 +16,18 @@
 
 package com.hippo.ehviewer.widget;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.view.ContentInfo;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatEditText;
 
 import com.hippo.util.ExceptionUtils;
@@ -89,9 +95,24 @@ public class SearchEditText extends AppCompatEditText {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    @Nullable
+    @Override
+    public ContentInfo onReceiveContent(@NonNull ContentInfo payload) {
+        ClipData clipData = payload.getClip();
+        if (clipData.getItemCount() == 1) {
+            if (mListener != null) {
+                mListener.onReceiveContent(clipData.getItemAt(0).getUri());
+            }
+        }
+        return super.onReceiveContent(payload);
+    }
+
     public interface SearchEditTextListener {
         void onClick();
 
         void onBackPressed();
+
+        void onReceiveContent(Uri uri);
     }
 }
