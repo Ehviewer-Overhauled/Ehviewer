@@ -33,6 +33,8 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 
@@ -48,6 +50,8 @@ public abstract class BaseScene extends SceneFragment {
 
     public static final String KEY_DRAWER_VIEW_STATE =
             "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE";
+
+    private WindowInsetsControllerCompat insetsController;
 
     @Nullable
     private View drawerView;
@@ -181,14 +185,12 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public void setLightStatusBar(boolean set) {
-        View decorView = requireActivity().getWindow().getDecorView();
-        int flags = decorView.getSystemUiVisibility();
-        if (set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-        } else {
-            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        if (insetsController == null) {
+            insetsController = ViewCompat.getWindowInsetsController(requireActivity().getWindow().getDecorView());
         }
-        decorView.setSystemUiVisibility(flags);
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0);
+        }
         needWhiteStatusBar = set;
     }
 
