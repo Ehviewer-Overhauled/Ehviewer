@@ -31,7 +31,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -61,6 +60,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
@@ -82,7 +85,6 @@ import com.hippo.glview.view.GLRootView;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
-import com.hippo.util.SystemUiHelper;
 import com.hippo.widget.ColorView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.ConcurrentPool;
@@ -100,6 +102,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import rikka.core.res.ConfigurationKt;
 import rikka.core.res.ResourcesKt;
 import rikka.material.app.DayNightDelegate;
 
@@ -135,8 +138,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Nullable
     private GalleryAdapter mGalleryAdapter;
     @Nullable
-    private SystemUiHelper mSystemUiHelper;
-    private boolean mShowSystemUi;
+    private WindowInsetsControllerCompat insetsController;
     @Nullable
     private ColorView mMaskView;
     @Nullable
@@ -328,8 +330,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (Settings.getReadingFullscreen()) {
             Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
@@ -386,22 +386,18 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mGalleryProvider.setListener(mGalleryAdapter);
         mGalleryProvider.setGLRoot(mGLRootView);
 
-        // System UI helper
-        if (Settings.getReadingFullscreen()) {
-            mSystemUiHelper = new SystemUiHelper(this);
-            mSystemUiHelper.hide();
-            mShowSystemUi = false;
-        } else {
-            Window window = getWindow();
-            View decorView = window.getDecorView();
-            int flags = decorView.getSystemUiVisibility();
-            if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0) {
-                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        insetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+        if (insetsController != null) {
+            if (Settings.getReadingFullscreen()) {
+                insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                insetsController.hide(WindowInsetsCompat.Type.systemBars());
             } else {
-                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                insetsController.show(WindowInsetsCompat.Type.systemBars());
             }
-            decorView.setSystemUiVisibility(flags);
-            window.setStatusBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground));
+            boolean night = ConfigurationKt.isNight(getResources().getConfiguration());
+            insetsController.setAppearanceLightStatusBars(!night);
+            insetsController.setAppearanceLightNavigationBars(!night);
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);
@@ -479,13 +475,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         // Cutout
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-
-            GalleryHeader galleryHeader = findViewById(R.id.gallery_header);
-            galleryHeader.setOnApplyWindowInsetsListener((v, insets) -> {
-                galleryHeader.setDisplayCutout(insets.getDisplayCutout());
-                return insets;
-            });
         }
+        GalleryHeader galleryHeader = findViewById(R.id.gallery_header);
+        ViewCompat.setOnApplyWindowInsetsListener(galleryHeader, (v, insets) -> {
+            if (!Settings.getReadingFullscreen()) {
+                galleryHeader.setTopInsets(insets.getInsets(WindowInsetsCompat.Type.statusBars()).top);
+            } else {
+                galleryHeader.setDisplayCutout(insets.getDisplayCutout());
+            }
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         if (Settings.getGuideGallery()) {
             FrameLayout mainLayout = (FrameLayout) ViewUtils.$$(this, R.id.main);
@@ -542,15 +541,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        SimpleHandler.getInstance().postDelayed(() -> {
-            if (hasFocus && mSystemUiHelper != null) {
-                if (mShowSystemUi) {
-                    mSystemUiHelper.show();
-                } else {
-                    mSystemUiHelper.hide();
-                }
-            }
-        }, 300);
     }
 
     @Override
@@ -778,9 +768,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mSeekBarPanelAnimator.addListener(mShowSliderListener);
         mSeekBarPanelAnimator.start();
 
-        if (null != mSystemUiHelper) {
-            mSystemUiHelper.show();
-            mShowSystemUi = true;
+        if (insetsController != null) {
+            if (Settings.getReadingFullscreen())
+                insetsController.show(WindowInsetsCompat.Type.systemBars());
         }
     }
 
@@ -797,9 +787,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mSeekBarPanelAnimator.addListener(mHideSliderListener);
         mSeekBarPanelAnimator.start();
 
-        if (null != mSystemUiHelper) {
-            mSystemUiHelper.hide();
-            mShowSystemUi = false;
+        if (insetsController != null) {
+            if (Settings.getReadingFullscreen())
+                insetsController.hide(WindowInsetsCompat.Type.systemBars());
         }
     }
 

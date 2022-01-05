@@ -20,19 +20,20 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.view.DisplayCutoutCompat;
 
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ObjectUtils;
 
 public class GalleryHeader extends ViewGroup {
 
-    private DisplayCutout displayCutout;
+    private DisplayCutoutCompat displayCutout;
+    private int topInsets = 0;
 
     private View battery;
     private View progress;
@@ -51,10 +52,16 @@ public class GalleryHeader extends ViewGroup {
         super(context, attrs);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.P)
-    public void setDisplayCutout(@Nullable DisplayCutout displayCutout) {
+    public void setDisplayCutout(@Nullable DisplayCutoutCompat displayCutout) {
         if (!ObjectUtils.equal(this.displayCutout, displayCutout)) {
             this.displayCutout = displayCutout;
+            requestLayout();
+        }
+    }
+
+    public void setTopInsets(int topInsets) {
+        if (this.topInsets != topInsets) {
+            this.topInsets = topInsets;
             requestLayout();
         }
     }
@@ -78,7 +85,7 @@ public class GalleryHeader extends ViewGroup {
         } else {
             left = width - paddingRight - lp.rightMargin - view.getMeasuredWidth();
         }
-        rect.set(left, lp.topMargin, left + view.getMeasuredWidth(), lp.topMargin + view.getMeasuredHeight());
+        rect.set(left, lp.topMargin + topInsets, left + view.getMeasuredWidth(), lp.topMargin + topInsets + view.getMeasuredHeight());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -147,7 +154,7 @@ public class GalleryHeader extends ViewGroup {
             View child = getChildAt(i);
             measureChild(child, widthMeasureSpec, heightMeasureSpec);
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-            height = Math.max(height, child.getMeasuredHeight() + lp.topMargin);
+            height = Math.max(height, child.getMeasuredHeight() + lp.topMargin + topInsets);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && displayCutout != null) {

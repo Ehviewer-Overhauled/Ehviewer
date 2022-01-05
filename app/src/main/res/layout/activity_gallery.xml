@@ -15,9 +15,11 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:fitsSystemWindowsInsets="start|end">
 
     <com.hippo.glview.view.GLRootView
         android:id="@+id/gl_root_view"
@@ -66,11 +68,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="?attr/gallerySliderBackgroundColor"
-        android:fitsSystemWindows="true"
         android:orientation="horizontal"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        app:fitsSystemWindowsInsets="bottom">
 
         <TextView
             android:id="@+id/left"
