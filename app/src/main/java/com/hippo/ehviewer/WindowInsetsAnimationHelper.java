@@ -56,14 +56,22 @@ public class WindowInsetsAnimationHelper extends WindowInsetsAnimationCompat.Cal
         if (animation == null) {
             return insets;
         }
-        for (View view : views) {
-            if (view == null) {
-                continue;
+        WindowInsetsAnimationCompat imeAnimation = null;
+        for (WindowInsetsAnimationCompat animation : runningAnimations) {
+            if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+                imeAnimation = animation;
+                break;
             }
-            int startPadding = startPaddings.containsKey(view) ? startPaddings.get(view) : 0;
-            int endPadding = endPaddings.containsKey(view) ? endPaddings.get(view) : 0;
-            int offset = MathUtils.lerp(-(startPadding - endPadding), 0, animation.getInterpolatedFraction());
-            view.setTranslationY(offset);
+        }
+        if (imeAnimation != null) {
+            for (View view : views) {
+                if (view == null) {
+                    continue;
+                }
+                int startPadding = startPaddings.containsKey(view) ? startPaddings.get(view) : 0;
+                int endPadding = endPaddings.containsKey(view) ? endPaddings.get(view) : 0;
+                view.setTranslationY(MathUtils.lerp(endPadding - startPadding, 0, animation.getInterpolatedFraction()));
+            }
         }
         return insets;
     }

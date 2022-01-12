@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
@@ -185,9 +186,7 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public void setLightStatusBar(boolean set) {
-        if (insetsController == null) {
-            insetsController = ViewCompat.getWindowInsetsController(requireActivity().getWindow().getDecorView());
-        }
+        var insetsController = getInsetsController();
         if (insetsController != null) {
             insetsController.setAppearanceLightStatusBars(set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0);
         }
@@ -222,7 +221,7 @@ public abstract class BaseScene extends SceneFragment {
         setNavCheckedItem(getNavCheckedItem());
 
         // Hide soft ime
-        AppHelper.hideSoftInput(getActivity());
+        hideSoftInput();
         setLightStatusBar(needWhiteStatusBar);
     }
 
@@ -247,23 +246,44 @@ public abstract class BaseScene extends SceneFragment {
     }
 
     public void hideSoftInput() {
-        FragmentActivity activity = getActivity();
-        if (null != activity) {
-            AppHelper.hideSoftInput(activity);
+        var insetsController = getInsetsController();
+        if (insetsController != null) {
+            insetsController.hide(WindowInsetsCompat.Type.ime());
         }
     }
 
     public void showSoftInput(@Nullable View view) {
-        FragmentActivity activity = getActivity();
-        if (null != activity && null != view) {
-            AppHelper.showSoftInput(activity, view);
+        if (view != null) {
+            view.requestFocus();
+            view.post(() -> {
+                var insetsController = getInsetsController();
+                if (insetsController != null) {
+                    insetsController.show(WindowInsetsCompat.Type.ime());
+                }
+            });
         }
+    }
+
+    public WindowInsetsControllerCompat getInsetsController() {
+        if (insetsController == null) {
+            var activity = getActivity();
+            if (activity != null) {
+                insetsController = ViewCompat.getWindowInsetsController(activity.getWindow().getDecorView());
+            }
+        }
+        return insetsController;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Analytics.onSceneView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        insetsController = null;
     }
 
     @Override

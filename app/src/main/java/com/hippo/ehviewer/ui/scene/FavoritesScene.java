@@ -75,7 +75,6 @@ import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.util.AppHelper;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
@@ -721,7 +720,6 @@ public class FavoritesScene extends BaseScene implements
             }
             builder.setError(null);
             mHelper.goTo(goTo);
-            AppHelper.hideSoftInput(dialog);
             dialog.dismiss();
         });
     }

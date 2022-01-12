@@ -104,7 +104,6 @@ import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.ehviewer.widget.SearchLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.util.AppHelper;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
@@ -963,7 +962,6 @@ public final class GalleryListScene extends BaseScene
             }
             builder.setError(null);
             mHelper.goTo(goTo);
-            AppHelper.hideSoftInput(dialog);
             dialog.dismiss();
         });
     }
