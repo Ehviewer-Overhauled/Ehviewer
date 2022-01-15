@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -124,7 +125,7 @@ public class ContentLayout extends FrameLayout {
                 resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
 
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();

@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -376,7 +377,7 @@ public class DownloadsScene extends ToolbarScene
             mRecyclerView.scrollToPosition(mInitPosition);
             mInitPosition = -1;
         }
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);

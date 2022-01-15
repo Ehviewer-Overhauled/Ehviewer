@@ -24,6 +24,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -233,7 +234,7 @@ public class HistoryScene extends ToolbarScene {
         guardManager.attachRecyclerView(mRecyclerView);
         swipeManager.attachRecyclerView(mRecyclerView);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, 4, 4);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();

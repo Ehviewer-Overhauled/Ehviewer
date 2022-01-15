@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -89,6 +90,7 @@ import java.util.Collections;
 import java.util.List;
 
 import rikka.core.res.ResourcesKt;
+import rikka.recyclerview.RecyclerViewKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")

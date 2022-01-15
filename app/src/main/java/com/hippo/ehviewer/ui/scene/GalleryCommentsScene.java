@@ -34,6 +34,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -222,7 +223,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         if (itemAnimator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
-        RecyclerViewKt.addVerticalPadding(mRecyclerView, 0, 80);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 0,0,0,80, TypedValue.COMPLEX_UNIT_DIP);
 
         mSendImage.setOnClickListener(this);
         mFab.setOnClickListener(this);
