@@ -112,6 +112,8 @@
         <item>1500</item>
         <item>2000</item>
         <item>3000</item>
+        <item>4000</item>
+        <item>5000</item>
         <item>10000</item>
         <item>20000</item>
     </string-array>
@@ -123,6 +125,8 @@
         <item>1500</item>
         <item>2000</item>
         <item>3000</item>
+        <item>4000</item>
+        <item>5000</item>
         <item>10000</item>
         <item>20000</item>
     </string-array>
