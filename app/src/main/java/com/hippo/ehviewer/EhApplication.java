@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.collection.LruCache;
 
-import com.hippo.a7zip.A7Zip;
+import com.hippo.Native;
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.conaco.Conaco;
 import com.hippo.ehviewer.client.EhClient;
@@ -334,8 +334,9 @@ public class EhApplication extends SceneApplication {
         EhDB.initialize(this);
         EhEngine.initialize();
         BitmapUtils.initialize(this);
-        Image.initialize(this);
-        A7Zip.initialize(this);
+        Native.initialize(this);
+        //Image.initialize(this);
+        //A7Zip.initialize(this);
 
         if (EhDB.needMerge()) {
             EhDB.mergeOldDB(this);
