@@ -240,20 +240,14 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         switch (mSearchMode) {
             case SEARCH_MODE_NORMAL:
                 int nsMode = mNormalSearchMode.getCheckedRadioButtonId();
-                switch (nsMode) {
-                    default:
-                    case R.id.search_normal_search:
-                        urlBuilder.setMode(ListUrlBuilder.MODE_NORMAL);
-                        break;
-                    case R.id.search_subscription_search:
-                        urlBuilder.setMode(ListUrlBuilder.MODE_SUBSCRIPTION);
-                        break;
-                    case R.id.search_specify_uploader:
-                        urlBuilder.setMode(ListUrlBuilder.MODE_UPLOADER);
-                        break;
-                    case R.id.search_specify_tag:
-                        urlBuilder.setMode(ListUrlBuilder.MODE_TAG);
-                        break;
+                if (nsMode == R.id.search_subscription_search) {
+                    urlBuilder.setMode(ListUrlBuilder.MODE_SUBSCRIPTION);
+                } else if (nsMode == R.id.search_specify_uploader) {
+                    urlBuilder.setMode(ListUrlBuilder.MODE_UPLOADER);
+                } else if (nsMode == R.id.search_specify_tag) {
+                    urlBuilder.setMode(ListUrlBuilder.MODE_TAG);
+                } else {
+                    urlBuilder.setMode(ListUrlBuilder.MODE_NORMAL);
                 }
                 urlBuilder.setKeyword(query);
                 urlBuilder.setCategory(mCategoryTable.getCategory());

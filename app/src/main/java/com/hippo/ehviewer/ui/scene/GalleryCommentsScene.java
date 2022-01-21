@@ -334,7 +334,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL, ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
-        decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, R.attr.dialogPreferredPadding));
+        decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, androidx.appcompat.R.attr.dialogPreferredPadding));
         rv.addItemDecoration(decoration);
         rv.setClipToPadding(false);
         builder.setView(rv).show();
