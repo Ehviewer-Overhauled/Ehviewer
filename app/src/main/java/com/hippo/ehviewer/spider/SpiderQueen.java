@@ -1394,10 +1394,16 @@ public final class SpiderQueen implements Runnable {
                         isPipe.obtain();
                         InputStream inputStream = new BufferedInputStream(isPipe.open());
                         boolean isPlainTxt = true;
+                        int j = 0;
                         for (; ; ) {
                             int b = inputStream.read();
                             if (b == -1) {
                                 break;
+                            }
+                            // Skip first three bytes
+                            if (j < 3) {
+                                j++;
+                                continue;
                             }
                             if (b > 126) {
                                 isPlainTxt = false;
