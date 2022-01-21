@@ -45,6 +45,8 @@ public class GalleryListParser {
 
     private static final String TAG = GalleryListParser.class.getSimpleName();
 
+    private static final String NO_UNFILTERED_TEXT = "No unfiltered results in this page range. You either requested an invalid page or used too aggressive filters.";
+
     private static final Pattern PATTERN_RATING = Pattern.compile("\\d+px");
     private static final Pattern PATTERN_THUMB_SIZE = Pattern.compile("height:(\\d+)px;width:(\\d+)px");
     private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("background-color:rgba\\((\\d+),(\\d+),(\\d+),");
@@ -347,7 +349,9 @@ public class GalleryListParser {
                 }
             }
             if (list.isEmpty()) {
-                throw new ParseException("No gallery", body);
+                if (es.size() < 2 || !NO_UNFILTERED_TEXT.equals(es.get(1).text())) {
+                    throw new ParseException("No gallery", body);
+                }
             }
             result.galleryInfoList = list;
         } catch (Throwable e) {
