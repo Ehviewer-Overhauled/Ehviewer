@@ -207,14 +207,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             new ActivityResultContracts.CreateDocument(),
             uri -> {
                 if (uri != null) {
-                    try {
-                        // grantUriPermission might throw RemoteException on MIUI
-                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e) {
-                        ExceptionUtils.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-                    String filepath = getCacheDir() + "/" + mCacheFileName;
+                    String filepath = AppConfig.getExternalTempDir() + File.separator + mCacheFileName;
                     File cachefile = new File(filepath);
 
                     ContentResolver resolver = getContentResolver();
@@ -828,7 +821,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        File dir = getCacheDir();
+        File dir = AppConfig.getExternalTempDir();
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show();
             return;
@@ -844,6 +837,12 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                MimeTypeMap.getFileExtensionFromUrl(filename));
+        if (TextUtils.isEmpty(mimeType)) {
+            mimeType = "image/jpeg";
+        }
+
         Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", new File(dir, filename));
 
         Intent intent = new Intent();
@@ -851,7 +850,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.putExtra(Intent.EXTRA_TEXT, EhUrl.getGalleryDetailUrl(mGalleryInfo.gid, mGalleryInfo.token));
-        intent.setDataAndType(uri, getContentResolver().getType(uri));
+        intent.setDataAndType(uri, mimeType);
 
         try {
             startActivity(Intent.createChooser(intent, getString(R.string.share_image)));
@@ -866,7 +865,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             return;
         }
 
-        File dir = getCacheDir();
+        File dir = AppConfig.getExternalCopyTempDir();
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show();
             return;

@@ -98,6 +98,17 @@ public class AppConfig {
     }
 
     @Nullable
+    public static File getExternalCopyTempDir() {
+        File dir = sContext.getExternalCacheDir();
+        File file;
+        if (null != dir && FileUtils.ensureDirectory(file = new File(dir, "copy"))) {
+            return file;
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
     public static File getExternalParseErrorDir() {
         return getDirInExternalAppDir(PARSE_ERROR);
     }

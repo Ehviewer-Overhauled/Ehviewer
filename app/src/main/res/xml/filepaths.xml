@@ -20,12 +20,7 @@
         name="temp"
         path="." />
 
-    <!--
-        java.lang.IllegalArgumentException:
-        Failed to find configured root that contains /storage/6230-3338/Android/data/io.github.nekoinverter.ehviewer/cache/1274942-c154d4fd8d-00000023.jpg
-        App install in sdcard ...?
-    -->
-    <root-path
-        name="root_path"
+    <external-cache-path
+        name="copy"
         path="." />
 </path>
