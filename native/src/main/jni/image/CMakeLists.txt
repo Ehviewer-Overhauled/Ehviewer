@@ -14,7 +14,8 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-add_subdirectory(cpufeatures)
+include(AndroidNdkModules)
+android_ndk_import_module_cpufeatures()
 add_subdirectory(image)
 add_subdirectory(stream)
 add_subdirectory(libjpeg-turbo)
