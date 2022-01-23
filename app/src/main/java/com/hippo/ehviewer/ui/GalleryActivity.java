@@ -387,12 +387,14 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mGalleryProvider.setGLRoot(mGLRootView);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        insetsController = ViewCompat.getWindowInsetsController(getWindow().getDecorView());
+        insetsController = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         if (insetsController != null) {
             if (Settings.getReadingFullscreen()) {
                 insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                // This does not hide navigation bar sometimes on 31, framework bug???
                 insetsController.hide(WindowInsetsCompat.Type.systemBars());
             } else {
+                insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH);
                 insetsController.show(WindowInsetsCompat.Type.systemBars());
             }
             boolean night = ConfigurationKt.isNight(getResources().getConfiguration());

@@ -71,8 +71,7 @@
         android:orientation="horizontal"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:visibility="invisible"
-        app:fitsSystemWindowsInsets="bottom">
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/left"
