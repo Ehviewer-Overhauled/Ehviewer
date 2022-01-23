@@ -48,7 +48,9 @@ android {
 
     packagingOptions {
         resources {
-            excludes += '**'
+            excludes += "/META-INF/**"
+            excludes += "/kotlin/**"
+            excludes += "/*.txt"
         }
     }
 
