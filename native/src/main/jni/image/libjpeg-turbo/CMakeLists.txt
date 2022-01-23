@@ -59,20 +59,50 @@ if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
 
   enable_language(ASM)
 
+  add_definitions(-DNEON_INTRINSICS)
+
   set(LIBJPEG_TURBO_SOURCES
       ${LIBJPEG_TURBO_SOURCES}
-      libjpeg-turbo/simd/arm/jsimd.c
-      libjpeg-turbo/simd/arm/jsimd_neon.S
+          libjpeg-turbo/simd/arm/jccolor-neon.c
+          libjpeg-turbo/simd/arm/jidctred-neon.c
+          libjpeg-turbo/simd/arm/jquanti-neon.c
+          libjpeg-turbo/simd/arm/jidctint-neon.c
+          libjpeg-turbo/simd/arm/jidctfst-neon.c
+          libjpeg-turbo/simd/arm/jfdctint-neon.c
+          libjpeg-turbo/simd/arm/jfdctfst-neon.c
+          libjpeg-turbo/simd/arm/jdsample-neon.c
+          libjpeg-turbo/simd/arm/jdmerge-neon.c
+          libjpeg-turbo/simd/arm/jdcolor-neon.c
+          libjpeg-turbo/simd/arm/jcsample-neon.c
+          libjpeg-turbo/simd/arm/jcphuff-neon.c
+          libjpeg-turbo/simd/arm/jcgray-neon.c
+          libjpeg-turbo/simd/arm/aarch32/jchuff-neon.c
+          libjpeg-turbo/simd/arm/aarch32/jsimd.c
   )
 
 elseif (${ANDROID_ABI} STREQUAL "arm64-v8a")
 
   enable_language(ASM)
 
+  add_definitions(-DNEON_INTRINSICS)
+
   set(LIBJPEG_TURBO_SOURCES
       ${LIBJPEG_TURBO_SOURCES}
-      libjpeg-turbo/simd/arm64/jsimd.c
-      libjpeg-turbo/simd/arm64/jsimd_neon.S
+          libjpeg-turbo/simd/arm/jccolor-neon.c
+          libjpeg-turbo/simd/arm/jidctred-neon.c
+          libjpeg-turbo/simd/arm/jquanti-neon.c
+          libjpeg-turbo/simd/arm/jidctint-neon.c
+          libjpeg-turbo/simd/arm/jidctfst-neon.c
+          libjpeg-turbo/simd/arm/jfdctint-neon.c
+          libjpeg-turbo/simd/arm/jfdctfst-neon.c
+          libjpeg-turbo/simd/arm/jdsample-neon.c
+          libjpeg-turbo/simd/arm/jdmerge-neon.c
+          libjpeg-turbo/simd/arm/jdcolor-neon.c
+          libjpeg-turbo/simd/arm/jcsample-neon.c
+          libjpeg-turbo/simd/arm/jcphuff-neon.c
+          libjpeg-turbo/simd/arm/jcgray-neon.c
+          libjpeg-turbo/simd/arm/aarch64/jchuff-neon.c
+          libjpeg-turbo/simd/arm/aarch64/jsimd.c
   )
 
 elseif (${ANDROID_ABI} STREQUAL "x86")
