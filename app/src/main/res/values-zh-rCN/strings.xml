@@ -754,4 +754,9 @@
     <string name="copy_trans">复制翻译</string>
     <string name="reset_download_location">恢复默认路径</string>
     <string name="pick_new_download_location">选择新路径</string>
+    <string name="dont_show_again">不再显示</string>
+    <string name="open_settings">打开设置</string>
+    <string name="app_link_not_verified_message">对于 Android 12 及更新的版本，您需要手动添加链接到已验证链接才能在 EhViewer 中打开 E-Hentai 链接。</string>
+    <string name="app_link_not_verified_title">应用链接未验证</string>
+    <string name="open_by_default">默认打开</string>
 </resources>

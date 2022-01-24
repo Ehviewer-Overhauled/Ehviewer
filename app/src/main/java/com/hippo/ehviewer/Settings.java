@@ -131,6 +131,8 @@ public class Settings {
     private static final String DEFAULT_EXCLUDED_LANGUAGES = null;
     private static final String KEY_METERED_NETWORK_WARNING = "cellular_network_warning";
     private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
+    private static final String KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip";
+    private static final boolean DEFAULT_APP_LINK_VERIFY_TIP = false;
     private static final String KEY_NIGHT_MODE = "night_mode";
     private static final String DEFAULT_NIGHT_MODE = "-1";
     private static final String KEY_E_INK_MODE = "e_ink_mode_2";
@@ -602,6 +604,14 @@ public class Settings {
 
     public static boolean getMeteredNetworkWarning() {
         return getBoolean(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING);
+    }
+
+    public static boolean getAppLinkVerifyTip() {
+        return getBoolean(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP);
+    }
+
+    public static void putAppLinkVerifyTip(boolean value) {
+        putBoolean(KEY_APP_LINK_VERIFY_TIP, value);
     }
 
     public static int getScreenRotation() {

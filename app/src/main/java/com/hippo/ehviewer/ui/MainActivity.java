@@ -19,6 +19,9 @@ package com.hippo.ehviewer.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.verify.domain.DomainVerificationManager;
+import android.content.pm.verify.domain.DomainVerificationUserState;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -38,6 +41,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -91,6 +95,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 import rikka.material.app.DayNightDelegate;
 
@@ -347,11 +352,55 @@ public final class MainActivity extends StageActivity
             if (Settings.getMeteredNetworkWarning()) {
                 checkMeteredNetwork();
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!Settings.getAppLinkVerifyTip()) {
+                    try {
+                        checkAppLinkVerify();
+                    } catch (PackageManager.NameNotFoundException ignored) {
+
+                    }
+                }
+            }
         } else {
             onRestore(savedInstanceState);
         }
 
         EhTagDatabase.update(this);
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void checkAppLinkVerify() throws PackageManager.NameNotFoundException {
+        DomainVerificationManager manager = getSystemService(DomainVerificationManager.class);
+        DomainVerificationUserState userState = manager.getDomainVerificationUserState(getPackageName());
+
+        if (userState == null) {
+            return;
+        }
+
+        boolean hasUnverified = false;
+        Map<String, Integer> hostToStateMap = userState.getHostToStateMap();
+        for (String key : hostToStateMap.keySet()) {
+            Integer stateValue = hostToStateMap.get(key);
+            if (stateValue == null || stateValue == DomainVerificationUserState.DOMAIN_STATE_VERIFIED || stateValue == DomainVerificationUserState.DOMAIN_STATE_SELECTED) {
+                continue;
+            }
+            hasUnverified = true;
+            break;
+        }
+        if (hasUnverified) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.app_link_not_verified_title)
+                    .setMessage(R.string.app_link_not_verified_message)
+                    .setPositiveButton(R.string.open_settings, (dialogInterface, i) -> {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNeutralButton(R.string.dont_show_again, (dialogInterface, i) -> Settings.putAppLinkVerifyTip(true))
+                    .show();
+        }
     }
 
     private void checkDownloadLocation() {

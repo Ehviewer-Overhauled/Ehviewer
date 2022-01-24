@@ -18,7 +18,10 @@ package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -59,6 +62,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
     private static final String KEY_APP_LANGUAGE = "app_language";
     private static final String KEY_IMPORT_DATA = "import_data";
     private static final String KEY_EXPORT_DATA = "export_data";
+    private static final String KEY_OPEN_BY_DEFAULT = "open_by_default";
 
     ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument(),
@@ -225,6 +229,13 @@ public class AdvancedFragment extends BasePreferenceFragment {
         Preference appLanguage = findPreference(KEY_APP_LANGUAGE);
         Preference importData = findPreference(KEY_IMPORT_DATA);
         Preference exportData = findPreference(KEY_EXPORT_DATA);
+        Preference openByDefault = findPreference(KEY_OPEN_BY_DEFAULT);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            openByDefault.setVisible(false);
+        } else {
+            openByDefault.setOnPreferenceClickListener(this);
+        }
 
         dumpLogcat.setOnPreferenceClickListener(this);
         clearMemoryCache.setOnPreferenceClickListener(this);
@@ -264,6 +275,11 @@ public class AdvancedFragment extends BasePreferenceFragment {
                 ExceptionUtils.throwIfFatal(e);
                 showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
             }
+            return true;
+        } else if (KEY_OPEN_BY_DEFAULT.equals(key)) {
+            Intent intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                    Uri.parse("package:" + requireContext().getPackageName()));
+            startActivity(intent);
             return true;
         }
         return false;
