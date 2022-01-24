@@ -323,6 +323,7 @@ public class EhApplication extends SceneApplication {
 
         super.onCreate();
 
+        Native.initialize();
         ClipboardUtil.initialize(this);
         GetText.initialize(this);
         StatusCodeException.initialize(this);
@@ -334,9 +335,6 @@ public class EhApplication extends SceneApplication {
         EhDB.initialize(this);
         EhEngine.initialize();
         BitmapUtils.initialize(this);
-        Native.initialize(this);
-        //Image.initialize(this);
-        //A7Zip.initialize(this);
 
         if (EhDB.needMerge()) {
             EhDB.mergeOldDB(this);
