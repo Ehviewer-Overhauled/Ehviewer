@@ -10,14 +10,12 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 1
-        versionName "1.0.0"
         consumerProguardFiles 'proguard-rules.pro'
 
         externalNativeBuild {
             cmake {
                 version '3.18.1'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23',  "-j=16"
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23'
             }
         }
     }
