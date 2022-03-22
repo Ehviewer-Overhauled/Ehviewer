@@ -2,16 +2,10 @@
     public static final ** CREATOR;
 }
 
--repackageclasses
--allowaccessmodification
--overloadaggressively
-
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     public static void check*(...);
     public static void throw*(...);
 }
-
--keepattributes SourceFile,LineNumberTable
 
 -keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { }
 -keep class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { }
@@ -19,6 +13,12 @@
 -keepnames class com.hippo.ehviewer.ui.scene.* { }
 
 -keep class com.hippo.ehviewer.dao.* { *; }
+
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute
+-repackageclasses
+-allowaccessmodification
+-overloadaggressively
 
 -dontwarn net.sqlcipher.database.**
 -dontwarn rx.**
