@@ -22,4 +22,3 @@ set(A_SEVEN_ZIP_SOURCES
 
 add_library(a7zip STATIC ${A_SEVEN_ZIP_SOURCES})
 target_link_libraries(a7zip PUBLIC p7zip log)
-target_compile_options(a7zip PRIVATE -fvisibility=hidden -fvisibility-inlines-hidden -fno-exceptions)

@@ -10,7 +10,4 @@ add_library(genuine STATIC
         path.c
         plt.c
         pm.c)
-target_compile_options(genuine PUBLIC
-        -Oz -Wall -Wextra -Wshadow -Werror -fvisibility=hidden)
-target_include_directories(genuine PUBLIC
-        integrity)
+target_include_directories(genuine PUBLIC integrity)

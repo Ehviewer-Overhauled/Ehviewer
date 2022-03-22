@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion 32
     buildToolsVersion "32.0.0"
-    ndkVersion "23.1.7779620"
+    ndkVersion "24.0.8215888"
 
     defaultConfig {
         minSdkVersion 23
@@ -14,15 +14,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                version '3.18.1'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23'
+                arguments '-DANDROID_STL=c++_static'
             }
-        }
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
         }
     }
 
