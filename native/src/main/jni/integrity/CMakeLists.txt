@@ -8,6 +8,5 @@ add_library(genuine STATIC
         inline.c
         openat.c
         path.c
-        plt.c
-        pm.c)
+        plt.c)
 target_include_directories(genuine PUBLIC integrity)

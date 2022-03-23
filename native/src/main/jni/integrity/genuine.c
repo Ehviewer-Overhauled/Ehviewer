@@ -15,7 +15,6 @@
 #include "inline.h"
 #include "apk-sign-v2.h"
 #include "am-proxy.h"
-#include "pm.h"
 #include "common.h"
 #include "openat.h"
 #include "path.h"
@@ -342,6 +341,49 @@ static inline void fill_cannot_find_s(char v[]) {
     v[0xe] = '\0';
 }
 
+static inline void fill_invalid_signature_path_s(char v[]) {
+    // invalid signature, path: %s
+    static unsigned int m = 0;
+
+    if (m == 0) {
+        m = 23;
+    } else if (m == 29) {
+        m = 31;
+    }
+
+    v[0x0] = 'm';
+    v[0x1] = 'k';
+    v[0x2] = 'p';
+    v[0x3] = 'f';
+    v[0x4] = 'd';
+    v[0x5] = '`';
+    v[0x6] = 'n';
+    v[0x7] = '+';
+    v[0x8] = '\x7f';
+    v[0x9] = 'd';
+    v[0xa] = 'i';
+    v[0xb] = 'a';
+    v[0xc] = 'q';
+    v[0xd] = 'e';
+    v[0xe] = 'g';
+    v[0xf] = 'a';
+    v[0x10] = 'q';
+    v[0x11] = '9';
+    v[0x12] = '6';
+    v[0x13] = 'p';
+    v[0x14] = '`';
+    v[0x15] = 'v';
+    v[0x16] = 'k';
+    v[0x17] = '>';
+    v[0x18] = '%';
+    v[0x19] = '#';
+    v[0x1a] = 't';
+    for (unsigned int i = 0; i < 0x1b; ++i) {
+        v[i] ^= ((i + 0x1b) % m);
+    }
+    v[0x1b] = '\0';
+}
+
 enum {
     TYPE_NON,
     TYPE_APK,
@@ -349,7 +391,7 @@ enum {
     TYPE_SO,
 };
 
-static inline int checkMaps(const char *packageName, const char *packagePath) {
+static inline int checkMaps(const char *packageName) {
     FILE *fp = NULL;
     char line[PATH_MAX];
     char maps[0x10];
@@ -435,15 +477,21 @@ static inline int checkMaps(const char *packageName, const char *packagePath) {
 #ifdef DEBUG_MAPS
         LOGI("type: %d, line: %s", type, line);
 #endif
-        if (strstr(path, packageName) != NULL && access(path, F_OK) == 0) {
+        if (strstr(path, packageName) != NULL) {
             if (type == TYPE_APK) {
 #ifdef DEBUG
                 LOGI("check %s", path);
 #endif
-                if (isSameFile(path, packagePath)) {
+                if (isDataApp(path) || isExternalSdApp(path)) {
                     loaded = true;
-                } else {
-                    LOGW(path);
+                    int sign = checkSignature(path);
+                    if (sign) {
+                        fill_invalid_signature_path_s(line);
+                        LOGE(line, path);
+#ifndef DEBUG_FAKE
+                        check = sign < 0 ? CHECK_NOAPK : CHECK_FAKE;
+#endif
+                    }
                 }
             } else if (type == TYPE_DEX) {
 #ifdef ANTI_ODEX
@@ -477,7 +525,7 @@ clean3:
 clean2:
     fill_cannot_find_s(line);
     if (!loaded) {
-        LOGE(line, packagePath);
+        LOGE(line, "");
         check = CHECK_ERROR;
     }
     for (int i = 0; i < symbol.size; ++i) {
@@ -805,49 +853,6 @@ static void handler(int sig __unused) {
     LOGI(v);
 }
 
-static inline void fill_invalid_signature_path_s(char v[]) {
-    // invalid signature, path: %s
-    static unsigned int m = 0;
-
-    if (m == 0) {
-        m = 23;
-    } else if (m == 29) {
-        m = 31;
-    }
-
-    v[0x0] = 'm';
-    v[0x1] = 'k';
-    v[0x2] = 'p';
-    v[0x3] = 'f';
-    v[0x4] = 'd';
-    v[0x5] = '`';
-    v[0x6] = 'n';
-    v[0x7] = '+';
-    v[0x8] = '\x7f';
-    v[0x9] = 'd';
-    v[0xa] = 'i';
-    v[0xb] = 'a';
-    v[0xc] = 'q';
-    v[0xd] = 'e';
-    v[0xe] = 'g';
-    v[0xf] = 'a';
-    v[0x10] = 'q';
-    v[0x11] = '9';
-    v[0x12] = '6';
-    v[0x13] = 'p';
-    v[0x14] = '`';
-    v[0x15] = 'v';
-    v[0x16] = 'k';
-    v[0x17] = '>';
-    v[0x18] = '%';
-    v[0x19] = '#';
-    v[0x1a] = 't';
-    for (unsigned int i = 0; i < 0x1b; ++i) {
-        v[i] ^= ((i + 0x1b) % m);
-    }
-    v[0x1b] = '\0';
-}
-
 #ifdef DEBUG_HOOK_IO
 
 static void check_hook_function(void *handle, const char *name) {
@@ -974,6 +979,11 @@ bool checkGenuine(JNIEnv *env) {
 
     sdk = getSdk();
 
+    if (sdk < 23) {
+        genuine = CHECK_FATAL;
+        goto done;
+    }
+
     uid = getuid();
 
 #ifdef DEBUG_HOOK_SELF
@@ -1017,27 +1027,6 @@ bool checkGenuine(JNIEnv *env) {
     }
 
     char *packageName = getGenuinePackageName();
-    char *packagePath = getPath(env, uid, packageName);
-    if (packageName == NULL) {
-        genuine = CHECK_TRUE;
-        goto clean;
-    }
-    if (packagePath == NULL) {
-        fill_cannot_find_s(v1);
-        LOGE(v1, packageName);
-        genuine = CHECK_FAKE;
-        goto clean;
-    } else {
-        int sign = checkSignature(packagePath);
-        if (sign) {
-            fill_invalid_signature_path_s(v1);
-            LOGE(v1, packagePath);
-#ifndef DEBUG_FAKE
-            genuine = sign < 0 ? CHECK_NOAPK : CHECK_FAKE;
-            goto clean;
-#endif
-        }
-    }
 
     if (uid < 10000) {
         goto clean;
@@ -1051,7 +1040,7 @@ bool checkGenuine(JNIEnv *env) {
 #ifdef DEBUG
     LOGI("checkMaps start");
 #endif
-    genuine = checkMaps(packageName, packagePath);
+    genuine = checkMaps(packageName);
 #endif
 
 #ifdef CHECK_HOOK
@@ -1085,7 +1074,6 @@ clean:
 #ifdef GENUINE_NAME
     free(packageName);
 #endif
-    free(packagePath);
 #ifdef DEBUG
     LOGI("JNI_OnLoad end, genuine: %d", genuine);
 #endif

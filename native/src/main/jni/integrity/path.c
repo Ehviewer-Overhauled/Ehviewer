@@ -59,3 +59,37 @@ bool isDataApp(const char *str) {
            && *++str == 'p'
            && *++str == '/';
 }
+
+bool isAsecApp(const char *str) {
+    return str != NULL
+           && *str == '/'
+           && *++str == 'm'
+           && *++str == 'n'
+           && *++str == 't'
+           && *++str == '/'
+           && *++str == 'a'
+           && *++str == 's'
+           && *++str == 'e'
+           && *++str == 'c'
+           && *++str == '/';
+}
+
+bool isExpandApp(const char *str) {
+    return str != NULL
+           && *str == '/'
+           && *++str == 'm'
+           && *++str == 'n'
+           && *++str == 't'
+           && *++str == '/'
+           && *++str == 'e'
+           && *++str == 'x'
+           && *++str == 'p'
+           && *++str == 'a'
+           && *++str == 'n'
+           && *++str == 'd'
+           && *++str == '/';
+}
+
+bool isExternalSdApp(const char *str) {
+    return isAsecApp(str) || isExpandApp(str);
+}
