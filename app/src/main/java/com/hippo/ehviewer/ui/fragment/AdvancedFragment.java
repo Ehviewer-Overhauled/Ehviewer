@@ -278,9 +278,15 @@ public class AdvancedFragment extends BasePreferenceFragment {
             }
             return true;
         } else if (KEY_OPEN_BY_DEFAULT.equals(key)) {
-            Intent intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                    Uri.parse("package:" + requireContext().getPackageName()));
-            startActivity(intent);
+            try {
+                Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                        Uri.parse("package:" + requireContext().getPackageName()));
+                startActivity(intent);
+            } catch (Throwable t) {
+                Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + requireContext().getPackageName()));
+                startActivity(intent);
+            }
             return true;
         }
         return false;

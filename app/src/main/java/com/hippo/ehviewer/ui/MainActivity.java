@@ -361,9 +361,15 @@ public final class MainActivity extends StageActivity
                     .setTitle(R.string.app_link_not_verified_title)
                     .setMessage(R.string.app_link_not_verified_message)
                     .setPositiveButton(R.string.open_settings, (dialogInterface, i) -> {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                                Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
+                        try {
+                            Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                                    Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        } catch (Throwable t) {
+                            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        }
                     })
                     .setNegativeButton(android.R.string.cancel, null)
                     .setNeutralButton(R.string.dont_show_again, (dialogInterface, i) -> Settings.putAppLinkVerifyTip(true))
