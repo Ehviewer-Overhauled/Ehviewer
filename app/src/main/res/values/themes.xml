@@ -19,7 +19,7 @@
     <!-- ========== -->
     <!-- Base Theme -->
     <!-- ========== -->
-    <style name="Base.AppTheme.Light" parent="Theme.Material.Light">
+    <style name="Base.AppTheme.Light" parent="Theme.Material3.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -60,7 +60,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Base.AppTheme" parent="Theme.Material">
+    <style name="Base.AppTheme" parent="Theme.Material3.DayNight">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/grey_875</item>
         <item name="colorAccent">@color/colorPrimary</item>
@@ -143,29 +143,21 @@
     <!-- ============ -->
     <!-- Widget Theme -->
     <!-- ============ -->
-    <style name="CommentEditText" parent="ThemeOverlay.MaterialComponents">
+    <style name="CommentEditText" parent="ThemeOverlay.Material3">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@android:color/white</item>
     </style>
 
-    <style name="RatingBarTheme" parent="ThemeOverlay.MaterialComponents">
+    <style name="RatingBarTheme" parent="ThemeOverlay.Material3">
         <item name="colorControlNormal">@color/yellow_800</item>
         <item name="colorControlActivated">@color/yellow_800</item>
     </style>
 
-    <style name="Widget.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="android:outlineAmbientShadowColor">?attr/widgetColorThemePrimary</item>
-        <item name="android:outlineSpotShadowColor">?attr/widgetColorThemePrimary</item>
-        <item name="backgroundTint">?attr/widgetColorThemePrimary</item>
-        <item name="tint">#fff</item>
+    <style name="Widget.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Tertiary">
     </style>
 
-    <style name="Widget.FloatingActionButton.Accent" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="android:outlineAmbientShadowColor">?attr/widgetColorThemeAccent</item>
-        <item name="android:outlineSpotShadowColor">?attr/widgetColorThemeAccent</item>
-        <item name="backgroundTint">?attr/widgetColorThemeAccent</item>
-        <item name="tint">#fff</item>
+    <style name="Widget.FloatingActionButton.Accent" parent="Widget.Material3.FloatingActionButton.Secondary">
     </style>
 
     <style name="Widget.FloatingActionButton.Accent.Mini" parent="Widget.FloatingActionButton.Accent">
