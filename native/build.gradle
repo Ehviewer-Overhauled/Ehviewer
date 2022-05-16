@@ -28,6 +28,7 @@ android {
     buildFeatures {
         buildConfig false
     }
+    namespace 'com.hippo'
 }
 
 dependencies {

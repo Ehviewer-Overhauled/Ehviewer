@@ -80,6 +80,7 @@ android {
             java.srcDirs += 'src/main/java-gen'
         }
     }
+    namespace 'com.hippo.ehviewer'
 }
 
 tasks.withType(JavaCompile) {
