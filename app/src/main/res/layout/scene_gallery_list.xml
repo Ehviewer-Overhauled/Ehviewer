@@ -35,7 +35,7 @@
 
     <com.hippo.ehviewer.widget.SearchBar
         android:id="@+id/search_bar"
-        style="@style/CardView.Normal"
+        style="@style/Widget.Material3.CardView.Filled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/gallery_search_bar_margin_h"

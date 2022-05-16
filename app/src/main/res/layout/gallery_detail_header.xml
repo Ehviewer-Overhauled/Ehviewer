@@ -125,7 +125,6 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/action_card"
-            style="@style/CardView.Normal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/keyline_margin"
