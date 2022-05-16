@@ -11,10 +11,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
         return JNI_ERR;
     }
 
-    if (!checkGenuine(env)) {
-        return JNI_ERR;
-    }
-
     if (!image_onLoad(vm)) {
         return JNI_ERR;
     }
