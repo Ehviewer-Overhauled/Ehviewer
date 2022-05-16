@@ -124,6 +124,7 @@
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Elevated"
             android:id="@+id/action_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

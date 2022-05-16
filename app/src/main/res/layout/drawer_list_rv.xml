@@ -14,6 +14,7 @@
   ~ limitations under the License.
   -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Material3.CardView.Filled"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -27,15 +28,13 @@
         android:focusable="true"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/toolbarColor"
             android:elevation="4dp"
-            android:saveEnabled="false"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-            app:popupTheme="?attr/toolbarPopupTheme" />
+            android:saveEnabled="false" />
 
         <FrameLayout
             android:layout_width="match_parent"
