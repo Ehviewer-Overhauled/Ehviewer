@@ -21,12 +21,10 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 
-import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.text.Html;
 import com.hippo.util.AppHelper;
-import com.microsoft.appcenter.distribute.Distribute;
 
 public class AboutFragment extends BasePreferenceFragment {
 
@@ -47,7 +45,6 @@ public class AboutFragment extends BasePreferenceFragment {
         author.setOnPreferenceClickListener(this);
         //donate.setOnPreferenceClickListener(this);
         checkForUpdate.setOnPreferenceClickListener(this);
-        checkForUpdate.setVisible(Analytics.isEnabled());
     }
 
     @Override
@@ -56,8 +53,6 @@ public class AboutFragment extends BasePreferenceFragment {
         if (KEY_AUTHOR.equals(key)) {
             AppHelper.sendEmail(requireActivity(), EhApplication.getDeveloperEmail(),
                     "About EhViewer", null);
-        } else if (KEY_CHECK_FOR_UPDATES.equals(key)) {
-            Distribute.checkForUpdate();
         }
         return true;
     }
