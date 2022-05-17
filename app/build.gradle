@@ -34,8 +34,8 @@ android {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 100011
-        versionName "1.7.26.4"
+        versionCode 114514
+        versionName "1.7.26.5"
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
     }
 
