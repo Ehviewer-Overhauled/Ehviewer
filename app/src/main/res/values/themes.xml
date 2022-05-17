@@ -20,9 +20,6 @@
     <!-- Base Theme -->
     <!-- ========== -->
     <style name="Base.AppTheme.Light" parent="Theme.Material3.Light">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="s">@color/ic_launcher_background</item>
 
@@ -61,9 +58,6 @@
     </style>
 
     <style name="Base.AppTheme" parent="Theme.Material3.DayNight">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/grey_875</item>
-        <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorControlActivated">@color/colorPrimary</item>
         <item name="android:colorBackground">@color/grey_850</item>
         <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="s">@color/ic_launcher_background</item>
@@ -109,8 +103,6 @@
     <style name="ThemeOverlay" />
 
     <style name="ThemeOverlay.Black">
-        <item name="colorPrimaryDark">@android:color/black</item>
-
         <item name="android:colorBackground">@android:color/black</item>
 
         <item name="android:textColorPrimary">@color/primary_text_material_black</item>
@@ -143,25 +135,9 @@
     <!-- ============ -->
     <!-- Widget Theme -->
     <!-- ============ -->
-    <style name="CommentEditText" parent="ThemeOverlay.Material3">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@android:color/white</item>
-    </style>
 
     <style name="RatingBarTheme" parent="ThemeOverlay.Material3">
         <item name="colorControlNormal">@color/yellow_800</item>
         <item name="colorControlActivated">@color/yellow_800</item>
     </style>
-
-    <style name="Widget.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Tertiary">
-    </style>
-
-    <style name="Widget.FloatingActionButton.Accent" parent="Widget.Material3.FloatingActionButton.Secondary">
-    </style>
-
-    <style name="Widget.FloatingActionButton.Accent.Mini" parent="Widget.FloatingActionButton.Accent">
-        <item name="fabSize">mini</item>
-    </style>
-
 </resources>

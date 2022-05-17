@@ -62,37 +62,36 @@
         app:fitsSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
+            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_check_all_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
+            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_play_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
+            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_pause_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
+            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_delete_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
+            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_folder_move_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_close_dark_x24" />

@@ -30,7 +30,6 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="?attr/galleryDetailHeaderBackgroundColor"
             android:elevation="4dp"
             app:fitsSystemWindowsInsets="top" />
 
@@ -49,7 +48,6 @@
             android:id="@+id/header_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             app:fitsSystemWindowsInsets="top">
 
             <com.hippo.widget.LoadImageView
@@ -70,7 +68,6 @@
                 android:layout_toRightOf="@id/thumb"
                 android:ellipsize="end"
                 android:maxLines="5"
-                android:textColor="@android:color/white"
                 android:textSize="@dimen/text_little_large" />
 
             <TextView
@@ -84,7 +81,6 @@
                 android:background="?selectableItemBackground"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="@android:color/white"
                 android:textSize="@dimen/text_little_small" />
 
             <TextView

@@ -51,25 +51,24 @@
         app:fitsSystemWindowsInsets="top|bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_magnify_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_go_to_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton.Accent.Mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_refresh_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            style="@style/Widget.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -84,7 +83,6 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/search_fab"
-            style="@style/Widget.FloatingActionButton.Accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleX="0"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <color android:color="@android:color/white" />
+        <color android:color="@android:color/system_neutral1_50" />
     </item>
     <item android:drawable="?android:attr/selectableItemBackground" />
 </layer-list>

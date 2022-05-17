@@ -69,8 +69,7 @@
             android:maxHeight="112dp"
             android:minHeight="56dp"
             android:padding="@dimen/keyline_margin"
-            android:textColor="?colorOnPrimarySurface"
-            android:theme="@style/CommentEditText" />
+            android:textColor="?colorOnPrimarySurface" />
 
         <ImageView
             android:id="@+id/send"
@@ -95,7 +94,6 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            style="@style/Widget.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_reply_dark_x24" />
