@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<data-extraction-rules>
+    <cloud-backup>
 
-    <string name="app_name">EhViewer Debug</string>
-
-</resources>
+    </cloud-backup>
+</data-extraction-rules>

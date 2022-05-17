@@ -41,7 +41,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="UnusedAttribute"
+        android:dataExtractionRules="@xml/data_extraction_rules">
 
         <activity
             android:name="com.hippo.ehviewer.ui.MainActivity"
