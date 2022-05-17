@@ -27,10 +27,11 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.R;
 import com.hippo.yorozuya.ViewUtils;
 
-public class ListCheckBoxDialogBuilder extends AlertDialog.Builder {
+public class ListCheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
 
     private final CheckBox mCheckBox;
 

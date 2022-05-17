@@ -35,12 +35,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
@@ -307,7 +307,7 @@ public class HistoryScene extends ToolbarScene {
     }
 
     private void showClearAllDialog() {
-        new AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setMessage(R.string.clear_all_history)
                 .setPositiveButton(R.string.clear_all, (dialog, which) -> {
                     if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
@@ -398,7 +398,7 @@ public class HistoryScene extends ToolbarScene {
                 R.drawable.v_delete_x24,
         };
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
                 .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
                     switch (which) {
@@ -410,7 +410,7 @@ public class HistoryScene extends ToolbarScene {
                             break;
                         case 1: // Download
                             if (downloaded) {
-                                new AlertDialog.Builder(context)
+                                new MaterialAlertDialogBuilder(context)
                                         .setTitle(R.string.download_remove_dialog_title)
                                         .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
                                         .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
@@ -448,7 +448,7 @@ public class HistoryScene extends ToolbarScene {
 
                             MoveDialogHelper helper = new MoveDialogHelper(labels, gi);
 
-                            new AlertDialog.Builder(context)
+                            new MaterialAlertDialogBuilder(context)
                                     .setTitle(R.string.download_move_dialog_title)
                                     .setItems(labels, helper)
                                     .show();
