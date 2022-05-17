@@ -136,7 +136,7 @@ public class HostsFragment extends BaseFragment
                 ip.setText(arguments.getString(KEY_IP));
             }
 
-            AlertDialog.Builder builder = new MaterialAlertDialogBuilder(requireContext()).setView(view);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext()).setView(view);
             onCreateDialogBuilder(builder);
             AlertDialog dialog = builder.create();
             dialog.setOnShowListener(d -> onCreateDialog((AlertDialog) d));

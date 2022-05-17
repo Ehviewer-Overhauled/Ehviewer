@@ -333,7 +333,7 @@ public final class MainActivity extends StageActivity
         mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
         mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
         ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
-            int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
+            int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? DayNightDelegate.MODE_NIGHT_NO : DayNightDelegate.MODE_NIGHT_YES;
             DayNightDelegate.setDefaultNightMode(theme);
             recreate();
             if (Settings.getTheme() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
@@ -389,7 +389,7 @@ public final class MainActivity extends StageActivity
             break;
         }
         if (hasUnverified) {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.app_link_not_verified_title)
                     .setMessage(R.string.app_link_not_verified_message)
                     .setPositiveButton(R.string.open_settings, (dialogInterface, i) -> {

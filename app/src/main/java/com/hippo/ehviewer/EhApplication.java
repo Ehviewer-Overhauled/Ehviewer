@@ -37,6 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.collection.LruCache;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.Native;
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.conaco.Conaco;
@@ -431,7 +432,7 @@ public class EhApplication extends SceneApplication {
         Activity activity = getTopActivity();
         if (activity != null) {
             activity.runOnUiThread(() -> {
-                AlertDialog dialog = new AlertDialog.Builder(activity)
+                AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
                         .setMessage(Html.fromHtml(html))
                         .setPositiveButton(android.R.string.ok, null)
                         .create();

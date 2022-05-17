@@ -309,7 +309,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             }
         }
 
-        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         context = builder.getContext();
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);

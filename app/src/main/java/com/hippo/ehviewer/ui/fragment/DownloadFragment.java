@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
@@ -99,7 +100,7 @@ public class DownloadFragment extends BasePreferenceFragment {
         if (KEY_DOWNLOAD_LOCATION.equals(key)) {
             UniFile file = Settings.getDownloadLocation();
             if (file != null && !UniFile.isFileUri(Settings.getDownloadLocation().getUri())) {
-                new AlertDialog.Builder(requireContext())
+                new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.settings_download_download_location)
                         .setMessage(file.getUri().toString())
                         .setPositiveButton(R.string.pick_new_download_location, (dialogInterface, i) -> openDirPickerL())
