@@ -17,6 +17,10 @@ android {
                 arguments '-DANDROID_STL=c++_static'
             }
         }
+
+        ndk {
+            abiFilters 'arm64-v8a', 'x86_64'
+        }
     }
 
     externalNativeBuild {
