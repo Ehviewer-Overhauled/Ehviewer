@@ -1,7 +1,3 @@
-### [下载](https://install.appcenter.ms/users/nekoinverter/apps/ehviewer/distribution_groups/public)
-
-[Download](https://install.appcenter.ms/users/nekoinverter/apps/ehviewer/distribution_groups/public)
-
 # EhViewer
 
 ![Icon](art/launcher_icon-web.png)
@@ -10,6 +6,9 @@
 
 An E-Hentai Application for Android.
 
+# Download
+
+[Github 下载](https://github.com/asuka-mio/Ehviewer/releases)
 
 # Screenshot
 
