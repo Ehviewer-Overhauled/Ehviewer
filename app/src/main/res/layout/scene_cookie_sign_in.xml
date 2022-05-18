@@ -154,8 +154,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="8dp"
-            android:text="@string/from_clipboard"
-            android:textColor="?attr/textColorThemeAccent" />
+            android:text="@string/from_clipboard" />
 
     </LinearLayout>
 </LinearLayout>

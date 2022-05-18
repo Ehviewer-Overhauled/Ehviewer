@@ -46,7 +46,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="8dp"
-            android:layout_toRightOf="@id/thumb" />
+            android:layout_toEndOf="@id/thumb" />
 
         <TextView
             android:id="@+id/uploader"
@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:layout_marginTop="2dp" />
 
         <com.hippo.ehviewer.widget.SimpleRatingView
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/uploader"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:layout_marginTop="2dp" />
 
         <TextView
@@ -70,7 +70,7 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:layout_alignBottom="@id/thumb"
             android:layout_marginBottom="8dp"
             android:paddingLeft="8dp"
@@ -85,8 +85,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/thumb"
-            android:layout_alignParentRight="true"
-            android:paddingRight="8dp">
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/start"
@@ -115,10 +115,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/actions"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginBottom="4dp"
-            android:paddingRight="16dp"
-            android:textColor="?attr/textColorThemeAccent" />
+            android:paddingRight="16dp" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -126,8 +125,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@id/actions"
-            android:layout_alignLeft="@id/title"
-            android:layout_marginRight="8dp"
+            android:layout_alignStart="@id/title"
+            android:layout_marginEnd="8dp"
             android:indeterminate="false" />
 
         <TextView
@@ -135,7 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/progress_bar"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:textSize="@dimen/text_super_small" />
 
         <TextView
@@ -143,8 +142,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/progress_bar"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="8dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
             android:textSize="@dimen/text_super_small" />
 
     </RelativeLayout>

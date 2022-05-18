@@ -24,27 +24,19 @@
         <item name="colorControlActivated">@color/colorPrimary</item>
         <item name="colorEdgeEffect">@color/grey_500</item>
         <item name="dividerColor">@color/divider</item>
-        <item name="textColorThemeAccent">?android:attr/textColorSecondary</item>
         <item name="colorControlNormal">@color/primary_drawable</item>
         <item name="drawableColorSecondary">@color/secondary_drawable</item>
         <item name="drawableColorThemePrimary">@color/primary_drawable</item>
-        <item name="contentColorReactive">@color/content_reactive</item>
         <item name="guideBackgroundColor">#e5303030</item>
         <item name="guideTitleColor">?android:attr/textColorPrimary</item>
         <item name="guideTextColor">?android:attr/textColorSecondary</item>
         <item name="tagGroupBackgroundColor">@color/tag_group_background</item>
         <item name="tagBackgroundColor">@color/tag_background</item>
-        <item name="galleryDetailHeaderTitleColor">?android:attr/textColorPrimary</item>
-        <item name="galleryDetailHeaderBackgroundColor">?attr/contentColorThemePrimary</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-
-    <!-- =============== -->
-    <!-- Base Black Theme -->
-    <!-- =============== -->
 
     <style name="ThemeOverlay" />
 
@@ -53,14 +45,10 @@
         <item name="colorControlNormal">@color/primary_drawable_black</item>
         <item name="drawableColorSecondary">@color/secondary_drawable_black</item>
         <item name="drawableColorThemePrimary">@color/primary_drawable_black</item>
-        <item name="contentColorReactive">@color/content_reactive_black</item>
         <item name="guideBackgroundColor">#e5000000</item>
         <item name="tagGroupBackgroundColor">@color/tag_group_background_black</item>
         <item name="tagBackgroundColor">@color/tag_background_black</item>
-        <item name="galleryDetailHeaderBackgroundColor">@android:color/black</item>
     </style>
-
-    <style name="AppTheme.Gallery" parent="AppTheme"></style>
 
     <!-- ============ -->
     <!-- Widget Theme -->

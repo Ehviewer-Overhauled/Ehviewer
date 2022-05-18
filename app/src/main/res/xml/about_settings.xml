@@ -36,30 +36,12 @@
         app:iconSpaceReserved="false"
         app:url="https://github.com/asuka-mio/Ehviewer/releases" />
 
-    <!--<com.hippo.preference.UrlPreference
-        android:key="website"
-        android:title="@string/settings_about_website"
-        app:iconSpaceReserved="false"
-        app:url="http://www.ehviewer.com" />-->
-
     <com.hippo.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
         app:enableCopying="true"
         app:iconSpaceReserved="false"
         app:url="https://github.com/asuka-mio/Ehviewer" />
-
-    <!--<com.hippo.preference.UrlPreference
-        android:key="changelog"
-        android:title="@string/settings_about_changelog"
-        app:iconSpaceReserved="false"
-        app:url="http://www.ehviewer.com/changelog" />
-
-    <com.hippo.preference.UrlPreference
-        android:key="help"
-        android:title="@string/settings_about_help"
-        app:iconSpaceReserved="false"
-        app:url="http://www.ehviewer.com/help" />-->
 
     <com.hippo.ehviewer.preference.VersionPreference
         android:key="version"
@@ -69,17 +51,4 @@
         android:key="check_for_updates"
         android:title="@string/settings_about_check_for_updates"
         app:iconSpaceReserved="false" />
-
-    <!--<SwitchPreferenceCompat
-        android:defaultValue="@bool/beta"
-        android:key="beta_update_channel"
-        android:summary="@string/settings_about_beta_update_channel_summary"
-        android:title="@string/settings_about_beta_update_channel"
-        app:iconSpaceReserved="false" />
-
-    <Preference
-        android:key="donate"
-        android:title="@string/settings_about_donate"
-        app:iconSpaceReserved="false" />-->
-
 </PreferenceScreen>

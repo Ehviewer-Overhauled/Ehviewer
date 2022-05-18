@@ -19,7 +19,7 @@
     <style name="AppTheme" parent="Base.AppTheme" />
 
     <!-- TextAppearance -->
-    <style name="TextAppearance" parent="TextAppearance.AppCompat" />
+    <style name="TextAppearance" parent="TextAppearance.Material3.TitleMedium" />
 
     <!-- Progress View -->
     <style name="ProgressView">
@@ -30,7 +30,6 @@
 
     <style name="TextAppearance.CardTitle">
         <item name="android:textSize">@dimen/text_little_small</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <style name="CardTitle">
@@ -42,7 +41,6 @@
 
     <style name="TextAppearance.CardMessage">
         <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="CardMessage">
@@ -54,16 +52,14 @@
 
     <!-- CategoryText -->
     <style name="CategoryText">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Subhead</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.ActionBar.Subtitle</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:minHeight">@dimen/category_table_item_height</item>
         <item name="android:foreground">@drawable/check_text_view_foreground</item>
-        <item name="android:theme">@style/Theme.Material3.DynamicColors.DayNight</item>
     </style>
 
-    <style name="TextAppearance.CategoryTitle" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">?attr/textColorThemeAccent</item>
+    <style name="TextAppearance.CategoryTitle" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -75,13 +71,12 @@
     </style>
 
     <style name="ButtonInCard">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Button</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:padding">8dp</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Slider">
@@ -95,18 +90,7 @@
         <item name="indicatorColor">?attr/dividerColor</item>
     </style>
 
-    <style name="Guide.Title" parent="TextAppearance.AppCompat.Title">
+    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textColor">?attr/guideTitleColor</item>
     </style>
-
-    <style name="ShapeAppearanceOverlay.App.CornerSize50Percent" parent="">
-        <item name="cornerSize">50%</item>
-    </style>
-
-    <style name="ShapeAppearanceOverlay.MaterialComponents.NavigationView" parent="">
-        <item name="cornerSizeTopLeft">0dp</item>
-        <item name="cornerSizeBottomLeft">0dp</item>
-        <item name="cornerSize">50%</item>
-    </style>
-
 </resources>

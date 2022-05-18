@@ -32,16 +32,15 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_gravity="bottom"
-        android:layout_marginLeft="16dp"
-        android:layout_marginBottom="48dp"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent" />
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="48dp" />
 
     <TextView
         android:id="@+id/display_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_small" />
@@ -58,7 +57,6 @@
             android:id="@+id/night_mode"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:padding="6dp"

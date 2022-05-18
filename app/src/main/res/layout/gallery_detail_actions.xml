@@ -29,7 +29,6 @@
         android:gravity="center"
         android:padding="8dp"
         android:text="@string/newer_version_avaliable"
-        android:textColor="?attr/textColorThemeAccent"
         android:visibility="gone" />
 
     <HorizontalScrollView

@@ -52,13 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="?android:attr/colorBackground"
             app:headerLayout="@layout/nav_header_main"
-            app:insetForeground="@null"
-            app:itemShapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.NavigationView"
-            app:itemShapeInsetBottom="0dp"
-            app:itemShapeInsetStart="0dp"
-            app:itemShapeInsetTop="0dp"
             app:menu="@menu/nav_drawer_main" />
 
         <com.hippo.widget.DrawerView
