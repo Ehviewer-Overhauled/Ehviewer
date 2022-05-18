@@ -41,7 +41,6 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.image.ImageBitmap;
 import com.hippo.image.ImageDrawable;
-import com.hippo.image.RecycledException;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -285,7 +284,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         Drawable drawable;
         try {
             drawable = new ImageDrawable(value);
-        } catch (RecycledException e) {
+        } catch (Exception e) {
             // The image might be recycled because it is removed from memory cache.
             Log.d(TAG, "The image is recycled", e);
             return false;
