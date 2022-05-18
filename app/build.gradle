@@ -113,7 +113,6 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.4.0'
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.6.0'
-    implementation 'com.getkeepsafe.relinker:relinker:1.4.4'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
     implementation 'com.github.seven332:beerbelly:0.1.4'
     implementation 'com.github.seven332:glgallery:0.1.2'
