@@ -127,7 +127,7 @@ dependencies {
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'com.gitlab.NekoInverter:yorozuya:723dc867a9'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
-    implementation 'dev.rikka.rikkax.core:core:1.3.4'
+    implementation 'dev.rikka.rikkax.core:core:1.4.0'
     implementation 'dev.rikka.rikkax.insets:insets:1.2.0'
     implementation 'dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0'
     implementation 'dev.rikka.rikkax.material:material:1.6.6'
