@@ -28,20 +28,11 @@
     <color name="primary_drawable_black">#ccffffff</color>
     <color name="secondary_drawable_black">#3dffffff</color>
 
-    <color name="primary_text_default_material_black">#d9ffffff</color>
-    <color name="primary_text_disabled_material_black">#4dffffff</color>
-
     <color name="content">#fff</color>
     <color name="content_black">@color/grey_925</color>
 
     <color name="content_activated">@color/grey_300</color>
     <color name="content_activated_black">@color/grey_700</color>
-
-    <color name="widget">@color/grey_200</color>
-    <color name="widget_black">@color/grey_850</color>
-
-    <color name="progress">@color/colorAccent</color>
-    <color name="progress_black">@color/grey_700</color>
 
     <color name="tag_group_background">@color/colorAccent</color>
     <color name="tag_group_background_black">@color/grey_875</color>
@@ -49,12 +40,8 @@
     <color name="tag_background">@color/colorPrimary</color>
     <color name="tag_background_black">@color/grey_875</color>
 
-    <color name="gallery_detail_button_background">@color/grey_100</color>
-    <color name="gallery_detail_button_background_black">@color/grey_900</color>
-
     <color name="red_500">#fff44336</color>
     <color name="teal_500">#ff009688</color>
-    <color name="teal_700">#ff00796b</color>
     <color name="purple_a200">#ffe040fb</color>
     <color name="purple_a700">#ffaa00ff</color>
     <color name="cyan_600">#ff00acc1</color>
@@ -62,22 +49,16 @@
     <color name="yellow_800">#fff9a825</color>
     <color name="deep_orange_400">#ffff7043</color>
     <color name="grey_925">#ff191919</color>
-    <color name="grey_900">#ff212121</color>
     <color name="grey_875">#ff292929</color>
-    <color name="grey_850">#ff323232</color>
     <color name="grey_825">#ff3a3a3a</color>
-    <color name="grey_800">#ff424242</color>
     <color name="grey_775">#ff4a4a4a</color>
     <color name="grey_700">#ff616161</color>
     <color name="grey_600">#ff757575</color>
     <color name="grey_500">#ff9e9e9e</color>
     <color name="grey_300">#ffe0e0e0</color>
-    <color name="grey_200">#ffeeeeee</color>
-    <color name="grey_100">#fff5f5f5</color>
     <color name="brown_500">#ff795548</color>
 
     <color name="colorPrimary">@color/teal_500</color>
-    <color name="colorPrimaryDark">@color/teal_700</color>
     <color name="colorAccent">@color/purple_a200</color>
 
     <color name="loading_indicator_red">#ffe53935</color>
@@ -118,9 +99,6 @@
     <!-- shadow -->
 
     <!-- Gallery Activity -->
-    <color name="gallery_slider_background">@color/grey_100</color>
-
-    <color name="guide_bg">#e5009688</color>
 
     <!-- Lock pattern view -->
     <color name="lock_pattern_view_regular_color">#8a000000</color>
@@ -129,5 +107,4 @@
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
-    <color name="colorBackground">#fff</color>
 </resources>

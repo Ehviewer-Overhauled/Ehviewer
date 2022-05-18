@@ -19,29 +19,6 @@
     <!-- ========== -->
     <!-- Base Theme -->
     <!-- ========== -->
-    <style name="Base.AppTheme.Light" parent="Theme.Material3.DynamicColors.Light">
-        <item name="colorEdgeEffect">@color/colorPrimary</item>
-        <item name="dividerColor">@color/divider</item>
-        <item name="textColorThemeAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/primary_drawable</item>
-        <item name="drawableColorSecondary">@color/secondary_drawable</item>
-        <item name="drawableColorThemePrimary">@color/colorPrimary</item>
-        <item name="contentColorThemePrimary">@color/colorPrimary</item>
-        <item name="contentColorThemeAccent">@color/colorAccent</item>
-        <item name="contentColorReactive">@color/content_reactive</item>
-        <item name="guideBackgroundColor">@color/guide_bg</item>
-        <item name="guideTitleColor">?android:attr/textColorPrimaryInverse</item>
-        <item name="guideTextColor">?android:attr/textColorSecondaryInverse</item>
-        <item name="tagGroupBackgroundColor">@color/tag_group_background</item>
-        <item name="tagBackgroundColor">@color/tag_background</item>
-        <item name="galleryDetailHeaderTitleColor">?android:attr/textColorPrimaryInverse</item>
-        <item name="galleryDetailHeaderBackgroundColor">?attr/contentColorThemePrimary</item>
-
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
 
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="colorControlActivated">@color/colorPrimary</item>

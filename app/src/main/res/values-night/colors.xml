@@ -21,11 +21,8 @@
 
     <color name="content">@color/grey_825</color>
     <color name="content_activated">@color/grey_600</color>
-    <color name="widget">@color/grey_700</color>
-    <color name="progress">@color/grey_600</color>
     <color name="tag_group_background">@color/grey_775</color>
     <color name="tag_background">@color/grey_775</color>
-    <color name="gallery_detail_button_background">@color/grey_800</color>
 
     <!-- divider -->
     <color name="divider">#20ffffff</color>
@@ -33,11 +30,9 @@
     <!-- shadow -->
 
     <!-- Gallery Activity -->
-    <color name="gallery_slider_background">@color/grey_900</color>
 
     <!-- Lock pattern view -->
     <color name="lock_pattern_view_regular_color">#8affffff</color>
 
     <!--Shortcut background-->
-    <color name="colorBackground">#303030</color>
 </resources>
