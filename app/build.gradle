@@ -114,7 +114,7 @@ dependencies {
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
     implementation 'com.github.seven332:beerbelly:0.1.4'
     implementation 'com.github.seven332:glgallery:0.1.2'
-    implementation 'com.github.seven332:glview:0.1.4'
+    implementation 'com.github.seven332:glview:0.1.0'
     implementation 'com.github.seven332:glview-image:0.1.3'
     implementation 'com.github.seven332:streampipe:0.1.0'
     implementation 'com.github.seven332:tuxiang:0.1.6'
@@ -143,7 +143,7 @@ dependencies {
 configurations.all {
     resolutionStrategy {
         force 'com.github.seven332:glgallery:25893283ca'
-        force 'com.github.seven332:glview:0.1.4'
+        force 'com.github.seven332:glview:ba6aee61d7'
         force 'com.github.seven332:glview-image:68d94b0fc2'
 
         exclude group: 'com.github.seven332', module: 'okhttp'
