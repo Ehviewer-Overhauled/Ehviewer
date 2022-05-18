@@ -31,8 +31,8 @@ import com.hippo.yorozuya.ViewUtils;
 
 public class SeekBarPanel extends LinearLayout {
 
-    private SeekBar mSeekBar;
     private final int[] mLocation = new int[2];
+    private SeekBar mSeekBar;
 
     public SeekBarPanel(Context context) {
         super(context);

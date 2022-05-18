@@ -86,23 +86,19 @@ public class EasyRecyclerView extends BridgeRecyclerView {
     double flingMoveDistanceY;
     boolean canScrollVertical = true;
     boolean canScrollHorizontally = true;
-
-    /**
-     * Controls if/how the user may choose/check items in the list
-     */
-    private int mChoiceMode = CHOICE_MODE_NONE;
-
-    /**
-     * Controls CHOICE_MODE_MULTIPLE_MODAL. null when inactive.
-     */
-    private ActionMode mChoiceActionMode;
-
     /**
      * Wrapper for the multiple choice mode callback; AbsListView needs to perform
      * a few extra actions around what application code does.
      */
     MultiChoiceModeWrapper mMultiChoiceModeCallback;
-
+    /**
+     * Controls if/how the user may choose/check items in the list
+     */
+    private int mChoiceMode = CHOICE_MODE_NONE;
+    /**
+     * Controls CHOICE_MODE_MULTIPLE_MODAL. null when inactive.
+     */
+    private ActionMode mChoiceActionMode;
     /**
      * Listener for custom multiple choices
      */
@@ -159,6 +155,14 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         super(context, attrs, defStyle);
         EasyRecyclerView.this.init(context);
         setEnableScroll(!Settings.getEInkMode());
+    }
+
+    public static void setViewChecked(View view, boolean checked) {
+        if (view instanceof Checkable) {
+            ((Checkable) view).setChecked(checked);
+        } else {
+            view.setActivated(checked);
+        }
     }
 
     /**
@@ -550,14 +554,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         }
     }
 
-    public static void setViewChecked(View view, boolean checked) {
-        if (view instanceof Checkable) {
-            ((Checkable) view).setChecked(checked);
-        } else {
-            view.setActivated(checked);
-        }
-    }
-
     private void init(Context context) {
         float scale = context.getResources().getDisplayMetrics().density;
         final float ppi = scale * 160.0f;
@@ -845,12 +841,78 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         return mFlingFriction * mPhysicalCoeff * Math.exp(DECELERATION_RATE / decelMinusOne * l);
     }
 
+    public boolean isEnableScroll() {
+        return enableScroll;
+    }
+
     public void setEnableScroll(boolean enableScroll) {
         this.enableScroll = enableScroll;
     }
 
-    public boolean isEnableScroll() {
-        return enableScroll;
+    @Override
+    public Parcelable onSaveInstanceState() {
+        final SavedState ss = new SavedState(super.onSaveInstanceState());
+
+        ss.choiceMode = mChoiceMode;
+        ss.customChoice = mCustomChoice;
+        ss.checkedItemCount = mCheckedItemCount;
+        ss.checkState = mCheckStates;
+        ss.checkIdState = mCheckedIdStates;
+
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        setChoiceMode(ss.choiceMode);
+        mCustomChoice = ss.customChoice;
+        mCheckedItemCount = ss.checkedItemCount;
+        if (ss.checkState != null) {
+            mCheckStates = ss.checkState;
+        }
+        if (ss.checkIdState != null) {
+            mCheckedIdStates = ss.checkIdState;
+        }
+
+        if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mCheckedItemCount > 0) {
+            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback);
+        }
+        updateOnScreenCheckedViews();
+    }
+
+    /**
+     * A MultiChoiceModeListener receives events for {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE_MODAL}.
+     * It acts as the {@link android.view.ActionMode.Callback} for the selection mode and also receives
+     * {@link #onItemCheckedStateChanged(android.view.ActionMode, int, long, boolean)} events when the user
+     * selects and deselects list items.
+     */
+    public interface MultiChoiceModeListener extends ActionMode.Callback {
+        /**
+         * Called when an item is checked or unchecked during selection mode.
+         *
+         * @param mode     The {@link android.view.ActionMode} providing the selection mode
+         * @param position Adapter position of the item that was checked or unchecked
+         * @param id       Adapter ID of the item that was checked or unchecked
+         * @param checked  <code>true</code> if the item is now checked, <code>false</code>
+         *                 if the item is now unchecked.
+         */
+        void onItemCheckedStateChanged(ActionMode mode,
+                                       int position, long id, boolean checked);
+    }
+
+    /**
+     * Custom checked
+     */
+    public interface CustomChoiceListener {
+
+        void onIntoCustomChoice(EasyRecyclerView view);
+
+        void onOutOfCustomChoice(EasyRecyclerView view);
+
+        void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked);
     }
 
     /**
@@ -870,13 +932,23 @@ public class EasyRecyclerView extends BridgeRecyclerView {
 
         public static final SavedState EMPTY_STATE = new SavedState() {
         };
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
 
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         int choiceMode;
         boolean customChoice;
         int checkedItemCount;
         SparseBooleanArray checkState;
         LongSparseArray<Integer> checkIdState;
-
         // This keeps the parent(RecyclerView)'s state
         Parcelable mSuperState;
 
@@ -939,73 +1011,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         public Parcelable getSuperState() {
             return mSuperState;
         }
-
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        final SavedState ss = new SavedState(super.onSaveInstanceState());
-
-        ss.choiceMode = mChoiceMode;
-        ss.customChoice = mCustomChoice;
-        ss.checkedItemCount = mCheckedItemCount;
-        ss.checkState = mCheckStates;
-        ss.checkIdState = mCheckedIdStates;
-
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-
-        setChoiceMode(ss.choiceMode);
-        mCustomChoice = ss.customChoice;
-        mCheckedItemCount = ss.checkedItemCount;
-        if (ss.checkState != null) {
-            mCheckStates = ss.checkState;
-        }
-        if (ss.checkIdState != null) {
-            mCheckedIdStates = ss.checkIdState;
-        }
-
-        if (mChoiceMode == CHOICE_MODE_MULTIPLE_MODAL && mCheckedItemCount > 0) {
-            mChoiceActionMode = startActionMode(mMultiChoiceModeCallback);
-        }
-        updateOnScreenCheckedViews();
-    }
-
-    /**
-     * A MultiChoiceModeListener receives events for {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE_MODAL}.
-     * It acts as the {@link android.view.ActionMode.Callback} for the selection mode and also receives
-     * {@link #onItemCheckedStateChanged(android.view.ActionMode, int, long, boolean)} events when the user
-     * selects and deselects list items.
-     */
-    public interface MultiChoiceModeListener extends ActionMode.Callback {
-        /**
-         * Called when an item is checked or unchecked during selection mode.
-         *
-         * @param mode     The {@link android.view.ActionMode} providing the selection mode
-         * @param position Adapter position of the item that was checked or unchecked
-         * @param id       Adapter ID of the item that was checked or unchecked
-         * @param checked  <code>true</code> if the item is now checked, <code>false</code>
-         *                 if the item is now unchecked.
-         */
-        void onItemCheckedStateChanged(ActionMode mode,
-                                       int position, long id, boolean checked);
     }
 
     class MultiChoiceModeWrapper implements MultiChoiceModeListener {
@@ -1063,17 +1068,5 @@ public class EasyRecyclerView extends BridgeRecyclerView {
                 mode.finish();
             }
         }
-    }
-
-    /**
-     * Custom checked
-     */
-    public interface CustomChoiceListener {
-
-        void onIntoCustomChoice(EasyRecyclerView view);
-
-        void onOutOfCustomChoice(EasyRecyclerView view);
-
-        void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked);
     }
 }

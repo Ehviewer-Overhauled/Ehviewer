@@ -28,9 +28,9 @@ import androidx.annotation.NonNull;
 
 public class HandlerDrawable extends Drawable {
 
-    private int mColor = Color.BLACK;
     private final Paint mPaint;
     private final RectF mTemp = new RectF();
+    private int mColor = Color.BLACK;
 
     public HandlerDrawable() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

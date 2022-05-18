@@ -15,9 +15,9 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/content"
@@ -62,33 +62,33 @@
         app:fitsSystemWindowsInsets="bottom">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_check_all_dark_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_play_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_pause_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_delete_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="mini"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fabSize="mini"
             app:srcCompat="@drawable/v_folder_move_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

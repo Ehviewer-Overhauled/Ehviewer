@@ -55,7 +55,7 @@ public class TextClock extends AppCompatTextView {
     private boolean mAttached;
 
     private Calendar mTime;
-    private final Runnable mTicker = new Runnable() {
+    private String mTimeZone;    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
             onTimeChanged();
@@ -66,7 +66,16 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
+    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mTimeZone == null && Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
+                final String timeZone = intent.getStringExtra("time-zone");
+                createTime(timeZone);
+            }
+            onTimeChanged();
+        }
+    };    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
             chooseFormat();
@@ -79,22 +88,9 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-    private String mTimeZone;
-    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (mTimeZone == null && Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
-                final String timeZone = intent.getStringExtra("time-zone");
-                createTime(timeZone);
-            }
-            onTimeChanged();
-        }
-    };
-
     public TextClock(Context context) {
         this(context, null);
     }
-
     public TextClock(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -261,4 +257,8 @@ public class TextClock extends AppCompatTextView {
         mTime.setTimeInMillis(System.currentTimeMillis());
         setText(DateFormat.format(mFormat, mTime));
     }
+
+
+
+
 }

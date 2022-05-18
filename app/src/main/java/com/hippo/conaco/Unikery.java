@@ -23,18 +23,18 @@ public interface Unikery<V> {
     int INVALID_ID = -1;
 
     /**
-     * Store the conaco task id
-     *
-     * @param id the conaco task id
-     */
-    void setTaskId(int id);
-
-    /**
      * Get the conaco task id
      *
      * @return the conaco task id
      */
     int getTaskId();
+
+    /**
+     * Store the conaco task id
+     *
+     * @param id the conaco task id
+     */
+    void setTaskId(int id);
 
     /**
      * On miss in the source

@@ -15,13 +15,12 @@ public class WindowInsetsAnimationHelper extends WindowInsetsAnimationCompat.Cal
     private final View[] views;
     private final HashMap<View, Integer> startPaddings = new HashMap<>();
     private final HashMap<View, Integer> endPaddings = new HashMap<>();
+    WindowInsetsAnimationCompat animation;
 
     public WindowInsetsAnimationHelper(int dispatchMode, View... views) {
         super(dispatchMode);
         this.views = views;
     }
-
-    WindowInsetsAnimationCompat animation;
 
     @Override
     public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {

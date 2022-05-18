@@ -86,7 +86,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 public class HistoryScene extends ToolbarScene {
@@ -234,7 +233,7 @@ public class HistoryScene extends ToolbarScene {
         guardManager.attachRecyclerView(mRecyclerView);
         swipeManager.attachRecyclerView(mRecyclerView);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4, 4, 4, 4, TypedValue.COMPLEX_UNIT_DIP);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
@@ -458,39 +457,6 @@ public class HistoryScene extends ToolbarScene {
         return true;
     }
 
-    private class MoveDialogHelper implements DialogInterface.OnClickListener {
-
-        private final String[] mLabels;
-        private final GalleryInfo mGi;
-
-        public MoveDialogHelper(String[] labels, GalleryInfo gi) {
-            mLabels = labels;
-            mGi = gi;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            // Cancel check mode
-            Context context = getContext();
-            if (null == context) {
-                return;
-            }
-            if (null != mRecyclerView) {
-                mRecyclerView.outOfCustomChoiceMode();
-            }
-
-            DownloadManager downloadManager = EhApplication.getDownloadManager(context);
-            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
-            if (downloadInfo == null) {
-                return;
-            }
-
-            String label = which == 0 ? null : mLabels[which];
-
-            downloadManager.changeLabel(Collections.singletonList(downloadInfo), label);
-        }
-    }
-
     private static class AddToFavoriteListener extends EhCallback<GalleryListScene, Void> {
 
         public AddToFavoriteListener(Context context, int stageId, String sceneTag) {
@@ -575,6 +541,39 @@ public class HistoryScene extends ToolbarScene {
         @Override
         public View getSwipeableContainerView() {
             return card;
+        }
+    }
+
+    private class MoveDialogHelper implements DialogInterface.OnClickListener {
+
+        private final String[] mLabels;
+        private final GalleryInfo mGi;
+
+        public MoveDialogHelper(String[] labels, GalleryInfo gi) {
+            mLabels = labels;
+            mGi = gi;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            // Cancel check mode
+            Context context = getContext();
+            if (null == context) {
+                return;
+            }
+            if (null != mRecyclerView) {
+                mRecyclerView.outOfCustomChoiceMode();
+            }
+
+            DownloadManager downloadManager = EhApplication.getDownloadManager(context);
+            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
+            if (downloadInfo == null) {
+                return;
+            }
+
+            String label = which == 0 ? null : mLabels[which];
+
+            downloadManager.changeLabel(Collections.singletonList(downloadInfo), label);
         }
     }
 

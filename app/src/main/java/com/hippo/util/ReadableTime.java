@@ -36,7 +36,6 @@ public final class ReadableTime {
     public static final long DAY_MILLIS = 24 * HOUR_MILLIS;
     public static final long WEEK_MILLIS = 7 * DAY_MILLIS;
     public static final long YEAR_MILLIS = 365 * DAY_MILLIS;
-    public static final int SIZE = 5;
     public static final long[] MULTIPLES = {
             YEAR_MILLIS,
             DAY_MILLIS,
@@ -44,6 +43,7 @@ public final class ReadableTime {
             MINUTE_MILLIS,
             SECOND_MILLIS
     };
+    public static final int SIZE = 5;
     public static final int[] UNITS = {
             R.plurals.year,
             R.plurals.day,

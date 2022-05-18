@@ -118,6 +118,11 @@ public class HostsFragment extends BaseFragment
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public int getFragmentTitle() {
+        return R.string.hosts;
+    }
+
     public abstract static class HostDialogFragment extends DialogFragment {
 
         private HostsFragment hostsFragment;
@@ -265,10 +270,5 @@ public class HostsFragment extends BaseFragment
         public int getItemCount() {
             return data.size();
         }
-    }
-
-    @Override
-    public int getFragmentTitle() {
-        return R.string.hosts;
     }
 }

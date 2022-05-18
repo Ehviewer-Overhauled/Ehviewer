@@ -19,13 +19,11 @@ package com.hippo.ehviewer;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.hippo.ehviewer.client.EhUrlOpener;
@@ -35,8 +33,6 @@ import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
-
-import rikka.core.res.ResourcesKt;
 
 public final class UrlOpener {
 

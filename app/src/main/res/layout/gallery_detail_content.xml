@@ -44,8 +44,8 @@
         </LinearLayout>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
-            style="@style/ProgressView"
             android:id="@+id/progress"
+            style="@style/ProgressView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

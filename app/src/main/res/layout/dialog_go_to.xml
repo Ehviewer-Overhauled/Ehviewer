@@ -18,8 +18,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:paddingTop="@dimen/abc_dialog_padding_top_material"
-    android:paddingHorizontal="?attr/dialogPreferredPadding">
+    android:paddingHorizontal="?attr/dialogPreferredPadding"
+    android:paddingTop="@dimen/abc_dialog_padding_top_material">
 
     <TextView
         android:id="@+id/start"

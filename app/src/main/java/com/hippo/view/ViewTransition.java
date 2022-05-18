@@ -26,12 +26,9 @@ public class ViewTransition {
     protected static final long ANIMATE_TIME = 300L;
 
     private final View[] mViews;
-
-    private int mShownView = -1;
-
     protected ViewPropertyAnimator mAnimator1;
     protected ViewPropertyAnimator mAnimator2;
-
+    private int mShownView = -1;
     private OnShowViewListener mOnShowViewListener;
 
     public ViewTransition(View... views) {

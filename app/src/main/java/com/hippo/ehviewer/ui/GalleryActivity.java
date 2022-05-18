@@ -130,6 +130,36 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private GalleryInfo mGalleryInfo;
     private int mPage;
     private String mCacheFileName;
+    ActivityResultLauncher<String> saveImageToLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument(),
+            uri -> {
+                if (uri != null) {
+                    String filepath = AppConfig.getExternalTempDir() + File.separator + mCacheFileName;
+                    File cachefile = new File(filepath);
+
+                    ContentResolver resolver = getContentResolver();
+
+                    IoThreadPoolExecutor.getInstance().execute(() -> {
+                        InputStream is = null;
+                        OutputStream os = null;
+                        try {
+                            is = new FileInputStream(cachefile);
+                            os = resolver.openOutputStream(uri);
+                            IOUtils.copy(is, os);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            IOUtils.closeQuietly(is);
+                            IOUtils.closeQuietly(os);
+                            runOnUiThread(() -> Toast.makeText(GalleryActivity.this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show());
+                        }
+                        //noinspection ResultOfMethodCallIgnored
+                        cachefile.delete();
+                    });
+                }
+
+
+            });
     @Nullable
     private GLRootView mGLRootView;
     @Nullable
@@ -191,10 +221,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mLayoutMode;
     private int mSize;
     private int mCurrentIndex;
-
-    private int mSavingPage = -1;
-
-    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+    private int mSavingPage = -1;    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
                 if (result && mSavingPage != -1) {
@@ -203,36 +230,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
                 }
                 mSavingPage = -1;
-            });
-    ActivityResultLauncher<String> saveImageToLauncher = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument(),
-            uri -> {
-                if (uri != null) {
-                    String filepath = AppConfig.getExternalTempDir() + File.separator + mCacheFileName;
-                    File cachefile = new File(filepath);
-
-                    ContentResolver resolver = getContentResolver();
-
-                    IoThreadPoolExecutor.getInstance().execute(() -> {
-                        InputStream is = null;
-                        OutputStream os = null;
-                        try {
-                            is = new FileInputStream(cachefile);
-                            os = resolver.openOutputStream(uri);
-                            IOUtils.copy(is, os);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            IOUtils.closeQuietly(is);
-                            IOUtils.closeQuietly(os);
-                            runOnUiThread(() -> Toast.makeText(GalleryActivity.this, getString(R.string.image_saved, uri.getPath()), Toast.LENGTH_SHORT).show());
-                        }
-                        //noinspection ResultOfMethodCallIgnored
-                        cachefile.delete();
-                    });
-                }
-
-
             });
 
     private void buildProvider() {
@@ -1023,6 +1020,29 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         });
     }
 
+    @Nullable
+    private String getGalleryDetailUrl() {
+        long gid;
+        String token;
+        if (mGalleryInfo != null) {
+            gid = mGalleryInfo.gid;
+            token = mGalleryInfo.token;
+        } else {
+            return null;
+        }
+        return EhUrl.getGalleryDetailUrl(gid, token, 0, false);
+    }
+
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        super.onProvideAssistContent(outContent);
+
+        String url = getGalleryDetailUrl();
+        if (url != null) {
+            outContent.setWebUri(Uri.parse(url));
+        }
+    }
+
     private class GalleryMenuHelper implements DialogInterface.OnClickListener {
 
         private final View mView;
@@ -1283,26 +1303,5 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
     }
 
-    @Nullable
-    private String getGalleryDetailUrl() {
-        long gid;
-        String token;
-        if (mGalleryInfo != null) {
-            gid = mGalleryInfo.gid;
-            token = mGalleryInfo.token;
-        } else {
-            return null;
-        }
-        return EhUrl.getGalleryDetailUrl(gid, token, 0, false);
-    }
 
-    @Override
-    public void onProvideAssistContent(AssistContent outContent) {
-        super.onProvideAssistContent(outContent);
-
-        String url = getGalleryDetailUrl();
-        if (url != null) {
-            outContent.setWebUri(Uri.parse(url));
-        }
-    }
 }

@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
+    android:orientation="vertical"
     app:consumeSystemWindowsInsets="start|end"
     app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end"
-    android:orientation="vertical">
+    app:fitsSystemWindowsInsets="start|end">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -16,8 +16,8 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_width="match_parent" />
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

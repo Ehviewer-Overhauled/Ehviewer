@@ -33,10 +33,9 @@ import java.util.Map;
 public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelper<GalleryInfo> {
 
     private static final String KEY_DATA_MAP = "data_map";
-
+    private final FavouriteStatusRouter.Listener listener;
     @SuppressLint("UseSparseArrays")
     private Map<Long, GalleryInfo> map = new HashMap<>();
-    private final FavouriteStatusRouter.Listener listener;
 
     public GalleryInfoContentHelper() {
         listener = (gid, slot) -> {

@@ -26,15 +26,15 @@
     <Preference
         android:key="author"
         android:title="@string/settings_about_author"
-        app:iconSpaceReserved="false"
-        app:enableCopying="true" />
+        app:enableCopying="true"
+        app:iconSpaceReserved="false" />
 
     <com.hippo.preference.UrlPreference
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
+        app:enableCopying="true"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/asuka-mio/Ehviewer/releases"
-        app:enableCopying="true" />
+        app:url="https://github.com/asuka-mio/Ehviewer/releases" />
 
     <!--<com.hippo.preference.UrlPreference
         android:key="website"
@@ -45,9 +45,9 @@
     <com.hippo.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
+        app:enableCopying="true"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/asuka-mio/Ehviewer"
-        app:enableCopying="true" />
+        app:url="https://github.com/asuka-mio/Ehviewer" />
 
     <!--<com.hippo.preference.UrlPreference
         android:key="changelog"

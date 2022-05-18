@@ -378,7 +378,7 @@ public class DownloadsScene extends ToolbarScene
             mRecyclerView.scrollToPosition(mInitPosition);
             mInitPosition = -1;
         }
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4, 4, 4, 4, TypedValue.COMPLEX_UNIT_DIP);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
@@ -437,8 +437,8 @@ public class DownloadsScene extends ToolbarScene
 
         TapTargetView.showFor(requireActivity(),
                 TapTarget.forView(((DownloadHolder) holder).thumb,
-                        getString(R.string.guide_download_thumb_title),
-                        getString(R.string.guide_download_thumb_text))
+                                getString(R.string.guide_download_thumb_title),
+                                getString(R.string.guide_download_thumb_text))
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
                     @Override
@@ -466,8 +466,8 @@ public class DownloadsScene extends ToolbarScene
 
         TapTargetView.showFor(requireActivity(),
                 TapTarget.forBounds(bounds,
-                        getString(R.string.guide_download_labels_title),
-                        getString(R.string.guide_download_labels_text))
+                                getString(R.string.guide_download_labels_title),
+                                getString(R.string.guide_download_labels_text))
                         .outerCircleColor(R.color.colorPrimary)
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
@@ -999,6 +999,73 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
+    private static class ThumbDataContainer implements DataContainer {
+
+        private final DownloadInfo mInfo;
+        @Nullable
+        private UniFile mFile;
+
+        public ThumbDataContainer(@NonNull DownloadInfo info) {
+            mInfo = info;
+        }
+
+        private void ensureFile() {
+            if (mFile == null) {
+                UniFile dir = SpiderDen.getGalleryDownloadDir(mInfo);
+                if (dir != null && dir.isDirectory()) {
+                    mFile = dir.createFile(".thumb");
+                }
+            }
+        }
+
+        @Override
+        public boolean isEnabled() {
+            ensureFile();
+            return mFile != null;
+        }
+
+        @Override
+        public void onUrlMoved(String requestUrl, String responseUrl) {
+        }
+
+        @Override
+        public boolean save(InputStream is, long length, String mediaType, ProgressNotifier notify) {
+            ensureFile();
+            if (mFile == null) {
+                return false;
+            }
+
+            OutputStream os = null;
+            try {
+                os = mFile.openOutputStream();
+                IOUtils.copy(is, os);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } finally {
+                IOUtils.closeQuietly(os);
+            }
+        }
+
+        @Override
+        public InputStreamPipe get() {
+            ensureFile();
+            if (mFile != null) {
+                return new UniFileInputStreamPipe(mFile);
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            if (mFile != null) {
+                mFile.delete();
+            }
+        }
+    }
+
     private class DownloadLabelAdapter extends RecyclerView.Adapter<DownloadLabelHolder> implements DraggableItemAdapter<DownloadLabelHolder> {
 
         private final LayoutInflater mInflater;
@@ -1388,73 +1455,6 @@ public class DownloadsScene extends ToolbarScene
         public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
             if (view.getCheckedItemCount() == 0) {
                 view.outOfCustomChoiceMode();
-            }
-        }
-    }
-
-    private static class ThumbDataContainer implements DataContainer {
-
-        private final DownloadInfo mInfo;
-        @Nullable
-        private UniFile mFile;
-
-        public ThumbDataContainer(@NonNull DownloadInfo info) {
-            mInfo = info;
-        }
-
-        private void ensureFile() {
-            if (mFile == null) {
-                UniFile dir = SpiderDen.getGalleryDownloadDir(mInfo);
-                if (dir != null && dir.isDirectory()) {
-                    mFile = dir.createFile(".thumb");
-                }
-            }
-        }
-
-        @Override
-        public boolean isEnabled() {
-            ensureFile();
-            return mFile != null;
-        }
-
-        @Override
-        public void onUrlMoved(String requestUrl, String responseUrl) {
-        }
-
-        @Override
-        public boolean save(InputStream is, long length, String mediaType, ProgressNotifier notify) {
-            ensureFile();
-            if (mFile == null) {
-                return false;
-            }
-
-            OutputStream os = null;
-            try {
-                os = mFile.openOutputStream();
-                IOUtils.copy(is, os);
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                IOUtils.closeQuietly(os);
-            }
-        }
-
-        @Override
-        public InputStreamPipe get() {
-            ensureFile();
-            if (mFile != null) {
-                return new UniFileInputStreamPipe(mFile);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public void remove() {
-            if (mFile != null) {
-                mFile.delete();
             }
         }
     }

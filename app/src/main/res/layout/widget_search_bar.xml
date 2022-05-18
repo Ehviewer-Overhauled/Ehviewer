@@ -30,8 +30,8 @@
                 android:layout_height="match_parent"
                 android:background="?selectableItemBackground"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="48dp"
                 android:maxLines="1"
+                android:paddingHorizontal="48dp"
                 android:singleLine="true"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="@dimen/text_little_large" />

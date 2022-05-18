@@ -35,13 +35,10 @@ import androidx.recyclerview.widget.RecyclerView;
 public class LinearDividerItemDecoration extends RecyclerView.ItemDecoration {
     public static final int HORIZONTAL = LinearLayoutManager.HORIZONTAL;
     public static final int VERTICAL = LinearLayoutManager.VERTICAL;
-
-    private boolean mShowFirstDivider = false;
-    private boolean mShowLastDivider = false;
-
     private final Rect mRect;
     private final Paint mPaint;
-
+    private boolean mShowFirstDivider = false;
+    private boolean mShowLastDivider = false;
     private int mOrientation;
     private int mThickness;
     private int mPaddingStart = 0;

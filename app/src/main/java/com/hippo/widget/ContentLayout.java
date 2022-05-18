@@ -56,7 +56,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
 import rikka.recyclerview.RecyclerViewKt;
 
 public class ContentLayout extends FrameLayout {
@@ -125,7 +124,7 @@ public class ContentLayout extends FrameLayout {
                 resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
 
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4,4,4,4, TypedValue.COMPLEX_UNIT_DIP);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4, 4, 4, 4, TypedValue.COMPLEX_UNIT_DIP);
         RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();
@@ -263,8 +262,6 @@ public class ContentLayout extends FrameLayout {
         private int mCurrentTaskId;
         private int mCurrentTaskType;
         private int mCurrentTaskPage;
-        private int mNextPageScrollSize;
-        private String mEmptyString = "No hint";
         private final SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -278,6 +275,8 @@ public class ContentLayout extends FrameLayout {
                 }
             }
         };
+        private int mNextPageScrollSize;
+        private String mEmptyString = "No hint";
         private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {

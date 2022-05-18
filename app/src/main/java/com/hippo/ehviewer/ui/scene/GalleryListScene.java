@@ -165,6 +165,9 @@ public final class GalleryListScene extends BaseScene
     private EasyRecyclerView mRecyclerView;
     @Nullable
     private SearchLayout mSearchLayout;
+    ActivityResultLauncher<String[]> selectImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(),
+            result -> mSearchLayout.setImageUri(result));
     @Nullable
     private SearchBar mSearchBar;
     @Nullable
@@ -235,10 +238,6 @@ public final class GalleryListScene extends BaseScene
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
     private boolean mIsTopList = false;
-
-    ActivityResultLauncher<String[]> selectImageLauncher = registerForActivityResult(
-            new ActivityResultContracts.OpenDocument(),
-            result -> mSearchLayout.setImageUri(result));
 
     @Nullable
     private static String getSuitableTitleForUrlBuilder(
@@ -657,8 +656,8 @@ public final class GalleryListScene extends BaseScene
 
         TapTargetView.showFor(requireActivity(),
                 TapTarget.forBounds(bounds,
-                        getString(R.string.guide_quick_search_title),
-                        getString(R.string.guide_quick_search_text))
+                                getString(R.string.guide_quick_search_title),
+                                getString(R.string.guide_quick_search_text))
                         .outerCircleColor(R.color.colorPrimary)
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
@@ -1091,39 +1090,6 @@ public final class GalleryListScene extends BaseScene
                     }
                 }).show();
         return true;
-    }
-
-    private class MoveDialogHelper implements DialogInterface.OnClickListener {
-
-        private final String[] mLabels;
-        private final GalleryInfo mGi;
-
-        public MoveDialogHelper(String[] labels, GalleryInfo gi) {
-            mLabels = labels;
-            mGi = gi;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            // Cancel check mode
-            Context context = getContext();
-            if (null == context) {
-                return;
-            }
-            if (null != mRecyclerView) {
-                mRecyclerView.outOfCustomChoiceMode();
-            }
-
-            DownloadManager downloadManager = EhApplication.getDownloadManager(context);
-            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
-            if (downloadInfo == null) {
-                return;
-            }
-
-            String label = which == 0 ? null : mLabels[which];
-
-            downloadManager.changeLabel(Collections.singletonList(downloadInfo), label);
-        }
     }
 
     private void showActionFab() {
@@ -1611,6 +1577,39 @@ public final class GalleryListScene extends BaseScene
             super(itemView);
             key = (TextView) ViewUtils.$$(itemView, R.id.tv_key);
             option = (ImageView) ViewUtils.$$(itemView, R.id.iv_option);
+        }
+    }
+
+    private class MoveDialogHelper implements DialogInterface.OnClickListener {
+
+        private final String[] mLabels;
+        private final GalleryInfo mGi;
+
+        public MoveDialogHelper(String[] labels, GalleryInfo gi) {
+            mLabels = labels;
+            mGi = gi;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            // Cancel check mode
+            Context context = getContext();
+            if (null == context) {
+                return;
+            }
+            if (null != mRecyclerView) {
+                mRecyclerView.outOfCustomChoiceMode();
+            }
+
+            DownloadManager downloadManager = EhApplication.getDownloadManager(context);
+            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
+            if (downloadInfo == null) {
+                return;
+            }
+
+            String label = which == 0 ? null : mLabels[which];
+
+            downloadManager.changeLabel(Collections.singletonList(downloadInfo), label);
         }
     }
 

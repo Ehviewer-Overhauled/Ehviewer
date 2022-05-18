@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Preference
+        android:fragment="com.hippo.ehviewer.ui.fragment.SetSecurityFragment"
         android:key="pattern_protection"
         android:title="@string/settings_privacy_pattern_protection_title"
-        android:fragment="com.hippo.ehviewer.ui.fragment.SetSecurityFragment"
         app:iconSpaceReserved="false" />
 
     <SwitchPreference

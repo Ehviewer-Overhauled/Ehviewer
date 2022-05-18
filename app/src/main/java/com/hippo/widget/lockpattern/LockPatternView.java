@@ -58,9 +58,6 @@ public class LockPatternView extends View {
     private static final int ASPECT_SQUARE = 0; // View will be the minimum of width/height
     private static final int ASPECT_LOCK_WIDTH = 1; // Fixed width; height will be minimum of (w,h)
     private static final int ASPECT_LOCK_HEIGHT = 2; // Fixed height; width will be minimum of (w,h)
-
-    private final Cell[][] mCells;
-
     private static final boolean PROFILE_DRAWING = false;
     /**
      * How many milliseconds we spend animating each circle of a lock pattern
@@ -73,6 +70,7 @@ public class LockPatternView extends View {
      * It didn't seem to have much impact on the devices tested, so currently set to 0.
      */
     private static final float DRAG_THRESHOLD = 0.0f;
+    private final Cell[][] mCells;
     private final CellState[][] mCellStates;
     private final int mDotSize;
     private final int mDotSizeActivated;
@@ -179,6 +177,66 @@ public class LockPatternView extends View {
 
         mFastOutSlowInInterpolator = new FastOutSlowInInterpolator();
         mLinearOutSlowInInterpolator = new LinearOutSlowInInterpolator();
+    }
+
+    /**
+     * Returns the greatest common divisor of {@code a, b}. Returns {@code 0} if
+     * {@code a == 0 && b == 0}.
+     *
+     * @throws IllegalArgumentException if {@code a < 0} or {@code b < 0}
+     */
+    private static int gcd(int a, int b) {
+
+        /*
+         * The reason we require both arguments to be >= 0 is because otherwise, what do you return
+         * on gcd(0, Integer.MIN_VALUE)? BigInteger.gcd would return positive 2^31, but positive
+         * 2^31 isn't an int.
+         */
+        //checkNonNegative("a", a);
+        if (a < 0) {
+            throw new IllegalArgumentException("a (" + a + ") must be >= 0");
+        }
+        //checkNonNegative("b", b);
+        if (b < 0) {
+            throw new IllegalArgumentException("b (" + b + ") must be >= 0");
+        }
+
+        if (a == 0) {
+            // 0 % b == 0, so b divides a, but the converse doesn't hold.
+            // BigInteger.gcd is consistent with this decision.
+            return b;
+        } else if (b == 0) {
+            return a; // similar logic
+        }
+        /*
+         * Uses the binary GCD algorithm; see http://en.wikipedia.org/wiki/Binary_GCD_algorithm.
+         * This is >40% faster than the Euclidean algorithm in benchmarks.
+         */
+        int aTwos = Integer.numberOfTrailingZeros(a);
+        a >>= aTwos; // divide out all 2s
+        int bTwos = Integer.numberOfTrailingZeros(b);
+        b >>= bTwos; // divide out all 2s
+        while (a != b) { // both a, b are odd
+
+            // The key to the binary GCD algorithm is as follows:
+            // Both a and b are odd. Assume a > b; then gcd(a - b, b) = gcd(a, b).
+            // But in gcd(a - b, b), a - b is even and b is odd, so we can divide out powers of two.
+
+            // We bend over backwards to avoid branching, adapting a technique from
+            // http://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax
+
+            int delta = a - b; // can't overflow, since a and b are nonnegative
+
+            int minDeltaOrZero = delta & (delta >> (Integer.SIZE - 1));
+            // equivalent to Math.min(delta, 0)
+
+            a = delta - minDeltaOrZero - minDeltaOrZero; // sets a to Math.abs(a - b)
+            // a is now nonnegative and even
+
+            b += minDeltaOrZero; // sets b to min(old a, b)
+            a >>= Integer.numberOfTrailingZeros(a); // divide out all 2s, since 2 doesn't divide b
+        }
+        return a << Math.min(aTwos, bTwos);
     }
 
     public int getCellSize() {
@@ -333,6 +391,9 @@ public class LockPatternView extends View {
         setMeasuredDimension(viewWidth, viewHeight);
     }
 
+    // From
+    // https://github.com/google/guava/blob/c462d69329709f72a17a64cb229d15e76e72199c/guava/src/com/google/common/math/IntMath.java
+
     /**
      * Determines whether the point x, y will add a new point to the current
      * pattern (in addition to finding the cell, also makes heuristic choices
@@ -374,69 +435,6 @@ public class LockPatternView extends View {
             return cell;
         }
         return null;
-    }
-
-    // From
-    // https://github.com/google/guava/blob/c462d69329709f72a17a64cb229d15e76e72199c/guava/src/com/google/common/math/IntMath.java
-
-    /**
-     * Returns the greatest common divisor of {@code a, b}. Returns {@code 0} if
-     * {@code a == 0 && b == 0}.
-     *
-     * @throws IllegalArgumentException if {@code a < 0} or {@code b < 0}
-     */
-    private static int gcd(int a, int b) {
-
-        /*
-         * The reason we require both arguments to be >= 0 is because otherwise, what do you return
-         * on gcd(0, Integer.MIN_VALUE)? BigInteger.gcd would return positive 2^31, but positive
-         * 2^31 isn't an int.
-         */
-        //checkNonNegative("a", a);
-        if (a < 0) {
-            throw new IllegalArgumentException("a (" + a + ") must be >= 0");
-        }
-        //checkNonNegative("b", b);
-        if (b < 0) {
-            throw new IllegalArgumentException("b (" + b + ") must be >= 0");
-        }
-
-        if (a == 0) {
-            // 0 % b == 0, so b divides a, but the converse doesn't hold.
-            // BigInteger.gcd is consistent with this decision.
-            return b;
-        } else if (b == 0) {
-            return a; // similar logic
-        }
-        /*
-         * Uses the binary GCD algorithm; see http://en.wikipedia.org/wiki/Binary_GCD_algorithm.
-         * This is >40% faster than the Euclidean algorithm in benchmarks.
-         */
-        int aTwos = Integer.numberOfTrailingZeros(a);
-        a >>= aTwos; // divide out all 2s
-        int bTwos = Integer.numberOfTrailingZeros(b);
-        b >>= bTwos; // divide out all 2s
-        while (a != b) { // both a, b are odd
-
-            // The key to the binary GCD algorithm is as follows:
-            // Both a and b are odd. Assume a > b; then gcd(a - b, b) = gcd(a, b).
-            // But in gcd(a - b, b), a - b is even and b is odd, so we can divide out powers of two.
-
-            // We bend over backwards to avoid branching, adapting a technique from
-            // http://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax
-
-            int delta = a - b; // can't overflow, since a and b are nonnegative
-
-            int minDeltaOrZero = delta & (delta >> (Integer.SIZE - 1));
-            // equivalent to Math.min(delta, 0)
-
-            a = delta - minDeltaOrZero - minDeltaOrZero; // sets a to Math.abs(a - b)
-            // a is now nonnegative and even
-
-            b += minDeltaOrZero; // sets b to min(old a, b)
-            a >>= Integer.numberOfTrailingZeros(a); // divide out all 2s, since 2 doesn't divide b
-        }
-        return a << Math.min(aTwos, bTwos);
     }
 
     private void addCellToPattern(Cell newCell) {
@@ -1040,14 +1038,14 @@ public class LockPatternView extends View {
     }
 
     public static class CellState {
+        public float lineEndX = Float.MIN_VALUE;
+        public float lineEndY = Float.MIN_VALUE;
+        public ValueAnimator lineAnimator;
         int row;
         int col;
         float radius;
         float translationY;
         float alpha = 1f;
-        public float lineEndX = Float.MIN_VALUE;
-        public float lineEndY = Float.MIN_VALUE;
-        public ValueAnimator lineAnimator;
     }
 
     /**

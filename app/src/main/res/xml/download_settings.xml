@@ -40,12 +40,12 @@
         app:iconSpaceReserved="false" />
 
     <rikka.preference.SimpleMenuPreference
+        android:defaultValue="0"
         android:key="download_delay"
-        android:title="@string/settings_download_download_delay"
         android:summary="@string/settings_download_download_delay_summary"
+        android:title="@string/settings_download_download_delay"
         app:entries="@array/download_delay_entries"
         app:entryValues="@array/download_delay_entry_values"
-        android:defaultValue="0"
         app:iconSpaceReserved="false" />
 
     <rikka.preference.SimpleMenuPreference

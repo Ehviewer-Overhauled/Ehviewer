@@ -62,8 +62,8 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="6dp"
-            app:tint="#fff"
-            app:srcCompat="@drawable/ic_baseline_dark_mode_24" />
+            app:srcCompat="@drawable/ic_baseline_dark_mode_24"
+            app:tint="#fff" />
     </FrameLayout>
 
 </FrameLayout>

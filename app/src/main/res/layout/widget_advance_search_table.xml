@@ -22,23 +22,23 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
             android:checked="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sname" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
             android:checked="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_stags" />
     </LinearLayout>
 
@@ -51,21 +51,21 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sdesc" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_storr" />
     </LinearLayout>
 
@@ -78,21 +78,21 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sto" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sdt1" />
     </LinearLayout>
 
@@ -105,21 +105,21 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sdt2" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sh" />
     </LinearLayout>
 
@@ -132,11 +132,11 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sr" />
 
         <Spinner
@@ -157,10 +157,10 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sp" />
 
         <EditText
@@ -225,32 +225,32 @@
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sfl" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sfu" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_sft" />
     </LinearLayout>
 </merge>

@@ -40,9 +40,9 @@ import okhttp3.HttpUrl;
 
 public class IdentityCookiePreference extends MessagePreference {
 
-    private String message;
     @SuppressLint("StaticFieldLeak")
     private final SettingsActivity mActivity;
+    private String message;
 
     public IdentityCookiePreference(Context context) {
         super(context);

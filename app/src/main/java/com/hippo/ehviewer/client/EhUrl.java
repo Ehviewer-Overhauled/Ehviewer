@@ -36,40 +36,29 @@ public class EhUrl {
     public static final String DOMAIN_LOFI = "lofi.e-hentai.org";
 
     public static final String HOST_EX = "https://" + DOMAIN_EX + "/";
-    public static final String HOST_E = "https://" + DOMAIN_E + "/";
-
-    public static final String API_SIGN_IN = "https://forums.e-hentai.org/index.php?act=Login&CODE=01";
-
-    public static final String API_E = HOST_E + "api.php";
     public static final String API_EX = HOST_EX + "api.php";
-
+    public static final String URL_FAVORITES_EX = HOST_EX + "favorites.php";
+    public static final String URL_UCONFIG_EX = HOST_EX + "uconfig.php";
+    public static final String URL_MY_TAGS_EX = HOST_EX + "mytags";
+    public static final String URL_WATCHED_EX = HOST_EX + "watched";
+    public static final String HOST_E = "https://" + DOMAIN_E + "/";
+    public static final String API_E = HOST_E + "api.php";
+    public static final String URL_FAVORITES_E = HOST_E + "favorites.php";
+    public static final String URL_UCONFIG_E = HOST_E + "uconfig.php";
+    public static final String URL_MY_TAGS_E = HOST_E + "mytags";
+    public static final String URL_WATCHED_E = HOST_E + "watched";
+    public static final String API_SIGN_IN = "https://forums.e-hentai.org/index.php?act=Login&CODE=01";
     public static final String URL_POPULAR_E = "https://e-hentai.org/popular";
     public static final String URL_POPULAR_EX = "https://exhentai.org/popular";
-
     public static final String URL_IMAGE_SEARCH_E = "https://upload.e-hentai.org/image_lookup.php";
     public static final String URL_IMAGE_SEARCH_EX = "https://exhentai.org/upload/image_lookup.php";
-
     public static final String URL_SIGN_IN = "https://forums.e-hentai.org/index.php?act=Login";
     public static final String URL_REGISTER = "https://forums.e-hentai.org/index.php?act=Reg&CODE=00";
-    public static final String URL_FAVORITES_E = HOST_E + "favorites.php";
-    public static final String URL_FAVORITES_EX = HOST_EX + "favorites.php";
     public static final String URL_FORUMS = "https://forums.e-hentai.org/";
-
     public static final String REFERER_EX = "https://" + DOMAIN_EX;
-    public static final String REFERER_E = "https://" + DOMAIN_E;
-
     public static final String ORIGIN_EX = REFERER_EX;
+    public static final String REFERER_E = "https://" + DOMAIN_E;
     public static final String ORIGIN_E = REFERER_E;
-
-    public static final String URL_UCONFIG_E = HOST_E + "uconfig.php";
-    public static final String URL_UCONFIG_EX = HOST_EX + "uconfig.php";
-
-    public static final String URL_MY_TAGS_E = HOST_E + "mytags";
-    public static final String URL_MY_TAGS_EX = HOST_EX + "mytags";
-
-    public static final String URL_WATCHED_E = HOST_E + "watched";
-    public static final String URL_WATCHED_EX = HOST_EX + "watched";
-
     private static final String URL_PREFIX_THUMB_E = "https://ehgt.org/";
     private static final String URL_PREFIX_THUMB_EX = "https://exhentai.org/t/";
 

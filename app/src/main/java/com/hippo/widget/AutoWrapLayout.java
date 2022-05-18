@@ -167,8 +167,8 @@ public class AutoWrapLayout extends ViewGroup {
                 // If it is first item in line, try to show it all
                 if (lineEndIndex == lineStartIndex) {
                     child.measure(MeasureSpec.makeMeasureSpec(
-                            maxWidth - paddingLeft - paddingRight
-                                    - lp.leftMargin - lp.rightMargin, MeasureSpec.AT_MOST),
+                                    maxWidth - paddingLeft - paddingRight
+                                            - lp.leftMargin - lp.rightMargin, MeasureSpec.AT_MOST),
                             MeasureSpec.UNSPECIFIED);
                     childWidth = child.getMeasuredWidth();
                     childHeight = child.getMeasuredHeight();

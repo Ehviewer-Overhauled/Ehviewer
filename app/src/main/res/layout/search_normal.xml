@@ -38,9 +38,9 @@
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/search_normal_search"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:layout_height="wrap_content"
             android:text="@string/search_normal_search" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
@@ -54,17 +54,17 @@
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/search_specify_uploader"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:layout_height="wrap_content"
             android:text="@string/search_specify_uploader" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/search_specify_tag"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="@string/search_specify_tag" />
 
     </com.hippo.widget.RadioGridGroup>
@@ -78,9 +78,9 @@
             android:id="@+id/normal_search_mode_help"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:layout_gravity="center"
             android:background="?selectableItemBackgroundBorderless"
             android:padding="6dp"
-            android:layout_gravity="center"
             app:srcCompat="@drawable/v_help_circle_x24"
             tools:ignore="ContentDescription" />
 
@@ -93,9 +93,9 @@
             android:id="@+id/search_enable_advance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:minWidth="36dp"
             android:minHeight="36dp"
-            android:layout_gravity="center"
             android:text="@string/search_enable_advance" />
 
     </LinearLayout>

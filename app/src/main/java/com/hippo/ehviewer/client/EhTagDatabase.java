@@ -56,9 +56,9 @@ import okio.Okio;
 public class EhTagDatabase {
 
     private static final Map<String, String> NAMESPACE_TO_PREFIX = new HashMap<>();
-    private static volatile EhTagDatabase instance;
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
+    private static volatile EhTagDatabase instance;
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");

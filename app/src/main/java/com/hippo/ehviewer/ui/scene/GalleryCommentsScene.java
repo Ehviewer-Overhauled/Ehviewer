@@ -45,7 +45,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
@@ -224,7 +223,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         if (itemAnimator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 0,0,0,80, TypedValue.COMPLEX_UNIT_DIP);
+        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 0, 0, 0, 80, TypedValue.COMPLEX_UNIT_DIP);
 
         mSendImage.setOnClickListener(this);
         mFab.setOnClickListener(this);
@@ -472,27 +471,27 @@ public final class GalleryCommentsScene extends ToolbarScene
         mFab.animate().x(fabEndX).y(fabEndY).scaleX(0.0f).scaleY(0.0f)
                 .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
                 .setDuration(300L).setListener(new SimpleAnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (null == mFab || null == mEditPanel) {
-                    return;
-                }
-
-                ((View) mFab).setVisibility(View.INVISIBLE);
-                mEditPanel.setVisibility(View.VISIBLE);
-                int halfW = mEditPanel.getWidth() / 2;
-                int halfH = mEditPanel.getHeight() / 2;
-                Animator animator = ViewAnimationUtils.createCircularReveal(mEditPanel, halfW, halfH, 0,
-                        (float) Math.hypot(halfW, halfH)).setDuration(300L);
-                animator.addListener(new SimpleAnimatorListener() {
                     @Override
-                    public void onAnimationEnd(Animator a) {
-                        mInAnimation = false;
+                    public void onAnimationEnd(Animator animation) {
+                        if (null == mFab || null == mEditPanel) {
+                            return;
+                        }
+
+                        ((View) mFab).setVisibility(View.INVISIBLE);
+                        mEditPanel.setVisibility(View.VISIBLE);
+                        int halfW = mEditPanel.getWidth() / 2;
+                        int halfH = mEditPanel.getHeight() / 2;
+                        Animator animator = ViewAnimationUtils.createCircularReveal(mEditPanel, halfW, halfH, 0,
+                                (float) Math.hypot(halfW, halfH)).setDuration(300L);
+                        animator.addListener(new SimpleAnimatorListener() {
+                            @Override
+                            public void onAnimationEnd(Animator a) {
+                                mInAnimation = false;
+                            }
+                        });
+                        animator.start();
                     }
-                });
-                animator.start();
-            }
-        }).start();
+                }).start();
     }
 
     private void showEditPanel(boolean animation) {
@@ -544,11 +543,11 @@ public final class GalleryCommentsScene extends ToolbarScene
                 mFab.animate().translationX(0.0f).translationY(0.0f).scaleX(1.0f).scaleY(1.0f).rotation(0.0f)
                         .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
                         .setDuration(300L).setListener(new SimpleAnimatorListener() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        mInAnimation = false;
-                    }
-                }).start();
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mInAnimation = false;
+                            }
+                        }).start();
             }
         });
         animator.start();
@@ -848,6 +847,18 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
     }
 
+    private static class MoreCommentHolder extends CommentHolder {
+        public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, R.layout.item_gallery_comment_more, parent);
+        }
+    }
+
+    private static class ProgressCommentHolder extends CommentHolder {
+        public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, R.layout.item_gallery_comment_progress, parent);
+        }
+    }
+
     private class ActualCommentHolder extends CommentHolder {
 
         private final TextView user;
@@ -899,18 +910,6 @@ public final class GalleryCommentsScene extends ToolbarScene
             });
             time.setText(ReadableTime.getTimeAgo(value.time));
             comment.setText(generateComment(comment.getContext(), comment, value));
-        }
-    }
-
-    private static class MoreCommentHolder extends CommentHolder {
-        public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_more, parent);
-        }
-    }
-
-    private static class ProgressCommentHolder extends CommentHolder {
-        public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_progress, parent);
         }
     }
 

@@ -15,12 +15,12 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:baselineAligned="true"
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/keyline_margin"
-    android:baselineAligned="true"
     app:fitsSystemWindowsInsets="bottom">
 
     <FrameLayout
@@ -31,8 +31,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center_horizontal|top"
+            android:gravity="center"
             android:padding="@dimen/keyline_margin"
             android:text="@string/set_pattern_protection_tip"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
@@ -51,8 +51,8 @@
             style="?attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
             android:layout_gravity="bottom"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingLeft="12dp"
             android:paddingTop="4dp"

@@ -265,12 +265,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private GalleryDetail mGalleryDetail;
     private int mRequestId = IntIdGenerator.INVALID_ID;
     private Pair<String, String>[] mTorrentList;
-    private String mArchiveFormParamOr;
-    private Pair<String, String>[] mArchiveList;
-    @State
-    private int mState = STATE_INIT;
-    private boolean mModifingFavorites;
-
     ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -284,6 +278,24 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     helper.setDialog(dialog, mGalleryDetail.torrentUrl);
                 }
             });
+    private String mArchiveFormParamOr;
+    private Pair<String, String>[] mArchiveList;
+    @State
+    private int mState = STATE_INIT;
+    private boolean mModifingFavorites;
+
+    @Nullable
+    private static String getArtist(GalleryTagGroup[] tagGroups) {
+        if (null == tagGroups) {
+            return null;
+        }
+        for (GalleryTagGroup tagGroup : tagGroups) {
+            if ("artist".equals(tagGroup.groupName) && tagGroup.size() > 0) {
+                return tagGroup.getTagAt(0);
+            }
+        }
+        return null;
+    }
 
     @StringRes
     private int getRatingText(float rating) {
@@ -328,19 +340,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         return resId;
-    }
-
-    @Nullable
-    private static String getArtist(GalleryTagGroup[] tagGroups) {
-        if (null == tagGroups) {
-            return null;
-        }
-        for (GalleryTagGroup tagGroup : tagGroups) {
-            if ("artist".equals(tagGroup.groupName) && tagGroup.size() > 0) {
-                return tagGroup.getTagAt(0);
-            }
-        }
-        return null;
     }
 
     private void handleArgs(Bundle args) {
@@ -1710,6 +1709,16 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mModifingFavorites = false;
     }
 
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        super.onProvideAssistContent(outContent);
+
+        String url = getGalleryDetailUrl(false);
+        if (url != null) {
+            outContent.setWebUri(Uri.parse(url));
+        }
+    }
+
     @IntDef({STATE_INIT, STATE_NORMAL, STATE_REFRESH, STATE_REFRESH_HEADER, STATE_FAILED})
     @Retention(RetentionPolicy.SOURCE)
     private @interface State {
@@ -2221,16 +2230,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             EhApplication.getEhClient(context).execute(request);
-        }
-    }
-
-    @Override
-    public void onProvideAssistContent(AssistContent outContent) {
-        super.onProvideAssistContent(outContent);
-
-        String url = getGalleryDetailUrl(false);
-        if (url != null) {
-            outContent.setWebUri(Uri.parse(url));
         }
     }
 }

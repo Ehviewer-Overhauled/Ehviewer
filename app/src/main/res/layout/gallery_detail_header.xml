@@ -114,14 +114,14 @@
                 android:paddingTop="16dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="16dp"
-                app:tint="@color/primary_drawable_black"
-                app:srcCompat="@drawable/v_dots_vertical_secondary_dark_x24" />
+                app:srcCompat="@drawable/v_dots_vertical_secondary_dark_x24"
+                app:tint="@color/primary_drawable_black" />
 
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
-            style="@style/Widget.Material3.CardView.Elevated"
             android:id="@+id/action_card"
+            style="@style/Widget.Material3.CardView.Elevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/keyline_margin"

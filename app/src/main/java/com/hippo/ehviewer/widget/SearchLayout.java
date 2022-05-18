@@ -314,6 +314,22 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
         void onSelectImage();
     }
 
+    static class SearchLayoutManager extends LinearLayoutManager {
+
+        public SearchLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private class SearchAdapter extends EasyRecyclerView.Adapter<SimpleHolder> {
 
         @Override
@@ -382,22 +398,6 @@ public class SearchLayout extends EasyRecyclerView implements CompoundButton.OnC
                 type = ITEM_TYPE_ACTION;
             }
             return type;
-        }
-    }
-
-    static class SearchLayoutManager extends LinearLayoutManager {
-
-        public SearchLayoutManager(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            try {
-                super.onLayoutChildren(recycler, state);
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

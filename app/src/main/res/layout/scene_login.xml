@@ -53,11 +53,11 @@
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="username"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true"
-                    android:autofillHints="username" />
+                    android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -75,11 +75,11 @@
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="password"
                     android:imeOptions="actionDone"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true"
-                    android:autofillHints="password" />
+                    android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -93,13 +93,13 @@
                 style="?attr/buttonBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 android:gravity="bottom"
                 android:orientation="vertical"
                 android:paddingLeft="12dp"
                 android:paddingTop="4dp"
                 android:paddingRight="12dp"
-                android:paddingBottom="4dp"
-                android:clipToPadding="false">
+                android:paddingBottom="4dp">
 
                 <Button
                     android:id="@+id/sign_in"
@@ -133,18 +133,18 @@
                     android:id="@+id/sign_in_via_webview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:paddingHorizontal="8dp"
                     android:text="@string/sign_in_via_webview"
-                    android:background="?selectableItemBackground"
                     android:textColor="?attr/textColorThemeAccent" />
 
                 <TextView
                     android:id="@+id/sign_in_via_cookies"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:paddingHorizontal="8dp"
                     android:text="@string/sign_in_via_cookies"
-                    android:background="?selectableItemBackground"
                     android:textColor="?attr/textColorThemeAccent" />
 
             </LinearLayout>
@@ -153,10 +153,10 @@
                 android:id="@+id/skip_signing_in"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/skip_signing_in"
                 android:background="?selectableItemBackground"
+                android:paddingHorizontal="8dp"
+                android:text="@string/skip_signing_in"
                 android:textColor="?attr/textColorThemeAccent" />
         </LinearLayout>
     </ScrollView>

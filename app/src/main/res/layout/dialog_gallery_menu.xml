@@ -21,10 +21,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/abc_dialog_padding_top_material"
-        android:paddingHorizontal="?dialogPreferredPadding"
         android:divider="@drawable/spacer_keyline"
         android:orientation="vertical"
+        android:paddingHorizontal="?dialogPreferredPadding"
+        android:paddingTop="@dimen/abc_dialog_padding_top_material"
         android:showDividers="middle">
 
         <LinearLayout

@@ -100,9 +100,9 @@
 
     <SwitchPreference
         android:defaultValue="false"
+        android:dependency="volume_page"
         android:key="reserve_volume_page"
         android:title="@string/settings_read_reverse_volume"
-        android:dependency="volume_page"
         app:iconSpaceReserved="false" />
 
     <SwitchPreference

@@ -23,7 +23,6 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;

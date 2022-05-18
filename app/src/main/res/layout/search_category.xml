@@ -22,12 +22,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingLeft="@dimen/search_category_padding_h"
         android:paddingRight="@dimen/search_category_padding_h"
-        android:paddingBottom="@dimen/search_category_padding_v"
-        android:clipToPadding="false"
-        android:clipChildren="false">
+        android:paddingBottom="@dimen/search_category_padding_v">
 
         <TextView
             android:id="@+id/category_title"

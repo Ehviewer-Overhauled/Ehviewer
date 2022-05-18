@@ -17,9 +17,9 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="@dimen/slider_bubble_width"
     android:height="@dimen/slider_bubble_height"
+    android:tint="?attr/colorControlNormal"
     android:viewportWidth="26"
-    android:viewportHeight="32"
-    android:tint="?attr/colorControlNormal">
+    android:viewportHeight="32">
 
     <path
         android:fillColor="@android:color/white"

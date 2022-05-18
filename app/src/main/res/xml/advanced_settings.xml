@@ -80,10 +80,10 @@
         app:iconSpaceReserved="false" />
 
     <Preference
+        android:fragment="com.hippo.ehviewer.ui.fragment.HostsFragment"
         android:key="custom_hosts_2"
         android:summary="@string/settings_advanced_custom_hosts_summary"
         android:title="@string/settings_advanced_custom_hosts_title"
-        android:fragment="com.hippo.ehviewer.ui.fragment.HostsFragment"
         app:iconSpaceReserved="false" />
 
     <SwitchPreference

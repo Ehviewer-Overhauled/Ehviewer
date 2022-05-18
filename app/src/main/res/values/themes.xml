@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- ========== -->
     <!-- Base Theme -->
@@ -83,8 +83,7 @@
         <item name="galleryDetailHeaderBackgroundColor">@android:color/black</item>
     </style>
 
-    <style name="AppTheme.Gallery" parent="AppTheme">
-    </style>
+    <style name="AppTheme.Gallery" parent="AppTheme"></style>
 
     <!-- ============ -->
     <!-- Widget Theme -->

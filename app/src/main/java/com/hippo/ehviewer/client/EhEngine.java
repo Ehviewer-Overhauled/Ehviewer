@@ -36,6 +36,7 @@ import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.ehviewer.client.parser.ArchiveParser;
+import com.hippo.ehviewer.client.parser.EventPaneParser;
 import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.client.parser.ForumsParser;
 import com.hippo.ehviewer.client.parser.GalleryApiParser;
@@ -48,7 +49,6 @@ import com.hippo.ehviewer.client.parser.GalleryTokenApiParser;
 import com.hippo.ehviewer.client.parser.ProfileParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.SignInParser;
-import com.hippo.ehviewer.client.parser.EventPaneParser;
 import com.hippo.ehviewer.client.parser.TorrentParser;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
@@ -971,7 +971,7 @@ public class EhEngine {
         try {
             Response response = call.execute();
 
-            Log.d(TAG, "" + response.request().url().toString());
+            Log.d(TAG, "" + response.request().url());
 
             code = response.code();
             headers = response.headers();

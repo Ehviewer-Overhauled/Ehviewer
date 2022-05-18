@@ -45,8 +45,6 @@ import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleHandler;
 
-import rikka.core.res.ResourcesKt;
-
 public class Slider extends View {
 
     private static final char[] CHARACTERS = {

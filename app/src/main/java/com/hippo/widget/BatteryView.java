@@ -41,7 +41,7 @@ public class BatteryView extends AppCompatTextView {
     private boolean mCharging = false;
 
     private BatteryDrawable mDrawable;
-    private final Runnable mCharger = new Runnable() {
+    private boolean mAttached = false;    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
 
@@ -55,9 +55,14 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-    private boolean mAttached = false;
     private boolean mIsChargerWorking = false;
-    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+    public BatteryView(Context context) {
+        super(context);
+        init();
+    }
+    public BatteryView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
         @SuppressLint("SetTextI18n")
@@ -87,15 +92,6 @@ public class BatteryView extends AppCompatTextView {
             }
         }
     };
-
-    public BatteryView(Context context) {
-        super(context);
-        init();
-    }
-
-    public BatteryView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
 
     public BatteryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -173,4 +169,8 @@ public class BatteryView extends AppCompatTextView {
     private void unregisterReceiver() {
         getContext().unregisterReceiver(mIntentReceiver);
     }
+
+
+
+
 }

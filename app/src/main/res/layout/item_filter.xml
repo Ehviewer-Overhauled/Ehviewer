@@ -28,9 +28,9 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:clickable="false"
-        android:maxLines="1"
         android:ellipsize="end"
         android:focusable="false"
+        android:maxLines="1"
         android:paddingStart="0dp"
         android:paddingEnd="24dp" />
 
@@ -38,11 +38,11 @@
         android:id="@+id/delete"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:padding="4dp"
         android:layout_gravity="end|center_vertical"
         android:background="?selectableItemBackgroundBorderless"
         android:clickable="true"
         android:contentDescription="@string/delete"
         android:focusable="true"
+        android:padding="4dp"
         app:srcCompat="@drawable/v_delete_x24" />
 </FrameLayout>

@@ -143,6 +143,7 @@ public final class SpiderQueen implements Runnable {
     private final int mWorkerMaxCount;
     private final int mPreloadNumber;
     private final int mDownloadDelay;
+    private final AtomicReference<String> showKey = new AtomicReference<>();
     private int mReadReference = 0;
     private int mDownloadReference = 0;
     // It mQueenThread is null, failed or stopped
@@ -153,7 +154,6 @@ public final class SpiderQueen implements Runnable {
     private volatile int[] mPageStateArray;
     // For download, when it go to mPageStateArray.size(), done
     private volatile int mDownloadPage = -1;
-    private final AtomicReference<String> showKey = new AtomicReference<>();
 
     private SpiderQueen(EhApplication application, @NonNull GalleryInfo galleryInfo) {
         mHttpClient = EhApplication.getOkHttpClient(application);

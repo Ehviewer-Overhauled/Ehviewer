@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_label_rename"
-        android:title="@string/rename_label"
         android:orderInCategory="100"
+        android:title="@string/rename_label"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_label_remove"
-        android:title="@string/delete"
         android:orderInCategory="101"
+        android:title="@string/delete"
         app:showAsAction="never" />
 </menu>

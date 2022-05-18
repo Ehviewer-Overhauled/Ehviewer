@@ -15,6 +15,7 @@
   -->
 
 <resources>
+
     <style name="AppTheme" parent="Base.AppTheme" />
 
     <!-- TextAppearance -->

@@ -32,19 +32,15 @@ import com.hippo.yorozuya.ObjectUtils;
 
 public class GalleryHeader extends ViewGroup {
 
-    private DisplayCutoutCompat displayCutout;
-    private int topInsets = 0;
-
-    private View battery;
-    private View progress;
-    private View clock;
-
     private final Rect batteryRect = new Rect();
     private final Rect progressRect = new Rect();
     private final Rect clockRect = new Rect();
-
     private final int[] location = new int[2];
-
+    private DisplayCutoutCompat displayCutout;
+    private int topInsets = 0;
+    private View battery;
+    private View progress;
+    private View clock;
     private int lastX = 0;
     private int lastY = 0;
 
