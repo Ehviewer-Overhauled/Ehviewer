@@ -1,4 +1,5 @@
-# EhViewer
+# EhViewer with Material Design 3 and Dynamic Color Support https://m3.material.io/
+# Only Support Android S and above!
 
 ![Icon](art/launcher_icon-web.png)
 
