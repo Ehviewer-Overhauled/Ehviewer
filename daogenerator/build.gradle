@@ -25,5 +25,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'org.greenrobot:greendao-generator:3.3.0'
     implementation 'org.jboss.forge.roaster:roaster-api:2.20.1.Final'
-    implementation 'org.jboss.forge.roaster:roaster-jdt:2.20.1.Final'
+    implementation 'org.jboss.forge.roaster:roaster-jdt:2.24.0.Final'
 }
