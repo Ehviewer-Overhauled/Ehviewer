@@ -47,10 +47,8 @@ public abstract class EhActivity extends MaterialActivity {
     }
 
     public static String getTheme(Context context) {
-        if (isBlackNightTheme()
-                && isNightMode(context.getResources().getConfiguration()))
+        if (isBlackNightTheme() && isNightMode(context.getResources().getConfiguration()))
             return THEME_BLACK;
-
         return THEME_DEFAULT;
     }
 
@@ -70,26 +68,21 @@ public abstract class EhActivity extends MaterialActivity {
 
     @StyleRes
     public int getThemeStyleRes(Context context) {
-        switch (getTheme(context)) {
-            case THEME_BLACK:
-                return R.style.ThemeOverlay_Black;
-            case THEME_DEFAULT:
-            default:
-                return R.style.ThemeOverlay;
+        if (THEME_BLACK.equals(getTheme(context))) {
+            return R.style.ThemeOverlay_Black;
         }
+        return R.style.ThemeOverlay;
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ((EhApplication) getApplication()).registerActivity(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         ((EhApplication) getApplication()).unregisterActivity(this);
     }
 
@@ -114,14 +107,10 @@ public abstract class EhActivity extends MaterialActivity {
             WindowInsets rootWindowInsets = window.getDecorView().getRootWindowInsets();
             if (rootWindowInsets != null && rootWindowInsets.getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
                 window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.setNavigationBarContrastEnforced(false);
-                }
+                window.setNavigationBarContrastEnforced(false);
             } else {
                 window.setNavigationBarColor(Color.TRANSPARENT);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.setNavigationBarContrastEnforced(true);
-                }
+                window.setNavigationBarContrastEnforced(true);
             }
         });
     }

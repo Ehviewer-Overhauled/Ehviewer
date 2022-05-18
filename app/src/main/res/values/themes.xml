@@ -41,6 +41,9 @@
     <style name="ThemeOverlay" />
 
     <style name="ThemeOverlay.Black">
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="toolbarColor">@android:color/black</item>
         <item name="dividerColor">@color/divider_black</item>
         <item name="colorControlNormal">@color/primary_drawable_black</item>
         <item name="drawableColorSecondary">@color/secondary_drawable_black</item>
