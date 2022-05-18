@@ -16,9 +16,7 @@
 
 package com.hippo.easyrecyclerview;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.hardware.SensorManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -26,33 +24,20 @@ import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.Checkable;
 
 import androidx.annotation.NonNull;
 import androidx.collection.LongSparseArray;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.BridgeRecyclerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.NumberUtils;
 
 /**
  * Add setChoiceMode for RecyclerView
  */
 // Get some code from twoway-view and AbsListView.
-public class EasyRecyclerView extends BridgeRecyclerView {
-
-    /**
-     * Represents an invalid position. All valid positions are in the range 0 to 1 less than the
-     * number of items in the current adapter.
-     */
-    public static final int INVALID_POSITION = -1;
+public class EasyRecyclerView extends RecyclerView {
 
     /**
      * Normal list that does not indicate choices
@@ -78,14 +63,8 @@ public class EasyRecyclerView extends BridgeRecyclerView {
      * The list allows multiple choices in custom action
      */
     public static final int CHOICE_MODE_MULTIPLE_CUSTOM = 4;
-    private static final float DECELERATION_RATE = (float) (Math.log(0.78) / Math.log(0.9));
     // Fling friction
-    private final float mFlingFriction = ViewConfiguration.getScrollFriction();
     public float pageScrollThreshold;
-    double flingMoveDistanceX;
-    double flingMoveDistanceY;
-    boolean canScrollVertical = true;
-    boolean canScrollHorizontally = true;
     /**
      * Wrapper for the multiple choice mode callback; AbsListView needs to perform
      * a few extra actions around what application code does.
@@ -131,30 +110,20 @@ public class EasyRecyclerView extends BridgeRecyclerView {
     private LongSparseArray<Integer> mCheckedIdStates;
 
     private Adapter<?> mAdapter;
-    private boolean isScrollBefore = false;
-    private int initialTouchX;
-    private int initialTouchY;
-    // A context-specific coefficient adjusted to physical values.
-    private float mPhysicalCoeff;
-    private int defaultOverflowItemScrollKeep;
-    private boolean enableScroll = false;
 
     public EasyRecyclerView(Context context) {
         super(context);
         EasyRecyclerView.this.init(context);
-        setEnableScroll(!Settings.getEInkMode());
     }
 
     public EasyRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         EasyRecyclerView.this.init(context);
-        setEnableScroll(!Settings.getEInkMode());
     }
 
     public EasyRecyclerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         EasyRecyclerView.this.init(context);
-        setEnableScroll(!Settings.getEInkMode());
     }
 
     public static void setViewChecked(View view, boolean checked) {
@@ -202,18 +171,7 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         }
     }
 
-    /**
-     * Returns the number of items currently selected. This will only be valid
-     * if the choice mode is not {@link #CHOICE_MODE_NONE} (default).
-     *
-     * <p>To determine the specific items that are currently selected, use one of
-     * the <code>getChecked*</code> methods.
-     *
-     * @return The number of items currently selected
-     * @see #getCheckedItemPosition()
-     * @see #getCheckedItemPositions()
-     * @see #getCheckedItemIds()
-     */
+
     public int getCheckedItemCount() {
         return mCheckedItemCount;
     }
@@ -238,22 +196,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
     }
 
     /**
-     * Returns the currently checked item. The result is only valid if the choice
-     * mode has been set to {@link #CHOICE_MODE_SINGLE}.
-     *
-     * @return The position of the currently checked item or
-     * {@link #INVALID_POSITION} if nothing is selected
-     * @see #setChoiceMode(int)
-     */
-    public int getCheckedItemPosition() {
-        if (mChoiceMode == CHOICE_MODE_SINGLE && mCheckStates != null && mCheckStates.size() == 1) {
-            return mCheckStates.keyAt(0);
-        }
-
-        return INVALID_POSITION;
-    }
-
-    /**
      * Returns the set of checked items in the list. The result is only valid if
      * the choice mode has not been set to {@link #CHOICE_MODE_NONE}.
      *
@@ -267,30 +209,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
             return mCheckStates;
         }
         return null;
-    }
-
-    /**
-     * Returns the set of checked items ids. The result is only valid if the
-     * choice mode has not been set to {@link #CHOICE_MODE_NONE} and the adapter
-     * has stable IDs. ({@link android.widget.ListAdapter#hasStableIds()} == {@code true})
-     *
-     * @return A new array which contains the id of each checked item in the
-     * list.
-     */
-    public long[] getCheckedItemIds() {
-        if (mChoiceMode == CHOICE_MODE_NONE || mCheckedIdStates == null || mAdapter == null) {
-            return new long[0];
-        }
-
-        final LongSparseArray<Integer> idStates = mCheckedIdStates;
-        final int count = idStates.size();
-        final long[] ids = new long[count];
-
-        for (int i = 0; i < count; i++) {
-            ids[i] = idStates.keyAt(i);
-        }
-
-        return ids;
     }
 
     public boolean isInCustomChoice() {
@@ -476,14 +394,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
     }
 
     /**
-     * @return The current choice mode
-     * @see #setChoiceMode(int)
-     */
-    public int getChoiceMode() {
-        return mChoiceMode;
-    }
-
-    /**
      * Defines the choice behavior for the List. By default, Lists do not have any choice behavior
      * ({@link #CHOICE_MODE_NONE}). By setting the choiceMode to {@link #CHOICE_MODE_SINGLE}, the
      * List allows up to one item to  be in a chosen state. By setting the choiceMode to
@@ -518,24 +428,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
         }
     }
 
-    /**
-     * Set a {@link MultiChoiceModeListener} that will manage the lifecycle of the
-     * selection {@link android.view.ActionMode}. Only used when the choice mode is set to
-     * {@link #CHOICE_MODE_MULTIPLE_MODAL}.
-     *
-     * @param listener Listener that will manage the selection mode
-     * @see #setChoiceMode(int)
-     */
-    public void setMultiChoiceModeListener(MultiChoiceModeListener listener) {
-        if (mMultiChoiceModeCallback == null) {
-            mMultiChoiceModeCallback = new MultiChoiceModeWrapper();
-        }
-        mMultiChoiceModeCallback.setWrapped(listener);
-    }
-
-    /**
-     * @param listener
-     */
     public void setCustomCheckedListener(CustomChoiceListener listener) {
         mCustomChoiceListener = listener;
     }
@@ -556,297 +448,11 @@ public class EasyRecyclerView extends BridgeRecyclerView {
 
     private void init(Context context) {
         float scale = context.getResources().getDisplayMetrics().density;
-        final float ppi = scale * 160.0f;
-        mPhysicalCoeff = SensorManager.GRAVITY_EARTH // g (m/s^2)
-                * 39.37f // inch/meter
-                * ppi
-                * 0.84f; // look and feel tuning
+        // g (m/s^2)
+        // inch/meter
+        // A context-specific coefficient adjusted to physical values.
+        // look and feel tuning
         pageScrollThreshold = scale * 80;
-    }
-
-    public void setPageScrollThreshold(float pageScrollThreshold) {
-        this.pageScrollThreshold = pageScrollThreshold;
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        if (enableScroll) {
-            return super.onTouchEvent(e);
-        }
-        boolean superTouchResult = super.onTouchEvent(e);
-        if (superTouchResult) {
-            switch (e.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    initialTouchX = (int) (e.getX() + 0.5f);
-                    initialTouchY = (int) (e.getY() + 0.5f);
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (initialTouchX < 0 || initialTouchY < 0) {
-                        initialTouchX = (int) (e.getX() + 0.5f);
-                        initialTouchY = (int) (e.getY() + 0.5f);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (isScrollBefore) {
-                        int moveDistanceX = (int) (initialTouchX - e.getX() + flingMoveDistanceX);
-                        int moveDistanceY = (int) (initialTouchY - e.getY() + flingMoveDistanceY);
-                        onTouchScroll(moveDistanceX, moveDistanceY);
-                        initialTouchX = initialTouchY = -1;
-                    }
-                    break;
-            }
-            isScrollBefore = getScrollState() == SCROLL_STATE_DRAGGING;
-        }
-        return superTouchResult;
-    }
-
-    @Override
-    public boolean scrollByInternal(int x, int y, MotionEvent ev, int type) {
-        if (enableScroll) {
-            return super.scrollByInternal(x, y, ev, type);
-        }
-        //disable drag scroll effect，e-ink screen don't need it
-        return false;
-    }
-
-    @Override
-    public boolean fling(int velocityX, int velocityY) {
-        if (enableScroll) {
-            return super.fling(velocityX, velocityY);
-        }
-        flingMoveDistanceX = getSplineFlingDistance(velocityX) * Math.signum(velocityX);
-        flingMoveDistanceY = getSplineFlingDistance(velocityY) * Math.signum(velocityY);
-        //disable fling scroll effect,e-ink screen don't need it
-        return false;
-    }
-
-    protected void onTouchScroll(int dx, int dy) {
-        canScrollVertical = true;
-        canScrollHorizontally = true;
-        LayoutManager layout = getLayoutManager();
-        if (layout != null) {
-            if (dy > pageScrollThreshold) {
-                if (canScrollVertical && layout.canScrollVertically()) {
-                    canScrollVertical = false;
-                    onScrollDown();
-                } else if (canScrollHorizontally && layout.canScrollHorizontally()) {
-                    canScrollHorizontally = false;
-                    onScrollRight();
-                }
-            } else if (dy < -pageScrollThreshold) {
-                if (canScrollVertical && layout.canScrollVertically()) {
-                    canScrollVertical = false;
-                    onScrollUp();
-                } else if (canScrollHorizontally && layout.canScrollHorizontally()) {
-                    canScrollHorizontally = false;
-                    onScrollLeft();
-                }
-            }
-
-            if (dx > pageScrollThreshold) {
-                if (canScrollVertical && layout.canScrollVertically()) {
-                    onScrollDown();
-                } else if (canScrollHorizontally && layout.canScrollHorizontally()) {
-                    onScrollRight();
-                }
-            } else if (dx < -pageScrollThreshold) {
-                if (canScrollVertical && layout.canScrollVertically()) {
-                    onScrollUp();
-                } else if (canScrollHorizontally && layout.canScrollHorizontally()) {
-                    onScrollLeft();
-                }
-            }
-        }
-    }
-
-    protected void onScrollLeft() {
-        LayoutManager layout = getLayoutManager();
-        if (layout instanceof LinearLayoutManager) {
-            LinearLayoutManager realLayout = (LinearLayoutManager) layout;
-            int firstVisiblePosition = realLayout.findFirstVisibleItemPosition();
-            ViewHolder firstVisibleItem = findViewHolderForAdapterPosition(firstVisiblePosition);
-
-            if (firstVisibleItem == null) {
-                return;
-            }
-
-            //when the item width overscreen, findLastCompletelyVisibleItemPosition always return NO_POSITION
-            if (firstVisibleItem.itemView.getMeasuredWidth() > getMeasuredWidth()) {
-                super.scrollByInternal(-getMeasuredWidth() + defaultOverflowItemScrollKeep, 0, null, ViewCompat.TYPE_TOUCH);
-            } else if (firstVisibleItem.itemView.getMeasuredWidth() == getMeasuredWidth()) {
-                super.scrollByInternal(-getMeasuredWidth(), 0, null, ViewCompat.TYPE_TOUCH);
-            } else {
-                super.scrollByInternal(firstVisibleItem.itemView.getRight() - getMeasuredWidth(), 0, null, ViewCompat.TYPE_TOUCH);
-            }
-        } else if (layout instanceof StaggeredGridLayoutManager) {
-            StaggeredGridLayoutManager realLayout = (StaggeredGridLayoutManager) layout;
-            int[] firstVisiblePosition = realLayout.findFirstVisibleItemPositions(null);
-            ViewHolder[] firstVisibleItems = new ViewHolder[firstVisiblePosition.length];
-            for (int i = 0; i < firstVisiblePosition.length; i++) {
-                firstVisibleItems[i] = findViewHolderForAdapterPosition(firstVisiblePosition[i]);
-            }
-            int scrollDistance = Integer.MAX_VALUE;
-            for (ViewHolder firstVisibleItem : firstVisibleItems) {
-                if (firstVisibleItem != null) {
-                    if (firstVisibleItem.itemView.getRight() < scrollDistance) {
-                        scrollDistance = firstVisibleItem.itemView.getRight();
-                    }
-                }
-            }
-
-            if (scrollDistance == getMeasuredWidth()) {
-                scrollDistance = 0;
-            }
-            super.scrollByInternal(scrollDistance - getMeasuredWidth(), 0, null, ViewCompat.TYPE_TOUCH);
-        }
-    }
-
-    protected void onScrollRight() {
-        LayoutManager layout = getLayoutManager();
-        if (layout instanceof LinearLayoutManager) {
-            LinearLayoutManager realLayout = (LinearLayoutManager) layout;
-            int lastVisiblePosition = realLayout.findLastVisibleItemPosition();
-            ViewHolder lastVisibleItem = findViewHolderForAdapterPosition(lastVisiblePosition);
-
-            if (lastVisibleItem == null) {
-                return;
-            }
-
-            //when the item width overflow screen, findLastCompletelyVisibleItemPosition always return NO_POSITION
-            if (lastVisibleItem.itemView.getMeasuredWidth() > getMeasuredWidth()) {
-                super.scrollByInternal(getMeasuredWidth() - defaultOverflowItemScrollKeep, 0, null, ViewCompat.TYPE_TOUCH);
-            } else if (lastVisibleItem.itemView.getMeasuredWidth() == getMeasuredWidth()) {
-                super.scrollByInternal(getMeasuredWidth(), 0, null, ViewCompat.TYPE_TOUCH);
-            } else {
-                super.scrollByInternal(lastVisibleItem.itemView.getLeft(), 0, null, ViewCompat.TYPE_TOUCH);
-            }
-        } else if (layout instanceof StaggeredGridLayoutManager) {
-            StaggeredGridLayoutManager realLayout = (StaggeredGridLayoutManager) layout;
-            int[] lastVisiblePosition = realLayout.findLastVisibleItemPositions(null);
-            ViewHolder[] lastVisibleItems = new ViewHolder[lastVisiblePosition.length];
-            for (int i = 0; i < lastVisiblePosition.length; i++) {
-                lastVisibleItems[i] = findViewHolderForAdapterPosition(lastVisiblePosition[i]);
-            }
-            int scrollDistance = 0;
-            for (ViewHolder lastVisibleItem : lastVisibleItems) {
-                if (lastVisibleItem != null) {
-                    if (lastVisibleItem.itemView.getLeft() > scrollDistance) {
-                        scrollDistance = lastVisibleItem.itemView.getLeft();
-                    }
-                }
-            }
-            if (scrollDistance == 0) {
-                scrollDistance = getMeasuredWidth();
-            }
-            super.scrollByInternal(scrollDistance, 0, null, ViewCompat.TYPE_TOUCH);
-        }
-    }
-
-    protected void onScrollUp() {
-        LayoutManager layout = getLayoutManager();
-        if (layout instanceof LinearLayoutManager) {
-            LinearLayoutManager realLayout = (LinearLayoutManager) layout;
-            int firstVisiblePosition = realLayout.findFirstVisibleItemPosition();
-            ViewHolder firstVisibleItem = findViewHolderForAdapterPosition(firstVisiblePosition);
-
-            if (firstVisibleItem == null) {
-                return;
-            }
-
-            //when the item height overscreen, findLastCompletelyVisibleItemPosition always return NO_POSITION
-            if (firstVisibleItem.itemView.getMeasuredHeight() > getMeasuredHeight()) {
-                super.scrollByInternal(0, -getMeasuredHeight() + defaultOverflowItemScrollKeep, null, ViewCompat.TYPE_TOUCH);
-            } else if (firstVisibleItem.itemView.getMeasuredHeight() == getMeasuredHeight()) {
-                super.scrollByInternal(0, -getMeasuredHeight(), null, ViewCompat.TYPE_TOUCH);
-            } else {
-                super.scrollByInternal(0, firstVisibleItem.itemView.getBottom() - getMeasuredHeight(), null, ViewCompat.TYPE_TOUCH);
-            }
-        } else if (layout instanceof StaggeredGridLayoutManager) {
-            StaggeredGridLayoutManager realLayout = (StaggeredGridLayoutManager) layout;
-            int[] firstVisiblePosition = realLayout.findFirstVisibleItemPositions(null);
-            ViewHolder[] firstVisibleItems = new ViewHolder[firstVisiblePosition.length];
-            for (int i = 0; i < firstVisiblePosition.length; i++) {
-                firstVisibleItems[i] = findViewHolderForAdapterPosition(firstVisiblePosition[i]);
-            }
-            int scrollDistance = Integer.MAX_VALUE;
-            for (ViewHolder firstVisibleItem : firstVisibleItems) {
-                if (firstVisibleItem != null) {
-                    if (firstVisibleItem.itemView.getBottom() < scrollDistance) {
-                        scrollDistance = firstVisibleItem.itemView.getBaseline();
-                    }
-                }
-            }
-            if (scrollDistance == getMeasuredWidth()) {
-                scrollDistance = 0;
-            }
-            super.scrollByInternal(0, scrollDistance - getMeasuredHeight(), null, ViewCompat.TYPE_TOUCH);
-        }
-    }
-
-    protected void onScrollDown() {
-        LayoutManager layout = getLayoutManager();
-        if (layout instanceof LinearLayoutManager) {
-            LinearLayoutManager realLayout = (LinearLayoutManager) layout;
-            int lastVisiblePosition = realLayout.findLastVisibleItemPosition();
-            ViewHolder lastVisibleItem = findViewHolderForAdapterPosition(lastVisiblePosition);
-
-            if (lastVisibleItem == null) {
-                return;
-            }
-
-            //when the item height overflow screen, findLastCompletelyVisibleItemPosition always return NO_POSITION
-            if (lastVisibleItem.itemView.getMeasuredHeight() > getMeasuredHeight()) {
-                super.scrollByInternal(0, getMeasuredHeight() - defaultOverflowItemScrollKeep, null, ViewCompat.TYPE_TOUCH);
-            } else if (lastVisibleItem.itemView.getMeasuredHeight() == getMeasuredHeight()) {
-                super.scrollByInternal(0, getMeasuredHeight(), null, ViewCompat.TYPE_TOUCH);
-            } else {
-                super.scrollByInternal(0, lastVisibleItem.itemView.getTop(), null, ViewCompat.TYPE_TOUCH);
-            }
-        } else if (layout instanceof StaggeredGridLayoutManager) {
-            StaggeredGridLayoutManager realLayout = (StaggeredGridLayoutManager) layout;
-            int[] lastVisiblePosition = realLayout.findLastVisibleItemPositions(null);
-            ViewHolder[] lastVisibleItems = new ViewHolder[lastVisiblePosition.length];
-            for (int i = 0; i < lastVisiblePosition.length; i++) {
-                lastVisibleItems[i] = findViewHolderForAdapterPosition(lastVisiblePosition[i]);
-            }
-            int scrollDistance = 0;
-            for (ViewHolder lastVisibleItem : lastVisibleItems) {
-                if (lastVisibleItem != null) {
-                    if (lastVisibleItem.itemView.getTop() > scrollDistance) {
-                        scrollDistance = lastVisibleItem.itemView.getTop();
-                    }
-                }
-            }
-            if (scrollDistance == 0) {
-                scrollDistance = getMeasuredHeight();
-            }
-            super.scrollByInternal(0, scrollDistance, null, ViewCompat.TYPE_TOUCH);
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        defaultOverflowItemScrollKeep = (int) (h * 0.05f);
-    }
-
-    private double getSplineDeceleration(int velocity) {
-        return Math.log(0.35f * Math.abs(velocity) / (mFlingFriction * mPhysicalCoeff));
-    }
-
-    private double getSplineFlingDistance(int velocity) {
-        final double l = getSplineDeceleration(velocity);
-        final double decelMinusOne = DECELERATION_RATE - 1.0;
-        return mFlingFriction * mPhysicalCoeff * Math.exp(DECELERATION_RATE / decelMinusOne * l);
-    }
-
-    public boolean isEnableScroll() {
-        return enableScroll;
-    }
-
-    public void setEnableScroll(boolean enableScroll) {
-        this.enableScroll = enableScroll;
     }
 
     @Override
@@ -1016,9 +622,6 @@ public class EasyRecyclerView extends BridgeRecyclerView {
     class MultiChoiceModeWrapper implements MultiChoiceModeListener {
         private MultiChoiceModeListener mWrapped;
 
-        public void setWrapped(MultiChoiceModeListener wrapped) {
-            mWrapped = wrapped;
-        }
 
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         public boolean hasWrappedCallback() {

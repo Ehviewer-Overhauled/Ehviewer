@@ -93,13 +93,6 @@
         android:title="@string/settings_advanced_domain_fronting_title"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="e_ink_mode_2"
-        android:summary="@string/settings_e_ink_mode_summary"
-        android:title="@string/settings_e_ink_mode_title"
-        app:iconSpaceReserved="false" />
-
     <Preference
         android:key="export_data"
         android:summary="@string/settings_advanced_export_data_summary"

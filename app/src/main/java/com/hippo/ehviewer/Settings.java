@@ -594,14 +594,6 @@ public class Settings {
         putString(KEY_EXCLUDED_LANGUAGES, value);
     }
 
-    public static void putEInkMode(boolean value) {
-        putBoolean(KEY_E_INK_MODE, value);
-    }
-
-    public static boolean getEInkMode() {
-        return getBoolean(KEY_E_INK_MODE, DEFAULT_E_INK_MODE);
-    }
-
     public static boolean getMeteredNetworkWarning() {
         return getBoolean(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING);
     }
