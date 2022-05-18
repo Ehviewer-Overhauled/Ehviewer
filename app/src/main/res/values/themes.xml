@@ -25,13 +25,13 @@
         <item name="colorEdgeEffect">@color/grey_500</item>
         <item name="dividerColor">@color/divider</item>
         <item name="colorControlNormal">@color/primary_drawable</item>
-        <item name="drawableColorSecondary">@color/secondary_drawable</item>
-        <item name="drawableColorThemePrimary">@color/primary_drawable</item>
-        <item name="guideBackgroundColor">#e5303030</item>
-        <item name="guideTitleColor">?android:attr/textColorPrimary</item>
-        <item name="guideTextColor">?android:attr/textColorSecondary</item>
-        <item name="tagGroupBackgroundColor">@color/tag_group_background</item>
-        <item name="tagBackgroundColor">@color/tag_background</item>
+        <item name="drawableColorSecondary">@color/material_dynamic_secondary50</item>
+        <item name="drawableColorThemePrimary">@color/material_dynamic_primary50</item>
+        <item name="guideBackgroundColor">@color/material_dynamic_neutral80</item>
+        <item name="guideTitleColor">@color/material_dynamic_primary70</item>
+        <item name="guideTextColor">@color/material_dynamic_primary50</item>
+        <item name="tagGroupBackgroundColor">@color/material_dynamic_primary50</item>
+        <item name="tagBackgroundColor">@color/material_dynamic_neutral50</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -49,8 +49,6 @@
         <item name="drawableColorSecondary">@color/secondary_drawable_black</item>
         <item name="drawableColorThemePrimary">@color/primary_drawable_black</item>
         <item name="guideBackgroundColor">#e5000000</item>
-        <item name="tagGroupBackgroundColor">@color/tag_group_background_black</item>
-        <item name="tagBackgroundColor">@color/tag_background_black</item>
     </style>
 
     <!-- ============ -->

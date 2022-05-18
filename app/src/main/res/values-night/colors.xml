@@ -17,12 +17,6 @@
 <resources>
 
     <color name="primary_drawable">#ffffffff</color>
-    <color name="secondary_drawable">#4dffffff</color>
-
-    <color name="content">@color/grey_825</color>
-    <color name="content_activated">@color/grey_600</color>
-    <color name="tag_group_background">@color/grey_775</color>
-    <color name="tag_background">@color/grey_775</color>
 
     <!-- divider -->
     <color name="divider">#20ffffff</color>
