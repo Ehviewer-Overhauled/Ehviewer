@@ -29,10 +29,7 @@
             android:id="@+id/below_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="?attr/galleryDetailDivider"
-            android:dividerPadding="@dimen/keyline_margin"
-            android:orientation="vertical"
-            android:showDividers="middle">
+            android:orientation="vertical">
 
             <include layout="@layout/gallery_detail_info" />
 

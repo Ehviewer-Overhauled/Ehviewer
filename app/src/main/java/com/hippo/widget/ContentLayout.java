@@ -106,7 +106,7 @@ public class ContentLayout extends FrameLayout {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
-        drawable.setColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.widgetColorThemeAccent));
+        drawable.setColor(com.google.android.material.R.color.material_dynamic_neutral100);
         mFastScroller.setHandlerDrawable(drawable);
 
         mRefreshLayout.setColorSchemeResources(

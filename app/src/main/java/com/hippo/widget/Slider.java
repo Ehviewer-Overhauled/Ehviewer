@@ -45,6 +45,8 @@ import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleHandler;
 
+import rikka.core.res.ResourcesKt;
+
 public class Slider extends View {
 
     private static final char[] CHARACTERS = {
@@ -134,10 +136,8 @@ public class Slider extends View {
         setProgress(a.getInteger(R.styleable.Slider_slider_progress, 0));
         mThickness = a.getDimension(R.styleable.Slider_thickness, 2);
         mRadius = a.getDimension(R.styleable.Slider_radius, 6);
-        setColor(a.getColor(R.styleable.Slider_color, Color.BLACK));
 
         mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBgPaint.setColor(a.getBoolean(R.styleable.Slider_dark, false) ? 0x4dffffff : 0x42000000);
 
         a.recycle();
 

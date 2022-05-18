@@ -92,14 +92,8 @@ public final class UrlOpener {
             }
         }
 
-        boolean isNight = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0;
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
         customTabsIntent.setShowTitle(true);
-        CustomTabColorSchemeParams params = new CustomTabColorSchemeParams.Builder()
-                .setToolbarColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.toolbarColor))
-                .build();
-        customTabsIntent.setDefaultColorSchemeParams(params);
-        customTabsIntent.setColorScheme(isNight ? CustomTabsIntent.COLOR_SCHEME_DARK : CustomTabsIntent.COLOR_SCHEME_LIGHT);
         try {
             customTabsIntent.build().launchUrl(context, uri);
         } catch (ActivityNotFoundException e) {

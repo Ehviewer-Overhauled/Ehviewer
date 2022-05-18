@@ -15,14 +15,13 @@
   -->
 
 <resources>
-    <style name="AppTheme" parent="Base.AppTheme.Light" />
+    <style name="AppTheme" parent="Base.AppTheme" />
 
     <!-- TextAppearance -->
     <style name="TextAppearance" parent="TextAppearance.AppCompat" />
 
     <!-- Progress View -->
     <style name="ProgressView">
-        <item name="indicatorColor">?attr/progressColor</item>
         <item name="android:indeterminate">true</item>
         <item name="android:minWidth">48dp</item>
         <item name="android:minHeight">48dp</item>
@@ -59,7 +58,7 @@
         <item name="android:gravity">center</item>
         <item name="android:minHeight">@dimen/category_table_item_height</item>
         <item name="android:foreground">@drawable/check_text_view_foreground</item>
-        <item name="android:theme">@style/Theme.MaterialComponents</item>
+        <item name="android:theme">@style/Theme.Material3.DynamicColors.DayNight</item>
     </style>
 
     <style name="TextAppearance.CategoryTitle" parent="TextAppearance.AppCompat.Small">
@@ -87,10 +86,7 @@
     <style name="Slider">
         <item name="thickness">2dp</item>
         <item name="radius">6dp</item>
-        <item name="color">?attr/widgetColorThemeAccent</item>
-        <item name="textColor">@android:color/white</item>
         <item name="textSize">12sp</item>
-        <item name="dark">false</item>
     </style>
 
     <style name="Indicating">

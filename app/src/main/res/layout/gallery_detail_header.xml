@@ -139,10 +139,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="?selectableItemBackgroundBorderless"
                     android:clickable="true"
-                    android:focusable="true"
-                    android:textColor="?attr/textColorThemePrimary" />
+                    android:focusable="true" />
 
                 <View
                     android:layout_width="1dp"
@@ -157,11 +155,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="?selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="@string/read"
-                    android:textColor="?attr/textColorThemeAccent" />
+                    android:text="@string/read" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

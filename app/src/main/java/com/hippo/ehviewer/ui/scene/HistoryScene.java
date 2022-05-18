@@ -238,7 +238,7 @@ public class HistoryScene extends ToolbarScene {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
-        handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), R.attr.widgetColorThemeAccent));
+        handlerDrawable.setColor(com.google.android.material.R.color.material_dynamic_neutral100);
         mFastScroller.setHandlerDrawable(handlerDrawable);
 
         updateLazyList();
