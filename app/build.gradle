@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
-    implementation 'com.github.seven332:beerbelly:0.1.4'
+    implementation 'com.github.seven332:beerbelly:0.2.1'
     implementation 'com.github.seven332:glgallery:0.1.2'
     implementation 'com.github.seven332:glview:0.1.0'
     implementation 'com.github.seven332:glview-image:0.1.3'
