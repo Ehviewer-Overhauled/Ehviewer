@@ -8,7 +8,7 @@ An E-Hentai Application for Android.
 
 # Download
 
-[Download](https://install.appcenter.ms/users/nekoinverter/apps/ehviewer/distribution_groups/public)
+[Github 下载](https://github.com/asuka-mio/Ehviewer/releases)
 
 # Screenshot
 
