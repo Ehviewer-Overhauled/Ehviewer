@@ -123,7 +123,7 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.2'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.3'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'com.gitlab.NekoInverter:yorozuya:723dc867a9'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
