@@ -1,5 +1,6 @@
 # EhViewer
 
+[![CodeFactor](https://www.codefactor.io/repository/github/asuka-mio/ehviewer/badge)](https://www.codefactor.io/repository/github/asuka-mio/ehviewer)
 ![Icon](art/launcher_icon-web.png)
 
 这是一个 E-Hentai Android 平台的浏览器
