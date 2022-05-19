@@ -128,16 +128,17 @@ class SearchLayout : EasyRecyclerView, CompoundButton.OnCheckedChangeListener, V
 
         val mCategoryGroup = normalView.findViewById(R.id.search_category_chipgroup) as ChipGroup
         for (mPair in mCategoryTable) {
-            val mChip = Chip(context)
+            val mChip = IdentifiedChip(context)
             mChip.isCheckable = true
             mChip.setText(mPair.second)
+            mChip.idt = mPair.first
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
             mCategoryGroup.addView(mChip)
         }
-        mCategoryGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+        mCategoryGroup.setOnCheckedStateChangeListener { _, checkedIds ->
             var mCategory = 0
             for (index in checkedIds) {
-                mCategory = mCategory or mCategoryTable[index - 1].first
+                mCategory = mCategory or findViewById<IdentifiedChip>(index).idt
             }
             mSharePref.edit { putInt(SEARCH_CATEGORY_PREF, mCategory) }
         }
@@ -380,6 +381,12 @@ class SearchLayout : EasyRecyclerView, CompoundButton.OnCheckedChangeListener, V
             }
             return type.toLong()
         }
+    }
+
+    inner class IdentifiedChip @JvmOverloads constructor(
+        context: Context, attrs: AttributeSet? = null
+    ) : Chip(context, attrs) {
+        var idt  = 0
     }
 
     companion object {
