@@ -6,7 +6,7 @@
 
 已针对性适配 Material Design 3 及其动态取色系统
 
-仅供 Android 13 及以上平台使用！
+仅供 Android 12 及以上平台使用！
 
 
 An E-Hentai Application for Android.
