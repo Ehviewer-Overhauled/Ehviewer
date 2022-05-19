@@ -20,11 +20,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.hippo.ehviewer.widget.CategoryTable
-        android:id="@+id/search_category_table"
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/search_category_chipgroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/search_item_interval" />
+        android:layout_marginBottom="@dimen/search_item_interval"/>
 
     <com.hippo.widget.RadioGridGroup
         android:id="@+id/normal_search_mode"
