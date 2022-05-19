@@ -139,10 +139,6 @@ public final class MainActivity extends StageActivity
     private NavigationView mNavView;
     @Nullable
     private DrawerView mRightDrawer;
-    @Nullable
-    private LoadImageView mAvatar;
-    @Nullable
-    private TextView mDisplayName;
     private int mNavCheckedItem = 0;
 
     @Override
@@ -320,19 +316,6 @@ public final class MainActivity extends StageActivity
         mDrawerLayout.setStatusBarBackgroundColor(0);
         mNavView = (NavigationView) ViewUtils.$$(this, R.id.nav_view);
         mRightDrawer = (DrawerView) ViewUtils.$$(this, R.id.right_drawer);
-        View headerLayout = mNavView.getHeaderView(0);
-        mAvatar = (LoadImageView) ViewUtils.$$(headerLayout, R.id.avatar);
-        mDisplayName = (TextView) ViewUtils.$$(headerLayout, R.id.display_name);
-        ViewUtils.$$(headerLayout, R.id.night_mode).setOnClickListener(v -> {
-            int theme = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0 ? DayNightDelegate.MODE_NIGHT_NO : DayNightDelegate.MODE_NIGHT_YES;
-            DayNightDelegate.setDefaultNightMode(theme);
-            recreate();
-            if (Settings.getTheme() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                Settings.putTheme(theme);
-            }
-        });
-
-        updateProfile();
 
         if (mNavView != null) {
             mNavView.setNavigationItemSelectedListener(this);
@@ -440,23 +423,18 @@ public final class MainActivity extends StageActivity
         mDrawerLayout = null;
         mNavView = null;
         mRightDrawer = null;
-        mAvatar = null;
-        mDisplayName = null;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         setNavCheckedItem(mNavCheckedItem);
-
         checkClipboardUrl();
     }
 
     @Override
     protected void onTransactScene() {
         super.onTransactScene();
-
         checkClipboardUrl();
     }
 
@@ -544,25 +522,6 @@ public final class MainActivity extends StageActivity
             BaseScene baseScene = (BaseScene) scene;
             baseScene.destroyDrawerView();
         }
-    }
-
-    public void updateProfile() {
-        if (null == mAvatar || null == mDisplayName) {
-            return;
-        }
-
-        String avatarUrl = Settings.getAvatar();
-        if (TextUtils.isEmpty(avatarUrl)) {
-            mAvatar.load(R.drawable.default_avatar);
-        } else {
-            mAvatar.load(avatarUrl, avatarUrl);
-        }
-
-        String displayName = Settings.getDisplayName();
-        if (TextUtils.isEmpty(displayName)) {
-            displayName = getString(R.string.default_display_name);
-        }
-        mDisplayName.setText(displayName);
     }
 
     public void addAboveSnackView(View view) {

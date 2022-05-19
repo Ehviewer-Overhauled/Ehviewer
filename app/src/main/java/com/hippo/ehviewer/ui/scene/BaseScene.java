@@ -58,13 +58,6 @@ public abstract class BaseScene extends SceneFragment {
     private SparseArray<Parcelable> drawerViewState;
     private boolean needWhiteStatusBar = needWhiteStatusBar();
 
-    public void updateAvatar() {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).updateProfile();
-        }
-    }
-
     public void addAboveSnackView(View view) {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {

@@ -27,41 +27,4 @@
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/sadpanda_low_poly" />
 
-    <com.hippo.widget.LoadImageView
-        android:id="@+id/avatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="48dp" />
-
-    <TextView
-        android:id="@+id/display_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/text_small" />
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:background="@android:color/transparent"
-        android:clipToPadding="false"
-        android:padding="8dp">
-
-        <ImageView
-            android:id="@+id/night_mode"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="6dp"
-            app:srcCompat="@drawable/ic_baseline_dark_mode_24"
-            app:tint="#fff" />
-    </FrameLayout>
-
 </FrameLayout>
