@@ -65,38 +65,30 @@
                 android:layout_alignTop="@id/thumb"
                 android:layout_marginLeft="@dimen/keyline_margin"
                 android:layout_marginRight="@dimen/keyline_margin"
-                android:layout_toRightOf="@id/thumb"
+                android:layout_toEndOf="@id/thumb"
                 android:ellipsize="end"
                 android:maxLines="5"
                 android:textSize="@dimen/text_little_large" />
 
-            <TextView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/uploader"
+                style="@style/Widget.Material3.Chip.Assist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
-                android:layout_alignLeft="@id/title"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:background="?selectableItemBackground"
+                android:layout_alignStart="@id/title"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textSize="@dimen/text_little_small" />
+                android:textAllCaps="true" />
 
-            <TextView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/category"
+                style="@style/Widget.Material3.Chip.Assist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uploader"
-                android:layout_alignLeft="@id/title"
-                android:layout_marginTop="12dp"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:background="@drawable/category_background"
+                android:layout_alignStart="@id/title"
                 android:ellipsize="end"
-                android:paddingLeft="8dp"
-                android:paddingTop="2dp"
-                android:paddingRight="8dp"
-                android:paddingBottom="2dp"
                 android:singleLine="true"
                 android:textAllCaps="true"
                 android:textStyle="bold" />
