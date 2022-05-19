@@ -1,11 +1,19 @@
-# EhViewer with Material Design 3 and Dynamic Color Support https://m3.material.io/
-# Only Support Android S and above!
+# EhViewer
 
 ![Icon](art/launcher_icon-web.png)
 
-这是一个 E-Hentai Android 平台的浏览器。
+这是一个 E-Hentai Android 平台的浏览器
+
+已针对性适配 Material Design 3 及其动态取色系统
+
+仅供 Android 13 及以上平台使用！
+
 
 An E-Hentai Application for Android.
+
+with Material Design 3 and Dynamic Color Support.
+
+Only Support Android S and above!
 
 # Download
 
