@@ -29,13 +29,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.hippo.ehviewer.widget.FixedThumb
-            android:id="@+id/thumb"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/thumb_card"
             android:layout_width="@dimen/gallery_list_thumb_width"
-            android:layout_height="@dimen/gallery_list_thumb_height"
-            app:maxAspect="1.333"
-            app:minAspect="0.333"
-            app:retryType="click" />
+            android:layout_height="@dimen/gallery_list_thumb_height">
+
+            <com.hippo.ehviewer.widget.FixedThumb
+                android:id="@+id/thumb"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:maxAspect="1.333"
+                app:minAspect="0.333"
+                app:retryType="click" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/title"
@@ -46,7 +53,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="8dp"
-            android:layout_toRightOf="@id/thumb" />
+            android:layout_toEndOf="@id/thumb_card" />
 
         <TextView
             android:id="@+id/uploader"
@@ -54,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:layout_marginTop="2dp" />
 
         <TextView
@@ -62,8 +69,8 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/title"
-            android:layout_alignBottom="@id/thumb"
+            android:layout_alignStart="@id/title"
+            android:layout_alignBottom="@id/thumb_card"
             android:layout_marginBottom="8dp"
             android:paddingLeft="8dp"
             android:paddingTop="2dp"
@@ -77,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/category"
-            android:layout_alignLeft="@id/title"
+            android:layout_alignStart="@id/title"
             android:layout_marginBottom="4dp" />
 
         <TextView
@@ -85,17 +92,17 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/thumb"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="6dp"
+            android:layout_alignBottom="@id/thumb_card"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="6dp"
             android:layout_marginBottom="4dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/posted"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="6dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="6dp"
             android:divider="@drawable/spacer_x6"
             android:gravity="center_vertical"
             android:orientation="horizontal"
