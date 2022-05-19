@@ -52,7 +52,8 @@
 
     <!-- CategoryText -->
     <style name="CategoryText">
-        <item name="android:textAppearance">@style/TextAppearance.Material3.ActionBar.Subtitle</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.ActionBar.Subtitle
+        </item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:minHeight">@dimen/category_table_item_height</item>

@@ -21,10 +21,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.text.Html;
-import com.hippo.util.AppHelper;
 
 public class AboutFragment extends BasePreferenceFragment {
 
