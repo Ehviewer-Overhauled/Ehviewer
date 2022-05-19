@@ -29,32 +29,13 @@ import com.hippo.util.AppHelper;
 public class AboutFragment extends BasePreferenceFragment {
 
     private static final String KEY_AUTHOR = "author";
-    //private static final String KEY_DONATE = "donate";
     private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.about_settings);
-
         Preference author = findPreference(KEY_AUTHOR);
-        //Preference donate = findPreference(KEY_DONATE);
-        Preference checkForUpdate = findPreference(KEY_CHECK_FOR_UPDATES);
-
         author.setSummary(Html.fromHtml(getString(R.string.settings_about_author_summary).replace('$', '@')));
-
-        author.setOnPreferenceClickListener(this);
-        //donate.setOnPreferenceClickListener(this);
-        checkForUpdate.setOnPreferenceClickListener(this);
-    }
-
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        String key = preference.getKey();
-        if (KEY_AUTHOR.equals(key)) {
-            AppHelper.sendEmail(requireActivity(), EhApplication.getDeveloperEmail(),
-                    "About EhViewer", null);
-        }
-        return true;
     }
 
     @Override

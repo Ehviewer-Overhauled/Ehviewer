@@ -297,11 +297,6 @@ public class EhApplication extends SceneApplication {
         return application.mFavouriteStatusRouter;
     }
 
-    @NonNull
-    public static String getDeveloperEmail() {
-        return "nekoworkshop$protonmail.com".replace('$', '@');
-    }
-
     @SuppressLint("StaticFieldLeak")
     @Override
     public void onCreate() {
