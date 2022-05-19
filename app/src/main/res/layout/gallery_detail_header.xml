@@ -90,8 +90,7 @@
                 android:layout_alignStart="@id/title"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textAllCaps="true"
-                android:textStyle="bold" />
+                android:textAllCaps="true" />
 
             <ImageView
                 android:id="@+id/other_actions"
