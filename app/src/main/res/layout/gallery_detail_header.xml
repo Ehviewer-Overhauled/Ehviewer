@@ -70,9 +70,9 @@
                 android:maxLines="5"
                 android:textSize="@dimen/text_little_large" />
 
-            <com.google.android.material.chip.Chip
+            <Button
                 android:id="@+id/uploader"
-                style="@style/Widget.Material3.Chip.Assist.Elevated"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
@@ -81,9 +81,9 @@
                 android:singleLine="true"
                 android:textAllCaps="true" />
 
-            <com.google.android.material.chip.Chip
+            <Button
                 android:id="@+id/category"
-                style="@style/Widget.Material3.Chip.Assist.Elevated"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/uploader"
