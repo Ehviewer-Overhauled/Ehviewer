@@ -22,14 +22,12 @@ android {
     }
 
     signingConfigs {
-        if (localProperties.getProperty("storeFile") != null) {
             sign {
-                storeFile file(localProperties.getProperty("storeFile"))
-                storePassword localProperties.getProperty("storePassword")
-                keyAlias localProperties.getProperty("keyAlias")
-                keyPassword localProperties.getProperty("keyPassword")
+                storeFile file(signStoreFile)
+                storePassword signStorePassword
+                keyAlias signkeyAlias
+                keyPassword signkeyPassword
             }
-        }
     }
 
     buildFeatures {
@@ -76,17 +74,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles 'proguard-rules.pro'
-            if (localProperties.getProperty("storeFile") != null) {
-                signingConfig signingConfigs.sign
-            }
+            signingConfig signingConfigs.sign
         }
         debug {
             applicationIdSuffix ".debug"
-            if (localProperties.getProperty("storeFile") != null) {
-                signingConfig signingConfigs.sign
-            } else {
-                signingConfig signingConfigs.debug
-            }
+            signingConfig signingConfigs.debug
         }
     }
 
