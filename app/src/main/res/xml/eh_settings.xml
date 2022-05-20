@@ -61,7 +61,7 @@
         android:title="@string/dark_theme"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="black_dark_theme"
         android:title="@string/black_dark_theme"
         app:iconSpaceReserved="false" />
@@ -111,27 +111,27 @@
         app:entryValues="@array/thumb_resolution_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="fix_thumb_url"
         android:title="@string/settings_eh_fix_thumb_url"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="show_jpn_title"
         android:summary="@string/settings_eh_show_jpn_title_summary"
         android:title="@string/settings_eh_show_jpn_title"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="show_gallery_pages"
         android:summary="@string/settings_eh_show_gallery_pages_summary"
         android:title="@string/settings_eh_show_gallery_pages"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="show_tag_translations"
         android:summary="@string/settings_eh_show_tag_translations_summary"
@@ -151,13 +151,13 @@
         android:title="@string/settings_eh_filter"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="cellular_network_warning"
         android:title="@string/settings_eh_metered_network_warning"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="request_news"
         android:title="@string/settings_request_news_title"
