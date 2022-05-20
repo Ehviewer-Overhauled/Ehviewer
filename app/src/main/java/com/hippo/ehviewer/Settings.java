@@ -457,14 +457,6 @@ public class Settings {
         putBoolean(KEY_SELECT_SITE, value);
     }
 
-    public static boolean getQuickSearchTip() {
-        return getBoolean(KEY_QUICK_SEARCH_TIP, DEFAULT_QUICK_SEARCH_TIP);
-    }
-
-    public static void putQuickSearchTip(boolean value) {
-        putBoolean(KEY_QUICK_SEARCH_TIP, value);
-    }
-
     public static int getTheme() {
         return getIntFromStr(KEY_THEME, DEFAULT_THEME);
     }

@@ -709,15 +709,10 @@ public final class GalleryListScene extends BaseScene
         if (null == context) {
             return;
         }
-        final CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(
-                context, getString(R.string.add_quick_search_tip), getString(R.string.get_it), false);
+        final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setMessage(R.string.add_quick_search_tip);
         builder.setTitle(R.string.readme);
-        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-            if (builder.isChecked()) {
-                Settings.putQuickSearchTip(false);
-            }
-            showAddQuickSearchDialog(adapter, recyclerView, tip);
-        }).show();
+        builder.show();
     }
 
 
@@ -823,11 +818,9 @@ public final class GalleryListScene extends BaseScene
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_add) {
-                if (Settings.getQuickSearchTip()) {
-                    showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
-                } else {
-                    showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
-                }
+                showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
+            } else if (id == R.id.action_help) {
+                showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
             }
             return true;
         });
