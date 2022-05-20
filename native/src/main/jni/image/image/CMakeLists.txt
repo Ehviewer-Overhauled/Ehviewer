@@ -16,28 +16,28 @@ cmake_minimum_required(VERSION 3.4.1)
 project(image C)
 
 set(IMAGE_SOURCES
-    image.c
-    image_utils.c
-    image_plain.c
-    image_jpeg.c
-    image_png.c
-    image_gif.c
-    filter/clahe.c
-    filter/gray.c
-    java_wrapper.c
-)
+        image.c
+        image_utils.c
+        image_plain.c
+        image_jpeg.c
+        image_png.c
+        image_gif.c
+        filter/clahe.c
+        filter/gray.c
+        java_wrapper.c
+        )
 set(IMAGE_INCLUDES
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        )
 set(IMAGE_LIBRARIES
-    log
-    jnigraphics
-    GLESv2
-    stream
-    libjpeg-turbo
-    libpng
-    giflib
-)
+        log
+        jnigraphics
+        GLESv2
+        stream
+        libjpeg-turbo
+        libpng
+        giflib
+        )
 
 add_library(image STATIC ${IMAGE_SOURCES})
 target_include_directories(image PRIVATE ${IMAGE_INCLUDES})

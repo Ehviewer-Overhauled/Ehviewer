@@ -16,11 +16,11 @@ cmake_minimum_required(VERSION 3.4.1)
 project(giflib C)
 
 set(GIFLIB_SOURCES
-    giflib/dgif_lib.c
-    giflib/gif_hash.c
-    giflib/gifalloc.c
-    giflib/openbsd-reallocarray.c
-)
+        giflib/dgif_lib.c
+        giflib/gif_hash.c
+        giflib/gifalloc.c
+        giflib/openbsd-reallocarray.c
+        )
 set(GIFLIB_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/giflib)
 
 add_library(giflib STATIC ${GIFLIB_SOURCES})
