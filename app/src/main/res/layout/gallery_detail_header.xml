@@ -86,8 +86,8 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/uploader"
-                android:layout_alignStart="@id/title"
+                android:layout_below="@id/title"
+                android:layout_toRightOf="@id/uploader"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textAllCaps="true" />
