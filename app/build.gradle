@@ -32,6 +32,10 @@ android {
         }
     }
 
+    buildFeatures {
+        compose true
+    }
+
     defaultConfig {
         applicationId "io.github.nekoinverter.ehviewer"
         minSdkVersion 31
@@ -91,6 +95,10 @@ android {
             java.srcDirs += 'src/main/java-gen'
         }
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion compose
+    }
     namespace 'com.hippo.ehviewer'
 }
 
@@ -138,6 +146,12 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'org.jsoup:jsoup:1.15.1'
     implementation projects.native
+
+    implementation "androidx.compose.material3:material3:1.0.0-alpha12"
+
+    implementation "androidx.compose.ui:ui:$compose"
+    implementation "androidx.compose.ui:ui-util:$compose"
+    implementation "androidx.compose.animation:animation-graphics:$compose"
 }
 
 configurations.all {
