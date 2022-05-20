@@ -1,6 +1,9 @@
-name: EhViewer
+name: Releases
 
-on: push
+on:
+  push:
+    tags:
+      - "*"
 
 jobs:
   linux:
@@ -29,14 +32,11 @@ jobs:
           git submodule update --init --recursive
           gradle assembleRelease
 
-      - name: Update ARM64
-        uses: actions/upload-artifact@v3
+      - name: Releases
+        uses: softprops/action-gh-release@v0.1.14
         with:
-            name: arm64-${{ github.sha }}
-            path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
-
-      - name: Update x86_64
-        uses: actions/upload-artifact@v3
-        with:
-          name: x86_64-${{ github.sha }}
-          path: app/build/outputs/apk/release/app-x86_64-release.apk
+          body: Bump Version
+          prerelease: true
+          files: |
+            app/build/outputs/apk/release/app-arm64-v8a-release.apk
+            app/build/outputs/apk/release/app-x86_64-release.apk
