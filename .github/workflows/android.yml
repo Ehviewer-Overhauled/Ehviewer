@@ -8,15 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-java@v3
         with:
             distribution: temurin
             java-version: 11
+
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v2
+
       - name: Install NDK
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
+
       - uses: gradle/gradle-build-action@v2
       - run: |
           git submodule update --init --recursive
