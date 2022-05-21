@@ -21,6 +21,7 @@
   </a>
 </p>
 
+# Description
 这是一个 E-Hentai Android 平台的浏览器
 
 已针对性适配 Material Design 3 及其动态取色系统
