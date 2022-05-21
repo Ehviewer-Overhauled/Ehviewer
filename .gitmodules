@@ -9,4 +9,4 @@
 	url = https://gitlab.com/NekoInverter/libpng.git
 [submodule "native/src/main/jni/libarchive"]
 	path = native/src/main/jni/libarchive
-	url = https://github.com/libarchive/libarchive
+	url = https://github.com/asuka-mio/libarchive
