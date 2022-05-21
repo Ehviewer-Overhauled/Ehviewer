@@ -238,16 +238,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             }
         } else if (Intent.ACTION_VIEW.equals(mAction)) {
             if (mUri != null) {
-                // Only support zip now
                 try {
                     grantUriPermission(BuildConfig.APPLICATION_ID, mUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 } catch (Exception e) {
-                    // Some stupid file manager send us a uri and don't allow us to read it
-                    // java.lang.SecurityException: UID 10671 does not have permission to
-                    // content://com.UCMobile.fileProvider/external_files/BaiduNetdisk/getvoice [user 0]
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show();
                 }
-                mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
+                throw new Error("UnImplement Feature!!");
+                //mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
             }
         }
     }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(

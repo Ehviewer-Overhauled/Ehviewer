@@ -1,6 +1,3 @@
-[submodule "native/src/main/jni/a7zip/p7zip/p7zip"]
-	path = native/src/main/jni/a7zip/p7zip/p7zip
-	url = https://github.com/seven332/p7zip.git
 [submodule "native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo"]
 	path = native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo
 	url = https://gitlab.com/NekoInverter/libjpeg-turbo.git
