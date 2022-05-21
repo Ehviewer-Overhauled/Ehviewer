@@ -7,3 +7,6 @@
 [submodule "native/src/main/jni/image/libpng/libpng"]
 	path = native/src/main/jni/image/libpng/libpng
 	url = https://gitlab.com/NekoInverter/libpng.git
+[submodule "native/src/main/jni/libarchive"]
+	path = native/src/main/jni/libarchive
+	url = https://github.com/libarchive/libarchive
