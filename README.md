@@ -3,7 +3,23 @@
   <br>EhViewer<br>
 </h1>
 
-[![CodeFactor](https://www.codefactor.io/repository/github/asuka-mio/ehviewer/badge)](https://www.codefactor.io/repository/github/asuka-mio/ehviewer)
+<p align="center">
+  <a href="https://github.com/asuka-mio/Ehviewer/actions">
+    <img src="https://img.shields.io/github/workflow/status/asuka-mio/Ehviewer/EhViewer" alt="Github Actions">
+  </a>
+  <a href="https://github.com/asuka-mio/Ehviewer/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/asuka-mio/Ehviewer" alt="LICENSE">
+  </a>
+  <a href="https://www.codefactor.io/repository/github/asuka-mio/ehviewer">
+    <img src="https://www.codefactor.io/repository/github/asuka-mio/ehviewer/badge" alt="CodeFactor">
+  </a>
+  <a href="https://github.com/asuka-mio/Ehviewer/releases">
+    <img src="https://img.shields.io/github/v/release/asuka-mio/ehviewer?include_prereleases" alt="Release">
+  </a>
+  <a href="https://github.com/asuka-mio/Ehviewer/issues">
+    <img src="https://img.shields.io/github/issues/asuka-mio/ehviewer" alt="Issues">
+  </a>
+</p>
 
 这是一个 E-Hentai Android 平台的浏览器
 
