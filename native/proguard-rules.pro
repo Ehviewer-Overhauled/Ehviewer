@@ -1,1 +1,2 @@
 -keep class com.hippo.* { *; }
+-keep class com.hippo.image.* { *; }
