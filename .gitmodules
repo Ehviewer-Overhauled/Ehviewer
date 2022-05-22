@@ -10,3 +10,6 @@
 [submodule "native/src/main/jni/libarchive"]
 	path = native/src/main/jni/libarchive
 	url = https://github.com/asuka-mio/libarchive
+[submodule "native/src/main/jni/liblzma"]
+	path = native/src/main/jni/liblzma
+	url = https://git.tukaani.org/xz.git

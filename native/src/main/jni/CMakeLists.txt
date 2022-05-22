@@ -1,13 +1,10 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
-
+add_subdirectory(liblzma)
+include_directories(liblzma/src/liblzma/api)
 add_subdirectory(image)
-
 include_directories(libarchive/contrib/android/include)
 add_subdirectory(libarchive)
-
 add_library(${PROJECT_NAME} SHARED main.c archive.c)
-
 target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
-
 target_link_libraries(${PROJECT_NAME} image archive)
