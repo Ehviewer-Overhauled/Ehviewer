@@ -110,39 +110,30 @@
 
         </RelativeLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/action_card"
-            style="@style/Widget.Material3.CardView.Elevated"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/keyline_margin"
-            android:layout_marginRight="@dimen/keyline_margin"
-            app:cardUseCompatPadding="true">
-
             <LinearLayout
+                android:id="@+id/action_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/keyline_margin"
+                android:layout_marginRight="@dimen/keyline_margin"
                 android:orientation="horizontal">
 
-                <TextView
+                <Button
                     android:id="@+id/download"
-                    style="@style/ButtonInCard"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="?attr/dividerColor" />
+                <android.widget.Space
+                    android:layout_width="8dp"
+                    android:layout_height="wrap_content" />
 
-                <TextView
+                <Button
                     android:id="@+id/read"
-                    style="@style/ButtonInCard"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -151,6 +142,5 @@
                     android:text="@string/read" />
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </FrameLayout>
