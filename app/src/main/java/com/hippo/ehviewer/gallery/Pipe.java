@@ -107,13 +107,6 @@ class Pipe {
         public void write(@NonNull byte[] b, int off, int len) throws IOException {
             synchronized (Pipe.this) {
                 while (len != 0) {
-                    if (outClosed) {
-                        throw new IOException("The OutputStream is closed");
-                    }
-                    if (inClosed) {
-                        throw new IOException("The InputStream is closed");
-                    }
-
                     if (head == tail && full) {
                         // The buffer is full, wait for InputStream read bytes
                         try {

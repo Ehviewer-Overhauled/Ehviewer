@@ -6,7 +6,7 @@ add_subdirectory(image)
 include_directories(libarchive/contrib/android/include)
 add_subdirectory(libarchive)
 
-add_library(${PROJECT_NAME} SHARED main.c)
+add_library(${PROJECT_NAME} SHARED main.c archive.c)
 
 target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
 

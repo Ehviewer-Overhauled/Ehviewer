@@ -243,8 +243,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 } catch (Exception e) {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show();
                 }
-                throw new Error("UnImplement Feature!!");
-                //mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
+                mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
             }
         }
     }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
