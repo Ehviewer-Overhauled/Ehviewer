@@ -59,8 +59,13 @@ public class UriArchiveAccessor implements Closeable {
             return Os.fstat(fd).st_size;
         }
 
-        public void seek(long pos) throws IOException, ErrnoException {
-            Os.lseek(fd, pos, OsConstants.SEEK_SET);
+        public long seek(long pos, int whence) throws IOException, ErrnoException {
+            try {
+                return Os.lseek(fd, pos, whence);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return -30;
+            }
         }
 
         public void rewind() throws IOException, ErrnoException {

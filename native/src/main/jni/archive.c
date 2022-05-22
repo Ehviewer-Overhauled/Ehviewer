@@ -87,14 +87,24 @@ int ins_close(struct archive *a, void* client_data)
     return ARCHIVE_OK;
 }
 
+la_int64_t ins_seek(struct archive *a, void *client_data, la_int64_t offset, int whence)
+{
+    archive_inst *arc = client_data;
+    jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->seekID, offset, whence);
+    return ret;
+}
+
 static archive_inst *archive_create_inst(JNIEnv *env, jobject file)
 {
     archive_inst *inst = malloc(sizeof(archive_inst));
     inst->archive = archive_read_new();
+    archive_read_set_seek_callback(inst->archive, ins_seek);
     archive_read_support_format_all(inst->archive);
+    archive_read_support_filter_all(inst->archive);
     inst->env = env;
     inst->file = file;
     inst->readID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "read", "([B)I");
+    inst->seekID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "seek", "(JI)J");
     inst->jbr = (*env)->NewByteArray(env, BLOCK_SIZE);
     inst->read_buffer = malloc(BLOCK_SIZE);
     inst->output_buffer = malloc(BLOCK_SIZE);
@@ -117,7 +127,6 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jobject
     archive_inst *arc = archive_create_inst(env, osf);
     r = archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
     if (r) {
-        LOGI("%s%d", "Error open inputstream as archive, id is ", r);
         r = 0;
     } else {
         archive_list_all_entries(arc);
