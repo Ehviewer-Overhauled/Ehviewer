@@ -40,16 +40,12 @@ static int filename_is_playable_file(const char* name)
     const char* dotptr = strrchr(name, '.');
     if (dotptr++) {
         switch (*dotptr) {
-            case 'b':
-                return strcmp(dotptr, "bmp") == 0;
             case 'j':
                 return (strcmp(dotptr, "jpg") == 0) || (strcmp(dotptr, "jpeg") == 0);
             case 'p':
                 return strcmp(dotptr, "png") == 0;
             case 'g':
                 return strcmp(dotptr, "gif") == 0;
-            case 'w':
-                return strcmp(dotptr, "webp") == 0;
             default:
                 return 0;
         }
