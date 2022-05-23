@@ -74,6 +74,8 @@ Here is the libraries
 - [ShowcaseView](https://github.com/amlcurran/ShowcaseView)
 - [Slabo](https://github.com/TiroTypeworks/Slabo)
 - [TagSoup](http://home.ccil.org/~cowan/tagsoup/)
+- [libarchive](http://www.libarchive.org/)
+- [XZ Utils](https://tukaani.org/xz/)
 
 
 # License
