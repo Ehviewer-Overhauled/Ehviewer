@@ -110,37 +110,37 @@
 
         </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/action_card"
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/action_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginRight="@dimen/keyline_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/download"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/keyline_margin"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true" />
 
-                <Button
-                    android:id="@+id/download"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true" />
+            <android.widget.Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
 
-                <android.widget.Space
-                    android:layout_width="8dp"
-                    android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/read"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/read" />
 
-                <Button
-                    android:id="@+id/read"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:text="@string/read" />
-
-            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

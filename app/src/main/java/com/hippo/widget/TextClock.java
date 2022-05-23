@@ -65,7 +65,10 @@ public class TextClock extends AppCompatTextView {
             }
             onTimeChanged();
         }
-    };    private final Runnable mTicker = new Runnable() {
+    };
+    public TextClock(Context context) {
+        this(context, null);
+    }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
             onTimeChanged();
@@ -76,24 +79,10 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-    public TextClock(Context context) {
-        this(context, null);
-    }
+
     public TextClock(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-    }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            chooseFormat();
-            onTimeChanged();
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            chooseFormat();
-            onTimeChanged();
-        }
-    };
+    }
 
     public TextClock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -109,7 +98,19 @@ public class TextClock extends AppCompatTextView {
         createTime(mTimeZone);
         // Wait until onAttachedToWindow() to handle the ticker
         chooseFormat(false);
-    }
+    }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            chooseFormat();
+            onTimeChanged();
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            chooseFormat();
+            onTimeChanged();
+        }
+    };
 
     private void createTime(String timeZone) {
         if (timeZone != null) {

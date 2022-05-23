@@ -16,12 +16,12 @@
 package com.hippo.ehviewer.preference
 
 import android.content.Context
-import com.hippo.preference.MessagePreference
-import com.hippo.ehviewer.R
 import android.content.pm.PackageManager
 import android.util.AttributeSet
 import androidx.appcompat.app.AlertDialog
 import com.hippo.Native
+import com.hippo.ehviewer.R
+import com.hippo.preference.MessagePreference
 
 class VersionPreference @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

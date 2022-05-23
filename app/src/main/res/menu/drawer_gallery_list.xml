@@ -19,13 +19,13 @@
     <item
         android:id="@+id/action_help"
         android:icon="@drawable/v_help_circle_x24"
-        android:title="@string/add"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="ifRoom"
+        android:title="@string/add" />
 
     <item
         android:id="@+id/action_add"
         android:icon="@drawable/v_plus_dark_x24"
-        android:title="@string/add"
-        android:showAsAction="always" />
+        android:showAsAction="always"
+        android:title="@string/add" />
 
 </menu>

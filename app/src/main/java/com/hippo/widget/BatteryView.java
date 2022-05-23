@@ -42,7 +42,11 @@ public class BatteryView extends AppCompatTextView {
 
     private BatteryDrawable mDrawable;
     private boolean mAttached = false;
-    private boolean mIsChargerWorking = false;    private final Runnable mCharger = new Runnable() {
+    private boolean mIsChargerWorking = false;
+    public BatteryView(Context context) {
+        super(context);
+        init();
+    }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
 
@@ -56,10 +60,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-    public BatteryView(Context context) {
-        super(context);
-        init();
-    }
 
     public BatteryView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -85,6 +85,22 @@ public class BatteryView extends AppCompatTextView {
         int height = (int) getTextSize();
         mDrawable.setBounds(0, 0, (int) (height / 0.618f), height);
         setCompoundDrawables(mDrawable, null, null, null);
+    }
+
+    @Override
+    public void setTextColor(int color) {
+        if (mCurrentColor == color) {
+            return;
+        }
+        mCurrentColor = color;
+        super.setTextColor(color);
+    }
+
+    private void startCharger() {
+        if (!mIsChargerWorking) {
+            getHandler().post(mCharger);
+            mIsChargerWorking = true;
+        }
     }    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
@@ -115,22 +131,6 @@ public class BatteryView extends AppCompatTextView {
             }
         }
     };
-
-    @Override
-    public void setTextColor(int color) {
-        if (mCurrentColor == color) {
-            return;
-        }
-        mCurrentColor = color;
-        super.setTextColor(color);
-    }
-
-    private void startCharger() {
-        if (!mIsChargerWorking) {
-            getHandler().post(mCharger);
-            mIsChargerWorking = true;
-        }
-    }
 
     private void stopCharger() {
         if (mIsChargerWorking) {

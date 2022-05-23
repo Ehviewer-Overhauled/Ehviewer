@@ -20,13 +20,13 @@
 
         android:id="@+id/action_add"
         android:icon="@drawable/v_plus_dark_x24"
-        android:title="@string/settings"
-        android:showAsAction="always" />
+        android:showAsAction="always"
+        android:title="@string/settings" />
 
     <item
         android:id="@+id/action_default_download_label"
         android:icon="@drawable/v_download_box_dark_x24"
-        android:title="@string/default_download_label"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="ifRoom"
+        android:title="@string/default_download_label" />
 
 </menu>

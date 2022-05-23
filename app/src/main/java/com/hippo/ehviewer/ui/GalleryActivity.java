@@ -246,16 +246,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 mGalleryProvider = new ArchiveGalleryProvider(this, mUri);
             }
         }
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            result -> {
-                if (result && mSavingPage != -1) {
-                    saveImage(mSavingPage);
-                } else {
-                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-                }
-                mSavingPage = -1;
-            });
+    }
 
     private void onInit() {
         Intent intent = getIntent();
@@ -269,7 +260,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mGalleryInfo = intent.getParcelableExtra(KEY_GALLERY_INFO);
         mPage = intent.getIntExtra(KEY_PAGE, -1);
         buildProvider();
-    }
+    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
 
     private void onRestore(@NonNull Bundle savedInstanceState) {
         mAction = savedInstanceState.getString(KEY_ACTION);

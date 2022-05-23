@@ -141,7 +141,7 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, os);
                 mImagePath = temp.getPath();
                 mPreview.setImageBitmap(bitmap);
-                ((View)mPreview.getParent()).setVisibility(VISIBLE);
+                ((View) mPreview.getParent()).setVisibility(VISIBLE);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -166,7 +166,7 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
             }
             mImagePath = imagePath;
             mPreview.setImageBitmap(bitmap);
-            ((View)mPreview.getParent()).setVisibility(VISIBLE);
+            ((View) mPreview.getParent()).setVisibility(VISIBLE);
         } catch (FileNotFoundException e) {
             // Ignore
         } finally {

@@ -52,7 +52,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private volatile int size = STATE_WAIT;
     private String error;
 
-    public ArchiveGalleryProvider(Context context, Uri uri){
+    public ArchiveGalleryProvider(Context context, Uri uri) {
         UriArchiveAccessor archiveAccessor1;
         try {
             archiveAccessor1 = new UriArchiveAccessor(context, uri);

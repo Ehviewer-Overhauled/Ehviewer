@@ -22,12 +22,12 @@ android {
     }
 
     signingConfigs {
-            sign {
-                storeFile file(signStoreFile)
-                storePassword signStorePassword
-                keyAlias signkeyAlias
-                keyPassword signkeyPassword
-            }
+        sign {
+            storeFile file(signStoreFile)
+            storePassword signStorePassword
+            keyAlias signkeyAlias
+            keyPassword signkeyPassword
+        }
     }
 
     buildFeatures {
