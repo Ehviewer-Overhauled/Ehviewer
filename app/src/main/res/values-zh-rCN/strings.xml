@@ -759,4 +759,6 @@
     <string name="app_link_not_verified_message">对于 Android 12 及更新的版本，您需要手动添加链接到已验证链接才能在 EhViewer 中打开 E-Hentai 链接。</string>
     <string name="app_link_not_verified_title">应用链接未验证</string>
     <string name="open_by_default">默认打开</string>
+
+    <string name="show_library_version">依赖库之版本</string>
 </resources>

@@ -823,4 +823,6 @@
     <string name="app_link_not_verified_message">For Android 12 and newer, you need to manually add link to verified links in order to open E-Hentai links in EhViewer.</string>
     <string name="app_link_not_verified_title">App links not verified</string>
     <string name="open_by_default">Open by default</string>
+
+    <string name="show_library_version">Library Version</string>
 </resources>

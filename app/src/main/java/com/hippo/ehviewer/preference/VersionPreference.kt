@@ -13,46 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import android.content.Context
+import com.hippo.preference.MessagePreference
+import com.hippo.ehviewer.R
+import android.content.pm.PackageManager
+import android.util.AttributeSet
+import androidx.appcompat.app.AlertDialog
+import com.hippo.Native
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.util.AttributeSet;
-
-import androidx.preference.Preference;
-
-import com.hippo.ehviewer.R;
-
-public class VersionPreference extends Preference {
-
-    public VersionPreference(Context context) {
-        super(context);
-        init(context);
-    }
-
-    public VersionPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    public VersionPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
-    private void init(Context context) {
-        setTitle(R.string.settings_about_version);
-
-        String version;
-        try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            version = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            version = context.getString(R.string.error_unknown);
+class VersionPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : MessagePreference(context, attrs) {
+    init {
+        setTitle(R.string.settings_about_version)
+        val version: String = try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            pInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            context.getString(R.string.error_unknown)
         }
-        setSummary(version);
+        summary = version
+    }
+
+    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
+        super.onPrepareDialogBuilder(builder)
+        builder.setTitle(R.string.show_library_version)
+        builder.setMessage(Native.getlibarchiveVersion() + "\nlzma(xz-utils) " + Native.getliblzmaVersion() + "\nlibzstd " + Native.getlibzstdVersion() + "\nzlib " + Native.getzlibVersion() + "\nlibjpeg-turbo " + Native.getlibjpeg_turboVersion())
     }
 }
