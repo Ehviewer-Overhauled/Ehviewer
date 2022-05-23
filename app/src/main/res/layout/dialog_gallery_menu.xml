@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<rikka.widget.borderview.BorderNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -37,8 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/settings_read_screen_rotation"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:text="@string/settings_read_screen_rotation" />
 
             <com.hippo.widget.CuteSpinner
                 android:id="@+id/screen_rotation"
@@ -60,8 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/settings_read_reading_direction"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:text="@string/settings_read_reading_direction" />
 
             <com.hippo.widget.CuteSpinner
                 android:id="@+id/reading_direction"
@@ -83,8 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/settings_read_page_scaling"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:text="@string/settings_read_page_scaling" />
 
             <com.hippo.widget.CuteSpinner
                 android:id="@+id/page_scaling"
@@ -106,8 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/settings_read_start_position"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:text="@string/settings_read_start_position" />
 
             <com.hippo.widget.CuteSpinner
                 android:id="@+id/start_position"
@@ -129,8 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/read_theme"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:text="@string/read_theme" />
 
             <com.hippo.widget.CuteSpinner
                 android:id="@+id/read_theme"
@@ -142,68 +137,60 @@
 
         </LinearLayout>
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/keep_screen_on"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_keep_screen_on"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_keep_screen_on" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/show_clock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_show_clock"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_show_clock" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/show_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_show_progress"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_show_progress" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/show_battery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_show_battery"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_show_battery" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/show_page_interval"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_show_page_interval"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_show_page_interval" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/volume_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_volume_page"
             android:textColor="?android:attr/textColorPrimary" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/reverse_volume_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_reverse_volume"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_reverse_volume" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/reading_fullscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_reading_fullscreen"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_reading_fullscreen" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/custom_screen_lightness"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_read_custom_screen_lightness"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:text="@string/settings_read_custom_screen_lightness" />
 
         <SeekBar
             android:id="@+id/screen_lightness"
@@ -212,4 +199,4 @@
             android:max="200" />
 
     </LinearLayout>
-</rikka.widget.borderview.BorderNestedScrollView>
+</androidx.core.widget.NestedScrollView>

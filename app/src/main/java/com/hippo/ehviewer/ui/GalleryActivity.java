@@ -66,6 +66,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.R;
@@ -1047,15 +1048,15 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         private final Spinner mScaleMode;
         private final Spinner mStartPosition;
         private final Spinner mReadTheme;
-        private final Switch mKeepScreenOn;
-        private final Switch mShowClock;
-        private final Switch mShowProgress;
-        private final Switch mShowBattery;
-        private final Switch mShowPageInterval;
-        private final Switch mVolumePage;
-        private final Switch mReverseVolumePage;
-        private final Switch mReadingFullscreen;
-        private final Switch mCustomScreenLightness;
+        private final SwitchMaterial mKeepScreenOn;
+        private final SwitchMaterial mShowClock;
+        private final SwitchMaterial mShowProgress;
+        private final SwitchMaterial mShowBattery;
+        private final SwitchMaterial mShowPageInterval;
+        private final SwitchMaterial mVolumePage;
+        private final SwitchMaterial mReverseVolumePage;
+        private final SwitchMaterial mReadingFullscreen;
+        private final SwitchMaterial mCustomScreenLightness;
         private final SeekBar mScreenLightness;
 
         @SuppressLint("InflateParams")
