@@ -1,6 +1,6 @@
 [submodule "native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo"]
 	path = native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo
-	url = https://gitlab.com/NekoInverter/libjpeg-turbo.git
+	url = https://github.com/asuka-mio/libjpeg-turbo
 [submodule "native/src/main/jni/image/giflib/giflib"]
 	path = native/src/main/jni/image/giflib/giflib
 	url = https://gitlab.com/NekoInverter/giflib.git
