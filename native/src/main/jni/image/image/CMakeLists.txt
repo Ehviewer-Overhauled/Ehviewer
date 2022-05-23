@@ -39,6 +39,6 @@ set(IMAGE_LIBRARIES
         giflib
         )
 
-add_library(image STATIC ${IMAGE_SOURCES})
+add_library(image SHARED ${IMAGE_SOURCES})
 target_include_directories(image PRIVATE ${IMAGE_INCLUDES})
 target_link_libraries(image PRIVATE ${IMAGE_LIBRARIES})
