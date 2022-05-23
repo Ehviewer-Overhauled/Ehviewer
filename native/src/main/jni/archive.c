@@ -61,6 +61,7 @@ static void archive_list_all_entries(struct archive_inst_sc *inst)
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
         if(filename_is_playable_file(archive_entry_pathname(entry)))
             count++;
+        archive_read_data_skip(a);
     }
     inst->entry_num = count;
 }
@@ -90,17 +91,26 @@ la_int64_t ins_seek(struct archive *a, void *client_data, la_int64_t offset, int
     return ret;
 }
 
+la_int64_t ins_skip(struct archive *a, void *client_data, la_int64_t request)
+{
+    archive_inst *arc = client_data;
+    jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->skipID, request);
+    return ret;
+}
+
 static archive_inst *archive_create_inst(JNIEnv *env, jobject file)
 {
     archive_inst *inst = malloc(sizeof(archive_inst));
     inst->archive = archive_read_new();
     archive_read_set_seek_callback(inst->archive, ins_seek);
+    archive_read_set_skip_callback(inst->archive, ins_skip);
     archive_read_support_format_all(inst->archive);
     archive_read_support_filter_all(inst->archive);
     inst->env = env;
     inst->file = file;
     inst->readID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "read", "([B)I");
     inst->seekID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "seek", "(JI)J");
+    inst->skipID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "skip", "(J)J");
     inst->jbr = (*env)->NewByteArray(env, BLOCK_SIZE);
     inst->read_buffer = malloc(BLOCK_SIZE);
     inst->output_buffer = malloc(BLOCK_SIZE);
@@ -158,6 +168,8 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
                 (*arc->env)->CallVoidMethod(env, os, flushID);
             }
             break;
+        } else {
+            archive_read_data_skip(arc->archive);
         }
         count++;
     }

@@ -72,6 +72,26 @@ public class UriArchiveAccessor implements Closeable {
             Os.lseek(fd, 0, OsConstants.SEEK_SET);
         }
 
+        public long skip(long n) throws IOException, ErrnoException {
+            long pos;
+            long len;
+            long newpos;
+
+            if (n <= 0) {
+                return 0;
+            }
+            pos = Os.lseek(fd, 0L, OsConstants.SEEK_CUR);
+            len = length();
+            newpos = pos + n;
+            if (newpos > len) {
+                newpos = len;
+            }
+            seek(newpos, OsConstants.SEEK_SET);
+
+            /* return the actual number of bytes skipped */
+            return newpos - pos;
+        }
+
         public void close() throws IOException {
             pfd.close();
             try {
