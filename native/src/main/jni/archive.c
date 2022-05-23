@@ -30,14 +30,13 @@ typedef struct archive_inst_sc {
     jmethodID readID;
     jmethodID seekID;
     jmethodID skipID;
-    void* read_buffer;
-    void* output_buffer;
+    void *read_buffer;
+    void *output_buffer;
     jbyteArray jbr;
 } archive_inst;
 
-static int filename_is_playable_file(const char* name)
-{
-    const char* dotptr = strrchr(name, '.');
+static int filename_is_playable_file(const char *name) {
+    const char *dotptr = strrchr(name, '.');
     if (dotptr++) {
         switch (*dotptr) {
             case 'j':
@@ -53,21 +52,19 @@ static int filename_is_playable_file(const char* name)
     return 0;
 }
 
-static void archive_list_all_entries(struct archive_inst_sc *inst)
-{
+static void archive_list_all_entries(struct archive_inst_sc *inst) {
     struct archive *a = inst->archive;
     struct archive_entry *entry;
     int count = 0;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        if(filename_is_playable_file(archive_entry_pathname(entry)))
+        if (filename_is_playable_file(archive_entry_pathname(entry)))
             count++;
         archive_read_data_skip(a);
     }
     inst->entry_num = count;
 }
 
-ssize_t ins_read(struct archive *a, void* client_data_ptr, const void **buff)
-{
+ssize_t ins_read(struct archive *a, void *client_data_ptr, const void **buff) {
     archive_inst *arc = client_data_ptr;
     int32_t r = (*arc->env)->CallIntMethod(arc->env, arc->file, arc->readID, arc->jbr);
     (*arc->env)->GetByteArrayRegion(arc->env, arc->jbr, 0, r, arc->read_buffer);
@@ -75,31 +72,28 @@ ssize_t ins_read(struct archive *a, void* client_data_ptr, const void **buff)
     return r;
 }
 
-int ins_close(struct archive *a, void* client_data)
-{
+int ins_close(struct archive *a, void *client_data) {
     archive_inst *arc = client_data;
     JNIEnv *env = arc->env;
-    jmethodID rewind = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, arc->file), "rewind", "()V");
+    jmethodID rewind = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, arc->file), "rewind",
+                                           "()V");
     (*arc->env)->CallVoidMethod(arc->env, arc->file, rewind);
     return ARCHIVE_OK;
 }
 
-la_int64_t ins_seek(struct archive *a, void *client_data, la_int64_t offset, int whence)
-{
+la_int64_t ins_seek(struct archive *a, void *client_data, la_int64_t offset, int whence) {
     archive_inst *arc = client_data;
     jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->seekID, offset, whence);
     return ret;
 }
 
-la_int64_t ins_skip(struct archive *a, void *client_data, la_int64_t request)
-{
+la_int64_t ins_skip(struct archive *a, void *client_data, la_int64_t request) {
     archive_inst *arc = client_data;
     jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->skipID, request);
     return ret;
 }
 
-static archive_inst *archive_create_inst(JNIEnv *env, jobject file)
-{
+static archive_inst *archive_create_inst(JNIEnv *env, jobject file) {
     archive_inst *inst = malloc(sizeof(archive_inst));
     inst->archive = archive_read_new();
     archive_read_set_seek_callback(inst->archive, ins_seek);
@@ -117,8 +111,7 @@ static archive_inst *archive_create_inst(JNIEnv *env, jobject file)
     return inst;
 }
 
-static void archive_destroy_inst(archive_inst* inst)
-{
+static void archive_destroy_inst(archive_inst *inst) {
     JNIEnv *env = inst->env;
     archive_read_close(inst->archive);
     (*env)->DeleteLocalRef(env, inst->jbr);
@@ -147,17 +140,17 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
                                                         jint index, jobject os) {
     int count = 0;
     struct archive_entry *entry;
-    archive_inst  *arc = archive_create_inst(env, osf);
+    archive_inst *arc = archive_create_inst(env, osf);
     int32_t size;
     jmethodID writeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "write", "([B)V");
     jmethodID flushID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "flush", "()V");
     archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
     while (archive_read_next_header(arc->archive, &entry) == ARCHIVE_OK) {
-        if(!filename_is_playable_file(archive_entry_pathname(entry)))
+        if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (count == index) {
             for (;;) {
-                size = (int32_t)archive_read_data(arc->archive, arc->output_buffer, BLOCK_SIZE);
+                size = (int32_t) archive_read_data(arc->archive, arc->output_buffer, BLOCK_SIZE);
                 if (size < 0) {
                     return READ_DATA_ERR;
                 }

@@ -40,19 +40,18 @@ import java.util.Set;
 public final class ImageBitmap implements Animatable, Runnable {
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-
-    @Nullable
-    private Image mImage;
     @NonNull
     private final Bitmap mBitmap;
     private final int mFormat;
     private final boolean mIsOpaque;
     private final int mByteCount;
     private final int mFrameCount;
+    private final Set<WeakReference<Callback>> mCallbackSet = new LinkedHashSet<>();
+    @Nullable
+    private Image mImage;
     private int mReferences;
     private int mAnimationReferences;
     private boolean mRunning;
-    private final Set<WeakReference<Callback>> mCallbackSet = new LinkedHashSet<>();
 
     private ImageBitmap(@NonNull Image image) throws OutOfMemoryError {
         int width = image.getWidth();

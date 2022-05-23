@@ -31,6 +31,7 @@ public class UriArchiveAccessor implements Closeable {
     }
 
     private native int openArchive(OsReadableFile osf);
+
     private native int extracttoOutputStream(OsReadableFile osf, int index, OutputStream os);
 
     @Override

@@ -55,12 +55,10 @@ public final class Image {
     public static final int FORMAT_GIF = 3;
 
     private static final AtomicInteger sImageCount = new AtomicInteger();
-
-    private long mNativePtr;
     private final int mFormat;
     private final int mWidth;
     private final int mHeight;
-
+    private long mNativePtr;
     private Throwable mRecycleTracker;
 
     private Image(long nativePtr, int format, int width, int height) {
@@ -71,6 +69,83 @@ public final class Image {
 
         sImageCount.getAndIncrement();
     }
+
+    /**
+     * Decode image from {@code InputStream}
+     */
+    @Nullable
+    public static Image decode(InputStream is, boolean partially) {
+        if (!(is instanceof BufferedInputStream)) {
+            is = new BufferedInputStream(is);
+        }
+        return nativeDecode(is, partially);
+    }
+
+    /**
+     * Create a plain image from Bitmap
+     */
+    @Nullable
+    public static Image create(Bitmap bitmap) {
+        return nativeCreate(bitmap);
+    }
+
+    /**
+     * Return all un-recycled {@code Image} instance count.
+     * It is useful for debug.
+     */
+    public static int getImageCount() {
+        return sImageCount.get();
+    }
+
+    /**
+     * Return all supported image formats, exclude {@link #FORMAT_PLAIN}
+     */
+    public static int[] getSupportedImageFormats() {
+        return nativeGetSupportedImageFormats();
+    }
+
+    /**
+     * Return decoder description of the image format,
+     * {@code null} for invalid image format.
+     */
+    public static String getDecoderDescription(int format) {
+        return nativeGetDecoderDescription(format);
+    }
+
+    private static native Image nativeDecode(InputStream is, boolean partially);
+
+    private static native Image nativeCreate(Bitmap bitmap);
+
+    private static native int nativeGetByteCount(long nativePtr, int format);
+
+    private static native boolean nativeComplete(long nativePtr, int format);
+
+    private static native boolean nativeIsCompleted(long nativePtr, int format);
+
+    private static native void nativeRender(long nativePtr, int format,
+                                            int srcX, int srcY, Bitmap dst, int dstX, int dstY,
+                                            int width, int height, boolean fillBlank, int defaultColor);
+
+    private static native void nativeTexImage(long nativePtr, int format,
+                                              boolean init, int offsetX, int offsetY, int width, int height);
+
+    private static native void nativeAdvance(long nativePtr, int format);
+
+    private static native int nativeGetDelay(long nativePtr, int format);
+
+    private static native int nativeFrameCount(long nativePtr, int format);
+
+    private static native boolean nativeIsOpaque(long nativePtr, int format);
+
+    private static native boolean nativeIsGray(long nativePtr, int format, int error);
+
+    private static native void nativeClahe(long nativePtr, int format, boolean toGray);
+
+    private static native void nativeRecycle(long nativePtr, int format);
+
+    private static native int[] nativeGetSupportedImageFormats();
+
+    private static native String nativeGetDecoderDescription(int format);
 
     /**
      * Return the format of the image
@@ -218,81 +293,4 @@ public final class Image {
     public boolean isRecycled() {
         return mNativePtr == 0;
     }
-
-    /**
-     * Decode image from {@code InputStream}
-     */
-    @Nullable
-    public static Image decode(InputStream is, boolean partially) {
-        if (!(is instanceof BufferedInputStream)) {
-            is = new BufferedInputStream(is);
-        }
-        return nativeDecode(is, partially);
-    }
-
-    /**
-     * Create a plain image from Bitmap
-     */
-    @Nullable
-    public static Image create(Bitmap bitmap) {
-        return nativeCreate(bitmap);
-    }
-
-    /**
-     * Return all un-recycled {@code Image} instance count.
-     * It is useful for debug.
-     */
-    public static int getImageCount() {
-        return sImageCount.get();
-    }
-
-    /**
-     * Return all supported image formats, exclude {@link #FORMAT_PLAIN}
-     */
-    public static int[] getSupportedImageFormats() {
-        return nativeGetSupportedImageFormats();
-    }
-
-    /**
-     * Return decoder description of the image format,
-     * {@code null} for invalid image format.
-     */
-    public static String getDecoderDescription(int format) {
-        return nativeGetDecoderDescription(format);
-    }
-
-    private static native Image nativeDecode(InputStream is, boolean partially);
-
-    private static native Image nativeCreate(Bitmap bitmap);
-
-    private static native int nativeGetByteCount(long nativePtr, int format);
-
-    private static native boolean nativeComplete(long nativePtr, int format);
-
-    private static native boolean nativeIsCompleted(long nativePtr, int format);
-
-    private static native void nativeRender(long nativePtr, int format,
-                                            int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-                                            int width, int height, boolean fillBlank, int defaultColor);
-
-    private static native void nativeTexImage(long nativePtr, int format,
-                                              boolean init, int offsetX, int offsetY, int width, int height);
-
-    private static native void nativeAdvance(long nativePtr, int format);
-
-    private static native int nativeGetDelay(long nativePtr, int format);
-
-    private static native int nativeFrameCount(long nativePtr, int format);
-
-    private static native boolean nativeIsOpaque(long nativePtr, int format);
-
-    private static native boolean nativeIsGray(long nativePtr, int format, int error);
-
-    private static native void nativeClahe(long nativePtr, int format, boolean toGray);
-
-    private static native void nativeRecycle(long nativePtr, int format);
-
-    private static native int[] nativeGetSupportedImageFormats();
-
-    private static native String nativeGetDecoderDescription(int format);
 }
