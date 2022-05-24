@@ -40,3 +40,13 @@ jobs:
         with:
           name: x86_64-${{ github.sha }}
           path: app/build/outputs/apk/release/app-x86_64-release.apk
+      - name: Update ARM32
+        uses: actions/upload-artifact@v3
+        with:
+            name: armeabi-v7a-${{ github.sha }}
+            path: app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+      - name: Update x86
+        uses: actions/upload-artifact@v3
+        with:
+            name: x86-${{ github.sha }}
+            path: app/build/outputs/apk/release/app-x86-release.apk
