@@ -13,7 +13,7 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.4.1)
-project(libjpeg-turbo C)
+project(jpeg C)
 
 set(LIBJPEG_TURBO_SOURCES
         libjpeg-turbo/jaricom.c
@@ -207,5 +207,5 @@ else ()
 
 endif ()
 
-add_library(libjpeg-turbo SHARED ${LIBJPEG_TURBO_SOURCES})
-target_include_directories(libjpeg-turbo PUBLIC ${LIBJPEG_TURBO_INCLUDES})
+add_library(jpeg SHARED ${LIBJPEG_TURBO_SOURCES})
+target_include_directories(jpeg PUBLIC ${LIBJPEG_TURBO_INCLUDES})

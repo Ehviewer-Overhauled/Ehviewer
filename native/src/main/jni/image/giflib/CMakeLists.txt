@@ -13,7 +13,7 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.4.1)
-project(giflib C)
+project(gif C)
 
 set(GIFLIB_SOURCES
         giflib/dgif_lib.c
@@ -23,5 +23,5 @@ set(GIFLIB_SOURCES
         )
 set(GIFLIB_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/giflib)
 
-add_library(giflib SHARED ${GIFLIB_SOURCES})
-target_include_directories(giflib PUBLIC ${GIFLIB_INCLUDES})
+add_library(gif SHARED ${GIFLIB_SOURCES})
+target_include_directories(gif PUBLIC ${GIFLIB_INCLUDES})

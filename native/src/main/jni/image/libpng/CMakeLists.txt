@@ -13,7 +13,7 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.4.1)
-project(libpng C)
+project(png C)
 
 set(LIBPNG_SOURCES
         libpng/png.c
@@ -91,7 +91,7 @@ elseif (${ANDROID_ABI} STREQUAL "arm64-v8a")
 
 endif ()
 
-add_library(libpng SHARED ${LIBPNG_SOURCES})
-target_include_directories(libpng PUBLIC ${LIBPNG_INCLUDES})
-target_compile_definitions(libpng PRIVATE ${LIBPNG_DEFINITIONS})
-target_link_libraries(libpng PRIVATE ${LIBPNG_LIBRARIES})
+add_library(png SHARED ${LIBPNG_SOURCES})
+target_include_directories(png PUBLIC ${LIBPNG_INCLUDES})
+target_compile_definitions(png PRIVATE ${LIBPNG_DEFINITIONS})
+target_link_libraries(png PRIVATE ${LIBPNG_LIBRARIES})

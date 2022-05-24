@@ -34,9 +34,9 @@ set(IMAGE_LIBRARIES
         jnigraphics
         GLESv2
         stream
-        libjpeg-turbo
-        libpng
-        giflib
+        jpeg
+        png
+        gif
         )
 
 add_library(image SHARED ${IMAGE_SOURCES})
