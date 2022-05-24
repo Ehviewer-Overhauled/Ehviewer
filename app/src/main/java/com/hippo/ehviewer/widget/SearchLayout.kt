@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.hippo.easyrecyclerview.EasyRecyclerView
@@ -59,7 +58,7 @@ class SearchLayout @JvmOverloads constructor(
     private var mNormalView: View
     private var mNormalSearchMode: RadioGridGroup
     private var mNormalSearchModeHelp: ImageView
-    private var mEnableAdvanceSwitch: SwitchMaterial
+    private var mEnableAdvanceSwitch: CheckBox
     private var mAdvanceView: View
     private var mTableAdvanceSearch: AdvanceSearchTable
     private var mImageView: ImageSearchLayout
@@ -118,8 +117,6 @@ class SearchLayout @JvmOverloads constructor(
         mEnableAdvanceSwitch = mNormalView.findViewById(R.id.search_enable_advance)
         mNormalSearchModeHelp.setOnClickListener(this)
         mEnableAdvanceSwitch.setOnCheckedChangeListener(this)
-        mEnableAdvanceSwitch.switchPadding =
-            resources.getDimensionPixelSize(R.dimen.switch_padding)
         // Create advance view
         mAdvanceView = mInflater.inflate(R.layout.search_advance, null)
         mTableAdvanceSearch = mAdvanceView.findViewById(R.id.search_advance_search_table)
