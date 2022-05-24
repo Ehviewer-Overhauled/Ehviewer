@@ -13,8 +13,8 @@ jobs:
       - name: Setup Java 11
         uses: actions/setup-java@v3
         with:
-            distribution: temurin
-            java-version: 11
+          distribution: temurin
+          java-version: 11
 
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v2
@@ -32,21 +32,23 @@ jobs:
       - name: Update ARM64
         uses: actions/upload-artifact@v3
         with:
-            name: arm64-${{ github.sha }}
-            path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
+          name: arm64-${{ github.sha }}
+          path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
       - name: Update x86_64
         uses: actions/upload-artifact@v3
         with:
           name: x86_64-${{ github.sha }}
           path: app/build/outputs/apk/release/app-x86_64-release.apk
+
       - name: Update ARM32
         uses: actions/upload-artifact@v3
         with:
-            name: armeabi-v7a-${{ github.sha }}
-            path: app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+          name: armeabi-v7a-${{ github.sha }}
+          path: app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+
       - name: Update x86
         uses: actions/upload-artifact@v3
         with:
-            name: x86-${{ github.sha }}
-            path: app/build/outputs/apk/release/app-x86-release.apk
+          name: x86-${{ github.sha }}
+          path: app/build/outputs/apk/release/app-x86-release.apk

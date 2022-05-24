@@ -16,8 +16,8 @@ jobs:
       - name: Setup Java 11
         uses: actions/setup-java@v3
         with:
-            distribution: temurin
-            java-version: 11
+          distribution: temurin
+          java-version: 11
 
       - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v2
@@ -39,3 +39,5 @@ jobs:
           files: |
             app/build/outputs/apk/release/app-arm64-v8a-release.apk
             app/build/outputs/apk/release/app-x86_64-release.apk
+            app/build/outputs/apk/release/app-x86-release.apk
+            app/build/outputs/apk/release/app-armeabi-v7a-release.apk
