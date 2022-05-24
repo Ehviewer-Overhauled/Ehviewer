@@ -28,36 +28,17 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
-    <style name="TextAppearance.CardTitle">
-        <item name="android:textSize">@dimen/text_little_small</item>
-    </style>
-
     <style name="CardTitle">
-        <item name="android:textAppearance">@style/TextAppearance.CardTitle</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.TitleSmall</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">2</item>
-        <item name="android:lineSpacingExtra">0sp</item>
-    </style>
-
-    <style name="TextAppearance.CardMessage">
-        <item name="android:textSize">@dimen/text_small</item>
     </style>
 
     <style name="CardMessage">
-        <item name="android:textAppearance">@style/TextAppearance.CardMessage</item>
+        <item name="android:textAppearance">@style/TextAppearance.Material3.BodyMedium</item>
         <item name="android:ellipsize">end</item>
         <item name="android:singleLine">true</item>
         <item name="android:maxLines">1</item>
-    </style>
-
-    <!-- CategoryText -->
-    <style name="CategoryText">
-        <item name="android:textAppearance">@style/TextAppearance.Material3.ActionBar.Subtitle
-        </item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center</item>
-        <item name="android:minHeight">@dimen/category_table_item_height</item>
-        <item name="android:foreground">@drawable/check_text_view_foreground</item>
     </style>
 
     <style name="TextAppearance.CategoryTitle" parent="TextAppearance.Material3.TitleMedium">
