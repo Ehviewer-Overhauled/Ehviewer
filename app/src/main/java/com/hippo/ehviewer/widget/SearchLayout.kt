@@ -99,6 +99,11 @@ class SearchLayout @JvmOverloads constructor(
             mChip.setText(mPair.second)
             mChip.idt = mPair.first
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
+            mChip.setOnLongClickListener {
+                mCategoryGroup.clearCheck()
+                mChip.isChecked = true
+                true
+            }
             mCategoryGroup.addView(mChip)
         }
         mCategoryGroup.setOnCheckedStateChangeListener { _, checkedIds ->
