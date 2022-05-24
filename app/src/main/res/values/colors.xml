@@ -15,8 +15,6 @@
   -->
 
 <resources>
-    <color name="primary_drawable">#8a000000</color>
-    <color name="primary_drawable_dark">#ffffffff</color>
     <color name="primary_drawable_black">#ccffffff</color>
     <color name="secondary_drawable_black">#3dffffff</color>
     <color name="red_500">#fff44336</color>

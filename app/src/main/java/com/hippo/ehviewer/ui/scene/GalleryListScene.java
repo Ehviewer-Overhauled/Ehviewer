@@ -96,6 +96,7 @@ import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.ui.CommonOperations;
+import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
@@ -613,7 +614,13 @@ public final class GalleryListScene extends BaseScene
         mFabLayout.setOnExpandListener(this);
         addAboveSnackView(mFabLayout);
 
-        mActionFabDrawable = new AddDeleteDrawable(context, resources.getColor(R.color.primary_drawable_dark));
+        int colorID;
+        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
+            colorID = resources.getColor(android.R.color.white, getTheme());
+        } else {
+            colorID = resources.getColor(android.R.color.black, getTheme());
+        }
+        mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
 
         mSearchFab.setOnClickListener(this);

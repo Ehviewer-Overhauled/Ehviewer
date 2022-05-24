@@ -68,6 +68,7 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.ui.CommonOperations;
+import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
 import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
@@ -290,7 +291,13 @@ public class FavoritesScene extends BaseScene implements
         updateSearchBar();
         mSearchBarMover = new SearchBarMover(this, mSearchBar, mRecyclerView);
 
-        mActionFabDrawable = new AddDeleteDrawable(context, resources.getColor(R.color.primary_drawable_dark));
+        int colorID;
+        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
+            colorID = resources.getColor(android.R.color.white, getTheme());
+        } else {
+            colorID = resources.getColor(android.R.color.black, getTheme());
+        }
+        mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
         mFabLayout.setExpanded(false, false);
         mFabLayout.setAutoCancel(true);

@@ -15,18 +15,9 @@
   -->
 
 <resources>
-
-    <color name="primary_drawable">#ffffffff</color>
-
     <!-- divider -->
     <color name="divider">#20ffffff</color>
 
-    <!-- shadow -->
-
-    <!-- Gallery Activity -->
-
     <!-- Lock pattern view -->
     <color name="lock_pattern_view_regular_color">#8affffff</color>
-
-    <!--Shortcut background-->
 </resources>
