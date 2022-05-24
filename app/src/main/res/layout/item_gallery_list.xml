@@ -60,8 +60,8 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/rating"
             android:layout_alignStart="@id/title"
+            android:layout_below="@id/title"
             android:layout_marginTop="2dp" />
 
         <TextView
