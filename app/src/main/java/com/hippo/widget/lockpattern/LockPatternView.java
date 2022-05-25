@@ -141,7 +141,7 @@ public class LockPatternView extends View {
 
         mRegularColor = getResources().getColor(R.color.lock_pattern_view_regular_color);
         mErrorColor = getResources().getColor(R.color.lock_pattern_view_error_color);
-        mSuccessColor = getResources().getColor(R.color.lock_pattern_view_success_color);
+        mSuccessColor = mErrorColor;
 
         mPathPaint.setColor(mRegularColor);
 

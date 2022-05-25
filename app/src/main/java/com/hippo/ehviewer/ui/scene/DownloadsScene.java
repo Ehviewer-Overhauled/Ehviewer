@@ -468,7 +468,6 @@ public class DownloadsScene extends ToolbarScene
                 TapTarget.forBounds(bounds,
                                 getString(R.string.guide_download_labels_title),
                                 getString(R.string.guide_download_labels_text))
-                        .outerCircleColor(R.color.colorPrimary)
                         .transparentTarget(true),
                 new TapTargetView.Listener() {
                     @Override
