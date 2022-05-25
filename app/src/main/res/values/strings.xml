@@ -825,4 +825,5 @@
     <string name="open_by_default">Open by default</string>
 
     <string name="show_library_version">Library Version</string>
+    <string name="settings_privacy_require_unlock">Require Unlock</string>
 </resources>

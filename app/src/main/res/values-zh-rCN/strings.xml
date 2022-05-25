@@ -761,4 +761,5 @@
     <string name="open_by_default">默认打开</string>
 
     <string name="show_library_version">依赖库之版本</string>
+    <string name="settings_privacy_require_unlock">需要解锁</string>
 </resources>

@@ -86,7 +86,7 @@ public class Settings {
      ****** Advanced
      ********************/
     public static final String KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body";
-    public static final String KEY_SECURITY = "security";
+    public static final String KEY_SECURITY = "require_unlock";
     public static final String DEFAULT_SECURITY = "";
     public static final String KEY_ENABLE_FINGERPRINT = "enable_fingerprint";
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
@@ -1028,20 +1028,12 @@ public class Settings {
         return getBoolean(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG);
     }
 
-    public static String getSecurity() {
-        return getString(KEY_SECURITY, DEFAULT_SECURITY);
-    }
-
-    public static void putSecurity(String value) {
-        putString(KEY_SECURITY, value);
+    public static boolean getSecurity() {
+        return getBoolean(KEY_SECURITY, false);
     }
 
     public static boolean getEnableFingerprint() {
         return getBoolean(KEY_ENABLE_FINGERPRINT, true);
-    }
-
-    public static void putEnableFingerprint(boolean value) {
-        putBoolean(KEY_ENABLE_FINGERPRINT, value);
     }
 
     public static int getReadCacheSize() {

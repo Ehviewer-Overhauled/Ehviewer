@@ -14,20 +14,9 @@ import com.hippo.ehviewer.Settings;
  */
 
 public class PrivacyFragment extends BasePreferenceFragment {
-    private static final String KEY_PATTERN_PROTECTION = "pattern_protection";
-
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.privacy_settings);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Preference patternProtection = findPreference(KEY_PATTERN_PROTECTION);
-        patternProtection.setSummary(TextUtils.isEmpty(Settings.getSecurity()) ?
-                R.string.settings_privacy_pattern_protection_not_set :
-                R.string.settings_privacy_pattern_protection_set);
     }
 
     @Override
