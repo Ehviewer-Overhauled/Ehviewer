@@ -18,7 +18,6 @@
     <color name="primary_drawable_black">#ccffffff</color>
     <color name="secondary_drawable_black">#3dffffff</color>
     <color name="red_500">#fff44336</color>
-    <color name="teal_500">#ff009688</color>
     <color name="purple_a700">#ffaa00ff</color>
     <color name="cyan_600">#ff00acc1</color>
     <color name="light_green_600">#ff7cb342</color>
@@ -33,28 +32,17 @@
     <color name="loading_indicator_green">@color/light_green_600</color>
     <color name="loading_indicator_yellow">@color/yellow_800</color>
     <color name="loading_indicator_orange">@color/deep_orange_400</color>
-    <color name="check_text_view_mask">#4a000000</color>
 
     <!-- Red -->
-    <color name="doujinshi">#fff44336</color>
     <!-- Orange -->
-    <color name="manga">#ffff9800</color>
     <!-- Yellow 700 -->
-    <color name="artist_cg">#ffFbc02d</color>
     <!-- Green -->
-    <color name="game_cg">#ff4caf50</color>
     <!-- Light Green -->
-    <color name="western">#ff8bc34a</color>
     <!-- Blue -->
-    <color name="non_h">#ff2196f3</color>
     <!-- Indigo -->
-    <color name="image_set">#ff3f51b5</color>
     <!-- Purple -->
-    <color name="cosplay">#ff9c27b0</color>
     <!-- Deep Purple 300 -->
-    <color name="asian_porn">#ff9575cd</color>
     <!-- Pink 300 -->
-    <color name="misc">#fff06292</color>
 
     <!-- divider -->
     <color name="divider">#20000000</color>
@@ -65,8 +53,6 @@
     <!-- Gallery Activity -->
 
     <!-- Lock pattern view -->
-    <color name="lock_pattern_view_regular_color">#8a000000</color>
-    <color name="lock_pattern_view_error_color">@color/red_500</color>
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>

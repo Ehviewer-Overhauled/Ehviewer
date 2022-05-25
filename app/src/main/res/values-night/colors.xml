@@ -19,5 +19,4 @@
     <color name="divider">#20ffffff</color>
 
     <!-- Lock pattern view -->
-    <color name="lock_pattern_view_regular_color">#8affffff</color>
 </resources>

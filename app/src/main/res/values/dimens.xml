@@ -82,8 +82,6 @@
     <dimen name="add_thickness">2dp</dimen>
 
     <!-- CategoryTable -->
-    <dimen name="category_table_item_height">40dp</dimen>
-    <dimen name="category_table_item_margin">4dp</dimen>
 
     <!-- AdvanceSearchTable -->
     <dimen name="advance_search_table_item_margin">4dp</dimen>
@@ -97,7 +95,6 @@
     <dimen name="image_search_max_size">240dp</dimen>
 
     <!-- Switch padding -->
-    <dimen name="switch_padding">8dp</dimen>
 
     <!-- FabLayout -->
     <dimen name="fab_layout_primary_margin">24dp</dimen>
@@ -120,9 +117,6 @@
     <dimen name="gallery_guide_divider_width">3dp</dimen>
 
     <!-- Lock pattern view -->
-    <dimen name="lock_pattern_dot_line_width">3dp</dimen>
-    <dimen name="lock_pattern_dot_size">12dp</dimen>
-    <dimen name="lock_pattern_dot_size_activated">28dp</dimen>
 
     <!-- Custom preference -->
 
