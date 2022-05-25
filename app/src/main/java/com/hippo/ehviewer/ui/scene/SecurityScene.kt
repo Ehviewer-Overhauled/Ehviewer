@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.ui.scene
 
+import android.content.Context
 import android.os.Bundle
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -32,16 +33,10 @@ class SecurityScene : SolidScene() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (isAuthenticationSupported())
+        if (isAuthenticationSupported(requireContext()))
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
         else
             startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
-    }
-
-    private fun isAuthenticationSupported(): Boolean {
-        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
-        return BiometricManager.from(requireContext())
-            .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
     private fun startAuthentication(
@@ -65,6 +60,14 @@ class SecurityScene : SolidScene() {
         ) {
             super.onAuthenticationSucceeded(activity, result)
             startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
+        }
+    }
+
+    companion object {
+        fun isAuthenticationSupported(context: Context): Boolean {
+            val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
+            return BiometricManager.from(context)
+                .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
         }
     }
 }

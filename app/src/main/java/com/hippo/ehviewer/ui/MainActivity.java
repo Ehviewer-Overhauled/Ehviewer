@@ -142,7 +142,7 @@ public final class MainActivity extends StageActivity
     @NonNull
     @Override
     protected Announcer getLaunchAnnouncer() {
-        if (Settings.getSecurity()) {
+        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
             return new Announcer(SecurityScene.class);
         } else if (Settings.getShowWarning()) {
             return new Announcer(WarningScene.class);
@@ -160,7 +160,7 @@ public final class MainActivity extends StageActivity
     // Sometimes scene can't show directly
     private Announcer processAnnouncer(Announcer announcer) {
         if (0 == getSceneCount()) {
-            if (Settings.getSecurity()) {
+            if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SecurityScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(SecurityScene.KEY_TARGET_ARGS, announcer.getArgs());

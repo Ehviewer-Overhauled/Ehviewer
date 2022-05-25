@@ -1,23 +1,29 @@
-package com.hippo.ehviewer.ui.fragment;
+package com.hippo.ehviewer.ui.fragment
 
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-
-import com.hippo.ehviewer.R;
+import android.os.Bundle
+import androidx.preference.SwitchPreferenceCompat
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.ui.scene.SecurityScene.Companion.isAuthenticationSupported
 
 /**
  * Created by Mo10 on 2018/2/10.
  */
-
-public class PrivacyFragment extends BasePreferenceFragment {
-    @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.privacy_settings);
+class PrivacyFragment : BasePreferenceFragment() {
+    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.privacy_settings)
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings_privacy;
+    override fun onStart() {
+        super.onStart()
+        if (!isAuthenticationSupported(requireContext())) {
+            Settings.putSecurity(false)
+            findPreference<SwitchPreferenceCompat>("require_unlock")?.isEnabled = false
+            findPreference<SwitchPreferenceCompat>("require_unlock")?.isChecked = false
+        }
+    }
+
+    override fun getFragmentTitle(): Int {
+        return R.string.settings_privacy
     }
 }

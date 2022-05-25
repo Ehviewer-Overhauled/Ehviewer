@@ -1032,6 +1032,10 @@ public class Settings {
         return getBoolean(KEY_SECURITY, false);
     }
 
+    public static void putSecurity(boolean value) {
+        putBoolean(KEY_SECURITY, value);
+    }
+
     public static boolean getEnableFingerprint() {
         return getBoolean(KEY_ENABLE_FINGERPRINT, true);
     }
