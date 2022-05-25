@@ -114,7 +114,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import rikka.core.res.ResourcesKt;
-import rikka.recyclerview.RecyclerViewKt;
 
 @SuppressLint("RtlHardcoded")
 public class DownloadsScene extends ToolbarScene
@@ -378,8 +377,6 @@ public class DownloadsScene extends ToolbarScene
             mRecyclerView.scrollToPosition(mInitPosition);
             mInitPosition = -1;
         }
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4, 4, 4, 4, TypedValue.COMPLEX_UNIT_DIP);
-        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();

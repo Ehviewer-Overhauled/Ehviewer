@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.takisoft.preferencex.PreferenceFragmentCompat;
 
-import rikka.recyclerview.RecyclerViewKt;
 
 public class BasePreferenceFragment extends PreferenceFragmentCompat
         implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -52,12 +51,5 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
 
     public void showTip(CharSequence message, int length) {
         ((SettingsActivity) requireActivity()).showTip(message, length);
-    }
-
-    @Override
-    public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
-        RecyclerViewKt.fixEdgeEffect(recyclerView, false, true);
-        return recyclerView;
     }
 }

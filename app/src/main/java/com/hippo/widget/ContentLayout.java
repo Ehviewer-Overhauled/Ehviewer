@@ -56,8 +56,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import rikka.recyclerview.RecyclerViewKt;
-
 public class ContentLayout extends FrameLayout {
 
     private CircularProgressIndicator mProgressView;
@@ -123,9 +121,6 @@ public class ContentLayout extends FrameLayout {
                 resources.getColor(R.color.loading_indicator_green),
                 resources.getColor(R.color.loading_indicator_orange));
         mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
-
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 4, 4, 4, 4, TypedValue.COMPLEX_UNIT_DIP);
-        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
 
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();
         mFastScrollerOriginBottom = mFastScroller.getPaddingBottom();

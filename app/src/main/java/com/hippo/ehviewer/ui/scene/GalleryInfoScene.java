@@ -44,7 +44,6 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 
 import rikka.core.res.ResourcesKt;
-import rikka.recyclerview.RecyclerViewKt;
 
 public final class GalleryInfoScene extends ToolbarScene {
 
@@ -174,7 +173,6 @@ public final class GalleryInfoScene extends ToolbarScene {
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setHasFixedSize(true);
-        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
         return view;
     }
 

@@ -94,7 +94,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rikka.core.res.ResourcesKt;
-import rikka.recyclerview.RecyclerViewKt;
 
 public final class GalleryCommentsScene extends ToolbarScene
         implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -176,7 +175,6 @@ public final class GalleryCommentsScene extends ToolbarScene
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_comments, container, false);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
-        RecyclerViewKt.fixEdgeEffect(mRecyclerView, false, true);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mEditPanel = ViewUtils.$$(view, R.id.edit_panel);
         mSendImage = (ImageView) ViewUtils.$$(mEditPanel, R.id.send);
@@ -223,7 +221,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         if (itemAnimator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
-        RecyclerViewKt.addEdgeSpacing(mRecyclerView, 0, 0, 0, 80, TypedValue.COMPLEX_UNIT_DIP);
 
         mSendImage.setOnClickListener(this);
         mFab.setOnClickListener(this);
