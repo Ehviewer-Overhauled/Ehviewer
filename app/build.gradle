@@ -104,7 +104,6 @@ dependencies {
     implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha04'
     implementation 'androidx.browser:browser:1.4.0'
     implementation 'androidx.core:core:1.7.0'
-    implementation 'androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03'
     implementation 'androidx.fragment:fragment:1.4.1'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
