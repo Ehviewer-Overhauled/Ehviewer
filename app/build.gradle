@@ -128,7 +128,6 @@ dependencies {
     implementation 'com.gitlab.NekoInverter:yorozuya:723dc867a9'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
     implementation 'dev.rikka.rikkax.core:core:1.4.0'
-    implementation 'dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0'
     implementation 'dev.rikka.rikkax.material:material:2.4.0'
     implementation 'dev.rikka.rikkax.preference:simplemenu-preference:1.0.3'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
