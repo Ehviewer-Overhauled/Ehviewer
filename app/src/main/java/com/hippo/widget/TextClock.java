@@ -66,8 +66,13 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
+
     public TextClock(Context context) {
         this(context, null);
+    }
+
+    public TextClock(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -79,10 +84,6 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-
-    public TextClock(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
 
     public TextClock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -98,6 +99,18 @@ public class TextClock extends AppCompatTextView {
         createTime(mTimeZone);
         // Wait until onAttachedToWindow() to handle the ticker
         chooseFormat(false);
+    }
+
+    private void createTime(String timeZone) {
+        if (timeZone != null) {
+            mTime = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        } else {
+            mTime = Calendar.getInstance();
+        }
+    }
+
+    public CharSequence getFormat12Hour() {
+        return mFormat12;
     }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -111,18 +124,6 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
-    private void createTime(String timeZone) {
-        if (timeZone != null) {
-            mTime = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
-        } else {
-            mTime = Calendar.getInstance();
-        }
-    }
-
-    public CharSequence getFormat12Hour() {
-        return mFormat12;
-    }
 
     public void setFormat12Hour(CharSequence format) {
         mFormat12 = format;

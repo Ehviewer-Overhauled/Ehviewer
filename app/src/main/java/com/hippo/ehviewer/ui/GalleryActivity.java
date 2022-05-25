@@ -49,7 +49,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -261,6 +260,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mGalleryInfo = intent.getParcelableExtra(KEY_GALLERY_INFO);
         mPage = intent.getIntExtra(KEY_PAGE, -1);
         buildProvider();
+    }
+
+    private void onRestore(@NonNull Bundle savedInstanceState) {
+        mAction = savedInstanceState.getString(KEY_ACTION);
+        mFilename = savedInstanceState.getString(KEY_FILENAME);
+        mUri = savedInstanceState.getParcelable(KEY_URI);
+        mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO);
+        mPage = savedInstanceState.getInt(KEY_PAGE, -1);
+        mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX);
+        buildProvider();
     }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -271,16 +280,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 }
                 mSavingPage = -1;
             });
-
-    private void onRestore(@NonNull Bundle savedInstanceState) {
-        mAction = savedInstanceState.getString(KEY_ACTION);
-        mFilename = savedInstanceState.getString(KEY_FILENAME);
-        mUri = savedInstanceState.getParcelable(KEY_URI);
-        mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO);
-        mPage = savedInstanceState.getInt(KEY_PAGE, -1);
-        mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX);
-        buildProvider();
-    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

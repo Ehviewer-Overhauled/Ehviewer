@@ -29,7 +29,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationChannelCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;

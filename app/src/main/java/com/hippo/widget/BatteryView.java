@@ -43,9 +43,14 @@ public class BatteryView extends AppCompatTextView {
     private BatteryDrawable mDrawable;
     private boolean mAttached = false;
     private boolean mIsChargerWorking = false;
+
     public BatteryView(Context context) {
         super(context);
         init();
+    }
+
+    public BatteryView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -60,10 +65,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    public BatteryView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
 
     public BatteryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -101,6 +102,24 @@ public class BatteryView extends AppCompatTextView {
             getHandler().post(mCharger);
             mIsChargerWorking = true;
         }
+    }
+
+    private void stopCharger() {
+        if (mIsChargerWorking) {
+            getHandler().removeCallbacks(mCharger);
+            mIsChargerWorking = false;
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        if (!mAttached) {
+            mAttached = true;
+
+            registerReceiver();
+        }
     }    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
@@ -131,24 +150,6 @@ public class BatteryView extends AppCompatTextView {
             }
         }
     };
-
-    private void stopCharger() {
-        if (mIsChargerWorking) {
-            getHandler().removeCallbacks(mCharger);
-            mIsChargerWorking = false;
-        }
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        if (!mAttached) {
-            mAttached = true;
-
-            registerReceiver();
-        }
-    }
 
     @Override
     protected void onDetachedFromWindow() {

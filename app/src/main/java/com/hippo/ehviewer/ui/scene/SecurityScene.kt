@@ -40,7 +40,8 @@ class SecurityScene : SolidScene() {
 
     private fun isAuthenticationSupported(): Boolean {
         val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
-        return BiometricManager.from(requireContext()).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+        return BiometricManager.from(requireContext())
+            .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
     private fun startAuthentication(
