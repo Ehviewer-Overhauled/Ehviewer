@@ -951,8 +951,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance(context) : null;
-        int colorTag = CommonOperations.resolveColor(getTheme(), R.attr.tagBackgroundColor);
-        int colorName = CommonOperations.resolveColor(getTheme(), R.attr.tagGroupBackgroundColor);
+        int colorTag = 0;
+        int colorName = 0;
         for (GalleryTagGroup tg : tagGroups) {
             LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.gallery_tag_group, mTags, false);
             ll.setOrientation(LinearLayout.HORIZONTAL);

@@ -18,11 +18,7 @@ package com.hippo.ehviewer.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 
-import androidx.annotation.AttrRes;
-import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 
 import com.hippo.app.ListCheckBoxDialogBuilder;
@@ -270,13 +266,5 @@ public final class CommonOperations {
         public void onCancel() {
             delegate.onCancel();
         }
-    }
-
-    public static @ColorInt
-    int resolveColor(Resources.Theme theme, @AttrRes int attrId) {
-        TypedArray a = theme.obtainStyledAttributes(new int[]{attrId});
-        int res = a.getColor(0, 0);
-        a.recycle();
-        return res;
     }
 }
