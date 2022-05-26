@@ -34,6 +34,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
+
 public class SceneFragment extends Fragment {
 
     public static final int LAUNCH_MODE_STANDARD = 0;
@@ -112,6 +114,7 @@ public class SceneFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         view.setTag(R.id.fragment_tag, getTag());
+        view.setBackground(ResourcesKt.resolveDrawable(requireActivity().getTheme(), android.R.attr.windowBackground));
 
         // Notify
         FragmentActivity activity = getActivity();

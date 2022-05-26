@@ -18,18 +18,25 @@ package com.hippo.ehviewer.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.StyleRes;
 
 import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 
-public abstract class EhActivity extends AppCompatActivity {
+import rikka.core.res.ResourcesKt;
+import rikka.material.app.MaterialActivity;
+
+public abstract class EhActivity extends MaterialActivity {
 
     private static final String THEME_DEFAULT = "DEFAULT";
     private static final String THEME_BLACK = "BLACK";
@@ -49,15 +56,26 @@ public abstract class EhActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onApplyUserThemeResource(@NonNull Resources.Theme theme, boolean isDecorView) {
+        theme.applyStyle(getThemeStyleRes(this), true);
+    }
+
+    @Override
+    public String computeUserThemeKey() {
+        return getTheme(this);
+    }
+
+    @StyleRes
+    public int getThemeStyleRes(Context context) {
+        if (THEME_BLACK.equals(getTheme(context))) {
+            return R.style.ThemeOverlay_Black;
+        }
+        return R.style.ThemeOverlay;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Window window = getWindow();
-        window.setStatusBarColor(Color.TRANSPARENT);
-
-        window.getDecorView().post(() -> {
-            window.setNavigationBarColor(Color.TRANSPARENT);
-            window.setNavigationBarContrastEnforced(true);
-        });
         ((EhApplication) getApplication()).registerActivity(this);
     }
 
@@ -76,5 +94,23 @@ public abstract class EhActivity extends AppCompatActivity {
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
+    }
+
+    @Override
+    public void onApplyTranslucentSystemBars() {
+        super.onApplyTranslucentSystemBars();
+        Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        window.getDecorView().post(() -> {
+            WindowInsets rootWindowInsets = window.getDecorView().getRootWindowInsets();
+            if (rootWindowInsets != null && rootWindowInsets.getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
+                window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
+                window.setNavigationBarContrastEnforced(false);
+            } else {
+                window.setNavigationBarColor(Color.TRANSPARENT);
+                window.setNavigationBarContrastEnforced(true);
+            }
+        });
     }
 }

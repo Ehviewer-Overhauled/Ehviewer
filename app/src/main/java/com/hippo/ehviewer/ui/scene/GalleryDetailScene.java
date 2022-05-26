@@ -135,6 +135,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.HttpUrl;
+import rikka.core.res.ResourcesKt;
 
 public class GalleryDetailScene extends BaseScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
@@ -831,7 +832,7 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         if ((oldState == STATE_INIT || oldState == STATE_FAILED || oldState == STATE_REFRESH) &&
-                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER)) {
+                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && ResourcesKt.resolveBoolean(getTheme(), androidx.appcompat.R.attr.isLightTheme, false)) {
             if (!createCircularReveal()) {
                 SimpleHandler.getInstance().post(this::createCircularReveal);
             }
@@ -951,8 +952,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
 
         EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance(context) : null;
-        int colorTag = 0;
-        int colorName = 0;
+        int colorTag = ResourcesKt.resolveColor(getTheme(), R.attr.tagBackgroundColor);
+        int colorName = ResourcesKt.resolveColor(getTheme(), R.attr.tagGroupBackgroundColor);
         for (GalleryTagGroup tg : tagGroups) {
             LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.gallery_tag_group, mTags, false);
             ll.setOrientation(LinearLayout.HORIZONTAL);

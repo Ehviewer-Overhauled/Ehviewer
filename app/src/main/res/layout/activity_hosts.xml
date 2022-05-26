@@ -24,7 +24,8 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        app:fitsSystemWindowsInsets="bottom" />
 
     <TextView
         android:id="@+id/tip"
@@ -33,7 +34,8 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/hosts_tip"
-        android:textSize="@dimen/text_super_large" />
+        android:textSize="@dimen/text_super_large"
+        app:fitsSystemWindowsInsets="bottom" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fab"
@@ -42,6 +44,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/corner_fab_margin"
         android:layout_marginBottom="@dimen/corner_fab_margin"
+        app:layout_fitsSystemWindowsInsets="bottom"
         app:srcCompat="@drawable/v_plus_dark_x24" />
 
 </FrameLayout>

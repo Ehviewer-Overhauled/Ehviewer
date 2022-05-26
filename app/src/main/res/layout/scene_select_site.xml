@@ -20,7 +20,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/keyline_margin"
-    android:paddingTop="@dimen/keyline_margin">
+    android:paddingTop="@dimen/keyline_margin"
+    app:fitsSystemWindowsInsets="top|bottom">
 
     <ScrollView
         android:layout_width="wrap_content"

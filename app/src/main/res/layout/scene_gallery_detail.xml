@@ -36,7 +36,8 @@
         style="@style/ProgressView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        app:fitsSystemWindowsInsets="top|bottom" />
 
     <TextView
         android:id="@+id/tip"
@@ -45,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:drawablePadding="8dp"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        app:fitsSystemWindowsInsets="top|bottom" />
 
 </FrameLayout>

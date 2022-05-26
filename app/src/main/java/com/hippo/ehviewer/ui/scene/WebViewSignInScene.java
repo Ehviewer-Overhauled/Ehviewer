@@ -42,6 +42,7 @@ import java.util.List;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import rikka.core.res.ResourcesKt;
 
 public class WebViewSignInScene extends SolidScene {
 
@@ -73,6 +74,7 @@ public class WebViewSignInScene extends SolidScene {
         cookieManager.removeSessionCookies(null);
 
         mWebView = new WebView(context);
+        mWebView.setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground));
         mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setDisplayZoomControls(false);
         mWebView.getSettings().setJavaScriptEnabled(true);

@@ -25,7 +25,8 @@
     android:focusable="true"
     android:orientation="vertical"
     android:padding="@dimen/keyline_margin"
-    android:showDividers="middle">
+    android:showDividers="middle"
+    app:fitsSystemWindowsInsets="bottom">
 
     <com.hippo.widget.SimpleGridAutoSpanLayout
         android:id="@+id/grid_layout"

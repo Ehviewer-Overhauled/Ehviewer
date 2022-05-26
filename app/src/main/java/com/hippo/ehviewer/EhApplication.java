@@ -91,6 +91,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import rikka.material.app.DayNightDelegate;
+import rikka.material.app.LocaleDelegate;
 
 public class EhApplication extends SceneApplication {
 
@@ -333,6 +335,10 @@ public class EhApplication extends SceneApplication {
         if (EhDB.needMerge()) {
             EhDB.mergeOldDB(this);
         }
+
+        LocaleDelegate.setDefaultLocale(Settings.getLocale());
+        DayNightDelegate.setApplicationContext(this);
+        DayNightDelegate.setDefaultNightMode(Settings.getTheme());
 
         // Do io tasks in new thread
         //noinspection deprecation

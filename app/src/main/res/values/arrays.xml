@@ -289,6 +289,12 @@
         <item>SOCKS</item>
     </string-array>
 
+    <string-array name="night_mode_entries" translatable="false">
+        <item>@string/dark_theme_follow_system</item>
+        <item>@string/dark_theme_off</item>
+        <item>@string/dark_theme_on</item>
+    </string-array>
+
     <string-array name="night_mode_values">
         <item>-1</item>
         <item>1</item>

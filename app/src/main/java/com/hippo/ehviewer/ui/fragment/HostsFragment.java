@@ -30,6 +30,8 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.List;
 import java.util.Locale;
 
+import rikka.core.res.ResourcesKt;
+
 public class HostsFragment extends BaseFragment
         implements View.OnClickListener {
 
@@ -67,7 +69,7 @@ public class HostsFragment extends BaseFragment
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                0,
+                ResourcesKt.resolveColor(requireActivity().getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(requireActivity(), 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

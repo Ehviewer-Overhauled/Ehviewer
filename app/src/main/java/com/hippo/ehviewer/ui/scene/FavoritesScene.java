@@ -90,6 +90,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
+
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")
 public class FavoritesScene extends BaseScene implements
@@ -281,7 +283,7 @@ public class FavoritesScene extends BaseScene implements
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context);
+        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(ContextCompat.getDrawable(context, R.drawable.v_magnify_x24));
         mSearchBar.setHelper(this);
@@ -289,7 +291,13 @@ public class FavoritesScene extends BaseScene implements
         updateSearchBar();
         mSearchBarMover = new SearchBarMover(this, mSearchBar, mRecyclerView);
 
-        mActionFabDrawable = new AddDeleteDrawable(context);
+        int colorID;
+        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
+            colorID = resources.getColor(android.R.color.white, getTheme());
+        } else {
+            colorID = resources.getColor(android.R.color.black, getTheme());
+        }
+        mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
         mFabLayout.setExpanded(false, false);
         mFabLayout.setAutoCancel(true);
@@ -446,7 +454,7 @@ public class FavoritesScene extends BaseScene implements
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                0,
+                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

@@ -1,8 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:consumeSystemWindowsInsets="start|end"
+    app:edgeToEdge="true"
+    app:fitsSystemWindowsInsets="start|end">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
