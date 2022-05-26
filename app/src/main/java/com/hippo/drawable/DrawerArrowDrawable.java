@@ -20,7 +20,6 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -32,7 +31,6 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Keep;
 
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.yorozuya.MathUtils;
 
 /**
@@ -84,8 +82,6 @@ public class DrawerArrowDrawable extends Drawable {
         mSpin = resources.getBoolean(R.bool.dad_spin_bars);
         mMiddleArrowSize = resources.getDimension(R.dimen.dad_middle_bar_arrow_size);
 
-        int colorID = EhActivity.isNightMode(context.getResources().getConfiguration()) ? Color.WHITE : Color.BLACK;
-        mPaint.setColor(colorID);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.MITER);
         mPaint.setStrokeCap(Paint.Cap.BUTT);
