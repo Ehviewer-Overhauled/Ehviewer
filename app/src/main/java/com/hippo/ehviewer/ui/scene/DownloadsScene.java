@@ -113,8 +113,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
-
 @SuppressLint("RtlHardcoded")
 public class DownloadsScene extends ToolbarScene
         implements DownloadManager.DownloadInfoListener,
@@ -651,7 +649,7 @@ public class DownloadsScene extends ToolbarScene
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
+                0,
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

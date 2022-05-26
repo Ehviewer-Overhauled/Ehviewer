@@ -103,10 +103,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import rikka.core.res.ConfigurationKt;
-import rikka.core.res.ResourcesKt;
-import rikka.material.app.DayNightDelegate;
-
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
         GalleryView.Listener {
 
@@ -295,24 +291,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    protected void attachBaseContext(@NonNull Context newBase) {
-        switch (Settings.getReadTheme()) {
-            case 1:
-                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_YES, false);
-                break;
-            case 2:
-                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_NO, false);
-                break;
-        }
-        super.attachBaseContext(newBase);
-    }
-
-    @Override
-    public boolean respectDefaultNightMode() {
-        return Settings.getReadTheme() == 0;
-    }
-
-    @Override
     @SuppressWarnings({"WrongConstant"})
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (Settings.getReadingFullscreen()) {
@@ -352,15 +330,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 .setScaleMode(Settings.getPageScaling())
                 .setStartPosition(Settings.getStartPosition())
                 .setStartPage(startPage)
-                .setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground))
-                .setEdgeColor(ResourcesKt.resolveColor(getTheme(), R.attr.colorEdgeEffect) & 0xffffff | 0x33000000)
+                .setEdgeColor(0)
                 .setPagerInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_pager_interval) : 0)
                 .setScrollInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_scroll_interval) : 0)
                 .setPageMinHeight(resources.getDimensionPixelOffset(R.dimen.gallery_page_min_height))
                 .setPageInfoInterval(resources.getDimensionPixelOffset(R.dimen.gallery_page_info_interval))
                 .setProgressColor(ResourcesUtils.getAttrColor(this, androidx.appcompat.R.attr.colorPrimary))
                 .setProgressSize(resources.getDimensionPixelOffset(R.dimen.gallery_progress_size))
-                .setPageTextColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary))
                 .setPageTextSize(resources.getDimensionPixelOffset(R.dimen.gallery_page_text_size))
                 .setPageTextTypeface(Typeface.DEFAULT)
                 .setErrorTextColor(resources.getColor(R.color.red_500))
@@ -384,9 +360,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 insetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH);
                 insetsController.show(WindowInsetsCompat.Type.systemBars());
             }
-            boolean night = ConfigurationKt.isNight(getResources().getConfiguration());
-            insetsController.setAppearanceLightStatusBars(!night);
-            insetsController.setAppearanceLightNavigationBars(!night);
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);

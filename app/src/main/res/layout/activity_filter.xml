@@ -22,8 +22,7 @@
     <com.hippo.easyrecyclerview.EasyRecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:fitsSystemWindowsInsets="bottom" />
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/tip"
@@ -33,8 +32,7 @@
         android:layout_gravity="center"
         android:drawablePadding="16dp"
         android:gravity="center_horizontal"
-        android:text="@string/no_filter"
-        app:fitsSystemWindowsInsets="bottom" />
+        android:text="@string/no_filter" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fab"
@@ -43,7 +41,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/corner_fab_margin"
         android:layout_marginBottom="@dimen/corner_fab_margin"
-        app:layout_fitsSystemWindowsInsets="bottom"
         app:srcCompat="@drawable/v_plus_dark_x24" />
 
 </FrameLayout>

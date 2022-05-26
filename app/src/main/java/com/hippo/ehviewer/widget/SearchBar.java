@@ -60,8 +60,6 @@ import com.hippo.yorozuya.ViewUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
-
 public class SearchBar extends MaterialCardView implements View.OnClickListener,
         TextView.OnEditorActionListener, TextWatcher,
         SearchEditText.SearchEditTextListener {
@@ -148,7 +146,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(context.getTheme(), R.attr.dividerColor),
+                0,
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(false);
         mListView.addItemDecoration(decoration);

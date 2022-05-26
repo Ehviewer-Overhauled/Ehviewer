@@ -30,8 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:elevation="4dp"
-            app:fitsSystemWindowsInsets="top" />
+            android:elevation="4dp" />
 
         <Space
             android:layout_width="match_parent"
@@ -47,14 +46,13 @@
         <RelativeLayout
             android:id="@+id/header_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:fitsSystemWindowsInsets="top">
+            android:layout_height="wrap_content">
 
             <com.hippo.widget.LoadImageView
                 android:id="@+id/thumb"
                 android:layout_width="@dimen/gallery_detail_thumb_width"
                 android:layout_height="@dimen/gallery_detail_thumb_height"
-                android:layout_marginLeft="@dimen/keyline_margin"
+                android:layout_marginStart="@dimen/keyline_margin"
                 android:layout_marginTop="@dimen/keyline_margin"
                 android:layout_marginBottom="@dimen/keyline_margin" />
 

@@ -27,16 +27,12 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
 
-import rikka.material.app.DayNightDelegate;
-
 public class EhFragment extends BasePreferenceFragment {
 
     @Override
     public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.eh_settings);
 
-        Preference theme = findPreference(Settings.KEY_THEME);
-        Preference blackDarkTheme = findPreference(Settings.KEY_BLACK_DARK_THEME);
         Preference gallerySite = findPreference(Settings.KEY_GALLERY_SITE);
         Preference listMode = findPreference(Settings.KEY_LIST_MODE);
         Preference detailSize = findPreference(Settings.KEY_DETAIL_SIZE);
@@ -44,13 +40,11 @@ public class EhFragment extends BasePreferenceFragment {
         Preference showTagTranslations = findPreference(Settings.KEY_SHOW_TAG_TRANSLATIONS);
         Preference tagTranslationsSource = findPreference("tag_translations_source");
 
-        theme.setOnPreferenceChangeListener(this);
         gallerySite.setOnPreferenceChangeListener(this);
         listMode.setOnPreferenceChangeListener(this);
         detailSize.setOnPreferenceChangeListener(this);
         thumbSize.setOnPreferenceChangeListener(this);
         showTagTranslations.setOnPreferenceChangeListener(this);
-        blackDarkTheme.setOnPreferenceChangeListener(this);
 
         if (!EhTagDatabase.isPossible(requireActivity())) {
             getPreferenceScreen().removePreference(showTagTranslations);
@@ -62,7 +56,6 @@ public class EhFragment extends BasePreferenceFragment {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
-            DayNightDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
             requireActivity().recreate();
             return true;
         } else if (Settings.KEY_GALLERY_SITE.equals(key)) {

@@ -47,13 +47,12 @@ public class AddDeleteDrawable extends Drawable {
     /**
      * @param context used to get the configuration for the drawable from
      */
-    public AddDeleteDrawable(Context context, int color) {
+    public AddDeleteDrawable(Context context) {
         Resources resources = context.getResources();
 
         mSize = resources.getDimensionPixelSize(R.dimen.add_size);
         float barThickness = Math.round(resources.getDimension(R.dimen.add_thickness));
 
-        mPaint.setColor(color);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.MITER);
         mPaint.setStrokeCap(Paint.Cap.BUTT);

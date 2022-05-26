@@ -29,8 +29,6 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.ViewUtils;
 
-import rikka.core.res.ResourcesKt;
-
 public class GalleryGuideView extends ViewGroup implements View.OnClickListener {
 
     private final float[] mPoints = new float[3 * 4];
@@ -60,9 +58,7 @@ public class GalleryGuideView extends ViewGroup implements View.OnClickListener 
     }
 
     private void init(Context context) {
-        mBgColor = ResourcesKt.resolveColor(context.getTheme(), R.attr.guideBackgroundColor);
         mPaint = new Paint();
-        mPaint.setColor(ResourcesKt.resolveColor(context.getTheme(), R.attr.guideTitleColor));
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(context.getResources().getDimension(R.dimen.gallery_guide_divider_width));
         setOnClickListener(this);

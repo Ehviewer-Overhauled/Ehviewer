@@ -126,8 +126,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
-
 @SuppressLint("RtlHardcoded")
 public final class GalleryListScene extends BaseScene
         implements SearchBar.Helper, SearchBar.OnStateChangeListener, FastScroller.OnDragHandlerListener,
@@ -594,8 +592,8 @@ public final class GalleryListScene extends BaseScene
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
-        mRightDrawable = new AddDeleteDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
+        mLeftDrawable = new DrawerArrowDrawable(context);
+        mRightDrawable = new AddDeleteDrawable(context);
         mSearchBar.setLeftDrawable(mLeftDrawable);
         mSearchBar.setRightDrawable(mRightDrawable);
         mSearchBar.setHelper(this);
@@ -614,13 +612,7 @@ public final class GalleryListScene extends BaseScene
         mFabLayout.setOnExpandListener(this);
         addAboveSnackView(mFabLayout);
 
-        int colorID;
-        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
-            colorID = resources.getColor(android.R.color.white, getTheme());
-        } else {
-            colorID = resources.getColor(android.R.color.black, getTheme());
-        }
-        mActionFabDrawable = new AddDeleteDrawable(context, colorID);
+        mActionFabDrawable = new AddDeleteDrawable(context);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
 
         mSearchFab.setOnClickListener(this);
@@ -802,7 +794,7 @@ public final class GalleryListScene extends BaseScene
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
+                0,
                 LayoutUtils.dp2pix(context, 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

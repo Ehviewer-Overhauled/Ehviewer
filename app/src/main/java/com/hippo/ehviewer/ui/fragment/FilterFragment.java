@@ -38,8 +38,6 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
 
-import rikka.core.res.ResourcesKt;
-
 public class FilterFragment extends BaseFragment {
 
     @Nullable
@@ -78,7 +76,7 @@ public class FilterFragment extends BaseFragment {
         recyclerView.setClipChildren(false);
         LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
                 LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(requireActivity().getTheme(), R.attr.dividerColor),
+                0,
                 LayoutUtils.dp2pix(requireActivity(), 1));
         decoration.setShowLastDivider(true);
         recyclerView.addItemDecoration(decoration);

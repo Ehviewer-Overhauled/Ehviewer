@@ -27,8 +27,7 @@
         <com.hippo.easyrecyclerview.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:fitsSystemWindowsInsets="bottom" />
+            android:layout_height="match_parent" />
 
         <com.hippo.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"
@@ -38,8 +37,7 @@
             android:paddingLeft="20dp"
             android:paddingTop="8dp"
             android:paddingRight="4dp"
-            android:paddingBottom="8dp"
-            app:fitsSystemWindowsInsets="bottom" />
+            android:paddingBottom="8dp" />
 
     </FrameLayout>
 
@@ -58,8 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/corner_fab_margin"
-        android:paddingBottom="@dimen/corner_fab_margin"
-        app:fitsSystemWindowsInsets="bottom">
+        android:paddingBottom="@dimen/corner_fab_margin">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"

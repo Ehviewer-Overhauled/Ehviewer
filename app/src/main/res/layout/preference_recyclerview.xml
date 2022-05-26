@@ -19,7 +19,6 @@
   -->
 
 <com.hippo.easyrecyclerview.EasyRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/list"
     android:layout_width="match_parent"
@@ -28,6 +27,5 @@
     android:fadeScrollbars="true"
     android:scrollbarStyle="outsideOverlay"
     android:scrollbars="vertical"
-    app:fitsSystemWindowsInsets="bottom"
     tools:ignore="UnusedResources"
     tools:viewBindingIgnore="true" />

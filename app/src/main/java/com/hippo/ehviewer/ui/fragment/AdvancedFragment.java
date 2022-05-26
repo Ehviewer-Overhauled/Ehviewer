@@ -54,8 +54,6 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import rikka.material.app.LocaleDelegate;
-
 public class AdvancedFragment extends BasePreferenceFragment {
 
     private static final String KEY_DUMP_LOGCAT = "dump_logcat";
@@ -281,21 +279,6 @@ public class AdvancedFragment extends BasePreferenceFragment {
             Intent intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
                     Uri.parse("package:" + requireContext().getPackageName()));
             startActivity(intent);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String key = preference.getKey();
-        if (KEY_APP_LANGUAGE.equals(key)) {
-            if ("system".equals(newValue)) {
-                LocaleDelegate.setDefaultLocale(LocaleDelegate.getSystemLocale());
-            } else {
-                LocaleDelegate.setDefaultLocale(Locale.forLanguageTag((String) newValue));
-            }
-            requireActivity().recreate();
             return true;
         }
         return false;
