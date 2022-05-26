@@ -125,7 +125,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.3'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
-    implementation 'com.gitlab.NekoInverter:yorozuya:723dc867a9'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
     implementation 'dev.rikka.rikkax.material:material:2.4.0'
     implementation 'dev.rikka.rikkax.preference:simplemenu-preference:1.0.3'
