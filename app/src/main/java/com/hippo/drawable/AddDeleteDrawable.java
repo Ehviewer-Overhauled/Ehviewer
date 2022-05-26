@@ -20,6 +20,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -30,6 +31,7 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.Keep;
 
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.yorozuya.MathUtils;
 
 public class AddDeleteDrawable extends Drawable {
@@ -53,6 +55,8 @@ public class AddDeleteDrawable extends Drawable {
         mSize = resources.getDimensionPixelSize(R.dimen.add_size);
         float barThickness = Math.round(resources.getDimension(R.dimen.add_thickness));
 
+        int colorID = EhActivity.isNightMode(context.getResources().getConfiguration()) ? Color.WHITE : Color.BLACK;
+        mPaint.setColor(colorID);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.MITER);
         mPaint.setStrokeCap(Paint.Cap.BUTT);
@@ -80,11 +84,6 @@ public class AddDeleteDrawable extends Drawable {
         canvas.rotate(canvasRotate);
         canvas.drawPath(mPath, mPaint);
         canvas.restore();
-    }
-
-    public void setColor(int color) {
-        mPaint.setColor(color);
-        invalidateSelf();
     }
 
     @Override
