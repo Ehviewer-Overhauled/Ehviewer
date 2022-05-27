@@ -76,6 +76,7 @@ Here is the libraries
 - [TagSoup](http://home.ccil.org/~cowan/tagsoup/)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
+- [Zstd](http://www.zstd.net/)
 
 
 # License
