@@ -45,7 +45,6 @@
         <item name="dividerColor">@color/divider_black</item>
         <item name="drawableColorSecondary">@color/secondary_drawable_black</item>
         <item name="drawableColorThemePrimary">@color/primary_drawable_black</item>
-        <item name="guideBackgroundColor">#e5000000</item>
     </style>
 
     <!-- ============ -->

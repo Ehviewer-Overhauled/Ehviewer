@@ -137,56 +137,65 @@
 
         </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/keep_screen_on"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_keep_screen_on" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/show_clock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_show_clock" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/show_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_show_progress" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/show_battery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_show_battery" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/show_page_interval"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_show_page_interval" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/volume_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_volume_page"
             android:textColor="?android:attr/textColorPrimary" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/reverse_volume_page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_reverse_volume" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/reading_fullscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings_read_reading_fullscreen" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
+            style="@style/Widget.Material3.CompoundButton.Switch"
             android:id="@+id/custom_screen_lightness"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
