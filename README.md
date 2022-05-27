@@ -43,17 +43,6 @@ Only Support Android S and above!
 
 ![screenshot-01](art/screenshot-01.png)
 
-
-# Build
-
-本项目使用了 CMake 3.23.1 作为构建工具链之一，而当前版本的 Android Studio SDK Tool 无法满足本项目需求。
-
-因此，在构建本项目前需要提前配置好 CMake >=3.23.1。
-
-This Project use CMake 3.23.1, with is highter than Android Studio bundle CMake.
-
-So you need to pre-install CMake>=3.23.1 before build.
-
 # Thanks
 
 本项目受到了诸多开源项目的帮助
