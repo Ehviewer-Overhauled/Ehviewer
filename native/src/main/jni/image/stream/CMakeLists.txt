@@ -24,6 +24,5 @@ set(STREAM_SOURCES
 )
 set(STREAM_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(stream SHARED ${STREAM_SOURCES})
+add_library(stream STATIC ${STREAM_SOURCES})
 target_include_directories(stream PUBLIC ${STREAM_INCLUDES})
-target_link_libraries(stream PRIVATE log)

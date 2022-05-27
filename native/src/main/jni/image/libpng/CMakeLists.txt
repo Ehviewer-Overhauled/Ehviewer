@@ -91,7 +91,7 @@ elseif (${ANDROID_ABI} STREQUAL "arm64-v8a")
 
 endif ()
 
-add_library(png SHARED ${LIBPNG_SOURCES})
+add_library(png STATIC ${LIBPNG_SOURCES})
 target_include_directories(png PUBLIC ${LIBPNG_INCLUDES})
 target_compile_definitions(png PRIVATE ${LIBPNG_DEFINITIONS})
 target_link_libraries(png PRIVATE ${LIBPNG_LIBRARIES})

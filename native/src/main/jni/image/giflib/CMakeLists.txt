@@ -23,5 +23,5 @@ set(GIFLIB_SOURCES
         )
 set(GIFLIB_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/giflib)
 
-add_library(gif SHARED ${GIFLIB_SOURCES})
+add_library(gif STATIC ${GIFLIB_SOURCES})
 target_include_directories(gif PUBLIC ${GIFLIB_INCLUDES})

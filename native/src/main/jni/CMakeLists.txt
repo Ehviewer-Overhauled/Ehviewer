@@ -1,11 +1,11 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-# Build liblzma as shared lib
-set(BUILD_SHARED_LIBS ON)
+# Build liblzma
 add_subdirectory(liblzma)
 
 # Build libzstd
+SET(ZSTD_BUILD_SHARED OFF)
 add_subdirectory(libzstd/build/cmake)
 
 # Configure libarchive for android platform
@@ -38,4 +38,4 @@ include_directories(libfuse/libfuse/include)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED main.c archive.c)
 target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} image archive fuse)
+target_link_libraries(${PROJECT_NAME} image archive_static fuse)

@@ -207,5 +207,5 @@ else ()
 
 endif ()
 
-add_library(jpeg SHARED ${LIBJPEG_TURBO_SOURCES})
+add_library(jpeg STATIC ${LIBJPEG_TURBO_SOURCES})
 target_include_directories(jpeg PUBLIC ${LIBJPEG_TURBO_INCLUDES})

@@ -26,5 +26,5 @@ set(FUSE_INCLUDES
         libfuse/lib
         libfuse/include)
 set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script=${CMAKE_SOURCE_DIR}/libfuse/libfuse/lib/fuse_versionscript")
-add_library(${PROJECT_NAME} SHARED ${FUSE_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${FUSE_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${FUSE_INCLUDES})
