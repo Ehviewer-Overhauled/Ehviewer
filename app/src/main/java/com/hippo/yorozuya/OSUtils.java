@@ -25,14 +25,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class OSUtils {
-    private OSUtils() {}
-
     private static final String PROCFS_MEMFILE = "/proc/meminfo";
     private static final Pattern PROCFS_MEMFILE_FORMAT =
             Pattern.compile("^([a-zA-Z]*):[ \t]*([0-9]*)[ \t]kB");
     private static final String MEMTOTAL_STRING = "MemTotal";
-
     private static long sTotalMem = Long.MIN_VALUE;
+
+    private OSUtils() {
+    }
 
     public static void checkMainLoop() {
         if (Looper.myLooper() != Looper.getMainLooper()) {

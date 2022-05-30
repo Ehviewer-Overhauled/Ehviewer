@@ -46,6 +46,84 @@ public class ImageMovableTextTexture extends ImageSpriteTexture {
         mMaxWidth = maxWidth;
     }
 
+    /**
+     * Create a TextTexture to draw text
+     *
+     * @param typeface   the typeface
+     * @param size       text size
+     * @param characters all Characters
+     * @return the TextTexture
+     */
+    @Nullable
+    public static ImageMovableTextTexture create(Typeface typeface, int size, int color, char[] characters) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setTextSize(size);
+        paint.setColor(color);
+        paint.setTypeface(typeface);
+
+        Paint.FontMetricsInt fmi = paint.getFontMetricsInt();
+        int fixed = fmi.bottom;
+        int height = fmi.bottom - fmi.top;
+
+        int length = characters.length;
+        float[] widths = new float[length];
+        paint.getTextWidths(characters, 0, length, widths);
+
+        // Calculate bitmap size
+        float maxWidth = 0.0f;
+        for (float f : widths) {
+            maxWidth = Math.max(maxWidth, f);
+        }
+        int hCount = (int) Math.ceil(Math.sqrt(height / maxWidth * length));
+        int vCount = (int) Math.ceil(Math.sqrt(maxWidth / height * length));
+        if (hCount * (vCount - 1) > length) {
+            vCount--;
+        }
+        if ((hCount - 1) * vCount > length) {
+            hCount--;
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap((int) Math.ceil(hCount * maxWidth),
+                (int) Math.ceil(vCount * height), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.translate(0, height - fixed);
+
+        // Draw
+        int[] rects = new int[length * 4];
+        int x = 0;
+        int y = 0;
+        for (int i = 0; i < length; i++) {
+            int offset = i * 4;
+            rects[offset + 0] = x;
+            rects[offset + 1] = y;
+            rects[offset + 2] = (int) widths[i];
+            rects[offset + 3] = height;
+
+            canvas.drawText(characters, i, 1, x, y, paint);
+
+            if (i % hCount == hCount - 1) {
+                // The end of row
+                x = 0;
+                y += height;
+            } else {
+                x += maxWidth;
+            }
+        }
+
+        Image image = Image.create(bitmap);
+        bitmap.recycle();
+        if (image == null) {
+            return null;
+        }
+        ImageWrapper imageWrapper = new ImageWrapper(image);
+        if (imageWrapper.obtain()) {
+            return new ImageMovableTextTexture(imageWrapper, length, rects, characters, widths, height, maxWidth);
+        } else {
+            return null;
+        }
+    }
+
     public int[] getTextIndexes(String text) {
         char[] characters = mCharacters;
 
@@ -128,84 +206,6 @@ public class ImageMovableTextTexture extends ImageSpriteTexture {
             } else {
                 x += mMaxWidth;
             }
-        }
-    }
-
-    /**
-     * Create a TextTexture to draw text
-     *
-     * @param typeface the typeface
-     * @param size text size
-     * @param characters all Characters
-     * @return the TextTexture
-     */
-    @Nullable
-    public static ImageMovableTextTexture create(Typeface typeface, int size, int color, char[] characters) {
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setTextSize(size);
-        paint.setColor(color);
-        paint.setTypeface(typeface);
-
-        Paint.FontMetricsInt fmi = paint.getFontMetricsInt();
-        int fixed = fmi.bottom;
-        int height = fmi.bottom - fmi.top;
-
-        int length = characters.length;
-        float[] widths = new float[length];
-        paint.getTextWidths(characters, 0, length, widths);
-
-        // Calculate bitmap size
-        float maxWidth = 0.0f;
-        for (float f : widths) {
-            maxWidth = Math.max(maxWidth, f);
-        }
-        int hCount = (int) Math.ceil(Math.sqrt(height / maxWidth * length));
-        int vCount = (int) Math.ceil(Math.sqrt(maxWidth / height * length));
-        if (hCount * (vCount - 1) > length) {
-            vCount--;
-        }
-        if ((hCount - 1) * vCount > length) {
-            hCount--;
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap((int) Math.ceil(hCount * maxWidth),
-                (int) Math.ceil(vCount * height), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.translate(0, height - fixed);
-
-        // Draw
-        int[] rects = new int[length * 4];
-        int x = 0;
-        int y = 0;
-        for (int i = 0; i < length; i++) {
-            int offset = i * 4;
-            rects[offset + 0] = x;
-            rects[offset + 1] = y;
-            rects[offset + 2] = (int) widths[i];
-            rects[offset + 3] = height;
-
-            canvas.drawText(characters, i, 1, x, y, paint);
-
-            if (i % hCount == hCount - 1) {
-                // The end of row
-                x = 0;
-                y += height;
-            } else {
-                x += maxWidth;
-            }
-        }
-
-        Image image = Image.create(bitmap);
-        bitmap.recycle();
-        if (image == null) {
-            return null;
-        }
-        ImageWrapper imageWrapper = new ImageWrapper(image);
-        if (imageWrapper.obtain()) {
-            return new ImageMovableTextTexture(imageWrapper, length, rects, characters, widths, height, maxWidth);
-        } else {
-            return null;
         }
     }
 }

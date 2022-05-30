@@ -18,9 +18,10 @@ package com.hippo.glview.widget;
 
 import android.graphics.Color;
 import android.graphics.Path;
-import androidx.core.view.animation.PathInterpolatorCompat;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+
+import androidx.core.view.animation.PathInterpolatorCompat;
 
 import com.hippo.glview.anim.Animation;
 import com.hippo.glview.anim.FloatAnimation;
@@ -148,7 +149,7 @@ public class GLProgressView extends GLView {
 
     @Override
     protected void onLayout(boolean changeSize, int left, int top, int right,
-            int bottom) {
+                            int bottom) {
         super.onLayout(changeSize, left, top, right, bottom);
 
         int width = right - left;
@@ -170,6 +171,10 @@ public class GLProgressView extends GLView {
         invalidate();
     }
 
+    public boolean isIndeterminate() {
+        return mIndeterminate;
+    }
+
     public void setIndeterminate(boolean indeterminate) {
         if (mIndeterminate != indeterminate) {
             mIndeterminate = indeterminate;
@@ -180,10 +185,6 @@ public class GLProgressView extends GLView {
             }
             invalidate();
         }
-    }
-
-    public boolean isIndeterminate() {
-        return mIndeterminate;
     }
 
     public void setProgress(float progress) {

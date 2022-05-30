@@ -24,21 +24,20 @@ import java.util.List;
 
 public final class Messenger {
 
+    private static Messenger sInstance;
     private final IntIdGenerator mIdGenerator;
     private final SparseArray<List<Receiver>> mReceiverListMap;
 
-    private static Messenger sInstance;
+    private Messenger() {
+        mIdGenerator = new IntIdGenerator();
+        mReceiverListMap = new SparseArray<>();
+    }
 
     public static Messenger getInstance() {
         if (sInstance == null) {
             sInstance = new Messenger();
         }
         return sInstance;
-    }
-
-    private Messenger() {
-        mIdGenerator = new IntIdGenerator();
-        mReceiverListMap = new SparseArray<>();
     }
 
     public int newId() {

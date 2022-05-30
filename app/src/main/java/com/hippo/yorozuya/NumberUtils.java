@@ -17,7 +17,8 @@
 package com.hippo.yorozuya;
 
 public final class NumberUtils {
-    private NumberUtils() {}
+    private NumberUtils() {
+    }
 
     /**
      * 0 for false, Non 0 for true
@@ -42,7 +43,7 @@ public final class NumberUtils {
     /**
      * Do not throw NumberFormatException, use default value
      *
-     * @param str the string to be parsed
+     * @param str          the string to be parsed
      * @param defaultValue the value to return when get error
      * @return the value of the string
      */
@@ -57,7 +58,7 @@ public final class NumberUtils {
     /**
      * Do not throw NumberFormatException, use default value
      *
-     * @param str the string to be parsed
+     * @param str          the string to be parsed
      * @param defaultValue the value to return when get error
      * @return the value of the string
      */
@@ -72,7 +73,7 @@ public final class NumberUtils {
     /**
      * Do not throw NumberFormatException, use default value
      *
-     * @param str the string to be parsed
+     * @param str          the string to be parsed
      * @param defaultValue the value to return when get error
      * @return the value of the string
      */

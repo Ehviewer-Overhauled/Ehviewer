@@ -28,31 +28,24 @@ import java.util.WeakHashMap;
 // If a BasicTexture is loaded into GL memory, it has a GL texture id.
 public abstract class BasicTexture implements Texture {
 
-    private static final String TAG = "BasicTexture";
     protected static final int UNSPECIFIED = -1;
-
     protected static final int STATE_UNLOADED = 0;
     protected static final int STATE_LOADED = 1;
     protected static final int STATE_ERROR = -1;
-
+    private static final String TAG = "BasicTexture";
     // Log a warning if a texture is larger along a dimension
     private static final int MAX_TEXTURE_SIZE = 4096;
-
-    protected int mId = -1;
-    protected int mState;
-
-    protected int mWidth = UNSPECIFIED;
-    protected int mHeight = UNSPECIFIED;
-
-    protected int mTextureWidth;
-    protected int mTextureHeight;
-
-    private boolean mHasBorder;
-
-    protected GLCanvas mCanvasRef = null;
     private final static WeakHashMap<BasicTexture, Object> sAllTextures
             = new WeakHashMap<>();
     private static final ThreadLocal<Class> sInFinalizer = new ThreadLocal<>();
+    protected int mId = -1;
+    protected int mState;
+    protected int mWidth = UNSPECIFIED;
+    protected int mHeight = UNSPECIFIED;
+    protected int mTextureWidth;
+    protected int mTextureHeight;
+    protected GLCanvas mCanvasRef = null;
+    private boolean mHasBorder;
 
     protected BasicTexture(GLCanvas canvas, int id, int state) {
         setAssociatedCanvas(canvas);
@@ -65,6 +58,30 @@ public abstract class BasicTexture implements Texture {
 
     protected BasicTexture() {
         this(null, 0, STATE_UNLOADED);
+    }
+
+    // This is for deciding if we can call Bitmap's recycle().
+    // We cannot call Bitmap's recycle() in finalizer because at that point
+    // the finalizer of Bitmap may already be called so recycle() will crash.
+    public static boolean inFinalizer() {
+        return sInFinalizer.get() != null;
+    }
+
+    public static void yieldAllTextures() {
+        synchronized (sAllTextures) {
+            for (BasicTexture t : sAllTextures.keySet()) {
+                t.yield();
+            }
+        }
+    }
+
+    public static void invalidateAllTextures() {
+        synchronized (sAllTextures) {
+            for (BasicTexture t : sAllTextures.keySet()) {
+                t.mState = STATE_UNLOADED;
+                t.setAssociatedCanvas(null);
+            }
+        }
     }
 
     protected void setAssociatedCanvas(GLCanvas canvas) {
@@ -87,7 +104,7 @@ public abstract class BasicTexture implements Texture {
     }
 
     public boolean isFlippedVertically() {
-      return false;
+        return false;
     }
 
     public int getId() {
@@ -192,30 +209,6 @@ public abstract class BasicTexture implements Texture {
             sInFinalizer.set(null);
         } finally {
             super.finalize();
-        }
-    }
-
-    // This is for deciding if we can call Bitmap's recycle().
-    // We cannot call Bitmap's recycle() in finalizer because at that point
-    // the finalizer of Bitmap may already be called so recycle() will crash.
-    public static boolean inFinalizer() {
-        return sInFinalizer.get() != null;
-    }
-
-    public static void yieldAllTextures() {
-        synchronized (sAllTextures) {
-            for (BasicTexture t : sAllTextures.keySet()) {
-                t.yield();
-            }
-        }
-    }
-
-    public static void invalidateAllTextures() {
-        synchronized (sAllTextures) {
-            for (BasicTexture t : sAllTextures.keySet()) {
-                t.mState = STATE_UNLOADED;
-                t.setAssociatedCanvas(null);
-            }
         }
     }
 }

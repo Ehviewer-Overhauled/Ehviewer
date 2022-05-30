@@ -51,20 +51,7 @@ public class BatteryView extends AppCompatTextView {
 
     public BatteryView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-    }    private final Runnable mCharger = new Runnable() {
-
-        private int level = 0;
-
-        @Override
-        public void run() {
-            level += 2;
-            if (level > 100) {
-                level = 0;
-            }
-            mDrawable.setElect(level, false);
-            getHandler().postDelayed(mCharger, 200);
-        }
-    };
+    }
 
     public BatteryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -79,7 +66,20 @@ public class BatteryView extends AppCompatTextView {
 
         mDrawable.setColor(mColor);
         mDrawable.setWarningColor(mWarningColor);
-    }
+    }    private final Runnable mCharger = new Runnable() {
+
+        private int level = 0;
+
+        @Override
+        public void run() {
+            level += 2;
+            if (level > 100) {
+                level = 0;
+            }
+            mDrawable.setElect(level, false);
+            getHandler().postDelayed(mCharger, 200);
+        }
+    };
 
     private void init() {
         mDrawable = new BatteryDrawable();
@@ -120,6 +120,23 @@ public class BatteryView extends AppCompatTextView {
 
             registerReceiver();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        if (mAttached) {
+            unregisterReceiver();
+            stopCharger();
+            mAttached = false;
+        }
+    }
+
+    private void registerReceiver() {
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
     }    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
@@ -150,23 +167,6 @@ public class BatteryView extends AppCompatTextView {
             }
         }
     };
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        if (mAttached) {
-            unregisterReceiver();
-            stopCharger();
-            mAttached = false;
-        }
-    }
-
-    private void registerReceiver() {
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-    }
 
     private void unregisterReceiver() {
         getContext().unregisterReceiver(mIntentReceiver);

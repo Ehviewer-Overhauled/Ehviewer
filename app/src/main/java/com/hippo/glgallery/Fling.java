@@ -35,9 +35,24 @@ abstract class Fling extends Animation {
 
     private static final int NB_SAMPLES = 100;
     private static final float[] SPLINE_POSITION = new float[NB_SAMPLES + 1];
+    private static final Interpolator FLING_INTERPOLATOR = new Interpolator() {
+        @Override
+        public float getInterpolation(float input) {
+            final int index = (int) (NB_SAMPLES * input);
+            float distanceCoef = 1.f;
+            float velocityCoef;
+            if (index < NB_SAMPLES) {
+                final float t_inf = (float) index / NB_SAMPLES;
+                final float t_sup = (float) (index + 1) / NB_SAMPLES;
+                final float d_inf = SPLINE_POSITION[index];
+                final float d_sup = SPLINE_POSITION[index + 1];
+                velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
+                distanceCoef = d_inf + (input - t_inf) * velocityCoef;
+            }
+            return distanceCoef;
+        }
+    };
     private static final float[] SPLINE_TIME = new float[NB_SAMPLES + 1];
-
-    private final float mPhysicalCoeff;
 
     static {
         float x_min = 0.0f;
@@ -72,23 +87,7 @@ abstract class Fling extends Animation {
         SPLINE_POSITION[NB_SAMPLES] = SPLINE_TIME[NB_SAMPLES] = 1.0f;
     }
 
-    private static final Interpolator FLING_INTERPOLATOR = new Interpolator() {
-        @Override
-        public float getInterpolation(float input) {
-            final int index = (int) (NB_SAMPLES * input);
-            float distanceCoef = 1.f;
-            float velocityCoef;
-            if (index < NB_SAMPLES) {
-                final float t_inf = (float) index / NB_SAMPLES;
-                final float t_sup = (float) (index + 1) / NB_SAMPLES;
-                final float d_inf = SPLINE_POSITION[index];
-                final float d_sup = SPLINE_POSITION[index + 1];
-                velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
-                distanceCoef = d_inf + (input - t_inf) * velocityCoef;
-            }
-            return distanceCoef;
-        }
-    };
+    private final float mPhysicalCoeff;
 
     public Fling(Context context) {
         final float ppi = context.getResources().getDisplayMetrics().density * 160.0f;
@@ -117,8 +116,8 @@ abstract class Fling extends Animation {
     }
 
     /**
-     *  Modifies mDuration to the duration it takes to get from start to newFinal using the
-     *  spline interpolation. The previous duration was needed to get to oldFinal.
+     * Modifies mDuration to the duration it takes to get from start to newFinal using the
+     * spline interpolation. The previous duration was needed to get to oldFinal.
      **/
     protected int adjustDuration(int start, int oldFinal, int newFinal, int duration) {
         final int oldDistance = oldFinal - start;

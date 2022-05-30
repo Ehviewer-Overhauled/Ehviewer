@@ -29,6 +29,10 @@ public class GLTextureView extends GLView {
 
     private Texture mTexture;
 
+    public Texture getTexture() {
+        return mTexture;
+    }
+
     public void setTexture(Texture texture) {
         mTexture = texture;
         if (texture != null) {
@@ -37,10 +41,6 @@ public class GLTextureView extends GLView {
             mSrc.setEmpty();
         }
         invalidate();
-    }
-
-    public Texture getTexture() {
-        return mTexture;
     }
 
     @Override

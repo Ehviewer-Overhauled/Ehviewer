@@ -41,6 +41,7 @@ import com.hippo.glview.widget.GLProgressView;
 import com.hippo.glview.widget.GLTextureView;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.Pool;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -49,40 +50,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GalleryView extends GLView implements GestureRecognizer.Listener {
 
-    @IntDef({LAYOUT_LEFT_TO_RIGHT, LAYOUT_RIGHT_TO_LEFT, LAYOUT_TOP_TO_BOTTOM})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface LayoutMode {}
-
-    @IntDef({SCALE_ORIGIN, SCALE_FIT_WIDTH, SCALE_FIT_HEIGHT, SCALE_FIT, SCALE_FIXED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ScaleMode {}
-
-    @IntDef({START_POSITION_TOP_LEFT, START_POSITION_TOP_RIGHT, START_POSITION_BOTTOM_LEFT,
-            START_POSITION_BOTTOM_RIGHT, START_POSITION_CENTER})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface StartPosition {}
-
     public static final int LAYOUT_LEFT_TO_RIGHT = 0;
     public static final int LAYOUT_RIGHT_TO_LEFT = 1;
     public static final int LAYOUT_TOP_TO_BOTTOM = 2;
-
     public static final int SCALE_ORIGIN = ImageView.SCALE_ORIGIN;
     public static final int SCALE_FIT_WIDTH = ImageView.SCALE_FIT_WIDTH;
     public static final int SCALE_FIT_HEIGHT = ImageView.SCALE_FIT_HEIGHT;
     public static final int SCALE_FIT = ImageView.SCALE_FIT;
     public static final int SCALE_FIXED = ImageView.SCALE_FIXED;
-
     public static final int START_POSITION_TOP_LEFT = ImageView.START_POSITION_TOP_LEFT;
     public static final int START_POSITION_TOP_RIGHT = ImageView.START_POSITION_TOP_RIGHT;
     public static final int START_POSITION_BOTTOM_LEFT = ImageView.START_POSITION_BOTTOM_LEFT;
     public static final int START_POSITION_BOTTOM_RIGHT = ImageView.START_POSITION_BOTTOM_RIGHT;
     public static final int START_POSITION_CENTER = ImageView.START_POSITION_CENTER;
-
     private static final float[] LEFT_AREA = {0.0f, 0.0f, 1.0f / 3.0f, 1f};
     private static final float[] RIGHT_AREA = {2.0f / 3.0f, 0.0f, 1.0f, 1f};
     private static final float[] MENU_AREA = {1.0f / 3.0f, 0.0f, 2.0f / 3.0f, 1.0f / 2.0f};
     private static final float[] SLIDER_AREA = {1.0f / 3.0f, 1.0f / 2.0f, 2.0f / 3.0f, 1.0f};
-
     private static final int METHOD_ON_SINGLE_TAP_UP = 0;
     private static final int METHOD_ON_SINGLE_TAP_CONFIRMED = 1;
     private static final int METHOD_ON_DOUBLE_TAP = 2;
@@ -106,28 +90,13 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     private static final int METHOD_ON_ATTACH_TO_ROOT = 20;
     private static final int METHOD_SET_PAGER_INTERVAL = 21;
     private static final int METHOD_SET_SCROLL_INTERVAL = 22;
-
     private final Context mContext;
-    private Adapter mAdapter;
     private final GestureRecognizer mGestureRecognizer;
     @Nullable
     private final Listener mListener;
-
-    private ImageMovableTextTexture mPageTextTexture;
-
-    private PagerLayoutManager mPagerLayoutManager;
-    private ScrollLayoutManager mScrollLayoutManager;
-    @Nullable
-    private LayoutManager mLayoutManager;
-
     private final GLEdgeView mEdgeView;
     private final Pool<GalleryPageView> mGalleryPageViewPool = new Pool<>(5);
-    private GLProgressView mProgressCache;
-    private GLTextureView mErrorViewCache;
-
     private final int mBackgroundColor;
-    private int mPagerInterval;
-    private int mScrollInterval;
     private final int mPageMinHeight;
     private final int mPageInfoInterval;
     private final int mProgressColor;
@@ -137,172 +106,37 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     private final Typeface mPageTextTypeface;
     private final int mErrorTextSize;
     private final int mErrorTextColor;
-
     private final String mDefaultErrorString;
     private final String mEmptyString;
-
-    private boolean mEnableRequestFill = true;
-    private boolean mRequestFill = false;
-    private boolean mWillFill = false;
-
-    private boolean mScale = false;
-    private boolean mScroll = false;
-    private boolean mFirstScroll = false;
-
     private final Rect mLeftArea = new Rect();
     private final Rect mRightArea = new Rect();
     private final Rect mMenuArea = new Rect();
     private final Rect mSliderArea = new Rect();
-
-    private int mLayoutMode = LAYOUT_RIGHT_TO_LEFT;
-    private int mScaleMode = ImageView.SCALE_FIT;
-    private int mStartPosition = ImageView.START_POSITION_TOP_LEFT;
-    private int mIndex;
-
     private final List<Integer> mMethodList = new ArrayList<>(5);
     private final List<Object[]> mArgsList = new ArrayList<>(5);
     private final List<Integer> mMethodListTemp = new ArrayList<>(5);
     private final List<Object[]> mArgsListTemp = new ArrayList<>(5);
-
     private final AtomicInteger mCurrentIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
-
-    public static class Builder {
-
-        private final Context mContext;
-        private final Adapter mAdapter;
-        private Listener mListener;
-
-        private int mLayoutMode = LAYOUT_LEFT_TO_RIGHT;
-        private int mScaleMode = SCALE_FIT;
-        private int mStartPosition = START_POSITION_TOP_LEFT;
-        private int mStartPage = 0;
-
-        private int mBackgroundColor = Color.BLACK;
-        private int mEdgeColor = Color.WHITE;
-        private int mPagerInterval = 48;
-        private int mScrollInterval = 24;
-        private int mPageMinHeight = 256;
-        private int mPageInfoInterval = 24;
-        private int mProgressColor = Color.WHITE;
-        private int mProgressSize = 56;
-        private int mPageTextColor = Color.WHITE;
-        private int mPageTextSize = 56;
-        private Typeface mPageTextTypeface = Typeface.DEFAULT;
-        private int mErrorTextColor = Color.RED;
-        private int mErrorTextSize = 24;
-        private String mDefaultErrorString = "Error";
-        private String mEmptyString = "Empty";
-
-        public Builder(@NonNull Context context, @NonNull Adapter adapter) {
-            mContext = context;
-            mAdapter = adapter;
-        }
-
-        public Builder setListener(Listener listener) {
-            mListener = listener;
-            return this;
-        }
-
-        public Builder setLayoutMode(@LayoutMode int layoutMode) {
-            mLayoutMode = layoutMode;
-            return this;
-        }
-
-        public Builder setScaleMode(@ScaleMode int scaleMode) {
-            mScaleMode = scaleMode;
-            return this;
-        }
-
-        public Builder setStartPosition(@StartPosition int startPosition) {
-            mStartPosition = startPosition;
-            return this;
-        }
-
-        public Builder setStartPage(int startPage) {
-            mStartPage = startPage;
-            return this;
-        }
-
-        public Builder setBackgroundColor(int backgroundColor) {
-            mBackgroundColor = backgroundColor;
-            return this;
-        }
-
-        public Builder setEdgeColor(int edgeColor) {
-            mEdgeColor = edgeColor;
-            return this;
-        }
-
-        public Builder setPagerInterval(int pagerInterval) {
-            mPagerInterval = pagerInterval;
-            return this;
-        }
-
-        public Builder setScrollInterval(int scrollInterval) {
-            mScrollInterval = scrollInterval;
-            return this;
-        }
-
-        public Builder setPageMinHeight(int pageMinHeight) {
-            mPageMinHeight = pageMinHeight;
-            return this;
-        }
-
-        public Builder setPageInfoInterval(int pageInfoInterval) {
-            mPageInfoInterval = pageInfoInterval;
-            return this;
-        }
-
-        public Builder setProgressColor(int progressColor) {
-            mProgressColor = progressColor;
-            return this;
-        }
-
-        public Builder setProgressSize(int progressSize) {
-            mProgressSize = progressSize;
-            return this;
-        }
-
-        public Builder setPageTextColor(int pageTextColor) {
-            mPageTextColor = pageTextColor;
-            return this;
-        }
-
-        public Builder setPageTextSize(int pageTextSize) {
-            mPageTextSize = pageTextSize;
-            return this;
-        }
-
-        public Builder setPageTextTypeface(Typeface pageTextTypeface) {
-            mPageTextTypeface = pageTextTypeface;
-            return this;
-        }
-
-        public Builder setErrorTextColor(int errorTextColor) {
-            mErrorTextColor = errorTextColor;
-            return this;
-        }
-
-        public Builder setErrorTextSize(int errorTextSize) {
-            mErrorTextSize = errorTextSize;
-            return this;
-        }
-
-        public Builder setDefaultErrorString(String defaultErrorString) {
-            mDefaultErrorString = defaultErrorString;
-            return this;
-        }
-
-        public Builder setEmptyString(String emptyString) {
-            mEmptyString = emptyString;
-            return this;
-        }
-
-        public GalleryView build() {
-            return new GalleryView(this);
-        }
-    }
-
+    private Adapter mAdapter;
+    private ImageMovableTextTexture mPageTextTexture;
+    private PagerLayoutManager mPagerLayoutManager;
+    private ScrollLayoutManager mScrollLayoutManager;
+    @Nullable
+    private LayoutManager mLayoutManager;
+    private GLProgressView mProgressCache;
+    private GLTextureView mErrorViewCache;
+    private int mPagerInterval;
+    private int mScrollInterval;
+    private boolean mEnableRequestFill = true;
+    private boolean mRequestFill = false;
+    private boolean mWillFill = false;
+    private boolean mScale = false;
+    private boolean mScroll = false;
+    private boolean mFirstScroll = false;
+    private int mLayoutMode = LAYOUT_RIGHT_TO_LEFT;
+    private int mScaleMode = ImageView.SCALE_FIT;
+    private int mStartPosition = ImageView.START_POSITION_TOP_LEFT;
+    private int mIndex;
     private GalleryView(Builder build) {
         mContext = build.mContext;
         mAdapter = build.mAdapter;
@@ -333,6 +167,43 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         mEmptyString = build.mEmptyString;
 
         setBackgroundColor(mBackgroundColor);
+    }
+
+    @LayoutMode
+    public static int sanitizeLayoutMode(int layoutMode) {
+        if (layoutMode != GalleryView.LAYOUT_LEFT_TO_RIGHT &&
+                layoutMode != GalleryView.LAYOUT_RIGHT_TO_LEFT &&
+                layoutMode != GalleryView.LAYOUT_TOP_TO_BOTTOM) {
+            return GalleryView.LAYOUT_LEFT_TO_RIGHT;
+        } else {
+            return layoutMode;
+        }
+    }
+
+    @ScaleMode
+    public static int sanitizeScaleMode(int scaleMode) {
+        if (scaleMode != GalleryView.SCALE_ORIGIN &&
+                scaleMode != GalleryView.SCALE_FIT_WIDTH &&
+                scaleMode != GalleryView.SCALE_FIT_HEIGHT &&
+                scaleMode != GalleryView.SCALE_FIT &&
+                scaleMode != GalleryView.SCALE_FIXED) {
+            return GalleryView.SCALE_FIT;
+        } else {
+            return scaleMode;
+        }
+    }
+
+    @StartPosition
+    public static int sanitizeStartPosition(int startPosition) {
+        if (startPosition != GalleryView.START_POSITION_TOP_LEFT &&
+                startPosition != GalleryView.START_POSITION_TOP_RIGHT &&
+                startPosition != GalleryView.START_POSITION_BOTTOM_LEFT &&
+                startPosition != GalleryView.START_POSITION_BOTTOM_RIGHT &&
+                startPosition != GalleryView.START_POSITION_CENTER) {
+            return GalleryView.START_POSITION_TOP_LEFT;
+        } else {
+            return startPosition;
+        }
     }
 
     private void ensurePagerLayoutManager() {
@@ -436,45 +307,12 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         mEdgeView.onDetachFromRoot();
     }
 
-    @LayoutMode
-    public static int sanitizeLayoutMode(int layoutMode) {
-        if (layoutMode != GalleryView.LAYOUT_LEFT_TO_RIGHT &&
-                layoutMode != GalleryView.LAYOUT_RIGHT_TO_LEFT &&
-                layoutMode != GalleryView.LAYOUT_TOP_TO_BOTTOM) {
-            return GalleryView.LAYOUT_LEFT_TO_RIGHT;
-        } else {
-            return layoutMode;
-        }
-    }
-
-    @ScaleMode
-    public static int sanitizeScaleMode(int scaleMode) {
-        if (scaleMode != GalleryView.SCALE_ORIGIN &&
-                scaleMode != GalleryView.SCALE_FIT_WIDTH &&
-                scaleMode != GalleryView.SCALE_FIT_HEIGHT &&
-                scaleMode != GalleryView.SCALE_FIT &&
-                scaleMode != GalleryView.SCALE_FIXED) {
-            return GalleryView.SCALE_FIT;
-        } else {
-            return scaleMode;
-        }
-    }
-
-    @StartPosition
-    public static int sanitizeStartPosition(int startPosition) {
-        if (startPosition != GalleryView.START_POSITION_TOP_LEFT &&
-                startPosition != GalleryView.START_POSITION_TOP_RIGHT &&
-                startPosition != GalleryView.START_POSITION_BOTTOM_LEFT &&
-                startPosition != GalleryView.START_POSITION_BOTTOM_RIGHT &&
-                startPosition != GalleryView.START_POSITION_CENTER) {
-            return GalleryView.START_POSITION_TOP_LEFT;
-        } else {
-            return startPosition;
-        }
-    }
-
     public int getLayoutMode() {
         return mLayoutMode;
+    }
+
+    public void setLayoutMode(@LayoutMode int layoutMode) {
+        postMethod(METHOD_SET_LAYOUT_MODE, layoutMode);
     }
 
     public int getCurrentIndex() {
@@ -529,10 +367,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         }
 
         invalidate();
-    }
-
-    public void setLayoutMode(@LayoutMode int layoutMode) {
-        postMethod(METHOD_SET_LAYOUT_MODE, layoutMode);
     }
 
     public void setCurrentPage(int page) {
@@ -669,7 +503,7 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     public void onDataChanged() {
         GalleryUtils.assertInRenderThread();
 
-        if (mLayoutManager != null){
+        if (mLayoutManager != null) {
             mLayoutManager.onDataChanged();
         }
     }
@@ -694,9 +528,9 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
 
         GalleryPageView page = findPageUnder(x, y);
         if (page != null &&
-            page.getIndex() != GalleryPageView.INVALID_INDEX &&
-            page.isError() &&
-            page.isUnderInfo(x - page.bounds().left, y - page.bounds().top)) {
+                page.getIndex() != GalleryPageView.INVALID_INDEX &&
+                page.isError() &&
+                page.isUnderInfo(x - page.bounds().left, y - page.bounds().top)) {
             if (mListener != null) {
                 mListener.onTapErrorText(page.getIndex());
             }
@@ -1123,6 +957,177 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         mErrorViewCache = errorView;
     }
 
+    @IntDef({LAYOUT_LEFT_TO_RIGHT, LAYOUT_RIGHT_TO_LEFT, LAYOUT_TOP_TO_BOTTOM})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface LayoutMode {
+    }
+
+    @IntDef({SCALE_ORIGIN, SCALE_FIT_WIDTH, SCALE_FIT_HEIGHT, SCALE_FIT, SCALE_FIXED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ScaleMode {
+    }
+
+    @IntDef({START_POSITION_TOP_LEFT, START_POSITION_TOP_RIGHT, START_POSITION_BOTTOM_LEFT,
+            START_POSITION_BOTTOM_RIGHT, START_POSITION_CENTER})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface StartPosition {
+    }
+
+    public interface Listener {
+
+        @RenderThread
+        void onUpdateCurrentIndex(int index);
+
+        @RenderThread
+        void onTapSliderArea();
+
+        @RenderThread
+        void onTapMenuArea();
+
+        @RenderThread
+        void onTapErrorText(int index);
+
+        @RenderThread
+        void onLongPressPage(int index);
+    }
+
+    public static class Builder {
+
+        private final Context mContext;
+        private final Adapter mAdapter;
+        private Listener mListener;
+
+        private int mLayoutMode = LAYOUT_LEFT_TO_RIGHT;
+        private int mScaleMode = SCALE_FIT;
+        private int mStartPosition = START_POSITION_TOP_LEFT;
+        private int mStartPage = 0;
+
+        private int mBackgroundColor = Color.BLACK;
+        private int mEdgeColor = Color.WHITE;
+        private int mPagerInterval = 48;
+        private int mScrollInterval = 24;
+        private int mPageMinHeight = 256;
+        private int mPageInfoInterval = 24;
+        private int mProgressColor = Color.WHITE;
+        private int mProgressSize = 56;
+        private int mPageTextColor = Color.WHITE;
+        private int mPageTextSize = 56;
+        private Typeface mPageTextTypeface = Typeface.DEFAULT;
+        private int mErrorTextColor = Color.RED;
+        private int mErrorTextSize = 24;
+        private String mDefaultErrorString = "Error";
+        private String mEmptyString = "Empty";
+
+        public Builder(@NonNull Context context, @NonNull Adapter adapter) {
+            mContext = context;
+            mAdapter = adapter;
+        }
+
+        public Builder setListener(Listener listener) {
+            mListener = listener;
+            return this;
+        }
+
+        public Builder setLayoutMode(@LayoutMode int layoutMode) {
+            mLayoutMode = layoutMode;
+            return this;
+        }
+
+        public Builder setScaleMode(@ScaleMode int scaleMode) {
+            mScaleMode = scaleMode;
+            return this;
+        }
+
+        public Builder setStartPosition(@StartPosition int startPosition) {
+            mStartPosition = startPosition;
+            return this;
+        }
+
+        public Builder setStartPage(int startPage) {
+            mStartPage = startPage;
+            return this;
+        }
+
+        public Builder setBackgroundColor(int backgroundColor) {
+            mBackgroundColor = backgroundColor;
+            return this;
+        }
+
+        public Builder setEdgeColor(int edgeColor) {
+            mEdgeColor = edgeColor;
+            return this;
+        }
+
+        public Builder setPagerInterval(int pagerInterval) {
+            mPagerInterval = pagerInterval;
+            return this;
+        }
+
+        public Builder setScrollInterval(int scrollInterval) {
+            mScrollInterval = scrollInterval;
+            return this;
+        }
+
+        public Builder setPageMinHeight(int pageMinHeight) {
+            mPageMinHeight = pageMinHeight;
+            return this;
+        }
+
+        public Builder setPageInfoInterval(int pageInfoInterval) {
+            mPageInfoInterval = pageInfoInterval;
+            return this;
+        }
+
+        public Builder setProgressColor(int progressColor) {
+            mProgressColor = progressColor;
+            return this;
+        }
+
+        public Builder setProgressSize(int progressSize) {
+            mProgressSize = progressSize;
+            return this;
+        }
+
+        public Builder setPageTextColor(int pageTextColor) {
+            mPageTextColor = pageTextColor;
+            return this;
+        }
+
+        public Builder setPageTextSize(int pageTextSize) {
+            mPageTextSize = pageTextSize;
+            return this;
+        }
+
+        public Builder setPageTextTypeface(Typeface pageTextTypeface) {
+            mPageTextTypeface = pageTextTypeface;
+            return this;
+        }
+
+        public Builder setErrorTextColor(int errorTextColor) {
+            mErrorTextColor = errorTextColor;
+            return this;
+        }
+
+        public Builder setErrorTextSize(int errorTextSize) {
+            mErrorTextSize = errorTextSize;
+            return this;
+        }
+
+        public Builder setDefaultErrorString(String defaultErrorString) {
+            mDefaultErrorString = defaultErrorString;
+            return this;
+        }
+
+        public Builder setEmptyString(String emptyString) {
+            mEmptyString = emptyString;
+            return this;
+        }
+
+        public GalleryView build() {
+            return new GalleryView(this);
+        }
+    }
+
     public static abstract class Adapter {
 
         protected GalleryView mGalleryView;
@@ -1216,23 +1221,5 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
             int viewTop = mGalleryView.getHeight() / 2 - viewHeight / 2;
             view.layout(viewLeft, viewTop, viewLeft + viewWidth, viewTop + viewHeight);
         }
-    }
-
-    public interface Listener {
-
-        @RenderThread
-        void onUpdateCurrentIndex(int index);
-
-        @RenderThread
-        void onTapSliderArea();
-
-        @RenderThread
-        void onTapMenuArea();
-
-        @RenderThread
-        void onTapErrorText(int index);
-
-        @RenderThread
-        void onLongPressPage(int index);
     }
 }

@@ -19,13 +19,14 @@ package com.hippo.yorozuya;
 import android.content.Context;
 
 public final class LayoutUtils {
-    private LayoutUtils() {}
+    private LayoutUtils() {
+    }
 
     /**
      * dp conversion to pix
      *
      * @param context The context
-     * @param dp The value you want to conversion
+     * @param dp      The value you want to conversion
      * @return value in pix
      */
     public static int dp2pix(Context context, float dp) {
@@ -36,7 +37,7 @@ public final class LayoutUtils {
      * pix conversion to dp
      *
      * @param context The context
-     * @param pix The value you want to conversion
+     * @param pix     The value you want to conversion
      * @return value in dp
      */
     public static float pix2dp(Context context, int pix) {

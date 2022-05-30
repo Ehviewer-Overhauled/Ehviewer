@@ -23,10 +23,10 @@ import android.util.TypedValue;
 import androidx.annotation.AttrRes;
 
 public final class ResourcesUtils {
-    private ResourcesUtils() {}
-
     private static final Object mAccessLock = new Object();
     private static TypedValue mTmpValue = new TypedValue();
+    private ResourcesUtils() {
+    }
 
     public static float getFloat(Resources resources, int resId) {
         TypedValue outValue = new TypedValue();

@@ -30,7 +30,20 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 public final class FileUtils {
-    private FileUtils() {}
+    private static final char[] FORBIDDEN_FILENAME_CHARACTERS = {
+            '\\',
+            '/',
+            ':',
+            '*',
+            '?',
+            '"',
+            '<',
+            '>',
+            '|',
+    };
+
+    private FileUtils() {
+    }
 
     public static boolean ensureFile(File file) {
         return file != null && (!file.exists() || file.isFile());
@@ -53,14 +66,14 @@ public final class FileUtils {
      * http://stackoverflow.com/questions/3758606/
      *
      * @param bytes the bytes to convert
-     * @param si si units
+     * @param si    si units
      * @return the human readable string
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format(Locale.US, "%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
@@ -68,7 +81,7 @@ public final class FileUtils {
      * Try to delete file, dir and it's children
      *
      * @param file the file to delete
-     * The dir to deleted
+     *             The dir to deleted
      */
     public static boolean delete(File file) {
         if (file == null) {
@@ -151,18 +164,6 @@ public final class FileUtils {
         }
     }
 
-    private static final char[] FORBIDDEN_FILENAME_CHARACTERS = {
-            '\\',
-            '/',
-            ':',
-            '*',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-    };
-
     public static String sanitizeFilename(@NonNull String filename) {
         // Remove forbidden_filename_characters
         filename = StringUtils.remove(filename, FORBIDDEN_FILENAME_CHARACTERS);
@@ -235,7 +236,7 @@ public final class FileUtils {
     /**
      * Create a temp file, you need to delete it by you self.
      *
-     * @param parent The temp file's parent
+     * @param parent    The temp file's parent
      * @param extension The extension of temp file
      * @return The temp file or null
      */

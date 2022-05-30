@@ -18,6 +18,7 @@ package com.hippo.glgallery;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
+
 import com.hippo.glview.anim.AlphaAnimation;
 import com.hippo.glview.glrenderer.GLCanvas;
 import com.hippo.glview.glrenderer.Texture;
@@ -25,47 +26,39 @@ import com.hippo.glview.image.ImageTexture;
 import com.hippo.glview.view.GLView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.MathUtils;
+
 import java.util.Arrays;
 
 class ImageView extends GLView implements ImageTexture.Callback {
-
-    // TODO adjust scale max and min according to image size and screen size
-    private static final float SCALE_MIN = 1 / 10.0f;
-    private static final float SCALE_MAX = 10.0f;
 
     public static final int SCALE_ORIGIN = 0;
     public static final int SCALE_FIT_WIDTH = 1;
     public static final int SCALE_FIT_HEIGHT = 2;
     public static final int SCALE_FIT = 3;
     public static final int SCALE_FIXED = 4;
-
     public static final int START_POSITION_TOP_LEFT = 0;
     public static final int START_POSITION_TOP_RIGHT = 1;
     public static final int START_POSITION_BOTTOM_LEFT = 2;
     public static final int START_POSITION_BOTTOM_RIGHT = 3;
     public static final int START_POSITION_CENTER = 4;
-
+    // TODO adjust scale max and min according to image size and screen size
+    private static final float SCALE_MIN = 1 / 10.0f;
+    private static final float SCALE_MAX = 10.0f;
     private static final long ALPHA_ANIMATION_DURING = 300L;
-
-    private ImageTexture mImageTexture;
-    private int mTextureWidth;
-    private int mTextureHeight;
-
     private final RectF mDst = new RectF();
     private final RectF mSrcActual = new RectF();
     private final RectF mDstActual = new RectF();
     private final Rect mValidRect = new Rect();
-
+    private final AlphaAnimation mAlphaAnimation;
+    private ImageTexture mImageTexture;
+    private int mTextureWidth;
+    private int mTextureHeight;
     private int mScaleMode = SCALE_FIT;
     private int mStartPosition = START_POSITION_TOP_RIGHT;
     private float mScaleValue = 1.0f;
-
     private float mScale = 1.0f;
-
     private boolean mScaleOffsetDirty = true;
     private boolean mPositionInRootDirty = true;
-
-    private final AlphaAnimation mAlphaAnimation;
 
     public ImageView() {
         mAlphaAnimation = new AlphaAnimation(0.0f, 1.0f);
@@ -186,6 +179,10 @@ class ImageView extends GLView implements ImageTexture.Callback {
         Arrays.sort(scaleDefault);
     }
 
+    public ImageTexture getImageTexture() {
+        return mImageTexture;
+    }
+
     public void setImageTexture(ImageTexture imageTexture) {
         // Remove callback
         if (mImageTexture != null) {
@@ -227,10 +224,6 @@ class ImageView extends GLView implements ImageTexture.Callback {
         if (oldTextureWidth != mTextureWidth || oldTextureHeight != mTextureHeight) {
             requestLayout();
         }
-    }
-
-    public ImageTexture getImageTexture() {
-        return mImageTexture;
     }
 
     public boolean isLoaded() {

@@ -33,20 +33,15 @@ import com.hippo.glview.widget.GLTextureView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.MathUtils;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 class PagerLayoutManager extends GalleryView.LayoutManager {
 
-    private static final String TAG = PagerLayoutManager.class.getSimpleName();
-
-    @IntDef({MODE_LEFT_TO_RIGHT, MODE_RIGHT_TO_LEFT})
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface Mode {}
-
     public static final int MODE_LEFT_TO_RIGHT = 0;
     public static final int MODE_RIGHT_TO_LEFT = 1;
-
+    private static final String TAG = PagerLayoutManager.class.getSimpleName();
     private static final Interpolator SMOOTH_SCROLLER_INTERPOLATOR = new Interpolator() {
         @Override
         public float getInterpolation(float t) {
@@ -54,45 +49,36 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
             return t * t * t * t * t + 1.0f;
         }
     };
-
+    private final int[] mScrollRemain = new int[2];
+    private final float[] mScaleDefault = new float[4];
+    private final SmoothScroller mSmoothScroller;
+    private final PageFling mPageFling;
+    private final SmoothScaler mSmoothScaler;
+    private final OverScroller mOverScroller;
+    private final Rect mTempRect = new Rect();
     private GalleryView.Adapter mAdapter;
-
     private GLProgressView mProgress;
     private String mErrorStr;
     private GLTextureView mErrorView;
     private GalleryPageView mPrevious;
     private GalleryPageView mCurrent;
     private GalleryPageView mNext;
-
     @Mode
     private int mMode = MODE_RIGHT_TO_LEFT;
     private int mScaleMode;
     private int mStartPosition;
     private float mScaleValue;
-
     private int mOffset;
     private int mDeltaX;
     private int mDeltaY;
     private boolean mCanScrollBetweenPages = false;
     private boolean mStopAnimationFinger;
-
     private int mInterval;
-
-    private final int[] mScrollRemain = new int[2];
-    private final float[] mScaleDefault = new float[4];
-
-    private final SmoothScroller mSmoothScroller;
-    private final PageFling mPageFling;
-    private final SmoothScaler mSmoothScaler;
-    private final OverScroller mOverScroller;
-
     // Current index
     private int mIndex;
 
-    private final Rect mTempRect = new Rect();
-
     public PagerLayoutManager(Context context, @NonNull GalleryView galleryView,
-            int scaleMode, int startPoint, float scaleValue, int interval) {
+                              int scaleMode, int startPoint, float scaleValue, int interval) {
         super(galleryView);
 
         mScaleMode = scaleMode;
@@ -292,7 +278,7 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
     }
 
     private void layoutPage(GalleryPageView page, int widthSpec, int heightSpec,
-            int left, int top, int right, int bottom) {
+                            int left, int top, int right, int bottom) {
         Rect rect = mTempRect;
         page.getValidRect(rect);
         boolean oldValid = !rect.isEmpty();
@@ -465,7 +451,7 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
         image.getScaleDefault(scales);
         float scale = image.getScale();
         float endScale = scales[0];
-        for (float value: scales) {
+        for (float value : scales) {
             if (scale < value - 0.01f) {
                 endScale = value;
                 break;
@@ -476,7 +462,8 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
     }
 
     @Override
-    public void onLongPress(float x, float y) {}
+    public void onLongPress(float x, float y) {
+    }
 
     private void pagePrevious() {
         if (mIndex <= 0) {
@@ -574,7 +561,7 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
             if (rightPage == null) {
                 limit = 0;
             } else {
-                limit = - width - mInterval;
+                limit = -width - mInterval;
             }
 
             if (dx < mOffset - limit) {
@@ -877,6 +864,11 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
         return currentIndex;
     }
 
+    @IntDef({MODE_LEFT_TO_RIGHT, MODE_RIGHT_TO_LEFT})
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface Mode {
+    }
+
     private class SmoothScroller extends Animation {
 
         private int mDx;
@@ -920,20 +912,20 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
 
     private class PageFling extends Fling {
 
+        private final int[] mTemp = new int[2];
         private int mVelocityX;
         private int mVelocityY;
         private int mDx;
         private int mDy;
         private int mLastX;
         private int mLastY;
-        private final int[] mTemp = new int[2];
 
         public PageFling(Context context) {
             super(context);
         }
 
         public void startFling(int velocityX, int minX, int maxX,
-                int velocityY, int minY, int maxY) {
+                               int velocityY, int minY, int maxY) {
             mVelocityX = velocityX;
             mVelocityY = velocityY;
             mDx = (int) (getSplineFlingDistance(velocityX) * Math.signum(velocityX));
@@ -1024,7 +1016,7 @@ class PagerLayoutManager extends GalleryView.LayoutManager {
         }
 
         public void startSmoothScaler(float focusX, float focusY,
-                float startScale, float endScale, int duration) {
+                                      float startScale, float endScale, int duration) {
             mFocusX = focusX;
             mFocusY = focusY;
             mStartScale = startScale;

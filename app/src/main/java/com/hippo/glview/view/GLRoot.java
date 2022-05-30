@@ -24,32 +24,45 @@ import com.hippo.glview.glrenderer.GLCanvas;
 
 public interface GLRoot {
 
-    // Listener will be called when GL is idle AND before each frame.
-    // Mainly used for uploading textures.
-    interface OnGLIdleListener {
-        boolean onGLIdle(GLCanvas canvas, boolean renderRequested);
-    }
-
     void addOnGLIdleListener(OnGLIdleListener listener);
+
     void registerLaunchedAnimation(CanvasAnimation animation);
+
     void requestRenderForced();
+
     void requestRender();
+
     void requestLayoutContentPane();
 
     void lockRenderThread();
+
     void unlockRenderThread();
 
     void setContentPane(GLView content);
+
     void setOrientationSource(OrientationSource source);
+
     int getDisplayRotation();
+
     int getCompensation();
+
     Matrix getCompensationMatrix();
+
     void freeze();
+
     void unfreeze();
+
     void setLightsOutMode(boolean enabled);
 
     Context getContext();
 
     int getWidth();
+
     int getHeight();
+
+    // Listener will be called when GL is idle AND before each frame.
+    // Mainly used for uploading textures.
+    interface OnGLIdleListener {
+        boolean onGLIdle(GLCanvas canvas, boolean renderRequested);
+    }
 }

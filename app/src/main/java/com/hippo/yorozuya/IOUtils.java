@@ -25,11 +25,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public final class IOUtils {
-    private IOUtils() {}
-
     private static final int EOF = -1;
-
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+
+    private IOUtils() {
+    }
 
     /**
      * Close the closeable stuff. Don't worry about anything.
@@ -50,7 +50,7 @@ public final class IOUtils {
      * Copy bytes from an <code>InputStream</code> to an
      * <code>OutputStream</code>.
      *
-     * @param input the InputStream
+     * @param input  the InputStream
      * @param output the OutputStream
      * @return the number of bytes copied
      * @throws IOException
@@ -72,7 +72,7 @@ public final class IOUtils {
      * "\n".
      *
      * @throws java.io.EOFException if the stream is exhausted before the next
-     *             newline character.
+     *                              newline character.
      */
     public static String readAsciiLine(final InputStream in) throws IOException {
         final StringBuilder result = new StringBuilder(80);
@@ -84,7 +84,7 @@ public final class IOUtils {
                 break;
             }
 
-            result.append((char)c);
+            result.append((char) c);
         }
         final int length = result.length();
         if (length > 0 && result.charAt(length - 1) == '\r') {

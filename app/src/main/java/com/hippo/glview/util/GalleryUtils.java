@@ -17,31 +17,32 @@
 package com.hippo.glview.util;
 
 import android.graphics.Color;
+
 import com.hippo.yorozuya.AssertError;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GalleryUtils {
 
     private static final String TAG = "GalleryUtils";
+    private static final List<Integer> sRenderThreads = new CopyOnWriteArrayList<>();
 
     public static float[] intColorToFloatARGBArray(int from) {
-        return new float[] {
-            Color.alpha(from) / 255f,
-            Color.red(from) / 255f,
-            Color.green(from) / 255f,
-            Color.blue(from) / 255f
+        return new float[]{
+                Color.alpha(from) / 255f,
+                Color.red(from) / 255f,
+                Color.green(from) / 255f,
+                Color.blue(from) / 255f
         };
-    }
-
-    public static int floatARGBArrayTointColor(float[] from) {
-        return Color.argb((int) (from[0] * 255), (int) (from[1] * 255), (int) (from[2] * 255), (int) (from[3] * 255));
     }
 
     // Below are used the detect using database in the render thread. It only
     // works most of the time, but that's ok because it's for debugging only.
 
-    private static final List<Integer> sRenderThreads = new CopyOnWriteArrayList<>();
+    public static int floatARGBArrayTointColor(float[] from) {
+        return Color.argb((int) (from[0] * 255), (int) (from[1] * 255), (int) (from[2] * 255), (int) (from[3] * 255));
+    }
 
     public static void setRenderThread() {
         sRenderThreads.add(Thread.currentThread().hashCode());

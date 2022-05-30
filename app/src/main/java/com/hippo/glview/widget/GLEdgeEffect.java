@@ -53,35 +53,25 @@ public class GLEdgeEffect {
     private static final double ANGLE = Math.PI / 6;
     private static final float SIN = (float) Math.sin(ANGLE);
     private static final float COS = (float) Math.cos(ANGLE);
-
-    private float mGlowAlpha;
-    private float mGlowScaleY;
-
-    private float mGlowAlphaStart;
-    private float mGlowAlphaFinish;
-    private float mGlowScaleYStart;
-    private float mGlowScaleYFinish;
-
-    private long mStartTime;
-    private float mDuration;
-
-    private final Interpolator mInterpolator;
-
     private static final int STATE_IDLE = 0;
     private static final int STATE_PULL = 1;
     private static final int STATE_ABSORB = 2;
     private static final int STATE_RECEDE = 3;
     private static final int STATE_PULL_DECAY = 4;
-
     private static final float PULL_DISTANCE_ALPHA_GLOW_FACTOR = 0.8f;
-
     private static final int VELOCITY_GLOW_FACTOR = 6;
-
-    private int mState = STATE_IDLE;
-
-    private float mPullDistance;
-
+    private final Interpolator mInterpolator;
     private final Rect mBounds = new Rect();
+    private float mGlowAlpha;
+    private float mGlowScaleY;
+    private float mGlowAlphaStart;
+    private float mGlowAlphaFinish;
+    private float mGlowScaleYStart;
+    private float mGlowScaleYFinish;
+    private long mStartTime;
+    private float mDuration;
+    private int mState = STATE_IDLE;
+    private float mPullDistance;
     private int mColor;
     private float mRadius;
     private float mBaseGlowScale;
@@ -99,7 +89,7 @@ public class GLEdgeEffect {
     /**
      * Set the size of this edge effect in pixels.
      *
-     * @param width Effect width in pixels
+     * @param width  Effect width in pixels
      * @param height Effect height in pixels
      */
     public void setSize(int width, int height) {
@@ -161,9 +151,9 @@ public class GLEdgeEffect {
      * @param deltaDistance Change in distance since the last call. Values may be 0 (no change) to
      *                      1.f (full length of the view) or negative values to express change
      *                      back toward the edge reached to initiate the effect.
-     * @param displacement The displacement from the starting side of the effect of the point
-     *                     initiating the pull. In the case of touch this is the finger position.
-     *                     Values may be from 0-1.
+     * @param displacement  The displacement from the starting side of the effect of the point
+     *                      initiating the pull. In the case of touch this is the finger position.
+     *                      Values may be from 0-1.
      */
     public void onPull(float deltaDistance, float displacement) {
         final long now = AnimationUtils.currentAnimationTimeMillis();
@@ -257,20 +247,21 @@ public class GLEdgeEffect {
     }
 
     /**
+     * Return the color of this edge effect in argb.
+     *
+     * @return The color of this edge effect in argb
+     */
+    public int getColor() {
+        return mColor;
+    }
+
+    /**
      * Set the color of this edge effect in argb.
      *
      * @param color Color in argb
      */
     public void setColor(int color) {
         mColor = color;
-    }
-
-    /**
-     * Return the color of this edge effect in argb.
-     * @return The color of this edge effect in argb
-     */
-    public int getColor() {
-        return mColor;
     }
 
     /**
@@ -281,7 +272,7 @@ public class GLEdgeEffect {
      *
      * @param canvas Canvas to draw into
      * @return true if drawing should continue beyond this frame to continue the
-     *         animation
+     * animation
      */
     public boolean draw(GLCanvas canvas) {
         update();
@@ -314,6 +305,7 @@ public class GLEdgeEffect {
     /**
      * Return the maximum height that the edge effect will be drawn at given the original
      * {@link #setSize(int, int) input size}.
+     *
      * @return The maximum height of the edge effect
      */
     public int getMaxHeight() {

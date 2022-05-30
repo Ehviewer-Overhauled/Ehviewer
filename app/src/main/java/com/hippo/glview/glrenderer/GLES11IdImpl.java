@@ -24,9 +24,9 @@ import javax.microedition.khronos.opengles.GL11ExtensionPack;
  */
 public class GLES11IdImpl implements GLId {
 
-    private static int sNextId = 1;
     // Mutex for sNextId
     private final static Object sLock = new Object();
+    private static int sNextId = 1;
 
     @Override
     public int generateTexture() {

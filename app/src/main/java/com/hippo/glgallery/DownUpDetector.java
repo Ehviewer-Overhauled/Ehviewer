@@ -19,16 +19,8 @@ package com.hippo.glgallery;
 import android.view.MotionEvent;
 
 class DownUpDetector {
-    public interface DownUpListener {
-        void onDown(MotionEvent e);
-        void onUp(MotionEvent e);
-        void onPointerDown(MotionEvent e);
-        void onPointerUp(MotionEvent e);
-    }
-
-    private boolean mStillDown;
     private final DownUpListener mListener;
-
+    private boolean mStillDown;
     public DownUpDetector(DownUpListener listener) {
         mListener = listener;
     }
@@ -63,5 +55,15 @@ class DownUpDetector {
 
     public boolean isDown() {
         return mStillDown;
+    }
+
+    public interface DownUpListener {
+        void onDown(MotionEvent e);
+
+        void onUp(MotionEvent e);
+
+        void onPointerDown(MotionEvent e);
+
+        void onPointerUp(MotionEvent e);
     }
 }

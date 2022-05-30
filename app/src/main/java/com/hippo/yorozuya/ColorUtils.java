@@ -17,7 +17,8 @@
 package com.hippo.yorozuya;
 
 public final class ColorUtils {
-    private ColorUtils() {}
+    private ColorUtils() {
+    }
 
     /**
      * Check is it the color opaque

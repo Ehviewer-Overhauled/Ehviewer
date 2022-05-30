@@ -21,20 +21,24 @@ public class GLPaint {
     private int mColor = 0;
     private int mBackgroundColor = 0;
 
+    public int getColor() {
+        return mColor;
+    }
+
     public void setColor(int color) {
         mColor = color;
     }
 
-    public int getColor() {
-        return mColor;
+    public int getBackgroundColor() {
+        return mBackgroundColor;
     }
 
     public void setBackgroundColor(int backgroundColor) {
         mBackgroundColor = backgroundColor;
     }
 
-    public int getBackgroundColor() {
-        return mBackgroundColor;
+    public float getLineWidth() {
+        return mLineWidth;
     }
 
     public void setLineWidth(float width) {
@@ -42,9 +46,5 @@ public class GLPaint {
             throw new IllegalArgumentException("width < 0");
         }
         mLineWidth = width;
-    }
-
-    public float getLineWidth() {
-        return mLineWidth;
     }
 }

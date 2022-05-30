@@ -47,10 +47,12 @@ import com.hippo.tuxiang.EGLContextFactory;
 import com.hippo.tuxiang.GLSurfaceView;
 import com.hippo.tuxiang.Renderer;
 import com.hippo.yorozuya.AssertUtils;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -72,145 +74,43 @@ public class GLRootView extends GLSurfaceView
     private static final String TAG = "GLRootView";
 
     private static final boolean DEBUG_FPS = false;
-    private int mFrameCount = 0;
-    private long mFrameCountingStart = 0;
-
     private static final boolean DEBUG_INVALIDATE = false;
-    private int mInvalidateColor = 0;
-
     private static final boolean DEBUG_DRAWING_STAT = false;
-
     private static final int FLAG_INITIALIZED = 1;
     private static final int FLAG_NEED_LAYOUT = 2;
-
+    // mCompensationMatrix maps the coordinates of touch events. It is kept sync
+    // with mCompensation.
+    private final Matrix mCompensationMatrix = new Matrix();
+    private final ArrayList<CanvasAnimation> mAnimations =
+            new ArrayList<>();
+    private final ArrayDeque<OnGLIdleListener> mIdleListeners =
+            new ArrayDeque<>();
+    private final IdleRunner mIdleRunner = new IdleRunner();
+    private final ReentrantLock mRenderLock = new ReentrantLock();
+    private final Condition mFreezeCondition =
+            mRenderLock.newCondition();
+    private final Runnable mRequestRenderOnAnimationFrame = new Runnable() {
+        @Override
+        public void run() {
+            superRequestRender();
+        }
+    };
+    private int mFrameCount = 0;
+    private long mFrameCountingStart = 0;
+    private int mInvalidateColor = 0;
     private GL11 mGL;
     private GLCanvas mCanvas;
     private GLView mContentView;
-
     private OrientationSource mOrientationSource;
     // mCompensation is the difference between the UI orientation on GLCanvas
     // and the framework orientation. See OrientationManager for details.
     private int mCompensation;
-    // mCompensationMatrix maps the coordinates of touch events. It is kept sync
-    // with mCompensation.
-    private final Matrix mCompensationMatrix = new Matrix();
     private int mDisplayRotation;
-
     private int mFlags = FLAG_NEED_LAYOUT;
     private volatile boolean mRenderRequested = false;
-
-    private final ArrayList<CanvasAnimation> mAnimations =
-            new ArrayList<>();
-
-    private final ArrayDeque<OnGLIdleListener> mIdleListeners =
-            new ArrayDeque<>();
-
-    private final IdleRunner mIdleRunner = new IdleRunner();
-
-    private final ReentrantLock mRenderLock = new ReentrantLock();
-    private final Condition mFreezeCondition =
-            mRenderLock.newCondition();
     private boolean mFreeze;
-
     private boolean mInDownState = false;
-
     private int mEGLContextClientVersion;
-
-    private class GLRootRenderer implements Renderer {
-
-        /**
-         * Called when the context is created, possibly after automatic destruction.
-         */
-        @Override
-        public void onSurfaceCreated(GL10 gl1, EGLConfig config) {
-            GL11 gl = (GL11) gl1;
-            if (mGL != null) {
-                // The GL Object has changed
-                Log.i(TAG, "GLObject has changed from " + mGL + " to " + gl);
-            }
-            mRenderLock.lock();
-            try {
-                mGL = gl;
-                mCanvas = mEGLContextClientVersion == 2 ? new GLES20Canvas() : new GLES11Canvas(gl);
-                BasicTexture.invalidateAllTextures();
-            } finally {
-                mRenderLock.unlock();
-            }
-
-            if (DEBUG_FPS) {
-                setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-            } else {
-                setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-            }
-        }
-
-        /**
-         * Called when the OpenGL surface is recreated without destroying the
-         * context.
-         */
-        @Override
-        public void onSurfaceChanged(GL10 gl1, int width, int height) {
-            Log.i(TAG, "onSurfaceChanged: " + width + "x" + height + ", gl10: " + gl1.toString());
-            Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-            GalleryUtils.setRenderThread();
-            GL11 gl = (GL11) gl1;
-            AssertUtils.assertTrue(mGL == gl);
-
-            mCanvas.setSize(width, height);
-        }
-
-        @Override
-        public boolean onDrawFrame(GL10 gl) {
-            AnimationTime.update();
-
-            long t0 = System.nanoTime();
-
-            mRenderLock.lock();
-
-            while (mFreeze) {
-                mFreezeCondition.awaitUninterruptibly();
-            }
-
-            try {
-                onDrawFrameLocked(gl);
-            } finally {
-                mRenderLock.unlock();
-            }
-
-            long t = System.nanoTime();
-            long duration = (t - t0) / 1000000;
-
-            if (duration > 8) {
-                Log.v(TAG, "--- " + duration + " ---");
-            }
-
-            return true;
-        }
-
-        @Override
-        public void onGLThreadStart() { }
-
-        @Override
-        public void onGLThreadExit() {
-            if (mContentView != null && mContentView.isAttachedToRoot()) {
-                mContentView.detachFromRoot();
-            }
-        }
-
-        @Override
-        public void onGLThreadPause() {
-            if (mContentView != null) {
-                mContentView.pause();
-            }
-        }
-
-        @Override
-        public void onGLThreadResume() {
-            if (mContentView != null) {
-                mContentView.resume();
-            }
-        }
-    }
 
     public GLRootView(Context context) {
         this(context, null);
@@ -293,13 +193,6 @@ public class GLRootView extends GLSurfaceView
             super.requestRender();
         }
     }
-
-    private final Runnable mRequestRenderOnAnimationFrame = new Runnable() {
-        @Override
-        public void run() {
-            superRequestRender();
-        }
-    };
 
     private void superRequestRender() {
         super.requestRender();
@@ -407,7 +300,7 @@ public class GLRootView extends GLSurfaceView
         mCanvas.save(GLCanvas.SAVE_FLAG_ALL);
         rotateCanvas(-mCompensation);
         if (mContentView != null) {
-           mContentView.render(mCanvas);
+            mContentView.render(mCanvas);
         } else {
             // Make sure we always draw something to prevent displaying garbage
             mCanvas.clearBuffer();
@@ -482,39 +375,6 @@ public class GLRootView extends GLSurfaceView
             return handled;
         } finally {
             mRenderLock.unlock();
-        }
-    }
-
-    private class IdleRunner implements Runnable {
-        // true if the idle runner is in the queue
-        private boolean mActive = false;
-
-        @Override
-        public void run() {
-            OnGLIdleListener listener;
-            synchronized (mIdleListeners) {
-                mActive = false;
-                if (mIdleListeners.isEmpty()) return;
-                listener = mIdleListeners.removeFirst();
-            }
-            mRenderLock.lock();
-            boolean keepInQueue;
-            try {
-                keepInQueue = listener.onGLIdle(mCanvas, mRenderRequested);
-            } finally {
-                mRenderLock.unlock();
-            }
-            synchronized (mIdleListeners) {
-                if (keepInQueue) mIdleListeners.addLast(listener);
-                if (!mRenderRequested && !mIdleListeners.isEmpty()) enable();
-            }
-        }
-
-        public void enable() {
-            // Who gets the flag can add it to the queue
-            if (mActive) return;
-            mActive = true;
-            queueEvent(this);
         }
     }
 
@@ -643,6 +503,136 @@ public class GLRootView extends GLSurfaceView
         }
     }
 
+    private class GLRootRenderer implements Renderer {
+
+        /**
+         * Called when the context is created, possibly after automatic destruction.
+         */
+        @Override
+        public void onSurfaceCreated(GL10 gl1, EGLConfig config) {
+            GL11 gl = (GL11) gl1;
+            if (mGL != null) {
+                // The GL Object has changed
+                Log.i(TAG, "GLObject has changed from " + mGL + " to " + gl);
+            }
+            mRenderLock.lock();
+            try {
+                mGL = gl;
+                mCanvas = mEGLContextClientVersion == 2 ? new GLES20Canvas() : new GLES11Canvas(gl);
+                BasicTexture.invalidateAllTextures();
+            } finally {
+                mRenderLock.unlock();
+            }
+
+            if (DEBUG_FPS) {
+                setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+            } else {
+                setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            }
+        }
+
+        /**
+         * Called when the OpenGL surface is recreated without destroying the
+         * context.
+         */
+        @Override
+        public void onSurfaceChanged(GL10 gl1, int width, int height) {
+            Log.i(TAG, "onSurfaceChanged: " + width + "x" + height + ", gl10: " + gl1.toString());
+            Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+            GalleryUtils.setRenderThread();
+            GL11 gl = (GL11) gl1;
+            AssertUtils.assertTrue(mGL == gl);
+
+            mCanvas.setSize(width, height);
+        }
+
+        @Override
+        public boolean onDrawFrame(GL10 gl) {
+            AnimationTime.update();
+
+            long t0 = System.nanoTime();
+
+            mRenderLock.lock();
+
+            while (mFreeze) {
+                mFreezeCondition.awaitUninterruptibly();
+            }
+
+            try {
+                onDrawFrameLocked(gl);
+            } finally {
+                mRenderLock.unlock();
+            }
+
+            long t = System.nanoTime();
+            long duration = (t - t0) / 1000000;
+
+            if (duration > 8) {
+                Log.v(TAG, "--- " + duration + " ---");
+            }
+
+            return true;
+        }
+
+        @Override
+        public void onGLThreadStart() {
+        }
+
+        @Override
+        public void onGLThreadExit() {
+            if (mContentView != null && mContentView.isAttachedToRoot()) {
+                mContentView.detachFromRoot();
+            }
+        }
+
+        @Override
+        public void onGLThreadPause() {
+            if (mContentView != null) {
+                mContentView.pause();
+            }
+        }
+
+        @Override
+        public void onGLThreadResume() {
+            if (mContentView != null) {
+                mContentView.resume();
+            }
+        }
+    }
+
+    private class IdleRunner implements Runnable {
+        // true if the idle runner is in the queue
+        private boolean mActive = false;
+
+        @Override
+        public void run() {
+            OnGLIdleListener listener;
+            synchronized (mIdleListeners) {
+                mActive = false;
+                if (mIdleListeners.isEmpty()) return;
+                listener = mIdleListeners.removeFirst();
+            }
+            mRenderLock.lock();
+            boolean keepInQueue;
+            try {
+                keepInQueue = listener.onGLIdle(mCanvas, mRenderRequested);
+            } finally {
+                mRenderLock.unlock();
+            }
+            synchronized (mIdleListeners) {
+                if (keepInQueue) mIdleListeners.addLast(listener);
+                if (!mRenderRequested && !mIdleListeners.isEmpty()) enable();
+            }
+        }
+
+        public void enable() {
+            // Who gets the flag can add it to the queue
+            if (mActive) return;
+            mActive = true;
+            queueEvent(this);
+        }
+    }
+
     // Always chose a config
     private class ConfigChooser implements EGLConfigChooser {
 
@@ -651,7 +641,7 @@ public class GLRootView extends GLSurfaceView
         @Override
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
             int[] num_config = new int[1];
-            int[] configSpec = new int[] { EGL10.EGL_NONE };
+            int[] configSpec = new int[]{EGL10.EGL_NONE};
             if (!egl.eglChooseConfig(display, configSpec, null, 0, num_config)) {
                 throw new IllegalArgumentException("eglChooseConfig failed");
             }
@@ -660,7 +650,7 @@ public class GLRootView extends GLSurfaceView
 
             if (numConfigs <= 0) {
                 throw new IllegalArgumentException(
-                    "No configs match configSpec");
+                        "No configs match configSpec");
             }
 
             EGLConfig[] configs = new EGLConfig[numConfigs];
@@ -690,24 +680,24 @@ public class GLRootView extends GLSurfaceView
             for (int i = 0, n = configs.length; i < n; i++) {
                 final EGLConfig config = configs[i];
                 final int redSize = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_RED_SIZE, 0);
+                        EGL10.EGL_RED_SIZE, 0);
                 final int greenSize = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_GREEN_SIZE, 0);
+                        EGL10.EGL_GREEN_SIZE, 0);
                 final int blueSize = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_BLUE_SIZE, 0);
+                        EGL10.EGL_BLUE_SIZE, 0);
                 final int alphaSize = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_ALPHA_SIZE, 0);
+                        EGL10.EGL_ALPHA_SIZE, 0);
                 final int sampleBuffers = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_SAMPLE_BUFFERS, 0);
+                        EGL10.EGL_SAMPLE_BUFFERS, 0);
                 final int samples = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_SAMPLES, 0);
+                        EGL10.EGL_SAMPLES, 0);
                 final int depth = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_DEPTH_SIZE, 0);
+                        EGL10.EGL_DEPTH_SIZE, 0);
                 final int stencil = findConfigAttrib(egl, display, config,
-                    EGL10.EGL_STENCIL_SIZE, 0);
+                        EGL10.EGL_STENCIL_SIZE, 0);
 
                 final int score = redSize + greenSize + blueSize + alphaSize +
-                    sampleBuffers + samples - depth - stencil;
+                        sampleBuffers + samples - depth - stencil;
 
                 if (score > maxScore) {
                     maxScore = score;
@@ -719,7 +709,7 @@ public class GLRootView extends GLSurfaceView
         }
 
         private int findConfigAttrib(EGL10 egl, EGLDisplay display,
-            EGLConfig config, int attribute, int defaultValue) {
+                                     EGLConfig config, int attribute, int defaultValue) {
             if (egl.eglGetConfigAttrib(display, config, attribute, mValue)) {
                 return mValue[0];
             }
@@ -734,7 +724,7 @@ public class GLRootView extends GLSurfaceView
         @Override
         public EGLContext createContext(EGL10 egl, EGLDisplay display, EGLConfig config) {
             int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, mEGLContextClientVersion,
-                    EGL10.EGL_NONE };
+                    EGL10.EGL_NONE};
 
             return egl.eglCreateContext(display, config, EGL10.EGL_NO_CONTEXT,
                     mEGLContextClientVersion != 0 ? attrib_list : null);

@@ -21,7 +21,8 @@ import android.view.MotionEvent;
 import android.view.MotionEvent.PointerCoords;
 
 public final class MotionEventHelper {
-    private MotionEventHelper() {}
+    private MotionEventHelper() {
+    }
 
     public static MotionEvent transformEvent(MotionEvent e, Matrix m) {
         // We try to use the new transform method if possible because it uses
@@ -58,16 +59,16 @@ public final class MotionEventHelper {
 
         // Copy the x and y coordinates into an array, map them, and copy back.
         float[] xy = new float[pointerCoords.length * 2];
-        for (int i = 0; i < pointerCount;i++) {
+        for (int i = 0; i < pointerCount; i++) {
             xy[2 * i] = pointerCoords[i].x;
             xy[2 * i + 1] = pointerCoords[i].y;
         }
         m.mapPoints(xy);
-        for (int i = 0; i < pointerCount;i++) {
+        for (int i = 0; i < pointerCount; i++) {
             pointerCoords[i].x = xy[2 * i];
             pointerCoords[i].y = xy[2 * i + 1];
             pointerCoords[i].orientation = transformAngle(
-                m, pointerCoords[i].orientation);
+                    m, pointerCoords[i].orientation);
         }
 
         MotionEvent n = MotionEvent.obtain(downTime, eventTime, action,

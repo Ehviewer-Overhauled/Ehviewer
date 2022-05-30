@@ -34,7 +34,7 @@ public class StringTexture extends CanvasTexture {
     private final FontMetricsInt mMetrics;
 
     private StringTexture(String text, TextPaint paint,
-            FontMetricsInt metrics, int width, int height) {
+                          FontMetricsInt metrics, int width, int height) {
         super(width, height);
         mText = text;
         mPaint = paint;

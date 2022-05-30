@@ -18,7 +18,6 @@ package com.hippo.glview.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -71,7 +70,7 @@ public class ImageWrapper {
      */
     public void setCutPercent(float left, float top, float right, float bottom) {
         setCutRect((int) (getWidth() * left), (int) (getHeight() * top),
-            (int) (getWidth() * right), (int) (getHeight() * bottom));
+                (int) (getWidth() * right), (int) (getHeight() * bottom));
     }
 
     /**
@@ -143,7 +142,7 @@ public class ImageWrapper {
      * @see Image#render(int, int, Bitmap, int, int, int, int, boolean, int)
      */
     public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-            int width, int height, boolean fillBlank, int defaultColor) {
+                       int width, int height, boolean fillBlank, int defaultColor) {
         mImage.render(srcX + mCut.left, srcY + mCut.top, dst, dstX, dstY,
                 width, height, fillBlank, defaultColor);
     }

@@ -45,8 +45,8 @@ public class GalleryPageView extends GLFrameLayout {
     private int mIndex = INVALID_INDEX;
 
     public GalleryPageView(ImageMovableTextTexture pageTextTexture,
-            int progressColor, int progressBgColor, int progressSize,
-            int minHeight, int infoInterval) {
+                           int progressColor, int progressBgColor, int progressSize,
+                           int minHeight, int infoInterval) {
         // Add image
         mImage = new ImageView();
         GravityLayoutParams glp = new GravityLayoutParams(LayoutParams.MATCH_PARENT,

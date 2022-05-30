@@ -51,37 +51,20 @@ import java.util.ArrayList;
 // lockRendering() if the rendering thread should not run at the same time.
 //
 public class GLView implements TouchOwner {
-    private static final String TAG = "GLView";
-
-    private static final boolean DEBUG_DRAW_BOUNDS = false;
-
-    @IntDef({VISIBLE, INVISIBLE, GONE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Visibility {}
-
-    public static final int VISIBLE =                   0b00000000;
-    public static final int INVISIBLE =                 0b00000001;
-    public static final int GONE =                      0b00000010;
-    public static final int VISIBILITY_INVALID =        0b00000011;
-
-    private static final int FLAG_INVISIBLE =           0b00000011;
-    private static final int FLAG_SET_MEASURED_SIZE =   0b00000100;
-    private static final int FLAG_LAYOUT_REQUESTED =    0b00001000;
-
+    public static final int VISIBLE = 0b00000000;
+    public static final int INVISIBLE = 0b00000001;
+    public static final int GONE = 0b00000010;
+    public static final int VISIBILITY_INVALID = 0b00000011;
     /**
      * Used to mark a GlView that has no ID.
      */
     public static final int NO_ID = -1;
-
-    public interface OnClickListener {
-        boolean onClick(GLView v);
-    }
-
-    public interface OnLongClickListener {
-        boolean onLongClick(GLView v);
-    }
-
     protected final static GLPaint mDrawBoundsPaint;
+    private static final String TAG = "GLView";
+    private static final boolean DEBUG_DRAW_BOUNDS = false;
+    private static final int FLAG_INVISIBLE = 0b00000011;
+    private static final int FLAG_SET_MEASURED_SIZE = 0b00000100;
+    private static final int FLAG_LAYOUT_REQUESTED = 0b00001000;
 
     static {
         mDrawBoundsPaint = new GLPaint();
@@ -93,33 +76,26 @@ public class GLView implements TouchOwner {
      * Position in parent, just like left, top, right, bottom in {@link android.view.View}
      */
     protected final Rect mBounds = new Rect();
+    protected final Rect mPaddings = new Rect();
     /**
      * Position in root
      */
     private final int[] mPositionInRoot = new int[2];
-    protected final Rect mPaddings = new Rect();
     private final Rect mTempRect = new Rect();
-
-    private GLRoot mRoot;
     protected GLView mParent;
-    private ArrayList<GLView> mComponents;
-    private GLView mMotionTarget;
-
-    private CanvasAnimation mAnimation;
-
-    private int mViewFlags = 0;
-
     protected int mMeasuredWidth = 0;
     protected int mMeasuredHeight = 0;
-
-    private int mLastWidthSpec = -1;
-    private int mLastHeightSpec = -1;
-
     protected int mScrollY = 0;
     protected int mScrollX = 0;
     protected int mScrollHeight = 0;
     protected int mScrollWidth = 0;
-
+    private GLRoot mRoot;
+    private ArrayList<GLView> mComponents;
+    private GLView mMotionTarget;
+    private CanvasAnimation mAnimation;
+    private int mViewFlags = 0;
+    private int mLastWidthSpec = -1;
+    private int mLastHeightSpec = -1;
     /**
      * The GlView's identifier.
      *
@@ -127,32 +103,191 @@ public class GLView implements TouchOwner {
      * @see #getId()
      */
     private int mID = NO_ID;
-
     /**
      * The minimum height of the view. We'll try our best to have the height
      * of this view to at least this amount.
      */
     private int mMinHeight;
-
     /**
      * The minimum width of the view. We'll try our best to have the width
      * of this view to at least this amount.
      */
     private int mMinWidth;
-
     private LayoutParams mLayoutParams;
-
     private int mBackgroundColor = Color.TRANSPARENT;
-
     private TouchHelper mTouchHelper;
-
     private float mHotspotX;
     private float mHotspotY;
-
     private boolean mPressed;
-
     private OnClickListener mOnClickListener;
     private OnLongClickListener mOnLongClickListener;
+
+    /**
+     * Utility to return a default begin. Uses the supplied number as left or top.
+     *
+     * @param size          the parent size
+     * @param specSize      the child size
+     * @param paddingBeign  the padding begin
+     * @param paddingFinish the padding finish
+     * @param position      the {@link Gravity#POSITION_BEGIN} or {@link Gravity#POSITION_CENTER} or
+     *                      {@link Gravity#POSITION_FINISH}
+     * @return the begin size
+     */
+    public static int getDefaultBegin(int size, int specSize, int paddingBeign, int paddingFinish,
+                                      @Gravity.PositionMode int position) {
+        if (position == Gravity.POSITION_FINISH) {
+            return size - paddingFinish - specSize;
+        } else if (position == Gravity.POSITION_CENTER) {
+            return ((size - paddingBeign - paddingFinish) / 2) - (specSize / 2) + paddingBeign;
+        } else {
+            return paddingBeign;
+        }
+    }
+
+    /**
+     * Utility to return a default size. Uses the supplied size if the
+     * MeasureSpec imposed no constraints. Will get larger if allowed
+     * by the MeasureSpec.
+     * <p>
+     * It works differently from {@link android.view.View#getDefaultSize(int, int)}.
+     * For {@link MeasureSpec#AT_MOST}, size is suggestion size
+     * if it is small then spec size or it is not zero,
+     * otherwise spec size.
+     *
+     * @param size        Default size for this view
+     * @param measureSpec Constraints imposed by the parent
+     * @return The size this view should be.
+     */
+    public static int getDefaultSize(int size, int measureSpec) {
+        int result = size;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        switch (specMode) {
+            case MeasureSpec.UNSPECIFIED:
+                result = size;
+                break;
+            case MeasureSpec.EXACTLY:
+                result = specSize;
+                break;
+            case MeasureSpec.AT_MOST:
+                return size == 0 ? specSize : Math.min(size, specSize);
+        }
+        return result;
+    }
+
+    /**
+     * Utility to return a max size. Uses the supplied size if the
+     * MeasureSpec imposed no constraints. Will get larger if allowed
+     * by the MeasureSpec.
+     * <p>
+     * It works the same as {@link android.view.View#getDefaultSize(int, int)}.
+     *
+     * @param size        Default size for this view
+     * @param measureSpec Constraints imposed by the parent
+     * @return The size this view should be.
+     */
+    public static int getMaxSize(int size, int measureSpec) {
+        int result = size;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        switch (specMode) {
+            case MeasureSpec.UNSPECIFIED:
+                result = size;
+                break;
+            case MeasureSpec.EXACTLY:
+            case MeasureSpec.AT_MOST:
+                result = specSize;
+                break;
+        }
+        return result;
+    }
+
+    public static int getComponentSpec(int spec, int childSize) {
+        int specMode = MeasureSpec.getMode(spec);
+        int specSize = MeasureSpec.getSize(spec);
+
+        int size = Math.max(0, specSize);
+
+        int resultSize = 0;
+        int resultMode = 0;
+
+        switch (specMode) {
+            // Parent has imposed an exact size on us
+            case MeasureSpec.EXACTLY:
+                if (childSize >= 0) {
+                    resultSize = childSize;
+                    resultMode = MeasureSpec.EXACTLY;
+                } else if (childSize == LayoutParams.MATCH_PARENT) {
+                    // Child wants to be our size. So be it.
+                    resultSize = size;
+                    resultMode = MeasureSpec.EXACTLY;
+                } else if (childSize == LayoutParams.WRAP_CONTENT) {
+                    // Child wants to determine its own size. It can't be
+                    // bigger than us.
+                    resultSize = size;
+                    resultMode = MeasureSpec.AT_MOST;
+                }
+                break;
+
+            // Parent has imposed a maximum size on us
+            case MeasureSpec.AT_MOST:
+                if (childSize >= 0) {
+                    // Child wants a specific size... so be it
+                    resultSize = childSize;
+                    resultMode = MeasureSpec.EXACTLY;
+                } else if (childSize == LayoutParams.MATCH_PARENT) {
+                    // Child wants to be our size, but our size is not fixed.
+                    // Constrain child to not be bigger than us.
+                    resultSize = size;
+                    resultMode = MeasureSpec.AT_MOST;
+                } else if (childSize == LayoutParams.WRAP_CONTENT) {
+                    // Child wants to determine its own size. It can't be
+                    // bigger than us.
+                    resultSize = size;
+                    resultMode = MeasureSpec.AT_MOST;
+                }
+                break;
+
+            // Parent asked to see how big we want to be
+            case MeasureSpec.UNSPECIFIED:
+                if (childSize >= 0) {
+                    // Child wants a specific size... let him have it
+                    resultSize = childSize;
+                    resultMode = MeasureSpec.EXACTLY;
+                } else if (childSize == LayoutParams.MATCH_PARENT) {
+                    // Child wants to be our size... find out how big it should
+                    // be
+                    resultSize = 0;
+                    resultMode = MeasureSpec.UNSPECIFIED;
+                } else if (childSize == LayoutParams.WRAP_CONTENT) {
+                    // Child wants to determine its own size.... find out how
+                    // big it should be
+                    resultSize = 0;
+                    resultMode = MeasureSpec.UNSPECIFIED;
+                }
+                break;
+        }
+        return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
+    }
+
+    public static void measureComponent(GLView component, int widthSpec, int heightSpec) {
+        final LayoutParams lp = component.getLayoutParams();
+        final int componentWidthSpec = getComponentSpec(widthSpec, lp.width);
+        final int componentHeightSpec = getComponentSpec(heightSpec, lp.height);
+        component.measure(componentWidthSpec, componentHeightSpec);
+    }
+
+    public static void measureAllComponents(GLView parent, int widthSpec, int heightSpec) {
+        for (int i = 0, n = parent.getComponentCount(); i < n; i++) {
+            GLView component = parent.getComponent(i);
+            if (component.getVisibility() == GONE) {
+                continue;
+            }
+            measureComponent(component, widthSpec, heightSpec);
+        }
+    }
 
     public void startAnimation(CanvasAnimation animation, boolean atOnce) {
         GLRoot root = getGLRoot();
@@ -167,6 +302,25 @@ public class GLView implements TouchOwner {
             }
         }
         invalidate();
+    }
+
+    /**
+     * Returns the visibility status for this view.
+     *
+     * @return One of {@link #VISIBLE}, {@link #INVISIBLE}, or {@link #GONE}.
+     */
+    @Visibility
+    @SuppressWarnings("WrongConstant")
+    public int getVisibility() {
+        int visibility = mViewFlags & FLAG_INVISIBLE;
+
+        if (visibility == VISIBILITY_INVALID) {
+            visibility = VISIBLE;
+            mViewFlags &= ~FLAG_INVISIBLE;
+            mViewFlags |= visibility;
+        }
+
+        return visibility;
     }
 
     /**
@@ -191,25 +345,6 @@ public class GLView implements TouchOwner {
         } else {
             invalidate();
         }
-    }
-
-    /**
-     * Returns the visibility status for this view.
-     *
-     * @return One of {@link #VISIBLE}, {@link #INVISIBLE}, or {@link #GONE}.
-     */
-    @Visibility
-    @SuppressWarnings("WrongConstant")
-    public int getVisibility() {
-        int visibility = mViewFlags & FLAG_INVISIBLE;
-
-        if (visibility == VISIBILITY_INVALID) {
-            visibility = VISIBLE;
-            mViewFlags &= ~FLAG_INVISIBLE;
-            mViewFlags |= visibility;
-        }
-
-        return visibility;
     }
 
     // This should only be called on the content pane (the topmost GLView).
@@ -346,6 +481,16 @@ public class GLView implements TouchOwner {
     }
 
     /**
+     * Returns this GlView's identifier.
+     *
+     * @return a positive integer used to identify the view or {@link #NO_ID}
+     * if the view has no ID
+     */
+    public int getId() {
+        return mID;
+    }
+
+    /**
      * Sets the identifier for this GlView. The identifier does not have to be
      * unique in this GlView's hierarchy. The identifier should be a positive
      * number.
@@ -354,16 +499,6 @@ public class GLView implements TouchOwner {
      */
     public void setId(int id) {
         mID = id;
-    }
-
-    /**
-     * Returns this GlView's identifier.
-     *
-     * @return a positive integer used to identify the view or {@link #NO_ID}
-     *         if the view has no ID
-     */
-    public int getId() {
-        return mID;
     }
 
     public Rect bounds() {
@@ -451,7 +586,7 @@ public class GLView implements TouchOwner {
      * @param offset the number of pixels to offset the view by
      */
     public void offsetTopAndBottom(int offset) {
-        if (offset != 0){
+        if (offset != 0) {
             mBounds.offset(0, offset);
             dispatchNotifyPositionInRoot();
             invalidate();
@@ -464,7 +599,7 @@ public class GLView implements TouchOwner {
      * @param offset the number of pixels to offset the view by
      */
     public void offsetLeftAndRight(int offset) {
-        if (offset != 0){
+        if (offset != 0) {
             mBounds.offset(offset, 0);
             dispatchNotifyPositionInRoot();
             invalidate();
@@ -563,7 +698,7 @@ public class GLView implements TouchOwner {
     }
 
     protected boolean dispatchTouchEvent(MotionEvent event,
-            int x, int y, GLView component, boolean checkBounds) {
+                                         int x, int y, GLView component, boolean checkBounds) {
         Rect rect = component.mBounds;
         int left = rect.left;
         int top = rect.top;
@@ -769,6 +904,7 @@ public class GLView implements TouchOwner {
 
     /**
      * Get the rect of the view clipped by root rect
+     *
      * @param rect the result
      */
     public void getValidRect(Rect rect) {
@@ -828,7 +964,6 @@ public class GLView implements TouchOwner {
      * Returns the minimum height of the view.
      *
      * @return the minimum height the view will try to be.
-     *
      * @see #setMinimumHeight(int)
      */
     public int getMinimumHeight() {
@@ -841,7 +976,6 @@ public class GLView implements TouchOwner {
      * constrains it with less available height).
      *
      * @param minHeight The minimum height the view will try to be.
-     *
      * @see #getMinimumHeight()
      */
     public void setMinimumHeight(int minHeight) {
@@ -853,7 +987,6 @@ public class GLView implements TouchOwner {
      * Returns the minimum width of the view.
      *
      * @return the minimum width the view will try to be.
-     *
      * @see #setMinimumWidth(int)
      */
     public int getMinimumWidth() {
@@ -866,7 +999,6 @@ public class GLView implements TouchOwner {
      * constrains it with less available width).
      *
      * @param minWidth The minimum width the view will try to be.
-     *
      * @see #getMinimumWidth()
      */
     public void setMinimumWidth(int minWidth) {
@@ -892,173 +1024,6 @@ public class GLView implements TouchOwner {
             boolean changeSize, int left, int top, int right, int bottom) {
     }
 
-    /**
-     * Utility to return a default begin. Uses the supplied number as left or top.
-     *
-     * @param size the parent size
-     * @param specSize the child size
-     * @param paddingBeign the padding begin
-     * @param paddingFinish the padding finish
-     * @param position the {@link Gravity#POSITION_BEGIN} or {@link Gravity#POSITION_CENTER} or
-     *                 {@link Gravity#POSITION_FINISH}
-     * @return the begin size
-     */
-    public static int getDefaultBegin(int size, int specSize, int paddingBeign, int paddingFinish,
-            @Gravity.PositionMode int position) {
-        if (position == Gravity.POSITION_FINISH) {
-            return size - paddingFinish - specSize;
-        } else if (position == Gravity.POSITION_CENTER) {
-            return ((size - paddingBeign - paddingFinish) / 2) - (specSize / 2) + paddingBeign;
-        } else {
-            return paddingBeign;
-        }
-    }
-
-    /**
-     * Utility to return a default size. Uses the supplied size if the
-     * MeasureSpec imposed no constraints. Will get larger if allowed
-     * by the MeasureSpec.
-     *
-     * It works differently from {@link android.view.View#getDefaultSize(int, int)}.
-     * For {@link MeasureSpec#AT_MOST}, size is suggestion size
-     * if it is small then spec size or it is not zero,
-     * otherwise spec size.
-     *
-     * @param size Default size for this view
-     * @param measureSpec Constraints imposed by the parent
-     * @return The size this view should be.
-     */
-    public static int getDefaultSize(int size, int measureSpec) {
-        int result = size;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        switch (specMode) {
-            case MeasureSpec.UNSPECIFIED:
-                result = size;
-                break;
-            case MeasureSpec.EXACTLY:
-                result = specSize;
-                break;
-            case MeasureSpec.AT_MOST:
-                return size == 0 ? specSize : Math.min(size, specSize);
-        }
-        return result;
-    }
-
-    /**
-     * Utility to return a max size. Uses the supplied size if the
-     * MeasureSpec imposed no constraints. Will get larger if allowed
-     * by the MeasureSpec.
-     *
-     * It works the same as {@link android.view.View#getDefaultSize(int, int)}.
-     *
-     * @param size Default size for this view
-     * @param measureSpec Constraints imposed by the parent
-     * @return The size this view should be.
-     */
-    public static int getMaxSize(int size, int measureSpec) {
-        int result = size;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        switch (specMode) {
-            case MeasureSpec.UNSPECIFIED:
-                result = size;
-                break;
-            case MeasureSpec.EXACTLY:
-            case MeasureSpec.AT_MOST:
-                result = specSize;
-                break;
-        }
-        return result;
-    }
-
-    public static int getComponentSpec(int spec, int childSize) {
-        int specMode = MeasureSpec.getMode(spec);
-        int specSize = MeasureSpec.getSize(spec);
-
-        int size = Math.max(0, specSize);
-
-        int resultSize = 0;
-        int resultMode = 0;
-
-        switch (specMode) {
-            // Parent has imposed an exact size on us
-            case MeasureSpec.EXACTLY:
-                if (childSize >= 0) {
-                    resultSize = childSize;
-                    resultMode = MeasureSpec.EXACTLY;
-                } else if (childSize == LayoutParams.MATCH_PARENT) {
-                    // Child wants to be our size. So be it.
-                    resultSize = size;
-                    resultMode = MeasureSpec.EXACTLY;
-                } else if (childSize == LayoutParams.WRAP_CONTENT) {
-                    // Child wants to determine its own size. It can't be
-                    // bigger than us.
-                    resultSize = size;
-                    resultMode = MeasureSpec.AT_MOST;
-                }
-                break;
-
-            // Parent has imposed a maximum size on us
-            case MeasureSpec.AT_MOST:
-                if (childSize >= 0) {
-                    // Child wants a specific size... so be it
-                    resultSize = childSize;
-                    resultMode = MeasureSpec.EXACTLY;
-                } else if (childSize == LayoutParams.MATCH_PARENT) {
-                    // Child wants to be our size, but our size is not fixed.
-                    // Constrain child to not be bigger than us.
-                    resultSize = size;
-                    resultMode = MeasureSpec.AT_MOST;
-                } else if (childSize == LayoutParams.WRAP_CONTENT) {
-                    // Child wants to determine its own size. It can't be
-                    // bigger than us.
-                    resultSize = size;
-                    resultMode = MeasureSpec.AT_MOST;
-                }
-                break;
-
-            // Parent asked to see how big we want to be
-            case MeasureSpec.UNSPECIFIED:
-                if (childSize >= 0) {
-                    // Child wants a specific size... let him have it
-                    resultSize = childSize;
-                    resultMode = MeasureSpec.EXACTLY;
-                } else if (childSize == LayoutParams.MATCH_PARENT) {
-                    // Child wants to be our size... find out how big it should
-                    // be
-                    resultSize = 0;
-                    resultMode = MeasureSpec.UNSPECIFIED;
-                } else if (childSize == LayoutParams.WRAP_CONTENT) {
-                    // Child wants to determine its own size.... find out how
-                    // big it should be
-                    resultSize = 0;
-                    resultMode = MeasureSpec.UNSPECIFIED;
-                }
-                break;
-        }
-        return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
-    }
-
-    public static void measureComponent(GLView component, int widthSpec, int heightSpec) {
-        final LayoutParams lp = component.getLayoutParams();
-        final int componentWidthSpec = getComponentSpec(widthSpec, lp.width);
-        final int componentHeightSpec = getComponentSpec(heightSpec, lp.height);
-        component.measure(componentWidthSpec, componentHeightSpec);
-    }
-
-    public static void measureAllComponents(GLView parent, int widthSpec, int heightSpec) {
-        for (int i = 0, n = parent.getComponentCount(); i < n; i++) {
-            GLView component = parent.getComponent(i);
-            if (component.getVisibility() == GONE) {
-                continue;
-            }
-            measureComponent(component, widthSpec, heightSpec);
-        }
-    }
-
     public LayoutParams getLayoutParams() {
         return mLayoutParams;
     }
@@ -1076,7 +1041,7 @@ public class GLView implements TouchOwner {
     }
 
     protected boolean checkLayoutParams(LayoutParams p) {
-        return  p != null;
+        return p != null;
     }
 
     protected LayoutParams generateDefaultLayoutParams() {
@@ -1159,6 +1124,19 @@ public class GLView implements TouchOwner {
         }
     }
 
+    @IntDef({VISIBLE, INVISIBLE, GONE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Visibility {
+    }
+
+    public interface OnClickListener {
+        boolean onClick(GLView v);
+    }
+
+    public interface OnLongClickListener {
+        boolean onLongClick(GLView v);
+    }
+
     /**
      * A MeasureSpec encapsulates the layout requirements passed from parent to child.
      * Each MeasureSpec represents a requirement for either the width or the height.
@@ -1182,41 +1160,37 @@ public class GLView implements TouchOwner {
      * The child can be as large as it wants up to the specified size.
      * </dd>
      * </dl>
-     *
+     * <p>
      * MeasureSpecs are implemented as ints to reduce object allocation. This class
      * is provided to pack and unpack the &lt;size, mode&gt; tuple into the int.
      */
     public static class MeasureSpec {
         private static final int MODE_SHIFT = 30;
-        private static final int MODE_MASK  = 0x3 << MODE_SHIFT;
-
         /**
          * Measure specification mode: The parent has not imposed any constraint
          * on the child. It can be whatever size it wants.
          */
         public static final int UNSPECIFIED = 0 << MODE_SHIFT;
-
         /**
          * Measure specification mode: The parent has determined an exact size
          * for the child. The child is going to be given those bounds regardless
          * of how big it wants to be.
          */
-        public static final int EXACTLY     = 1 << MODE_SHIFT;
-
+        public static final int EXACTLY = 1 << MODE_SHIFT;
         /**
          * Measure specification mode: The child can be as large as it wants up
          * to the specified size.
          */
-        public static final int AT_MOST     = 2 << MODE_SHIFT;
-
+        public static final int AT_MOST = 2 << MODE_SHIFT;
+        private static final int MODE_MASK = 0x3 << MODE_SHIFT;
         /**
          * The max size allowed
          */
-        public static final int MAX_SIZE    = ~MODE_MASK;
+        public static final int MAX_SIZE = ~MODE_MASK;
 
         /**
          * Creates a measure specification based on the supplied size and mode.
-         *
+         * <p>
          * The mode must always be one of the following:
          * <ul>
          *  <li>{@link #UNSPECIFIED}</li>
@@ -1244,8 +1218,8 @@ public class GLView implements TouchOwner {
          *
          * @param measureSpec the measure specification to extract the mode from
          * @return {@link #UNSPECIFIED},
-         *         {@link #AT_MOST} or
-         *         {@link #EXACTLY}
+         * {@link #AT_MOST} or
+         * {@link #EXACTLY}
          */
         public static int getMode(int measureSpec) {
             return (measureSpec & MODE_MASK);
@@ -1324,10 +1298,10 @@ public class GLView implements TouchOwner {
          * Creates a new set of layout parameters with the specified width
          * and height.
          *
-         * @param width the width, either {@link #WRAP_CONTENT},
-         *        {@link #MATCH_PARENT}, or a fixed size in pixels
+         * @param width  the width, either {@link #WRAP_CONTENT},
+         *               {@link #MATCH_PARENT}, or a fixed size in pixels
          * @param height the height, either {@link #WRAP_CONTENT},
-         *        {@link #MATCH_PARENT}, or a fixed size in pixels
+         *               {@link #MATCH_PARENT}, or a fixed size in pixels
          */
         public LayoutParams(int width, int height) {
             this.width = width;

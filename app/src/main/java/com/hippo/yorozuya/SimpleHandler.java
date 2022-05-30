@@ -23,14 +23,14 @@ public final class SimpleHandler extends Handler {
 
     private static Handler sInstance;
 
+    private SimpleHandler(Looper mainLooper) {
+        super(mainLooper);
+    }
+
     public static Handler getInstance() {
         if (sInstance == null) {
             sInstance = new Handler(Looper.getMainLooper());
         }
         return sInstance;
-    }
-
-    private SimpleHandler(Looper mainLooper) {
-        super(mainLooper);
     }
 }

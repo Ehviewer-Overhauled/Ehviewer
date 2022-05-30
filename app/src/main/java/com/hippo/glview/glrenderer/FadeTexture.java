@@ -69,7 +69,7 @@ public abstract class FadeTexture implements Texture {
     }
 
     protected float getRatio() {
-        float r = (float)(now() - mStartTime) / DURATION;
+        float r = (float) (now() - mStartTime) / DURATION;
         return MathUtils.clamp(1.0f - r, 0.0f, 1.0f);
     }
 

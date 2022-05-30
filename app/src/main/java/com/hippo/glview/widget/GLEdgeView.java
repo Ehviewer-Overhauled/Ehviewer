@@ -28,15 +28,10 @@ import java.lang.annotation.RetentionPolicy;
 
 public final class GLEdgeView extends GLView {
 
-    @IntDef({TOP, LEFT, BOTTOM, RIGHT})
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface Direction {}
-
     public static final int TOP = 0;
     public static final int LEFT = 1;
     public static final int BOTTOM = 2;
     public static final int RIGHT = 3;
-
     // Each edge effect has a transform matrix, and each matrix has 16 elements.
     // We put all the elements in one array. These constants specify the
     // starting index of each matrix.
@@ -44,10 +39,8 @@ public final class GLEdgeView extends GLView {
     private static final int LEFT_M = LEFT * 16;
     private static final int BOTTOM_M = BOTTOM * 16;
     private static final int RIGHT_M = RIGHT * 16;
-
     private final GLEdgeEffect[] mEffect = new GLEdgeEffect[4];
     private final float[] mMatrix = new float[4 * 16];
-
     public GLEdgeView(int color) {
         for (int i = 0; i < 4; i++) {
             mEffect[i] = new GLEdgeEffect(color);
@@ -159,5 +152,10 @@ public final class GLEdgeView extends GLView {
 
     public boolean isFinished(int direction) {
         return mEffect[direction].isFinished();
+    }
+
+    @IntDef({TOP, LEFT, BOTTOM, RIGHT})
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface Direction {
     }
 }

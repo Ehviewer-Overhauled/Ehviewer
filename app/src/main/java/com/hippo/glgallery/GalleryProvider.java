@@ -38,11 +38,9 @@ public abstract class GalleryProvider {
     public static final int STATE_ERROR = -2;
 
     private final ConcurrentPool<NotifyTask> mNotifyTaskPool = new ConcurrentPool<>(5);
+    private final ImageCache mImageCache = new ImageCache();
     private volatile Listener mListener;
     private volatile GLRoot mGLRoot;
-
-    private final ImageCache mImageCache = new ImageCache();
-
     private boolean mStarted = false;
 
     @UiThread
@@ -67,8 +65,8 @@ public abstract class GalleryProvider {
 
     /**
      * @return {@link #STATE_WAIT} for wait,
-     *          {@link #STATE_ERROR} for error, {@link #getError()} to get error message,
-     *          0 for empty
+     * {@link #STATE_ERROR} for error, {@link #getError()} to get error message,
+     * 0 for empty
      */
     public abstract int size();
 
@@ -154,28 +152,36 @@ public abstract class GalleryProvider {
         glRoot.addOnGLIdleListener(task);
     }
 
-    private static class NotifyTask implements GLRoot.OnGLIdleListener {
+    public interface Listener {
 
-        @IntDef({TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface Type {}
+        void onDataChanged();
+
+        void onPageWait(int index);
+
+        void onPagePercent(int index, float percent);
+
+        void onPageSucceed(int index, ImageWrapper image);
+
+        void onPageFailed(int index, String error);
+
+        void onDataChanged(int index);
+    }
+
+    private static class NotifyTask implements GLRoot.OnGLIdleListener {
 
         public static final int TYPE_DATA_CHANGED = 0;
         public static final int TYPE_WAIT = 1;
         public static final int TYPE_PERCENT = 2;
         public static final int TYPE_SUCCEED = 3;
         public static final int TYPE_FAILED = 4;
-
         private final Listener mListener;
         private final ConcurrentPool<NotifyTask> mPool;
-
         @Type
         private int mType;
         private int mIndex;
         private float mPercent;
         private ImageWrapper mImage;
         private String mError;
-
         public NotifyTask(Listener listener, ConcurrentPool<NotifyTask> pool) {
             mListener = listener;
             mPool = pool;
@@ -221,6 +227,11 @@ public abstract class GalleryProvider {
 
             return false;
         }
+
+        @IntDef({TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED})
+        @Retention(RetentionPolicy.SOURCE)
+        public @interface Type {
+        }
     }
 
     private static class ImageCache extends LruCache<Integer, ImageWrapper> {
@@ -253,20 +264,5 @@ public abstract class GalleryProvider {
                 oldValue.release();
             }
         }
-    }
-
-    public interface Listener {
-
-        void onDataChanged();
-
-        void onPageWait(int index);
-
-        void onPagePercent(int index, float percent);
-
-        void onPageSucceed(int index, ImageWrapper image);
-
-        void onPageFailed(int index, String error);
-
-        void onDataChanged(int index);
     }
 }

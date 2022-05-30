@@ -17,7 +17,8 @@
 package com.hippo.yorozuya;
 
 public final class AssertUtils {
-    private AssertUtils() {}
+    private AssertUtils() {
+    }
 
     public static void assertTrue(boolean cond) {
         assertTrue("Condition has to be true.", cond);

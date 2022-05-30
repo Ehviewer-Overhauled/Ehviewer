@@ -28,6 +28,10 @@ import android.graphics.RectF;
 //
 public interface GLCanvas {
 
+    int SAVE_FLAG_ALL = 0xFFFFFFFF;
+    int SAVE_FLAG_ALPHA = 0x01;
+    int SAVE_FLAG_MATRIX = 0x02;
+
     GLId getGLId();
 
     // Tells GLCanvas the size of the underlying GL surface. This should be
@@ -42,10 +46,10 @@ public interface GLCanvas {
 
     void clearBuffer(float[] argb);
 
+    float getAlpha();
+
     // Sets and gets the current alpha, alpha must be in [0, 1].
     void setAlpha(float alpha);
-
-    float getAlpha();
 
     // (current alpha) = (current alpha) * alpha
     void multiplyAlpha(float alpha);
@@ -68,10 +72,6 @@ public interface GLCanvas {
     // Same as save(), but only save those specified in saveFlags.
     void save(int saveFlags);
 
-    int SAVE_FLAG_ALL = 0xFFFFFFFF;
-    int SAVE_FLAG_ALPHA = 0x01;
-    int SAVE_FLAG_MATRIX = 0x02;
-
     // Pops from the top of the stack as current configuration state (matrix,
     // alpha, and clip). This call balances a previous call to save(), and is
     // used to remove all modifications to the configuration state since the
@@ -89,11 +89,11 @@ public interface GLCanvas {
     // Draws a oval using the specified paint for (cx, cy, radiusX, radiusY)
     // (Both end points are included).
     void drawOval(float cx, float cy, float radiusX, float radiusY,
-            GLPaint paint);
+                  GLPaint paint);
 
     // Draw a arc inside a rect
     void drawArc(float cx, float cy, float radiusX, float radiusY,
-            float sweepAngle, GLPaint paint);
+                 float sweepAngle, GLPaint paint);
 
     // Fills the specified rectangle with the specified color.
     void fillRect(float x, float y, float width, float height, int color);
@@ -160,8 +160,8 @@ public interface GLCanvas {
      * Initializes the texture to a size by calling texImage2D on it.
      *
      * @param texture The texture to initialize the size.
-     * @param format The texture format (e.g. GL_RGBA)
-     * @param type The texture type (e.g. GL_UNSIGNED_BYTE)
+     * @param format  The texture format (e.g. GL_RGBA)
+     * @param type    The texture type (e.g. GL_UNSIGNED_BYTE)
      */
     void initializeTextureSize(BasicTexture texture, int format, int type);
 
@@ -169,7 +169,7 @@ public interface GLCanvas {
      * Initializes the texture to a size by calling texImage2D on it.
      *
      * @param texture The texture to initialize the size.
-     * @param bitmap The bitmap to initialize the bitmap with.
+     * @param bitmap  The bitmap to initialize the bitmap with.
      */
     void initializeTexture(BasicTexture texture, Bitmap bitmap);
 
@@ -178,11 +178,11 @@ public interface GLCanvas {
      *
      * @param texture The target texture to write to.
      * @param xOffset Specifies a texel offset in the x direction within the
-     *            texture array.
+     *                texture array.
      * @param yOffset Specifies a texel offset in the y direction within the
-     *            texture array.
-     * @param format The texture format (e.g. GL_RGBA)
-     * @param type The texture type (e.g. GL_UNSIGNED_BYTE)
+     *                texture array.
+     * @param format  The texture format (e.g. GL_RGBA)
+     * @param type    The texture type (e.g. GL_UNSIGNED_BYTE)
      */
     void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap, int format, int type);
 
@@ -214,9 +214,9 @@ public interface GLCanvas {
      * It only considers the lower-left and upper-right corners as the bounds.
      *
      * @param bounds The output bounds to write to.
-     * @param x The left side of the input rectangle.
-     * @param y The bottom of the input rectangle.
-     * @param width The width of the input rectangle.
+     * @param x      The left side of the input rectangle.
+     * @param y      The bottom of the input rectangle.
+     * @param width  The width of the input rectangle.
      * @param height The height of the input rectangle.
      */
     void getBounds(Rect bounds, int x, int y, int width, int height);

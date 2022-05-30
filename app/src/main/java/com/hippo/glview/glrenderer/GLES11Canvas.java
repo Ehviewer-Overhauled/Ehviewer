@@ -24,13 +24,16 @@ import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
+
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.collect.IntList;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
@@ -54,20 +57,27 @@ public class GLES11Canvas implements GLCanvas {
     private static final int OFFSET_LAST = OFFSET_DRAW_CIRCLE + COUNT_CIRCLE_VERTEX + 1;
 
     private static final float[] BOX_COORDINATES = new float[OFFSET_LAST * 2];
+    // TODO: the code only work for 2D should get fixed for 3D or removed
+    private static final int MSKEW_X = 4;
+    private static final int MSKEW_Y = 1;
+    private static final int MSCALE_X = 0;
+    private static final int MSCALE_Y = 5;
+    private static float[] sCropRect = new float[4];
+    private static GLId mGLId = new GLES11IdImpl();
 
     static {
         float[] temp = {
-            0, 0, // Fill rectangle
-            1, 0,
-            0, 1,
-            1, 1,
-            0, 0, // Draw line
-            1, 1,
-            0, 0, // Draw rectangle outline
-            0, 1,
-            1, 1,
-            1, 0,
-            0.5f, 0.5f // Fill circle
+                0, 0, // Fill rectangle
+                1, 0,
+                0, 1,
+                1, 1,
+                0, 0, // Draw line
+                1, 1,
+                0, 0, // Draw rectangle outline
+                0, 1,
+                1, 1,
+                1, 0,
+                0.5f, 0.5f // Fill circle
         };
         System.arraycopy(temp, 0, BOX_COORDINATES, 0, temp.length);
 
@@ -88,47 +98,35 @@ public class GLES11Canvas implements GLCanvas {
         }
     }
 
-    private GL11 mGL;
-
     private final float mMatrixValues[] = new float[16];
     private final float mTextureMatrixValues[] = new float[16];
-
     // The results of mapPoints are stored in this buffer, and the order is
     // x1, y1, x2, y2.
     private final float mMapPointsBuffer[] = new float[4];
-
     private final float mTextureColor[] = new float[4];
-
-    private int mBoxCoords;
-
-    private GLState mGLState;
     private final ArrayList<RawTexture> mTargetStack = new ArrayList<RawTexture>();
-
-    private float mAlpha;
     private final ArrayList<ConfigState> mRestoreStack = new ArrayList<ConfigState>();
-    private ConfigState mRecycledRestoreAction;
-
     private final RectF mDrawTextureSourceRect = new RectF();
     private final RectF mDrawTextureTargetRect = new RectF();
     private final float[] mTempMatrix = new float[32];
     private final IntList mUnboundTextures = new IntList();
     private final IntList mDeleteBuffers = new IntList();
-    private int mScreenWidth;
-    private int mScreenHeight;
-    private boolean mBlendEnabled = true;
-    private int mFrameBuffer[] = new int[1];
-    private static float[] sCropRect = new float[4];
-
-    private RawTexture mTargetTexture;
-
     // Drawing statistics
     int mCountDrawLine;
     int mCountFillRect;
     int mCountDrawMesh;
     int mCountTextureRect;
     int mCountTextureOES;
-
-    private static GLId mGLId = new GLES11IdImpl();
+    private GL11 mGL;
+    private int mBoxCoords;
+    private GLState mGLState;
+    private float mAlpha;
+    private ConfigState mRecycledRestoreAction;
+    private int mScreenWidth;
+    private int mScreenHeight;
+    private boolean mBlendEnabled = true;
+    private int mFrameBuffer[] = new int[1];
+    private RawTexture mTargetTexture;
 
     public GLES11Canvas(GL11 gl) {
         mGL = gl;
@@ -158,6 +156,80 @@ public class GLES11Canvas implements GLCanvas {
         // mMatrixValues and mAlpha will be initialized in setSize()
     }
 
+    private static ByteBuffer allocateDirectNativeOrderBuffer(int size) {
+        return ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+    }
+
+    // This function changes the source coordinate to the texture coordinates.
+    // It also clips the source and target coordinates if it is beyond the
+    // bound of the texture.
+    private static void convertCoordinate(RectF source, RectF target,
+                                          BasicTexture texture) {
+
+        int width = texture.getWidth();
+        int height = texture.getHeight();
+        int texWidth = texture.getTextureWidth();
+        int texHeight = texture.getTextureHeight();
+        // Convert to texture coordinates
+        source.left /= texWidth;
+        source.right /= texWidth;
+        source.top /= texHeight;
+        source.bottom /= texHeight;
+
+        // Clip if the rendering range is beyond the bound of the texture.
+        float xBound = (float) width / texWidth;
+        if (source.right > xBound) {
+            target.right = target.left + target.width() *
+                    (xBound - source.left) / source.width();
+            source.right = xBound;
+        }
+        float yBound = (float) height / texHeight;
+        if (source.bottom > yBound) {
+            target.bottom = target.top + target.height() *
+                    (yBound - source.top) / source.height();
+            source.bottom = yBound;
+        }
+    }
+
+    private static boolean isMatrixRotatedOrFlipped(float matrix[]) {
+        final float eps = 1e-5f;
+        return Math.abs(matrix[MSKEW_X]) > eps
+                || Math.abs(matrix[MSKEW_Y]) > eps
+                || matrix[MSCALE_X] < -eps
+                || matrix[MSCALE_Y] > eps;
+    }
+
+    private static void checkFramebufferStatus(GL11ExtensionPack gl11ep) {
+        int status = gl11ep.glCheckFramebufferStatusOES(GL11ExtensionPack.GL_FRAMEBUFFER_OES);
+        if (status != GL11ExtensionPack.GL_FRAMEBUFFER_COMPLETE_OES) {
+            String msg = "";
+            switch (status) {
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_OES:
+                    msg = "FRAMEBUFFER_FORMATS";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_OES:
+                    msg = "FRAMEBUFFER_ATTACHMENT";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_OES:
+                    msg = "FRAMEBUFFER_MISSING_ATTACHMENT";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_OES:
+                    msg = "FRAMEBUFFER_DRAW_BUFFER";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_OES:
+                    msg = "FRAMEBUFFER_READ_BUFFER";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_UNSUPPORTED_OES:
+                    msg = "FRAMEBUFFER_UNSUPPORTED";
+                    break;
+                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_OES:
+                    msg = "FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
+                    break;
+            }
+            throw new RuntimeException(msg + ":" + Integer.toHexString(status));
+        }
+    }
+
     @Override
     public void setSize(int width, int height) {
         if (mTargetTexture == null) {
@@ -185,22 +257,18 @@ public class GLES11Canvas implements GLCanvas {
     }
 
     @Override
-    public void setAlpha(float alpha) {
-        mAlpha = alpha;
-    }
-
-    @Override
     public float getAlpha() {
         return mAlpha;
     }
 
     @Override
-    public void multiplyAlpha(float alpha) {
-        mAlpha *= alpha;
+    public void setAlpha(float alpha) {
+        mAlpha = alpha;
     }
 
-    private static ByteBuffer allocateDirectNativeOrderBuffer(int size) {
-        return ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+    @Override
+    public void multiplyAlpha(float alpha) {
+        mAlpha *= alpha;
     }
 
     @Override
@@ -362,7 +430,7 @@ public class GLES11Canvas implements GLCanvas {
 
     @Override
     public void drawMesh(BasicTexture tex, int x, int y, int xyBuffer,
-            int uvBuffer, int indexBuffer, int indexCount) {
+                         int uvBuffer, int indexBuffer, int indexCount) {
         float alpha = mAlpha;
         if (!bindTexture(tex)) return;
 
@@ -458,7 +526,7 @@ public class GLES11Canvas implements GLCanvas {
     }
 
     private void drawTexture(BasicTexture texture,
-            int x, int y, int width, int height, float alpha) {
+                             int x, int y, int width, int height, float alpha) {
         if (width <= 0 || height <= 0) return;
 
         mGLState.setBlendEnabled(mBlendEnabled
@@ -489,7 +557,7 @@ public class GLES11Canvas implements GLCanvas {
 
     @Override
     public void drawTexture(BasicTexture texture, float[] mTextureTransform,
-            int x, int y, int w, int h) {
+                            int x, int y, int w, int h) {
         mGLState.setBlendEnabled(mBlendEnabled
                 && (!texture.isOpaque() || mAlpha < OPAQUE_ALPHA));
         if (!bindTexture(texture)) return;
@@ -498,40 +566,9 @@ public class GLES11Canvas implements GLCanvas {
         textureRect(x, y, w, h);
     }
 
-    // This function changes the source coordinate to the texture coordinates.
-    // It also clips the source and target coordinates if it is beyond the
-    // bound of the texture.
-    private static void convertCoordinate(RectF source, RectF target,
-            BasicTexture texture) {
-
-        int width = texture.getWidth();
-        int height = texture.getHeight();
-        int texWidth = texture.getTextureWidth();
-        int texHeight = texture.getTextureHeight();
-        // Convert to texture coordinates
-        source.left /= texWidth;
-        source.right /= texWidth;
-        source.top /= texHeight;
-        source.bottom /= texHeight;
-
-        // Clip if the rendering range is beyond the bound of the texture.
-        float xBound = (float) width / texWidth;
-        if (source.right > xBound) {
-            target.right = target.left + target.width() *
-                    (xBound - source.left) / source.width();
-            source.right = xBound;
-        }
-        float yBound = (float) height / texHeight;
-        if (source.bottom > yBound) {
-            target.bottom = target.top + target.height() *
-                    (yBound - source.top) / source.height();
-            source.bottom = yBound;
-        }
-    }
-
     @Override
     public void drawMixed(BasicTexture from,
-            int toColor, float ratio, int x, int y, int w, int h) {
+                          int toColor, float ratio, int x, int y, int w, int h) {
         drawMixed(from, toColor, ratio, x, y, w, h, mAlpha);
     }
 
@@ -594,7 +631,7 @@ public class GLES11Canvas implements GLCanvas {
 
     @Override
     public void drawMixed(BasicTexture from, int toColor, float ratio,
-            RectF source, RectF target) {
+                          RectF source, RectF target) {
         if (target.width() <= 0 || target.height() <= 0) return;
 
         if (ratio <= 0.01f) {
@@ -628,7 +665,7 @@ public class GLES11Canvas implements GLCanvas {
     }
 
     private void drawMixed(BasicTexture from, int toColor,
-            float ratio, int x, int y, int width, int height, float alpha) {
+                           float ratio, int x, int y, int width, int height, float alpha) {
         // change from 0 to 0.01f to prevent getting divided by zero below
         if (ratio <= 0.01f) {
             drawTexture(from, x, y, width, height, alpha);
@@ -652,18 +689,270 @@ public class GLES11Canvas implements GLCanvas {
         mGLState.setTexEnvMode(GL11.GL_REPLACE);
     }
 
-    // TODO: the code only work for 2D should get fixed for 3D or removed
-    private static final int MSKEW_X = 4;
-    private static final int MSKEW_Y = 1;
-    private static final int MSCALE_X = 0;
-    private static final int MSCALE_Y = 5;
+    @Override
+    public void clearBuffer(float[] argb) {
+        if (argb != null && argb.length == 4) {
+            mGL.glClearColor(argb[1], argb[2], argb[3], argb[0]);
+        } else {
+            mGL.glClearColor(0, 0, 0, 1);
+        }
+        mGL.glClear(GL10.GL_COLOR_BUFFER_BIT);
+    }
 
-    private static boolean isMatrixRotatedOrFlipped(float matrix[]) {
-        final float eps = 1e-5f;
-        return Math.abs(matrix[MSKEW_X]) > eps
-                || Math.abs(matrix[MSKEW_Y]) > eps
-                || matrix[MSCALE_X] < -eps
-                || matrix[MSCALE_Y] > eps;
+    @Override
+    public void clearBuffer() {
+        clearBuffer(null);
+    }
+
+    private void setTextureCoords(RectF source) {
+        setTextureCoords(source.left, source.top, source.right, source.bottom);
+    }
+
+    private void setTextureCoords(float left, float top,
+                                  float right, float bottom) {
+        mGL.glMatrixMode(GL11.GL_TEXTURE);
+        mTextureMatrixValues[0] = right - left;
+        mTextureMatrixValues[5] = bottom - top;
+        mTextureMatrixValues[10] = 1;
+        mTextureMatrixValues[12] = left;
+        mTextureMatrixValues[13] = top;
+        mTextureMatrixValues[15] = 1;
+        mGL.glLoadMatrixf(mTextureMatrixValues, 0);
+        mGL.glMatrixMode(GL11.GL_MODELVIEW);
+    }
+
+    private void setTextureCoords(float[] mTextureTransform) {
+        mGL.glMatrixMode(GL11.GL_TEXTURE);
+        mGL.glLoadMatrixf(mTextureTransform, 0);
+        mGL.glMatrixMode(GL11.GL_MODELVIEW);
+    }
+
+    // unloadTexture and deleteBuffer can be called from the finalizer thread,
+    // so we synchronized on the mUnboundTextures object.
+    @Override
+    public boolean unloadTexture(BasicTexture t) {
+        synchronized (mUnboundTextures) {
+            if (!t.isLoaded()) return false;
+            mUnboundTextures.add(t.mId);
+            return true;
+        }
+    }
+
+    @Override
+    public void deleteBuffer(int bufferId) {
+        synchronized (mUnboundTextures) {
+            mDeleteBuffers.add(bufferId);
+        }
+    }
+
+    @Override
+    public void deleteRecycledResources() {
+        synchronized (mUnboundTextures) {
+            IntList ids = mUnboundTextures;
+            if (ids.size() > 0) {
+                mGLId.glDeleteTextures(mGL, ids.size(), ids.getInternalArray(), 0);
+                ids.clear();
+            }
+
+            ids = mDeleteBuffers;
+            if (ids.size() > 0) {
+                mGLId.glDeleteBuffers(mGL, ids.size(), ids.getInternalArray(), 0);
+                ids.clear();
+            }
+        }
+    }
+
+    @Override
+    public void save() {
+        save(SAVE_FLAG_ALL);
+    }
+
+    @Override
+    public void save(int saveFlags) {
+        ConfigState config = obtainRestoreConfig();
+
+        if ((saveFlags & SAVE_FLAG_ALPHA) != 0) {
+            config.mAlpha = mAlpha;
+        } else {
+            config.mAlpha = -1;
+        }
+
+        if ((saveFlags & SAVE_FLAG_MATRIX) != 0) {
+            System.arraycopy(mMatrixValues, 0, config.mMatrix, 0, 16);
+        } else {
+            config.mMatrix[0] = Float.NEGATIVE_INFINITY;
+        }
+
+        mRestoreStack.add(config);
+    }
+
+    @Override
+    public void restore() {
+        if (mRestoreStack.isEmpty()) throw new IllegalStateException();
+        ConfigState config = mRestoreStack.remove(mRestoreStack.size() - 1);
+        config.restore(this);
+        freeRestoreConfig(config);
+    }
+
+    private void freeRestoreConfig(ConfigState action) {
+        action.mNextFree = mRecycledRestoreAction;
+        mRecycledRestoreAction = action;
+    }
+
+    private ConfigState obtainRestoreConfig() {
+        if (mRecycledRestoreAction != null) {
+            ConfigState result = mRecycledRestoreAction;
+            mRecycledRestoreAction = result.mNextFree;
+            return result;
+        }
+        return new ConfigState();
+    }
+
+    @Override
+    public void dumpStatisticsAndClear() {
+        String line = String.format(
+                "MESH:%d, TEX_OES:%d, TEX_RECT:%d, FILL_RECT:%d, LINE:%d",
+                mCountDrawMesh, mCountTextureRect, mCountTextureOES,
+                mCountFillRect, mCountDrawLine);
+        mCountDrawMesh = 0;
+        mCountTextureRect = 0;
+        mCountTextureOES = 0;
+        mCountFillRect = 0;
+        mCountDrawLine = 0;
+        Log.d(TAG, line);
+    }
+
+    private void saveTransform() {
+        System.arraycopy(mMatrixValues, 0, mTempMatrix, 0, 16);
+    }
+
+    private void restoreTransform() {
+        System.arraycopy(mTempMatrix, 0, mMatrixValues, 0, 16);
+    }
+
+    private void setRenderTarget(RawTexture texture) {
+        GL11ExtensionPack gl11ep = (GL11ExtensionPack) mGL;
+
+        if (mTargetTexture == null && texture != null) {
+            mGLId.glGenBuffers(1, mFrameBuffer, 0);
+            gl11ep.glBindFramebufferOES(
+                    GL11ExtensionPack.GL_FRAMEBUFFER_OES, mFrameBuffer[0]);
+        }
+        if (mTargetTexture != null && texture == null) {
+            gl11ep.glBindFramebufferOES(GL11ExtensionPack.GL_FRAMEBUFFER_OES, 0);
+            gl11ep.glDeleteFramebuffersOES(1, mFrameBuffer, 0);
+        }
+
+        mTargetTexture = texture;
+        if (texture == null) {
+            setSize(mScreenWidth, mScreenHeight);
+        } else {
+            setSize(texture.getWidth(), texture.getHeight());
+
+            if (!texture.isLoaded()) texture.prepare(this);
+
+            gl11ep.glFramebufferTexture2DOES(
+                    GL11ExtensionPack.GL_FRAMEBUFFER_OES,
+                    GL11ExtensionPack.GL_COLOR_ATTACHMENT0_OES,
+                    GL11.GL_TEXTURE_2D, texture.getId(), 0);
+
+            checkFramebufferStatus(gl11ep);
+        }
+    }
+
+    @Override
+    public void endRenderTarget() {
+        RawTexture texture = mTargetStack.remove(mTargetStack.size() - 1);
+        setRenderTarget(texture);
+        restore(); // restore matrix and alpha
+    }
+
+    @Override
+    public void beginRenderTarget(RawTexture texture) {
+        save(); // save matrix and alpha
+        mTargetStack.add(mTargetTexture);
+        setRenderTarget(texture);
+    }
+
+    @Override
+    public void setTextureParameters(BasicTexture texture) {
+        int width = texture.getWidth();
+        int height = texture.getHeight();
+        // Define a vertically flipped crop rectangle for OES_draw_texture.
+        // The four values in sCropRect are: left, bottom, width, and
+        // height. Negative value of width or height means flip.
+        sCropRect[0] = 0;
+        sCropRect[1] = height;
+        sCropRect[2] = width;
+        sCropRect[3] = -height;
+
+        // Set texture parameters.
+        int target = texture.getTarget();
+        mGL.glBindTexture(target, texture.getId());
+        mGL.glTexParameterfv(target, GL11Ext.GL_TEXTURE_CROP_RECT_OES, sCropRect, 0);
+        mGL.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP_TO_EDGE);
+        mGL.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP_TO_EDGE);
+        mGL.glTexParameterf(target, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        mGL.glTexParameterf(target, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+    }
+
+    @Override
+    public void initializeTextureSize(BasicTexture texture, int format, int type) {
+        int target = texture.getTarget();
+        mGL.glBindTexture(target, texture.getId());
+        int width = texture.getTextureWidth();
+        int height = texture.getTextureHeight();
+        mGL.glTexImage2D(target, 0, format, width, height, 0, format, type, null);
+    }
+
+    @Override
+    public void initializeTexture(BasicTexture texture, Bitmap bitmap) {
+        int target = texture.getTarget();
+        mGL.glBindTexture(target, texture.getId());
+        GLUtils.texImage2D(target, 0, bitmap, 0);
+    }
+
+    @Override
+    public void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap,
+                              int format, int type) {
+        int target = texture.getTarget();
+        mGL.glBindTexture(target, texture.getId());
+        GLUtils.texSubImage2D(target, 0, xOffset, yOffset, bitmap, format, type);
+    }
+
+    @Override
+    public int uploadBuffer(FloatBuffer buf) {
+        return uploadBuffer(buf, Float.SIZE / Byte.SIZE);
+    }
+
+    @Override
+    public int uploadBuffer(ByteBuffer buf) {
+        return uploadBuffer(buf, 1);
+    }
+
+    private int uploadBuffer(Buffer buf, int elementSize) {
+        int[] bufferIds = new int[1];
+        mGLId.glGenBuffers(bufferIds.length, bufferIds, 0);
+        int bufferId = bufferIds[0];
+        mGL.glBindBuffer(GL11.GL_ARRAY_BUFFER, bufferId);
+        mGL.glBufferData(GL11.GL_ARRAY_BUFFER, buf.capacity() * elementSize, buf,
+                GL11.GL_STATIC_DRAW);
+        return bufferId;
+    }
+
+    @Override
+    public void recoverFromLightCycle() {
+        // This is only required for GLES20
+    }
+
+    @Override
+    public void getBounds(Rect bounds, int x, int y, int width, int height) {
+        // This is only required for GLES20
+    }
+
+    @Override
+    public GLId getGLId() {
+        return mGLId;
     }
 
     private static class GLState {
@@ -768,125 +1057,6 @@ public class GLES11Canvas implements GLCanvas {
         }
     }
 
-    @Override
-    public void clearBuffer(float[] argb) {
-        if(argb != null && argb.length == 4) {
-            mGL.glClearColor(argb[1], argb[2], argb[3], argb[0]);
-        } else {
-            mGL.glClearColor(0, 0, 0, 1);
-        }
-        mGL.glClear(GL10.GL_COLOR_BUFFER_BIT);
-    }
-
-    @Override
-    public void clearBuffer() {
-        clearBuffer(null);
-    }
-
-    private void setTextureCoords(RectF source) {
-        setTextureCoords(source.left, source.top, source.right, source.bottom);
-    }
-
-    private void setTextureCoords(float left, float top,
-            float right, float bottom) {
-        mGL.glMatrixMode(GL11.GL_TEXTURE);
-        mTextureMatrixValues[0] = right - left;
-        mTextureMatrixValues[5] = bottom - top;
-        mTextureMatrixValues[10] = 1;
-        mTextureMatrixValues[12] = left;
-        mTextureMatrixValues[13] = top;
-        mTextureMatrixValues[15] = 1;
-        mGL.glLoadMatrixf(mTextureMatrixValues, 0);
-        mGL.glMatrixMode(GL11.GL_MODELVIEW);
-    }
-
-    private void setTextureCoords(float[] mTextureTransform) {
-        mGL.glMatrixMode(GL11.GL_TEXTURE);
-        mGL.glLoadMatrixf(mTextureTransform, 0);
-        mGL.glMatrixMode(GL11.GL_MODELVIEW);
-    }
-
-    // unloadTexture and deleteBuffer can be called from the finalizer thread,
-    // so we synchronized on the mUnboundTextures object.
-    @Override
-    public boolean unloadTexture(BasicTexture t) {
-        synchronized (mUnboundTextures) {
-            if (!t.isLoaded()) return false;
-            mUnboundTextures.add(t.mId);
-            return true;
-        }
-    }
-
-    @Override
-    public void deleteBuffer(int bufferId) {
-        synchronized (mUnboundTextures) {
-            mDeleteBuffers.add(bufferId);
-        }
-    }
-
-    @Override
-    public void deleteRecycledResources() {
-        synchronized (mUnboundTextures) {
-            IntList ids = mUnboundTextures;
-            if (ids.size() > 0) {
-                mGLId.glDeleteTextures(mGL, ids.size(), ids.getInternalArray(), 0);
-                ids.clear();
-            }
-
-            ids = mDeleteBuffers;
-            if (ids.size() > 0) {
-                mGLId.glDeleteBuffers(mGL, ids.size(), ids.getInternalArray(), 0);
-                ids.clear();
-            }
-        }
-    }
-
-    @Override
-    public void save() {
-        save(SAVE_FLAG_ALL);
-    }
-
-    @Override
-    public void save(int saveFlags) {
-        ConfigState config = obtainRestoreConfig();
-
-        if ((saveFlags & SAVE_FLAG_ALPHA) != 0) {
-            config.mAlpha = mAlpha;
-        } else {
-            config.mAlpha = -1;
-        }
-
-        if ((saveFlags & SAVE_FLAG_MATRIX) != 0) {
-            System.arraycopy(mMatrixValues, 0, config.mMatrix, 0, 16);
-        } else {
-            config.mMatrix[0] = Float.NEGATIVE_INFINITY;
-        }
-
-        mRestoreStack.add(config);
-    }
-
-    @Override
-    public void restore() {
-        if (mRestoreStack.isEmpty()) throw new IllegalStateException();
-        ConfigState config = mRestoreStack.remove(mRestoreStack.size() - 1);
-        config.restore(this);
-        freeRestoreConfig(config);
-    }
-
-    private void freeRestoreConfig(ConfigState action) {
-        action.mNextFree = mRecycledRestoreAction;
-        mRecycledRestoreAction = action;
-    }
-
-    private ConfigState obtainRestoreConfig() {
-        if (mRecycledRestoreAction != null) {
-            ConfigState result = mRecycledRestoreAction;
-            mRecycledRestoreAction = result.mNextFree;
-            return result;
-        }
-        return new ConfigState();
-    }
-
     private static class ConfigState {
         float mAlpha;
         float mMatrix[] = new float[16];
@@ -898,183 +1068,5 @@ public class GLES11Canvas implements GLCanvas {
                 System.arraycopy(mMatrix, 0, canvas.mMatrixValues, 0, 16);
             }
         }
-    }
-
-    @Override
-    public void dumpStatisticsAndClear() {
-        String line = String.format(
-                "MESH:%d, TEX_OES:%d, TEX_RECT:%d, FILL_RECT:%d, LINE:%d",
-                mCountDrawMesh, mCountTextureRect, mCountTextureOES,
-                mCountFillRect, mCountDrawLine);
-        mCountDrawMesh = 0;
-        mCountTextureRect = 0;
-        mCountTextureOES = 0;
-        mCountFillRect = 0;
-        mCountDrawLine = 0;
-        Log.d(TAG, line);
-    }
-
-    private void saveTransform() {
-        System.arraycopy(mMatrixValues, 0, mTempMatrix, 0, 16);
-    }
-
-    private void restoreTransform() {
-        System.arraycopy(mTempMatrix, 0, mMatrixValues, 0, 16);
-    }
-
-    private void setRenderTarget(RawTexture texture) {
-        GL11ExtensionPack gl11ep = (GL11ExtensionPack) mGL;
-
-        if (mTargetTexture == null && texture != null) {
-            mGLId.glGenBuffers(1, mFrameBuffer, 0);
-            gl11ep.glBindFramebufferOES(
-                    GL11ExtensionPack.GL_FRAMEBUFFER_OES, mFrameBuffer[0]);
-        }
-        if (mTargetTexture != null && texture  == null) {
-            gl11ep.glBindFramebufferOES(GL11ExtensionPack.GL_FRAMEBUFFER_OES, 0);
-            gl11ep.glDeleteFramebuffersOES(1, mFrameBuffer, 0);
-        }
-
-        mTargetTexture = texture;
-        if (texture == null) {
-            setSize(mScreenWidth, mScreenHeight);
-        } else {
-            setSize(texture.getWidth(), texture.getHeight());
-
-            if (!texture.isLoaded()) texture.prepare(this);
-
-            gl11ep.glFramebufferTexture2DOES(
-                    GL11ExtensionPack.GL_FRAMEBUFFER_OES,
-                    GL11ExtensionPack.GL_COLOR_ATTACHMENT0_OES,
-                    GL11.GL_TEXTURE_2D, texture.getId(), 0);
-
-            checkFramebufferStatus(gl11ep);
-        }
-    }
-
-    @Override
-    public void endRenderTarget() {
-        RawTexture texture = mTargetStack.remove(mTargetStack.size() - 1);
-        setRenderTarget(texture);
-        restore(); // restore matrix and alpha
-    }
-
-    @Override
-    public void beginRenderTarget(RawTexture texture) {
-        save(); // save matrix and alpha
-        mTargetStack.add(mTargetTexture);
-        setRenderTarget(texture);
-    }
-
-    private static void checkFramebufferStatus(GL11ExtensionPack gl11ep) {
-        int status = gl11ep.glCheckFramebufferStatusOES(GL11ExtensionPack.GL_FRAMEBUFFER_OES);
-        if (status != GL11ExtensionPack.GL_FRAMEBUFFER_COMPLETE_OES) {
-            String msg = "";
-            switch (status) {
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_OES:
-                    msg = "FRAMEBUFFER_FORMATS";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_OES:
-                    msg = "FRAMEBUFFER_ATTACHMENT";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_OES:
-                    msg = "FRAMEBUFFER_MISSING_ATTACHMENT";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_OES:
-                    msg = "FRAMEBUFFER_DRAW_BUFFER";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_OES:
-                    msg = "FRAMEBUFFER_READ_BUFFER";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_UNSUPPORTED_OES:
-                    msg = "FRAMEBUFFER_UNSUPPORTED";
-                    break;
-                case GL11ExtensionPack.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_OES:
-                    msg = "FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
-                    break;
-            }
-            throw new RuntimeException(msg + ":" + Integer.toHexString(status));
-        }
-    }
-
-    @Override
-    public void setTextureParameters(BasicTexture texture) {
-        int width = texture.getWidth();
-        int height = texture.getHeight();
-        // Define a vertically flipped crop rectangle for OES_draw_texture.
-        // The four values in sCropRect are: left, bottom, width, and
-        // height. Negative value of width or height means flip.
-        sCropRect[0] = 0;
-        sCropRect[1] = height;
-        sCropRect[2] = width;
-        sCropRect[3] = -height;
-
-        // Set texture parameters.
-        int target = texture.getTarget();
-        mGL.glBindTexture(target, texture.getId());
-        mGL.glTexParameterfv(target, GL11Ext.GL_TEXTURE_CROP_RECT_OES, sCropRect, 0);
-        mGL.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP_TO_EDGE);
-        mGL.glTexParameteri(target, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP_TO_EDGE);
-        mGL.glTexParameterf(target, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        mGL.glTexParameterf(target, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-    }
-
-    @Override
-    public void initializeTextureSize(BasicTexture texture, int format, int type) {
-        int target = texture.getTarget();
-        mGL.glBindTexture(target, texture.getId());
-        int width = texture.getTextureWidth();
-        int height = texture.getTextureHeight();
-        mGL.glTexImage2D(target, 0, format, width, height, 0, format, type, null);
-    }
-
-    @Override
-    public void initializeTexture(BasicTexture texture, Bitmap bitmap) {
-        int target = texture.getTarget();
-        mGL.glBindTexture(target, texture.getId());
-        GLUtils.texImage2D(target, 0, bitmap, 0);
-    }
-
-    @Override
-    public void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap,
-            int format, int type) {
-        int target = texture.getTarget();
-        mGL.glBindTexture(target, texture.getId());
-        GLUtils.texSubImage2D(target, 0, xOffset, yOffset, bitmap, format, type);
-    }
-
-    @Override
-    public int uploadBuffer(FloatBuffer buf) {
-        return uploadBuffer(buf, Float.SIZE / Byte.SIZE);
-    }
-
-    @Override
-    public int uploadBuffer(ByteBuffer buf) {
-        return uploadBuffer(buf, 1);
-    }
-
-    private int uploadBuffer(Buffer buf, int elementSize) {
-        int[] bufferIds = new int[1];
-        mGLId.glGenBuffers(bufferIds.length, bufferIds, 0);
-        int bufferId = bufferIds[0];
-        mGL.glBindBuffer(GL11.GL_ARRAY_BUFFER, bufferId);
-        mGL.glBufferData(GL11.GL_ARRAY_BUFFER, buf.capacity() * elementSize, buf,
-                GL11.GL_STATIC_DRAW);
-        return bufferId;
-    }
-
-    @Override
-    public void recoverFromLightCycle() {
-        // This is only required for GLES20
-    }
-
-    @Override
-    public void getBounds(Rect bounds, int x, int y, int width, int height) {
-        // This is only required for GLES20
-    }
-
-    @Override
-    public GLId getGLId() {
-        return mGLId;
     }
 }

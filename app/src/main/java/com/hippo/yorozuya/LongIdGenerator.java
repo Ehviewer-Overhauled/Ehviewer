@@ -24,7 +24,8 @@ public final class LongIdGenerator {
 
     private final AtomicLong mId = new AtomicLong();
 
-    public LongIdGenerator() {}
+    public LongIdGenerator() {
+    }
 
     public LongIdGenerator(long init) {
         setNextId(init);
@@ -33,7 +34,7 @@ public final class LongIdGenerator {
     @SuppressWarnings("StatementWithEmptyBody")
     public long nextId() {
         long id;
-        while ((id = mId.getAndIncrement()) == INVALID_ID);
+        while ((id = mId.getAndIncrement()) == INVALID_ID) ;
         return id;
     }
 

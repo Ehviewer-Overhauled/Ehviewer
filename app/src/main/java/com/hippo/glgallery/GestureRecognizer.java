@@ -29,34 +29,10 @@ import androidx.core.view.GestureDetectorCompat;
 class GestureRecognizer {
     @SuppressWarnings("unused")
     private static final String TAG = "GestureRecognizer";
-
-    public interface Listener {
-        boolean onSingleTapUp(float x, float y);
-        boolean onSingleTapConfirmed(float x, float y);
-        boolean onDoubleTap(float x, float y);
-        boolean onDoubleTapConfirmed(float x, float y);
-        void onLongPress(float x, float y);
-        boolean onScroll(float dx, float dy, float totalX, float totalY, float x, float y);
-
-        /**
-         * @param velocityX Finger from top to bottom is positive
-         * @param velocityY Finger from left to right is positive
-         */
-        boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY);
-        boolean onScaleBegin(float focusX, float focusY);
-        boolean onScale(float focusX, float focusY, float scale);
-        void onScaleEnd();
-        void onDown(float x, float y);
-        void onUp();
-        void onPointerDown(float x, float y);
-        void onPointerUp();
-    }
-
     private final GestureDetectorCompat mGestureDetector;
     private final ScaleGestureDetector mScaleDetector;
     private final DownUpDetector mDownUpDetector;
     private final Listener mListener;
-
     public GestureRecognizer(Context context, Listener listener) {
         mListener = listener;
         MyGestureListener gestureListener = new MyGestureListener();
@@ -86,8 +62,42 @@ class GestureRecognizer {
         cancelEvent.recycle();
     }
 
+    public interface Listener {
+        boolean onSingleTapUp(float x, float y);
+
+        boolean onSingleTapConfirmed(float x, float y);
+
+        boolean onDoubleTap(float x, float y);
+
+        boolean onDoubleTapConfirmed(float x, float y);
+
+        void onLongPress(float x, float y);
+
+        boolean onScroll(float dx, float dy, float totalX, float totalY, float x, float y);
+
+        /**
+         * @param velocityX Finger from top to bottom is positive
+         * @param velocityY Finger from left to right is positive
+         */
+        boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY);
+
+        boolean onScaleBegin(float focusX, float focusY);
+
+        boolean onScale(float focusX, float focusY, float scale);
+
+        void onScaleEnd();
+
+        void onDown(float x, float y);
+
+        void onUp();
+
+        void onPointerDown(float x, float y);
+
+        void onPointerUp();
+    }
+
     private class MyGestureListener
-                extends GestureDetector.SimpleOnGestureListener {
+            extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             return mListener.onSingleTapUp(e.getX(), e.getY());
@@ -126,7 +136,7 @@ class GestureRecognizer {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                float velocityY) {
+                               float velocityY) {
             return mListener.onFling(e1, e2, velocityX, velocityY);
         }
     }

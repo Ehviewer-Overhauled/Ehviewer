@@ -35,16 +35,16 @@ import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ViewUtils {
-    private ViewUtils() {}
-
     public static final int MAX_SIZE = Integer.MAX_VALUE & ~(0x3 << 30);
-
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+
+    private ViewUtils() {
+    }
 
     /**
      * Get view center location in window
      *
-     * @param view the view to check
+     * @param view     the view to check
      * @param location an array of two integers in which to hold the coordinates
      */
     public static void getCenterInWindows(View view, int[] location) {
@@ -56,7 +56,7 @@ public final class ViewUtils {
     /**
      * Get view location in window
      *
-     * @param view the view to check
+     * @param view     the view to check
      * @param location an array of two integers in which to hold the coordinates
      */
     public static void getLocationInWindow(View view, int[] location) {
@@ -66,8 +66,8 @@ public final class ViewUtils {
     /**
      * Get view center in ths ancestor
      *
-     * @param view the view to start with
-     * @param location the container of result
+     * @param view       the view to start with
+     * @param location   the container of result
      * @param ancestorId the ancestor id
      */
     public static void getCenterInAncestor(View view, int[] location, int ancestorId) {
@@ -79,8 +79,8 @@ public final class ViewUtils {
     /**
      * Get view location in ths ancestor
      *
-     * @param view the view to start with
-     * @param location the container of result
+     * @param view       the view to start with
+     * @param location   the container of result
      * @param ancestorId the ancestor id
      */
     public static void getLocationInAncestor(View view, int[] location, int ancestorId) {
@@ -117,7 +117,7 @@ public final class ViewUtils {
     /**
      * Get view center in ths ancestor
      *
-     * @param view the view to start with
+     * @param view     the view to start with
      * @param location the container of result
      * @param ancestor the ancestor
      */
@@ -130,7 +130,7 @@ public final class ViewUtils {
     /**
      * Get view location in ths ancestor
      *
-     * @param view the view to start with
+     * @param view     the view to start with
      * @param location the container of result
      * @param ancestor the ancestor
      */
@@ -170,7 +170,7 @@ public final class ViewUtils {
      * id, return this view.
      *
      * @param view the view to start with
-     * @param id The id to search for.
+     * @param id   The id to search for.
      * @return The view that has the given id in the hierarchy or null
      */
     public static View getAncestor(View view, int id) {
@@ -194,7 +194,7 @@ public final class ViewUtils {
      * id, return this view.
      *
      * @param view the view to start with
-     * @param id the id to search for
+     * @param id   the id to search for
      * @return the view that has the given id in the hierarchy or null
      */
     public static View getChild(View view, int id) {
@@ -262,8 +262,7 @@ public final class ViewUtils {
      * setLayerType(View.LAYER_TYPE_SOFTWARE, null).'
      * </pre>
      *
-     * @param v
-     *            The view
+     * @param v The view
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void removeHardwareAccelerationSupport(View v) {
@@ -307,8 +306,8 @@ public final class ViewUtils {
      * parent view's coordinate system.
      *
      * @param view Child view of the parent to hit test
-     * @param x X position to test in the parent's coordinate system
-     * @param y Y position to test in the parent's coordinate system
+     * @param x    X position to test in the parent's coordinate system
+     * @param y    Y position to test in the parent's coordinate system
      * @param slop the slop out of the view, or negative for inside
      * @return true if the supplied view is under the given point, false otherwise
      */
@@ -334,7 +333,7 @@ public final class ViewUtils {
      * MeasureSpec imposed no constraints. Will get suitable if allowed
      * by the MeasureSpec.
      *
-     * @param size Default size for this view
+     * @param size        Default size for this view
      * @param measureSpec Constraints imposed by the parent
      * @return The size this view should be.
      */
@@ -360,12 +359,12 @@ public final class ViewUtils {
      * removeOnGlobalLayoutListener
      *
      * @param viewTreeObserver the ViewTreeObserver
-     * @param l the OnGlobalLayoutListener
+     * @param l                the OnGlobalLayoutListener
      */
     @SuppressWarnings("deprecation")
     public static void removeOnGlobalLayoutListener(ViewTreeObserver viewTreeObserver,
-            ViewTreeObserver.OnGlobalLayoutListener l) {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                                                    ViewTreeObserver.OnGlobalLayoutListener l) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             viewTreeObserver.removeGlobalOnLayoutListener(l);
         } else {
             viewTreeObserver.removeOnGlobalLayoutListener(l);
@@ -379,7 +378,7 @@ public final class ViewUtils {
      * @return The index
      */
     public static int getIndexInParent(View view) {
-        ViewParent parent =  view.getParent();
+        ViewParent parent = view.getParent();
         if (parent instanceof ViewGroup) {
             ViewGroup viewParent = (ViewGroup) parent;
             int count = viewParent.getChildCount();
@@ -396,9 +395,9 @@ public final class ViewUtils {
     /**
      * Transform point from parent to child
      *
-     * @param point the point
+     * @param point  the point
      * @param parent the parent
-     * @param child the child
+     * @param child  the child
      */
     public static void transformPointToViewLocal(float[] point, View parent, View child) {
         point[0] += parent.getScrollX() - child.getLeft();
@@ -420,7 +419,9 @@ public final class ViewUtils {
     }
 
     private static void dumpViewHierarchy(View view, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(view.getClass().getName());writer.write('\n');
+        writer.write(prefix);
+        writer.write(view.getClass().getName());
+        writer.write('\n');
         if (view instanceof ViewGroup) {
             String newPrefix = prefix + "    ";
             ViewGroup viewGroup = (ViewGroup) view;
@@ -439,7 +440,7 @@ public final class ViewUtils {
      * @return a generated ID value
      */
     public static int generateViewId() {
-        for (;;) {
+        for (; ; ) {
             final int result = sNextGeneratedId.get();
             // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
             int newValue = result + 1;

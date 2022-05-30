@@ -18,5 +18,6 @@ package com.hippo.glview.view;
 
 public interface OrientationSource {
     int getDisplayRotation();
+
     int getCompensation();
 }

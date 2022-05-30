@@ -47,9 +47,6 @@ import com.hippo.yorozuya.MathUtils;
 // The start() method can be called again to restart the Animation.
 //
 abstract public class Animation {
-    private static final long ANIMATION_START = -1;
-    private static final long NO_ANIMATION = -2;
-
     /**
      * When the animation reaches the end and <code>repeatCount</code> is INFINITE
      * or a positive value, the animation restarts from the beginning.
@@ -65,7 +62,8 @@ abstract public class Animation {
      * the animation indefinitely.
      */
     public static final int INFINITE = -1;
-
+    private static final long ANIMATION_START = -1;
+    private static final long NO_ANIMATION = -2;
     private long mStartTime = NO_ANIMATION;
     private long mDuration;
     private Interpolator mInterpolator;

@@ -73,6 +73,16 @@ public class TextClock extends AppCompatTextView {
 
     public TextClock(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+    }
+
+    public TextClock(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
+        mFormat12 = DEFAULT_FORMAT_12_HOUR;
+        mFormat24 = DEFAULT_FORMAT_24_HOUR;
+        mTimeZone = TimeZone.getDefault().getID();
+
+        init();
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -84,16 +94,6 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-
-    public TextClock(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-
-        mFormat12 = DEFAULT_FORMAT_12_HOUR;
-        mFormat24 = DEFAULT_FORMAT_24_HOUR;
-        mTimeZone = TimeZone.getDefault().getID();
-
-        init();
-    }
 
     private void init() {
         createTime(mTimeZone);
@@ -111,6 +111,17 @@ public class TextClock extends AppCompatTextView {
 
     public CharSequence getFormat12Hour() {
         return mFormat12;
+    }
+
+    public void setFormat12Hour(CharSequence format) {
+        mFormat12 = format;
+
+        chooseFormat();
+        onTimeChanged();
+    }
+
+    public CharSequence getFormat24Hour() {
+        return mFormat24;
     }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -124,17 +135,6 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
-    public void setFormat12Hour(CharSequence format) {
-        mFormat12 = format;
-
-        chooseFormat();
-        onTimeChanged();
-    }
-
-    public CharSequence getFormat24Hour() {
-        return mFormat24;
-    }
 
     public void setFormat24Hour(CharSequence format) {
         mFormat24 = format;

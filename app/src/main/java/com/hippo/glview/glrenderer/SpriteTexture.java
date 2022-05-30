@@ -60,7 +60,7 @@ public class SpriteTexture extends TiledTexture {
     }
 
     public void drawSpriteMixed(GLCanvas canvas, int index, int color, float ratio,
-            int x, int y, int width, int height) {
+                                int x, int y, int width, int height) {
         int[] rects = mRects;
         int offset = index * 4;
         int sourceX = rects[offset];

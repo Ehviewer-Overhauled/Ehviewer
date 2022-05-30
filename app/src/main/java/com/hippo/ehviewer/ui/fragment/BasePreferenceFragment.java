@@ -1,13 +1,10 @@
 package com.hippo.ehviewer.ui.fragment;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.preference.Preference;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.hippo.ehviewer.ui.SettingsActivity;
 import com.takisoft.preferencex.PreferenceFragmentCompat;

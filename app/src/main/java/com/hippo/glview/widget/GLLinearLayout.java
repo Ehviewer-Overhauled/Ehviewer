@@ -30,17 +30,11 @@ import java.util.List;
 
 public class GLLinearLayout extends GLView {
 
-    @IntDef({HORIZONTAL, VERTICAL})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface OrientationMode {}
-
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
-
+    private final List<GLView> mTempList = new ArrayList<>();
     private int mInterval = 0;
     private int mOrientation = VERTICAL;
-
-    private final List<GLView> mTempList = new ArrayList<>();
 
     public void setInterval(int interval) {
         if (mInterval != interval) {
@@ -51,8 +45,9 @@ public class GLLinearLayout extends GLView {
 
     /**
      * Should the layout be a column or a row.
+     *
      * @param orientation Pass {@link #HORIZONTAL} or {@link #VERTICAL}. Default
-     * value is {@link #HORIZONTAL}.
+     *                    value is {@link #HORIZONTAL}.
      */
     public void setOrientation(@OrientationMode int orientation) {
         if (mOrientation != orientation) {
@@ -222,6 +217,11 @@ public class GLLinearLayout extends GLView {
     @Override
     protected GLView.LayoutParams generateLayoutParams(GLView.LayoutParams p) {
         return p == null ? generateDefaultLayoutParams() : new LayoutParams(p);
+    }
+
+    @IntDef({HORIZONTAL, VERTICAL})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface OrientationMode {
     }
 
     public static class LayoutParams extends GravityLayoutParams {

@@ -25,11 +25,18 @@ import java.util.regex.Pattern;
 
 public final class Utilities {
 
+    private static final String[] MIME_TYPE_ARRAY = {
+            "image/jpg"
+    };
+    private static final String[] EXTENSION_ARRAY = {
+            "jpg"
+    };
+
     /**
      * Whether the array contain the element
      *
      * @param array the array
-     * @param obj the element
+     * @param obj   the element
      * @return true for the array contain the element
      */
     public static boolean contain(@Nullable Object[] array, @Nullable Object obj) {
@@ -49,7 +56,7 @@ public final class Utilities {
      * Whether the array contain the element
      *
      * @param array the array
-     * @param ch the element
+     * @param ch    the element
      * @return true for the array contain the element
      */
     public static boolean contain(@Nullable char[] array, char ch) {
@@ -57,7 +64,7 @@ public final class Utilities {
             return false;
         }
 
-        for (char c: array) {
+        for (char c : array) {
             if (c == ch) {
                 return true;
             }
@@ -94,14 +101,6 @@ public final class Utilities {
 
         return null;
     }
-
-    private static final String[] MIME_TYPE_ARRAY = {
-            "image/jpg"
-    };
-
-    private static final String[] EXTENSION_ARRAY = {
-            "jpg"
-    };
 
     public static String getExtensionFromMimeType(String mimeType) {
         if (TextUtils.isEmpty(mimeType)) {

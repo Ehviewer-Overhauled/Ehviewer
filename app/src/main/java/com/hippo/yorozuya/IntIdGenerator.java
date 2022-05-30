@@ -24,7 +24,8 @@ public final class IntIdGenerator {
 
     private final AtomicInteger mId = new AtomicInteger();
 
-    public IntIdGenerator() {}
+    public IntIdGenerator() {
+    }
 
     public IntIdGenerator(int init) {
         setNextId(init);
@@ -33,7 +34,7 @@ public final class IntIdGenerator {
     @SuppressWarnings("StatementWithEmptyBody")
     public int nextId() {
         int id;
-        while ((id = mId.getAndIncrement()) == INVALID_ID);
+        while ((id = mId.getAndIncrement()) == INVALID_ID) ;
         return id;
     }
 

@@ -29,16 +29,16 @@ public abstract class NativeTexture extends BasicTexture {
 
     private boolean mOpaque = true;
 
-    public void invalidateContent() {
-        mContentValid = false;
-    }
-
     public static void checkError() {
         int error = GLES20.glGetError();
         if (error != 0) {
             Throwable t = new Throwable();
             Log.e(TAG, "GL error: " + error, t);
         }
+    }
+
+    public void invalidateContent() {
+        mContentValid = false;
     }
 
     protected abstract void texImage(boolean init);
@@ -92,12 +92,12 @@ public abstract class NativeTexture extends BasicTexture {
         return GL11.GL_TEXTURE_2D;
     }
 
-    public void setOpaque(boolean isOpaque) {
-        mOpaque = isOpaque;
-    }
-
     @Override
     public boolean isOpaque() {
         return mOpaque;
+    }
+
+    public void setOpaque(boolean isOpaque) {
+        mOpaque = isOpaque;
     }
 }

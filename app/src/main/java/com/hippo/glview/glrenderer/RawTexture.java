@@ -62,9 +62,9 @@ public class RawTexture extends BasicTexture {
     }
 
     @Override
-     public void yield() {
-         // we cannot free the texture because we have no backup.
-     }
+    public void yield() {
+        // we cannot free the texture because we have no backup.
+    }
 
     @Override
     protected int getTarget() {

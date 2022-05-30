@@ -20,11 +20,11 @@ import java.util.Random;
 
 // Get most code from android.util.MathUtils
 public final class MathUtils {
-    private MathUtils() {}
-
     private static final Random sRandom = new Random();
     private static final float DEG_TO_RAD = 3.1415926f / 180.0f;
     private static final float RAD_TO_DEG = 180.0f / 3.1415926f;
+    private MathUtils() {
+    }
 
     public static float abs(float v) {
         return v > 0 ? v : -v;
@@ -285,7 +285,7 @@ public final class MathUtils {
      * Throws IllegalArgumentException if the input is <= 0 or
      * the answer overflows.
      */
-    public static int previousPowerOf2 (int n) {
+    public static int previousPowerOf2(int n) {
         if (n <= 0 || n > (1 << 30)) throw new IllegalArgumentException("n is invalid: " + n);
         n |= n >> 1;
         n |= n >> 2;

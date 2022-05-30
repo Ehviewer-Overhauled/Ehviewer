@@ -23,10 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class StringUtils {
-    private StringUtils() {}
-
     public static final String[] EMPTY_STRING_ARRAY = new String[0];
-
+    public static final char[] WHITE_SPACE_ARRAY = {
+            '\u0009', // TAB
+            '\u0020', // SPACE
+            '\u00A0', // NO-BREAK SPACE
+            '\u3000', // IDEOGRAPHIC SPACE
+    };
     private static final String[] ESCAPE_CHARATER_LIST = {
             "&amp;",
             "&lt;",
@@ -46,6 +49,9 @@ public final class StringUtils {
             "×",
             " "
     };
+
+    private StringUtils() {
+    }
 
     /**
      * Unescape xml. It do not work perfectly.
@@ -70,12 +76,12 @@ public final class StringUtils {
      * StringUtils.replace("aba", "a", "z")   = "zbz"
      * </pre>
      *
-     * @see #replace(String text, String searchString, String replacement, int max)
-     * @param text  text to search and replace in, may be null
-     * @param searchString  the String to search for, may be null
+     * @param text         text to search and replace in, may be null
+     * @param searchString the String to search for, may be null
      * @param replacement  the String to replace it with, may be null
      * @return the text with any replacements processed,
-     *  {@code null} if null String input
+     * {@code null} if null String input
+     * @see #replace(String text, String searchString, String replacement, int max)
      */
     public static String replace(final String text, final String searchString, final String replacement) {
         return replace(text, searchString, replacement, -1);
@@ -102,12 +108,12 @@ public final class StringUtils {
      * StringUtils.replace("abaa", "a", "z", -1)  = "zbzz"
      * </pre>
      *
-     * @param text  text to search and replace in, may be null
-     * @param searchString  the String to search for, may be null
+     * @param text         text to search and replace in, may be null
+     * @param searchString the String to search for, may be null
      * @param replacement  the String to replace it with, may be null
-     * @param max  maximum number of values to replace, or {@code -1} if no maximum
+     * @param max          maximum number of values to replace, or {@code -1} if no maximum
      * @return the text with any replacements processed,
-     *  {@code null} if null String input
+     * {@code null} if null String input
      */
     public static String replace(final String text, final String searchString, final String replacement, int max) {
         if (TextUtils.isEmpty(text) || TextUtils.isEmpty(searchString) || replacement == null || max == 0) {
@@ -161,21 +167,17 @@ public final class StringUtils {
      *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "t"})  = "dcte"
      * </pre>
      *
-     * @param text
-     *            text to search and replace in, no-op if null
-     * @param searchList
-     *            the Strings to search for, no-op if null
-     * @param replacementList
-     *            the Strings to replace them with, no-op if null
+     * @param text            text to search and replace in, no-op if null
+     * @param searchList      the Strings to search for, no-op if null
+     * @param replacementList the Strings to replace them with, no-op if null
      * @return the text with any replacements processed, {@code null} if
-     *         null String input
-     * @throws IllegalArgumentException
-     *             if the lengths of the arrays are not the same (null is ok,
-     *             and/or size 0)
+     * null String input
+     * @throws IllegalArgumentException if the lengths of the arrays are not the same (null is ok,
+     *                                  and/or size 0)
      */
     // Get from org.apache.commons.lang3.StringUtils
     public static String replaceEach(final String text, final String[] searchList,
-            final String[] replacementList) {
+                                     final String[] replacementList) {
         return replaceEach(text, searchList, replacementList, false, 0);
     }
 
@@ -206,25 +208,19 @@ public final class StringUtils {
      *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "ab"}, *) = IllegalStateException
      * </pre>
      *
-     * @param text
-     *            text to search and replace in, no-op if null
-     * @param searchList
-     *            the Strings to search for, no-op if null
-     * @param replacementList
-     *            the Strings to replace them with, no-op if null
-     * @param repeat if true, then replace repeatedly
-     *       until there are no more possible replacements or timeToLive < 0
-     * @param timeToLive
-     *            if less than 0 then there is a circular reference and endless
-     *            loop
+     * @param text            text to search and replace in, no-op if null
+     * @param searchList      the Strings to search for, no-op if null
+     * @param replacementList the Strings to replace them with, no-op if null
+     * @param repeat          if true, then replace repeatedly
+     *                        until there are no more possible replacements or timeToLive < 0
+     * @param timeToLive      if less than 0 then there is a circular reference and endless
+     *                        loop
      * @return the text with any replacements processed, {@code null} if
-     *         null String input
-     * @throws IllegalStateException
-     *             if the search is repeating and there is an endless loop due
-     *             to outputs of one being inputs to another
-     * @throws IllegalArgumentException
-     *             if the lengths of the arrays are not the same (null is ok,
-     *             and/or size 0)
+     * null String input
+     * @throws IllegalStateException    if the search is repeating and there is an endless loop due
+     *                                  to outputs of one being inputs to another
+     * @throws IllegalArgumentException if the lengths of the arrays are not the same (null is ok,
+     *                                  and/or size 0)
      */
     // Get from org.apache.commons.lang3.StringUtils
     private static String replaceEach(
@@ -385,8 +381,8 @@ public final class StringUtils {
      * StringUtils.split("a b c", ' ')    = ["a", "b", "c"]
      * </pre>
      *
-     * @param str  the String to parse, may be null
-     * @param separatorChar  the character used as the delimiter
+     * @param str           the String to parse, may be null
+     * @param separatorChar the character used as the delimiter
      * @return an array of parsed Strings, {@code null} if null String input
      * @since 2.0
      */
@@ -400,11 +396,11 @@ public final class StringUtils {
      * {@code splitPreserveAllTokens} methods that do not return a
      * maximum array length.
      *
-     * @param str  the String to parse, may be {@code null}
-     * @param separatorChar the separate character
+     * @param str               the String to parse, may be {@code null}
+     * @param separatorChar     the separate character
      * @param preserveAllTokens if {@code true}, adjacent separators are
-     * treated as empty token separators; if {@code false}, adjacent
-     * separators are treated as one separator.
+     *                          treated as empty token separators; if {@code false}, adjacent
+     *                          separators are treated as one separator.
      * @return an array of parsed Strings, {@code null} if null String input
      */
     // Get from org.apache.commons.lang3.StringUtils
@@ -482,7 +478,7 @@ public final class StringUtils {
      * StringUtils.countMatches("abba", 'x') = 0
      * </pre>
      *
-     * @param str  the CharSequence to check, may be null
+     * @param str the CharSequence to check, may be null
      * @param ch  the char to count
      * @return the number of occurrences, 0 if the CharSequence is {@code null}
      */
@@ -520,13 +516,6 @@ public final class StringUtils {
 
         return pos;
     }
-
-    public static final char[] WHITE_SPACE_ARRAY = {
-            '\u0009', // TAB
-            '\u0020', // SPACE
-            '\u00A0', // NO-BREAK SPACE
-            '\u3000', // IDEOGRAPHIC SPACE
-    };
 
     /**
      * Works like {@link String#trim()}, but more white space is excluded.

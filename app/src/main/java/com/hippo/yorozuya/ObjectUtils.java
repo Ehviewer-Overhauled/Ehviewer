@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ObjectUtils {
-    private ObjectUtils() {}
+    private ObjectUtils() {
+    }
 
     /**
      * Returns true if two possibly-null objects are equal.
@@ -43,39 +44,57 @@ public final class ObjectUtils {
     }
 
     private static void dumpObject(Object o, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(o.getClass().getName());writer.write('\n');
+        writer.write(prefix);
+        writer.write(o.getClass().getName());
+        writer.write('\n');
     }
 
     private static void dumpBoolean(boolean z, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Boolean.toString(z));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Boolean.toString(z));
+        writer.write('\n');
     }
 
     private static void dumpByte(byte b, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Byte.toString(b));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Byte.toString(b));
+        writer.write('\n');
     }
 
     private static void dumpChar(char c, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Character.toString(c));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Character.toString(c));
+        writer.write('\n');
     }
 
     private static void dumpShort(short s, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Short.toString(s));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Short.toString(s));
+        writer.write('\n');
     }
 
     private static void dumpInt(int i, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Integer.toString(i));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Integer.toString(i));
+        writer.write('\n');
     }
 
     private static void dumpLong(long j, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Long.toString(j));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Long.toString(j));
+        writer.write('\n');
     }
 
     private static void dumpFloat(float f, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Float.toString(f));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Float.toString(f));
+        writer.write('\n');
     }
 
     private static void dumpDouble(double d, PrintWriter writer, String prefix) {
-        writer.write(prefix);writer.write(Double.toString(d));writer.write('\n');
+        writer.write(prefix);
+        writer.write(Double.toString(d));
+        writer.write('\n');
     }
 
     private static void dumpArray(Object array, PrintWriter writer, String prefix, boolean skipFirstPrefix) {
@@ -86,7 +105,9 @@ public final class ObjectUtils {
         }
 
         String newPrefix = prefix + "    ";
-        writer.write(newPrefix);writer.write('[');writer.write('\n');
+        writer.write(newPrefix);
+        writer.write('[');
+        writer.write('\n');
 
         if (array instanceof Object[]) {
             Object[] a = (Object[]) array;
@@ -145,13 +166,18 @@ public final class ObjectUtils {
             Map map = (Map) array;
             for (Object key : map.keySet()) {
                 Object value = map.get(key);
-                writer.write(newPrefix);writer.write(key.toString());writer.write(": ");dump(value, writer, newPrefix, true);
+                writer.write(newPrefix);
+                writer.write(key.toString());
+                writer.write(": ");
+                dump(value, writer, newPrefix, true);
             }
         } else {
             throw new IllegalStateException(array + " is not array");
         }
 
-        writer.write(newPrefix);writer.write(']');writer.write('\n');
+        writer.write(newPrefix);
+        writer.write(']');
+        writer.write('\n');
     }
 
     public static void dump(Object o, PrintWriter writer) {
@@ -196,7 +222,10 @@ public final class ObjectUtils {
                 String name = field.getName();
                 try {
                     Object value = field.get(o);
-                    writer.write(newPrefix);writer.write(name);writer.write(": ");dump(value, writer, newPrefix, true);
+                    writer.write(newPrefix);
+                    writer.write(name);
+                    writer.write(": ");
+                    dump(value, writer, newPrefix, true);
                 } catch (IllegalAccessException e) {
                     // Ignore
                 }

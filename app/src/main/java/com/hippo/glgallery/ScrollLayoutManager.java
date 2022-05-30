@@ -31,6 +31,7 @@ import com.hippo.glview.widget.GLTextureView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.MathUtils;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,15 +47,15 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     private static final float SCALE_ERROR = 0.01f;
 
     private static final int INVALID_TOP = Integer.MAX_VALUE;
-
+    private final LinkedList<GalleryPageView> mPages = new LinkedList<>();
+    private final LinkedList<GalleryPageView> mTempPages = new LinkedList<>();
+    private final PageFling mPageFling;
+    private final SmoothScaler mSmoothScaler;
+    private final OverScroller mOverScroller;
     private GalleryView.Adapter mAdapter;
-
     private GLProgressView mProgress;
     private String mErrorStr;
     private GLTextureView mErrorView;
-    private final LinkedList<GalleryPageView> mPages = new LinkedList<>();
-    private final LinkedList<GalleryPageView> mTempPages = new LinkedList<>();
-
     private float mScale = 0.5f;
     private int mOffsetX;
     private int mOffsetY;
@@ -66,13 +67,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     private boolean mScrollUp;
     private boolean mFlingUp;
     private boolean mStopAnimationFinger;
-
     private int mInterval;
-
-    private final PageFling mPageFling;
-    private final SmoothScaler mSmoothScaler;
-    private final OverScroller mOverScroller;
-
     // Current index
     private int mIndex;
 
@@ -195,7 +190,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     }
 
     private GalleryPageView getPageForIndex(List<GalleryPageView> pages, int index, boolean remove) {
-        for (Iterator<GalleryPageView> iterator = pages.iterator(); iterator.hasNext();) {
+        for (Iterator<GalleryPageView> iterator = pages.iterator(); iterator.hasNext(); ) {
             GalleryPageView page = iterator.next();
             if (index == page.getIndex()) {
                 if (remove) {
@@ -341,7 +336,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         page = pages.getFirst();
         if (0 == page.getIndex() && page.bounds().top > 0) {
             int offset = -page.bounds().top;
-            for (GalleryPageView p: pages) {
+            for (GalleryPageView p : pages) {
                 p.offsetTopAndBottom(offset);
             }
             topOffset += offset;
@@ -390,7 +385,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
                 page.measure(widthSpec, heightSpec);
 
                 int offset = Math.min(height - pagesBottom, page.getMeasuredHeight());
-                for (GalleryPageView p: pages) {
+                for (GalleryPageView p : pages) {
                     p.offsetTopAndBottom(offset);
                 }
                 int bottom = pagesTop - interval + offset;
@@ -885,7 +880,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
             // Get first shown page
             GalleryPageView previousPage = null;
             GalleryPageView firstShownPage = null;
-            for (GalleryPageView p: mPages) {
+            for (GalleryPageView p : mPages) {
                 if (isInScreen(p)) {
                     firstShownPage = p;
                     break;
@@ -940,7 +935,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
             // Get first shown page
             GalleryPageView lastShownPage = null;
             GalleryPageView nextPage = null;
-            for (GalleryPageView p: mPages) {
+            for (GalleryPageView p : mPages) {
                 if (isInScreen(p)) {
                     lastShownPage = p;
                 } else if (null != lastShownPage) {
@@ -1019,7 +1014,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
             GalleryPageView targetPage = null;
             for (GalleryPageView page : mPages) {
                 if (page.getIndex() == index) {
-                    targetPage =page;
+                    targetPage = page;
                     break;
                 }
             }
@@ -1084,7 +1079,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         }
 
         public void startFling(int velocityX, int minX, int maxX,
-                int velocityY, int minY, int maxY) {
+                               int velocityY, int minY, int maxY) {
             mVelocityX = velocityX;
             mVelocityY = velocityY;
             mDx = (int) (getSplineFlingDistance(velocityX) * Math.signum(velocityX));
@@ -1173,7 +1168,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         }
 
         public void startSmoothScaler(float focusX, float focusY,
-                float startScale, float endScale, int duration) {
+                                      float startScale, float endScale, int duration) {
             mFocusX = focusX;
             mFocusY = focusY;
             mStartScale = startScale;

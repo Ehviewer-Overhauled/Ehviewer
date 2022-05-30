@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import java.util.Arrays;
 
 // TODO support multiline
+
 /**
  * Works like movable type.<br>
  * <br>
@@ -21,12 +22,79 @@ public final class MovableTextTexture extends SpriteTexture {
     private final float mMaxWidth;
 
     private MovableTextTexture(Bitmap bitmap, int count, int[] rects, char[] characters,
-            float[] widths, float height, float maxWidth) {
+                               float[] widths, float height, float maxWidth) {
         super(bitmap, false, count, rects);
         mCharacters = characters;
         mWidths = widths;
         mHeight = height;
         mMaxWidth = maxWidth;
+    }
+
+    /**
+     * Create a TextTexture to draw text
+     *
+     * @param typeface   the typeface
+     * @param size       text size
+     * @param characters all Characters
+     * @return the TextTexture
+     */
+    public static MovableTextTexture create(Typeface typeface, int size, int color, char[] characters) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setTextSize(size);
+        paint.setColor(color);
+        paint.setTypeface(typeface);
+
+        Paint.FontMetricsInt fmi = paint.getFontMetricsInt();
+        int fixed = fmi.bottom;
+        int height = fmi.bottom - fmi.top;
+
+        int length = characters.length;
+        float[] widths = new float[length];
+        paint.getTextWidths(characters, 0, length, widths);
+
+        // Calculate bitmap size
+        float maxWidth = 0.0f;
+        for (float f : widths) {
+            maxWidth = Math.max(maxWidth, f);
+        }
+        int hCount = (int) Math.ceil(Math.sqrt(height / maxWidth * length));
+        int vCount = (int) Math.ceil(Math.sqrt(maxWidth / height * length));
+        if (hCount * (vCount - 1) > length) {
+            vCount--;
+        }
+        if ((hCount - 1) * vCount > length) {
+            hCount--;
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap((int) Math.ceil(hCount * maxWidth),
+                (int) Math.ceil(vCount * height), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.translate(0, height - fixed);
+
+        // Draw
+        int[] rects = new int[length * 4];
+        int x = 0;
+        int y = 0;
+        for (int i = 0; i < length; i++) {
+            int offset = i * 4;
+            rects[offset + 0] = x;
+            rects[offset + 1] = y;
+            rects[offset + 2] = (int) widths[i];
+            rects[offset + 3] = height;
+
+            canvas.drawText(characters, i, 1, x, y, paint);
+
+            if (i % hCount == hCount - 1) {
+                // The end of row
+                x = 0;
+                y += height;
+            } else {
+                x += maxWidth;
+            }
+        }
+
+        return new MovableTextTexture(bitmap, length, rects, characters, widths, height, maxWidth);
     }
 
     public int[] getTextIndexes(String text) {
@@ -112,72 +180,5 @@ public final class MovableTextTexture extends SpriteTexture {
                 x += mMaxWidth;
             }
         }
-    }
-
-    /**
-     * Create a TextTexture to draw text
-     *
-     * @param typeface the typeface
-     * @param size text size
-     * @param characters all Characters
-     * @return the TextTexture
-     */
-    public static MovableTextTexture create(Typeface typeface, int size, int color, char[] characters) {
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setTextSize(size);
-        paint.setColor(color);
-        paint.setTypeface(typeface);
-
-        Paint.FontMetricsInt fmi = paint.getFontMetricsInt();
-        int fixed = fmi.bottom;
-        int height = fmi.bottom - fmi.top;
-
-        int length = characters.length;
-        float[] widths = new float[length];
-        paint.getTextWidths(characters, 0, length, widths);
-
-        // Calculate bitmap size
-        float maxWidth = 0.0f;
-        for (float f : widths) {
-            maxWidth = Math.max(maxWidth, f);
-        }
-        int hCount = (int) Math.ceil(Math.sqrt(height / maxWidth * length));
-        int vCount = (int) Math.ceil(Math.sqrt(maxWidth / height * length));
-        if (hCount * (vCount - 1) > length) {
-            vCount--;
-        }
-        if ((hCount - 1) * vCount > length) {
-            hCount--;
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap((int) Math.ceil(hCount * maxWidth),
-                (int) Math.ceil(vCount * height), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.translate(0, height - fixed);
-
-        // Draw
-        int[] rects = new int[length * 4];
-        int x = 0;
-        int y = 0;
-        for (int i = 0; i < length; i++) {
-            int offset = i * 4;
-            rects[offset + 0] = x;
-            rects[offset + 1] = y;
-            rects[offset + 2] = (int) widths[i];
-            rects[offset + 3] = height;
-
-            canvas.drawText(characters, i, 1, x, y, paint);
-
-            if (i % hCount == hCount - 1) {
-                // The end of row
-                x = 0;
-                y += height;
-            } else {
-                x += maxWidth;
-            }
-        }
-
-        return new MovableTextTexture(bitmap, length, rects, characters, widths, height, maxWidth);
     }
 }

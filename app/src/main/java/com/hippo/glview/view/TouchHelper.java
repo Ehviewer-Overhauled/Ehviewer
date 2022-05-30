@@ -27,27 +27,24 @@ import com.hippo.yorozuya.SimpleHandler;
 
 public class TouchHelper {
 
+    /**
+     * Cache the touch slop from the context that created the view.
+     */
+    private static int sTouchSlop = 8;
     private final TouchOwner mOwner;
-
     private boolean mPrePressed = false;
     private boolean mHasPerformedLongPress = false;
-
     private CheckForLongPress mPendingCheckForLongPress = null;
     private CheckForTap mPendingCheckForTap = null;
     private PerformClick mPerformClick = null;
     private UnsetPressedState mUnsetPressedState = null;
 
-    /**
-     * Cache the touch slop from the context that created the view.
-     */
-    private static int sTouchSlop = 8;
+    public TouchHelper(@NonNull TouchOwner owner) {
+        mOwner = owner;
+    }
 
     public static void initialize(Context context) {
         sTouchSlop = LayoutUtils.dp2pix(context, 8); // 8dp
-    }
-
-    public TouchHelper(@NonNull TouchOwner owner) {
-        mOwner = owner;
     }
 
     public boolean onTouch(MotionEvent event) {
@@ -152,7 +149,7 @@ public class TouchHelper {
         return false;
     }
 
-    private void setPressed(boolean pressed, float x, float y){
+    private void setPressed(boolean pressed, float x, float y) {
         mOwner.setPressed(pressed);
         if (pressed) {
             mOwner.setHotspot(x, y);
