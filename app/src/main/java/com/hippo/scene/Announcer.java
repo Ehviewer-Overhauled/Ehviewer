@@ -22,7 +22,6 @@ public final class Announcer {
 
     Class<?> clazz;
     Bundle args;
-    TransitionHelper tranHelper;
     SceneFragment requestFrom;
     int requestCode;
 
@@ -40,11 +39,6 @@ public final class Announcer {
 
     public Announcer setArgs(Bundle args) {
         this.args = args;
-        return this;
-    }
-
-    public Announcer setTranHelper(TransitionHelper tranHelper) {
-        this.tranHelper = tranHelper;
         return this;
     }
 

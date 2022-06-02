@@ -1340,7 +1340,6 @@ public class DownloadsScene extends ToolbarScene
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list.get(index));
                 Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-                announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
                 startScene(announcer);
             } else if (start == v) {
                 Intent intent = new Intent(activity, DownloadService.class);

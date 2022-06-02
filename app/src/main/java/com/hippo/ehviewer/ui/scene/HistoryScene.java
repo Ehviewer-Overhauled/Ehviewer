@@ -342,10 +342,6 @@ public class HistoryScene extends ToolbarScene {
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, mLazyList.get(position));
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-        View thumb;
-        if (null != (thumb = view.findViewById(R.id.thumb))) {
-            announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
-        }
         startScene(announcer);
         return true;
     }

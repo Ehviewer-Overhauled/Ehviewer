@@ -252,7 +252,6 @@ public abstract class StageActivity extends EhActivity {
     public void startScene(Announcer announcer, boolean horizontal) {
         Class<?> clazz = announcer.clazz;
         Bundle args = announcer.args;
-        TransitionHelper tranHelper = announcer.tranHelper;
         FragmentManager fragmentManager = getSupportFragmentManager();
         int launchMode = getSceneLaunchMode(clazz);
 
@@ -351,23 +350,20 @@ public abstract class StageActivity extends EhActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         // Animation
         if (currentScene != null) {
-            if (tranHelper == null || !tranHelper.onTransition(
-                    this, transaction, currentScene, newScene)) {
-                // Clear shared item
-                currentScene.setSharedElementEnterTransition(null);
-                currentScene.setSharedElementReturnTransition(null);
-                currentScene.setEnterTransition(null);
-                currentScene.setExitTransition(null);
-                newScene.setSharedElementEnterTransition(null);
-                newScene.setSharedElementReturnTransition(null);
-                newScene.setEnterTransition(null);
-                newScene.setExitTransition(null);
-                // Set default animation
-                if (horizontal) {
-                    transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit);
-                } else {
-                    transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
-                }
+            // Clear shared item
+            currentScene.setSharedElementEnterTransition(null);
+            currentScene.setSharedElementReturnTransition(null);
+            currentScene.setEnterTransition(null);
+            currentScene.setExitTransition(null);
+            newScene.setSharedElementEnterTransition(null);
+            newScene.setSharedElementReturnTransition(null);
+            newScene.setEnterTransition(null);
+            newScene.setExitTransition(null);
+            // Set default animation
+            if (horizontal) {
+                transaction.setCustomAnimations(R.anim.scene_open_enter_horizontal, R.anim.scene_open_exit);
+            } else {
+                transaction.setCustomAnimations(R.anim.scene_open_enter, R.anim.scene_open_exit);
             }
             // Detach current scene
             if (!currentScene.isDetached()) {
@@ -480,14 +476,10 @@ public abstract class StageActivity extends EhActivity {
     }
 
     public void finishScene(SceneFragment scene) {
-        finishScene(scene, null);
+        finishScene(scene.getTag());
     }
 
-    public void finishScene(SceneFragment scene, TransitionHelper transitionHelper) {
-        finishScene(scene.getTag(), transitionHelper);
-    }
-
-    private void finishScene(String tag, TransitionHelper transitionHelper) {
+    private void finishScene(String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // Get scene
@@ -519,8 +511,6 @@ public abstract class StageActivity extends EhActivity {
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (next != null) {
-            if (transitionHelper == null || !transitionHelper.onTransition(
-                    this, transaction, scene, next)) {
                 // Clear shared item
                 scene.setSharedElementEnterTransition(null);
                 scene.setSharedElementReturnTransition(null);
@@ -532,7 +522,6 @@ public abstract class StageActivity extends EhActivity {
                 next.setExitTransition(null);
                 // Do not show animate if it is not the first fragment
                 transaction.setCustomAnimations(R.anim.scene_close_enter, R.anim.scene_close_exit);
-            }
             // Attach fragment
             transaction.attach(next);
         }

@@ -903,10 +903,6 @@ public final class GalleryListScene extends BaseScene
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-        View thumb;
-        if (null != (thumb = view.findViewById(R.id.thumb))) {
-            announcer.setTranHelper(new EnterGalleryDetailTransaction(thumb));
-        }
         startScene(announcer);
         return true;
     }

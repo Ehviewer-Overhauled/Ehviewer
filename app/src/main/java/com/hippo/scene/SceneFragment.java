@@ -72,13 +72,9 @@ public class SceneFragment extends Fragment {
     }
 
     public void finish() {
-        finish(null);
-    }
-
-    public void finish(TransitionHelper transitionHelper) {
         FragmentActivity activity = getActivity();
         if (activity instanceof StageActivity) {
-            ((StageActivity) activity).finishScene(this, transitionHelper);
+            ((StageActivity) activity).finishScene(this);
         }
     }
 
