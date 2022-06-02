@@ -44,70 +44,69 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/header_content"
+        <TextView
+            android:id="@+id/title"
+            style="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginRight="@dimen/keyline_margin"
+            android:ellipsize="end"
+            android:maxLines="5" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Elevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginRight="@dimen/keyline_margin"
+            android:layout_marginBottom="@dimen/keyline_margin"
+            android:layout_marginTop="@dimen/keyline_margin"
             app:fitsSystemWindowsInsets="top">
 
-            <com.hippo.widget.LoadImageView
-                android:id="@+id/thumb"
-                android:layout_width="@dimen/gallery_detail_thumb_width"
-                android:layout_height="@dimen/gallery_detail_thumb_height"
-                android:layout_marginLeft="@dimen/keyline_margin"
-                android:layout_marginTop="@dimen/keyline_margin"
-                android:layout_marginBottom="@dimen/keyline_margin" />
+            <RelativeLayout
+                android:id="@+id/header_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/thumb"
-                android:layout_marginLeft="@dimen/keyline_margin"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:layout_toEndOf="@id/thumb"
-                android:ellipsize="end"
-                android:maxLines="5"
-                android:textSize="@dimen/text_little_large" />
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/thumb_card"
+                    style="@style/Widget.Material3.CardView.Elevated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/uploader"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/title"
-                android:layout_alignStart="@id/title"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textAllCaps="true" />
+                    <com.hippo.widget.LoadImageView
+                        android:id="@+id/thumb"
+                        android:layout_width="@dimen/gallery_detail_thumb_width"
+                        android:layout_height="@dimen/gallery_detail_thumb_height" />
 
-            <Button
-                android:id="@+id/category"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/title"
-                android:layout_toRightOf="@id/uploader"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textAllCaps="true" />
+                </com.google.android.material.card.MaterialCardView>
 
-            <ImageView
-                android:id="@+id/other_actions"
-                android:layout_width="48dp"
-                android:layout_height="56dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingLeft="12dp"
-                android:paddingTop="16dp"
-                android:paddingRight="12dp"
-                android:paddingBottom="16dp"
-                app:srcCompat="@drawable/v_dots_vertical_secondary_dark_x24" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/uploader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:layout_alignBottom="@id/thumb_card"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textAllCaps="true" />
 
-        </RelativeLayout>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/uploader"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textAllCaps="true" />
+
+            </RelativeLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:id="@+id/action_card"

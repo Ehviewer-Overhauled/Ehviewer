@@ -36,15 +36,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -59,7 +58,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
@@ -137,7 +135,7 @@ import java.util.List;
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
 
-public class GalleryDetailScene extends BaseScene implements View.OnClickListener,
+public class GalleryDetailScene extends ToolbarScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
         View.OnLongClickListener {
 
@@ -177,8 +175,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private TextView mUploader;
     @Nullable
     private TextView mCategory;
-    @Nullable
-    private ImageView mOtherActions;
     @Nullable
     private ViewGroup mActionGroup;
     @Nullable
@@ -250,8 +246,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
     private View mProgress;
     @Nullable
     private ViewTransition mViewTransition2;
-    @Nullable
-    private PopupMenu mPopupMenu;
     @WholeLifeCircle
     private int mDownloadState;
     @Nullable
@@ -499,10 +493,62 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         outState.putInt(KEY_REQUEST_ID, mRequestId);
     }
 
+    @Override
+    public int getMenuResId() {
+        return R.menu.scene_gallery_detail;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
+    }
+
+    @Override
+    public void onNavigationClick() {
+        onBackPressed();
+        super.onNavigationClick();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_open_in_other_app) {
+            String url = getGalleryDetailUrl(false);
+            Activity activity = getMainActivity();
+            if (null != url && null != activity) {
+                UrlOpener.openUrl(activity, url, false);
+            }
+        } else if (itemId == R.id.action_refresh) {
+            if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
+                adjustViewVisibility(STATE_REFRESH, true);
+                request();
+            }
+        } else if (itemId == R.id.action_add_tag) {
+            if (mGalleryDetail == null) {
+                return false;
+            }
+            if (mGalleryDetail.apiUid < 0) {
+                showTip(R.string.sign_in_first, LENGTH_LONG);
+                return false;
+            }
+            EditTextDialogBuilder builder = new EditTextDialogBuilder(requireContext(), "", getString(R.string.action_add_tag_tip));
+            builder.setPositiveButton(android.R.string.ok, null);
+            AlertDialog dialog = builder.setTitle(R.string.action_add_tag)
+                    .show();
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setOnClickListener(v -> {
+                        voteTag(builder.getText().trim(), 1);
+                        dialog.dismiss();
+                    });
+        }
+        return true;
+    }
+
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                                        @Nullable Bundle savedInstanceState) {
         // Get download state
         long gid = getGid();
         if (gid != -1) {
@@ -541,14 +587,12 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTitle = (TextView) ViewUtils.$$(mHeader, R.id.title);
         mUploader = (TextView) ViewUtils.$$(mHeader, R.id.uploader);
         mCategory = (TextView) ViewUtils.$$(mHeader, R.id.category);
-        mOtherActions = (ImageView) ViewUtils.$$(mHeader, R.id.other_actions);
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
         mDownload = (TextView) ViewUtils.$$(mActionGroup, R.id.download);
         mRead = (TextView) ViewUtils.$$(mActionGroup, R.id.read);
 
         mUploader.setOnClickListener(this);
         mCategory.setOnClickListener(this);
-        mOtherActions.setOnClickListener(this);
         mDownload.setOnClickListener(this);
         mDownload.setOnLongClickListener(this);
         mRead.setOnClickListener(this);
@@ -650,7 +694,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mTitle = null;
         mUploader = null;
         mCategory = null;
-        mOtherActions = null;
         mActionGroup = null;
         mDownload = null;
         mRead = null;
@@ -690,8 +733,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         mProgress = null;
 
         mViewTransition2 = null;
-
-        mPopupMenu = null;
     }
 
     private boolean prepareData() {
@@ -1084,51 +1125,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         }
     }
 
-    private void ensurePopMenu() {
-        if (mPopupMenu != null) {
-            return;
-        }
-
-        Context context = getContext();
-        AssertUtils.assertNotNull(context);
-        PopupMenu popup = new PopupMenu(context, mOtherActions, Gravity.TOP);
-        mPopupMenu = popup;
-        popup.getMenuInflater().inflate(R.menu.scene_gallery_detail, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.action_open_in_other_app) {
-                String url = getGalleryDetailUrl(false);
-                Activity activity = getMainActivity();
-                if (null != url && null != activity) {
-                    UrlOpener.openUrl(activity, url, false);
-                }
-            } else if (itemId == R.id.action_refresh) {
-                if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
-                    adjustViewVisibility(STATE_REFRESH, true);
-                    request();
-                }
-            } else if (itemId == R.id.action_add_tag) {
-                if (mGalleryDetail == null) {
-                    return false;
-                }
-                if (mGalleryDetail.apiUid < 0) {
-                    showTip(R.string.sign_in_first, LENGTH_LONG);
-                    return false;
-                }
-                EditTextDialogBuilder builder = new EditTextDialogBuilder(context, "", getString(R.string.action_add_tag_tip));
-                builder.setPositiveButton(android.R.string.ok, null);
-                AlertDialog dialog = builder.setTitle(R.string.action_add_tag)
-                        .show();
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                        .setOnClickListener(v -> {
-                            voteTag(builder.getText().trim(), 1);
-                            dialog.dismiss();
-                        });
-            }
-            return true;
-        });
-    }
-
     private void showSimilarGalleryList() {
         GalleryDetail gd = mGalleryDetail;
         if (null == gd) {
@@ -1202,11 +1198,6 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         if (mTip == v) {
             if (request()) {
                 adjustViewVisibility(STATE_REFRESH, true);
-            }
-        } else if (mOtherActions == v) {
-            ensurePopMenu();
-            if (mPopupMenu != null) {
-                mPopupMenu.show();
             }
         } else if (mUploader == v) {
             String uploader = getUploader();
