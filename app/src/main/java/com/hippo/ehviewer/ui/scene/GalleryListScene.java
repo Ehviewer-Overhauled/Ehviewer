@@ -614,12 +614,7 @@ public final class GalleryListScene extends BaseScene
         mFabLayout.setOnExpandListener(this);
         addAboveSnackView(mFabLayout);
 
-        int colorID;
-        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
-            colorID = resources.getColor(android.R.color.white, getTheme());
-        } else {
-            colorID = resources.getColor(android.R.color.black, getTheme());
-        }
+        int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
         mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
 

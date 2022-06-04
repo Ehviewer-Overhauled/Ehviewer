@@ -291,12 +291,7 @@ public class FavoritesScene extends BaseScene implements
         updateSearchBar();
         mSearchBarMover = new SearchBarMover(this, mSearchBar, mRecyclerView);
 
-        int colorID;
-        if (EhActivity.isNightMode(context.getResources().getConfiguration())) {
-            colorID = resources.getColor(android.R.color.white, getTheme());
-        } else {
-            colorID = resources.getColor(android.R.color.black, getTheme());
-        }
+        int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
         mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
         mFabLayout.setExpanded(false, false);
