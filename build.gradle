@@ -1,12 +1,6 @@
-buildscript {
-    ext {
-        compose = '1.2.0-beta03'
-    }
-}
-
 plugins {
     id 'com.android.application' version '7.2.1' apply false
-    id 'org.jetbrains.kotlin.android' version '1.6.21' apply false
+    id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
 }
 
 task clean(type: Delete) {
