@@ -28,7 +28,7 @@ class VersionPreference @JvmOverloads constructor(
 ) : MessagePreference(context, attrs) {
     init {
         setTitle(R.string.settings_about_version)
-        val version: String = try {
+        @Suppress("DEPRECATION") val version: String = try {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             pInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
