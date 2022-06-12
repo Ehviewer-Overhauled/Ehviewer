@@ -113,7 +113,7 @@ dependencies {
     implementation 'com.github.seven332:yorozuya-collect:0.1.4'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
     implementation 'dev.rikka.rikkax.material:material:2.4.0'
