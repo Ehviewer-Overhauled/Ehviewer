@@ -6,7 +6,7 @@
     android:viewportHeight="48">
     <path
         android:fillAlpha="1"
-        android:fillColor="@android:color/white"
+        android:fillColor="@color/shortcut_bg"
         android:pathData="M46,24A22,22 0,0 1,24 46,22 22,0 0,1 2,24 22,22 0,0 1,24 2,22 22,0 0,1 46,24Z" />
     <path
         android:fillAlpha="1"
