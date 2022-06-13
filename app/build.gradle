@@ -93,7 +93,6 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation 'androidx.activity:activity:1.4.0'
-    implementation 'androidx.activity:activity-compose:1.4.0'
     implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha04'
     implementation 'androidx.browser:browser:1.4.0'
     implementation 'androidx.core:core:1.8.0'
