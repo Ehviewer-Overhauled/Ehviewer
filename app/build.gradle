@@ -6,7 +6,7 @@ plugins {
 
 android {
     compileSdkVersion 33
-    buildToolsVersion "32.0.0"
+    buildToolsVersion "33.0.0"
 
     Properties localProperties = new Properties()
     if (project.rootProject.file('local.properties').exists()) {
