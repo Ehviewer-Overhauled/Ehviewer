@@ -21,7 +21,7 @@
   </a>
 </p>
 
-# Description
+## Description
 这是一个 E-Hentai Android 平台的浏览器
 
 已针对性适配 Material Design 3 及其动态取色系统
@@ -35,15 +35,15 @@ with Material Design 3 and Dynamic Color Support.
 
 Only Support Android S and above!
 
-# Download
+## Download
 
 [Github 下载](https://github.com/asuka-mio/Ehviewer/releases)
 
-# Screenshot
+## Screenshot
 
 ![screenshot-01](art/screenshot-01.png)
 
-# Thanks
+## Thanks
 
 本项目受到了诸多开源项目的帮助
 
@@ -68,7 +68,7 @@ Here is the libraries
 - [Zstd](http://www.zstd.net/)
 
 
-# License
+## License
 
     Copyright (C) 2014-2019 Hippo Seven
 
