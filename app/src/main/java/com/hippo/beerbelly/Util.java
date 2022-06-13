@@ -26,76 +26,77 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-/** Junk drawer of utility methods. */
+/**
+ * Junk drawer of utility methods.
+ */
 final class Util {
-  static final Charset US_ASCII = StandardCharsets.US_ASCII;
-  static final Charset UTF_8 = StandardCharsets.UTF_8;
+    static final Charset US_ASCII = StandardCharsets.US_ASCII;
+    static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private static final int EOF = -1;
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
-  private Util() {
-  }
-
-  static String readFully(Reader reader) throws IOException {
-    try (reader) {
-      StringWriter writer = new StringWriter();
-      char[] buffer = new char[1024];
-      int count;
-      while ((count = reader.read(buffer)) != -1) {
-        writer.write(buffer, 0, count);
-      }
-      return writer.toString();
+    private Util() {
     }
-  }
 
-  /**
-   * Deletes the contents of {@code dir}. Throws an IOException if any file
-   * could not be deleted, or if {@code dir} is not a readable directory.
-   */
-  static void deleteContents(File dir) throws IOException {
-    File[] files = dir.listFiles();
-    if (files == null) {
-      throw new IOException("not a readable directory: " + dir);
+    static String readFully(Reader reader) throws IOException {
+        try (reader) {
+            StringWriter writer = new StringWriter();
+            char[] buffer = new char[1024];
+            int count;
+            while ((count = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, count);
+            }
+            return writer.toString();
+        }
     }
-    for (File file : files) {
-      if (file.isDirectory()) {
-        deleteContents(file);
-      }
-      if (!file.delete()) {
-        throw new IOException("failed to delete file: " + file);
-      }
-    }
-  }
 
-  static void closeQuietly(/*Auto*/Closeable closeable) {
-    if (closeable != null) {
-      try {
-        closeable.close();
-      } catch (RuntimeException rethrown) {
-        throw rethrown;
-      } catch (Exception ignored) {
-      }
+    /**
+     * Deletes the contents of {@code dir}. Throws an IOException if any file
+     * could not be deleted, or if {@code dir} is not a readable directory.
+     */
+    static void deleteContents(File dir) throws IOException {
+        File[] files = dir.listFiles();
+        if (files == null) {
+            throw new IOException("not a readable directory: " + dir);
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                deleteContents(file);
+            }
+            if (!file.delete()) {
+                throw new IOException("failed to delete file: " + file);
+            }
+        }
     }
-  }
 
-  private static final int EOF = -1;
-  private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-
-  /**
-   * Copy bytes from an <code>InputStream</code> to an
-   * <code>OutputStream</code>.
-   *
-   * @param input the InputStream
-   * @param output the OutputStream
-   * @return the number of bytes copied
-   */
-  public static long copy(InputStream input, OutputStream output)
-          throws IOException {
-    byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-    long count = 0;
-    int n;
-    while (EOF != (n = input.read(buffer))) {
-      output.write(buffer, 0, n);
-      count += n;
+    static void closeQuietly(/*Auto*/Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception ignored) {
+            }
+        }
     }
-    return count;
-  }
+
+    /**
+     * Copy bytes from an <code>InputStream</code> to an
+     * <code>OutputStream</code>.
+     *
+     * @param input  the InputStream
+     * @param output the OutputStream
+     * @return the number of bytes copied
+     */
+    public static long copy(InputStream input, OutputStream output)
+            throws IOException {
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        long count = 0;
+        int n;
+        while (EOF != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
+    }
 }

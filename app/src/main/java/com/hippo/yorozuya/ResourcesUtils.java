@@ -25,6 +25,7 @@ import androidx.annotation.AttrRes;
 public final class ResourcesUtils {
     private static final Object mAccessLock = new Object();
     private static TypedValue mTmpValue = new TypedValue();
+
     private ResourcesUtils() {
     }
 

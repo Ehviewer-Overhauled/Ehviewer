@@ -137,6 +137,7 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     private int mScaleMode = ImageView.SCALE_FIT;
     private int mStartPosition = ImageView.START_POSITION_TOP_LEFT;
     private int mIndex;
+
     private GalleryView(Builder build) {
         mContext = build.mContext;
         mAdapter = build.mAdapter;

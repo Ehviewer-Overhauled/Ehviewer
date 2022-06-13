@@ -30,9 +30,8 @@ public class InfiniteThreadExecutor implements Executor {
     private final ThreadFactory mThreadFactory;
 
     private final AtomicInteger mThreadCount = new AtomicInteger();
-    private int mEmptyThreadCount;
-
     private final Object mLock = new Object();
+    private int mEmptyThreadCount;
 
     public InfiniteThreadExecutor(long keepAliveMillis, Queue<Runnable> workQueue, ThreadFactory threadFactory) {
         mKeepAliveMillis = keepAliveMillis;
@@ -65,7 +64,7 @@ public class InfiniteThreadExecutor implements Executor {
             mThreadCount.incrementAndGet();
 
             boolean hasWait = false;
-            for (;;) {
+            for (; ; ) {
                 Runnable command;
                 synchronized (mLock) {
                     command = mWorkQueue.poll();

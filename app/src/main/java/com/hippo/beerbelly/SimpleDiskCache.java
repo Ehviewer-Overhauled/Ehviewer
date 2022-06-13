@@ -55,15 +55,13 @@ public class SimpleDiskCache {
 
     private final File mCacheDir;
     private final int mSize;
-
-    private int mDiskCacheState;
-
-    @Nullable
-    private DiskLruCache mDiskLruCache;
     @NonNull
     private final Map<String, CounterLock> mLockMap = new HashMap<>();
     @NonNull
     private final LockPool mLockPool = new LockPool();
+    private int mDiskCacheState;
+    @Nullable
+    private DiskLruCache mDiskLruCache;
 
     public SimpleDiskCache(File cacheDir, int size) {
         mCacheDir = cacheDir;
@@ -74,6 +72,43 @@ public class SimpleDiskCache {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * A hashing method that changes a string (like a URL) into a hash suitable
+     * for using as a disk filename.
+     *
+     * @param key The key used to store the file
+     */
+    private static String hashKeyForDisk(final String key) {
+        String cacheKey;
+        try {
+            final MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(key.getBytes());
+            cacheKey = bytesToHexString(digest.digest());
+        } catch (final NoSuchAlgorithmException e) {
+            cacheKey = String.valueOf(key.hashCode());
+        }
+        return cacheKey;
+    }
+
+    /**
+     * http://stackoverflow.com/questions/332079
+     *
+     * @param bytes The bytes to convert.
+     * @return A {@link String} converted from the bytes of a hashable key used
+     * to store a filename on the disk, to hex digits.
+     */
+    private static String bytesToHexString(final byte[] bytes) {
+        final StringBuilder builder = new StringBuilder();
+        for (final byte b : bytes) {
+            final String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) {
+                builder.append('0');
+            }
+            builder.append(hex);
+        }
+        return builder.toString();
     }
 
     public synchronized boolean isValid() {
@@ -303,43 +338,6 @@ public class SimpleDiskCache {
         return new CacheOutputStreamPipe(diskKey);
     }
 
-    /**
-     * A hashing method that changes a string (like a URL) into a hash suitable
-     * for using as a disk filename.
-     *
-     * @param key The key used to store the file
-     */
-    private static String hashKeyForDisk(final String key) {
-        String cacheKey;
-        try {
-            final MessageDigest digest = MessageDigest.getInstance("MD5");
-            digest.update(key.getBytes());
-            cacheKey = bytesToHexString(digest.digest());
-        } catch (final NoSuchAlgorithmException e) {
-            cacheKey = String.valueOf(key.hashCode());
-        }
-        return cacheKey;
-    }
-
-    /**
-     * http://stackoverflow.com/questions/332079
-     *
-     * @param bytes The bytes to convert.
-     * @return A {@link String} converted from the bytes of a hashable key used
-     *         to store a filename on the disk, to hex digits.
-     */
-    private static String bytesToHexString(final byte[] bytes) {
-        final StringBuilder builder = new StringBuilder();
-        for (final byte b : bytes) {
-            final String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) {
-                builder.append('0');
-            }
-            builder.append(hex);
-        }
-        return builder.toString();
-    }
-
     private class CacheInputStreamPipe implements InputStreamPipe {
 
         private final String mKey;
@@ -372,7 +370,8 @@ public class SimpleDiskCache {
         }
 
         @Override
-        public @NonNull InputStream open() throws IOException {
+        public @NonNull
+        InputStream open() throws IOException {
             if (mLock == null) {
                 throw new IllegalStateException("Please obtain it first");
             }
@@ -431,7 +430,8 @@ public class SimpleDiskCache {
         }
 
         @Override
-        public @NonNull OutputStream open() throws IOException {
+        public @NonNull
+        OutputStream open() throws IOException {
             if (mLock == null) {
                 throw new IllegalStateException("Please obtain it first");
             }

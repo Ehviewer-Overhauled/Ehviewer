@@ -511,17 +511,17 @@ public abstract class StageActivity extends EhActivity {
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (next != null) {
-                // Clear shared item
-                scene.setSharedElementEnterTransition(null);
-                scene.setSharedElementReturnTransition(null);
-                scene.setEnterTransition(null);
-                scene.setExitTransition(null);
-                next.setSharedElementEnterTransition(null);
-                next.setSharedElementReturnTransition(null);
-                next.setEnterTransition(null);
-                next.setExitTransition(null);
-                // Do not show animate if it is not the first fragment
-                transaction.setCustomAnimations(R.anim.scene_close_enter, R.anim.scene_close_exit);
+            // Clear shared item
+            scene.setSharedElementEnterTransition(null);
+            scene.setSharedElementReturnTransition(null);
+            scene.setEnterTransition(null);
+            scene.setExitTransition(null);
+            next.setSharedElementEnterTransition(null);
+            next.setSharedElementReturnTransition(null);
+            next.setEnterTransition(null);
+            next.setExitTransition(null);
+            // Do not show animate if it is not the first fragment
+            transaction.setCustomAnimations(R.anim.scene_close_enter, R.anim.scene_close_exit);
             // Attach fragment
             transaction.attach(next);
         }

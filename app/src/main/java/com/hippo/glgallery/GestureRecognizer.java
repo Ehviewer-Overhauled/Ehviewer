@@ -33,6 +33,7 @@ class GestureRecognizer {
     private final ScaleGestureDetector mScaleDetector;
     private final DownUpDetector mDownUpDetector;
     private final Listener mListener;
+
     public GestureRecognizer(Context context, Listener listener) {
         mListener = listener;
         MyGestureListener gestureListener = new MyGestureListener();

@@ -33,14 +33,12 @@ import java.io.OutputStream;
 public abstract class BeerBelly<V> {
 
     private static final String TAG = BeerBelly.class.getSimpleName();
-
+    private final boolean mHasMemoryCache;
+    private final boolean mHasDiskCache;
     @Nullable
     private MemoryCache<V> mMemoryCache;
     @Nullable
     private DiskCache<V> mDiskCache;
-
-    private final boolean mHasMemoryCache;
-    private final boolean mHasDiskCache;
 
     public BeerBelly(BeerBellyParams params) {
         params.isValid();
@@ -220,7 +218,7 @@ public abstract class BeerBelly<V> {
     /**
      * Put value to memory cache
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      * @return false if no memory cache
      */
@@ -237,7 +235,7 @@ public abstract class BeerBelly<V> {
     /**
      * Put value to disk cache
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      * @return false if no disk cache or get error
      */
@@ -252,7 +250,7 @@ public abstract class BeerBelly<V> {
     /**
      * Put value to memory cache and disk cache
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      */
     public void put(@NonNull String key, @NonNull V value) {
@@ -286,9 +284,8 @@ public abstract class BeerBelly<V> {
     }
 
     /**
-     *
      * @param key the key
-     * @param is the input stream to store
+     * @param is  the input stream to store
      * @return false if no disk cache or get error
      */
     public boolean putRawToDisk(@NonNull String key, @NonNull InputStream is) {
@@ -381,26 +378,6 @@ public abstract class BeerBelly<V> {
         }
     }
 
-    private class MemoryCache<E> extends LruCache<String, E> {
-
-        public BeerBelly<E> mParent;
-
-        public MemoryCache(int maxSize, BeerBelly<E> parent) {
-            super(maxSize);
-            mParent = parent;
-        }
-
-        @Override
-        protected int sizeOf(String key, E value) {
-            return mParent.sizeOf(key, value);
-        }
-
-        @Override
-        protected void entryRemoved(boolean evicted, String key, E oldValue, E newValue) {
-            mParent.memoryEntryRemoved(evicted, key, oldValue, newValue);
-        }
-    }
-
     private static class DiskCache<E> {
 
         private static final int IO_BUFFER_SIZE = 8 * 1024;
@@ -490,6 +467,26 @@ public abstract class BeerBelly<V> {
                     isPipe.release();
                 }
             }
+        }
+    }
+
+    private class MemoryCache<E> extends LruCache<String, E> {
+
+        public BeerBelly<E> mParent;
+
+        public MemoryCache(int maxSize, BeerBelly<E> parent) {
+            super(maxSize);
+            mParent = parent;
+        }
+
+        @Override
+        protected int sizeOf(String key, E value) {
+            return mParent.sizeOf(key, value);
+        }
+
+        @Override
+        protected void entryRemoved(boolean evicted, String key, E oldValue, E newValue) {
+            mParent.memoryEntryRemoved(evicted, key, oldValue, newValue);
         }
     }
 }

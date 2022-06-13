@@ -59,9 +59,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginTop="@dimen/keyline_margin"
             android:layout_marginRight="@dimen/keyline_margin"
             android:layout_marginBottom="@dimen/keyline_margin"
-            android:layout_marginTop="@dimen/keyline_margin"
             app:fitsSystemWindowsInsets="top">
 
             <RelativeLayout
@@ -86,9 +86,9 @@
                     android:id="@+id/uploader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/thumb_card"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="@dimen/keyline_margin"
-                    android:layout_alignBottom="@id/thumb_card"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAllCaps="true" />

@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 class DownUpDetector {
     private final DownUpListener mListener;
     private boolean mStillDown;
+
     public DownUpDetector(DownUpListener listener) {
         mListener = listener;
     }

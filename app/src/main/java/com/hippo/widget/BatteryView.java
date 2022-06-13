@@ -66,6 +66,13 @@ public class BatteryView extends AppCompatTextView {
 
         mDrawable.setColor(mColor);
         mDrawable.setWarningColor(mWarningColor);
+    }
+
+    private void init() {
+        mDrawable = new BatteryDrawable();
+        int height = (int) getTextSize();
+        mDrawable.setBounds(0, 0, (int) (height / 0.618f), height);
+        setCompoundDrawables(mDrawable, null, null, null);
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -80,13 +87,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    private void init() {
-        mDrawable = new BatteryDrawable();
-        int height = (int) getTextSize();
-        mDrawable.setBounds(0, 0, (int) (height / 0.618f), height);
-        setCompoundDrawables(mDrawable, null, null, null);
-    }
 
     @Override
     public void setTextColor(int color) {
@@ -137,7 +137,13 @@ public class BatteryView extends AppCompatTextView {
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-    }    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+    }
+
+    private void unregisterReceiver() {
+        getContext().unregisterReceiver(mIntentReceiver);
+    }
+
+    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
 
         @Override
         @SuppressLint("SetTextI18n")
@@ -167,12 +173,6 @@ public class BatteryView extends AppCompatTextView {
             }
         }
     };
-
-    private void unregisterReceiver() {
-        getContext().unregisterReceiver(mIntentReceiver);
-    }
-
-
 
 
 

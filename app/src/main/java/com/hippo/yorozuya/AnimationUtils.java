@@ -26,6 +26,7 @@ public final class AnimationUtils {
     public static final Interpolator FAST_SLOW_INTERPOLATOR = new LinearOutSlowInInterpolator();
     public static final Interpolator SLOW_FAST_INTERPOLATOR = new FastOutLinearInInterpolator();
     public static final Interpolator SLOW_FAST_SLOW_INTERPOLATOR = new FastOutSlowInInterpolator();
+
     private AnimationUtils() {
     }
 }

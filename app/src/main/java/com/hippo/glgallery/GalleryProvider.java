@@ -182,6 +182,7 @@ public abstract class GalleryProvider {
         private float mPercent;
         private ImageWrapper mImage;
         private String mError;
+
         public NotifyTask(Listener listener, ConcurrentPool<NotifyTask> pool) {
             mListener = listener;
             mPool = pool;

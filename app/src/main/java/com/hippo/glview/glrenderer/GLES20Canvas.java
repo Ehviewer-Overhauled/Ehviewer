@@ -216,6 +216,7 @@ public class GLES20Canvas implements GLCanvas {
     private int mCountTextureRect = 0;
     private int mCountFillRect = 0;
     private int mCountDrawLine = 0;
+
     public GLES20Canvas() {
         Matrix.setIdentityM(mTempTextureMatrix, 0);
         Matrix.setIdentityM(mMatrices, mCurrentMatrixIndex);

@@ -41,6 +41,7 @@ public final class GLEdgeView extends GLView {
     private static final int RIGHT_M = RIGHT * 16;
     private final GLEdgeEffect[] mEffect = new GLEdgeEffect[4];
     private final float[] mMatrix = new float[4 * 16];
+
     public GLEdgeView(int color) {
         for (int i = 0; i < 4; i++) {
             mEffect[i] = new GLEdgeEffect(color);
