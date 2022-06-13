@@ -23,13 +23,10 @@
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="colorEdgeEffect">@color/grey_500</item>
         <item name="dividerColor">@color/divider</item>
-        <item name="drawableColorSecondary">@color/material_dynamic_secondary50</item>
-        <item name="drawableColorThemePrimary">@color/material_dynamic_primary50</item>
-        <item name="guideBackgroundColor">@color/material_dynamic_neutral80</item>
-        <item name="guideTitleColor">@color/material_dynamic_primary70</item>
-        <item name="guideTextColor">@color/material_dynamic_primary50</item>
-        <item name="tagGroupBackgroundColor">@color/material_dynamic_primary50</item>
-        <item name="tagBackgroundColor">@color/material_dynamic_neutral50</item>
+        <item name="drawableColorSecondary">?attr/colorOnSurface</item>
+        <item name="drawableColorThemePrimary">?attr/colorPrimary</item>
+        <item name="tagGroupBackgroundColor">?attr/colorPrimary</item>
+        <item name="tagBackgroundColor">?attr/colorTertiary</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>

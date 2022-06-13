@@ -55,6 +55,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
+
 public class ContentLayout extends FrameLayout {
 
     private CircularProgressIndicator mProgressView;
@@ -102,7 +104,7 @@ public class ContentLayout extends FrameLayout {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
-        drawable.setColor(com.google.android.material.R.color.material_dynamic_neutral100);
+        drawable.setColor(ResourcesKt.resolveColor(context.getTheme(), androidx.appcompat.R.attr.colorPrimary));
         mFastScroller.setHandlerDrawable(drawable);
 
         mRefreshLayout.setColorSchemeResources(

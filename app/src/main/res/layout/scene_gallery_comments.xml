@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/material_dynamic_primary50"
+        android:background="?attr/colorPrimaryContainer"
         android:elevation="4dp"
         android:orientation="horizontal"
         android:visibility="invisible"

@@ -85,6 +85,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rikka.core.res.ResourcesKt;
+
 public class HistoryScene extends ToolbarScene {
 
     /*---------------
@@ -232,7 +234,7 @@ public class HistoryScene extends ToolbarScene {
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
-        handlerDrawable.setColor(com.google.android.material.R.color.material_dynamic_neutral100);
+        handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorPrimary));
         mFastScroller.setHandlerDrawable(handlerDrawable);
 
         updateLazyList();

@@ -62,7 +62,5 @@
         <item name="indicatorColor">?attr/dividerColor</item>
     </style>
 
-    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium">
-        <item name="android:textColor">?attr/guideTitleColor</item>
-    </style>
+    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium"/>
 </resources>

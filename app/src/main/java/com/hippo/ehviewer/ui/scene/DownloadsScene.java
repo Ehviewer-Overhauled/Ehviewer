@@ -379,7 +379,7 @@ public class DownloadsScene extends ToolbarScene
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
-        handlerDrawable.setColor(com.google.android.material.R.color.material_dynamic_neutral100);
+        handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorPrimary));
         mFastScroller.setHandlerDrawable(handlerDrawable);
         mFastScroller.setOnDragHandlerListener(this);
 
