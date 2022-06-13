@@ -105,7 +105,6 @@ dependencies {
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.7.0-alpha02'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
-    implementation 'com.github.seven332:beerbelly:0.1.4'
     implementation 'com.github.seven332:streampipe:0.1.0'
     implementation 'com.github.seven332:tuxiang:0.1.6'
     implementation 'com.github.seven332:unifile:9ec57bcd8f'
