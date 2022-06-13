@@ -1,16 +1,11 @@
-//
-// Created by tarsin on 2022/5/21.
-//
-
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <android/log.h>
 #include <archive.h>
 #include <archive_entry.h>
 
-#define LOG_TAG "libarchive"
+#define LOG_TAG "libarchive_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG ,__VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG ,__VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG ,__VA_ARGS__)
@@ -20,11 +15,8 @@
 
 #define BLOCK_SIZE 4096
 
-#define READ_DATA_ERR 3
-
 typedef struct archive_inst_sc {
     struct archive *archive;
-    int entry_num;
     JNIEnv *env;
     jobject file;
     jmethodID readID;
@@ -52,16 +44,17 @@ static int filename_is_playable_file(const char *name) {
     return 0;
 }
 
-static void archive_list_all_entries(struct archive_inst_sc *inst) {
+static long archive_list_all_entries(struct archive_inst_sc *inst) {
     struct archive *a = inst->archive;
     struct archive_entry *entry;
-    int count = 0;
+    long count = 0;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
         if (filename_is_playable_file(archive_entry_pathname(entry)))
             count++;
-        archive_read_data_skip(a);
     }
-    inst->entry_num = count;
+    if (!count)
+        LOGE("%s", archive_error_string(inst->archive));
+    return count;
 }
 
 ssize_t ins_read(struct archive *a, void *client_data_ptr, const void **buff) {
@@ -122,14 +115,14 @@ static void archive_destroy_inst(archive_inst *inst) {
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jobject osf) {
-    int r;
     archive_inst *arc = archive_create_inst(env, osf);
-    r = archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
+    long r = archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
     if (r) {
         r = 0;
+        LOGE("%s%s", "Archive open failed:", archive_error_string(arc->archive));
     } else {
-        archive_list_all_entries(arc);
-        r = arc->entry_num;
+        r = archive_list_all_entries(arc);
+        LOGI("%s%ld%s", "Found ", r, " image entries in archive");
     }
     archive_destroy_inst(arc);
     return r;
@@ -152,7 +145,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
             for (;;) {
                 size = (int32_t) archive_read_data(arc->archive, arc->output_buffer, BLOCK_SIZE);
                 if (size < 0) {
-                    return READ_DATA_ERR;
+                    return 3;
                 }
                 if (size == 0)
                     break;
