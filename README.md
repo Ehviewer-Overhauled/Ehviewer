@@ -42,6 +42,7 @@ Only Support Android S and above!
 ## Screenshot
 
 ![screenshot-01](art/screenshot-01.png)
+![screenshot-02](art/screenshot-02.png)
 
 ## Thanks
 
