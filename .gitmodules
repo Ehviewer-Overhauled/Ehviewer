@@ -16,6 +16,3 @@
 [submodule "native/src/main/jni/libzstd"]
 	path = native/src/main/jni/libzstd
 	url = https://github.com/facebook/zstd
-[submodule "native/src/main/jni/libfuse/libfuse"]
-	path = native/src/main/jni/libfuse/libfuse
-	url = https://github.com/libfuse/libfuse/
