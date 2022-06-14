@@ -102,4 +102,18 @@ public class UriArchiveAccessor implements Closeable {
             }
         }
     }
+
+    private static native boolean compressDirToOutStream(String dirname, int format, OutputStream os);
+
+    public static synchronized boolean exportGalleryArchive(String dirName, int format, Uri target, Context context) {
+        try {
+            OutputStream os = context.getContentResolver().openOutputStream(target);
+            compressDirToOutStream(dirName, format, os);
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
 }

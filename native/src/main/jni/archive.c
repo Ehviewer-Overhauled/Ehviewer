@@ -165,3 +165,9 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
     archive_destroy_inst(arc);
     return 0;
 }
+
+JNIEXPORT jboolean JNICALL
+Java_com_hippo_UriArchiveAccessor_compressDirToOutStream(JNIEnv *env, jclass clazz, jstring dirname,
+                                                         jint format, jobject os) {
+    return JNI_FALSE;
+}
