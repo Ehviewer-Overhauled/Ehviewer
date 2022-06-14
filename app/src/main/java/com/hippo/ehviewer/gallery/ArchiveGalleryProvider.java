@@ -194,7 +194,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     continue;
                 }
 
-                Pipe pipe = new Pipe(4096);
+                Pipe pipe = new Pipe(4096 * 16);
 
                 synchronized (streams) {
                     if (streams.get(index) != null) {
