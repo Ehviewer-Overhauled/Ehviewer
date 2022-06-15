@@ -28,6 +28,7 @@ public class FixedThumb extends LoadImageView {
 
     private float minAspect;
     private float maxAspect;
+    private boolean alwaysCutAndScale;
 
     public FixedThumb(Context context) {
         super(context);
@@ -48,6 +49,7 @@ public class FixedThumb extends LoadImageView {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FixedThumb, defStyleAttr, defStyleRes);
         minAspect = a.getFloat(R.styleable.FixedThumb_minAspect, 0.0f);
         maxAspect = a.getFloat(R.styleable.FixedThumb_maxAspect, 0.0f);
+        alwaysCutAndScale = a.getBoolean(R.styleable.FixedThumb_alwaysCutAndScale, false);
         a.recycle();
     }
 
@@ -58,6 +60,10 @@ public class FixedThumb extends LoadImageView {
 
     @Override
     public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) {
+        if (alwaysCutAndScale) {
+            setScaleType(ScaleType.CENTER_CROP);
+            return;
+        }
         if (isTarget && drawable != null) {
             int width = drawable.getIntrinsicWidth();
             int height = drawable.getIntrinsicHeight();

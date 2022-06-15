@@ -33,8 +33,7 @@
             android:id="@+id/thumb"
             android:layout_width="@dimen/gallery_list_thumb_width"
             android:layout_height="@dimen/gallery_list_thumb_height"
-            app:maxAspect="1.333"
-            app:minAspect="0.333"
+            app:alwaysCutAndScale="true"
             app:retryType="longClick" />
 
         <TextView

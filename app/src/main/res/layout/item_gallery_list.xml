@@ -38,8 +38,7 @@
                 android:id="@+id/thumb"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:maxAspect="1.333"
-                app:minAspect="0.333"
+                app:alwaysCutAndScale="true"
                 app:retryType="click" />
 
         </com.google.android.material.card.MaterialCardView>
