@@ -72,6 +72,8 @@ Here is the libraries
 ## License
 
     Copyright (C) 2014-2019 Hippo Seven
+    Copyright (C) 2020-2022 NekoInverter
+    Copyright (C) 2022 Tarsin Norbin
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
