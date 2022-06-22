@@ -1,0 +1,108 @@
+name: Bug 反馈 / Bug report
+description: 提交一个问题报告 / Create a bug report to help us improve
+labels:
+  - "bug"
+body:
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤 / Step to reproduce
+      description: |
+        在此处写下复现的方式
+        Describe how to reproduce here
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id : expected
+    attributes:
+      label: 预期行为 / Expected behaviour
+      description: |
+        在此处说明正常情况下应用的预期行为
+        Describe what should happened here
+      placeholder: |
+        它应该XXX...
+        It should be ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为 / Actual Behaviour
+      description: |
+        在此处描绘应用的实际行为，最好附上截图
+        Describe what actually happened here, screenshots is better
+      placeholder: |
+        实际上它XXX...
+        Actually it ...
+        [截图] / [Screenshots]
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: EhViewer 版本号 / EhViewer version code
+      description: 您可以在设置 - 关于处找到版本号 / You can get version code in Settings - About
+      placeholder: 四位版本号 / 4 digits version code
+    validations:
+      required: true
+
+  - type: input
+    id: ci
+    attributes:
+      label: EhViewer CI 版本 / EhViewer CI Version
+      description: 直接将对应 CI 下载页面网址填入即可 / Simply drop CI download page url here
+      placeholder: https://github.com/asuka-mio/Ehviewer/actions/runs/XXXXXXXXXX
+    validations:
+      required: true
+
+  - type: input
+    id: system
+    attributes:
+      label: Android 系统版本 / Android version
+      description: Android 分支名称 + 版本号 / AOSP fork name + version code
+      placeholder: MIUI 12.5, ArrowOS 12.1
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: 设备信息 / Device info
+      description: 特殊设备在此填入设备信息 / Put message here if you device is special
+      placeholder: WSA, arm-v7a
+
+  - type: textarea
+    id: log
+    attributes:
+      label: 应用日志 / App logs
+      description: 您可以通过设置-高级-导出日志来获得日志文件 / You can get logs file in Settings - Advanced - Dump logcat
+      placeholder: 06-15 17:44:53.704 23382 23382 E ...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: check
+    attributes:
+      label: 自查步骤 / Verify steps
+      description: |
+        请确认您已经遵守所有必选项
+        Please ensure you have obtained all needed options
+      options:
+      - label: 如果您有足够的时间和能力，并愿意为此提交 PR ，请勾上此复选框 / Pull request is welcome. Check this if you want to start a pull request
+        required: false
+
+      - label: 您已搜索过 [Issue Tracker](……/)，没有找到类似内容 / I have searched on [Issue Tracker](……/), No duplicate or related open issue has been found
+        required: true
+
+      - label: 您确保这个 Issue 只提及一个问题。如果您有多个问题报告，烦请发起多个 Issue / Ensure there is only one bug report in this issue. Please make mutiply issue for mutiply bugs.
+        required: true
+
+      - label: 您确保已使用最新 CI 版本测试，并且该问题在最新 CI 版本中并未解决 / This bug have not solved in latest CI version.
+        required: true
