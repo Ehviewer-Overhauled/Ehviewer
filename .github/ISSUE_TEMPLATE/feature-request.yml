@@ -1,0 +1,82 @@
+name: 功能请求 / Feature request
+description: 提出一个功能建议 / Suggest an idea for this project
+labels:
+  - "enhancement"
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: 需求 / Requirement
+      description: |
+        在此处描述您的需求。这通常会是一个您想要的功能
+        Ddescribe what you need here.
+      placeholder: |
+          我需要 XXX 功能 ...
+          I want ABC feature ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: impl
+    attributes:
+      label: 建议实现 / Suggested implements
+      description: |
+        在此处表述您建议的实现方式。如有可能，UI 类功能请求还请尽量附上图示
+        Describe your suggested implements here, It's recommend to add a photo if you are making a UI feature request.
+      placeholder: |
+          建议在 XX 处添加 XX ...
+          I recommend add ABC feature to DEF...
+          图片（如果有）/ Photos (if exists)
+    validations:
+      required: true
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 其他细节 / Addition details
+      description: |
+        在此处写下其他您想说的内容
+        Describe addition details here
+      placeholder: |
+        其他有用的信息与附件
+        Additional details and attachments
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: EhViewer 版本号 / EhViewer version code
+      description: 您可以在设置 - 关于处找到版本号 / You can get version code in Settings - About
+      placeholder: 四位版本号 / 4 digits version code
+    validations:
+      required: true
+
+  - type: input
+    id: ci
+    attributes:
+      label: EhViewer CI 版本 / EhViewer CI Version
+      description: 直接将对应 CI 下载页面网址填入即可 / Simply drop CI download page url here
+      placeholder: https://github.com/asuka-mio/Ehviewer/actions/runs/XXXXXXXXXX
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: check
+    attributes:
+      label: 自查步骤 / Verify steps
+      description: |
+        请确认您已经遵守所有必选项
+        Please ensure you have obtained all needed options
+      options:
+      - label: 如果您有足够的时间和能力，并愿意为此提交 PR ，请勾上此复选框 / Pull request is welcome. Check this if you want to start a pull request
+        required: false
+
+      - label: 您已搜索过 [Issue Tracker](……/)，没有找到类似内容 / I have searched on [Issue Tracker](……/), No duplicate or related open issue has been found
+        required: true
+
+      - label: 您确保这个 Issue 只提及一个功能。如果您有多个功能请求，烦请发起多个 Issue / Ensure there is only one feature request in this issue. Please make mutiply issue for mutiply feature request.
+        required: true
+
+      - label: 您确保已使用最新 CI 版本测试，并且该功能在最新 CI 版本中并未按照预期实现 / This feature don't implement correctly in latest CI version.
+        required: true
