@@ -109,7 +109,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
     implementation 'com.takisoft.preferencex:preferencex:1.1.0'
     implementation 'dev.rikka.rikkax.appcompat:appcompat:1.4.1'
-    implementation 'dev.rikka.rikkax.material:material:2.4.0'
+    implementation 'dev.rikka.rikkax.material:material:2.5.0'
     implementation 'dev.rikka.rikkax.preference:simplemenu-preference:1.0.3'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     implementation 'org.greenrobot:greendao:3.3.0'
