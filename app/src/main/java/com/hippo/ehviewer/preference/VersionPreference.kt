@@ -41,6 +41,6 @@ class VersionPreference @JvmOverloads constructor(
     override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
         super.onPrepareDialogBuilder(builder)
         builder.setTitle(R.string.show_library_version)
-        builder.setMessage(Native.getlibarchiveVersion() + "\nlzma(xz-utils) " + Native.getliblzmaVersion() + "\nlibzstd " + Native.getlibzstdVersion() + "\nzlib " + Native.getzlibVersion() + "\nlibjpeg-turbo " + Native.getlibjpeg_turboVersion())
+        builder.setMessage(Native.getlibarchiveVersion() + "\nlzma(xz-utils) " + Native.getliblzmaVersion() + "\nzlib " + Native.getzlibVersion() + "\nlibjpeg-turbo " + Native.getlibjpeg_turboVersion())
     }
 }

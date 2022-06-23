@@ -1,7 +1,6 @@
 #include <jni.h>
 #include <archive.h>
 #include <lzma.h>
-#include <zstd.h>
 #include <zlib.h>
 #include "image/libjpeg-turbo/jconfigint.h"
 
@@ -34,11 +33,6 @@ Java_com_hippo_Native_getliblzmaVersion(JNIEnv *env, jclass clazz) {
 JNIEXPORT jstring JNICALL
 Java_com_hippo_Native_getlibjpeg_1turboVersion(JNIEnv *env, jclass clazz) {
     return (*env)->NewStringUTF(env, VERSION);
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_Native_getlibzstdVersion(JNIEnv *env, jclass clazz) {
-    return (*env)->NewStringUTF(env, ZSTD_VERSION_STRING);
 }
 
 JNIEXPORT jstring JNICALL

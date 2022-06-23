@@ -13,6 +13,3 @@
 [submodule "native/src/main/jni/liblzma"]
 	path = native/src/main/jni/liblzma
 	url = https://git.tukaani.org/xz.git
-[submodule "native/src/main/jni/libzstd"]
-	path = native/src/main/jni/libzstd
-	url = https://github.com/facebook/zstd
