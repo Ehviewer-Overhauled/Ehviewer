@@ -353,7 +353,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 .setStartPosition(Settings.getStartPosition())
                 .setStartPage(startPage)
                 .setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground))
-                .setEdgeColor(ResourcesKt.resolveColor(getTheme(), R.attr.colorEdgeEffect) & 0xffffff | 0x33000000)
                 .setPagerInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_pager_interval) : 0)
                 .setScrollInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_scroll_interval) : 0)
                 .setPageMinHeight(resources.getDimensionPixelOffset(R.dimen.gallery_page_min_height))

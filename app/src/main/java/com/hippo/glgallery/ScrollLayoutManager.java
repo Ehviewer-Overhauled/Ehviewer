@@ -23,9 +23,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.hippo.glview.anim.Animation;
-import com.hippo.glview.anim.FloatAnimation;
 import com.hippo.glview.view.GLView;
-import com.hippo.glview.widget.GLEdgeView;
 import com.hippo.glview.widget.GLProgressView;
 import com.hippo.glview.widget.GLTextureView;
 import com.hippo.yorozuya.AnimationUtils;
@@ -51,7 +49,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     private final LinkedList<GalleryPageView> mTempPages = new LinkedList<>();
     private final PageFling mPageFling;
     private final SmoothScaler mSmoothScaler;
-    private final OverScroller mOverScroller;
     private GalleryView.Adapter mAdapter;
     private GLProgressView mProgress;
     private String mErrorStr;
@@ -80,7 +77,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         mInterval = interval;
         mPageFling = new PageFling(context);
         mSmoothScaler = new SmoothScaler();
-        mOverScroller = new OverScroller();
     }
 
     public void setInterval(int interval) {
@@ -117,11 +113,9 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     // Return true for animations are running
     private boolean cancelAllAnimations() {
         boolean running = mPageFling.isRunning() ||
-                mSmoothScaler.isRunning() ||
-                mOverScroller.isRunning();
+                mSmoothScaler.isRunning();
         mPageFling.cancel();
         mSmoothScaler.cancel();
-        mOverScroller.cancel();
         return running;
     }
 
@@ -536,7 +530,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     @Override
     public void onUp() {
         mScrollUp = false;
-        mGalleryView.getEdgeView().onRelease();
     }
 
     @Override
@@ -559,37 +552,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     @Override
     public void onLongPress(float x, float y) {
 
-    }
-
-    public void overScrollEdge(int dx, int dy, float x, float y) {
-        GLEdgeView edgeView = mGalleryView.getEdgeView();
-
-        mDeltaX += dx;
-        mDeltaY += dy;
-
-        if (mDeltaX < 0) {
-            edgeView.onPull(-mDeltaX, y, GLEdgeView.LEFT);
-            if (!edgeView.isFinished(GLEdgeView.RIGHT)) {
-                edgeView.onRelease(GLEdgeView.RIGHT);
-            }
-        } else if (mDeltaX > 0) {
-            edgeView.onPull(mDeltaX, y, GLEdgeView.RIGHT);
-            if (!edgeView.isFinished(GLEdgeView.LEFT)) {
-                edgeView.onRelease(GLEdgeView.LEFT);
-            }
-        }
-
-        if (mDeltaY < 0) {
-            edgeView.onPull(-mDeltaY, x, GLEdgeView.TOP);
-            if (!edgeView.isFinished(GLEdgeView.BOTTOM)) {
-                edgeView.onRelease(GLEdgeView.BOTTOM);
-            }
-        } else if (mDeltaY > 0) {
-            edgeView.onPull(mDeltaY, x, GLEdgeView.BOTTOM);
-            if (!edgeView.isFinished(GLEdgeView.TOP)) {
-                edgeView.onRelease(GLEdgeView.TOP);
-            }
-        }
     }
 
     private void getBottomState() {
@@ -673,9 +635,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
                             mOffsetY = limit;
                             requestFill = true;
                         }
-                        if (!fling) {
-                            overScrollEdge(0, remainY + limit - mOffsetY, x, y);
-                        }
                         remainY = 0;
                         result = true;
                     }
@@ -715,9 +674,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
                         if (mOffsetY != limit) {
                             mOffsetY -= bottom - limit;
                             requestFill = true;
-                        }
-                        if (!fling) {
-                            overScrollEdge(0, remainY + limit - bottom, x, y);
                         }
                         remainY = 0;
                         result = true;
@@ -841,7 +797,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
     public boolean onUpdateAnimation(long time) {
         boolean invalidate = mPageFling.calculate(time);
         invalidate |= mSmoothScaler.calculate(time);
-        invalidate |= mOverScroller.calculate(time);
         return invalidate;
     }
 
@@ -872,7 +827,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         ///////
         GalleryView galleryView = mGalleryView;
         if (mIndex == 0 && mOffsetY >= 0) {
-            mOverScroller.overScroll(GLEdgeView.TOP);
         } else {
             // Cancel all animations
             cancelAllAnimations();
@@ -926,9 +880,7 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
         getBottomState();
         int bottom = mBottomStateBottom;
         boolean hasNext = mBottomStateHasNext;
-        if (!hasNext && bottom <= galleryView.getHeight()) {
-            mOverScroller.overScroll(GLEdgeView.BOTTOM);
-        } else {
+        if (hasNext || bottom > galleryView.getHeight()) {
             // Cancel all animations
             cancelAllAnimations();
 
@@ -1141,17 +1093,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
             int bottom = mBottomStateBottom;
             boolean hasNext = mBottomStateHasNext;
             boolean bottomEdge = !hasNext && bottom <= mGalleryView.getHeight();
-
-            if (topEdge && bottomEdge) {
-                return;
-            }
-
-            GLEdgeView edgeView = mGalleryView.getEdgeView();
-            if (topEdge && edgeView.isFinished(GLEdgeView.TOP)) {
-                edgeView.onAbsorb(mVelocityY, GLEdgeView.TOP);
-            } else if (bottomEdge && edgeView.isFinished(GLEdgeView.BOTTOM)) {
-                edgeView.onAbsorb(-mVelocityY, GLEdgeView.BOTTOM);
-            }
         }
     }
 
@@ -1188,49 +1129,6 @@ class ScrollLayoutManager extends GalleryView.LayoutManager {
             float scale = MathUtils.lerp(mStartScale, mEndScale, progress);
             onScale(mFocusX, mFocusY, scale / mLastScale);
             mLastScale = scale;
-        }
-    }
-
-    private class OverScroller extends FloatAnimation {
-
-        private int mDirection;
-        private int mPosition;
-
-        public OverScroller() {
-            setDuration(300L);
-        }
-
-        public void overScroll(int direction) {
-            mDirection = direction;
-            int range;
-            switch (mDirection) {
-                case GLEdgeView.LEFT:
-                case GLEdgeView.RIGHT:
-                    range = mGalleryView.getWidth() / 7;
-                    mPosition = mGalleryView.getHeight() / 2;
-                    break;
-                case GLEdgeView.TOP:
-                case GLEdgeView.BOTTOM:
-                    range = mGalleryView.getHeight() / 7;
-                    mPosition = mGalleryView.getWidth() / 2;
-                    break;
-                default:
-                    return;
-            }
-            setRange(0, range);
-            start();
-            mGalleryView.invalidate();
-        }
-
-        @Override
-        protected void onCalculate(float progress) {
-            super.onCalculate(progress);
-            mGalleryView.getEdgeView().onPull(get(), mPosition, mDirection);
-        }
-
-        @Override
-        protected void onFinish() {
-            mGalleryView.getEdgeView().onRelease(mDirection);
         }
     }
 }

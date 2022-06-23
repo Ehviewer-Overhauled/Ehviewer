@@ -36,7 +36,6 @@ import com.hippo.glview.util.GalleryUtils;
 import com.hippo.glview.view.AnimationTime;
 import com.hippo.glview.view.GLRoot;
 import com.hippo.glview.view.GLView;
-import com.hippo.glview.widget.GLEdgeView;
 import com.hippo.glview.widget.GLProgressView;
 import com.hippo.glview.widget.GLTextureView;
 import com.hippo.yorozuya.MathUtils;
@@ -94,7 +93,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     private final GestureRecognizer mGestureRecognizer;
     @Nullable
     private final Listener mListener;
-    private final GLEdgeView mEdgeView;
     private final Pool<GalleryPageView> mGalleryPageViewPool = new Pool<>(5);
     private final int mBackgroundColor;
     private final int mPageMinHeight;
@@ -144,7 +142,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         mAdapter.setGalleryView(this);
         mListener = build.mListener;
         mGestureRecognizer = new GestureRecognizer(mContext, this);
-        mEdgeView = new GLEdgeView(build.mEdgeColor);
 
         mLayoutMode = build.mLayoutMode;
         mScaleMode = build.mScaleMode;
@@ -291,7 +288,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
     @Override
     public void onAttachToRoot(GLRoot root) {
         super.onAttachToRoot(root);
-        mEdgeView.onAttachToRoot(root);
         postMethod(METHOD_ON_ATTACH_TO_ROOT);
     }
 
@@ -305,7 +301,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         }
 
         super.onDetachFromRoot();
-        mEdgeView.onDetachFromRoot();
     }
 
     public int getLayoutMode() {
@@ -340,10 +335,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         // Do not pass event to component, so handle event here
         mGestureRecognizer.onTouchEvent(event);
         return true;
-    }
-
-    GLEdgeView getEdgeView() {
-        return mEdgeView;
     }
 
     String getDefaultErrorStr() {
@@ -482,10 +473,7 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
 
     @Override
     protected void onLayout(boolean changeSize, int left, int top, int right, int bottom) {
-        mEdgeView.layout(left, top, right, bottom);
-
         fill();
-
         if (changeSize) {
             int width = right - left;
             int height = bottom - top;
@@ -861,7 +849,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
         mWillFill = false;
 
         super.render(canvas);
-        mEdgeView.render(canvas);
 
         int newCurrentIndex;
         if (mLayoutManager != null) {
@@ -1051,11 +1038,6 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
 
         public Builder setBackgroundColor(int backgroundColor) {
             mBackgroundColor = backgroundColor;
-            return this;
-        }
-
-        public Builder setEdgeColor(int edgeColor) {
-            mEdgeColor = edgeColor;
             return this;
         }
 

@@ -21,7 +21,6 @@
     <!-- ========== -->
 
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
-        <item name="colorEdgeEffect">@color/grey_500</item>
         <item name="dividerColor">@color/divider</item>
         <item name="drawableColorSecondary">?attr/colorOnSurface</item>
         <item name="drawableColorThemePrimary">?attr/colorPrimary</item>
