@@ -29,6 +29,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -278,8 +279,10 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         if (v == mTitleTextView) {
             mHelper.onClickTitle();
         } else if (v == mMenuButton) {
+            v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
             mHelper.onClickLeftIcon();
         } else if (v == mActionButton) {
+            v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
             mHelper.onClickRightIcon();
         }
     }
