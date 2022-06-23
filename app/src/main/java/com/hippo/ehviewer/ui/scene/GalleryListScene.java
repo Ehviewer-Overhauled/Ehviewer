@@ -835,22 +835,6 @@ public final class GalleryListScene extends BaseScene
         return view;
     }
 
-    private boolean checkDoubleClickExit() {
-        if (getStackIndex() != 0) {
-            return false;
-        }
-
-        long time = System.currentTimeMillis();
-        if (time - mPressBackTime > BACK_PRESSED_INTERVAL) {
-            // It is the last scene
-            mPressBackTime = time;
-            showTip(R.string.press_twice_exit, LENGTH_SHORT);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public void onBackPressed() {
         if (null != mFabLayout && mFabLayout.isExpanded()) {
@@ -858,28 +842,17 @@ public final class GalleryListScene extends BaseScene
             return;
         }
 
-        boolean handle;
         switch (mState) {
-            default:
             case STATE_NORMAL:
-                handle = checkDoubleClickExit();
+                requireActivity().moveTaskToBack(false);
                 break;
             case STATE_SIMPLE_SEARCH:
-                setState(STATE_NORMAL);
-                handle = true;
-                break;
             case STATE_SEARCH:
                 setState(STATE_NORMAL);
-                handle = true;
                 break;
             case STATE_SEARCH_SHOW_LIST:
                 setState(STATE_SEARCH);
-                handle = true;
                 break;
-        }
-
-        if (!handle) {
-            finish();
         }
     }
 
