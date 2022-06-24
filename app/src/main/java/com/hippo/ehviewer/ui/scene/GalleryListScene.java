@@ -844,7 +844,8 @@ public final class GalleryListScene extends BaseScene
 
         switch (mState) {
             case STATE_NORMAL:
-                requireActivity().moveTaskToBack(false);
+                if (getStackIndex() == 0)
+                    requireActivity().moveTaskToBack(false);
                 break;
             case STATE_SIMPLE_SEARCH:
             case STATE_SEARCH:
