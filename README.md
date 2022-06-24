@@ -57,16 +57,14 @@ Here is the libraries
 - [giflib](http://giflib.sourceforge.net)
 - [greenDAO](https://github.com/greenrobot/greenDAO)
 - [jsoup](https://github.com/jhy/jsoup)
-- [libjpeg-turbo](http://libjpeg-turbo.virtualgl.org/)
+- [libjpeg-turbo](https://libjpeg-turbo.org/)
 - [libpng](http://www.libpng.org/pub/png/libpng.html)
 - [okhttp](https://github.com/square/okhttp)
 - [roaster](https://github.com/forge/roaster)
-- [ShowcaseView](https://github.com/amlcurran/ShowcaseView)
-- [Slabo](https://github.com/TiroTypeworks/Slabo)
+- [TapTargetView](https://github.com/KeepSafe/TapTargetView)
 - [TagSoup](http://home.ccil.org/~cowan/tagsoup/)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
-- [Zstd](http://www.zstd.net/)
 
 
 ## License
