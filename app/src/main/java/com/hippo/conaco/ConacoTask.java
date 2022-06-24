@@ -441,6 +441,7 @@ public final class ConacoTask<V> {
                     receivedSize += bytesRead;
                     notifyProgress(bytesRead, receivedSize, length);
                 }
+                os.flush();
 
                 return true;
             } catch (IOException e) {

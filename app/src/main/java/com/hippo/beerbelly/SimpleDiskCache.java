@@ -34,6 +34,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import okhttp3.internal.cache.DiskLruCache;
+import okhttp3.internal.concurrent.TaskRunner;
+import okhttp3.internal.io.FileSystem;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
+
 public class SimpleDiskCache {
 
     private static final String TAG = SimpleDiskCache.class.getSimpleName();
@@ -117,16 +124,18 @@ public class SimpleDiskCache {
 
     private synchronized void init() throws IOException {
         if (!isValid()) {
-            mDiskLruCache = DiskLruCache.open(mCacheDir, 1, 1, mSize);
+            mDiskLruCache = new DiskLruCache(FileSystem.SYSTEM, mCacheDir, 1, 1, mSize, TaskRunner.INSTANCE);
         }
     }
 
     public synchronized long size() {
         if (null != mDiskLruCache) {
-            return mDiskLruCache.size();
-        } else {
-            return -1L;
+            try {
+                return mDiskLruCache.size();
+            } catch (IOException ignored) {
+            }
         }
+        return -1L;
     }
 
     public synchronized void flush() {
@@ -231,7 +240,12 @@ public class SimpleDiskCache {
         }
         lock.readLock().lock();
 
-        boolean result = mDiskLruCache.contain(diskKey);
+        boolean result;
+        try {
+            result = mDiskLruCache.get(diskKey) != null;
+        } catch (IOException e) {
+            result = false;
+        }
 
         lock.readLock().unlock();
         releaseLock(diskKey, lock);
@@ -294,18 +308,13 @@ public class SimpleDiskCache {
                 return false;
             }
 
-            os = editor.newOutputStream(0);
-            if (os != null) {
-                Util.copy(is, os);
-                completeEdit = true;
-                editor.commit();
-                return true;
-            } else {
-                // Can't get OutputStream
-                completeEdit = true;
-                editor.abort();
-                return false;
-            }
+            BufferedSink buf = Okio.buffer(editor.newSink(0));
+            os = buf.outputStream();
+            Util.copy(is, os);
+            os.flush();
+            completeEdit = true;
+            editor.commit();
+            return true;
         } catch (IOException e) {
             Util.closeQuietly(os);
             try {
@@ -388,7 +397,8 @@ public class SimpleDiskCache {
                 throw new IOException("Miss the key " + mKey);
             }
             mCurrentSnapshot = snapshot;
-            return snapshot.getInputStream(0);
+            BufferedSource buffer = Okio.buffer(snapshot.getSource(0));
+            return buffer.inputStream();
         }
 
         @Override
@@ -448,19 +458,10 @@ public class SimpleDiskCache {
             }
 
             OutputStream os;
-            try {
-                os = editor.newOutputStream(0);
-                mCurrentEditor = editor;
-                return os;
-            } catch (IOException e) {
-                // Get trouble
-                try {
-                    editor.abort();
-                } catch (IOException ex) {
-                    // Ignore
-                }
-                throw e;
-            }
+            BufferedSink buf = Okio.buffer(editor.newSink(0));
+            os = buf.outputStream();
+            mCurrentEditor = editor;
+            return os;
         }
 
         @Override
