@@ -36,10 +36,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import okhttp3.internal.cache.DiskLruCache;
 import okhttp3.internal.concurrent.TaskRunner;
-import okhttp3.internal.io.FileSystem;
 import okio.BufferedSink;
 import okio.BufferedSource;
+import okio.FileSystem;
 import okio.Okio;
+import okio.Path;
 
 public class SimpleDiskCache {
 
@@ -124,7 +125,7 @@ public class SimpleDiskCache {
 
     private synchronized void init() throws IOException {
         if (!isValid()) {
-            mDiskLruCache = new DiskLruCache(FileSystem.SYSTEM, mCacheDir, 1, 1, mSize, TaskRunner.INSTANCE);
+            mDiskLruCache = new DiskLruCache(FileSystem.SYSTEM, Path.get(mCacheDir), 1, 1, mSize, TaskRunner.INSTANCE);
         }
     }
 
