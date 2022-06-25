@@ -21,13 +21,12 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
-
-import rikka.material.app.DayNightDelegate;
 
 public class EhFragment extends BasePreferenceFragment {
 
@@ -62,7 +61,7 @@ public class EhFragment extends BasePreferenceFragment {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
         if (Settings.KEY_THEME.equals(key)) {
-            DayNightDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
             requireActivity().recreate();
             return true;
         } else if (Settings.KEY_GALLERY_SITE.equals(key)) {

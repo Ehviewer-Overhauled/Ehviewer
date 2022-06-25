@@ -27,6 +27,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.Preference;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -53,8 +55,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import rikka.material.app.LocaleDelegate;
 
 public class AdvancedFragment extends BasePreferenceFragment {
 
@@ -291,9 +291,9 @@ public class AdvancedFragment extends BasePreferenceFragment {
         String key = preference.getKey();
         if (KEY_APP_LANGUAGE.equals(key)) {
             if ("system".equals(newValue)) {
-                LocaleDelegate.setDefaultLocale(LocaleDelegate.getSystemLocale());
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getDefault());
             } else {
-                LocaleDelegate.setDefaultLocale(Locale.forLanguageTag((String) newValue));
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) newValue));
             }
             requireActivity().recreate();
             return true;

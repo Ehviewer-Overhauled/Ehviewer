@@ -35,7 +35,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.collection.LruCache;
+import androidx.core.os.LocaleListCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.Native;
@@ -91,8 +93,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import rikka.material.app.DayNightDelegate;
-import rikka.material.app.LocaleDelegate;
 
 public class EhApplication extends SceneApplication {
 
@@ -336,9 +336,8 @@ public class EhApplication extends SceneApplication {
             EhDB.mergeOldDB(this);
         }
 
-        LocaleDelegate.setDefaultLocale(Settings.getLocale());
-        DayNightDelegate.setApplicationContext(this);
-        DayNightDelegate.setDefaultNightMode(Settings.getTheme());
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Settings.getLocale()));
+        AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
 
         // Do io tasks in new thread
         //noinspection deprecation

@@ -57,6 +57,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.ViewCompat;
@@ -105,7 +106,6 @@ import java.io.OutputStream;
 
 import rikka.core.res.ConfigurationKt;
 import rikka.core.res.ResourcesKt;
-import rikka.material.app.DayNightDelegate;
 
 public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
         GalleryView.Listener {
@@ -289,10 +289,10 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     protected void attachBaseContext(@NonNull Context newBase) {
         switch (Settings.getReadTheme()) {
             case 1:
-                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_YES, false);
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
             case 2:
-                getDayNightDelegate().setLocalNightMode(DayNightDelegate.MODE_NIGHT_NO, false);
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 break;
         }
         super.attachBaseContext(newBase);
@@ -306,11 +306,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 }
                 mSavingPage = -1;
             });
-
-    @Override
-    public boolean respectDefaultNightMode() {
-        return Settings.getReadTheme() == 0;
-    }
 
     @Override
     @SuppressWarnings({"WrongConstant"})
