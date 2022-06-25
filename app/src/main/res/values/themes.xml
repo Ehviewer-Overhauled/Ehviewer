@@ -38,6 +38,7 @@
     <style name="ThemeOverlay" />
 
     <style name="ThemeOverlay.Black">
+        <item name="colorSurface">@android:color/black</item>
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
         <item name="dividerColor">@color/divider_black</item>
