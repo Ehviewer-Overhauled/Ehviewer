@@ -33,6 +33,8 @@
     <color name="loading_indicator_yellow">@color/yellow_800</color>
     <color name="loading_indicator_orange">@color/deep_orange_400</color>
 
+    <color name="navigation_bar_divider">#1f000000</color>
+
     <!-- Red -->
     <!-- Orange -->
     <!-- Yellow 700 -->

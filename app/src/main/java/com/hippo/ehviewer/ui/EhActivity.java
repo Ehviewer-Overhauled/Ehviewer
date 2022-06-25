@@ -97,6 +97,9 @@ public abstract class EhActivity extends AppCompatActivity {
         window.getDecorView().post(() -> {
             WindowInsets rootWindowInsets = window.getDecorView().getRootWindowInsets();
             if (rootWindowInsets != null && rootWindowInsets.getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    window.setNavigationBarDividerColor(getColor(R.color.navigation_bar_divider));
+                }
                 window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     window.setNavigationBarContrastEnforced(false);

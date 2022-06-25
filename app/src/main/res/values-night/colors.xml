@@ -18,5 +18,7 @@
     <!-- divider -->
     <color name="divider">#20ffffff</color>
 
+    <color name="navigation_bar_divider">#1fffffff</color>
+
     <!-- Lock pattern view -->
 </resources>
