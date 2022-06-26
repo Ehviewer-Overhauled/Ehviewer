@@ -320,7 +320,7 @@ class SearchLayout @JvmOverloads constructor(
 
     inner class IdentifiedChip @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null
-    ) : Chip(context, attrs) {
+    ) : Chip(context, attrs, R.attr.filterChipStyle) {
         var idt = 0
     }
 

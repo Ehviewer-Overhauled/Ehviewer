@@ -33,6 +33,7 @@
         <item name="materialSwitchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch
         </item>
         <item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
+        <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
     </style>
 
     <style name="ThemeOverlay" />
