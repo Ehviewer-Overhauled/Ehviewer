@@ -83,6 +83,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.chip.Chip
+                    style="@style/Widget.Material3.Chip.Assist"
                     android:id="@+id/uploader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -91,9 +92,12 @@
                     android:layout_marginEnd="@dimen/keyline_margin"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textAllCaps="true" />
+                    android:textAllCaps="true"
+                    app:chipIcon="@drawable/file_upload_black_24dp"
+                    app:ensureMinTouchTargetSize="true" />
 
                 <com.google.android.material.chip.Chip
+                    style="@style/Widget.Material3.Chip.Assist"
                     android:id="@+id/category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -102,7 +106,9 @@
                     android:layout_marginEnd="@dimen/keyline_margin"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textAllCaps="true" />
+                    android:textAllCaps="true"
+                    app:chipIcon="@drawable/ic_baseline_label_24"
+                    app:ensureMinTouchTargetSize="true" />
 
             </RelativeLayout>
 
