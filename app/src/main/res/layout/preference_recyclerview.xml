@@ -1,23 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ This file is part of LSPosed.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2022 Tarsin Norbin
   ~
-  ~ LSPosed is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ This file is part of EhViewer
+  ~
+  ~ EhViewer is free software: you can redistribute it and/or modify it
+  ~ under the terms of the GNU GeneralPublic License as published
+  ~ by the Free Software Foundation,either version 3 of the License, or
   ~ (at your option) any later version.
   ~
-  ~ LSPosed is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~ EhViewer is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with LSPosed.  If not, see <https://www.gnu.org/licenses/>.
-  ~
-  ~ Copyright (C) 2020 EdXposed Contributors
-  ~ Copyright (C) 2021 LSPosed Contributors
+  ~ You should have received a copy of the GNU General Public License along with EhViewer.
+  ~ If not, see <https://www.gnu.org/licenses/>.
   -->
-
 <com.hippo.easyrecyclerview.EasyRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
