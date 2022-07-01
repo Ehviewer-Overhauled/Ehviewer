@@ -18,6 +18,7 @@ package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -291,7 +292,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         String key = preference.getKey();
         if (KEY_APP_LANGUAGE.equals(key)) {
             if ("system".equals(newValue)) {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getDefault());
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.wrap(Resources.getSystem().getConfiguration().getLocales()));
             } else {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) newValue));
             }
