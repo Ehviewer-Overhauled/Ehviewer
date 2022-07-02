@@ -21,6 +21,9 @@
   </a>
 </p>
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer?ref=badge_large)
+
 ## Description
 这是一个 E-Hentai Android 平台的浏览器
 
@@ -43,6 +46,7 @@ Dynamic Color only support Android S and above!
 
 ![screenshot-01](art/screenshot-01.png)
 ![screenshot-02](art/screenshot-02.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer?ref=badge_shield)
 
 ## Thanks
 
