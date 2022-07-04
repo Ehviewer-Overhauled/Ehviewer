@@ -113,6 +113,6 @@ dependencies {
     implementation 'dev.rikka.rikkax.preference:simplemenu-preference:1.0.3'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     implementation 'org.greenrobot:greendao:3.3.0'
-    implementation 'org.jsoup:jsoup:1.15.1'
+    implementation 'org.jsoup:jsoup:1.15.2'
     implementation projects.native
 }
