@@ -23,5 +23,4 @@
     android:paddingLeft="12dp"
     android:paddingTop="4dp"
     android:paddingRight="12dp"
-    android:paddingBottom="4dp"
-    android:textColor="@android:color/white" />
+    android:paddingBottom="4dp" />
