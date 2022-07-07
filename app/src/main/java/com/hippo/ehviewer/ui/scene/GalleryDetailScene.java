@@ -64,14 +64,11 @@ import androidx.core.view.ViewCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
-import com.hippo.UriArchiveAccessor;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.UrlOpener;
@@ -108,7 +105,6 @@ import com.hippo.text.URLImageGetter;
 import com.hippo.util.AppHelper;
 import com.hippo.util.ClipboardUtil;
 import com.hippo.util.ExceptionUtils;
-import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.util.ReadableTime;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.AutoWrapLayout;
@@ -540,44 +536,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                     .setOnClickListener(v -> {
                         voteTag(builder.getText().trim(), 1);
                         dialog.dismiss();
-                    });
-        } else if (itemId == R.id.action_export) {
-            ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
-                    new ActivityResultContracts.CreateDocument(),
-                    uri -> {
-                        if (uri != null) {
-                            try {
-                                // grantUriPermission might throw RemoteException on MIUI
-                                requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            } catch (Exception e) {
-                                ExceptionUtils.throwIfFatal(e);
-                                e.printStackTrace();
-                            }
-                            try {
-                                AlertDialog alertDialog = new MaterialAlertDialogBuilder(requireActivity())
-                                        .setCancelable(false)
-                                        .setView(R.layout.preference_dialog_task)
-                                        .show();
-                                IoThreadPoolExecutor.getInstance().execute(() -> {
-                                    boolean success = false;
-                                    Activity activity = getActivity();
-                                    if (activity != null) {
-                                        activity.runOnUiThread(() -> {
-                                            if (alertDialog.isShowing()) {
-                                                alertDialog.dismiss();
-                                            }
-                                            showTip(
-                                                    (success)
-                                                            ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
-                                                            : GetText.getString(R.string.settings_advanced_export_data_failed),
-                                                    BaseScene.LENGTH_SHORT);
-                                        });
-                                    }
-                                });
-                            } catch (Exception e) {
-                                showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
-                            }
-                        }
                     });
         }
         return true;
