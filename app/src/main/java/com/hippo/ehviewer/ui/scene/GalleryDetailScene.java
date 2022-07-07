@@ -640,7 +640,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mBelowHeader = mainView.findViewById(R.id.below_header);
         View belowHeader = mBelowHeader;
 
-        mInfo = ViewUtils.$$(belowHeader, R.id.info);
+        mInfo = ViewUtils.$$(mHeader, R.id.info);
         mLanguage = (TextView) ViewUtils.$$(mInfo, R.id.language);
         mPages = (TextView) ViewUtils.$$(mInfo, R.id.pages);
         mSize = (TextView) ViewUtils.$$(mInfo, R.id.size);

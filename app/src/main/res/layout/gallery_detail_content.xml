@@ -31,8 +31,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/gallery_detail_info" />
-
             <include layout="@layout/gallery_detail_actions" />
 
             <include layout="@layout/gallery_detail_tags" />

@@ -82,9 +82,80 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/info"
+                    style="@style/Widget.Material3.CardView.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical">
+
+                    <TableLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp">
+
+                        <TableRow>
+
+                            <TextView
+                                android:id="@+id/language"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="left"
+                                android:singleLine="true" />
+
+                            <TextView
+                                android:id="@+id/size"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:singleLine="true" />
+
+                        </TableRow>
+
+                        <TableRow android:paddingTop="8dp">
+
+                            <TextView
+                                android:id="@+id/favoredTimes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="left"
+                                android:singleLine="true" />
+
+                            <TextView
+                                android:id="@+id/pages"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="right"
+                                android:singleLine="true" />
+
+                        </TableRow>
+
+                        <TableRow android:paddingTop="8dp">
+
+                            <TextView
+                                android:id="@+id/posted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="left"
+                                android:singleLine="true" />
+
+                        </TableRow>
+                    </TableLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.chip.Chip
-                    style="@style/Widget.Material3.Chip.Assist"
                     android:id="@+id/uploader"
+                    style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@id/thumb_card"
@@ -97,8 +168,8 @@
                     app:ensureMinTouchTargetSize="true" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Widget.Material3.Chip.Assist"
                     android:id="@+id/category"
+                    style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@id/uploader"
