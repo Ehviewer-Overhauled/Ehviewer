@@ -420,6 +420,9 @@ public final class MainActivity extends StageActivity
 
     @Override
     protected void onResume() {
+        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
+            startScene(new Announcer(SecurityScene.class), true);
+        }
         super.onResume();
         setNavCheckedItem(mNavCheckedItem);
         checkClipboardUrl();

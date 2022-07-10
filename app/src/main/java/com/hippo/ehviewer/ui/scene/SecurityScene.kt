@@ -69,7 +69,7 @@ class SecurityScene : SolidScene() {
             errorCode: Int,
             errString: CharSequence
         ) {
-            finish()
+            requireActivity().finish()
         }
     }
 
@@ -82,7 +82,8 @@ class SecurityScene : SolidScene() {
     }
 
     private fun onSuccess() {
-        startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
+        if (stackIndex == 0)
+            startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
         finish()
     }
 }
