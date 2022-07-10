@@ -39,7 +39,7 @@ class SecurityScene : SolidScene() {
         if (isAuthenticationSupported(requireContext()))
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
         else
-            startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
+            onSuccess()
     }
 
     private fun startAuthentication(
@@ -61,8 +61,15 @@ class SecurityScene : SolidScene() {
             activity: FragmentActivity?,
             result: BiometricPrompt.AuthenticationResult
         ) {
-            super.onAuthenticationSucceeded(activity, result)
-            startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
+            onSuccess()
+        }
+
+        override fun onAuthenticationError(
+            activity: FragmentActivity?,
+            errorCode: Int,
+            errString: CharSequence
+        ) {
+            finish()
         }
     }
 
@@ -72,5 +79,10 @@ class SecurityScene : SolidScene() {
             return BiometricManager.from(context)
                 .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
         }
+    }
+
+    private fun onSuccess() {
+        startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
+        finish()
     }
 }
