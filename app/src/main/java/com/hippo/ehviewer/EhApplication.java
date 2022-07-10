@@ -38,6 +38,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.collection.LruCache;
 import androidx.core.os.LocaleListCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.Native;
@@ -103,6 +106,8 @@ public class EhApplication extends SceneApplication {
     private static final boolean DEBUG_PRINT_NATIVE_MEMORY = false;
     private static final boolean DEBUG_PRINT_IMAGE_COUNT = false;
     private static final long DEBUG_PRINT_INTERVAL = 3000L;
+
+    public static boolean locked = false;
 
     private static EhApplication instance;
 
@@ -297,9 +302,17 @@ public class EhApplication extends SceneApplication {
         return application.mFavouriteStatusRouter;
     }
 
+    static class EhlifecycleObserver implements DefaultLifecycleObserver {
+        @Override
+        public void onPause(@NonNull LifecycleOwner owner) {
+            locked = true;
+        }
+    }
+
     @SuppressLint("StaticFieldLeak")
     @Override
     public void onCreate() {
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(new EhlifecycleObserver());
         instance = this;
 
         Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();

@@ -27,6 +27,7 @@ import androidx.biometric.auth.AuthPromptCallback
 import androidx.biometric.auth.startClass2BiometricOrCredentialAuthentication
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 
 class SecurityScene : SolidScene() {
@@ -82,6 +83,7 @@ class SecurityScene : SolidScene() {
     }
 
     private fun onSuccess() {
+        EhApplication.locked = false
         if (stackIndex == 0)
             startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
         finish()

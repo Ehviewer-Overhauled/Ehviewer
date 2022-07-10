@@ -47,6 +47,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
@@ -420,7 +421,7 @@ public final class MainActivity extends StageActivity
 
     @Override
     protected void onResume() {
-        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
+        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this) && EhApplication.locked) {
             startScene(new Announcer(SecurityScene.class), true);
         }
         super.onResume();
