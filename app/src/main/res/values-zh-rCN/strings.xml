@@ -732,7 +732,7 @@
     <string name="tag_vote_up">是的，这很正确</string>
     <string name="tag_vote_successfully">投票成功</string>
     <string name="from_clipboard">从剪贴板导入</string>
-    <string name="from_clipboard_error">未在剪贴板中发现 Cookeis。</string>
+    <string name="from_clipboard_error">未在剪贴板中发现 Cookies。</string>
     <string name="delete_search_history">从搜索记录中删除“%s”？</string>
     <string name="settings_advanced_dns_over_http_title">安全 DNS（DoH）</string>
     <string name="settings_advanced_dns_over_http_summary">解决某些地区的 DNS 污染问题</string>
