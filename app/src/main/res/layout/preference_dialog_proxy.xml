@@ -22,7 +22,7 @@
     android:paddingTop="18dp"
     android:paddingRight="?attr/dialogPreferredPadding">
 
-    <com.hippo.widget.CuteSpinner
+    <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

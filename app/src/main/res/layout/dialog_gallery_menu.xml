@@ -39,7 +39,7 @@
                 android:layout_weight="1"
                 android:text="@string/settings_read_screen_rotation" />
 
-            <com.hippo.widget.CuteSpinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/screen_rotation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                 android:layout_weight="1"
                 android:text="@string/settings_read_reading_direction" />
 
-            <com.hippo.widget.CuteSpinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/reading_direction"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                 android:layout_weight="1"
                 android:text="@string/settings_read_page_scaling" />
 
-            <com.hippo.widget.CuteSpinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/page_scaling"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                 android:layout_weight="1"
                 android:text="@string/settings_read_start_position" />
 
-            <com.hippo.widget.CuteSpinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/start_position"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
                 android:layout_weight="1"
                 android:text="@string/read_theme" />
 
-            <com.hippo.widget.CuteSpinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/read_theme"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
