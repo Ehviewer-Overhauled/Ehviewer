@@ -34,6 +34,7 @@
         </item>
         <item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
         <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
     </style>
 
     <style name="ThemeOverlay" />
