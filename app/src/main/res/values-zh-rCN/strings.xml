@@ -762,4 +762,5 @@
 
     <string name="show_library_version">依赖库之版本</string>
     <string name="settings_privacy_require_unlock">需要解锁</string>
+    <string name="proxy_type_name">代理类型</string>
 </resources>

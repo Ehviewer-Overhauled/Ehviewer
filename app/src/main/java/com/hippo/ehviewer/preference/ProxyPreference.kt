@@ -13,179 +13,150 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import com.google.android.material.textfield.TextInputLayout
+import android.widget.EditText
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.EhProxySelector
+import android.text.TextUtils
+import com.hippo.network.InetValidator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.DialogInterface
+import android.util.AttributeSet
+import android.view.View
+import android.widget.AutoCompleteTextView
+import androidx.appcompat.app.AlertDialog
+import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.Settings
+import com.hippo.preference.DialogPreference
+import com.hippo.yorozuya.MathUtils
+import com.hippo.yorozuya.ViewUtils
+import java.lang.NumberFormatException
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
+class ProxyPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : DialogPreference(context, attrs), View.OnClickListener {
+    private var mType: TextInputLayout? = null
+    private var mIpInputLayout: TextInputLayout? = null
+    private var mIp: EditText? = null
+    private var mPortInputLayout: TextInputLayout? = null
+    private var mPort: EditText? = null
+    private val mArray: Array<String>
 
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.textfield.TextInputLayout;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.EhProxySelector;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.network.InetValidator;
-import com.hippo.preference.DialogPreference;
-import com.hippo.yorozuya.MathUtils;
-import com.hippo.yorozuya.ViewUtils;
-
-public class ProxyPreference extends DialogPreference implements View.OnClickListener {
-
-    private Spinner mType;
-    private TextInputLayout mIpInputLayout;
-    private EditText mIp;
-    private TextInputLayout mPortInputLayout;
-    private EditText mPort;
-
-    public ProxyPreference(Context context) {
-        super(context);
-        init();
+    init {
+        mArray = context.resources.getStringArray(R.array.proxy_types)
+        dialogLayoutResource = R.layout.preference_dialog_proxy
+        updateSummary(Settings.getProxyType(), Settings.getProxyIp(), Settings.getProxyPort())
     }
 
-    public ProxyPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
+    private fun getProxyTypeText(type: Int): String {
+        return mArray[MathUtils.clamp(type, 0, mArray.size - 1)]
     }
 
-    public ProxyPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    private void init() {
-        setDialogLayoutResource(R.layout.preference_dialog_proxy);
-        updateSummary(Settings.getProxyType(), Settings.getProxyIp(), Settings.getProxyPort());
-    }
-
-    private String getProxyTypeText(Context context, int type) {
-        String[] array = context.getResources().getStringArray(R.array.proxy_types);
-        return array[MathUtils.clamp(type, 0, array.length - 1)];
-    }
-
-    private void updateSummary(int type, String ip, int port) {
+    private fun updateSummary(type: Int, ip: String?, port: Int) {
+        var type = type
         if ((type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS)
-                && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))) {
-            type = EhProxySelector.TYPE_SYSTEM;
+            && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))
+        ) {
+            type = EhProxySelector.TYPE_SYSTEM
         }
-
-        if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
-            Context context = getContext();
-            setSummary(context.getString(R.string.settings_advanced_proxy_summary_1,
-                    getProxyTypeText(context, type),
-                    ip,
-                    port));
+        summary = if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
+            val context = context
+            context.getString(
+                R.string.settings_advanced_proxy_summary_1,
+                getProxyTypeText(type),
+                ip,
+                port
+            )
         } else {
-            Context context = getContext();
-            setSummary(context.getString(R.string.settings_advanced_proxy_summary_2,
-                    getProxyTypeText(context, type)));
+            val context = context
+            context.getString(
+                R.string.settings_advanced_proxy_summary_2,
+                getProxyTypeText(type)
+            )
         }
     }
 
-    @Override
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        super.onPrepareDialogBuilder(builder);
-        builder.setPositiveButton(android.R.string.ok, null);
+    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
+        super.onPrepareDialogBuilder(builder)
+        builder.setPositiveButton(android.R.string.ok, null)
     }
 
-    @Override
     @SuppressLint("SetTextI18n")
-    protected void onDialogCreated(AlertDialog dialog) {
-        super.onDialogCreated(dialog);
-
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(this);
-
-        mType = (Spinner) ViewUtils.$$(dialog, R.id.type);
-        mIpInputLayout = (TextInputLayout) ViewUtils.$$(dialog, R.id.ip_input_layout);
-        mIp = (EditText) ViewUtils.$$(dialog, R.id.ip);
-        mPortInputLayout = (TextInputLayout) ViewUtils.$$(dialog, R.id.port_input_layout);
-        mPort = (EditText) ViewUtils.$$(dialog, R.id.port);
-
-        int type = Settings.getProxyType();
-        String[] array = getContext().getResources().getStringArray(R.array.proxy_types);
-        mType.setSelection(MathUtils.clamp(type, 0, array.length));
-
-        mIp.setText(Settings.getProxyIp());
-
-        String portString;
-        int port = Settings.getProxyPort();
-        if (!InetValidator.isValidInetPort(port)) {
-            portString = null;
+    override fun onDialogCreated(dialog: AlertDialog) {
+        super.onDialogCreated(dialog)
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(this)
+        mType = ViewUtils.`$$`(dialog, R.id.type) as TextInputLayout
+        val array = context.resources.getStringArray(R.array.proxy_types)
+        mIpInputLayout = ViewUtils.`$$`(dialog, R.id.ip_input_layout) as TextInputLayout
+        mIp = ViewUtils.`$$`(dialog, R.id.ip) as EditText
+        mPortInputLayout = ViewUtils.`$$`(dialog, R.id.port_input_layout) as TextInputLayout
+        mPort = ViewUtils.`$$`(dialog, R.id.port) as EditText
+        val type = Settings.getProxyType()
+        (mType!!.editText as AutoCompleteTextView).setText(array[MathUtils.clamp(type, 0, array.size)], false)
+        mIp!!.setText(Settings.getProxyIp())
+        val portString: String?
+        val port = Settings.getProxyPort()
+        portString = if (!InetValidator.isValidInetPort(port)) {
+            null
         } else {
-            portString = Integer.toString(port);
+            port.toString()
         }
-        mPort.setText(portString);
+        mPort!!.setText(portString)
     }
 
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-        mType = null;
-        mIpInputLayout = null;
-        mIp = null;
-        mPortInputLayout = null;
-        mPort = null;
+    override fun onDialogClosed(positiveResult: Boolean) {
+        super.onDialogClosed(positiveResult)
+        mType = null
+        mIpInputLayout = null
+        mIp = null
+        mPortInputLayout = null
+        mPort = null
     }
 
-    @Override
-    public void onClick(View v) {
-        Dialog dialog = getDialog();
-        Context context = getContext();
-        if (null == dialog || null == context || null == mType ||
-                null == mIpInputLayout || null == mIp ||
-                null == mPortInputLayout || null == mPort) {
-            return;
+    override fun onClick(v: View) {
+        val dialog = dialog
+        val context: Context = context
+        if (null == dialog || null == mType || null == mIpInputLayout || null == mIp || null == mPortInputLayout || null == mPort) {
+            return
         }
-
-        int type = mType.getSelectedItemPosition();
-
-        String ip = mIp.getText().toString().trim();
+        val type = mArray.indexOf(mType!!.editText!!.text.toString())
+        val ip = mIp!!.text.toString().trim { it <= ' ' }
         if (ip.isEmpty()) {
             if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
-                mIpInputLayout.setError(context.getString(R.string.text_is_empty));
-                return;
+                mIpInputLayout!!.error = context.getString(R.string.text_is_empty)
+                return
             }
         }
-        mIpInputLayout.setError(null);
-
-        int port;
-        String portString = mPort.getText().toString().trim();
+        mIpInputLayout!!.error = null
+        val port: Int
+        val portString = mPort!!.text.toString().trim { it <= ' ' }
         if (portString.isEmpty()) {
             if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
-                mPortInputLayout.setError(context.getString(R.string.text_is_empty));
-                return;
+                mPortInputLayout!!.error = context.getString(R.string.text_is_empty)
+                return
             } else {
-                port = -1;
+                port = -1
             }
         } else {
-            try {
-                port = Integer.parseInt(portString);
-            } catch (NumberFormatException e) {
-                port = -1;
+            port = try {
+                portString.toInt()
+            } catch (e: NumberFormatException) {
+                -1
             }
             if (!InetValidator.isValidInetPort(port)) {
-                mPortInputLayout.setError(context.getString(R.string.proxy_invalid_port));
-                return;
+                mPortInputLayout!!.error = context.getString(R.string.proxy_invalid_port)
+                return
             }
         }
-        mPortInputLayout.setError(null);
-
-        Settings.putProxyType(type);
-        Settings.putProxyIp(ip);
-        Settings.putProxyPort(port);
-
-        updateSummary(type, ip, port);
-
-        EhApplication.getEhProxySelector(getContext()).updateProxy();
-
-        dialog.dismiss();
+        mPortInputLayout!!.error = null
+        Settings.putProxyType(type)
+        Settings.putProxyIp(ip)
+        Settings.putProxyPort(port)
+        updateSummary(type, ip, port)
+        EhApplication.getEhProxySelector(getContext()).updateProxy()
+        dialog.dismiss()
     }
 }

@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -22,13 +23,20 @@
     android:paddingTop="18dp"
     android:paddingRight="?attr/dialogPreferredPadding">
 
-    <androidx.appcompat.widget.AppCompatSpinner
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/type"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/proxy_types"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp" />
+        android:hint="@string/proxy_type_name">
+
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            app:simpleItems="@array/proxy_types" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ip_input_layout"
