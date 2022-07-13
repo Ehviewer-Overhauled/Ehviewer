@@ -62,56 +62,56 @@
         app:entryValues="@array/read_theme_entry_values"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="keep_screen_on"
         android:title="@string/settings_read_keep_screen_on"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="true"
         android:key="gallery_show_clock"
         android:title="@string/settings_read_show_clock"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="true"
         android:key="gallery_show_progress"
         android:title="@string/settings_read_show_progress"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="true"
         android:key="gallery_show_battery"
         android:title="@string/settings_read_show_battery"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="true"
         android:key="gallery_show_page_interval"
         android:title="@string/settings_read_show_page_interval"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="volume_page"
         android:title="@string/settings_read_volume_page"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:dependency="volume_page"
         android:key="reserve_volume_page"
         android:title="@string/settings_read_reverse_volume"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="true"
         android:key="reading_fullscreen"
         android:title="@string/settings_read_reading_fullscreen"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="custom_screen_lightness"
         android:title="@string/settings_read_custom_screen_lightness"

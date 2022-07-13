@@ -19,13 +19,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="require_unlock"
         android:title="@string/settings_privacy_require_unlock"
         app:iconSpaceReserved="false" />
 
-    <SwitchPreferenceCompat
+    <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="enable_secure"
         android:title="@string/settings_privacy_secure"
