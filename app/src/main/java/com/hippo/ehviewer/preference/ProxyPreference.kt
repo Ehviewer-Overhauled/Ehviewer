@@ -56,17 +56,17 @@ class ProxyPreference @JvmOverloads constructor(
     }
 
     private fun updateSummary(type: Int, ip: String?, port: Int) {
-        var type = type
-        if ((type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS)
+        var type1 = type
+        if ((type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS)
             && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))
         ) {
-            type = EhProxySelector.TYPE_SYSTEM
+            type1 = EhProxySelector.TYPE_SYSTEM
         }
-        summary = if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
+        summary = if (type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS) {
             val context = context
             context.getString(
                 R.string.settings_advanced_proxy_summary_1,
-                getProxyTypeText(type),
+                getProxyTypeText(type1),
                 ip,
                 port
             )
@@ -74,7 +74,7 @@ class ProxyPreference @JvmOverloads constructor(
             val context = context
             context.getString(
                 R.string.settings_advanced_proxy_summary_2,
-                getProxyTypeText(type)
+                getProxyTypeText(type1)
             )
         }
     }
