@@ -21,7 +21,7 @@ jobs:
 
       - name: Install NDK
         run: |
-          echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;24.0.8215888" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
+          echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.0.8775105" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
 
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
