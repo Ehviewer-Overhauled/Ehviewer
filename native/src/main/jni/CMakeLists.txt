@@ -1,7 +1,7 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -flto")
 
 # Build liblzma
 add_subdirectory(liblzma)
@@ -22,6 +22,6 @@ add_subdirectory(image)
 
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED main.c archive.c)
-target_compile_options(${PROJECT_NAME} PUBLIC -Oz -fvisibility=hidden -fvisibility-inlines-hidden)
+target_compile_options(${PROJECT_NAME} PUBLIC -Oz -fvisibility=hidden -fvisibility-inlines-hidden -flto)
 target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
 target_link_libraries(${PROJECT_NAME} image archive_static)
