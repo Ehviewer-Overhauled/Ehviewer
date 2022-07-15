@@ -21,6 +21,7 @@ import android.view.MenuItem;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.R;
@@ -41,6 +42,7 @@ public final class SettingsActivity extends EhActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
                     .replace(R.id.fragment, new SettingsFragment())
                     .commitAllowingStateLoss();
         }

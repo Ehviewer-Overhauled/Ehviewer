@@ -21,6 +21,9 @@ package com.hippo.ehviewer.ui.fragment;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.Preference;
 
 import com.hippo.ehviewer.R;
 
@@ -28,6 +31,24 @@ public class SettingsFragment extends BasePreferenceFragment {
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.settings_headers);
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        String key = preference.getKey();
+        try {
+            Fragment classObj = (Fragment)Class.forName(key).newInstance();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .replace(R.id.fragment, classObj)
+                    .addToBackStack("1")
+                    .commitAllowingStateLoss();
+        } catch (ClassNotFoundException | IllegalAccessException | java.lang.InstantiationException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @Override
