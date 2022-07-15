@@ -34,24 +34,6 @@ public class SettingsFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
-        String key = preference.getKey();
-        try {
-            Fragment classObj = (Fragment)Class.forName(key).newInstance();
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .replace(R.id.fragment, classObj)
-                    .addToBackStack("1")
-                    .commitAllowingStateLoss();
-        } catch (ClassNotFoundException | IllegalAccessException | java.lang.InstantiationException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public int getFragmentTitle() {
         return R.string.settings;
     }

@@ -39,15 +39,13 @@
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.SignInRequiredPreference
-        android:fragment="com.hippo.ehviewer.ui.fragment.UConfigFragment"
-        android:key="u_config"
+        android:key="com.hippo.ehviewer.ui.fragment.UConfigFragment"
         android:summary="@string/settings_u_config_summary"
         android:title="@string/settings_u_config"
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.SignInRequiredPreference
-        android:fragment="com.hippo.ehviewer.ui.fragment.MyTagsFragment"
-        android:key="my_tags"
+        android:key="com.hippo.ehviewer.ui.fragment.MyTagsFragment"
         android:summary="@string/settings_my_tags_summary"
         android:title="@string/settings_my_tags"
         app:iconSpaceReserved="false" />
@@ -145,8 +143,7 @@
         app:url="@string/settings_eh_tag_translations_source_url" />
 
     <Preference
-        android:fragment="com.hippo.ehviewer.ui.fragment.FilterFragment"
-        android:key="filter"
+        android:key="com.hippo.ehviewer.ui.fragment.FilterFragment"
         android:summary="@string/settings_eh_filter_summary"
         android:title="@string/settings_eh_filter"
         app:iconSpaceReserved="false" />
