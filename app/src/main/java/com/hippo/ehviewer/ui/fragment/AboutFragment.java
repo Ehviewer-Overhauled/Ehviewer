@@ -30,7 +30,7 @@ public class AboutFragment extends BasePreferenceFragment {
     private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.about_settings);
         Preference author = findPreference(KEY_AUTHOR);
         author.setSummary(Html.fromHtml(getString(R.string.settings_about_author_summary).replace('$', '@')));

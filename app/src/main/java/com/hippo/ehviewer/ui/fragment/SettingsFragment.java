@@ -26,7 +26,7 @@ import com.hippo.ehviewer.R;
 
 public class SettingsFragment extends BasePreferenceFragment {
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.settings_headers);
     }
 

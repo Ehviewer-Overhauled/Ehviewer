@@ -28,7 +28,7 @@ import com.hippo.ehviewer.ui.scene.SecurityScene.Companion.isAuthenticationSuppo
  * Created by Mo10 on 2018/2/10.
  */
 class PrivacyFragment : BasePreferenceFragment() {
-    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.privacy_settings)
     }
 

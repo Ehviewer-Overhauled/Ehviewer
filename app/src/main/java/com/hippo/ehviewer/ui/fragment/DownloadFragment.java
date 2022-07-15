@@ -59,7 +59,7 @@ public class DownloadFragment extends BasePreferenceFragment {
             });
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.download_settings);
 
         Preference mediaScan = findPreference(Settings.KEY_MEDIA_SCAN);

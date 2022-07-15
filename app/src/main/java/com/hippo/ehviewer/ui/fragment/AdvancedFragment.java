@@ -223,7 +223,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
             });
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.advanced_settings);
 
         Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);

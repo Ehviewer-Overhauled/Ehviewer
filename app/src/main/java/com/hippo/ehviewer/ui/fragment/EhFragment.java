@@ -31,7 +31,7 @@ import com.hippo.ehviewer.client.EhTagDatabase;
 public class EhFragment extends BasePreferenceFragment {
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.eh_settings);
 
         Preference theme = findPreference(Settings.KEY_THEME);

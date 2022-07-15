@@ -23,9 +23,9 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.hippo.ehviewer.ui.SettingsActivity;
-import com.takisoft.preferencex.PreferenceFragmentCompat;
 
 
 public class BasePreferenceFragment extends PreferenceFragmentCompat
@@ -52,7 +52,7 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
 
     }
 
