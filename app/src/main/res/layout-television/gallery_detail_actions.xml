@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2016 Hippo Seven
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actions"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/keyline_margin">
+
+    <TextView
+        android:id="@+id/newerVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="@string/newer_version_avaliable"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/keyline_margin"
+        android:paddingRight="@dimen/keyline_margin">
+
+
+        <LinearLayout
+            android:id="@+id/rate"
+            android:layout_width="484dp"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:id="@+id/rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+
+                android:isIndicator="true"
+                android:theme="@style/RatingBarTheme" />
+
+            <TextView
+                android:id="@+id/rating_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="0dp"
+                android:textColor="?android:attr/textColorPrimary" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/actions_scroll_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:clipToPadding="false"
+            android:paddingLeft="36dp"
+            android:paddingRight="@dimen/keyline_margin"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:divider="@drawable/spacer_keyline"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <FrameLayout
+                    android:id="@+id/heart_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:nextFocusUp="@+id/download">
+
+                    <TextView
+                        android:id="@+id/heart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="4dp"
+                        android:gravity="center_horizontal"
+                        android:text="@string/favorited"
+                        android:textColor="?android:attr/textColorPrimary" />
+
+                    <TextView
+                        android:id="@+id/heart_outline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="4dp"
+                        android:gravity="center_horizontal"
+                        android:text="@string/not_favorited"
+                        android:textColor="?android:attr/textColorPrimary" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:drawablePadding="4dp"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+                    android:nextFocusUp="@+id/download"
+                    android:text="@string/share"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/torrent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:drawablePadding="4dp"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+                    android:nextFocusUp="@+id/download"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/archive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:drawablePadding="4dp"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+                    android:nextFocusUp="@+id/download"
+                    android:text="@string/archive"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/similar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:drawablePadding="4dp"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+                    android:nextFocusUp="@+id/download"
+                    android:text="@string/similar_gallery"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/search_cover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:drawablePadding="4dp"
+                    android:focusable="true"
+                    android:gravity="center_horizontal"
+                    android:nextFocusRight="@+id/search_cover"
+                    android:nextFocusUp="@+id/download"
+                    android:text="@string/search_cover"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+</LinearLayout>
