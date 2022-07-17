@@ -74,7 +74,6 @@ import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.FavouriteStatusRouter;
@@ -794,12 +793,6 @@ public final class GalleryListScene extends BaseScene
 
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setShowLastDivider(true);
-        recyclerView.addItemDecoration(decoration);
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
         qsDrawerAdapter.setHasStableIds(true);
         final GeneralItemAnimator animator = new DraggableItemAnimator();

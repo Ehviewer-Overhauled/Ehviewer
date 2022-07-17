@@ -72,7 +72,6 @@ import com.hippo.conaco.ProgressNotifier;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -648,12 +647,6 @@ public class DownloadsScene extends ToolbarScene
         mLabelAdapter = new DownloadLabelAdapter(inflater);
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setShowLastDivider(true);
-        recyclerView.addItemDecoration(decoration);
         mLabelAdapter.setHasStableIds(true);
         final GeneralItemAnimator animator = new DraggableItemAnimator();
         recyclerView.setItemAnimator(animator);

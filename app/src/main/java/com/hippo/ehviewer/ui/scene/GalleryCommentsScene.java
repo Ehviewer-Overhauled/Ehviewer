@@ -55,7 +55,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.UrlOpener;
@@ -209,11 +208,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context,
                 RecyclerView.VERTICAL, false));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL, ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setShowLastDivider(true);
-        mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setHasFixedSize(true);
         // Cancel change animator
         RecyclerView.ItemAnimator itemAnimator = mRecyclerView.getItemAnimator();
@@ -327,11 +321,6 @@ public final class GalleryCommentsScene extends ToolbarScene
             }
         });
         rv.setLayoutManager(new LinearLayoutManager(context));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL, ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setPadding(ResourcesUtils.getAttrDimensionPixelOffset(context, androidx.appcompat.R.attr.dialogPreferredPadding));
-        rv.addItemDecoration(decoration);
         rv.setClipToPadding(false);
         builder.setView(rv).show();
     }

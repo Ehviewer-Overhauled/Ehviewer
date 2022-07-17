@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.UrlOpener;
@@ -164,13 +163,6 @@ public final class GalleryInfoScene extends ToolbarScene {
         InfoAdapter adapter = new InfoAdapter();
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        int keylineMargin = context.getResources().getDimensionPixelOffset(R.dimen.keyline_margin);
-        decoration.setPadding(keylineMargin);
-        mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setClipToPadding(false);
         mRecyclerView.setHasFixedSize(true);
         return view;

@@ -37,7 +37,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
@@ -85,12 +84,6 @@ public class HostsFragment extends BaseFragment
         adapter = new HostsAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(requireActivity().getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(requireActivity(), 1));
-        decoration.setShowLastDivider(true);
-        recyclerView.addItemDecoration(decoration);
         recyclerView.setHasFixedSize(true);
 
         fab.setOnClickListener(this);

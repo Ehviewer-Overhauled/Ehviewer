@@ -35,7 +35,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
 import com.hippo.easyrecyclerview.EasyRecyclerView
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
@@ -83,13 +82,6 @@ class FilterFragment : BaseFragment() {
         recyclerView.adapter = mAdapter
         recyclerView.clipToPadding = false
         recyclerView.clipChildren = false
-        val decoration = LinearDividerItemDecoration(
-            LinearDividerItemDecoration.VERTICAL,
-            requireActivity().theme.resolveColor(R.attr.dividerColor),
-            LayoutUtils.dp2pix(requireActivity(), 1f)
-        )
-        decoration.setShowLastDivider(true)
-        recyclerView.addItemDecoration(decoration)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.setHasFixedSize(true)
         val defaultItemAnimator = recyclerView.itemAnimator as DefaultItemAnimator?

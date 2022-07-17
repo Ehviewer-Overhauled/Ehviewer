@@ -55,7 +55,6 @@ import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.R;
@@ -446,12 +445,6 @@ public class FavoritesScene extends BaseScene implements
 
         EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setShowLastDivider(true);
-        recyclerView.addItemDecoration(decoration);
 
         mDrawerAdapter = new FavDrawerAdapter(inflater);
         recyclerView.setAdapter(mDrawerAdapter);

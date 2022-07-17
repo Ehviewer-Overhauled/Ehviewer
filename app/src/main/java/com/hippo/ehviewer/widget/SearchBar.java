@@ -48,7 +48,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.view.ViewTransition;
@@ -147,12 +146,6 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
         mSuggestionAdapter = new SuggestionAdapter(LayoutInflater.from(getContext()));
         mListView.setAdapter(mSuggestionAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        LinearDividerItemDecoration decoration = new LinearDividerItemDecoration(
-                LinearDividerItemDecoration.VERTICAL,
-                ResourcesKt.resolveColor(context.getTheme(), R.attr.dividerColor),
-                LayoutUtils.dp2pix(context, 1));
-        decoration.setShowLastDivider(false);
-        mListView.addItemDecoration(decoration);
         mListView.setLayoutManager(layoutManager);
     }
 
