@@ -36,7 +36,7 @@
 
             <ImageView
                 android:layout_width="257dp"
-                android:layout_height="518dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:padding="@dimen/keyline_margin"
                 app:srcCompat="@mipmap/ic_launcher" />
