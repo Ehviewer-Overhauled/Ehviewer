@@ -26,14 +26,13 @@
 
 已针对性适配 Material Design 3 及其动态取色系统
 
-动态配色仅供 Android 12 及以上平台使用！
-
+我们力图代码精简，保持低资源消耗，在低配置设备上也有良好的表现
 
 An E-Hentai Application for Android.
 
 with Material Design 3 and Dynamic Color Support.
 
-Dynamic Color only support Android S and above!
+We aim to keep code clean and low resources occupation. It have good performance even on low-end device.
 
 ## Download
 
