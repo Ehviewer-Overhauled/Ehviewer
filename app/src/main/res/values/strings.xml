@@ -827,4 +827,5 @@
     <string name="show_library_version">Library Version</string>
     <string name="settings_privacy_require_unlock">Require Unlock</string>
     <string name="proxy_type_name">Proxy Type</string>
+    <string name="filter_label">Blocker Type</string>
 </resources>
