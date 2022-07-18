@@ -24,9 +24,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -69,7 +71,6 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
-import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.ClipboardUtil;
 import com.hippo.util.ExceptionUtils;
@@ -858,8 +859,10 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         private CharSequence generateComment(Context context, ObservedTextView textView, GalleryComment comment) {
-            SpannableStringBuilder ssb = Html.fromHtml(comment.comment, new URLImageGetter(textView,
+            Spanned sp = Html.fromHtml(comment.comment, Html.FROM_HTML_MODE_LEGACY, new URLImageGetter(textView,
                     EhApplication.getConaco(context)), null);
+
+            SpannableStringBuilder ssb = new SpannableStringBuilder(sp);
 
             if (0 != comment.id && 0 != comment.score) {
                 int score = comment.score;

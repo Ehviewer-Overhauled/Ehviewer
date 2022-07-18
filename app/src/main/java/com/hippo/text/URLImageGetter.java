@@ -17,6 +17,7 @@
 package com.hippo.text;
 
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 
 import com.hippo.conaco.Conaco;
 import com.hippo.drawable.UnikeryDrawable;

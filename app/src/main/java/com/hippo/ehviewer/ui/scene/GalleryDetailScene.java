@@ -34,6 +34,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -100,7 +101,6 @@ import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryRatingBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.text.Html;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.AppHelper;
 import com.hippo.util.ClipboardUtil;
@@ -1063,7 +1063,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
             time.setText(ReadableTime.getTimeAgo(comment.time));
             ObservedTextView c = v.findViewById(R.id.comment);
             c.setMaxLines(5);
-            c.setText(Html.fromHtml(comment.comment,
+            c.setText(Html.fromHtml(comment.comment, Html.FROM_HTML_MODE_LEGACY,
                     new URLImageGetter(c, EhApplication.getConaco(context)), null));
             v.setBackgroundColor(Color.TRANSPARENT);
         }

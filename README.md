@@ -62,7 +62,6 @@ Here is the libraries
 - [okhttp](https://github.com/square/okhttp)
 - [roaster](https://github.com/forge/roaster)
 - [TapTargetView](https://github.com/KeepSafe/TapTargetView)
-- [TagSoup](http://home.ccil.org/~cowan/tagsoup/)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
 
