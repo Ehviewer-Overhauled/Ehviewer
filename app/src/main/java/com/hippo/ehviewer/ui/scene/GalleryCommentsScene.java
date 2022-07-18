@@ -82,8 +82,6 @@ import com.hippo.widget.LinkifyTextView;
 import com.hippo.widget.ObservedTextView;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.LayoutUtils;
-import com.hippo.yorozuya.ResourcesUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.ViewUtils;

@@ -166,7 +166,16 @@ public final class DiskLruCache implements Closeable {
      * a sequence number each time an edit is committed. A snapshot is stale if
      * its sequence number is not equal to its entry's sequence number.
      */
-    private long nextSequenceNumber = 0;    private final Callable<Void> cleanupCallable = new Callable<>() {
+    private long nextSequenceNumber = 0;
+    private DiskLruCache(File directory, int appVersion, int valueCount, long maxSize) {
+        this.directory = directory;
+        this.appVersion = appVersion;
+        this.journalFile = new File(directory, JOURNAL_FILE);
+        this.journalFileTmp = new File(directory, JOURNAL_FILE_TEMP);
+        this.journalFileBackup = new File(directory, JOURNAL_FILE_BACKUP);
+        this.valueCount = valueCount;
+        this.maxSize = maxSize;
+    }    private final Callable<Void> cleanupCallable = new Callable<>() {
         public Void call() throws Exception {
             synchronized (DiskLruCache.this) {
                 if (journalWriter == null) {
@@ -181,16 +190,6 @@ public final class DiskLruCache implements Closeable {
             return null;
         }
     };
-
-    private DiskLruCache(File directory, int appVersion, int valueCount, long maxSize) {
-        this.directory = directory;
-        this.appVersion = appVersion;
-        this.journalFile = new File(directory, JOURNAL_FILE);
-        this.journalFileTmp = new File(directory, JOURNAL_FILE_TEMP);
-        this.journalFileBackup = new File(directory, JOURNAL_FILE_BACKUP);
-        this.valueCount = valueCount;
-        this.maxSize = maxSize;
-    }
 
     /**
      * Opens the cache in {@code directory}, creating a cache if none exists
@@ -978,6 +977,8 @@ public final class DiskLruCache implements Closeable {
             return new File(directory, key + "." + i + ".tmp");
         }
     }
+
+
 
 
 }

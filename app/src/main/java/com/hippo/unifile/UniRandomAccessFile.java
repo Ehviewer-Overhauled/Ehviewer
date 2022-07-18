@@ -80,8 +80,8 @@ public interface UniRandomAccessFile {
      *
      * @param b the buffer into which the data is read
      * @return the total number of bytes read into the buffer, or
-     *         {@code -1} if there is no more data because the end of
-     *         the file has been reached.
+     * {@code -1} if there is no more data because the end of
+     * the file has been reached.
      * @throws IOException if an I/O error occurs
      */
     int read(byte[] b) throws IOException;
@@ -90,12 +90,12 @@ public interface UniRandomAccessFile {
      * Reads exactly len bytes from this file into the byte array,
      * starting at the current file pointer.
      *
-     * @param b the buffer into which the data is read
+     * @param b   the buffer into which the data is read
      * @param off the start offset of the data
      * @param len the number of bytes to read
      * @return the total number of bytes read into the buffer, or
-     *         {@code -1} if there is no more data because the end of
-     *         the file has been reached.
+     * {@code -1} if there is no more data because the end of
+     * the file has been reached.
      * @throws IOException
      */
     int read(byte[] b, int off, int len) throws IOException;
@@ -112,7 +112,7 @@ public interface UniRandomAccessFile {
     /**
      * Writes len bytes from the specified byte array starting at offset off to this file.
      *
-     * @param b the data
+     * @param b   the data
      * @param off the start offset in the data
      * @param len the number of bytes to write
      * @throws IOException

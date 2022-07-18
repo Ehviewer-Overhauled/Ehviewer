@@ -63,7 +63,7 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
     public boolean onPreferenceTreeClick(Preference preference) {
         String key = preference.getKey();
         try {
-            Fragment classObj = (Fragment)Class.forName(key).newInstance();
+            Fragment classObj = (Fragment) Class.forName(key).newInstance();
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)

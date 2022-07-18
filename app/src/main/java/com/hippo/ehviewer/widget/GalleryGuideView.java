@@ -30,8 +30,6 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.yorozuya.ViewUtils;
 
-import rikka.core.res.ResourcesKt;
-
 public class GalleryGuideView extends ViewGroup implements View.OnClickListener {
 
     private final float[] mPoints = new float[3 * 4];

@@ -41,13 +41,10 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
 import com.hippo.view.ViewTransition;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.List;
 import java.util.Locale;
-
-import rikka.core.res.ResourcesKt;
 
 public class HostsFragment extends BaseFragment
         implements View.OnClickListener {

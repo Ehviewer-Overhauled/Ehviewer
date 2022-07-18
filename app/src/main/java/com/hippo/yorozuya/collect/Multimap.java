@@ -29,16 +29,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 // Top level class to get rid of 3rd generic collection parameter for more convenient usage.
 public class Multimap<K, V> extends AbstractMultimap<K, V, List<V>> {
+    protected Multimap(Map<K, List<V>> map, boolean threadSafeCollections) {
+        super(map, threadSafeCollections);
+    }
+
     public static <K, V> Multimap<K, V> create() {
         return new Multimap<>(new HashMap<K, List<V>>(), false);
     }
 
     public static <K, V> Multimap<K, V> createWithThreadSafeLists() {
         return new Multimap<>(new HashMap<K, List<V>>(), true);
-    }
-
-    protected Multimap(Map<K, List<V>> map, boolean threadSafeCollections) {
-        super(map, threadSafeCollections);
     }
 
     protected List<V> createNewCollection() {

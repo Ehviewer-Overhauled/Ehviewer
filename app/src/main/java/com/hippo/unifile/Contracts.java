@@ -28,15 +28,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 final class Contracts {
-    private Contracts() {}
+    private Contracts() {
+    }
 
     static String queryForString(Context context, Uri self, String column,
-            String defaultValue) {
+                                 String defaultValue) {
         final ContentResolver resolver = context.getContentResolver();
 
         Cursor c = null;
         try {
-            c = resolver.query(self, new String[] { column }, null, null, null);
+            c = resolver.query(self, new String[]{column}, null, null, null);
             if (c != null && c.moveToFirst() && !c.isNull(0)) {
                 return c.getString(0);
             } else {
@@ -51,17 +52,17 @@ final class Contracts {
     }
 
     static int queryForInt(Context context, Uri self, String column,
-            int defaultValue) {
+                           int defaultValue) {
         return (int) queryForLong(context, self, column, defaultValue);
     }
 
     static long queryForLong(Context context, Uri self, String column,
-            long defaultValue) {
+                             long defaultValue) {
         final ContentResolver resolver = context.getContentResolver();
 
         Cursor c = null;
         try {
-            c = resolver.query(self, new String[] { column }, null, null, null);
+            c = resolver.query(self, new String[]{column}, null, null, null);
             if (c != null && c.moveToFirst() && !c.isNull(0)) {
                 return c.getLong(0);
             } else {

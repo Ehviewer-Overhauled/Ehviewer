@@ -18,7 +18,6 @@ package com.hippo.unifile;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -38,6 +37,10 @@ class MediaFile extends UniFile {
         mUri = uri;
     }
 
+    static boolean isMediaUri(Context context, Uri uri) {
+        return null != MediaContract.getName(context, uri);
+    }
+
     @Override
     public UniFile createFile(String displayName) {
         return null;
@@ -52,10 +55,6 @@ class MediaFile extends UniFile {
     @NonNull
     public Uri getUri() {
         return mUri;
-    }
-
-    static boolean isMediaUri(Context context, Uri uri) {
-        return null != MediaContract.getName(context, uri);
     }
 
     @Override

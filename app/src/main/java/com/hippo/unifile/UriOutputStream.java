@@ -45,12 +45,6 @@ class UriOutputStream extends FileOutputStream {
         mPfd = pfd;
     }
 
-    @Override
-    public void close() throws IOException {
-        mPfd.close();
-        super.close();
-    }
-
     @NonNull
     static OutputStream create(Context context, Uri uri, String mode) throws IOException {
         ParcelFileDescriptor pfd;
@@ -69,5 +63,11 @@ class UriOutputStream extends FileOutputStream {
         }
 
         return new UriOutputStream(pfd, fd);
+    }
+
+    @Override
+    public void close() throws IOException {
+        mPfd.close();
+        super.close();
     }
 }

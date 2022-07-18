@@ -16,9 +16,9 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     app:fitsSystemWindowsInsets="top|bottom">
 
@@ -76,13 +76,13 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ipb_member_id"
-                    tools:ignore="HardcodedText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,13 +97,13 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ipb_pass_hash"
-                    tools:ignore="HardcodedText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,13 +118,13 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/igneous"
-                    tools:ignore="HardcodedText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionDone"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:ignore="HardcodedText" />
 
                 <Space
                     android:layout_width="wrap_content"

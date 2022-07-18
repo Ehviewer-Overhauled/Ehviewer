@@ -37,12 +37,9 @@ import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.util.ClipboardUtil;
 import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
-
-import rikka.core.res.ResourcesKt;
 
 public final class GalleryInfoScene extends ToolbarScene {
 

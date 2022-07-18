@@ -172,7 +172,7 @@ public class SparseJLArray<E> {
      * Remove a range of mappings as a batch.
      *
      * @param index Index to begin at
-     * @param size Number of mappings to remove
+     * @param size  Number of mappings to remove
      */
     public void removeAtRange(int index, int size) {
         final int end = Math.min(mSize, index + size);
@@ -388,7 +388,7 @@ public class SparseJLArray<E> {
 
         StringBuilder buffer = new StringBuilder(mSize * 28);
         buffer.append('{');
-        for (int i=0; i<mSize; i++) {
+        for (int i = 0; i < mSize; i++) {
             if (i > 0) {
                 buffer.append(", ");
             }

@@ -43,6 +43,36 @@ class RawFile extends UniFile {
         mFile = file;
     }
 
+    private static String getTypeForName(String name) {
+        final int lastDot = name.lastIndexOf('.');
+        if (lastDot >= 0) {
+            final String extension = name.substring(lastDot + 1).toLowerCase();
+            final String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+            if (mime != null) {
+                return mime;
+            }
+        }
+
+        return "application/octet-stream";
+    }
+
+    private static boolean deleteContents(File dir) {
+        File[] files = dir.listFiles();
+        boolean success = true;
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    success &= deleteContents(file);
+                }
+                if (!file.delete()) {
+                    Log.w(TAG, "Failed to delete " + file);
+                    success = false;
+                }
+            }
+        }
+        return success;
+    }
+
     @Override
     public UniFile createFile(String displayName) {
         final File target = new File(mFile, displayName);
@@ -238,35 +268,5 @@ class RawFile extends UniFile {
     @NonNull
     public UniRandomAccessFile createRandomAccessFile(String mode) throws FileNotFoundException {
         return new RawRandomAccessFile(new RandomAccessFile(mFile, mode));
-    }
-
-    private static String getTypeForName(String name) {
-        final int lastDot = name.lastIndexOf('.');
-        if (lastDot >= 0) {
-            final String extension = name.substring(lastDot + 1).toLowerCase();
-            final String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-            if (mime != null) {
-                return mime;
-            }
-        }
-
-        return "application/octet-stream";
-    }
-
-    private static boolean deleteContents(File dir) {
-        File[] files = dir.listFiles();
-        boolean success = true;
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    success &= deleteContents(file);
-                }
-                if (!file.delete()) {
-                    Log.w(TAG, "Failed to delete " + file);
-                    success = false;
-                }
-            }
-        }
-        return success;
     }
 }

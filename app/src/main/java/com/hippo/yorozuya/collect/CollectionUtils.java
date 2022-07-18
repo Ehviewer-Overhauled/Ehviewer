@@ -42,12 +42,13 @@ public class CollectionUtils {
 
     /**
      * Appends an element to the end of the array, growing the array if there is no more room.
-     * @param array The array to which to append the element. This must NOT be null.
+     *
+     * @param array       The array to which to append the element. This must NOT be null.
      * @param currentSize The number of elements in the array. Must be less than or equal to
      *                    array.length.
-     * @param element The element to append.
+     * @param element     The element to append.
      * @return the array to which the element was appended. This may be different than the given
-     *         array.
+     * array.
      */
     public static <T> T[] append(T[] array, int currentSize, T element) {
         if (currentSize + 1 > array.length) {
@@ -103,12 +104,12 @@ public class CollectionUtils {
      * Inserts an element into the array at the specified index, growing the array if there is no
      * more room.
      *
-     * @param array The array to which to append the element. Must NOT be null.
+     * @param array       The array to which to append the element. Must NOT be null.
      * @param currentSize The number of elements in the array. Must be less than or equal to
      *                    array.length.
-     * @param element The element to insert.
+     * @param element     The element to insert.
      * @return the array to which the element was appended. This may be different than the given
-     *         array.
+     * array.
      */
     public static <T> T[] insert(T[] array, int currentSize, int index, T element) {
         if (currentSize + 1 <= array.length) {

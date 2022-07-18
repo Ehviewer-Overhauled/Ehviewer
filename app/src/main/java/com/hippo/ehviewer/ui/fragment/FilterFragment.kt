@@ -39,9 +39,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.view.ViewTransition
-import com.hippo.yorozuya.LayoutUtils
 import com.hippo.yorozuya.ViewUtils
-import rikka.core.res.resolveColor
 
 class FilterFragment : BaseFragment() {
     private var mViewTransition: ViewTransition? = null

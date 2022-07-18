@@ -17,32 +17,32 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.EhFragment"
         android:icon="@drawable/v_sad_panda_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.EhFragment"
         android:title="@string/settings_eh" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.ReadFragment"
         android:icon="@drawable/v_book_open_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.ReadFragment"
         android:title="@string/settings_read" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.DownloadFragment"
         android:icon="@drawable/v_download_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.DownloadFragment"
         android:title="@string/settings_download" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.PrivacyFragment"
         android:icon="@drawable/v_sec_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.PrivacyFragment"
         android:title="@string/settings_privacy" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.AdvancedFragment"
         android:icon="@drawable/v_adb_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.AdvancedFragment"
         android:title="@string/settings_advanced" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.AboutFragment"
         android:icon="@drawable/v_info_primary_x24"
+        android:key="com.hippo.ehviewer.ui.fragment.AboutFragment"
         android:title="@string/settings_about" />
 </PreferenceScreen>

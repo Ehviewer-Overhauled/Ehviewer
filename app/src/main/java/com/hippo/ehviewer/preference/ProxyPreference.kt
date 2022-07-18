@@ -15,25 +15,24 @@
  */
 package com.hippo.ehviewer.preference
 
-import com.google.android.material.textfield.TextInputLayout
-import android.widget.EditText
-import com.hippo.ehviewer.R
-import com.hippo.ehviewer.EhProxySelector
-import android.text.TextUtils
-import com.hippo.network.InetValidator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import android.widget.AutoCompleteTextView
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.EhProxySelector
+import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.network.InetValidator
 import com.hippo.preference.DialogPreference
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ViewUtils
-import java.lang.NumberFormatException
 
 class ProxyPreference @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -95,7 +94,13 @@ class ProxyPreference @JvmOverloads constructor(
         mPortInputLayout = ViewUtils.`$$`(dialog, R.id.port_input_layout) as TextInputLayout
         mPort = ViewUtils.`$$`(dialog, R.id.port) as EditText
         val type = Settings.getProxyType()
-        (mType!!.editText as AutoCompleteTextView).setText(array[MathUtils.clamp(type, 0, array.size)], false)
+        (mType!!.editText as AutoCompleteTextView).setText(
+            array[MathUtils.clamp(
+                type,
+                0,
+                array.size
+            )], false
+        )
         mIp!!.setText(Settings.getProxyIp())
         val portString: String?
         val port = Settings.getProxyPort()

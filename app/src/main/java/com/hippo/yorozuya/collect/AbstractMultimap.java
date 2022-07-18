@@ -27,8 +27,8 @@ import java.util.Set;
  */
 public abstract class AbstractMultimap<K, V, C extends Collection<V>> implements Map<K, C> {
 
-    protected Map<K, C> map;
     protected final boolean threadSafeCollections;
+    protected Map<K, C> map;
 
     protected AbstractMultimap(Map<K, C> map, boolean threadSafeCollections) {
         this.map = map;
@@ -120,7 +120,9 @@ public abstract class AbstractMultimap<K, V, C extends Collection<V>> implements
         return map.entrySet();
     }
 
-    /** @return true if the collection was changed. */
+    /**
+     * @return true if the collection was changed.
+     */
     public synchronized boolean putElements(K key, Collection<V> values) {
         C collection = map.get(key);
         if (collection == null) {
@@ -130,7 +132,9 @@ public abstract class AbstractMultimap<K, V, C extends Collection<V>> implements
         return collection.addAll(values);
     }
 
-    /** @return true if the given element was removed. */
+    /**
+     * @return true if the given element was removed.
+     */
     public synchronized boolean removeElement(K key, V value) {
         C collection = map.get(key);
         if (collection == null) {

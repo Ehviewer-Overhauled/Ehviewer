@@ -24,20 +24,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
 import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 final class DocumentsContractApi21 {
-    private DocumentsContractApi21() {}
-
     private static final String TAG = DocumentsContractApi21.class.getSimpleName();
-
     private static final String PATH_DOCUMENT = "document";
     private static final String PATH_TREE = "tree";
+    private DocumentsContractApi21() {
+    }
 
     public static Uri createFile(Context context, Uri self, String mimeType,
-            String displayName) {
+                                 String displayName) {
         try {
             return DocumentsContract.createDocument(context.getContentResolver(), self, mimeType,
                     displayName);
@@ -79,8 +79,8 @@ final class DocumentsContractApi21 {
 
         Cursor c = null;
         try {
-            c = resolver.query(childrenUri, new String[] {
-                    DocumentsContract.Document.COLUMN_DOCUMENT_ID }, null, null, null);
+            c = resolver.query(childrenUri, new String[]{
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID}, null, null, null);
             if (null != c) {
                 while (c.moveToNext()) {
                     final String documentId = c.getString(0);

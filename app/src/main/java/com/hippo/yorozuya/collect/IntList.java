@@ -21,8 +21,19 @@ import android.os.Parcelable;
 
 public class IntList implements Parcelable {
 
-    private static final int MIN_CAPACITY_INCREMENT = 12;
+    public static final Parcelable.Creator<IntList> CREATOR = new Parcelable.Creator<IntList>() {
 
+        @Override
+        public IntList createFromParcel(Parcel source) {
+            return new IntList(source);
+        }
+
+        @Override
+        public IntList[] newArray(int size) {
+            return new IntList[size];
+        }
+    };
+    private static final int MIN_CAPACITY_INCREMENT = 12;
     private int[] mArray;
     private int mSize = 0;
 
@@ -32,6 +43,16 @@ public class IntList implements Parcelable {
 
     public IntList(int capacity) {
         mArray = new int[capacity];
+    }
+
+    protected IntList(Parcel in) {
+        this(in.readInt());
+        mSize = in.readInt();
+        int s = mSize;
+        int[] a = mArray;
+        for (int i = 0; i < s; i++) {
+            a[i] = in.readInt();
+        }
     }
 
     static void throwIndexOutOfBoundsException(int index, int size) {
@@ -193,27 +214,4 @@ public class IntList implements Parcelable {
             dest.writeInt(a[i]);
         }
     }
-
-    protected IntList(Parcel in) {
-        this(in.readInt());
-        mSize = in.readInt();
-        int s = mSize;
-        int[] a = mArray;
-        for (int i = 0; i < s; i++) {
-            a[i] = in.readInt();
-        }
-    }
-
-    public static final Parcelable.Creator<IntList> CREATOR = new Parcelable.Creator<IntList>() {
-
-        @Override
-        public IntList createFromParcel(Parcel source) {
-            return new IntList(source);
-        }
-
-        @Override
-        public IntList[] newArray(int size) {
-            return new IntList[size];
-        }
-    };
 }

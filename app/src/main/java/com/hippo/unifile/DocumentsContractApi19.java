@@ -30,9 +30,10 @@ import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
 final class DocumentsContractApi19 {
-    private DocumentsContractApi19() {}
-
     private static final String TAG = DocumentsContractApi19.class.getSimpleName();
+
+    private DocumentsContractApi19() {
+    }
 
     public static boolean isDocumentUri(Context context, Uri self) {
         return DocumentsContract.isDocumentUri(context, self);
@@ -132,8 +133,8 @@ final class DocumentsContractApi19 {
 
         Cursor c = null;
         try {
-            c = resolver.query(self, new String[] {
-                    DocumentsContract.Document.COLUMN_DOCUMENT_ID }, null, null, null);
+            c = resolver.query(self, new String[]{
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID}, null, null, null);
             return null != c && c.getCount() > 0;
         } catch (Throwable e) {
             Utils.throwIfFatal(e);

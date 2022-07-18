@@ -60,7 +60,7 @@ public class ContainerHelpers {
     }
 
     public static <T> int binarySearch(T[] array, int size, T value,
-            Comparator<? super T> comparator) {
+                                       Comparator<? super T> comparator) {
         int lo = 0;
         int hi = size - 1;
 

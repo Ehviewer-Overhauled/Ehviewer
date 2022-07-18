@@ -52,15 +52,12 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AnimationUtils;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import rikka.core.res.ResourcesKt;
 
 public class SearchBar extends MaterialCardView implements View.OnClickListener,
         TextView.OnEditorActionListener, TextWatcher,

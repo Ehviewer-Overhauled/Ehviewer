@@ -89,6 +89,14 @@ public class TextClock extends AppCompatTextView {
         createTime(mTimeZone);
         // Wait until onAttachedToWindow() to handle the ticker
         chooseFormat(false);
+    }
+
+    private void createTime(String timeZone) {
+        if (timeZone != null) {
+            mTime = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        } else {
+            mTime = Calendar.getInstance();
+        }
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -100,14 +108,6 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-
-    private void createTime(String timeZone) {
-        if (timeZone != null) {
-            mTime = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
-        } else {
-            mTime = Calendar.getInstance();
-        }
-    }
 
     public CharSequence getFormat12Hour() {
         return mFormat12;
@@ -133,6 +133,17 @@ public class TextClock extends AppCompatTextView {
 
     public boolean is24HourModeEnabled() {
         return DateFormat.is24HourFormat(getContext());
+    }
+
+    public String getTimeZone() {
+        return mTimeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        mTimeZone = timeZone;
+
+        createTime(timeZone);
+        onTimeChanged();
     }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -146,17 +157,6 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
-    public String getTimeZone() {
-        return mTimeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        mTimeZone = timeZone;
-
-        createTime(timeZone);
-        onTimeChanged();
-    }
 
     /**
      * Selects either one of {@link #getFormat12Hour()} or {@link #getFormat24Hour()}

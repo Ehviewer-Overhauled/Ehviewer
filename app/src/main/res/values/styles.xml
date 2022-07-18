@@ -62,5 +62,5 @@
         <item name="indicatorColor">?attr/dividerColor</item>
     </style>
 
-    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium"/>
+    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium" />
 </resources>

@@ -302,13 +302,6 @@ public class EhApplication extends SceneApplication {
         return application.mFavouriteStatusRouter;
     }
 
-    static class EhlifecycleObserver implements DefaultLifecycleObserver {
-        @Override
-        public void onPause(@NonNull LifecycleOwner owner) {
-            locked = true;
-        }
-    }
-
     @SuppressLint("StaticFieldLeak")
     @Override
     public void onCreate() {
@@ -591,6 +584,13 @@ public class EhApplication extends SceneApplication {
             t.printStackTrace();
             ExceptionUtils.throwIfFatal(t);
             return null;
+        }
+    }
+
+    static class EhlifecycleObserver implements DefaultLifecycleObserver {
+        @Override
+        public void onPause(@NonNull LifecycleOwner owner) {
+            locked = true;
         }
     }
 }

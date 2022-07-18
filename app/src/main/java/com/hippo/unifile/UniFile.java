@@ -67,7 +67,7 @@ public abstract class UniFile {
 
     /**
      * Create a {@link UniFile} representing the given {@link File}.
-
+     *
      * @param file the file to wrap
      * @return the {@link UniFile} representing the given {@link File}.
      */
@@ -83,8 +83,8 @@ public abstract class UniFile {
      * {@code null} when called on earlier platform versions.
      *
      * @param singleUri the {@link Intent#getData()} from a successful
-     *            {@link Intent#ACTION_OPEN_DOCUMENT} or
-     *            {@link Intent#ACTION_CREATE_DOCUMENT} request.
+     *                  {@link Intent#ACTION_OPEN_DOCUMENT} or
+     *                  {@link Intent#ACTION_CREATE_DOCUMENT} request.
      * @return the {@link UniFile} representing the given {@link Uri}.
      */
     public static UniFile fromSingleUri(Context context, Uri singleUri) {
@@ -103,7 +103,7 @@ public abstract class UniFile {
      * {@code null} when called on earlier platform versions.
      *
      * @param treeUri the {@link Intent#getData()} from a successful
-     *            {@link Intent#ACTION_OPEN_DOCUMENT_TREE} request.
+     *                {@link Intent#ACTION_OPEN_DOCUMENT_TREE} request.
      * @return the {@link UniFile} representing the given {@link Uri}.
      */
     public static UniFile fromTreeUri(Context context, Uri treeUri) {
@@ -198,7 +198,7 @@ public abstract class UniFile {
      * @param displayName name of new file
      * @return file representing newly created document, or null if failed
      * @see android.provider.DocumentsContract#createDocument(ContentResolver,
-     *      Uri, String, String)
+     * Uri, String, String)
      */
     public abstract UniFile createFile(String displayName);
 
@@ -208,7 +208,7 @@ public abstract class UniFile {
      * @param displayName name of new directory
      * @return file representing newly created directory, or null if failed
      * @see android.provider.DocumentsContract#createDocument(ContentResolver,
-     *      Uri, String, String)
+     * Uri, String, String)
      */
     public abstract UniFile createDirectory(String displayName);
 
@@ -267,7 +267,7 @@ public abstract class UniFile {
      * Indicates if this file represents a <em>directory</em>.
      *
      * @return {@code true} if this file is a directory, {@code false}
-     *         otherwise.
+     * otherwise.
      * @see android.provider.DocumentsContract.Document#MIME_TYPE_DIR
      */
     public abstract boolean isDirectory();
@@ -311,7 +311,7 @@ public abstract class UniFile {
      * Indicates whether the current context is allowed to write to this file.
      *
      * @return {@code true} if this file can be written, {@code false}
-     *         otherwise.
+     * otherwise.
      * @see android.provider.DocumentsContract.Document#COLUMN_FLAGS
      * @see android.provider.DocumentsContract.Document#FLAG_SUPPORTS_DELETE
      * @see android.provider.DocumentsContract.Document#FLAG_SUPPORTS_WRITE
@@ -323,7 +323,7 @@ public abstract class UniFile {
      * It works like mkdirs, but it will return true if the UniFile is directory
      *
      * @return {@code true} if the directory was created
-     *         or if the directory already existed.
+     * or if the directory already existed.
      */
     public abstract boolean ensureDir();
 
@@ -331,7 +331,7 @@ public abstract class UniFile {
      * Make sure the UniFile is file
      *
      * @return {@code true} if the file can be created
-     *         or if the file already existed.
+     * or if the file already existed.
      */
     public abstract boolean ensureFile();
 
@@ -351,7 +351,7 @@ public abstract class UniFile {
      *
      * @return {@code true} if this file was deleted, {@code false} otherwise.
      * @see android.provider.DocumentsContract#deleteDocument(ContentResolver,
-     *      Uri)
+     * Uri)
      */
     public abstract boolean delete();
 
@@ -368,7 +368,7 @@ public abstract class UniFile {
      *
      * @return an array of files or {@code null}.
      * @see android.provider.DocumentsContract#buildChildDocumentsUriUsingTree(Uri,
-     *      String)
+     * String)
      */
     @Nullable
     public abstract UniFile[] listFiles();
@@ -408,7 +408,7 @@ public abstract class UniFile {
      * @param displayName the new display name.
      * @return true on success.
      * @see android.provider.DocumentsContract#renameDocument(ContentResolver,
-     *      Uri, String)
+     * Uri, String)
      */
     public abstract boolean renameTo(String displayName);
 

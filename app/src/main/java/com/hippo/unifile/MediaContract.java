@@ -21,7 +21,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 final class MediaContract {
-    private MediaContract() {}
+    private MediaContract() {
+    }
 
     public static String getName(Context context, Uri self) {
         return Contracts.queryForString(context, self, MediaStore.MediaColumns.DISPLAY_NAME, null);

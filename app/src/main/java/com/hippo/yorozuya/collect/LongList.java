@@ -21,8 +21,19 @@ import android.os.Parcelable;
 
 public class LongList implements Parcelable {
 
-    private static final int MIN_CAPACITY_INCREMENT = 12;
+    public static final Creator<LongList> CREATOR = new Creator<LongList>() {
 
+        @Override
+        public LongList createFromParcel(Parcel source) {
+            return new LongList(source);
+        }
+
+        @Override
+        public LongList[] newArray(int size) {
+            return new LongList[size];
+        }
+    };
+    private static final int MIN_CAPACITY_INCREMENT = 12;
     private long[] mArray;
     private int mSize = 0;
 
@@ -32,6 +43,16 @@ public class LongList implements Parcelable {
 
     public LongList(int capacity) {
         mArray = new long[capacity];
+    }
+
+    protected LongList(Parcel in) {
+        this(in.readInt());
+        mSize = in.readInt();
+        int s = mSize;
+        long[] a = mArray;
+        for (int i = 0; i < s; i++) {
+            a[i] = in.readLong();
+        }
     }
 
     static void throwIndexOutOfBoundsException(int index, int size) {
@@ -193,27 +214,4 @@ public class LongList implements Parcelable {
             dest.writeLong(a[i]);
         }
     }
-
-    protected LongList(Parcel in) {
-        this(in.readInt());
-        mSize = in.readInt();
-        int s = mSize;
-        long[] a = mArray;
-        for (int i = 0; i < s; i++) {
-            a[i] = in.readLong();
-        }
-    }
-
-    public static final Creator<LongList> CREATOR = new Creator<LongList>() {
-
-        @Override
-        public LongList createFromParcel(Parcel source) {
-            return new LongList(source);
-        }
-
-        @Override
-        public LongList[] newArray(int size) {
-            return new LongList[size];
-        }
-    };
 }

@@ -296,16 +296,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 break;
         }
         super.attachBaseContext(newBase);
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            result -> {
-                if (result && mSavingPage != -1) {
-                    saveImage(mSavingPage);
-                } else {
-                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-                }
-                mSavingPage = -1;
-            });
+    }
 
     @Override
     @SuppressWarnings({"WrongConstant"})
@@ -473,7 +464,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             FrameLayout mainLayout = (FrameLayout) ViewUtils.$$(this, R.id.main);
             mainLayout.addView(new GalleryGuideView(this));
         }
-    }
+    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
 
     @Override
     protected void onDestroy() {

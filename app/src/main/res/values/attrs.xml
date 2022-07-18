@@ -52,7 +52,7 @@
     <declare-styleable name="FixedThumb">
         <attr name="minAspect" format="float" />
         <attr name="maxAspect" format="float" />
-        <attr name="alwaysCutAndScale" format="boolean"/>
+        <attr name="alwaysCutAndScale" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="CheckTextView">
@@ -143,6 +143,6 @@
         <attr name="draggable" format="boolean" />
     </declare-styleable>
 
-    <attr name="filterChipStyle"/>
+    <attr name="filterChipStyle" />
 
 </resources>
