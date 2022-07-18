@@ -16,12 +16,11 @@
 
 package com.hippo.glview.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
-import android.os.Build;
 import android.os.Parcelable;
 import android.os.Process;
 import android.os.SystemClock;
@@ -42,10 +41,6 @@ import com.hippo.glview.glrenderer.UploadedTexture;
 import com.hippo.glview.util.ApiHelper;
 import com.hippo.glview.util.GalleryUtils;
 import com.hippo.glview.util.MotionEventHelper;
-import com.hippo.tuxiang.EGLConfigChooser;
-import com.hippo.tuxiang.EGLContextFactory;
-import com.hippo.tuxiang.GLSurfaceView;
-import com.hippo.tuxiang.Renderer;
 import com.hippo.yorozuya.AssertUtils;
 
 import java.util.ArrayDeque;
@@ -89,12 +84,7 @@ public class GLRootView extends GLSurfaceView
     private final ReentrantLock mRenderLock = new ReentrantLock();
     private final Condition mFreezeCondition =
             mRenderLock.newCondition();
-    private final Runnable mRequestRenderOnAnimationFrame = new Runnable() {
-        @Override
-        public void run() {
-            superRequestRender();
-        }
-    };
+    private final Runnable mRequestRenderOnAnimationFrame = this::superRequestRender;
     private int mFrameCount = 0;
     private long mFrameCountingStart = 0;
     private int mInvalidateColor = 0;
@@ -187,11 +177,7 @@ public class GLRootView extends GLSurfaceView
         }
         if (mRenderRequested) return;
         mRenderRequested = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            postOnAnimation(mRequestRenderOnAnimationFrame);
-        } else {
-            super.requestRender();
-        }
+        postOnAnimation(mRequestRenderOnAnimationFrame);
     }
 
     private void superRequestRender() {
@@ -281,7 +267,7 @@ public class GLRootView extends GLSurfaceView
         ++mFrameCount;
     }
 
-    private void onDrawFrameLocked(GL10 gl) {
+    private void onDrawFrameLocked() {
         if (DEBUG_FPS) outputFps();
         // release the unbound textures and deleted buffers.
         mCanvas.deleteRecycledResources();
@@ -391,7 +377,18 @@ public class GLRootView extends GLSurfaceView
     @Override
     public void onPause() {
         unfreeze();
+        if (mContentView != null) {
+            mContentView.pause();
+        }
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        if (mContentView != null) {
+            mContentView.resume();
+        }
+        super.onResume();
     }
 
     @Override
@@ -430,7 +427,6 @@ public class GLRootView extends GLSurfaceView
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void setLightsOutMode(boolean enabled) {
         if (!ApiHelper.HAS_SET_SYSTEM_UI_VISIBILITY) return;
 
@@ -503,7 +499,7 @@ public class GLRootView extends GLSurfaceView
         }
     }
 
-    private class GLRootRenderer implements Renderer {
+    private class GLRootRenderer implements GLSurfaceView.Renderer {
 
         /**
          * Called when the context is created, possibly after automatic destruction.
@@ -547,7 +543,7 @@ public class GLRootView extends GLSurfaceView
         }
 
         @Override
-        public boolean onDrawFrame(GL10 gl) {
+        public void onDrawFrame(GL10 gl) {
             AnimationTime.update();
 
             long t0 = System.nanoTime();
@@ -559,7 +555,7 @@ public class GLRootView extends GLSurfaceView
             }
 
             try {
-                onDrawFrameLocked(gl);
+                onDrawFrameLocked();
             } finally {
                 mRenderLock.unlock();
             }
@@ -569,33 +565,6 @@ public class GLRootView extends GLSurfaceView
 
             if (duration > 8) {
                 Log.v(TAG, "--- " + duration + " ---");
-            }
-
-            return true;
-        }
-
-        @Override
-        public void onGLThreadStart() {
-        }
-
-        @Override
-        public void onGLThreadExit() {
-            if (mContentView != null && mContentView.isAttachedToRoot()) {
-                mContentView.detachFromRoot();
-            }
-        }
-
-        @Override
-        public void onGLThreadPause() {
-            if (mContentView != null) {
-                mContentView.pause();
-            }
-        }
-
-        @Override
-        public void onGLThreadResume() {
-            if (mContentView != null) {
-                mContentView.resume();
             }
         }
     }
@@ -662,7 +631,7 @@ public class GLRootView extends GLSurfaceView
                 throw new IllegalArgumentException("No config chosen");
             }
 
-            int renderableType = findConfigAttrib(egl, display, config, EGL10.EGL_RENDERABLE_TYPE, 0);
+            int renderableType = findConfigAttrib(egl, display, config, EGL10.EGL_RENDERABLE_TYPE);
             if ((renderableType & 0x0004) == 0x0004 /* EGL_OPENGL_ES2_BIT */) {
                 mEGLContextClientVersion = 2;
             } else {
@@ -680,21 +649,21 @@ public class GLRootView extends GLSurfaceView
             for (int i = 0, n = configs.length; i < n; i++) {
                 final EGLConfig config = configs[i];
                 final int redSize = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_RED_SIZE, 0);
+                        EGL10.EGL_RED_SIZE);
                 final int greenSize = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_GREEN_SIZE, 0);
+                        EGL10.EGL_GREEN_SIZE);
                 final int blueSize = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_BLUE_SIZE, 0);
+                        EGL10.EGL_BLUE_SIZE);
                 final int alphaSize = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_ALPHA_SIZE, 0);
+                        EGL10.EGL_ALPHA_SIZE);
                 final int sampleBuffers = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_SAMPLE_BUFFERS, 0);
+                        EGL10.EGL_SAMPLE_BUFFERS);
                 final int samples = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_SAMPLES, 0);
+                        EGL10.EGL_SAMPLES);
                 final int depth = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_DEPTH_SIZE, 0);
+                        EGL10.EGL_DEPTH_SIZE);
                 final int stencil = findConfigAttrib(egl, display, config,
-                        EGL10.EGL_STENCIL_SIZE, 0);
+                        EGL10.EGL_STENCIL_SIZE);
 
                 final int score = redSize + greenSize + blueSize + alphaSize +
                         sampleBuffers + samples - depth - stencil;
@@ -709,11 +678,11 @@ public class GLRootView extends GLSurfaceView
         }
 
         private int findConfigAttrib(EGL10 egl, EGLDisplay display,
-                                     EGLConfig config, int attribute, int defaultValue) {
+                                     EGLConfig config, int attribute) {
             if (egl.eglGetConfigAttrib(display, config, attribute, mValue)) {
                 return mValue[0];
             }
-            return defaultValue;
+            return 0;
         }
     }
 
