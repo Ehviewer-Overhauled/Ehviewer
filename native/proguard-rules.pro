@@ -1,2 +1,2 @@
--keep class com.hippo.* { *; }
+-keep class com.hippo.UriArchiveAccessor
 -keep class com.hippo.image.* { *; }
