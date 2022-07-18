@@ -22,8 +22,14 @@ task executeDaoGenerator(type:JavaExec) {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'org.greenrobot:greendao-generator:3.3.0'
-    implementation 'org.jboss.forge.roaster:roaster-api:2.26.0.Final'
-    implementation 'org.jboss.forge.roaster:roaster-jdt:2.26.0.Final'
+
+    def roaster_version = "2.26.0.Final"
+    implementation "org.jboss.forge.roaster:roaster-api:$roaster_version"
+    implementation "org.jboss.forge.roaster:roaster-jdt:$roaster_version"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
