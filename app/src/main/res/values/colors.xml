@@ -23,7 +23,6 @@
     <color name="light_green_600">#ff7cb342</color>
     <color name="yellow_800">#fff9a825</color>
     <color name="deep_orange_400">#ffff7043</color>
-    <color name="grey_500">#ff9e9e9e</color>
     <color name="brown_500">#ff795548</color>
     <color name="loading_indicator_red">#ffe53935</color>
     <color name="loading_indicator_purple">@color/purple_a700</color>
