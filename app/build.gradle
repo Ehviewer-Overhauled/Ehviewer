@@ -92,16 +92,60 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'androidx.activity:activity:1.6.0-alpha05'
-    implementation 'androidx.appcompat:appcompat:1.6.0-alpha05'
-    implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha04'
-    implementation 'androidx.browser:browser:1.4.0'
-    implementation 'androidx.fragment:fragment:1.5.0'
-    implementation "androidx.lifecycle:lifecycle-process:2.5.0"
+    def activity_version = "1.6.0-alpha05"
+    implementation "androidx.activity:activity:$activity_version"
+    implementation "androidx.activity:activity-ktx:$activity_version"
+
+    implementation "androidx.annotation:annotation:1.4.0"
+    implementation "androidx.annotation:annotation-experimental:1.2.0"
+    implementation "androidx.appcompat:appcompat:1.6.0-alpha05"
+
+    def arch_core_version = "2.1.0"
+    implementation "androidx.arch.core:core-common:$arch_core_version"
+    implementation "androidx.arch.core:core-runtime:$arch_core_version"
+
+    implementation "androidx.biometric:biometric-ktx:1.2.0-alpha04"
+    implementation "androidx.browser:browser:1.4.0"
+
+    def collection_version = "1.3.0-alpha01"
+    implementation "androidx.collection:collection:$collection_version"
+    implementation "androidx.collection:collection-ktx:$collection_version"
+
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha03"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
+
+    def core_version = "1.9.0-alpha05"
+    implementation "androidx.core:core:$core_version"
+    implementation "androidx.core:core-ktx:$core_version"
+
+    implementation "androidx.customview:customview:1.2.0-alpha01"
+    implementation "androidx.documentfile:documentfile:1.1.0-alpha01"
+    implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
+
+    def fragment_version = "1.5.0"
+    implementation "androidx.fragment:fragment:$fragment_version"
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
+
+    def lifecycle_version = "2.6.0-alpha01"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+
+    implementation "androidx.loader:loader:1.1.0"
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0-beta01'
+    implementation 'androidx.startup:startup-runtime:1.2.0-alpha01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
-    implementation 'androidx.webkit:webkit:1.4.0'
+    implementation "androidx.transition:transition-ktx:1.4.1"
+    implementation "androidx.vectordrawable:vectordrawable:1.2.0-beta01"
+    implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+    implementation 'androidx.viewpager:viewpager:1.1.0-alpha01'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0-beta01'
+    implementation 'androidx.webkit:webkit:1.5.0-beta01'
+
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.7.0-alpha03'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'

@@ -249,7 +249,7 @@ class SearchLayout @JvmOverloads constructor(
         fun onSelectImage()
     }
 
-    internal class SearchLayoutManager(context: Context?) : LinearLayoutManager(context) {
+    internal class SearchLayoutManager(context: Context?) : LinearLayoutManager(context!!) {
         override fun onLayoutChildren(recycler: Recycler, state: State) {
             try {
                 super.onLayoutChildren(recycler, state)
