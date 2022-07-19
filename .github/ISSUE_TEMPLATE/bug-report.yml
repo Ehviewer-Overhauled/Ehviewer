@@ -74,9 +74,20 @@ body:
   - type: input
     id: device
     attributes:
-      label: 设备信息 / Device info
-      description: 特殊设备在此填入设备信息 / Put message here if you device is special
-      placeholder: WSA, arm-v7a
+      label: 设备型号 / Device model
+      description: 在此填入设备型号 / Put device model here
+      placeholder: OnePlus 7 Pro, Xiaomi 12 Ultra
+    validations:
+      required: true
+
+  - type: input
+    id: SoC
+    attributes:
+      label: SoC 型号 / Soc model
+      description: 在此填入 SoC 型号 / Put Soc model here
+      placeholder: 骁龙 8+ Gen 1, Snapdragon 8+ Gen 1
+    validations:
+      required: true
 
   - type: textarea
     id: log
