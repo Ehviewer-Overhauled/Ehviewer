@@ -58,7 +58,7 @@ body:
     attributes:
       label: EhViewer CI 版本 / EhViewer CI Version
       description: 直接将对应 CI 下载页面网址填入即可 / Simply drop CI download page url here
-      placeholder: https://github.com/asuka-mio/Ehviewer/actions/runs/XXXXXXXXXX
+      placeholder: https://github.com/Ehviewer-Overhauled/Ehviewer/actions/runs/XXXXXXXXXX
     validations:
       required: true
 
@@ -109,10 +109,10 @@ body:
       - label: 如果您有足够的时间和能力，并愿意为此提交 PR ，请勾上此复选框 / Pull request is welcome. Check this if you want to start a pull request
         required: false
 
-      - label: 您已仔细查看并知情 [Q&A](https://github.com/asuka-mio/Ehviewer/issues/61) 中的内容 / You have checked [Q&A](https://github.com/asuka-mio/Ehviewer/issues/61) carefully
+      - label: 您已仔细查看并知情 [Q&A](https://github.com/Ehviewer-Overhauled/Ehviewer/issues/61) 中的内容 / You have checked [Q&A](https://github.com/Ehviewer-Overhauled/Ehviewer/issues/61) carefully
         required: true
 
-      - label: 您已搜索过 [Issue Tracker](https://github.com/asuka-mio/Ehviewer/issues)，没有找到类似内容 / I have searched on [Issue Tracker](https://github.com/asuka-mio/Ehviewer/issues), No duplicate or related open issue has been found
+      - label: 您已搜索过 [Issue Tracker](https://github.com/Ehviewer-Overhauled/Ehviewer/issues)，没有找到类似内容 / I have searched on [Issue Tracker](https://github.com/Ehviewer-Overhauled/Ehviewer/issues), No duplicate or related open issue has been found
         required: true
 
       - label: 您确保这个 Issue 只提及一个问题。如果您有多个问题报告，烦请发起多个 Issue / Ensure there is only one bug report in this issue. Please make mutiply issue for mutiply bugs

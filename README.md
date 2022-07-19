@@ -4,20 +4,20 @@
 </h1>
 
 <p align="center">
-  <a href="https://github.com/asuka-mio/Ehviewer/actions">
-    <img src="https://img.shields.io/github/workflow/status/asuka-mio/Ehviewer/EhViewer" alt="Github Actions">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/actions">
+    <img src="https://img.shields.io/github/workflow/status/Ehviewer-Overhauled/Ehviewer/EhViewer" alt="Github Actions">
   </a>
-  <a href="https://github.com/asuka-mio/Ehviewer/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/asuka-mio/Ehviewer" alt="LICENSE">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/Ehviewer-Overhauled/Ehviewer" alt="LICENSE">
   </a>
-  <a href="https://www.codefactor.io/repository/github/asuka-mio/ehviewer">
-    <img src="https://www.codefactor.io/repository/github/asuka-mio/ehviewer/badge" alt="CodeFactor">
+  <a href="https://www.codefactor.io/repository/github/Ehviewer-Overhauled/ehviewer">
+    <img src="https://www.codefactor.io/repository/github/Ehviewer-Overhauled/ehviewer/badge" alt="CodeFactor">
   </a>
-  <a href="https://github.com/asuka-mio/Ehviewer/releases">
-    <img src="https://img.shields.io/github/v/release/asuka-mio/ehviewer?include_prereleases" alt="Release">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases">
+    <img src="https://img.shields.io/github/v/release/Ehviewer-Overhauled/ehviewer?include_prereleases" alt="Release">
   </a>
-  <a href="https://github.com/asuka-mio/Ehviewer/issues">
-    <img src="https://img.shields.io/github/issues/asuka-mio/ehviewer" alt="Issues">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/issues">
+    <img src="https://img.shields.io/github/issues/Ehviewer-Overhauled/ehviewer" alt="Issues">
   </a>
 </p>
 
@@ -37,7 +37,7 @@ Dynamic Color only support Android S and above!
 
 ## Download
 
-[Github 下载](https://github.com/asuka-mio/Ehviewer/releases)
+[Github 下载](https://github.com/Ehviewer-Overhauled/Ehviewer/releases)
 
 ## Screenshot
 
