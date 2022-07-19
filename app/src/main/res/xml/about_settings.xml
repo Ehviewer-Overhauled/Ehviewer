@@ -34,14 +34,14 @@
         android:title="@string/settings_about_latest_release"
         app:enableCopying="true"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/asuka-mio/Ehviewer/releases" />
+        app:url="https://github.com/Ehviewer-Overhauled/Ehviewer/releases" />
 
     <com.hippo.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
         app:enableCopying="true"
         app:iconSpaceReserved="false"
-        app:url="https://github.com/asuka-mio/Ehviewer" />
+        app:url="https://github.com/Ehviewer-Overhauled/Ehviewer" />
 
     <com.hippo.ehviewer.preference.VersionPreference
         android:key="version"
