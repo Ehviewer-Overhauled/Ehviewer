@@ -13,74 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.app
 
-package com.hippo.app;
+import android.content.Context
+import android.content.DialogInterface
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout
+import com.hippo.ehviewer.R
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+class EditTextDialogBuilder constructor(
+    context: Context,
+    text: String?,
+    hint: String?
+) : MaterialAlertDialogBuilder(
+    context
+), OnEditorActionListener {
+    private val mTextInputLayout: TextInputLayout
+    val editText: EditText
+    private var mDialog: AlertDialog? = null
+    val text: String
+        get() = editText.text.toString()
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputLayout;
-import com.hippo.ehviewer.R;
-
-public class EditTextDialogBuilder extends MaterialAlertDialogBuilder implements EditText.OnEditorActionListener {
-
-    private final TextInputLayout mTextInputLayout;
-    private final EditText mEditText;
-    private AlertDialog mDialog;
-
-    @SuppressLint("InflateParams")
-    public EditTextDialogBuilder(Context context, String text, String hint) {
-        super(context);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edittext_builder, null);
-        setView(view);
-        mTextInputLayout = (TextInputLayout) view;
-        mEditText = view.findViewById(R.id.edit_text);
-        mEditText.setText(text);
-        mEditText.setSelection(mEditText.getText().length());
-        mEditText.setOnEditorActionListener(this);
-        mTextInputLayout.setHint(hint);
+    fun setError(error: CharSequence?) {
+        mTextInputLayout.error = error
     }
 
-    public EditText getEditText() {
-        return mEditText;
+    override fun create(): AlertDialog {
+        mDialog = super.create()
+        return mDialog as AlertDialog
     }
 
-    public String getText() {
-        return mEditText.getText().toString();
-    }
-
-    public void setError(CharSequence error) {
-        mTextInputLayout.setError(error);
-    }
-
-    @NonNull
-    @Override
-    public AlertDialog create() {
-        mDialog = super.create();
-        return mDialog;
-    }
-
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (mDialog != null) {
-            Button button = mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-            if (button != null) {
-                button.performClick();
-            }
-            return true;
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+        return if (mDialog != null) {
+            val button = mDialog!!.getButton(DialogInterface.BUTTON_POSITIVE)
+            button?.performClick()
+            true
         } else {
-            return false;
+            false
         }
+    }
+
+    init {
+        val view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edittext_builder, null)
+        setView(view)
+        mTextInputLayout = view as TextInputLayout
+        editText = view.findViewById(R.id.edit_text)
+        editText.setText(text)
+        editText.setSelection(editText.text.length)
+        editText.setOnEditorActionListener(this)
+        mTextInputLayout.hint = hint
     }
 }

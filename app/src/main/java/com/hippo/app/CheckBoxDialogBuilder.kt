@@ -13,35 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.app
 
-package com.hippo.app;
+import android.content.Context
+import android.view.LayoutInflater
+import android.widget.CheckBox
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.hippo.ehviewer.R
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
+class CheckBoxDialogBuilder constructor(
+    context: Context,
+    message: String?,
+    checkText: String?,
+    checked: Boolean
+) : MaterialAlertDialogBuilder(
+    context
+) {
+    private val mCheckBox: CheckBox
+    val isChecked: Boolean
+        get() = mCheckBox.isChecked
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hippo.ehviewer.R;
-
-public class CheckBoxDialogBuilder extends MaterialAlertDialogBuilder {
-
-    private final CheckBox mCheckBox;
-
-    @SuppressLint("InflateParams")
-    public CheckBoxDialogBuilder(Context context, String message, String checkText, boolean checked) {
-        super(context);
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_checkbox_builder, null);
-        setView(view);
-        setMessage(message);
-        mCheckBox = view.findViewById(R.id.checkbox);
-        mCheckBox.setText(checkText);
-        mCheckBox.setChecked(checked);
-        view.setOnClickListener(v -> mCheckBox.toggle());
-    }
-
-    public boolean isChecked() {
-        return mCheckBox.isChecked();
+    init {
+        val view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_checkbox_builder, null)
+        setView(view)
+        setMessage(message)
+        mCheckBox = view.findViewById(R.id.checkbox)
+        mCheckBox.text = checkText
+        mCheckBox.isChecked = checked
+        view.setOnClickListener { mCheckBox.toggle() }
     }
 }
