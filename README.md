@@ -52,6 +52,7 @@ Here is the libraries
 
 - [AOSP](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
+- [material-design-icons](https://github.com/google/material-design-icons)
 - [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/)
 - [apng](http://apng.sourceforge.net/)
 - [giflib](http://giflib.sourceforge.net)
