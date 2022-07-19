@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.okhttp
 
-package com.hippo.okhttp;
+import okhttp3.Request
 
-import okhttp3.Request;
+open class ChromeRequestBuilder(url: String) : Request.Builder() {
+    companion object {
+        private const val CHROME_USER_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
+        private const val CHROME_ACCEPT =
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+        private const val CHROME_ACCEPT_LANGUAGE = "en-US,en;q=0.5"
+    }
 
-public class ChromeRequestBuilder extends Request.Builder {
-
-    private static final String CHROME_USER_AGENT =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36";
-
-    private static final String CHROME_ACCEPT =
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
-
-    private static final String CHROME_ACCEPT_LANGUAGE =
-            "en-US,en;q=0.5";
-
-    public ChromeRequestBuilder(String url) {
-        url(url);
-        addHeader("User-Agent", CHROME_USER_AGENT);
-        addHeader("Accept", CHROME_ACCEPT);
-        addHeader("Accept-Language", CHROME_ACCEPT_LANGUAGE);
+    init {
+        this.url(url)
+        this.addHeader("User-Agent", CHROME_USER_AGENT)
+        this.addHeader("Accept", CHROME_ACCEPT)
+        this.addHeader("Accept-Language", CHROME_ACCEPT_LANGUAGE)
     }
 }
