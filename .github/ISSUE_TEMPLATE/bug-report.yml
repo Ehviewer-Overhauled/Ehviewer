@@ -80,6 +80,15 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: SoC
+    attributes:
+      label: SoC 型号 / Soc model
+      description: 在此填入 SoC 型号 / Put Soc model here
+      placeholder: 骁龙 8+ Gen 1, Snapdragon 8+ Gen 1
+    validations:
+      required: true
+
   - type: textarea
     id: log
     attributes:
