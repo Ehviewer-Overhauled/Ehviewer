@@ -13,183 +13,169 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.network
 
-package com.hippo.network;
+import android.content.Context
+import com.hippo.yorozuya.ObjectUtils
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
+import java.util.regex.Pattern
 
-/*
- * Created by Hippo on 2017/9/4.
- */
+open class CookieRepository(context: Context, name: String) : CookieJar {
+    private val db: CookieDatabase
+    private val map: MutableMap<String, CookieSet>
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.hippo.yorozuya.ObjectUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
-
-public class CookieRepository implements CookieJar {
-
-    /**
-     * Quick and dirty pattern to differentiate IP addresses from hostnames. This is an approximation
-     * of Android's private InetAddress#isNumeric API.
-     * <p>
-     * This matches IPv6 addresses as a hex string containing at least one colon, and possibly
-     * including dots after the first colon. It matches IPv4 addresses as strings containing only
-     * decimal digits and dots. This pattern matches strings like "a:.23" and "54" that are neither IP
-     * addresses nor hostnames; they will be verified as IP addresses (which is a more strict
-     * verification).
-     */
-    private static final Pattern VERIFY_AS_IP_ADDRESS = Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)");
-    private final CookieDatabase db;
-    private final Map<String, CookieSet> map;
-
-    public CookieRepository(Context context, String name) {
-        db = new CookieDatabase(context, name);
-        map = db.getAllCookies();
-    }
-
-    /**
-     * Returns true if `host` is not a host name and might be an IP address.
-     */
-    private static boolean verifyAsIpAddress(String host) {
-        return VERIFY_AS_IP_ADDRESS.matcher(host).matches();
-    }
-
-    // okhttp3.Cookie.domainMatch(HttpUrl, String)
-    protected static boolean domainMatch(HttpUrl url, String domain) {
-        String urlHost = url.host();
-
-        if (urlHost.equals(domain)) {
-            return true; // As in 'example.com' matching 'example.com'.
-        }
-
-        return urlHost.endsWith(domain)
-                && urlHost.charAt(urlHost.length() - domain.length() - 1) == '.'
-                && !verifyAsIpAddress(urlHost); // As in 'example.com' matching 'www.example.com'.
-    }
-
-    public synchronized void addCookie(Cookie cookie) {
+    @Synchronized
+    fun addCookie(cookie: Cookie) {
         // For cookie database
-        Cookie toAdd = null;
-        Cookie toUpdate = null;
-        Cookie toRemove = null;
-
-        CookieSet set = map.get(cookie.domain());
+        var toAdd: Cookie? = null
+        var toUpdate: Cookie? = null
+        var toRemove: Cookie? = null
+        var set = map[cookie.domain]
         if (set == null) {
-            set = new CookieSet();
-            map.put(cookie.domain(), set);
+            set = CookieSet()
+            map[cookie.domain] = set
         }
-
-        if (cookie.expiresAt() <= System.currentTimeMillis()) {
-            toRemove = set.remove(cookie);
+        if (cookie.expiresAt <= System.currentTimeMillis()) {
+            toRemove = set.remove(cookie)
             // If the cookie is not persistent, it's not in database
-            if (toRemove != null && !toRemove.persistent()) {
-                toRemove = null;
+            if (toRemove != null && !toRemove.persistent) {
+                toRemove = null
             }
         } else {
-            toAdd = cookie;
-            toUpdate = set.add(cookie);
+            toAdd = cookie
+            toUpdate = set.add(cookie)
             // If the cookie is not persistent, it's not in database
-            if (!toAdd.persistent()) toAdd = null;
-            if (toUpdate != null && !toUpdate.persistent()) toUpdate = null;
+            if (!toAdd.persistent) toAdd = null
+            if (toUpdate != null && !toUpdate.persistent) toUpdate = null
             // Remove the cookie if it updates to null
             if (toAdd == null && toUpdate != null) {
-                toRemove = toUpdate;
-                toUpdate = null;
+                toRemove = toUpdate
+                toUpdate = null
             }
         }
-
         if (toRemove != null) {
-            db.remove(toRemove);
+            db.remove(toRemove)
         }
         if (toAdd != null) {
             if (toUpdate != null) {
-                db.update(toUpdate, toAdd);
+                db.update(toUpdate, toAdd)
             } else {
-                db.add(toAdd);
+                db.add(toAdd)
             }
         }
     }
 
-    public String getCookieHeader(HttpUrl url) {
-        List<Cookie> cookies = getCookies(url);
-        StringBuilder cookieHeader = new StringBuilder();
-        for (int i = 0, size = cookies.size(); i < size; i++) {
+    fun getCookieHeader(url: HttpUrl): String {
+        val cookies = getCookies(url)
+        val cookieHeader = StringBuilder()
+        var i = 0
+        val size = cookies.size
+        while (i < size) {
             if (i > 0) {
-                cookieHeader.append("; ");
+                cookieHeader.append("; ")
             }
-            Cookie cookie = cookies.get(i);
-            cookieHeader.append(cookie.name()).append('=').append(cookie.value());
+            val cookie = cookies[i]
+            cookieHeader.append(cookie.name).append('=').append(cookie.value)
+            i++
         }
-        return cookieHeader.toString();
+        return cookieHeader.toString()
     }
 
-    public synchronized List<Cookie> getCookies(HttpUrl url) {
-        List<Cookie> accepted = new ArrayList<>();
-        List<Cookie> expired = new ArrayList<>();
-
-        for (Map.Entry<String, CookieSet> entry : map.entrySet()) {
-            String domain = entry.getKey();
-            CookieSet cookieSet = entry.getValue();
+    @Synchronized
+    fun getCookies(url: HttpUrl): List<Cookie> {
+        val accepted: MutableList<Cookie> = ArrayList()
+        val expired: MutableList<Cookie> = ArrayList()
+        for ((domain, cookieSet) in map) {
             if (domainMatch(url, domain)) {
-                cookieSet.get(url, accepted, expired);
+                cookieSet[url, accepted, expired]
             }
         }
-
-        for (Cookie cookie : expired) {
-            if (cookie.persistent()) {
-                db.remove(cookie);
+        for (cookie in expired) {
+            if (cookie.persistent) {
+                db.remove(cookie)
             }
         }
 
         // RFC 6265 Section-5.4 step 2, sort the cookie-list
         // Cookies with longer paths are listed before cookies with shorter paths.
         // Ignore creation-time, we don't store them.
-        Collections.sort(accepted, (o1, o2) -> o2.path().length() - o1.path().length());
-
-        return accepted;
+        accepted.sortWith { o1: Cookie, o2: Cookie -> o2.path.length - o1.path.length }
+        return accepted
     }
 
-    public boolean contains(HttpUrl url, String name) {
-        for (Cookie cookie : getCookies(url)) {
-            if (ObjectUtils.equal(cookie.name(), name)) {
-                return true;
+    fun contains(url: HttpUrl, name: String?): Boolean {
+        for (cookie in getCookies(url)) {
+            if (ObjectUtils.equal(cookie.name, name)) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
     /**
-     * Remove all cookies in this {@code CookieRepository}.
+     * Remove all cookies in this `CookieRepository`.
      */
-    public synchronized void clear() {
-        map.clear();
-        db.clear();
+    @Synchronized
+    fun clear() {
+        map.clear()
+        db.clear()
     }
 
-    public synchronized void close() {
-        db.close();
+    @Synchronized
+    fun close() {
+        db.close()
     }
 
-    @Override
-    public void saveFromResponse(@NonNull HttpUrl httpUrl, List<Cookie> list) {
-        for (Cookie cookie : list) {
-            addCookie(cookie);
+    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+        for (cookie in cookies) {
+            addCookie(cookie)
         }
     }
 
-    @NonNull
-    @Override
-    public List<Cookie> loadForRequest(@NonNull HttpUrl httpUrl) {
-        return getCookies(httpUrl);
+    override fun loadForRequest(url: HttpUrl): List<Cookie> {
+        return getCookies(url)
+    }
+
+    companion object {
+        /**
+         * Quick and dirty pattern to differentiate IP addresses from hostnames. This is an approximation
+         * of Android's private InetAddress#isNumeric API.
+         *
+         *
+         * This matches IPv6 addresses as a hex string containing at least one colon, and possibly
+         * including dots after the first colon. It matches IPv4 addresses as strings containing only
+         * decimal digits and dots. This pattern matches strings like "a:.23" and "54" that are neither IP
+         * addresses nor hostnames; they will be verified as IP addresses (which is a more strict
+         * verification).
+         */
+        private val VERIFY_AS_IP_ADDRESS =
+            Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)")
+
+        /**
+         * Returns true if `host` is not a host name and might be an IP address.
+         */
+        private fun verifyAsIpAddress(host: String): Boolean {
+            return VERIFY_AS_IP_ADDRESS.matcher(host).matches()
+        }
+
+        // okhttp3.Cookie.domainMatch(HttpUrl, String)
+        @JvmStatic
+        protected fun domainMatch(url: HttpUrl, domain: String?): Boolean {
+            val urlHost = url.host
+            return if (urlHost == domain) {
+                true // As in 'example.com' matching 'example.com'.
+            } else urlHost.endsWith(domain!!)
+                    && urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(
+                urlHost
+            )
+            // As in 'example.com' matching 'www.example.com'.
+        }
+    }
+
+    init {
+        db = CookieDatabase(context, name)
+        map = db.allCookies
     }
 }

@@ -13,94 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.network
 
-package com.hippo.network;
+import com.hippo.util.HashCodeUtils
+import com.hippo.yorozuya.ObjectUtils
+import okhttp3.Cookie
+import okhttp3.HttpUrl
 
-/*
- * Created by Hippo on 2017/9/4.
- */
-
-import com.hippo.util.HashCodeUtils;
-import com.hippo.yorozuya.ObjectUtils;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-
-class CookieSet {
-
-    private final Map<Key, Cookie> map = new HashMap<>();
+internal class CookieSet {
+    private val map: MutableMap<Key, Cookie> = HashMap()
 
     /**
-     * Adds a cookie to this {@code CookieSet}.
+     * Adds a cookie to this `CookieSet`.
      * Returns a previous cookie with
-     * the same name, domain and path or {@code null}.
+     * the same name, domain and path or `null`.
      */
-    public Cookie add(Cookie cookie) {
-        return map.put(new Key(cookie), cookie);
+    fun add(cookie: Cookie): Cookie? {
+        return map.put(Key(cookie), cookie)
     }
 
     /**
      * Removes a cookie with the same name,
      * domain and path as the cookie.
-     * Returns the removed cookie or {@code null}.
+     * Returns the removed cookie or `null`.
      */
-    public Cookie remove(Cookie cookie) {
-        return map.remove(new Key(cookie));
+    fun remove(cookie: Cookie): Cookie? {
+        return map.remove(Key(cookie))
     }
 
     /**
-     * Get cookies for the url. Fill {@code accepted} and {@code expired}.
+     * Get cookies for the url. Fill `accepted` and `expired`.
      */
-    public void get(HttpUrl url, List<Cookie> accepted, List<Cookie> expired) {
-        long now = System.currentTimeMillis();
-        Iterator<Map.Entry<Key, Cookie>> iterator = map.entrySet().iterator();
+    operator fun get(url: HttpUrl?, accepted: MutableList<Cookie>, expired: MutableList<Cookie>) {
+        val now = System.currentTimeMillis()
+        val iterator: MutableIterator<Map.Entry<Key, Cookie>> = map.entries.iterator()
         while (iterator.hasNext()) {
-            Cookie cookie = iterator.next().getValue();
-            if (cookie.expiresAt() <= now) {
-                iterator.remove();
-                expired.add(cookie);
-            } else if (cookie.matches(url)) {
-                accepted.add(cookie);
+            val cookie = iterator.next().value
+            if (cookie.expiresAt <= now) {
+                iterator.remove()
+                expired.add(cookie)
+            } else if (cookie.matches(url!!)) {
+                accepted.add(cookie)
             }
         }
     }
 
-    static class Key {
-
-        private final String name;
-        private final String domain;
-        private final String path;
-
-        public Key(Cookie cookie) {
-            this.name = cookie.name();
-            this.domain = cookie.domain();
-            this.path = cookie.path();
+    internal class Key(cookie: Cookie) {
+        private val name: String
+        private val domain: String
+        private val path: String
+        override fun equals(other: Any?): Boolean {
+            if (other === this) {
+                return true
+            }
+            if (other is Key) {
+                return ObjectUtils.equal(other.name, name) &&
+                        ObjectUtils.equal(other.domain, domain) &&
+                        ObjectUtils.equal(other.path, path)
+            }
+            return false
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-
-            if (obj instanceof Key) {
-                Key key = (Key) obj;
-                return ObjectUtils.equal(key.name, this.name) &&
-                        ObjectUtils.equal(key.domain, this.domain) &&
-                        ObjectUtils.equal(key.path, this.path);
-            }
-
-            return false;
+        override fun hashCode(): Int {
+            return HashCodeUtils.hashCode(name, domain, path)
         }
 
-        @Override
-        public int hashCode() {
-            return HashCodeUtils.hashCode(name, domain, path);
+        init {
+            name = cookie.name
+            domain = cookie.domain
+            path = cookie.path
         }
     }
 }

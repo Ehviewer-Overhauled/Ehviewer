@@ -13,45 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.network
 
-package com.hippo.network;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-public class UrlBuilder {
-
-    public String mRootUrl;
-    public Map<String, Object> mQueryMap = new HashMap<>();
-
-    public UrlBuilder(String rootUrl) {
-        mRootUrl = rootUrl;
+class UrlBuilder(private var mRootUrl: String) {
+    private var mQueryMap: MutableMap<String, Any> = HashMap()
+    fun addQuery(key: String, value: Any) {
+        mQueryMap[key] = value
     }
 
-    public void addQuery(String key, Object value) {
-        mQueryMap.put(key, value);
-    }
-
-    public String build() {
-        if (mQueryMap.size() == 0) {
-            return mRootUrl;
+    fun build(): String {
+        return if (mQueryMap.isEmpty()) {
+            mRootUrl
         } else {
-            StringBuilder sb = new StringBuilder(mRootUrl);
-            sb.append("?");
-
-            Iterator<String> iter = mQueryMap.keySet().iterator();
+            val sb = StringBuilder(mRootUrl)
+            sb.append("?")
+            val iter: Iterator<String> = mQueryMap.keys.iterator()
             if (iter.hasNext()) {
-                String key = iter.next();
-                Object value = mQueryMap.get(key);
-                sb.append(key).append("=").append(value);
+                val key = iter.next()
+                val value = mQueryMap[key]
+                sb.append(key).append("=").append(value)
             }
             while (iter.hasNext()) {
-                String key = iter.next();
-                Object value = mQueryMap.get(key);
-                sb.append("&").append(key).append("=").append(value);
+                val key = iter.next()
+                val value = mQueryMap[key]
+                sb.append("&").append(key).append("=").append(value)
             }
-            return sb.toString();
+            sb.toString()
         }
     }
 }

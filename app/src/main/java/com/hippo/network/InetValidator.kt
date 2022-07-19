@@ -13,55 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.network
 
-package com.hippo.network;
+import java.util.regex.Pattern
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+object InetValidator {
+    private const val IPV4_REGEX = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$"
+    private val IPV4_PATTERN = Pattern.compile(IPV4_REGEX)
 
-public final class InetValidator {
-
-    private static final String IPV4_REGEX =
-            "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
-
-    private static final Pattern IPV4_PATTERN = Pattern.compile(IPV4_REGEX);
-
-    private InetValidator() {
-    }
-
-    public static boolean isValidInet4Address(String inet4Address) {
+    @JvmStatic
+    fun isValidInet4Address(inet4Address: String?): Boolean {
         if (null == inet4Address) {
-            return false;
+            return false
         }
-
-        Matcher matcher = IPV4_PATTERN.matcher(inet4Address);
+        val matcher = IPV4_PATTERN.matcher(inet4Address)
         if (!matcher.find()) {
-            return false;
+            return false
         }
 
         // verify that address subgroups are legal
-        for (int i = 1; i <= 4; i++) {
-            String ipSegment = matcher.group(i);
-            if (ipSegment == null || ipSegment.length() == 0) {
-                return false;
+        for (i in 1..4) {
+            val ipSegment = matcher.group(i)
+            if (ipSegment == null || ipSegment.isEmpty()) {
+                return false
             }
-            int iIpSegment;
-            try {
-                iIpSegment = Integer.parseInt(ipSegment);
-            } catch (NumberFormatException e) {
-                return false;
+            val iIpSegment: Int = try {
+                ipSegment.toInt()
+            } catch (e: NumberFormatException) {
+                return false
             }
             if (iIpSegment > 255) {
-                return false;
+                return false
             }
-            if (ipSegment.length() > 1 && ipSegment.startsWith("0")) {
-                return false;
+            if (ipSegment.length > 1 && ipSegment.startsWith("0")) {
+                return false
             }
         }
-        return true;
+        return true
     }
 
-    public static boolean isValidInetPort(int inetPort) {
-        return inetPort >= 0 && inetPort <= 65535;
+    @JvmStatic
+    fun isValidInetPort(inetPort: Int): Boolean {
+        return inetPort in 0..65535
     }
 }
