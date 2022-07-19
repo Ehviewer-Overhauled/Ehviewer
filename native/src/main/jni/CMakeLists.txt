@@ -1,7 +1,7 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines-hidden -flto\
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -flto\
            -mllvm -polly \
            -mllvm -polly-run-dce \
 		   -mllvm -polly-run-inliner \
@@ -33,4 +33,4 @@ add_subdirectory(image)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED main.c archive.c)
 target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} image archive_static)
+target_link_libraries(${PROJECT_NAME} image archive_static -Wl,--gc-sections)
