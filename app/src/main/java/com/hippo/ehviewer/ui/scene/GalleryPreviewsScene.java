@@ -36,6 +36,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.slider.Slider;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhApplication;
@@ -53,7 +54,6 @@ import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.LoadImageView;
-import com.hippo.widget.Slider;
 import com.hippo.widget.recyclerview.AutoGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.LayoutUtils;
@@ -209,7 +209,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
                 return true;
             }
             int pages = mHelper.getPages();
-            if (pages > 0 && mHelper.canGoTo()) {
+            if (pages > 1 && mHelper.canGoTo()) {
                 GoToDialogHelper helper = new GoToDialogHelper(pages, mHelper.getPageForTop());
                 AlertDialog dialog = new MaterialAlertDialogBuilder(context).setTitle(R.string.go_to)
                         .setView(R.layout.dialog_go_to)
@@ -418,8 +418,8 @@ public class GalleryPreviewsScene extends ToolbarScene {
             ((TextView) ViewUtils.$$(dialog, R.id.start)).setText(String.format(Locale.US, "%d", 1));
             ((TextView) ViewUtils.$$(dialog, R.id.end)).setText(String.format(Locale.US, "%d", mPages));
             mSlider = (Slider) ViewUtils.$$(dialog, R.id.slider);
-            mSlider.setRange(1, mPages);
-            mSlider.setProgress(mCurrentPage + 1);
+            mSlider.setValueTo(mPages);
+            mSlider.setValue(mCurrentPage + 1);
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(this);
             dialog.setOnDismissListener(this);
@@ -431,7 +431,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
                 return;
             }
 
-            int page = mSlider.getProgress() - 1;
+            int page = (int) (mSlider.getValue() - 1);
             if (page >= 0 && page < mPages && mHelper != null) {
                 mHelper.goTo(page);
                 if (mDialog != null) {

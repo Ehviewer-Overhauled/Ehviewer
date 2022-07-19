@@ -51,12 +51,6 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="Slider">
-        <item name="thickness">2dp</item>
-        <item name="radius">6dp</item>
-        <item name="textSize">12sp</item>
-    </style>
-
     <style name="Indicating">
         <item name="indicatorHeight">1dp</item>
         <item name="indicatorColor">?attr/dividerColor</item>
