@@ -13,45 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.database
 
-package com.hippo.database;
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import com.hippo.util.SqlUtils
 
-/*
- * Created by Hippo on 2017/9/4.
- */
-
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import com.hippo.util.SqlUtils;
-
-class MSQLiteOpenHelper extends SQLiteOpenHelper {
-
-    private final int version;
-    private final MSQLiteBuilder builder;
-
-    public MSQLiteOpenHelper(Context context, String name, int version, MSQLiteBuilder builder) {
-        super(context, name, null, version);
-        this.version = version;
-        this.builder = builder;
+internal class MSQLiteOpenHelper(
+    context: Context?,
+    name: String?,
+    private val version: Int,
+    private val builder: MSQLiteBuilder
+) : SQLiteOpenHelper(context, name, null, version) {
+    override fun onCreate(db: SQLiteDatabase) {
+        onUpgrade(db, 0, version)
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        onUpgrade(db, 0, version);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (String command : builder.getStatements(oldVersion, newVersion)) {
-            db.execSQL(command);
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        for (command in builder.getStatements(oldVersion, newVersion)) {
+            db.execSQL(command)
         }
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        SqlUtils.dropAllTable(db);
-        onCreate(db);
+    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        SqlUtils.dropAllTable(db)
+        onCreate(db)
     }
 }
