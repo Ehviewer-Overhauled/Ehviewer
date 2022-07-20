@@ -1,6 +1,6 @@
-name: EhViewer
+name: CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   linux:
@@ -32,7 +32,7 @@ jobs:
       - name: Update ARM64
         uses: actions/upload-artifact@v3
         with:
-          name: arm64-${{ github.sha }}
+          name: arm64-v8a-${{ github.sha }}
           path: app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
       - name: Update x86_64

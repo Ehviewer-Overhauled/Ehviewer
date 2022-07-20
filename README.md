@@ -4,8 +4,8 @@
 </h1>
 
 <p align="center">
-  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/actions">
-    <img src="https://img.shields.io/github/workflow/status/Ehviewer-Overhauled/Ehviewer/EhViewer" alt="Github Actions">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml">
+    <img src="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml/badge.svg" alt="Github Actions">
   </a>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/Ehviewer-Overhauled/Ehviewer" alt="LICENSE">
