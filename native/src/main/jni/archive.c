@@ -34,16 +34,33 @@
 
 #define BLOCK_SIZE 4096 * 16
 
-typedef struct archive_inst_sc {
-    struct archive *archive;
-    JNIEnv *env;
-    jobject file;
-    jmethodID readID;
-    jmethodID seekID;
-    jmethodID skipID;
-    void *read_buffer;
-    jbyteArray jbr;
-} archive_inst;
+static JNIEnv *env;
+static jobject file;
+static jmethodID readID;
+static jmethodID seekID;
+static jmethodID skipID;
+static jmethodID rewindID;
+static void* read_buffer;
+jbyteArray jbr;
+
+static void JNI_prepare_environment(JNIEnv* jniEnv, jobject OsReadablefile)
+{
+    env = jniEnv;
+    file = (*env)->NewGlobalRef(env, OsReadablefile);
+    readID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, OsReadablefile), "read", "([B)I");
+    seekID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, OsReadablefile), "seek", "(JI)J");
+    skipID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, OsReadablefile), "skip", "(J)J");
+    rewindID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, OsReadablefile), "rewind", "()V");
+    jbr = (*env)->NewGlobalRef(env, (*env)->NewByteArray(env, BLOCK_SIZE));
+    read_buffer = malloc(BLOCK_SIZE);
+}
+
+static void JNI_destroy_environment()
+{
+    (*env)->DeleteGlobalRef(env, file);
+    (*env)->DeleteGlobalRef(env, jbr);
+    free(read_buffer);
+}
 
 static int filename_is_playable_file(const char *name) {
     const char *dotptr = strrchr(name, '.');
@@ -62,95 +79,71 @@ static int filename_is_playable_file(const char *name) {
     return 0;
 }
 
-static long archive_list_all_entries(struct archive_inst_sc *inst) {
-    struct archive *a = inst->archive;
+static long archive_list_all_entries(struct archive *arc) {
     struct archive_entry *entry;
     long count = 0;
-    while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (filename_is_playable_file(archive_entry_pathname(entry)))
             count++;
     }
     if (!count)
-        LOGE("%s", archive_error_string(inst->archive));
+        LOGE("%s", archive_error_string(arc));
     return count;
 }
 
 ssize_t ins_read(struct archive *a, void *client_data_ptr, const void **buff) {
-    archive_inst *arc = client_data_ptr;
-    int32_t r = (*arc->env)->CallIntMethod(arc->env, arc->file, arc->readID, arc->jbr);
-    (*arc->env)->GetByteArrayRegion(arc->env, arc->jbr, 0, r, arc->read_buffer);
-    *buff = arc->read_buffer;
+    int32_t r = (*env)->CallIntMethod(env, file, readID, jbr);
+    (*env)->GetByteArrayRegion(env, jbr, 0, r, read_buffer);
+    *buff = read_buffer;
     return r;
 }
 
 int ins_close(struct archive *a, void *client_data) {
-    archive_inst *arc = client_data;
-    JNIEnv *env = arc->env;
-    jmethodID rewind = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, arc->file), "rewind",
-                                           "()V");
-    (*arc->env)->CallVoidMethod(arc->env, arc->file, rewind);
+    (*env)->CallVoidMethod(env, file, rewindID);
     return ARCHIVE_OK;
 }
 
 la_int64_t ins_seek(struct archive *a, void *client_data, la_int64_t offset, int whence) {
-    archive_inst *arc = client_data;
-    jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->seekID, offset, whence);
+    jlong ret = (*env)->CallLongMethod(env, file, seekID, offset, whence);
     return ret;
 }
 
 la_int64_t ins_skip(struct archive *a, void *client_data, la_int64_t request) {
-    archive_inst *arc = client_data;
-    jlong ret = (*arc->env)->CallLongMethod(arc->env, arc->file, arc->skipID, request);
+    jlong ret = (*env)->CallLongMethod(env, file, skipID, request);
     return ret;
 }
 
-static archive_inst *archive_create_inst(JNIEnv *env, jobject file) {
-    archive_inst *inst = malloc(sizeof(archive_inst));
-    inst->archive = archive_read_new();
-    archive_read_set_seek_callback(inst->archive, ins_seek);
-    archive_read_set_skip_callback(inst->archive, ins_skip);
-    archive_read_support_format_all(inst->archive);
-    archive_read_support_filter_all(inst->archive);
-    inst->env = env;
-    inst->file = file;
-    inst->readID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "read", "([B)I");
-    inst->seekID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "seek", "(JI)J");
-    inst->skipID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "skip", "(J)J");
-    inst->jbr = (*env)->NewByteArray(env, BLOCK_SIZE);
-    inst->read_buffer = malloc(BLOCK_SIZE);
-    return inst;
-}
-
-static void archive_destroy_inst(archive_inst *inst) {
-    JNIEnv *env = inst->env;
-    archive_read_free(inst->archive);
-    (*env)->DeleteLocalRef(env, inst->jbr);
-    free(inst->read_buffer);
-    free(inst);
+static struct archive *archive_create() {
+    struct archive* arc = archive_read_new();
+    archive_read_set_seek_callback(arc, ins_seek);
+    archive_read_set_skip_callback(arc, ins_skip);
+    archive_read_support_format_all(arc);
+    archive_read_support_filter_all(arc);
+    return arc;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jobject osf) {
-    archive_inst *arc = archive_create_inst(env, osf);
-    long r = archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
+Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jobject osf) {
+    JNI_prepare_environment(_, osf);
+    struct archive *arc = archive_create();
+    long r = archive_read_open(arc, arc, NULL, ins_read, ins_close);
     if (r) {
         r = 0;
-        LOGE("%s%s", "Archive open failed:", archive_error_string(arc->archive));
+        LOGE("%s%s", "Archive open failed:", archive_error_string(arc));
     } else {
         r = archive_list_all_entries(arc);
         LOGI("%s%ld%s", "Found ", r, " image entries in archive");
     }
-    archive_read_close(arc->archive);
-    archive_destroy_inst(arc);
+    archive_read_close(arc);
+    archive_read_free(arc);
     return r;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thiz, jobject osf,
-                                                        jint index, jobject os) {
+JNIEXPORT void JNICALL
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index, jobject os) {
     int count = 0;
     struct archive_entry *entry;
-    archive_inst *arc = archive_create_inst(env, osf);
+    struct archive *arc = archive_create();
     size_t size;
     int ret;
     la_int64_t offset;
@@ -158,28 +151,32 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
     jmethodID writeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "write", "([B)V");
     jmethodID flushID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "flush", "()V");
     jmethodID closeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "close", "()V");
-    archive_read_open(arc->archive, arc, NULL, ins_read, ins_close);
-    while (archive_read_next_header(arc->archive, &entry) == ARCHIVE_OK) {
+    archive_read_open(arc, arc, NULL, ins_read, ins_close);
+    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (count++ == index) {
             for (;;) {
-                ret = archive_read_data_block(arc->archive, &buff, &size, &offset);
+                ret = archive_read_data_block(arc, &buff, &size, &offset);
                 if (ret == ARCHIVE_EOF)
                     break;
                 if (ret != ARCHIVE_OK) {
-                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc->archive));
+                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
                     break;
                 }
-                (*arc->env)->SetByteArrayRegion(env, arc->jbr, 0, (int)size, buff);
-                (*arc->env)->CallVoidMethod(env, os, writeID, arc->jbr);
+                (*env)->SetByteArrayRegion(env, jbr, 0, (int)size, buff);
+                (*env)->CallVoidMethod(env, os, writeID, jbr);
             }
             break;
         }
     }
-    (*arc->env)->CallVoidMethod(env, os, flushID);
-    (*arc->env)->CallVoidMethod(env, os, closeID);
-    archive_read_close(arc->archive);
-    archive_destroy_inst(arc);
-    return 0;
+    (*env)->CallVoidMethod(env, os, flushID);
+    (*env)->CallVoidMethod(env, os, closeID);
+    archive_read_close(arc);
+    archive_read_free(arc);
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
+    JNI_destroy_environment();
 }

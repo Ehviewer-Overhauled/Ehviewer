@@ -31,7 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class UriArchiveAccessor implements Closeable {
+public class UriArchiveAccessor implements AutoCloseable {
     public static int OPEN_OK = 1;
     public static int OPEN_ERR = 2;
     private final OsReadableFile osf;
@@ -45,15 +45,18 @@ public class UriArchiveAccessor implements Closeable {
     }
 
     public void extractTargetIndexToOutputStream(int index, OutputStream os) {
-        extracttoOutputStream(osf, index, os);
+        extracttoOutputStream(index, os);
     }
 
     private native int openArchive(OsReadableFile osf);
 
-    private native int extracttoOutputStream(OsReadableFile osf, int index, OutputStream os);
+    private native void extracttoOutputStream(int index, OutputStream os);
+
+    private native void closeArchive();
 
     @Override
     public void close() throws IOException {
+        closeArchive();
         osf.close();
     }
 
