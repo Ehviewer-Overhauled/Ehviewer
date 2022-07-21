@@ -56,7 +56,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         UriArchiveAccessor archiveAccessor1;
         try {
             archiveAccessor1 = new UriArchiveAccessor(context, uri);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             archiveAccessor1 = null;
             e.printStackTrace();
         }
@@ -89,6 +89,11 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         if (decodeThread != null) {
             decodeThread.interrupt();
             decodeThread = null;
+        }
+        try {
+            archiveAccessor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -161,7 +166,12 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private class ArchiveTask implements Runnable {
         @Override
         public void run() {
-            size = archiveAccessor.open();
+            try {
+                size = archiveAccessor.open();
+            } catch (Exception e) {
+                e.printStackTrace();
+                size = 0;
+            }
             if (size <= 0) {
                 size = STATE_ERROR;
                 error = GetText.getString(R.string.error_reading_failed);
