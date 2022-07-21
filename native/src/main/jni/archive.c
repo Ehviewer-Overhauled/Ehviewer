@@ -41,7 +41,10 @@ static jmethodID seekID;
 static jmethodID skipID;
 static jmethodID rewindID;
 static void* read_buffer;
-jbyteArray jbr;
+static jbyteArray jbr;
+
+static int cur_index = 0;
+static struct archive* arc;
 
 static void JNI_prepare_environment(JNIEnv* jniEnv, jobject OsReadablefile)
 {
@@ -79,7 +82,7 @@ static int filename_is_playable_file(const char *name) {
     return 0;
 }
 
-static long archive_list_all_entries(struct archive *arc) {
+static long archive_list_all_entries() {
     struct archive_entry *entry;
     long count = 0;
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
@@ -113,49 +116,54 @@ la_int64_t ins_skip(struct archive *a, void *client_data, la_int64_t request) {
     return ret;
 }
 
-static struct archive *archive_create() {
-    struct archive* arc = archive_read_new();
+static void archive_create() {
+    arc = archive_read_new();
     archive_read_set_seek_callback(arc, ins_seek);
     archive_read_set_skip_callback(arc, ins_skip);
     archive_read_support_format_all(arc);
     archive_read_support_filter_all(arc);
-    return arc;
 }
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jobject osf) {
     JNI_prepare_environment(_, osf);
-    struct archive *arc = archive_create();
+    archive_create();
     long r = archive_read_open(arc, arc, NULL, ins_read, ins_close);
     if (r) {
         r = 0;
         LOGE("%s%s", "Archive open failed:", archive_error_string(arc));
     } else {
-        r = archive_list_all_entries(arc);
+        r = archive_list_all_entries();
         LOGI("%s%ld%s", "Found ", r, " image entries in archive");
     }
     archive_read_close(arc);
     archive_read_free(arc);
+    arc = NULL;
     return r;
 }
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index, jobject os) {
-    int count = 0;
     struct archive_entry *entry;
-    struct archive *arc = archive_create();
     size_t size;
     int ret;
     la_int64_t offset;
     const void* buff;
+    if (!arc || index <= cur_index) {
+        if (arc)
+            archive_read_close(arc);
+        archive_read_free(arc);
+        archive_create();
+        archive_read_open(arc, arc, NULL, ins_read, ins_close);
+        cur_index = 0;
+    }
     jmethodID writeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "write", "([B)V");
     jmethodID flushID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "flush", "()V");
     jmethodID closeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "close", "()V");
-    archive_read_open(arc, arc, NULL, ins_read, ins_close);
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
-        if (count++ == index) {
+        if (cur_index++ == index) {
             for (;;) {
                 ret = archive_read_data_block(arc, &buff, &size, &offset);
                 if (ret == ARCHIVE_EOF)
@@ -172,11 +180,13 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
     }
     (*env)->CallVoidMethod(env, os, flushID);
     (*env)->CallVoidMethod(env, os, closeID);
-    archive_read_close(arc);
-    archive_read_free(arc);
 }
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
+    if (arc) {
+        archive_read_close(arc);
+        archive_read_free(arc);
+    }
     JNI_destroy_environment();
 }
