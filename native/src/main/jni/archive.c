@@ -42,7 +42,6 @@ typedef struct archive_inst_sc {
     jmethodID seekID;
     jmethodID skipID;
     void *read_buffer;
-    void *output_buffer;
     jbyteArray jbr;
 } archive_inst;
 
@@ -119,7 +118,6 @@ static archive_inst *archive_create_inst(JNIEnv *env, jobject file) {
     inst->skipID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "skip", "(J)J");
     inst->jbr = (*env)->NewByteArray(env, BLOCK_SIZE);
     inst->read_buffer = malloc(BLOCK_SIZE);
-    inst->output_buffer = malloc(BLOCK_SIZE);
     return inst;
 }
 
@@ -128,7 +126,6 @@ static void archive_destroy_inst(archive_inst *inst) {
     archive_read_free(inst->archive);
     (*env)->DeleteLocalRef(env, inst->jbr);
     free(inst->read_buffer);
-    free(inst->output_buffer);
     free(inst);
 }
 
@@ -154,7 +151,10 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
     int count = 0;
     struct archive_entry *entry;
     archive_inst *arc = archive_create_inst(env, osf);
-    la_ssize_t size;
+    size_t size;
+    int ret;
+    la_int64_t offset;
+    const void* buff;
     jmethodID writeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "write", "([B)V");
     jmethodID flushID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "flush", "()V");
     jmethodID closeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "close", "()V");
@@ -164,21 +164,20 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thi
             continue;
         if (count++ == index) {
             for (;;) {
-                size = archive_read_data(arc->archive, arc->output_buffer, BLOCK_SIZE);
-                if (size < 0) {
-                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc->archive));
-                    goto free;
-                }
-                (*arc->env)->SetByteArrayRegion(env, arc->jbr, 0, size, arc->output_buffer);
-                (*arc->env)->CallVoidMethod(env, os, writeID, arc->jbr);
-                (*arc->env)->CallVoidMethod(env, os, flushID);
-                if (size < BLOCK_SIZE)
+                ret = archive_read_data_block(arc->archive, &buff, &size, &offset);
+                if (ret == ARCHIVE_EOF)
                     break;
+                if (ret != ARCHIVE_OK) {
+                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc->archive));
+                    break;
+                }
+                (*arc->env)->SetByteArrayRegion(env, arc->jbr, 0, (int)size, buff);
+                (*arc->env)->CallVoidMethod(env, os, writeID, arc->jbr);
             }
             break;
         }
     }
-    free:
+    (*arc->env)->CallVoidMethod(env, os, flushID);
     (*arc->env)->CallVoidMethod(env, os, closeID);
     archive_read_close(arc->archive);
     archive_destroy_inst(arc);
