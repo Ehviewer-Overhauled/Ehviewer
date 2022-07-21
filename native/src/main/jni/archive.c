@@ -43,7 +43,7 @@ static jmethodID rewindID;
 static void* read_buffer;
 static jbyteArray jbr;
 
-static int cur_index = 0;
+static int cur_index = 0; // Current entry we haven't read any data from it yet
 static struct archive* arc;
 
 static void JNI_prepare_environment(JNIEnv* jniEnv, jobject OsReadablefile)
@@ -149,7 +149,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
     int ret;
     la_int64_t offset;
     const void* buff;
-    if (!arc || index <= cur_index) {
+    if (!arc || index < cur_index) {
         if (arc)
             archive_read_close(arc);
         archive_read_free(arc);
