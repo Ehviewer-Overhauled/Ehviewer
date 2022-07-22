@@ -37,19 +37,12 @@
 #define BLOCK_SIZE 4096 * 16
 
 static JNIEnv *env;
-static jbyteArray jbr;
 
 static int cur_index = 0; // Current entry we haven't read any data from it yet
 static struct archive* arc;
 
 static void* archiveAddr = 0;
 static jlong archiveSize = 0;
-
-static void JNI_prepare_environment(JNIEnv* jniEnv)
-{
-    env = jniEnv;
-    jbr = (*env)->NewGlobalRef(env, (*env)->NewByteArray(env, BLOCK_SIZE));
-}
 
 static int filename_is_playable_file(const char *name) {
     const char *dotptr = strrchr(name, '.');
@@ -90,8 +83,8 @@ JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong addr, jlong size) {
     archiveAddr = (void *) addr;
     archiveSize = size;
+    env = _;
     madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
-    JNI_prepare_environment(_);
     archive_create();
     long r = archive_read_open_memory(arc, (const void *) archiveAddr, archiveSize);
     if (r) {
