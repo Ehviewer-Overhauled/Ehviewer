@@ -104,6 +104,7 @@
 
                         <TextView
                             android:id="@+id/language"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="start"
@@ -113,6 +114,7 @@
 
                         <TextView
                             android:id="@+id/size"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -126,6 +128,7 @@
 
                         <TextView
                             android:id="@+id/favoredTimes"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
@@ -136,6 +139,7 @@
 
                         <TextView
                             android:id="@+id/pages"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -149,6 +153,7 @@
 
                         <TextView
                             android:id="@+id/posted"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
