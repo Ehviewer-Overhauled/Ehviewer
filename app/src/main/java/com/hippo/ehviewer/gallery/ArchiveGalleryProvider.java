@@ -18,7 +18,6 @@ package com.hippo.ehviewer.gallery;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Process;
 
@@ -28,6 +27,7 @@ import androidx.annotation.Nullable;
 import com.hippo.UriArchiveAccessor;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.Settings;
 import com.hippo.glgallery.GalleryPageView;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
@@ -38,15 +38,15 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArchiveGalleryProvider extends GalleryProvider2 {
+    private static final AtomicInteger sIdGenerator = new AtomicInteger();
     public static Handler showPasswd;
     public static String passwd;
     public static PVLock pv = new PVLock(0);
-
-    private static final AtomicInteger sIdGenerator = new AtomicInteger();
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
@@ -56,10 +56,8 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private Thread decodeThread;
     private volatile int size = STATE_WAIT;
     private String error;
-    private final Context ctx;
 
     public ArchiveGalleryProvider(Context context, Uri uri) {
-        ctx = context;
         UriArchiveAccessor archiveAccessor1;
         try {
             archiveAccessor1 = new UriArchiveAccessor(context, uri);
@@ -172,7 +170,6 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
 
     private class ArchiveTask implements Runnable {
         private void waitPasswd() throws InterruptedException {
-            Bundle bundle = new Bundle();
             showPasswd.sendEmptyMessage(0);
             pv.p();
         }
@@ -203,7 +200,17 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
             notifyDataChanged();
 
             if (archiveAccessor.needPassword()) {
-                while (!Thread.currentThread().isInterrupted()) {
+                boolean need_request = true;
+                Set<String> set = Settings.getArchivePasswds();
+                if (set != null) {
+                    for (String passwd : set) {
+                        if (archiveAccessor.providePassword(passwd)) {
+                            need_request = false;
+                            break;
+                        }
+                    }
+                }
+                while (!Thread.currentThread().isInterrupted() && need_request) {
                     try {
                         waitPasswd();
                     } catch (InterruptedException e) {
@@ -213,6 +220,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     if (!archiveAccessor.providePassword(passwd))
                         notifyError();
                     else {
+                        Settings.putPasswdToArchivePasswds(passwd);
                         notifyDismiss();
                         break;
                     }
