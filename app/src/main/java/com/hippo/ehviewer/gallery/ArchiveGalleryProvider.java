@@ -204,7 +204,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     continue;
                 }
 
-                Pipe pipe = new Pipe(4096 * 16);
+                Pipe pipe = new Pipe();
 
                 synchronized (streams) {
                     if (streams.get(index) != null) {
@@ -214,7 +214,8 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     streams.notify();
                 }
 
-                archiveAccessor.extractTargetIndexToOutputStream(index, pipe.getOutputStream());
+                archiveAccessor.extracttoOutputStream(index, pipe.getOutputFd());
+                pipe.closeOutputFd();
             }
         }
     }

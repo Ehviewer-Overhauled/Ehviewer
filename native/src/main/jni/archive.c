@@ -23,6 +23,8 @@
 #include <android/log.h>
 #include <archive.h>
 #include <archive_entry.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #define LOG_TAG "libarchive_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG ,__VA_ARGS__)
@@ -40,7 +42,7 @@ static jbyteArray jbr;
 static int cur_index = 0; // Current entry we haven't read any data from it yet
 static struct archive* arc;
 
-static jlong archiveAddr = 0;
+static void* archiveAddr = 0;
 static jlong archiveSize = 0;
 
 static void JNI_prepare_environment(JNIEnv* jniEnv)
@@ -86,8 +88,9 @@ static void archive_create() {
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong addr, jlong size) {
-    archiveAddr = addr;
+    archiveAddr = (void *) addr;
     archiveSize = size;
+    madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
     JNI_prepare_environment(_);
     archive_create();
     long r = archive_read_open_memory(arc, (const void *) archiveAddr, archiveSize);
@@ -105,7 +108,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index, jobject os) {
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index, jint fd) {
     struct archive_entry *entry;
     size_t size;
     int ret;
@@ -116,12 +119,9 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
             archive_read_close(arc);
         archive_read_free(arc);
         archive_create();
-        archive_read_open_memory(arc, (const void *) archiveAddr, archiveSize);
+        archive_read_open_memory(arc, archiveAddr, archiveSize);
         cur_index = 0;
     }
-    jmethodID writeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "write", "([B)V");
-    jmethodID flushID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "flush", "()V");
-    jmethodID closeID = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, os), "close", "()V");
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
@@ -134,24 +134,11 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
                     LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
                     break;
                 }
-                for (;;) {
-                    if (size > BLOCK_SIZE) {
-                        (*env)->SetByteArrayRegion(env, jbr, 0, BLOCK_SIZE, buff);
-                        (*env)->CallVoidMethod(env, os, writeID, jbr);
-                        buff += BLOCK_SIZE;
-                        size -= BLOCK_SIZE;
-                    } else {
-                        (*env)->SetByteArrayRegion(env, jbr, 0, (int)size, buff);
-                        (*env)->CallVoidMethod(env, os, writeID, jbr);
-                        break;
-                    }
-                }
+                write(fd, buff, size);
             }
             break;
         }
     }
-    (*env)->CallVoidMethod(env, os, flushID);
-    (*env)->CallVoidMethod(env, os, closeID);
 }
 
 JNIEXPORT void JNICALL

@@ -21,15 +21,10 @@ package com.hippo;
 import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
 
-import java.io.Closeable;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
 
 public class UriArchiveAccessor {
     ParcelFileDescriptor pfd;
@@ -50,20 +45,16 @@ public class UriArchiveAccessor {
         return openArchive(archiveAddr, pfd.getStatSize());
     }
 
-    public void extractTargetIndexToOutputStream(int index, OutputStream os) {
-        extracttoOutputStream(index, os);
-    }
-
     private native int openArchive(long addr, long size);
 
-    private native void extracttoOutputStream(int index, OutputStream os);
+    public native void extracttoOutputStream(int index, int fd);
 
     private native void closeArchive();
 
     public void close() throws Exception {
         closeArchive();
         Os.munmap(archiveAddr, pfd.getStatSize());
-        pfd.close();
         Os.close(fd);
+        pfd.close();
     }
 }
