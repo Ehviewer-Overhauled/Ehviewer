@@ -28,8 +28,6 @@ public class Native {
 
     public static native String getliblzmaVersion();
 
-    public static native String getlibzstdVersion();
-
     public static native String getlibjpeg_turboVersion();
 
     public static native String getzlibVersion();
