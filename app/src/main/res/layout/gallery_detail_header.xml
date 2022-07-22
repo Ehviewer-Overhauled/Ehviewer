@@ -64,7 +64,7 @@
             android:layout_marginBottom="@dimen/keyline_margin"
             app:fitsSystemWindowsInsets="top">
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -73,7 +73,9 @@
                     android:id="@+id/thumb_card"
                     style="@style/Widget.Material3.CardView.Elevated"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <com.hippo.widget.LoadImageView
                         android:id="@+id/thumb"
@@ -87,12 +89,13 @@
                     style="@style/Widget.Material3.CardView.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="@dimen/keyline_margin"
                     android:clickable="true"
                     android:focusable="true"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
@@ -165,30 +168,31 @@
                     style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/thumb_card"
-                    android:layout_alignParentEnd="true"
                     android:layout_marginEnd="@dimen/keyline_margin"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAllCaps="true"
                     app:chipIcon="@drawable/file_upload_black_24dp"
-                    app:ensureMinTouchTargetSize="true" />
+                    app:ensureMinTouchTargetSize="true"
+                    app:layout_constraintBottom_toBottomOf="@id/thumb_card"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/category"
                     style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@id/uploader"
-                    android:layout_alignParentEnd="true"
                     android:layout_marginEnd="@dimen/keyline_margin"
+                    app:chipSpacingHorizontal="8dp"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAllCaps="true"
                     app:chipIcon="@drawable/ic_baseline_label_24"
-                    app:ensureMinTouchTargetSize="true" />
+                    app:ensureMinTouchTargetSize="true"
+                    app:layout_constraintBottom_toTopOf="@id/uploader"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-            </RelativeLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
