@@ -37,6 +37,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -67,6 +69,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
 import com.hippo.ehviewer.R;
@@ -103,6 +106,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 
 import rikka.core.res.ConfigurationKt;
 import rikka.core.res.ResourcesKt;
@@ -314,10 +318,19 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             onRestore(savedInstanceState);
         }
 
+        builder = new EditTextDialogBuilder(this, null, getString(R.string.archive_passwd));
+        builder.setTitle(getString(R.string.archive_need_passwd));
+        builder.setPositiveButton(getString(android.R.string.ok), null);
+        dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+
         if (mGalleryProvider == null) {
             finish();
             return;
         }
+
+        ArchiveGalleryProvider.showPasswd = new ShowPasswdDialogHandler(this);
+
         mGalleryProvider.start();
 
         // Get start page
@@ -1293,7 +1306,69 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
     }
 
+    private EditTextDialogBuilder builder;
 
+    private boolean dialogShown = false;
 
+    private AlertDialog dialog;
 
+    private void showPasswdDialog() {
+        if (!dialogShown) {
+            dialogShown = true;
+            dialog.show();
+            if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    GalleryActivity.this.onProvidePasswd();
+                });
+            }
+            dialog.setOnCancelListener(v -> finish());
+        }
+    }
+
+    private void onProvidePasswd() {
+        String passwd = builder.getText();
+        if (passwd.isEmpty())
+            builder.setError(getString(R.string.passwd_cannot_be_empty));
+        else {
+            ArchiveGalleryProvider.passwd = passwd;
+            ArchiveGalleryProvider.pv.v();
+        }
+    }
+
+    private void onPasswdWrong() {
+        builder.setError(getString(R.string.passwd_wrong));
+    }
+
+    private void onPasswdCorrect() {
+        dialog.dismiss();
+    }
+
+    private static class ShowPasswdDialogHandler extends Handler {
+
+        //弱引用持有HandlerActivity , GC 回收时会被回收掉
+        private final WeakReference<GalleryActivity> weakReference;
+
+        public ShowPasswdDialogHandler(GalleryActivity activity) {
+            this.weakReference = new WeakReference(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            GalleryActivity activity = weakReference.get();
+            super.handleMessage(msg);
+            if (null != activity) {
+                switch (msg.what) {
+                    case 0:
+                        activity.showPasswdDialog();
+                        break;
+                    case 1:
+                        activity.onPasswdWrong();
+                        break;
+                    case 2:
+                        activity.onPasswdCorrect();
+                        break;
+                }
+            }
+        }
+    }
 }

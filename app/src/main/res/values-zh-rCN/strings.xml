@@ -764,4 +764,9 @@
     <string name="settings_privacy_require_unlock">需要解锁</string>
     <string name="proxy_type_name">代理类型</string>
     <string name="filter_label">屏蔽项类型</string>
+
+    <string name="archive_passwd">归档文件密码</string>
+    <string name="archive_need_passwd">归档文件需要密码</string>
+    <string name="passwd_wrong">密码错误</string>
+    <string name="passwd_cannot_be_empty">密码不能为空</string>
 </resources>

@@ -828,4 +828,9 @@
     <string name="settings_privacy_require_unlock">Require Unlock</string>
     <string name="proxy_type_name">Proxy Type</string>
     <string name="filter_label">Blocker Type</string>
+
+    <string name="archive_passwd">password</string>
+    <string name="archive_need_passwd">Archive need password</string>
+    <string name="passwd_wrong">Password Wrong</string>
+    <string name="passwd_cannot_be_empty">Password can\'t be empty</string>
 </resources>

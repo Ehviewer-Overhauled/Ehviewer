@@ -25,6 +25,7 @@
 #include <archive_entry.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <stdbool.h>
 
 #define LOG_TAG "libarchive_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG ,__VA_ARGS__)
@@ -40,6 +41,9 @@ static JNIEnv *env;
 
 static int cur_index = 0; // Current entry we haven't read any data from it yet
 static struct archive* arc;
+
+static bool need_encrypt = false;
+static char* passwd = NULL;
 
 static void* archiveAddr = 0;
 static jlong archiveSize = 0;
@@ -77,6 +81,8 @@ static void archive_create() {
     arc = archive_read_new();
     archive_read_support_format_all(arc);
     archive_read_support_filter_all(arc);
+    if (passwd)
+        archive_read_add_passphrase(arc, passwd);
 }
 
 JNIEXPORT jint JNICALL
@@ -91,6 +97,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
         r = 0;
         LOGE("%s%s", "Archive open failed:", archive_error_string(arc));
     } else {
+        need_encrypt = archive_read_has_encrypted_entries(arc);
         r = archive_list_all_entries();
         LOGI("%s%ld%s", "Found ", r, " image entries in archive");
     }
@@ -140,4 +147,40 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
         archive_read_close(arc);
         archive_read_free(arc);
     }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *_, jobject thiz) {
+    return need_encrypt;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *_, jobject thiz, jstring str) {
+    struct archive_entry* entry;
+    jboolean ret = true;
+    int len = (*env)->GetStringUTFLength(env, str);
+    if (passwd)
+        free(passwd);
+    passwd = calloc(len, sizeof(char));
+    strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
+    LOGI("%s%s", "Passwd is ", passwd);
+    archive_create();
+    archive_read_open_memory(arc, (const void *) archiveAddr, archiveSize);
+    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
+        if (!filename_is_playable_file(archive_entry_pathname(entry)))
+            continue;
+        if (!archive_entry_is_encrypted(entry))
+            continue;
+        void* tmpBuf = malloc(4096);
+        if (archive_read_data(arc, tmpBuf, 4096) < ARCHIVE_OK) {
+            LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
+            ret = false;
+        }
+        free(tmpBuf);
+        break;
+    }
+    archive_read_close(arc);
+    archive_read_free(arc);
+    arc = NULL;
+    return ret;
 }

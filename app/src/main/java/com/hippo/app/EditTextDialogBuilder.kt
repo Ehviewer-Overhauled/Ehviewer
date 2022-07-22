@@ -49,7 +49,7 @@ class EditTextDialogBuilder constructor(
         return mDialog as AlertDialog
     }
 
-    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+    override fun onEditorAction(v: TextView?, p1: Int, event: KeyEvent?): Boolean {
         return if (mDialog != null) {
             val button = mDialog!!.getButton(DialogInterface.BUTTON_POSITIVE)
             button?.performClick()

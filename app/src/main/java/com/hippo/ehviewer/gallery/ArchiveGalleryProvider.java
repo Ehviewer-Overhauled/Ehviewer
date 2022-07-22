@@ -18,6 +18,8 @@ package com.hippo.ehviewer.gallery;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.Process;
 
 import androidx.annotation.NonNull;
@@ -29,9 +31,9 @@ import com.hippo.ehviewer.R;
 import com.hippo.glgallery.GalleryPageView;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
+import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -40,6 +42,9 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArchiveGalleryProvider extends GalleryProvider2 {
+    public static Handler showPasswd;
+    public static String passwd;
+    public static PVLock pv = new PVLock(0);
 
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
     private final UriArchiveAccessor archiveAccessor;
@@ -51,8 +56,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private Thread decodeThread;
     private volatile int size = STATE_WAIT;
     private String error;
+    private final Context ctx;
 
     public ArchiveGalleryProvider(Context context, Uri uri) {
+        ctx = context;
         UriArchiveAccessor archiveAccessor1;
         try {
             archiveAccessor1 = new UriArchiveAccessor(context, uri);
@@ -164,6 +171,20 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     }
 
     private class ArchiveTask implements Runnable {
+        private void waitPasswd() throws InterruptedException {
+            Bundle bundle = new Bundle();
+            showPasswd.sendEmptyMessage(0);
+            pv.p();
+        }
+
+        private void notifyError() {
+            showPasswd.sendEmptyMessage(1);
+        }
+
+        private void notifyDismiss() {
+            showPasswd.sendEmptyMessage(2);
+        }
+
         @Override
         public void run() {
             try {
@@ -180,6 +201,23 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
             }
             // Update size and notify changed
             notifyDataChanged();
+
+            if (archiveAccessor.needPassword()) {
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        waitPasswd();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    if (!archiveAccessor.providePassword(passwd))
+                        notifyError();
+                    else {
+                        notifyDismiss();
+                        break;
+                    }
+                }
+            }
 
             while (!Thread.currentThread().isInterrupted()) {
                 int index;

@@ -49,6 +49,10 @@ public class UriArchiveAccessor {
 
     public native void extracttoOutputStream(int index, int fd);
 
+    public native boolean needPassword();
+
+    public native boolean providePassword(String str);
+
     private native void closeArchive();
 
     public void close() throws Exception {
