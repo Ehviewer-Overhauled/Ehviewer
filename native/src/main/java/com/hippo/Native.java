@@ -31,4 +31,6 @@ public class Native {
     public static native String getlibjpeg_turboVersion();
 
     public static native String getzlibVersion();
+
+    public static native String getnettleVersion();
 }

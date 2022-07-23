@@ -22,6 +22,7 @@
 #include <lzma.h>
 #include <zlib.h>
 #include "image/libjpeg-turbo/jconfigint.h"
+#include <nettle/config.h>
 
 #include "java_wrapper.h"
 
@@ -57,4 +58,9 @@ Java_com_hippo_Native_getlibjpeg_1turboVersion(JNIEnv *env, jclass clazz) {
 JNIEXPORT jstring JNICALL
 Java_com_hippo_Native_getzlibVersion(JNIEnv *env, jclass clazz) {
     return (*env)->NewStringUTF(env, ZLIB_VERSION);
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_hippo_Native_getnettleVersion(JNIEnv *env, jclass clazz) {
+    return (*env)->NewStringUTF(env, PACKAGE_STRING);
 }
