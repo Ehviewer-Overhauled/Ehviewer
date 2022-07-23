@@ -38,6 +38,9 @@ SET(HAVE_LZMA_STREAM_ENCODER_MT 1)
 SET(HAVE_LZMADEC_H 1)
 SET(HAVE_LIBLZMADEC 1)
 
+# Configure libarchive link's static lib
+SET(LIBARCHIVE_CUSTOM_LIBS "liblzma" "nettle")
+
 # Build libarchive
 add_subdirectory(libarchive)
 
