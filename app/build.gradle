@@ -34,8 +34,8 @@ android {
         applicationId "moe.tarsin.ehviewer"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 114532
-        versionName "1.7.29.0"
+        versionCode 114533
+        versionName "1.7.29.1"
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
     }
 
