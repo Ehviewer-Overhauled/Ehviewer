@@ -13,3 +13,6 @@
 [submodule "native/src/main/jni/liblzma"]
 	path = native/src/main/jni/liblzma
 	url = https://github.com/Ehviewer-Overhauled/xz
+[submodule "native/src/main/jni/libnettle/libnettle"]
+	path = native/src/main/jni/libnettle/libnettle
+	url = https://github.com/Ehviewer-Overhauled/nettle
