@@ -13,6 +13,20 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines
            -mllvm -polly-detect-profitability-min-per-loop-insts=40 \
 		   -mllvm -polly-invariant-load-hoisting")
 
+# Build GNUTLS libnettle
+add_subdirectory(nettle)
+
+# Configure libnettle support for libarchive
+include_directories(nettle)
+include_directories(.)
+set(HAVE_LIBNETTLE 1)
+set(HAVE_NETTLE_AES_H 1)
+set(HAVE_NETTLE_HMAC_H 1)
+set(HAVE_NETTLE_MD5_H 1)
+set(HAVE_NETTLE_PBKDF2_H 1)
+set(HAVE_NETTLE_RIPEMD160_H 1)
+set(HAVE_NETTLE_SHA_H 1)
+
 # Build liblzma
 add_subdirectory(liblzma)
 
