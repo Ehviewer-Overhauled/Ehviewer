@@ -72,7 +72,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/thumb_card"
                     style="@style/Widget.Material3.CardView.Filled"
-                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.None"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
