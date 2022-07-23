@@ -120,35 +120,21 @@
                 <data android:mimeType="application/x-7z-compressed" />
                 <data android:mimeType="application/x-rar-compressed" />
                 <data android:mimeType="application/x-zip-compressed" />
-            </intent-filter>
+                <data android:mimeType="application/x-tar" />
+                <data android:mimeType="application/x-xz" />
+                <data android:mimeType="application/gzip" />
+                <data android:mimeType="application/x-cbz" />
+                <data android:mimeType="application/x-cbr" />
+                <data android:mimeType="application/x-cbt" />
+                <data android:mimeType="application/x-cb7" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\\.7z" />
-                <data android:pathPattern=".*\\.rar" />
-                <data android:pathPattern=".*\\.zip" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:host="*" />
-                <data android:mimeType="*/*" />
-                <data android:pathPattern=".*\\.7z" />
-                <data android:pathPattern=".*\\.rar" />
-                <data android:pathPattern=".*\\.zip" />
+                <!-- untested -->
+                <data android:mimeType="application/vnd.comicbook+zip" />
+                <data android:mimeType="application/vnd.comicbook-rar" />
+                <data android:mimeType="application/x-compressed-tar" />
+                <data android:mimeType="application/x-bzip-compressed-tar" />
+                <data android:mimeType="application/x-lzma-compressed-tar" />
+                <data android:mimeType="application/x-xz-compressed-tar" />
             </intent-filter>
         </activity>
 
