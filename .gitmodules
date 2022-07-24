@@ -1,12 +1,3 @@
-[submodule "native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo"]
-	path = native/src/main/jni/image/libjpeg-turbo/libjpeg-turbo
-	url = https://github.com/Ehviewer-Overhauled/libjpeg-turbo
-[submodule "native/src/main/jni/image/giflib/giflib"]
-	path = native/src/main/jni/image/giflib/giflib
-	url = https://github.com/Ehviewer-Overhauled/giflib
-[submodule "native/src/main/jni/image/libpng/libpng"]
-	path = native/src/main/jni/image/libpng/libpng
-	url = https://github.com/Ehviewer-Overhauled/libpng
 [submodule "native/src/main/jni/libarchive"]
 	path = native/src/main/jni/libarchive
 	url = https://github.com/Ehviewer-Overhauled/libarchive
