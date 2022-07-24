@@ -147,7 +147,7 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.5.0-beta01'
 
     implementation 'com.drakeet.drawer:drawer:1.0.3'
-    implementation 'com.google.android.material:material:1.7.0-SNAPSHOT'
+    implementation 'com.google.android.material:material:1.7.0-alpha03'
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
     implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
