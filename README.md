@@ -22,18 +22,15 @@
 </p>
 
 # Description
-这是一个 E-Hentai Android 平台的浏览器
+
+致力于轻量化与良好性能表现的 EhViewer 分支
 
 已针对性适配 Material Design 3 及其动态取色系统
 
-动态配色仅供 Android 12 及以上平台使用！
 
+EhViewer fork dedicated to lightweight and high-performance
 
-An E-Hentai Application for Android.
-
-with Material Design 3 and Dynamic Color Support.
-
-Dynamic Color only support Android S and above!
+with Material Design 3 and Dynamic Color Support
 
 # Download
 
