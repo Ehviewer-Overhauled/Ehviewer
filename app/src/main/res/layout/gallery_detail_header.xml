@@ -214,19 +214,17 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true" />
-
-            <android.widget.Space
-                android:layout_width="8dp"
-                android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/read"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true"
