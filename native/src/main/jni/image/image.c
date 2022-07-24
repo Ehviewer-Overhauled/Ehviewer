@@ -20,6 +20,7 @@
 
 #include <android/imagedecoder.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "image.h"
 #include "image_plain.h"
@@ -30,7 +31,10 @@
 void* decode(JNIEnv* env, int fd, bool partially, int* format)
 {
     AImageDecoder *decoder;
-    AImageDecoder_createFromFd(fd, &decoder);
+    int r = AImageDecoder_createFromFd(fd, &decoder);
+    LOGD("%s%d", "Create ImageDecoder with ret ", r);
+    if (r)
+        return NULL;
     *format = AImageDecoder_isAnimated(decoder);
     AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
     IMAGE *image = malloc(sizeof(IMAGE));

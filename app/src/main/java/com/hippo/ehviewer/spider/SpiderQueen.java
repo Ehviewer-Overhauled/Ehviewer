@@ -1097,33 +1097,6 @@ public final class SpiderQueen implements Runnable {
         void onGetImageFailure(int index, String error);
     }
 
-    private static class AutoCloseInputStream extends InputStream {
-
-        private final InputStreamPipe mPipe;
-        private final InputStream mIs;
-
-        public AutoCloseInputStream(InputStreamPipe pipe, InputStream is) {
-            mPipe = pipe;
-            mIs = is;
-        }
-
-        @Override
-        public int read() throws IOException {
-            return mIs.read();
-        }
-
-        @Override
-        public int read(@NonNull byte[] buffer, int byteOffset, int byteCount) throws IOException {
-            return mIs.read(buffer, byteOffset, byteCount);
-        }
-
-        @Override
-        public void close() throws IOException {
-            mPipe.close();
-            mPipe.release();
-        }
-    }
-
     private class SpiderWorker implements Runnable {
 
         private final long mGid;
@@ -1694,7 +1667,7 @@ public final class SpiderQueen implements Runnable {
 
                 pipe.obtain();
                 try {
-                    is = new AutoCloseInputStream(pipe, pipe.open());
+                    is = pipe.open();
                 } catch (IOException e) {
                     // Can't open pipe
                     error = GetText.getString(R.string.error_reading_failed);
@@ -1709,6 +1682,12 @@ public final class SpiderQueen implements Runnable {
                     } catch (IOException e) {
                         e.printStackTrace();
                         image = null;
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                     if (image == null) {
                         error = GetText.getString(R.string.error_decoding_failed);

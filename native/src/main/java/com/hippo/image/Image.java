@@ -58,6 +58,14 @@ public final class Image {
     }
 
     /**
+     * Decode image from {@code InputStream}
+     */
+    @Nullable
+    public static Image decode(Integer fd, boolean partially) {
+        return nativeDecodeFdInt(fd, partially);
+    }
+
+    /**
      * Create a plain image from Bitmap
      */
     @Nullable
@@ -74,6 +82,8 @@ public final class Image {
     }
 
     private static native Image nativeDecode(FileDescriptor fd, boolean partially);
+
+    private static native Image nativeDecodeFdInt(int fd, boolean partially);
 
     private static native Image nativeCreate(Bitmap bitmap);
 

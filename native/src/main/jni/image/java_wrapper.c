@@ -109,6 +109,29 @@ Java_com_hippo_image_Image_nativeDecode(JNIEnv* env,
 }
 
 JNIEXPORT jobject JNICALL
+Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv* env,
+                                        jclass clazz, jint fd, jboolean partially)
+{
+  int format;
+  void* image;
+  jobject image_object;
+
+  image = decode(env, fd, partially, &format);
+  if (image == NULL) {
+    return NULL;
+  }
+
+  image_object = create_image_object(env, image, format,
+                                     get_width(image, format), get_height(image, format));
+  if (image_object == NULL) {
+    recycle(env, image, format);
+    return NULL;
+  } else {
+    return image_object;
+  }
+}
+
+JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeCreate(JNIEnv* env,
     jclass clazz, jobject bitmap)
 {
