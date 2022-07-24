@@ -81,5 +81,3 @@ Here is the libraries
     EhViewer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License along with EhViewer. If not, see <https://www.gnu.org/licenses/>.
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fasuka-mio%2FEhviewer?ref=badge_large)
