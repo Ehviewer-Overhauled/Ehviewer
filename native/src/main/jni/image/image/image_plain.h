@@ -28,12 +28,9 @@
 
 #include "patch_head_input_stream.h"
 
-typedef struct
-{
-  unsigned int width;
-  unsigned int height;
-  void* buffer;
-} PLAIN;
+#include "image.h"
+
+typedef IMAGE PLAIN;
 
 void* PLAIN_create(unsigned int width, unsigned int height, const void* data);
 bool PLAIN_complete(PLAIN* plain);

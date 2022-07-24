@@ -44,7 +44,6 @@ class VersionPreference @JvmOverloads constructor(
         val info = NativeLibInfo().addLib(Native.getlibarchiveVersion())
             .addLib("lzma(xz-utils)", Native.getliblzmaVersion())
             .addLib("zlib", Native.getzlibVersion())
-            .addLib("libjpeg-turbo", Native.getlibjpeg_turboVersion())
             .addLib(Native.getnettleVersion())
         builder.setMessage(info.getMessage())
     }

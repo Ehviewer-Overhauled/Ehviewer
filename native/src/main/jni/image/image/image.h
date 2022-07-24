@@ -42,6 +42,13 @@
 
 #define IMAGE_MAX_SUPPORTED_FORMAT_COUNT 3
 
+typedef struct
+{
+    unsigned int width;
+    unsigned int height;
+    void* buffer;
+} IMAGE;
+
 void* decode(JNIEnv* env, InputStream* stream, bool partially, int* format);
 void* create(unsigned int width, unsigned int height, const void* data);
 bool complete(JNIEnv* env, void* image, int format);

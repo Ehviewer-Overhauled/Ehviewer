@@ -16,6 +16,3 @@ cmake_minimum_required(VERSION 3.4.1)
 
 add_subdirectory(image)
 add_subdirectory(stream)
-add_subdirectory(libjpeg-turbo)
-add_subdirectory(libpng)
-add_subdirectory(giflib)

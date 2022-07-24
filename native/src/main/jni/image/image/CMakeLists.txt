@@ -19,9 +19,6 @@ set(IMAGE_SOURCES
         image.c
         image_utils.c
         image_plain.c
-        image_jpeg.c
-        image_png.c
-        image_gif.c
         filter/clahe.c
         filter/gray.c
         java_wrapper.c
@@ -34,9 +31,6 @@ set(IMAGE_LIBRARIES
         jnigraphics
         GLESv2
         stream
-        jpeg
-        png
-        gif
         )
 
 add_library(image STATIC ${IMAGE_SOURCES})
