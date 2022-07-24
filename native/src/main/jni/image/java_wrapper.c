@@ -30,6 +30,20 @@ static JavaVM* jvm;
 
 static void* tile_buffer;
 
+static int jniGetFDFromFileDescriptor(JNIEnv * env, jobject fileDescriptor) {
+  jint fd = -1;
+  jclass fdClass = (*env)->FindClass(env, "java/io/FileDescriptor");
+
+  if (fdClass != NULL) {
+    jfieldID fdClassDescriptorFieldID = (*env)->GetFieldID(env, fdClass, "descriptor", "I");
+    if (fdClassDescriptorFieldID != NULL && fileDescriptor != NULL) {
+      fd = (*env)->GetIntField(env, fileDescriptor, fdClassDescriptorFieldID);
+    }
+  }
+
+  return fd;
+}
+
 JNIEnv *obtain_env(bool *attach)
 {
   JNIEnv *env;
@@ -73,13 +87,13 @@ jobject create_image_object(JNIEnv* env, void* ptr, int format, int width, int h
 
 JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecode(JNIEnv* env,
-    jclass clazz, jint fd, jboolean partially)
+    jclass clazz, jobject fd, jboolean partially)
 {
   int format;
   void* image;
   jobject image_object;
 
-  image = decode(env, fd, partially, &format);
+  image = decode(env, jniGetFDFromFileDescriptor(env, fd), partially, &format);
   if (image == NULL) {
     return NULL;
   }

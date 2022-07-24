@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
 
 import java.io.BufferedInputStream;
+import java.io.FileDescriptor;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +53,7 @@ public final class Image {
      * Decode image from {@code InputStream}
      */
     @Nullable
-    public static Image decode(Integer fd, boolean partially) {
+    public static Image decode(FileDescriptor fd, boolean partially) {
         return nativeDecode(fd, partially);
     }
 
@@ -72,7 +73,7 @@ public final class Image {
         return sImageCount.get();
     }
 
-    private static native Image nativeDecode(int fd, boolean partially);
+    private static native Image nativeDecode(FileDescriptor fd, boolean partially);
 
     private static native Image nativeCreate(Bitmap bitmap);
 

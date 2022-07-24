@@ -28,6 +28,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.FileDescriptor;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -84,7 +85,7 @@ public final class ImageBitmap implements Animatable, Runnable {
      * Decode {@code InputStream}, then create image.
      */
     @Nullable
-    public static ImageBitmap decode(@NonNull Integer fd) {
+    public static ImageBitmap decode(@NonNull FileDescriptor fd) {
         Image image = Image.decode(fd, false);
         if (image != null) {
             return create(image);

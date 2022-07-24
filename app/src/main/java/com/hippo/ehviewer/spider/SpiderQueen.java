@@ -66,6 +66,7 @@ import com.hippo.yorozuya.thread.PriorityThread;
 import com.hippo.yorozuya.thread.PriorityThreadFactory;
 
 import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1703,7 +1704,12 @@ public final class SpiderQueen implements Runnable {
                 }
 
                 if (is != null) {
-                    image = Image.decode(is, true);
+                    try {
+                        image = Image.decode(((FileInputStream)is).getFD(), true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        image = null;
+                    }
                     if (image == null) {
                         error = GetText.getString(R.string.error_decoding_failed);
                     }

@@ -34,6 +34,9 @@ import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -50,7 +53,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
-    private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, FileDescriptor> streams = new LinkedHashMap<>();
     private final AtomicInteger decodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private Thread archiveThread;
     private Thread decodeThread;
@@ -256,7 +259,11 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     if (streams.get(index) != null) {
                         continue;
                     }
-                    streams.put(index, pipe.getInputStream());
+                    try {
+                        streams.put(index, ((FileInputStream)pipe.getInputStream()).getFD());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     streams.notify();
                 }
 
@@ -271,7 +278,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                Integer fd;
+                FileDescriptor fd;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -283,8 +290,8 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, Integer>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, Integer> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, FileDescriptor>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, FileDescriptor> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
                     fd = entry.getValue();

@@ -34,6 +34,7 @@ import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.thread.PriorityThread;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -258,7 +259,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
             InputStream is = null;
             try {
                 is = files[index].openInputStream();
-                Image image = Image.decode(is, true);
+                Image image = Image.decode(((FileInputStream)is).getFD(), true);
                 mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
                 if (image != null) {
                     notifyPageSucceed(index, image);
