@@ -32,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId "moe.tarsin.ehviewer"
-        minSdkVersion 26
+        minSdkVersion 31
         targetSdkVersion 33
         versionCode 114533
         versionName "1.7.29.1"

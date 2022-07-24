@@ -9,7 +9,7 @@ android {
     ndkVersion "25.0.8775105"
 
     defaultConfig {
-        minSdkVersion 26
+        minSdkVersion 31
         targetSdkVersion 33
         consumerProguardFiles 'proguard-rules.pro'
 
