@@ -95,27 +95,30 @@
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
                 android:gravity="bottom"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:paddingLeft="12dp"
                 android:paddingTop="4dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="4dp">
 
                 <Button
-                    android:id="@+id/sign_in"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/sign_in" />
-
-                <Button
                     android:id="@+id/register"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:layout_weight="1"
                     android:text="@string/register" />
+
+                <Button
+                    android:id="@+id/sign_in"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/sign_in" />
+
             </LinearLayout>
 
             <LinearLayout
