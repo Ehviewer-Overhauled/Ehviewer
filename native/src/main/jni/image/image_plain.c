@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-//
-// Created by Hippo on 5/3/2016.
-//
-
-#include "config.h"
-#ifdef IMAGE_SUPPORT_PLAIN
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -28,13 +21,13 @@
 #include "image_utils.h"
 #include "log.h"
 
-void* PLAIN_create(unsigned int width, unsigned int height, const void* data)
+void* PLAIN_create(int32_t width, int32_t height, const void* data)
 {
-  PLAIN* plain = NULL;
+  IMAGE * plain = NULL;
   void* buffer = NULL;
   size_t length;
 
-  plain = (PLAIN*) malloc(sizeof(PLAIN));
+  plain = malloc(sizeof(IMAGE));
   if (plain == NULL) {
     WTF_OM;
     return NULL;
@@ -54,76 +47,8 @@ void* PLAIN_create(unsigned int width, unsigned int height, const void* data)
   plain->width = width;
   plain->height = height;
   plain->buffer = buffer;
+  plain->bufferLen = length;
+  plain->decoder = NULL;
 
   return plain;
 }
-
-bool PLAIN_complete(PLAIN* plain)
-{
-  return true;
-}
-
-bool PLAIN_is_completed(PLAIN* plain)
-{
-  return true;
-}
-
-void* PLAIN_get_pixels(PLAIN* plain)
-{
-  return plain->buffer;
-}
-
-int PLAIN_get_width(PLAIN* plain)
-{
-  return plain->width;
-}
-
-int PLAIN_get_height(PLAIN* plain)
-{
-  return plain->height;
-}
-
-int PLAIN_get_byte_count(PLAIN* plain)
-{
-  return plain->width * plain->height * 4;
-}
-
-void PLAIN_render(PLAIN* plain, int src_x, int src_y,
-    void* dst, int dst_w, int dst_h, int dst_x, int dst_y,
-    int width, int height, bool fill_blank, int default_color)
-{
-  copy_pixels(plain->buffer, plain->width, plain->height, src_x, src_y,
-      dst, dst_w, dst_h, dst_x, dst_y,
-      width, height, fill_blank, default_color);
-}
-
-void PLAIN_advance(PLAIN* plain)
-{
-
-}
-
-int PLAIN_get_delay(PLAIN* plain)
-{
-  return 0;
-}
-
-int PLAIN_get_frame_count(PLAIN* plain)
-{
-  return 1;
-}
-
-bool PLAIN_is_opaque(PLAIN* plain)
-{
-  // TODO Check plain all alpha
-  return false;
-}
-
-void PLAIN_recycle(PLAIN* plain)
-{
-  free(plain->buffer);
-  plain->buffer = NULL;
-
-  free(plain);
-}
-
-#endif // IMAGE_SUPPORT_PLAIN

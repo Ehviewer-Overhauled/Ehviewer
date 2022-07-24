@@ -24,6 +24,7 @@
 
 #include "image.h"
 #include "image_plain.h"
+#include "image_utils.h"
 #include "filter/clahe.h"
 #include "filter/gray.h"
 #include "log.h"
@@ -36,81 +37,84 @@ void* decode(JNIEnv* env, int fd, bool partially, int* format)
     if (r)
         return NULL;
     *format = AImageDecoder_isAnimated(decoder);
-    AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
+    const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
+    size_t stride = AImageDecoder_getMinimumStride(decoder);
     IMAGE *image = malloc(sizeof(IMAGE));
     image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
     image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
-    unsigned long bufferLen = image->height * image->width * 4;
-    image->buffer = malloc(bufferLen);
-    AImageDecoder_decodeImage(decoder, image->buffer, AImageDecoder_getMinimumStride(decoder), bufferLen);
-    AImageDecoder_delete(decoder);
+    image->decoder = decoder;
+    image->bufferLen = image->height * stride;
+    image->buffer = malloc(image->bufferLen);
+    AImageDecoder_decodeImage(decoder, image->buffer, stride, image->bufferLen);
     return image;
 }
 
-void* create(unsigned int width, unsigned int height, const void* data)
+void* create(int32_t width, int32_t height, const void* data)
 {
     return PLAIN_create(width, height, data);
 }
 
-bool complete(JNIEnv* env, void* image, int format)
+bool complete(JNIEnv* env, IMAGE * image, int format)
 {
     return true;
 }
 
-bool is_completed(void* image, int format)
+bool is_completed(IMAGE * image, int format)
 {
     return true;
 }
 
-int get_width(void* image, int format)
+int get_width(IMAGE * image, int format)
 {
-    return ((IMAGE*)image)->width;
+    return image->width;
 }
 
-int get_height(void* image, int format)
+int get_height(IMAGE * image, int format)
 {
-    return ((IMAGE*)image)->height;
+    return image->height;
 }
 
-int get_byte_count(void* image, int format)
+int get_byte_count(IMAGE * image, int format)
 {
-    return ((IMAGE*)image)->width * ((IMAGE*)image)->height * 4;
+    return image->bufferLen;
 }
 
-void render(void* image, int format, int src_x, int src_y,
+void render(IMAGE * image, int format, int src_x, int src_y,
     void* dst, int dst_w, int dst_h, int dst_x, int dst_y,
     int width, int height, bool fill_blank, int default_color)
 {
-    PLAIN_render((IMAGE *) image, src_x, src_y, dst, dst_w, dst_h, dst_x, dst_y, width, height, fill_blank, default_color);
+    copy_pixels(image->buffer, image->width, image->height, src_x, src_y, dst, dst_w, dst_h, dst_x, dst_y, width, height, fill_blank, default_color);
 }
 
-void advance(void* image, int format)
+void advance(IMAGE * image, int format)
 {
+    if (format) {
+        AImageDecoder_advanceFrame(image->decoder);
+    }
 }
 
-int get_delay(void* image, int format)
+int get_delay(IMAGE * image, int format)
 {
     return 0;
 }
 
-int get_frame_count(void* image, int format)
+int get_frame_count(IMAGE * image, int format)
 {
     return 1;
 }
 
-bool is_opaque(void* image, int format)
+bool is_opaque(IMAGE * image, int format)
 {
     return false;
 }
 
-static void get_image_data(void* image, int format, void** pixel, int* width, int* height) {
-      PLAIN* plain = (PLAIN*) image;
-      *pixel = PLAIN_get_pixels(plain);
-      *width = PLAIN_get_width(plain);
-      *height = PLAIN_get_height(plain);
+static void get_image_data(IMAGE * image, int format, void** pixel, int* width, int* height) {
+      *pixel = image->buffer;
+      *width = image->width;
+      *height = image->height;
 }
 
-bool is_gray(void* image, int format, int error)
+bool is_gray(IMAGE * image, int format, int error)
 {
   void* pixel = NULL;
   int width = 0;
@@ -125,7 +129,7 @@ bool is_gray(void* image, int format, int error)
   return IMAGE_is_gray(pixel, width, height, error);
 }
 
-void clahe(void* image, int format, bool to_gray)
+void clahe(IMAGE * image, int format, bool to_gray)
 {
   void* pixel = NULL;
   int width = 0;
@@ -140,7 +144,10 @@ void clahe(void* image, int format, bool to_gray)
   IMAGE_clahe(pixel, width, height, to_gray);
 }
 
-void recycle(JNIEnv *env, void* image, int format)
+void recycle(JNIEnv *env, IMAGE* image, int format)
 {
-    PLAIN_recycle((PLAIN*) image);
+    free(image->buffer);
+    image->buffer = NULL;
+    AImageDecoder_delete(image->decoder);
+    free(image);
 }

@@ -21,31 +21,10 @@
 #ifndef IMAGE_IMAGE_PLAIN_H
 #define IMAGE_IMAGE_PLAIN_H
 
-#include "config.h"
-#ifdef IMAGE_SUPPORT_PLAIN
-
 #include <stdbool.h>
 
 #include "image.h"
 
-typedef IMAGE PLAIN;
-
-void* PLAIN_create(unsigned int width, unsigned int height, const void* data);
-bool PLAIN_complete(PLAIN* plain);
-bool PLAIN_is_completed(PLAIN* plain);
-void* PLAIN_get_pixels(PLAIN* plain);
-int PLAIN_get_width(PLAIN* plain);
-int PLAIN_get_height(PLAIN* plain);
-int PLAIN_get_byte_count(PLAIN* plain);
-void PLAIN_render(PLAIN* plain, int src_x, int src_y,
-    void* dst, int dst_w, int dst_h, int dst_x, int dst_y,
-    int width, int height, bool fill_blank, int default_color);
-void PLAIN_advance(PLAIN* plain);
-int PLAIN_get_delay(PLAIN* plain);
-int PLAIN_get_frame_count(PLAIN* plain);
-bool PLAIN_is_opaque(PLAIN* plain);
-void PLAIN_recycle(PLAIN* plain);
-
-#endif // IMAGE_SUPPORT_PLAIN
+void* PLAIN_create(int32_t width, int32_t height, const void* data);
 
 #endif // IMAGE_IMAGE_PLAIN_H

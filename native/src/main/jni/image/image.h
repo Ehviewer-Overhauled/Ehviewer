@@ -21,52 +21,35 @@
 #ifndef IMAGE_IMAGE_H
 #define IMAGE_IMAGE_H
 
+#include <android/imagedecoder.h>
 #include <stdbool.h>
 #include <jni.h>
 
-#include "config.h"
-
-#define IMAGE_FORMAT_UNKNOWN -1
-#ifdef IMAGE_SUPPORT_PLAIN
-#define IMAGE_FORMAT_PLAIN 0
-#endif
-#ifdef IMAGE_SUPPORT_JPEG
-#define IMAGE_FORMAT_JPEG 1
-#endif
-#ifdef IMAGE_SUPPORT_PNG
-#define IMAGE_FORMAT_PNG 2
-#endif
-#ifdef IMAGE_SUPPORT_GIF
-#define IMAGE_FORMAT_GIF 3
-#endif
-
-#define IMAGE_MAX_SUPPORTED_FORMAT_COUNT 3
-
 typedef struct
 {
-    unsigned int width;
-    unsigned int height;
+    int32_t width;
+    int32_t height;
     void* buffer;
+    int bufferLen;
+    AImageDecoder* decoder;
 } IMAGE;
 
 void* decode(JNIEnv* env, int fd, bool partially, int* format);
-void* create(unsigned int width, unsigned int height, const void* data);
-bool complete(JNIEnv* env, void* image, int format);
-bool is_completed(void* image, int format);
-int get_width(void* image, int format);
-int get_height(void* image, int format);
-int get_byte_count(void* image, int format);
-void render(void* image, int format, int src_x, int src_y,
+void* create(int32_t width, int32_t height, const void* data);
+bool complete(JNIEnv* env, IMAGE * image, int format);
+bool is_completed(IMAGE * image, int format);
+int get_width(IMAGE * image, int format);
+int get_height(IMAGE * image, int format);
+int get_byte_count(IMAGE * image, int format);
+void render(IMAGE * image, int format, int src_x, int src_y,
     void* dst, int dst_w, int dst_h, int dst_x, int dst_y,
     int width, int height, bool fill_blank, int default_color);
-void advance(void* image, int format);
-int get_delay(void* image, int format);
-int get_frame_count(void* image, int format);
-bool is_opaque(void* image, int format);
-bool is_gray(void* image, int format, int error);
-void clahe(void* image, int format, bool to_gray);
-void recycle(JNIEnv *env, void* image, int format);
-int get_supported_formats(int *);
-const char *get_decoder_description(int);
+void advance(IMAGE * image, int format);
+int get_delay(IMAGE * image, int format);
+int get_frame_count(IMAGE * image, int format);
+bool is_opaque(IMAGE * image, int format);
+bool is_gray(IMAGE * image, int format, int error);
+void clahe(IMAGE * image, int format, bool to_gray);
+void recycle(JNIEnv *env, IMAGE * image, int format);
 
 #endif //IMAGE_IMAGE_H

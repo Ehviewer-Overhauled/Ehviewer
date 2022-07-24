@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-//
-// Created by Hippo on 12/27/2015.
-//
-
 #include <stdlib.h>
 #include <android/bitmap.h>
 #include <GLES2/gl2.h>
@@ -86,29 +82,6 @@ jobject create_image_object(JNIEnv* env, void* ptr, int format, int width, int h
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_hippo_image_Image_nativeDecode(JNIEnv* env,
-    jclass clazz, jobject fd, jboolean partially)
-{
-  int format;
-  void* image;
-  jobject image_object;
-
-  image = decode(env, jniGetFDFromFileDescriptor(env, fd), partially, &format);
-  if (image == NULL) {
-    return NULL;
-  }
-
-  image_object = create_image_object(env, image, format,
-      get_width(image, format), get_height(image, format));
-  if (image_object == NULL) {
-    recycle(env, image, format);
-    return NULL;
-  } else {
-    return image_object;
-  }
-}
-
-JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv* env,
                                         jclass clazz, jint fd, jboolean partially)
 {
@@ -129,6 +102,13 @@ Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv* env,
   } else {
     return image_object;
   }
+}
+
+JNIEXPORT jobject JNICALL
+Java_com_hippo_image_Image_nativeDecode(JNIEnv* env,
+                                        jclass clazz, jobject fd, jboolean partially)
+{
+  return Java_com_hippo_image_Image_nativeDecodeFdInt(env, clazz, jniGetFDFromFileDescriptor(env, fd), partially);
 }
 
 JNIEXPORT jobject JNICALL
@@ -155,10 +135,10 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv* env,
     return NULL;
   }
 
-  image_object = create_image_object(env, image, IMAGE_FORMAT_PLAIN,
+  image_object = create_image_object(env, image, 0,
       info.width, info.height);
   if (image_object == NULL) {
-    recycle(env, image, IMAGE_FORMAT_PLAIN);
+    recycle(env, image, 0);
     return NULL;
   } else {
     return image_object;
