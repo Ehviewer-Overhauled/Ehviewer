@@ -104,62 +104,69 @@
                         android:nextFocusRight="@+id/read"
                         android:orientation="vertical">
 
-                        <TableLayout
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="8dp">
 
-                            <TableRow>
 
-                                <TextView
-                                    android:id="@+id/language"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="left"
-                                    android:singleLine="true" />
+                            <TextView
+                                android:id="@+id/language"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="left"
+                                android:singleLine="true"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                                <TextView
-                                    android:id="@+id/size"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="right"
-                                    android:singleLine="true" />
+                            <TextView
+                                android:id="@+id/size"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                app:layout_constraintBaseline_toBaselineOf="@id/language"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="1.0"
+                                app:layout_constraintStart_toEndOf="@id/language" />
 
-                            </TableRow>
 
-                            <TableRow android:paddingTop="8dp">
+                            <TextView
+                                android:id="@+id/favoredTimes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:gravity="left"
+                                android:singleLine="true"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/language" />
 
-                                <TextView
-                                    android:id="@+id/favoredTimes"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="left"
-                                    android:singleLine="true" />
+                            <TextView
+                                android:id="@+id/pages"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                app:layout_constraintBaseline_toBaselineOf="@id/favoredTimes"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="1.0"
+                                app:layout_constraintStart_toEndOf="@id/favoredTimes" />
 
-                                <TextView
-                                    android:id="@+id/pages"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="right"
-                                    android:singleLine="true" />
 
-                            </TableRow>
+                            <TextView
+                                android:id="@+id/posted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:gravity="left"
+                                android:singleLine="true"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/favoredTimes" />
 
-                            <TableRow android:paddingTop="8dp">
 
-                                <TextView
-                                    android:id="@+id/posted"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="left"
-                                    android:singleLine="true" />
-
-                            </TableRow>
-                        </TableLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
