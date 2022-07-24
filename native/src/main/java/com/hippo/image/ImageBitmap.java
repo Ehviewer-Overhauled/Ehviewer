@@ -73,7 +73,7 @@ public final class ImageBitmap implements Animatable, Runnable {
     }
 
     private ImageBitmap(@NonNull Bitmap bitmap) {
-        mFormat = Image.FORMAT_PLAIN;
+        mFormat = Image.FORMAT_NORMAL;
         mBitmap = bitmap;
         mIsOpaque = !bitmap.hasAlpha();
         mByteCount = bitmap.getRowBytes() * bitmap.getHeight();
@@ -84,8 +84,8 @@ public final class ImageBitmap implements Animatable, Runnable {
      * Decode {@code InputStream}, then create image.
      */
     @Nullable
-    public static ImageBitmap decode(@NonNull InputStream is) {
-        Image image = Image.decode(is, false);
+    public static ImageBitmap decode(@NonNull Integer fd) {
+        Image image = Image.decode(fd, false);
         if (image != null) {
             return create(image);
         } else {

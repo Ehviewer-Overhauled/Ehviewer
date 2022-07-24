@@ -50,7 +50,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
-    private final LinkedHashMap<Integer, InputStream> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
     private final AtomicInteger decodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private Thread archiveThread;
     private Thread decodeThread;
@@ -271,7 +271,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                InputStream stream;
+                Integer fd;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -283,16 +283,16 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, InputStream>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, InputStream> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Integer>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Integer> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    stream = entry.getValue();
+                    fd = entry.getValue();
                     decodingIndex.lazySet(index);
                 }
 
                 try {
-                    Image image = Image.decode(stream, true);
+                    Image image = Image.decode(fd, true);
                     if (image != null) {
                         notifyPageSucceed(index, image);
                     } else {

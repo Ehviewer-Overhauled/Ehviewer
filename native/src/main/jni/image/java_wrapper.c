@@ -23,9 +23,8 @@
 #include <GLES2/gl2.h>
 
 #include "java_wrapper.h"
-#include "input_stream.h"
 #include "image.h"
-#include "../log.h"
+#include "log.h"
 
 static JavaVM* jvm;
 
@@ -74,19 +73,13 @@ jobject create_image_object(JNIEnv* env, void* ptr, int format, int width, int h
 
 JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecode(JNIEnv* env,
-    jclass clazz, jobject is, jboolean partially)
+    jclass clazz, jint fd, jboolean partially)
 {
-  InputStream* input_stream;
   int format;
   void* image;
   jobject image_object;
 
-  input_stream = create_input_stream(env, is);
-  if (input_stream == NULL) {
-    return NULL;
-  }
-
-  image = decode(env, input_stream, partially, &format);
+  image = decode(env, fd, partially, &format);
   if (image == NULL) {
     return NULL;
   }
@@ -105,7 +98,6 @@ JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeCreate(JNIEnv* env,
     jclass clazz, jobject bitmap)
 {
-#ifdef IMAGE_SUPPORT_PLAIN
   AndroidBitmapInfo info;
   void *pixels = NULL;
   void* image = NULL;
@@ -134,9 +126,6 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv* env,
   } else {
     return image_object;
   }
-#else
-  return NULL;
-#endif
 }
 
 JNIEXPORT jboolean JNICALL
@@ -259,32 +248,6 @@ Java_com_hippo_image_Image_nativeRecycle(JNIEnv* env,
     jclass clazz, jlong ptr, jint format)
 {
   recycle(env, (void*) (intptr_t) ptr, format);
-}
-
-JNIEXPORT jintArray JNICALL
-Java_com_hippo_image_Image_nativeGetSupportedImageFormats(
-    JNIEnv *env, jclass clazz)
-{
-  int formats[IMAGE_MAX_SUPPORTED_FORMAT_COUNT];
-  int count = get_supported_formats(formats);
-  jintArray array = (*env)->NewIntArray(env, count);
-  if (array == NULL) {
-    return NULL;
-  }
-  (*env)->SetIntArrayRegion(env, array, 0, count, formats);
-  return array;
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_image_Image_nativeGetDecoderDescription(
-    JNIEnv *env, jclass clazz, jint format)
-{
-  const char *description = get_decoder_description(format);
-  if (description == NULL) {
-    return NULL;
-  } else {
-    return (*env)->NewStringUTF(env, description);
-  }
 }
 
 bool image_onLoad(JavaVM *vm)

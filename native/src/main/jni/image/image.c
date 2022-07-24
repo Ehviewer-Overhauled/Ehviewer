@@ -25,26 +25,21 @@
 #include "image_plain.h"
 #include "filter/clahe.h"
 #include "filter/gray.h"
-#include "../log.h"
+#include "log.h"
 
-void* decode(JNIEnv* env, InputStream* stream, bool partially, int* format)
+void* decode(JNIEnv* env, int fd, bool partially, int* format)
 {
     AImageDecoder *decoder;
-    size_t len = 1024 * 1024 * 4;
-    void* buffer = calloc(len, sizeof(char));
-    len = read_input_stream(env, stream, buffer, 0, len);
-    AImageDecoder_createFromBuffer(buffer, len, &decoder);
-    free(buffer);
+    AImageDecoder_createFromFd(fd, &decoder);
+    *format = AImageDecoder_isAnimated(decoder);
     AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
     IMAGE *image = malloc(sizeof(IMAGE));
     image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
     image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
-    ssize_t bufferLen = 1024 * 1024 * 64;
+    unsigned long bufferLen = image->height * image->width * 4;
     image->buffer = malloc(bufferLen);
     AImageDecoder_decodeImage(decoder, image->buffer, AImageDecoder_getMinimumStride(decoder), bufferLen);
     AImageDecoder_delete(decoder);
-    destroy_input_stream(env, &stream);
-    *format = IMAGE_FORMAT_JPEG;
     return image;
 }
 
@@ -144,24 +139,4 @@ void clahe(void* image, int format, bool to_gray)
 void recycle(JNIEnv *env, void* image, int format)
 {
     PLAIN_recycle((PLAIN*) image);
-}
-
-int get_supported_formats(int *formats)
-{
-  int i = 0;
-#ifdef IMAGE_SUPPORT_JPEG
-  formats[i++] = IMAGE_FORMAT_JPEG;
-#endif
-#ifdef IMAGE_SUPPORT_PNG
-  formats[i++] = IMAGE_FORMAT_PNG;
-#endif
-#ifdef IMAGE_SUPPORT_GIF
-  formats[i++] = IMAGE_FORMAT_GIF;
-#endif
-  return i;
-}
-
-const char *get_decoder_description(int format)
-{
-    return NULL;
 }

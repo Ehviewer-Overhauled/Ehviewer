@@ -28,31 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The {@code Image} is a image which stored pixel data in native heap
  */
 public final class Image {
+    public static final int FORMAT_NORMAL = 0;
 
-    /**
-     * Unknown image format
-     */
-    public static final int FORMAT_UNKNOWN = -1;
-
-    /**
-     * Plain image format, for {@code Image} from {@link #create(Bitmap)}
-     */
-    public static final int FORMAT_PLAIN = 0;
-
-    /**
-     * JPEG image format
-     */
-    public static final int FORMAT_JPEG = 1;
-
-    /**
-     * PNG image format
-     */
-    public static final int FORMAT_PNG = 2;
-
-    /**
-     * GIF image format
-     */
-    public static final int FORMAT_GIF = 3;
+    public static final int FORMAT_ANIMATED = 1;
 
     private static final AtomicInteger sImageCount = new AtomicInteger();
     private final int mFormat;
@@ -74,11 +52,8 @@ public final class Image {
      * Decode image from {@code InputStream}
      */
     @Nullable
-    public static Image decode(InputStream is, boolean partially) {
-        if (!(is instanceof BufferedInputStream)) {
-            is = new BufferedInputStream(is);
-        }
-        return nativeDecode(is, partially);
+    public static Image decode(Integer fd, boolean partially) {
+        return nativeDecode(fd, partially);
     }
 
     /**
@@ -97,22 +72,7 @@ public final class Image {
         return sImageCount.get();
     }
 
-    /**
-     * Return all supported image formats, exclude {@link #FORMAT_PLAIN}
-     */
-    public static int[] getSupportedImageFormats() {
-        return nativeGetSupportedImageFormats();
-    }
-
-    /**
-     * Return decoder description of the image format,
-     * {@code null} for invalid image format.
-     */
-    public static String getDecoderDescription(int format) {
-        return nativeGetDecoderDescription(format);
-    }
-
-    private static native Image nativeDecode(InputStream is, boolean partially);
+    private static native Image nativeDecode(int fd, boolean partially);
 
     private static native Image nativeCreate(Bitmap bitmap);
 
@@ -142,10 +102,6 @@ public final class Image {
     private static native void nativeClahe(long nativePtr, int format, boolean toGray);
 
     private static native void nativeRecycle(long nativePtr, int format);
-
-    private static native int[] nativeGetSupportedImageFormats();
-
-    private static native String nativeGetDecoderDescription(int format);
 
     /**
      * Return the format of the image

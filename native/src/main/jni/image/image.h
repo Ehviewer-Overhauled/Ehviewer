@@ -22,9 +22,9 @@
 #define IMAGE_IMAGE_H
 
 #include <stdbool.h>
+#include <jni.h>
 
 #include "config.h"
-#include "input_stream.h"
 
 #define IMAGE_FORMAT_UNKNOWN -1
 #ifdef IMAGE_SUPPORT_PLAIN
@@ -49,7 +49,7 @@ typedef struct
     void* buffer;
 } IMAGE;
 
-void* decode(JNIEnv* env, InputStream* stream, bool partially, int* format);
+void* decode(JNIEnv* env, int fd, bool partially, int* format);
 void* create(unsigned int width, unsigned int height, const void* data);
 bool complete(JNIEnv* env, void* image, int format);
 bool is_completed(void* image, int format);

@@ -26,8 +26,6 @@
 
 #include <stdbool.h>
 
-#include "patch_head_input_stream.h"
-
 #include "image.h"
 
 typedef IMAGE PLAIN;

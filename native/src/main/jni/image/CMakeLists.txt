@@ -13,6 +13,25 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.4.1)
+project(image C)
 
-add_subdirectory(image)
-add_subdirectory(stream)
+set(IMAGE_SOURCES
+        image.c
+        image_utils.c
+        image_plain.c
+        filter/clahe.c
+        filter/gray.c
+        java_wrapper.c
+        )
+set(IMAGE_INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+set(IMAGE_LIBRARIES
+        log
+        jnigraphics
+        GLESv2
+        )
+
+add_library(image STATIC ${IMAGE_SOURCES})
+target_include_directories(image PRIVATE ${IMAGE_INCLUDES})
+target_link_libraries(image PRIVATE ${IMAGE_LIBRARIES})

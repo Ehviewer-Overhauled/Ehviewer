@@ -16,8 +16,8 @@
 
 #include "clahe.h"
 #include "pixel.h"
-#include "../../utils.h"
-#include "../../log.h"
+#include "../utils.h"
+#include "../log.h"
 
 #define TILE_BLOCK 8
 #define LIMIT_MULTIPLE 4

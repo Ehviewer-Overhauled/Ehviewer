@@ -26,7 +26,7 @@
 
 #include "image_plain.h"
 #include "image_utils.h"
-#include "../log.h"
+#include "log.h"
 
 void* PLAIN_create(unsigned int width, unsigned int height, const void* data)
 {

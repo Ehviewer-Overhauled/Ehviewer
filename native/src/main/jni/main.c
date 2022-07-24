@@ -23,7 +23,7 @@
 #include <zlib.h>
 #include <nettle/config.h>
 
-#include "java_wrapper.h"
+#include "image/java_wrapper.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
