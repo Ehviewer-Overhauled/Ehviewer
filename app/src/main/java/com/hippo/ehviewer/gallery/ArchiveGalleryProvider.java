@@ -53,7 +53,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
-    private final LinkedHashMap<Integer, FileDescriptor> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Long> streams = new LinkedHashMap<>();
     private final AtomicInteger decodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private Thread archiveThread;
     private Thread decodeThread;
@@ -253,22 +253,14 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     continue;
                 }
 
-                Pipe pipe = new Pipe();
-
                 synchronized (streams) {
                     if (streams.get(index) != null) {
                         continue;
                     }
-                    try {
-                        streams.put(index, ((FileInputStream)pipe.getInputStream()).getFD());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    long addr = archiveAccessor.extracttoOutputStream(index);
+                    streams.put(index, addr);
                     streams.notify();
                 }
-
-                archiveAccessor.extracttoOutputStream(index, pipe.getOutputFd());
-                pipe.closeOutputFd();
             }
         }
     }
@@ -278,7 +270,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                FileDescriptor fd;
+                Long addr;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -290,16 +282,16 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, FileDescriptor>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, FileDescriptor> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Long>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Long> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    fd = entry.getValue();
+                    addr = entry.getValue();
                     decodingIndex.lazySet(index);
                 }
 
                 try {
-                    Image image = Image.decode(fd, true);
+                    Image image = Image.decodeAddr(addr, true);
                     if (image != null) {
                         notifyPageSucceed(index, image);
                     } else {

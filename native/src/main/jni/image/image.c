@@ -39,12 +39,33 @@ void* decode(JNIEnv* env, int fd, bool partially, int* format)
     *format = AImageDecoder_isAnimated(decoder);
     const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
     size_t stride = AImageDecoder_getMinimumStride(decoder);
-    IMAGE *image = malloc(sizeof(IMAGE));
+    IMAGE *image = calloc(1, sizeof(IMAGE));
     image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
     image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
     image->decoder = decoder;
     image->bufferLen = image->height * stride;
     image->buffer = malloc(image->bufferLen);
+    AImageDecoder_decodeImage(decoder, image->buffer, stride, image->bufferLen);
+    return image;
+}
+
+void* decodeAddr(JNIEnv* env, void* addr, long size, bool partially, int* format)
+{
+    AImageDecoder *decoder;
+    int r = AImageDecoder_createFromBuffer((const void *) addr, size, &decoder);
+    LOGD("%s%d", "Create ImageDecoder with ret ", r);
+    if (r)
+        return NULL;
+    *format = AImageDecoder_isAnimated(decoder);
+    const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
+    size_t stride = AImageDecoder_getMinimumStride(decoder);
+    IMAGE *image = calloc(1, sizeof(IMAGE));
+    image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
+    image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
+    image->decoder = decoder;
+    image->bufferLen = image->height * stride;
+    image->buffer = malloc(image->bufferLen);
+    image->srcBuffer = addr;
     AImageDecoder_decodeImage(decoder, image->buffer, stride, image->bufferLen);
     return image;
 }
@@ -149,5 +170,6 @@ void recycle(JNIEnv *env, IMAGE* image, int format)
     free(image->buffer);
     image->buffer = NULL;
     AImageDecoder_delete(image->decoder);
+    free(image->srcBuffer);
     free(image);
 }

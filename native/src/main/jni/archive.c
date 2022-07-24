@@ -121,35 +121,37 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
     return r;
 }
 
-JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index,
-                                                        jint fd) {
+typedef struct Memarea {
+    void* buffer;
+    long size;
+} Memarea;
+
+JNIEXPORT jlong JNICALL
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index) {
     struct archive_entry *entry;
-    size_t size;
     int ret;
-    la_int64_t offset;
-    const void *buff;
     if (!arc || index < cur_index) {
         archive_alloc();
         cur_index = 0;
     }
+    Memarea* memarea = malloc(sizeof(Memarea));
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (cur_index++ == index) {
+            memarea->size = archive_entry_size(entry);
+            memarea->buffer = malloc(memarea->size);
             for (;;) {
-                ret = archive_read_data_block(arc, &buff, &size, &offset);
-                if (ret == ARCHIVE_EOF)
-                    break;
-                if (ret != ARCHIVE_OK) {
+                ret = archive_read_data(arc, memarea->buffer, memarea->size);
+                if (ret < 0) {
                     LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
-                    break;
                 }
-                write(fd, buff, size);
+                break;
             }
             break;
         }
     }
+    return (jlong) memarea;
 }
 
 JNIEXPORT void JNICALL

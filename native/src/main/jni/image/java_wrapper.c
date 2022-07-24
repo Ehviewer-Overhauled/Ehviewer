@@ -282,3 +282,32 @@ JNI_OnUnload(JavaVM *vm, void *reserved)
   free(tile_buffer);
   tile_buffer = NULL;
 }
+
+typedef struct Memarea {
+    void* buffer;
+    long size;
+} Memarea;
+
+JNIEXPORT jobject JNICALL
+Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr,
+                                            jboolean partially) {
+  int format;
+  void* image;
+  jobject image_object;
+
+  Memarea *memarea = (Memarea*)addr;
+  image = decodeAddr(env, memarea->buffer, memarea->size, partially, &format);
+  free(memarea);
+  if (image == NULL) {
+    return NULL;
+  }
+
+  image_object = create_image_object(env, image, format,
+                                     get_width(image, format), get_height(image, format));
+  if (image_object == NULL) {
+    recycle(env, image, format);
+    return NULL;
+  } else {
+    return image_object;
+  }
+}

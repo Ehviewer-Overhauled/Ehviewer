@@ -32,9 +32,11 @@ typedef struct
     void* buffer;
     int bufferLen;
     AImageDecoder* decoder;
+    void* srcBuffer;
 } IMAGE;
 
 void* decode(JNIEnv* env, int fd, bool partially, int* format);
+void* decodeAddr(JNIEnv* env, void* addr, long size, bool partially, int* format);
 void* create(int32_t width, int32_t height, const void* data);
 bool complete(JNIEnv* env, IMAGE * image, int format);
 bool is_completed(IMAGE * image, int format);

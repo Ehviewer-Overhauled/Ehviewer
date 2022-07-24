@@ -47,7 +47,7 @@ public class UriArchiveAccessor {
 
     private native int openArchive(long addr, long size);
 
-    public native void extracttoOutputStream(int index, int fd);
+    public native long extracttoOutputStream(int index);
 
     public native boolean needPassword();
 
