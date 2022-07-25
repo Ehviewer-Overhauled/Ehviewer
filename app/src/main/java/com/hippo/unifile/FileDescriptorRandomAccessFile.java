@@ -41,6 +41,7 @@ class FileDescriptorRandomAccessFile implements UniRandomAccessFile {
     private final int flushAfterWrite;
     private final Object closeLock = new Object();
     private volatile boolean closed = false;
+
     private FileDescriptorRandomAccessFile(ParcelFileDescriptor pfd, FileDescriptor fd, String mode) {
         this.pfd = pfd;
         this.fd = fd;

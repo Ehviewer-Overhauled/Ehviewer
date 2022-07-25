@@ -82,6 +82,13 @@ public class BatteryView extends AppCompatTextView {
         }
         mCurrentColor = color;
         super.setTextColor(color);
+    }
+
+    private void startCharger() {
+        if (!mIsChargerWorking) {
+            getHandler().post(mCharger);
+            mIsChargerWorking = true;
+        }
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -96,13 +103,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    private void startCharger() {
-        if (!mIsChargerWorking) {
-            getHandler().post(mCharger);
-            mIsChargerWorking = true;
-        }
-    }
 
     private void stopCharger() {
         if (mIsChargerWorking) {
@@ -142,6 +142,7 @@ public class BatteryView extends AppCompatTextView {
     private void unregisterReceiver() {
         getContext().unregisterReceiver(mIntentReceiver);
     }
+
 
 
 

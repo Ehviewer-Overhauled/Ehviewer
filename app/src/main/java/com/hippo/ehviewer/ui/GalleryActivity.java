@@ -226,6 +226,9 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mSize;
     private int mCurrentIndex;
     private int mSavingPage = -1;
+    private EditTextDialogBuilder builder;
+    private boolean dialogShown = false;
+    private AlertDialog dialog;
 
     private void buildProvider() {
         if (mGalleryProvider != null) {
@@ -287,7 +290,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
         outState.putInt(KEY_PAGE, mPage);
         outState.putInt(KEY_CURRENT_INDEX, mCurrentIndex);
-    }
+    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
 
     @Override
     protected void attachBaseContext(@NonNull Context newBase) {
@@ -477,16 +489,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             FrameLayout mainLayout = (FrameLayout) ViewUtils.$$(this, R.id.main);
             mainLayout.addView(new GalleryGuideView(this));
         }
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            result -> {
-                if (result && mSavingPage != -1) {
-                    saveImage(mSavingPage);
-                } else {
-                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-                }
-                mSavingPage = -1;
-            });
+    }
 
     @Override
     protected void onDestroy() {
@@ -1046,6 +1049,66 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
     }
 
+    private void showPasswdDialog() {
+        if (!dialogShown) {
+            dialogShown = true;
+            dialog.show();
+            if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    GalleryActivity.this.onProvidePasswd();
+                });
+            }
+            dialog.setOnCancelListener(v -> finish());
+        }
+    }
+
+    private void onProvidePasswd() {
+        String passwd = builder.getText();
+        if (passwd.isEmpty())
+            builder.setError(getString(R.string.passwd_cannot_be_empty));
+        else {
+            ArchiveGalleryProvider.passwd = passwd;
+            ArchiveGalleryProvider.pv.v();
+        }
+    }
+
+    private void onPasswdWrong() {
+        builder.setError(getString(R.string.passwd_wrong));
+    }
+
+    private void onPasswdCorrect() {
+        dialog.dismiss();
+    }
+
+    private static class ShowPasswdDialogHandler extends Handler {
+
+        //弱引用持有HandlerActivity , GC 回收时会被回收掉
+        private final WeakReference<GalleryActivity> weakReference;
+
+        public ShowPasswdDialogHandler(GalleryActivity activity) {
+            this.weakReference = new WeakReference(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            GalleryActivity activity = weakReference.get();
+            super.handleMessage(msg);
+            if (null != activity) {
+                switch (msg.what) {
+                    case 0:
+                        activity.showPasswdDialog();
+                        break;
+                    case 1:
+                        activity.onPasswdWrong();
+                        break;
+                    case 2:
+                        activity.onPasswdCorrect();
+                        break;
+                }
+            }
+        }
+    }
+
     private class GalleryMenuHelper implements DialogInterface.OnClickListener {
 
         private final View mView;
@@ -1306,69 +1369,5 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
     }
 
-    private EditTextDialogBuilder builder;
 
-    private boolean dialogShown = false;
-
-    private AlertDialog dialog;
-
-    private void showPasswdDialog() {
-        if (!dialogShown) {
-            dialogShown = true;
-            dialog.show();
-            if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                    GalleryActivity.this.onProvidePasswd();
-                });
-            }
-            dialog.setOnCancelListener(v -> finish());
-        }
-    }
-
-    private void onProvidePasswd() {
-        String passwd = builder.getText();
-        if (passwd.isEmpty())
-            builder.setError(getString(R.string.passwd_cannot_be_empty));
-        else {
-            ArchiveGalleryProvider.passwd = passwd;
-            ArchiveGalleryProvider.pv.v();
-        }
-    }
-
-    private void onPasswdWrong() {
-        builder.setError(getString(R.string.passwd_wrong));
-    }
-
-    private void onPasswdCorrect() {
-        dialog.dismiss();
-    }
-
-    private static class ShowPasswdDialogHandler extends Handler {
-
-        //弱引用持有HandlerActivity , GC 回收时会被回收掉
-        private final WeakReference<GalleryActivity> weakReference;
-
-        public ShowPasswdDialogHandler(GalleryActivity activity) {
-            this.weakReference = new WeakReference(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            GalleryActivity activity = weakReference.get();
-            super.handleMessage(msg);
-            if (null != activity) {
-                switch (msg.what) {
-                    case 0:
-                        activity.showPasswdDialog();
-                        break;
-                    case 1:
-                        activity.onPasswdWrong();
-                        break;
-                    case 2:
-                        activity.onPasswdCorrect();
-                        break;
-                }
-            }
-        }
-    }
 }

@@ -188,11 +188,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/keyline_margin"
-                    app:chipSpacingHorizontal="8dp"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAllCaps="true"
                     app:chipIcon="@drawable/ic_baseline_label_24"
+                    app:chipSpacingHorizontal="8dp"
                     app:ensureMinTouchTargetSize="true"
                     app:layout_constraintBottom_toTopOf="@id/uploader"
                     app:layout_constraintEnd_toEndOf="parent" />

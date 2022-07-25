@@ -50,7 +50,7 @@ class VersionPreference @JvmOverloads constructor(
 
     inner class NativeLibInfo {
         private var message: String = ""
-        fun addLib(libname:String, libversion:String): NativeLibInfo {
+        fun addLib(libname: String, libversion: String): NativeLibInfo {
             message = "$message$libname $libversion\n"
             return this
         }

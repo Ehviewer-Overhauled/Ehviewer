@@ -230,8 +230,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:insetLeft="40dp"
-                    android:insetRight="40dp"
                     android:insetTop="16dp"
+                    android:insetRight="40dp"
                     android:text="@string/read">
 
                     <requestFocus />
@@ -244,11 +244,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
-                    android:nextFocusDown="@+id/torrent"
                     android:focusable="true"
                     android:insetLeft="40dp"
                     android:insetTop="16dp"
-                    android:insetRight="40dp" />
+                    android:insetRight="40dp"
+                    android:nextFocusDown="@+id/torrent" />
 
 
                 <android.widget.Space

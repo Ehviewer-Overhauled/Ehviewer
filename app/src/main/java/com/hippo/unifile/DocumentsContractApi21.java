@@ -33,6 +33,7 @@ final class DocumentsContractApi21 {
     private static final String TAG = DocumentsContractApi21.class.getSimpleName();
     private static final String PATH_DOCUMENT = "document";
     private static final String PATH_TREE = "tree";
+
     private DocumentsContractApi21() {
     }
 

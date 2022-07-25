@@ -16,8 +16,6 @@
 
 package com.hippo.ehviewer;
 
-import android.os.ParcelFileDescriptor;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -27,7 +25,6 @@ import com.hippo.streampipe.InputStreamPipe;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ImageBitmapHelper implements ValueHelper<ImageBitmap> {
 
