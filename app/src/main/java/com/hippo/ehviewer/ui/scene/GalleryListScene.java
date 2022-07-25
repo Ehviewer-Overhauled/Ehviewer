@@ -59,8 +59,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
@@ -634,38 +632,7 @@ public final class GalleryListScene extends BaseScene
             mHelper.firstRefresh();
         }
 
-        guideQuickSearch();
-
         return view;
-    }
-
-    private void guideQuickSearch() {
-        Activity activity = getMainActivity();
-        if (null == activity || !Settings.getGuideQuickSearch()) {
-            return;
-        }
-
-        Display display = activity.getWindowManager().getDefaultDisplay();
-        Point point = new Point();
-        display.getSize(point);
-        Rect bounds = new Rect(point.x + LayoutUtils.dp2pix(requireContext(), 20),
-                point.y / 3 + LayoutUtils.dp2pix(requireContext(), 20),
-                point.x - LayoutUtils.dp2pix(requireContext(), 20),
-                point.y / 3 - LayoutUtils.dp2pix(requireContext(), 20));
-
-        TapTargetView.showFor(requireActivity(),
-                TapTarget.forBounds(bounds,
-                                getString(R.string.guide_quick_search_title),
-                                getString(R.string.guide_quick_search_text))
-                        .transparentTarget(true),
-                new TapTargetView.Listener() {
-                    @Override
-                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
-                        super.onTargetClick(view);
-                        Settings.putGuideQuickSearch(false);
-                        openDrawer(Gravity.RIGHT);
-                    }
-                });
     }
 
     @Override
