@@ -42,7 +42,7 @@ IMAGE *createFromFd(JNIEnv *env, int fd, bool partially, int *format);
 
 IMAGE *createFromAddr(JNIEnv *env, void *addr, long size, bool partially, int *format);
 
-void *create(int32_t width, int32_t height, const void *data);
+IMAGE *create(int32_t width, int32_t height, const void *data);
 
 int get_width(IMAGE *image, int format);
 

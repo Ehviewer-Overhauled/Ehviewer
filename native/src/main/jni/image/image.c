@@ -76,33 +76,18 @@ IMAGE *createFromAddr(JNIEnv *env, void *addr, long size, bool partially, int *f
     return image;
 }
 
-void *create(int32_t width, int32_t height, const void *data) {
-    IMAGE *plain = NULL;
+IMAGE *create(int32_t width, int32_t height, const void *data) {
+    IMAGE *plain = calloc(1, sizeof(IMAGE));
     void *buffer = NULL;
-    size_t length;
-
-    plain = malloc(sizeof(IMAGE));
-    if (plain == NULL) {
-        WTF_OM;
-        return NULL;
-    }
-
-    length = (size_t) (width * height * 4);
+    size_t length = width * height * 4;
 
     buffer = malloc(length);
-    if (buffer == NULL) {
-        WTF_OM;
-        free(plain);
-        return NULL;
-    }
-
     memcpy(buffer, data, length);
 
     plain->width = width;
     plain->height = height;
     plain->buffer = buffer;
     plain->bufferLen = length;
-    plain->decoder = NULL;
 
     return plain;
 }
@@ -184,7 +169,6 @@ void clahe(IMAGE *image, int format, bool to_gray) {
 
 void recycle(JNIEnv *env, IMAGE *image, int format) {
     free(image->buffer);
-    image->buffer = NULL;
     AImageDecoderFrameInfo_delete(image->frameInfo);
     AImageDecoder_delete(image->decoder);
     free(image->srcBuffer);
