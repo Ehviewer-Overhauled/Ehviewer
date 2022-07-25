@@ -97,7 +97,7 @@ public final class Image {
 
     private static native void nativeRender(long nativePtr,
                                             int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-                                            int width, int height, boolean fillBlank, int defaultColor);
+                                            int width, int height);
 
     private static native void nativeTexImage(long nativePtr, boolean init, int offsetX, int offsetY, int width, int height);
 
@@ -146,8 +146,7 @@ public final class Image {
     public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
                        int width, int height, boolean fillBlank, int defaultColor) {
         checkRecycled();
-        nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY,
-                width, height, fillBlank, defaultColor);
+        nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY, width, height);
     }
 
     /**

@@ -87,9 +87,9 @@ IMAGE *create(int32_t width, int32_t height, const void *data) {
 
 void render(IMAGE *image, int src_x, int src_y,
             void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
-            int width, int height, bool fill_blank, int default_color) {
+            int width, int height) {
     copy_pixels(image->buffer, image->width, image->height, src_x, src_y, dst, dst_w, dst_h, dst_x,
-                dst_y, width, height, fill_blank, default_color);
+                dst_y, width, height);
 }
 
 void advance(IMAGE *image) {

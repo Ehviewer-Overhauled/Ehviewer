@@ -119,7 +119,7 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitma
 JNIEXPORT void JNICALL
 Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jlong ptr, jint src_x,
                                         jint src_y, jobject dst, jint dst_x, jint dst_y, jint width,
-                                        jint height, jboolean fill_blank, jint default_color) {
+                                        jint height) {
     AndroidBitmapInfo info;
     void *pixels = NULL;
 
@@ -131,7 +131,7 @@ Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jlong ptr, ji
     }
 
     render((IMAGE *) ptr, src_x, src_y, pixels, info.width, info.height, dst_x, dst_y, width,
-           height, fill_blank, default_color);
+           height);
 
     AndroidBitmap_unlockPixels(env, dst);
 }
@@ -142,7 +142,7 @@ Java_com_hippo_image_Image_nativeTexImage(JNIEnv *env, jclass clazz, jlong ptr, 
     if (width * height > IMAGE_TILE_MAX_SIZE)
         return;
 
-    render((IMAGE *) ptr, src_x, src_y, tile_buffer, width, height, 0, 0, width, height, false, 0);
+    render((IMAGE *) ptr, src_x, src_y, tile_buffer, width, height, 0, 0, width, height);
 
     if (init) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,

@@ -21,6 +21,8 @@
 #include <stdbool.h>
 #include <jni.h>
 
+#include "log.h"
+
 typedef struct {
     AImageDecoder *decoder;
     void *srcBuffer;
@@ -64,7 +66,7 @@ IMAGE *create(int32_t width, int32_t height, const void *data);
 
 void render(IMAGE *image, int src_x, int src_y,
             void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
-            int width, int height, bool fill_blank, int default_color);
+            int width, int height);
 
 void advance(IMAGE *image);
 
