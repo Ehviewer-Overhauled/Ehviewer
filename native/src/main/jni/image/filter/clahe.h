@@ -19,6 +19,6 @@
 
 #include <stdbool.h>
 
-void IMAGE_clahe(void* data, int width, int height, bool to_gray);
+void IMAGE_clahe(void *data, int width, int height, bool to_gray);
 
 #endif //IMAGE_CLAHE_H

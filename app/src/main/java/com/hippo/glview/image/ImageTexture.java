@@ -153,12 +153,6 @@ public class ImageTexture implements Texture, Animatable {
         }
 
         mTiles = list.toArray(new Tile[list.size()]);
-
-        if (!mImage.isCompleted()) {
-            Runnable runnable = new AnimateRunnable();
-            mAnimateRunnable = runnable;
-            sThreadExecutor.execute(runnable);
-        }
     }
 
     private static Tile obtainSmallTile() {
@@ -239,7 +233,7 @@ public class ImageTexture implements Texture, Animatable {
         }
 
         boolean end = mReleased.get() || mImage.isImageRecycled() || mNeedRelease.get() ||
-                (mImage.isCompleted() && mImage.getFormat() == 0) || mRunning.get();
+                (mImage.getFormat() == 0) || mRunning.get();
 
         synchronized (mImage) {
             mImageBusy = false;
@@ -595,18 +589,6 @@ public class ImageTexture implements Texture, Animatable {
                 }
                 // Obtain image
                 mImageBusy = true;
-            }
-
-            if (!mImage.isCompleted()) {
-                try {
-                    sPVLock.p();
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                if (!mNeedRelease.get()) {
-                    mImage.complete();
-                }
-                sPVLock.v();
             }
 
             synchronized (mImage) {

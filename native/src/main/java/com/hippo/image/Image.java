@@ -99,10 +99,6 @@ public final class Image {
 
     private static native int nativeGetByteCount(long nativePtr, int format);
 
-    private static native boolean nativeComplete(long nativePtr, int format);
-
-    private static native boolean nativeIsCompleted(long nativePtr, int format);
-
     private static native void nativeRender(long nativePtr, int format,
                                             int srcX, int srcY, Bitmap dst, int dstX, int dstY,
                                             int width, int height, boolean fillBlank, int defaultColor);
@@ -113,8 +109,6 @@ public final class Image {
     private static native void nativeAdvance(long nativePtr, int format);
 
     private static native int nativeGetDelay(long nativePtr, int format);
-
-    private static native int nativeFrameCount(long nativePtr, int format);
 
     private static native boolean nativeIsOpaque(long nativePtr, int format);
 
@@ -161,22 +155,6 @@ public final class Image {
                 throw new IllegalStateException("The image is recycled.");
             }
         }
-    }
-
-    /**
-     * Complete the image decoding
-     */
-    public boolean complete() {
-        checkRecycled();
-        return nativeComplete(mNativePtr, mFormat);
-    }
-
-    /**
-     * Is the image decoding completed
-     */
-    public boolean isCompleted() {
-        checkRecycled();
-        return nativeIsCompleted(mNativePtr, mFormat);
     }
 
     /**

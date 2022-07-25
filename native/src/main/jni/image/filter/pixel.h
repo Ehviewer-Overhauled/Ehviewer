@@ -19,12 +19,11 @@
 
 typedef unsigned char BYTE;
 
-typedef struct
-{
-  BYTE c1;
-  BYTE c2;
-  BYTE c3;
-  BYTE c4;
+typedef struct {
+    BYTE c1;
+    BYTE c2;
+    BYTE c3;
+    BYTE c4;
 } PIXEL;
 
 #endif //IMAGE_PIXEL_H

@@ -17,20 +17,20 @@
 #include "gray.h"
 #include "pixel.h"
 
-bool IMAGE_is_gray(void* data, int width, int height, int error) {
-  PIXEL* p = data;
+bool IMAGE_is_gray(void *data, int width, int height, int error) {
+    PIXEL *p = data;
 
-  for (int i = 0, n = width * height; i < n; i++, p++) {
-    int e1 = p->c1 - p->c2;
-    int e2 = p->c1 - p->c3;
-    int e3 = p->c2 - p->c3;
+    for (int i = 0, n = width * height; i < n; i++, p++) {
+        int e1 = p->c1 - p->c2;
+        int e2 = p->c1 - p->c3;
+        int e3 = p->c2 - p->c3;
 
-    if (e1 > error || e1 < -error
-        || e2 > error || e2 < -error
-        || e3 > error || e3 < -error) {
-      return false;
+        if (e1 > error || e1 < -error
+            || e2 > error || e2 < -error
+            || e3 > error || e3 < -error) {
+            return false;
+        }
     }
-  }
 
-  return true;
+    return true;
 }

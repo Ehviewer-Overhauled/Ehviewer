@@ -19,6 +19,6 @@
 
 #include <stdbool.h>
 
-bool IMAGE_is_gray(void* data, int width, int height, int error);
+bool IMAGE_is_gray(void *data, int width, int height, int error);
 
 #endif //IMAGE_GRAY_H

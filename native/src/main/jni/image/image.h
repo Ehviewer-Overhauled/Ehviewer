@@ -25,35 +25,45 @@
 #include <stdbool.h>
 #include <jni.h>
 
-typedef struct
-{
+typedef struct {
     int32_t width;
     int32_t height;
-    void* buffer;
+    void *buffer;
     int bufferLen;
-    AImageDecoder* decoder;
-    void* srcBuffer;
+    AImageDecoder *decoder;
+    void *srcBuffer;
     size_t stride;
     bool isAnimated;
     AImageDecoderFrameInfo *frameInfo;
+    bool alpha;
 } IMAGE;
 
-IMAGE * createFromFd(JNIEnv* env, int fd, bool partially, int* format);
-IMAGE * createFromAddr(JNIEnv* env, void* addr, long size, bool partially, int* format);
-void* create(int32_t width, int32_t height, const void* data);
-bool complete(JNIEnv* env, IMAGE * image, int format);
-bool is_completed(IMAGE * image, int format);
-int get_width(IMAGE * image, int format);
-int get_height(IMAGE * image, int format);
-int get_byte_count(IMAGE * image, int format);
-void render(IMAGE * image, int format, int src_x, int src_y,
-    void* dst, int dst_w, int dst_h, int dst_x, int dst_y,
-    int width, int height, bool fill_blank, int default_color);
-void advance(IMAGE * image, int format);
-int get_delay(IMAGE * image, int format);
-bool is_opaque(IMAGE * image, int format);
-bool is_gray(IMAGE * image, int format, int error);
-void clahe(IMAGE * image, int format, bool to_gray);
-void recycle(JNIEnv *env, IMAGE * image, int format);
+IMAGE *createFromFd(JNIEnv *env, int fd, bool partially, int *format);
+
+IMAGE *createFromAddr(JNIEnv *env, void *addr, long size, bool partially, int *format);
+
+void *create(int32_t width, int32_t height, const void *data);
+
+int get_width(IMAGE *image, int format);
+
+int get_height(IMAGE *image, int format);
+
+int get_byte_count(IMAGE *image, int format);
+
+void render(IMAGE *image, int format, int src_x, int src_y,
+            void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
+            int width, int height, bool fill_blank, int default_color);
+
+void advance(IMAGE *image, int format);
+
+int get_delay(IMAGE *image, int format);
+
+bool is_opaque(IMAGE *image, int format);
+
+bool is_gray(IMAGE *image, int format, int error);
+
+void clahe(IMAGE *image, int format, bool to_gray);
+
+void recycle(JNIEnv *env, IMAGE *image, int format);
 
 #endif //IMAGE_IMAGE_H

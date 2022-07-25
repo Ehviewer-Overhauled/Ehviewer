@@ -123,22 +123,6 @@ public class ImageWrapper {
     }
 
     /**
-     * @see Image#complete()
-     */
-    public boolean complete() {
-        synchronized (mImage) {
-            return mImage.complete();
-        }
-    }
-
-    /**
-     * @see Image#isCompleted()
-     */
-    public boolean isCompleted() {
-        return mImage.isCompleted();
-    }
-
-    /**
      * @see Image#render(int, int, Bitmap, int, int, int, int, boolean, int)
      */
     public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
