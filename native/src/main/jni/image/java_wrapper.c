@@ -89,7 +89,7 @@ Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv* env,
   void* image;
   jobject image_object;
 
-  image = decode(env, fd, partially, &format);
+  image = createFromFd(env, fd, partially, &format);
   if (image == NULL) {
     return NULL;
   }
@@ -232,13 +232,6 @@ Java_com_hippo_image_Image_nativeGetDelay(JNIEnv* env,
   return (jint) get_delay((void*) (intptr_t) ptr, format);
 }
 
-JNIEXPORT jint JNICALL
-Java_com_hippo_image_Image_nativeFrameCount(JNIEnv* env,
-    jclass clazz, jlong ptr, jint format)
-{
-  return (jint) get_frame_count((void*) (intptr_t) ptr, format);
-}
-
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_image_Image_nativeIsOpaque(JNIEnv* env,
     jclass clazz, jlong ptr, jint format)
@@ -296,7 +289,7 @@ Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong add
   jobject image_object;
 
   Memarea *memarea = (Memarea*)addr;
-  image = decodeAddr(env, memarea->buffer, memarea->size, partially, &format);
+  image = createFromAddr(env, memarea->buffer, memarea->size, partially, &format);
   free(memarea);
   if (image == NULL) {
     return NULL;

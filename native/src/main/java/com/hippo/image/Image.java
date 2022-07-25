@@ -217,14 +217,6 @@ public final class Image {
     }
 
     /**
-     * Return frame count. 1 for non-animation image
-     */
-    public int getFrameCount() {
-        checkRecycled();
-        return nativeFrameCount(mNativePtr, mFormat);
-    }
-
-    /**
      * Return is the image opaque
      */
     public boolean isOpaque() {

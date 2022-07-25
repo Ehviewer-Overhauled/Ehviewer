@@ -19,6 +19,7 @@
 //
 
 #include <android/imagedecoder.h>
+#include <android/data_space.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -29,44 +30,48 @@
 #include "filter/gray.h"
 #include "log.h"
 
-void* decode(JNIEnv* env, int fd, bool partially, int* format)
+void decodeCommon(IMAGE * image)
 {
+    AImageDecoder *decoder = image->decoder;
+    AImageDecoder_setDataSpace(decoder, ADATASPACE_SRGB);
+    AImageDecoder_setAndroidBitmapFormat(decoder, ANDROID_BITMAP_FORMAT_RGBA_8888);
+    const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
+    image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
+    image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
+    image->stride = AImageDecoder_getMinimumStride(decoder);
+    image->bufferLen = image->height * image->stride;
+    image->buffer = malloc(image->bufferLen);
+    if (image->isAnimated) {
+        image->frameInfo = AImageDecoderFrameInfo_create();
+        AImageDecoder_getFrameInfo(decoder, image->frameInfo);
+    }
+    AImageDecoder_decodeImage(decoder, image->buffer, image->stride, image->bufferLen);
+}
+
+IMAGE * createFromFd(JNIEnv* env, int fd, bool partially, int* format) {
     AImageDecoder *decoder;
     int r = AImageDecoder_createFromFd(fd, &decoder);
     LOGD("%s%d", "Create ImageDecoder with ret ", r);
     if (r)
         return NULL;
-    *format = AImageDecoder_isAnimated(decoder);
-    const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
-    size_t stride = AImageDecoder_getMinimumStride(decoder);
     IMAGE *image = calloc(1, sizeof(IMAGE));
-    image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
-    image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
+    image->isAnimated = *format = AImageDecoder_isAnimated(decoder);
     image->decoder = decoder;
-    image->bufferLen = image->height * stride;
-    image->buffer = malloc(image->bufferLen);
-    AImageDecoder_decodeImage(decoder, image->buffer, stride, image->bufferLen);
+    decodeCommon(image);
     return image;
 }
 
-void* decodeAddr(JNIEnv* env, void* addr, long size, bool partially, int* format)
-{
+IMAGE * createFromAddr(JNIEnv* env, void* addr, long size, bool partially, int* format) {
     AImageDecoder *decoder;
     int r = AImageDecoder_createFromBuffer((const void *) addr, size, &decoder);
     LOGD("%s%d", "Create ImageDecoder with ret ", r);
     if (r)
         return NULL;
-    *format = AImageDecoder_isAnimated(decoder);
-    const AImageDecoderHeaderInfo *headerInfo = AImageDecoder_getHeaderInfo(decoder);
-    size_t stride = AImageDecoder_getMinimumStride(decoder);
     IMAGE *image = calloc(1, sizeof(IMAGE));
-    image->height = AImageDecoderHeaderInfo_getHeight(headerInfo);
-    image->width = AImageDecoderHeaderInfo_getWidth(headerInfo);
+    image->isAnimated = *format = AImageDecoder_isAnimated(decoder);
     image->decoder = decoder;
-    image->bufferLen = image->height * stride;
-    image->buffer = malloc(image->bufferLen);
     image->srcBuffer = addr;
-    AImageDecoder_decodeImage(decoder, image->buffer, stride, image->bufferLen);
+    decodeCommon(image);
     return image;
 }
 
@@ -111,17 +116,16 @@ void advance(IMAGE * image, int format)
 {
     if (format) {
         AImageDecoder_advanceFrame(image->decoder);
+        if (AImageDecoder_decodeImage(image->decoder, image->buffer, image->stride, image->bufferLen) == ANDROID_IMAGE_DECODER_FINISHED) {
+            AImageDecoder_rewind(image->decoder);
+            AImageDecoder_decodeImage(image->decoder, image->buffer, image->stride, image->bufferLen);
+        }
     }
 }
 
 int get_delay(IMAGE * image, int format)
 {
     return 0;
-}
-
-int get_frame_count(IMAGE * image, int format)
-{
-    return 1;
 }
 
 bool is_opaque(IMAGE * image, int format)

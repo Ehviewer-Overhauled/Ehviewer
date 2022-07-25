@@ -169,13 +169,6 @@ public class ImageWrapper {
     }
 
     /**
-     * @see Image#getFrameCount()
-     */
-    public int getFrameCount() {
-        return mImage.getFrameCount();
-    }
-
-    /**
      * @see Image#isOpaque()
      */
     public boolean isOpaque() {

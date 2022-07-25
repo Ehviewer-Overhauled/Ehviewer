@@ -239,7 +239,7 @@ public class ImageTexture implements Texture, Animatable {
         }
 
         boolean end = mReleased.get() || mImage.isImageRecycled() || mNeedRelease.get() ||
-                (mImage.isCompleted() && mImage.getFrameCount() <= 1) || mRunning.get();
+                (mImage.isCompleted() && mImage.getFormat() == 0) || mRunning.get();
 
         synchronized (mImage) {
             mImageBusy = false;
@@ -609,13 +609,11 @@ public class ImageTexture implements Texture, Animatable {
                 sPVLock.v();
             }
 
-            int frameCount = mImage.getFrameCount();
-
             synchronized (mImage) {
                 // Release image
                 mImageBusy = false;
                 // Check need release, frameCount <= 1
-                if (mNeedRelease.get() || frameCount <= 1) {
+                if (mNeedRelease.get() || mImage.getFormat() == 0) {
                     mAnimateRunnable = null;
                     return;
                 }

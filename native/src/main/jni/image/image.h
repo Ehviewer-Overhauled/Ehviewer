@@ -33,10 +33,13 @@ typedef struct
     int bufferLen;
     AImageDecoder* decoder;
     void* srcBuffer;
+    size_t stride;
+    bool isAnimated;
+    AImageDecoderFrameInfo *frameInfo;
 } IMAGE;
 
-void* decode(JNIEnv* env, int fd, bool partially, int* format);
-void* decodeAddr(JNIEnv* env, void* addr, long size, bool partially, int* format);
+IMAGE * createFromFd(JNIEnv* env, int fd, bool partially, int* format);
+IMAGE * createFromAddr(JNIEnv* env, void* addr, long size, bool partially, int* format);
 void* create(int32_t width, int32_t height, const void* data);
 bool complete(JNIEnv* env, IMAGE * image, int format);
 bool is_completed(IMAGE * image, int format);
@@ -48,7 +51,6 @@ void render(IMAGE * image, int format, int src_x, int src_y,
     int width, int height, bool fill_blank, int default_color);
 void advance(IMAGE * image, int format);
 int get_delay(IMAGE * image, int format);
-int get_frame_count(IMAGE * image, int format);
 bool is_opaque(IMAGE * image, int format);
 bool is_gray(IMAGE * image, int format, int error);
 void clahe(IMAGE * image, int format, bool to_gray);
