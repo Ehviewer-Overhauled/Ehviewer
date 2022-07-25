@@ -43,7 +43,7 @@ static char *passwd = NULL;
 static void *archiveAddr = NULL;
 static jlong archiveSize = 0;
 
-const char supportExt[9][6]  = {
+const char supportExt[9][6] = {
         "jpeg",
         "jpg",
         "png",
@@ -60,7 +60,7 @@ static int filename_is_playable_file(const char *name) {
     if (!dotptr++)
         return false;
     int i;
-    for (i=0; i<9; i++)
+    for (i = 0; i < 9; i++)
         if (strcmp(dotptr, supportExt[i]) == 0)
             return true;
     return false;
@@ -127,7 +127,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
 }
 
 typedef struct Memarea {
-    void* buffer;
+    void *buffer;
     long size;
 } Memarea;
 
@@ -139,7 +139,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
         archive_alloc();
         cur_index = 0;
     }
-    Memarea* memarea = malloc(sizeof(Memarea));
+    Memarea *memarea = malloc(sizeof(Memarea));
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
@@ -147,7 +147,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
             memarea->size = archive_entry_size(entry);
             memarea->buffer = malloc(memarea->size);
             ret = archive_read_data(arc, memarea->buffer, memarea->size);
-            if(ret != memarea->size)
+            if (ret != memarea->size)
                 LOGE("%s", "No enough data read, WTF?");
             if (ret < 0)
                 LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
