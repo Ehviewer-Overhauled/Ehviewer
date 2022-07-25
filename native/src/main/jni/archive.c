@@ -117,7 +117,6 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
                 need_encrypt = true;
                 break;
             case 0: // format supports but no encrypted entry found
-            case ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW: // Sometimes we might not read through whole file|vm, but it means so far we haven't meet any encrypted entry yet
             default:
                 need_encrypt = false;
         }
@@ -147,13 +146,11 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
         if (cur_index++ == index) {
             memarea->size = archive_entry_size(entry);
             memarea->buffer = malloc(memarea->size);
-            for (;;) {
-                ret = archive_read_data(arc, memarea->buffer, memarea->size);
-                if (ret < 0) {
-                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
-                }
-                break;
-            }
+            ret = archive_read_data(arc, memarea->buffer, memarea->size);
+            if(ret != memarea->size)
+                LOGE("%s", "No enough data read, WTF?");
+            if (ret < 0)
+                LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
             break;
         }
     }
@@ -180,7 +177,6 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *_, jobject thiz, jstri
         free(passwd);
     passwd = calloc(len, sizeof(char));
     strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
-    LOGI("%s%s", "Passwd is ", passwd);
     archive_alloc();
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
