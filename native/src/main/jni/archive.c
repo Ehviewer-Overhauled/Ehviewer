@@ -43,21 +43,27 @@ static char *passwd = NULL;
 static void *archiveAddr = NULL;
 static jlong archiveSize = 0;
 
+const char supportExt[9][6]  = {
+        "jpeg",
+        "jpg",
+        "png",
+        "gif",
+        "webp",
+        "bmp",
+        "ico",
+        "wbmp",
+        "heif"
+};
+
 static int filename_is_playable_file(const char *name) {
     const char *dotptr = strrchr(name, '.');
-    if (dotptr++) {
-        switch (*dotptr) {
-            case 'j':
-                return (strcmp(dotptr, "jpg") == 0) || (strcmp(dotptr, "jpeg") == 0);
-            case 'p':
-                return strcmp(dotptr, "png") == 0;
-            case 'g':
-                return strcmp(dotptr, "gif") == 0;
-            default:
-                return 0;
-        }
-    }
-    return 0;
+    if (!dotptr++)
+        return false;
+    int i;
+    for (i=0; i<9; i++)
+        if (strcmp(dotptr, supportExt[i]) == 0)
+            return true;
+    return false;
 }
 
 static long archive_list_all_entries() {
