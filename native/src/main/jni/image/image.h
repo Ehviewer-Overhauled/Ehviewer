@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-//
-// Created by Hippo on 12/27/2015.
-//
-
 #ifndef IMAGE_IMAGE_H
 #define IMAGE_IMAGE_H
 
@@ -26,44 +22,52 @@
 #include <jni.h>
 
 typedef struct {
+    AImageDecoder *decoder;
+    void *srcBuffer;
+    size_t stride;
+    AImageDecoderFrameInfo *frameInfo;
+    int fd;
+} SOURCE;
+
+typedef struct {
     int32_t width;
     int32_t height;
     void *buffer;
     int bufferLen;
-    AImageDecoder *decoder;
-    void *srcBuffer;
-    size_t stride;
     bool isAnimated;
-    AImageDecoderFrameInfo *frameInfo;
     bool alpha;
+    SOURCE *src;
 } IMAGE;
 
-IMAGE *createFromFd(JNIEnv *env, int fd, bool partially, int *format);
+static void recycleSource(SOURCE *src) {
+    if (!src)
+        return;
+    AImageDecoderFrameInfo_delete(src->frameInfo);
+    AImageDecoder_delete(src->decoder);
+    free(src->srcBuffer);
+    free(src);
+}
 
-IMAGE *createFromAddr(JNIEnv *env, void *addr, long size, bool partially, int *format);
+static void recycle(IMAGE *image) {
+    if (!image)
+        return;
+    recycleSource(image->src);
+    free(image->buffer);
+    free(image);
+}
+
+IMAGE *createFromFd(JNIEnv *env, int fd);
+
+IMAGE *createFromAddr(JNIEnv *env, void *addr, long size);
 
 IMAGE *create(int32_t width, int32_t height, const void *data);
 
-int get_width(IMAGE *image, int format);
-
-int get_height(IMAGE *image, int format);
-
-int get_byte_count(IMAGE *image, int format);
-
-void render(IMAGE *image, int format, int src_x, int src_y,
+void render(IMAGE *image, int src_x, int src_y,
             void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
             int width, int height, bool fill_blank, int default_color);
 
-void advance(IMAGE *image, int format);
+void advance(IMAGE *image);
 
-int get_delay(IMAGE *image, int format);
-
-bool is_opaque(IMAGE *image, int format);
-
-bool is_gray(IMAGE *image, int format, int error);
-
-void clahe(IMAGE *image, int format, bool to_gray);
-
-void recycle(JNIEnv *env, IMAGE *image, int format);
+int get_delay(IMAGE *image);
 
 #endif //IMAGE_IMAGE_H

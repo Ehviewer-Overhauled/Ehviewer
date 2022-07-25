@@ -20,6 +20,7 @@
 
 #include "java_wrapper.h"
 #include "image.h"
+#include "image_utils.h"
 #include "log.h"
 
 static JavaVM *jvm;
@@ -80,42 +81,28 @@ jobject create_image_object(JNIEnv *env, void *ptr, int format, int width, int h
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env,
-                                             jclass clazz, jint fd, jboolean partially) {
-    int format;
-    void *image;
-    jobject image_object;
+Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env, jclass clazz, jint fd) {
+    IMAGE *image;
 
-    image = createFromFd(env, fd, partially, &format);
+    image = createFromFd(env, fd);
     if (image == NULL) {
         return NULL;
     }
 
-    image_object = create_image_object(env, image, format,
-                                       get_width(image, format), get_height(image, format));
-    if (image_object == NULL) {
-        recycle(env, image, format);
-        return NULL;
-    } else {
-        return image_object;
-    }
+    return create_image_object(env, image, image->isAnimated, image->width, image->height);
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_hippo_image_Image_nativeDecode(JNIEnv *env,
-                                        jclass clazz, jobject fd, jboolean partially) {
+Java_com_hippo_image_Image_nativeDecode(JNIEnv *env, jclass clazz, jobject fd) {
     return Java_com_hippo_image_Image_nativeDecodeFdInt(env, clazz,
-                                                        jniGetFDFromFileDescriptor(env, fd),
-                                                        partially);
+                                                        jniGetFDFromFileDescriptor(env, fd));
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_hippo_image_Image_nativeCreate(JNIEnv *env,
-                                        jclass clazz, jobject bitmap) {
+Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitmap) {
     AndroidBitmapInfo info;
     void *pixels = NULL;
     void *image = NULL;
-    jobject image_object;
 
     AndroidBitmap_getInfo(env, bitmap, &info);
     AndroidBitmap_lockPixels(env, bitmap, &pixels);
@@ -125,35 +112,14 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv *env,
     }
 
     image = create(info.width, info.height, pixels);
-
     AndroidBitmap_unlockPixels(env, bitmap);
-
-    if (image == NULL) {
-        return NULL;
-    }
-
-    image_object = create_image_object(env, image, 0,
-                                       info.width, info.height);
-    if (image_object == NULL) {
-        recycle(env, image, 0);
-        return NULL;
-    } else {
-        return image_object;
-    }
-}
-
-JNIEXPORT jint JNICALL
-Java_com_hippo_image_Image_nativeGetByteCount(JNIEnv *env,
-                                              jclass clazz, jlong ptr, jint format) {
-    return (jint) get_byte_count((void *) (intptr_t) ptr, format);
+    return create_image_object(env, image, 0, info.width, info.height);
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeRender(JNIEnv *env,
-                                        jclass clazz, jlong ptr, jint format,
-                                        jint src_x, jint src_y, jobject dst, jint dst_x, jint dst_y,
-                                        jint width, jint height, jboolean fill_blank,
-                                        jint default_color) {
+Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jlong ptr, jint src_x,
+                                        jint src_y, jobject dst, jint dst_x, jint dst_y, jint width,
+                                        jint height, jboolean fill_blank, jint default_color) {
     AndroidBitmapInfo info;
     void *pixels = NULL;
 
@@ -164,82 +130,52 @@ Java_com_hippo_image_Image_nativeRender(JNIEnv *env,
         return;
     }
 
-    render((void *) (intptr_t) ptr, format, src_x, src_y,
-           pixels, info.width, info.height, dst_x, dst_y,
-           width, height, fill_blank, default_color);
+    render((IMAGE *) ptr, src_x, src_y, pixels, info.width, info.height, dst_x, dst_y, width,
+           height, fill_blank, default_color);
 
     AndroidBitmap_unlockPixels(env, dst);
-
-    return;
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeTexImage(JNIEnv *env,
-                                          jclass clazz, jlong ptr, jint format, jboolean init,
+Java_com_hippo_image_Image_nativeTexImage(JNIEnv *env, jclass clazz, jlong ptr, jboolean init,
                                           jint src_x, jint src_y, jint width, jint height) {
-    // Check tile_buffer NULL
-    if (NULL == tile_buffer) {
+    if (width * height > IMAGE_TILE_MAX_SIZE)
         return;
-    }
-    // Check render size
-    if (width * height > IMAGE_TILE_MAX_SIZE) {
-        return;
-    }
 
-    render((void *) (intptr_t) ptr, format, src_x, src_y,
-           tile_buffer, width, height, 0, 0,
-           width, height, false, 0);
+    render((IMAGE *) ptr, src_x, src_y, tile_buffer, width, height, 0, 0, width, height, false, 0);
 
     if (init) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, tile_buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                     tile_buffer);
     } else {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RGBA, GL_UNSIGNED_BYTE, tile_buffer);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
+                        tile_buffer);
     }
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeAdvance(JNIEnv *env,
-                                         jclass clazz, jlong ptr, jint format) {
-    advance((void *) (intptr_t) ptr, format);
+Java_com_hippo_image_Image_nativeAdvance(JNIEnv *env, jclass clazz, jlong ptr) {
+    advance((IMAGE *) ptr);
 }
 
 JNIEXPORT jint JNICALL
-Java_com_hippo_image_Image_nativeGetDelay(JNIEnv *env,
-                                          jclass clazz, jlong ptr, jint format) {
-    return (jint) get_delay((void *) (intptr_t) ptr, format);
+Java_com_hippo_image_Image_nativeGetDelay(JNIEnv *env, jclass clazz, jlong ptr) {
+    return get_delay((IMAGE *) ptr);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_hippo_image_Image_nativeIsOpaque(JNIEnv *env,
-                                          jclass clazz, jlong ptr, jint format) {
-    return (jboolean) is_opaque((void *) (intptr_t) ptr, format);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_com_hippo_image_Image_nativeIsGray(JNIEnv *env,
-                                        jclass clazz, jlong ptr, jint format, jint error) {
-    return (jboolean) is_gray((void *) (intptr_t) ptr, format, error);
+Java_com_hippo_image_Image_nativeIsOpaque(JNIEnv *env, jclass clazz, jlong ptr) {
+    return ((IMAGE *) ptr)->alpha;
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeClahe(JNIEnv *env,
-                                       jclass clazz, jlong ptr, jint format, jboolean to_gray) {
-    clahe((void *) (intptr_t) ptr, format, to_gray);
-}
-
-JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeRecycle(JNIEnv *env,
-                                         jclass clazz, jlong ptr, jint format) {
-    recycle(env, (void *) (intptr_t) ptr, format);
+Java_com_hippo_image_Image_nativeRecycle(JNIEnv *env, jclass clazz, jlong ptr) {
+    recycle((IMAGE *) ptr);
 }
 
 bool image_onLoad(JavaVM *vm) {
     jvm = vm;
-
     tile_buffer = malloc(IMAGE_TILE_MAX_SIZE * 4);
-
     return true;
 }
 
@@ -249,31 +185,10 @@ JNI_OnUnload(JavaVM *vm, void *reserved) {
     tile_buffer = NULL;
 }
 
-typedef struct Memarea {
-    void *buffer;
-    long size;
-} Memarea;
-
 JNIEXPORT jobject JNICALL
-Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr,
-                                            jboolean partially) {
-    int format;
-    void *image;
-    jobject image_object;
-
+Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr) {
     Memarea *memarea = (Memarea *) addr;
-    image = createFromAddr(env, memarea->buffer, memarea->size, partially, &format);
+    IMAGE *image = createFromAddr(env, memarea->buffer, memarea->size);
     free(memarea);
-    if (image == NULL) {
-        return NULL;
-    }
-
-    image_object = create_image_object(env, image, format,
-                                       get_width(image, format), get_height(image, format));
-    if (image_object == NULL) {
-        recycle(env, image, format);
-        return NULL;
-    } else {
-        return image_object;
-    }
+    return create_image_object(env, image, image->isAnimated, image->width, image->height);
 }

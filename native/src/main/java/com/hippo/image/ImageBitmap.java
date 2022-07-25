@@ -45,7 +45,6 @@ public final class ImageBitmap implements Animatable, Runnable {
     private final Bitmap mBitmap;
     private final int mFormat;
     private final boolean mIsOpaque;
-    private final int mByteCount;
     private final Set<WeakReference<Callback>> mCallbackSet = new LinkedHashSet<>();
     @Nullable
     private Image mImage;
@@ -60,7 +59,6 @@ public final class ImageBitmap implements Animatable, Runnable {
         image.render(0, 0, mBitmap, 0, 0, width, height, false, 0);
         mFormat = image.getFormat();
         mIsOpaque = image.isOpaque();
-        mByteCount = image.getByteCount();
 
         if (mFormat == 1) {
             // For animated image, save image object
@@ -75,7 +73,6 @@ public final class ImageBitmap implements Animatable, Runnable {
         mFormat = Image.FORMAT_NORMAL;
         mBitmap = bitmap;
         mIsOpaque = !bitmap.hasAlpha();
-        mByteCount = bitmap.getRowBytes() * bitmap.getHeight();
     }
 
     /**
@@ -219,13 +216,6 @@ public final class ImageBitmap implements Animatable, Runnable {
      */
     public boolean isOpaque() {
         return mIsOpaque;
-    }
-
-    /**
-     * Return byte count of image
-     */
-    public int getByteCount() {
-        return mByteCount;
     }
 
     /**

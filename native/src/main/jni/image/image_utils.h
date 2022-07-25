@@ -30,4 +30,10 @@ void copy_pixels(const void *src, int src_w, int src_h, int src_x, int src_y,
                  void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
                  int width, int height, bool fill_blank, int default_color);
 
+#define STRINGIZE(L) #L
+#define MAKESTRING(M, L) M(L)
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 #endif //IMAGE_IMAGE_UTILS_H

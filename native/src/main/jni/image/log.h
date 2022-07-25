@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-//
-// Created by Hippo on 10/19/2015.
-//
-
 #ifndef LOG_H
 #define LOG_H
 
 #include <android/log.h>
 
-#include "utils.h"
-
-#define TAG "Image"
+#define TAG "ImageDecoder_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG ,__VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG ,__VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, TAG ,__VA_ARGS__)

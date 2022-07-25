@@ -20,9 +20,7 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
-import java.io.BufferedInputStream;
 import java.io.FileDescriptor;
-import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -54,7 +52,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(FileDescriptor fd, boolean partially) {
-        return nativeDecode(fd, partially);
+        return nativeDecode(fd);
     }
 
     /**
@@ -62,7 +60,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(Integer fd, boolean partially) {
-        return nativeDecodeFdInt(fd, partially);
+        return nativeDecodeFdInt(fd);
     }
 
     /**
@@ -70,7 +68,7 @@ public final class Image {
      */
     @Nullable
     public static Image decodeAddr(Long addr, boolean partially) {
-        return nativeDecodeAddr(addr, partially);
+        return nativeDecodeAddr(addr);
     }
 
     /**
@@ -89,34 +87,27 @@ public final class Image {
         return sImageCount.get();
     }
 
-    private static native Image nativeDecode(FileDescriptor fd, boolean partially);
+    private static native Image nativeDecode(FileDescriptor fd);
 
-    private static native Image nativeDecodeFdInt(int fd, boolean partially);
+    private static native Image nativeDecodeFdInt(int fd);
 
-    private static native Image nativeDecodeAddr(long addr, boolean partially);
+    private static native Image nativeDecodeAddr(long addr);
 
     private static native Image nativeCreate(Bitmap bitmap);
 
-    private static native int nativeGetByteCount(long nativePtr, int format);
-
-    private static native void nativeRender(long nativePtr, int format,
+    private static native void nativeRender(long nativePtr,
                                             int srcX, int srcY, Bitmap dst, int dstX, int dstY,
                                             int width, int height, boolean fillBlank, int defaultColor);
 
-    private static native void nativeTexImage(long nativePtr, int format,
-                                              boolean init, int offsetX, int offsetY, int width, int height);
+    private static native void nativeTexImage(long nativePtr, boolean init, int offsetX, int offsetY, int width, int height);
 
-    private static native void nativeAdvance(long nativePtr, int format);
+    private static native void nativeAdvance(long nativePtr);
 
-    private static native int nativeGetDelay(long nativePtr, int format);
+    private static native int nativeGetDelay(long nativePtr);
 
-    private static native boolean nativeIsOpaque(long nativePtr, int format);
+    private static native boolean nativeIsOpaque(long nativePtr);
 
-    private static native boolean nativeIsGray(long nativePtr, int format, int error);
-
-    private static native void nativeClahe(long nativePtr, int format, boolean toGray);
-
-    private static native void nativeRecycle(long nativePtr, int format);
+    private static native void nativeRecycle(long nativePtr);
 
     /**
      * Return the format of the image
@@ -139,14 +130,6 @@ public final class Image {
         return mHeight;
     }
 
-    /**
-     * Return the minimum number of bytes that can be used to store this image's pixels.
-     */
-    public int getByteCount() {
-        checkRecycled();
-        return nativeGetByteCount(mNativePtr, mFormat);
-    }
-
     private void checkRecycled() {
         if (mNativePtr == 0) {
             if (mRecycleTracker != null) {
@@ -163,7 +146,7 @@ public final class Image {
     public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
                        int width, int height, boolean fillBlank, int defaultColor) {
         checkRecycled();
-        nativeRender(mNativePtr, mFormat, srcX, srcY, dst, dstX, dstY,
+        nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY,
                 width, height, fillBlank, defaultColor);
     }
 
@@ -174,7 +157,7 @@ public final class Image {
      */
     public void texImage(boolean init, int offsetX, int offsetY, int width, int height) {
         checkRecycled();
-        nativeTexImage(mNativePtr, mFormat, init, offsetX, offsetY, width, height);
+        nativeTexImage(mNativePtr, init, offsetX, offsetY, width, height);
     }
 
     /**
@@ -182,7 +165,7 @@ public final class Image {
      */
     public void advance() {
         checkRecycled();
-        nativeAdvance(mNativePtr, mFormat);
+        nativeAdvance(mNativePtr);
     }
 
     /**
@@ -190,7 +173,7 @@ public final class Image {
      */
     public int getDelay() {
         checkRecycled();
-        int delay = nativeGetDelay(mNativePtr, mFormat);
+        int delay = nativeGetDelay(mNativePtr);
         return delay <= 10 ? 100 : delay;
     }
 
@@ -199,23 +182,7 @@ public final class Image {
      */
     public boolean isOpaque() {
         checkRecycled();
-        return nativeIsOpaque(mNativePtr, mFormat);
-    }
-
-    /**
-     * Return {@code true} if the image is gray.
-     */
-    public boolean isGray(int error) {
-        checkRecycled();
-        return nativeIsGray(mNativePtr, mFormat, error);
-    }
-
-    /**
-     * Improves contrast in this image with CLAHE.
-     */
-    public void clahe(boolean toGray) {
-        checkRecycled();
-        nativeClahe(mNativePtr, mFormat, toGray);
+        return nativeIsOpaque(mNativePtr);
     }
 
     /**
@@ -225,7 +192,7 @@ public final class Image {
      */
     public void recycle() {
         if (mNativePtr != 0) {
-            nativeRecycle(mNativePtr, mFormat);
+            nativeRecycle(mNativePtr);
             mNativePtr = 0;
 
             sImageCount.getAndDecrement();

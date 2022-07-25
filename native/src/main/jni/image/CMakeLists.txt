@@ -18,8 +18,6 @@ project(image C)
 set(IMAGE_SOURCES
         image.c
         image_utils.c
-        filter/clahe.c
-        filter/gray.c
         java_wrapper.c
         )
 set(IMAGE_INCLUDES
