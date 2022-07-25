@@ -257,7 +257,11 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     if (streams.get(index) != null) {
                         continue;
                     }
-                    long addr = archiveAccessor.extracttoOutputStream(index);
+                }
+
+                long addr = archiveAccessor.extracttoOutputStream(index);
+
+                synchronized (streams) {
                     streams.put(index, addr);
                     streams.notify();
                 }
