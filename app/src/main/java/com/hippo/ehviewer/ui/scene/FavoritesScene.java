@@ -45,8 +45,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.annotation.Implemented;
@@ -311,38 +309,7 @@ public class FavoritesScene extends BaseScene implements
             mHelper.firstRefresh();
         }
 
-        guideCollections();
-
         return view;
-    }
-
-    private void guideCollections() {
-        Activity activity = getMainActivity();
-        if (null == activity || !Settings.getGuideCollections()) {
-            return;
-        }
-
-        Display display = activity.getWindowManager().getDefaultDisplay();
-        Point point = new Point();
-        display.getSize(point);
-        Rect bounds = new Rect(point.x + LayoutUtils.dp2pix(requireContext(), 20),
-                point.y / 3 + LayoutUtils.dp2pix(requireContext(), 20),
-                point.x - LayoutUtils.dp2pix(requireContext(), 20),
-                point.y / 3 - LayoutUtils.dp2pix(requireContext(), 20));
-
-        TapTargetView.showFor(requireActivity(),
-                TapTarget.forBounds(bounds,
-                                getString(R.string.guide_collections_title),
-                                getString(R.string.guide_collections_text))
-                        .transparentTarget(true),
-                new TapTargetView.Listener() {
-                    @Override
-                    public void onTargetDismissed(TapTargetView view, boolean userInitiated) {
-                        super.onTargetClick(view);
-                        Settings.putGuideCollections(false);
-                        openDrawer(Gravity.RIGHT);
-                    }
-                });
     }
 
     // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
