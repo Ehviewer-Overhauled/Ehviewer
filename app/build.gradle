@@ -107,7 +107,7 @@ dependencies {
     implementation "androidx.biometric:biometric-ktx:1.2.0-alpha04"
     implementation "androidx.browser:browser:1.4.0"
 
-    def collection_version = "1.3.0-alpha01"
+    def collection_version = "1.3.0-alpha02"
     implementation "androidx.collection:collection:$collection_version"
     implementation "androidx.collection:collection-ktx:$collection_version"
 
