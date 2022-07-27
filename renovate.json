@@ -1,4 +1,9 @@
 {
+  "baseBranches": [
+    "1.8.x.x",
+    "1.7.x.x"
+  ],
+
   "extends": [
     "config:base"
   ]
