@@ -17,15 +17,13 @@
 #include <stdlib.h>
 #include <android/bitmap.h>
 #include <GLES2/gl2.h>
+#include <jni.h>
 
 #include "java_wrapper.h"
 #include "image.h"
-#include "image_utils.h"
 #include "log.h"
 
-static JavaVM *jvm;
-
-static void *tile_buffer;
+static void *tile_buffer = NULL;
 
 static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
     jint fd = -1;
@@ -41,54 +39,20 @@ static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
     return fd;
 }
 
-JNIEnv *obtain_env(bool *attach) {
-    JNIEnv *env;
-    switch ((*jvm)->GetEnv(jvm, (void **) &env, JNI_VERSION_1_6)) {
-        case JNI_EDETACHED:
-            if ((*jvm)->AttachCurrentThread(jvm, &env, NULL) == JNI_OK) {
-                *attach = true;
-                return env;
-            } else {
-                return NULL;
-            }
-        case JNI_OK:
-            *attach = false;
-            return env;
-        default:
-        case JNI_EVERSION:
-            return NULL;
-    }
-}
-
-void release_env() {
-    (*jvm)->DetachCurrentThread(jvm);
-}
-
 jobject create_image_object(JNIEnv *env, void *ptr, int format, int width, int height) {
     jclass image_clazz;
     jmethodID constructor;
 
     image_clazz = (*env)->FindClass(env, "com/hippo/image/Image");
     constructor = (*env)->GetMethodID(env, image_clazz, "<init>", "(JIII)V");
-    if (constructor == 0) {
-        LOGE(MSG("Can't find Image object constructor"));
-        return NULL;
-    } else {
-        return (*env)->NewObject(env, image_clazz, constructor,
-                                 (jlong) (uintptr_t) ptr, (jint) format, (jint) width,
-                                 (jint) height);
-    }
+    return (*env)->NewObject(env, image_clazz, constructor,
+                             (jlong) (uintptr_t) ptr, (jint) format, (jint) width,
+                             (jint) height);
 }
 
 JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env, jclass clazz, jint fd) {
-    IMAGE *image;
-
-    image = createFromFd(env, fd);
-    if (image == NULL) {
-        return NULL;
-    }
-
+    IMAGE *image = createFromFd(fd);
     return create_image_object(env, image, image->isAnimated, image->width, image->height);
 }
 
@@ -106,10 +70,6 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitma
 
     AndroidBitmap_getInfo(env, bitmap, &info);
     AndroidBitmap_lockPixels(env, bitmap, &pixels);
-    if (pixels == NULL) {
-        LOGE(MSG("Can't lock bitmap pixels"));
-        return NULL;
-    }
 
     image = create(info.width, info.height, pixels);
     AndroidBitmap_unlockPixels(env, bitmap);
@@ -125,10 +85,6 @@ Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jlong ptr, ji
 
     AndroidBitmap_getInfo(env, dst, &info);
     AndroidBitmap_lockPixels(env, dst, &pixels);
-    if (pixels == NULL) {
-        LOGE(MSG("Can't lock bitmap pixels"));
-        return;
-    }
 
     render((IMAGE *) ptr, src_x, src_y, pixels, info.width, info.height, dst_x, dst_y, width,
            height);
@@ -160,7 +116,7 @@ Java_com_hippo_image_Image_nativeAdvance(JNIEnv *env, jclass clazz, jlong ptr) {
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_image_Image_nativeGetDelay(JNIEnv *env, jclass clazz, jlong ptr) {
-    return get_delay((IMAGE *) ptr);
+    return ((IMAGE *) ptr)->delay;
 }
 
 JNIEXPORT jboolean JNICALL
@@ -173,14 +129,12 @@ Java_com_hippo_image_Image_nativeRecycle(JNIEnv *env, jclass clazz, jlong ptr) {
     recycle((IMAGE *) ptr);
 }
 
-bool image_onLoad(JavaVM *vm) {
-    jvm = vm;
+bool image_onLoad() {
     tile_buffer = malloc(IMAGE_TILE_MAX_SIZE * 4);
-    return true;
+    return tile_buffer != NULL;
 }
 
-JNIEXPORT void JNICALL
-JNI_OnUnload(JavaVM *vm, void *reserved) {
+void image_onUnload() {
     free(tile_buffer);
     tile_buffer = NULL;
 }
@@ -188,7 +142,7 @@ JNI_OnUnload(JavaVM *vm, void *reserved) {
 JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr) {
     Memarea *memarea = (Memarea *) addr;
-    IMAGE *image = createFromAddr(env, memarea->buffer, memarea->size);
+    IMAGE *image = createFromAddr(memarea->buffer, memarea->size);
     free(memarea);
     return create_image_object(env, image, image->isAnimated, image->width, image->height);
 }

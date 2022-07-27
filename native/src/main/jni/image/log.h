@@ -27,11 +27,4 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG ,__VA_ARGS__)
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, TAG ,__VA_ARGS__)
 
-#define FILE_LINE MAKESTRING(STRINGIZE, __LINE__ )
-#define MSG(msg) __FILE__ "(" FILE_LINE "): "msg
-
-#define OUT_OF_MEMORY "Out of memory"
-
-#define WTF_OM LOGE(MSG(OUT_OF_MEMORY))
-
-#endif //LOG_H
+#endif /* LOG_H */

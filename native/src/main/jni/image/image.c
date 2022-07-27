@@ -1,17 +1,20 @@
 /*
- * Copyright 2015 Hippo Seven
+ * Copyright 2022 Tarsin Norbin
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This file is part of EhViewer
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * EhViewer is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * EhViewer is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <android/data_space.h>
@@ -33,12 +36,14 @@ void decodeCommon(IMAGE *image, SOURCE *src) {
     image->alpha =
             AImageDecoderHeaderInfo_getAlphaFlags(headerInfo) == ANDROID_BITMAP_FLAGS_ALPHA_PREMUL;
     src->stride = AImageDecoder_getMinimumStride(decoder);
-    image->bufferLen = image->height * src->stride;
+    image->bufferLen = (int) (image->height * src->stride);
     image->buffer = malloc(image->bufferLen);
     if (image->isAnimated) {
         AImageDecoder_setInternallyHandleDisposePrevious(decoder, false);
-        src->frameInfo = AImageDecoderFrameInfo_create();
-        AImageDecoder_getFrameInfo(decoder, src->frameInfo);
+        AImageDecoderFrameInfo *frameInfo = AImageDecoderFrameInfo_create();
+        AImageDecoder_getFrameInfo(decoder, frameInfo);
+        image->delay = (int) AImageDecoderFrameInfo_getDuration(frameInfo) / 1000000;
+        AImageDecoderFrameInfo_delete(frameInfo);
     }
     AImageDecoder_decodeImage(decoder, image->buffer, src->stride, image->bufferLen);
     if (!image->isAnimated) {
@@ -47,7 +52,7 @@ void decodeCommon(IMAGE *image, SOURCE *src) {
     }
 }
 
-IMAGE *createFromFd(JNIEnv *env, int fd) {
+IMAGE *createFromFd(int fd) {
     AImageDecoder *decoder;
     AImageDecoder_createFromFd(fd, &decoder);
     IMAGE *image = calloc(1, sizeof(IMAGE));
@@ -58,7 +63,7 @@ IMAGE *createFromFd(JNIEnv *env, int fd) {
     return image;
 }
 
-IMAGE *createFromAddr(JNIEnv *env, void *addr, long size) {
+IMAGE *createFromAddr(void *addr, long size) {
     AImageDecoder *decoder;
     AImageDecoder_createFromBuffer((const void *) addr, size, &decoder);
     IMAGE *image = calloc(1, sizeof(IMAGE));
@@ -80,7 +85,7 @@ IMAGE *create(int32_t width, int32_t height, const void *data) {
     plain->width = width;
     plain->height = height;
     plain->buffer = buffer;
-    plain->bufferLen = length;
+    plain->bufferLen = (int) length;
 
     return plain;
 }
@@ -102,10 +107,4 @@ void advance(IMAGE *image) {
                                       image->bufferLen);
         }
     }
-}
-
-int get_delay(IMAGE *image) {
-    if (image->isAnimated)
-        return (int) AImageDecoderFrameInfo_getDuration(image->src->frameInfo) / 1000000;
-    return 0;
 }

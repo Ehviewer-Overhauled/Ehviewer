@@ -39,6 +39,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
+JNIEXPORT void JNICALL
+JNI_OnUnload(JavaVM *vm, void *reserved) {
+    image_onUnload();
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_hippo_Native_getlibarchiveVersion(JNIEnv *env, jclass clazz) {
     return (*env)->NewStringUTF(env, ARCHIVE_VERSION_STRING);

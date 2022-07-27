@@ -20,7 +20,6 @@
 #ifndef IMAGE_JAVA_WRAPPER_H
 #define IMAGE_JAVA_WRAPPER_H
 
-#include <jni.h>
 #include <stdbool.h>
 
 #define IMAGE_TILE_MAX_SIZE (512 * 512)
@@ -30,10 +29,8 @@ typedef struct Memarea {
     long size;
 } Memarea;
 
-bool image_onLoad(JavaVM *vm);
+bool image_onLoad();
 
-JNIEnv *obtain_env(bool *attach);
+void image_onUnload();
 
-void release_env();
-
-#endif // IMAGE_JAVA_WRAPPER_H
+#endif /* IMAGE_JAVA_WRAPPER_H */

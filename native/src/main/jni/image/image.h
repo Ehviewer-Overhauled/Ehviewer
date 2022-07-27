@@ -1,17 +1,20 @@
 /*
- * Copyright 2015 Hippo Seven
+ * Copyright 2022 Tarsin Norbin
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This file is part of EhViewer
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * EhViewer is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * EhViewer is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef IMAGE_IMAGE_H
@@ -19,15 +22,11 @@
 
 #include <android/imagedecoder.h>
 #include <stdbool.h>
-#include <jni.h>
-
-#include "log.h"
 
 typedef struct {
     AImageDecoder *decoder;
     void *srcBuffer;
     size_t stride;
-    AImageDecoderFrameInfo *frameInfo;
     int fd;
 } SOURCE;
 
@@ -38,13 +37,13 @@ typedef struct {
     int bufferLen;
     bool isAnimated;
     bool alpha;
+    int delay;
     SOURCE *src;
 } IMAGE;
 
 static void recycleSource(SOURCE *src) {
     if (!src)
         return;
-    AImageDecoderFrameInfo_delete(src->frameInfo);
     AImageDecoder_delete(src->decoder);
     free(src->srcBuffer);
     free(src);
@@ -58,9 +57,9 @@ static void recycle(IMAGE *image) {
     free(image);
 }
 
-IMAGE *createFromFd(JNIEnv *env, int fd);
+IMAGE *createFromFd(int fd);
 
-IMAGE *createFromAddr(JNIEnv *env, void *addr, long size);
+IMAGE *createFromAddr(void *addr, long size);
 
 IMAGE *create(int32_t width, int32_t height, const void *data);
 
@@ -70,6 +69,4 @@ void render(IMAGE *image, int src_x, int src_y,
 
 void advance(IMAGE *image);
 
-int get_delay(IMAGE *image);
-
-#endif //IMAGE_IMAGE_H
+#endif /* IMAGE_IMAGE_H */
