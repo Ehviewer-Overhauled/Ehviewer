@@ -43,27 +43,21 @@ static char *passwd = NULL;
 static void *archiveAddr = NULL;
 static jlong archiveSize = 0;
 
-const char supportExt[9][6]  = {
-        "jpeg",
-        "jpg",
-        "png",
-        "gif",
-        "webp",
-        "bmp",
-        "ico",
-        "wbmp",
-        "heif"
-};
-
 static int filename_is_playable_file(const char *name) {
     const char *dotptr = strrchr(name, '.');
-    if (!dotptr++)
-        return false;
-    int i;
-    for (i=0; i<9; i++)
-        if (strcmp(dotptr, supportExt[i]) == 0)
-            return true;
-    return false;
+    if (dotptr++) {
+        switch (*dotptr) {
+            case 'j':
+                return (strcmp(dotptr, "jpg") == 0) || (strcmp(dotptr, "jpeg") == 0);
+            case 'p':
+                return strcmp(dotptr, "png") == 0;
+            case 'g':
+                return strcmp(dotptr, "gif") == 0;
+            default:
+                return 0;
+        }
+    }
+    return 0;
 }
 
 static long archive_list_all_entries() {
@@ -117,6 +111,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
                 need_encrypt = true;
                 break;
             case 0: // format supports but no encrypted entry found
+            case ARCHIVE_READ_FORMAT_ENCRYPTION_DONT_KNOW: // Sometimes we might not read through whole file|vm, but it means so far we haven't meet any encrypted entry yet
             default:
                 need_encrypt = false;
         }
@@ -126,35 +121,35 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
     return r;
 }
 
-typedef struct Memarea {
-    void* buffer;
-    long size;
-} Memarea;
-
-JNIEXPORT jlong JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index) {
+JNIEXPORT void JNICALL
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index,
+                                                        jint fd) {
     struct archive_entry *entry;
+    size_t size;
     int ret;
+    la_int64_t offset;
+    const void *buff;
     if (!arc || index < cur_index) {
         archive_alloc();
         cur_index = 0;
     }
-    Memarea* memarea = malloc(sizeof(Memarea));
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (cur_index++ == index) {
-            memarea->size = archive_entry_size(entry);
-            memarea->buffer = malloc(memarea->size);
-            ret = archive_read_data(arc, memarea->buffer, memarea->size);
-            if(ret != memarea->size)
-                LOGE("%s", "No enough data read, WTF?");
-            if (ret < 0)
-                LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
+            for (;;) {
+                ret = archive_read_data_block(arc, &buff, &size, &offset);
+                if (ret == ARCHIVE_EOF)
+                    break;
+                if (ret != ARCHIVE_OK) {
+                    LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
+                    break;
+                }
+                write(fd, buff, size);
+            }
             break;
         }
     }
-    return (jlong) memarea;
 }
 
 JNIEXPORT void JNICALL
