@@ -17,7 +17,6 @@
 package com.hippo.image;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -39,11 +38,11 @@ public final class Image {
     private final int mWidth;
     private final int mHeight;
     private long mNativePtr;
-    private Throwable mRecycleTracker;
 
     private Image(long nativePtr, int format, int width, int height) {
         if (needEvictAll)
             evictAll();
+
         mNativePtr = nativePtr;
         mFormat = format;
         mWidth = width;
@@ -57,11 +56,7 @@ public final class Image {
     }
 
     private static void evictAll() {
-        for (Image image : imageList) {
-            nativeRecycle(image.mNativePtr);
-            image.mNativePtr = 0;
-        }
-        imageList.clear();
+        (new ArrayList<>(imageList)).forEach(Image::recycle);
         needEvictAll = false;
     }
 
@@ -150,11 +145,7 @@ public final class Image {
 
     private void checkRecycled() {
         if (mNativePtr == 0) {
-            if (mRecycleTracker != null) {
-                throw new IllegalStateException("The image is recycled.", mRecycleTracker);
-            } else {
-                throw new IllegalStateException("The image is recycled.");
-            }
+            throw new IllegalStateException("The image is recycled.");
         }
     }
 
@@ -207,14 +198,11 @@ public final class Image {
      * It must be called when the image will not be used.
      * The image can't be used after this method is called.
      */
-    public void recycle() {
+    public synchronized void recycle() {
         if (mNativePtr != 0) {
             nativeRecycle(mNativePtr);
             mNativePtr = 0;
-
             imageList.remove(this);
-
-            mRecycleTracker = new Throwable("It's a ImageRecycleTracker");
         }
     }
 
