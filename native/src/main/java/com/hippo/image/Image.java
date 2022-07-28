@@ -17,11 +17,12 @@
 package com.hippo.image;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import java.io.FileDescriptor;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
 
 /**
  * The {@code Image} is a image which stored pixel data in native heap
@@ -31,7 +32,9 @@ public final class Image {
 
     public static final int FORMAT_ANIMATED = 1;
 
-    private static final AtomicInteger sImageCount = new AtomicInteger();
+    private static final ArrayList<Image> imageList = new ArrayList<>();
+    private static boolean needEvictAll = false;
+
     private final int mFormat;
     private final int mWidth;
     private final int mHeight;
@@ -39,12 +42,27 @@ public final class Image {
     private Throwable mRecycleTracker;
 
     private Image(long nativePtr, int format, int width, int height) {
+        if (needEvictAll)
+            evictAll();
         mNativePtr = nativePtr;
         mFormat = format;
         mWidth = width;
         mHeight = height;
 
-        sImageCount.getAndIncrement();
+        imageList.add(this);
+    }
+
+    public static void lazyEvictAll() {
+        needEvictAll = true;
+    }
+
+    private static void evictAll() {
+        for (Image image : imageList) {
+            nativeRecycle(image.mNativePtr);
+            image.mNativePtr = 0;
+        }
+        imageList.clear();
+        needEvictAll = false;
     }
 
     /**
@@ -84,7 +102,7 @@ public final class Image {
      * It is useful for debug.
      */
     public static int getImageCount() {
-        return sImageCount.get();
+        return imageList.size();
     }
 
     private static native Image nativeDecode(FileDescriptor fd);
@@ -194,7 +212,7 @@ public final class Image {
             nativeRecycle(mNativePtr);
             mNativePtr = 0;
 
-            sImageCount.getAndDecrement();
+            imageList.remove(this);
 
             mRecycleTracker = new Throwable("It's a ImageRecycleTracker");
         }
