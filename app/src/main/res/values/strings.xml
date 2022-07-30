@@ -820,8 +820,8 @@
     <string name="pick_new_download_location">Pick a new location</string>
     <string name="dont_show_again">Don\'t show again</string>
     <string name="open_settings">Open settings</string>
-    <string name="app_link_not_verified_message">For Android 12 and newer, you need to manually add link to verified links in order to open E-Hentai links in EhViewer.</string>
-    <string name="app_link_not_verified_title">App links not verified</string>
+    <string name="app_link_not_verified_message">For you device, We strongly recommend you to use version 1.8. version 1.7 is only made for Android 11 and below .</string>
+    <string name="app_link_not_verified_title">Update App Version</string>
     <string name="open_by_default">Open by default</string>
 
     <string name="show_library_version">Library Version</string>
