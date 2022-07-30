@@ -36,7 +36,6 @@ with Material Design 3 and Dynamic Color Support
 
 [Github 下载](https://github.com/Ehviewer-Overhauled/Ehviewer/releases)
 
-[CI 版本下载（需登录）](https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml)
 
 # Screenshot
 
