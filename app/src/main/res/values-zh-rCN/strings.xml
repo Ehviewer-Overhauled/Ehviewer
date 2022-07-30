@@ -756,8 +756,8 @@
     <string name="pick_new_download_location">选择新路径</string>
     <string name="dont_show_again">不再显示</string>
     <string name="open_settings">打开设置</string>
-    <string name="app_link_not_verified_message">对于 Android 12 及更新的版本，您需要手动添加链接到已验证链接才能在 EhViewer 中打开 E-Hentai 链接。</string>
-    <string name="app_link_not_verified_title">应用链接未验证</string>
+    <string name="app_link_not_verified_message">对于您的设备，我们强烈建议您使用 1.8 版本。1.7 版本仅为 Android 11 及以下版本设计</string>
+    <string name="app_link_not_verified_title">升级 App 版本</string>
     <string name="open_by_default">默认打开</string>
 
     <string name="show_library_version">依赖库之版本</string>
