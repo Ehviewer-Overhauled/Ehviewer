@@ -36,6 +36,7 @@ with Material Design 3 and Dynamic Color Support
 
 [Github 下载](https://github.com/Ehviewer-Overhauled/Ehviewer/releases)
 
+App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系统，为开发主线；1.7 版本适配 Android 11 及以下版本，削减了 Android 12 及以上系统的独有功能，使其能在低版本 Android 上正常工作
 
 # Screenshot
 
