@@ -53,8 +53,9 @@ void decodeCommon(IMAGE *image, SOURCE *src) {
 }
 
 IMAGE *createFromFd(int fd) {
-    AImageDecoder *decoder;
-    AImageDecoder_createFromFd(fd, &decoder);
+    AImageDecoder *decoder = NULL;
+    if (AImageDecoder_createFromFd(fd, &decoder) != ANDROID_IMAGE_DECODER_SUCCESS)
+        return NULL;
     IMAGE *image = calloc(1, sizeof(IMAGE));
     SOURCE *src = calloc(1, sizeof(SOURCE));
     src->decoder = decoder;

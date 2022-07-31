@@ -53,6 +53,8 @@ jobject create_image_object(JNIEnv *env, void *ptr, int format, int width, int h
 JNIEXPORT jobject JNICALL
 Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env, jclass clazz, jint fd) {
     IMAGE *image = createFromFd(fd);
+    if (!image)
+        return NULL;
     return create_image_object(env, image, image->isAnimated, image->width, image->height);
 }
 
