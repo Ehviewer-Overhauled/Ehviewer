@@ -28,7 +28,6 @@ import com.hippo.scene.Announcer;
  */
 public class SolidScene extends BaseScene {
 
-    public static final int CHECK_STEP_SECURITY = 0;
     public static final int CHECK_STEP_SIGN_IN = 1;
     public static final int CHECK_STEP_SELECT_SITE = 2;
     public static final String KEY_TARGET_SCENE = "target_scene";
@@ -37,11 +36,6 @@ public class SolidScene extends BaseScene {
 
     public void startSceneForCheckStep(int checkStep, Bundle args) {
         switch (checkStep) {
-            case CHECK_STEP_SECURITY:
-                if (EhUtils.needSignedIn(getContext())) {
-                    startScene(new Announcer(SignInScene.class).setArgs(args), true);
-                    break;
-                }
             case CHECK_STEP_SIGN_IN:
                 if (Settings.getSelectSite()) {
                     startScene(new Announcer(SelectSiteScene.class).setArgs(args), true);
