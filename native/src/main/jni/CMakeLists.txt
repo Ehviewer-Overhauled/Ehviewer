@@ -1,17 +1,17 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -flto\
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -flto \
            -mllvm -polly \
            -mllvm -polly-run-dce \
-		   -mllvm -polly-run-inliner \
+           -mllvm -polly-run-inliner \
            -mllvm -polly-isl-arg=--no-schedule-serialize-sccs \
-		   -mllvm -polly-ast-use-context \
+           -mllvm -polly-ast-use-context \
            -mllvm -polly-detect-keep-going \
            -mllvm -polly-position=before-vectorizer \
-		   -mllvm -polly-vectorizer=stripmine \
+           -mllvm -polly-vectorizer=stripmine \
            -mllvm -polly-detect-profitability-min-per-loop-insts=40 \
-		   -mllvm -polly-invariant-load-hoisting")
+           -mllvm -polly-invariant-load-hoisting")
 
 # Build GNUTLS libnettle
 add_subdirectory(nettle)
