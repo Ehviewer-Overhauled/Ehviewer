@@ -71,7 +71,6 @@ import com.hippo.ehviewer.ui.scene.SecurityScene;
 import com.hippo.ehviewer.ui.scene.SelectSiteScene;
 import com.hippo.ehviewer.ui.scene.SignInScene;
 import com.hippo.ehviewer.ui.scene.SolidScene;
-import com.hippo.ehviewer.ui.scene.WarningScene;
 import com.hippo.ehviewer.ui.scene.WebViewSignInScene;
 import com.hippo.ehviewer.widget.EhStageLayout;
 import com.hippo.io.UniFileInputStreamPipe;
@@ -99,7 +98,6 @@ public final class MainActivity extends StageActivity
 
     static {
         registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
-        registerLaunchMode(WarningScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(SignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(WebViewSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(CookieSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -145,8 +143,6 @@ public final class MainActivity extends StageActivity
     protected Announcer getLaunchAnnouncer() {
         if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
             return new Announcer(SecurityScene.class);
-        } else if (Settings.getShowWarning()) {
-            return new Announcer(WarningScene.class);
         } else if (EhUtils.needSignedIn(this)) {
             return new Announcer(SignInScene.class);
         } else if (Settings.getSelectSite()) {
@@ -166,11 +162,6 @@ public final class MainActivity extends StageActivity
                 newArgs.putString(SecurityScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(SecurityScene.KEY_TARGET_ARGS, announcer.getArgs());
                 return new Announcer(SecurityScene.class).setArgs(newArgs);
-            } else if (Settings.getShowWarning()) {
-                Bundle newArgs = new Bundle();
-                newArgs.putString(WarningScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
-                newArgs.putBundle(WarningScene.KEY_TARGET_ARGS, announcer.getArgs());
-                return new Announcer(WarningScene.class).setArgs(newArgs);
             } else if (EhUtils.needSignedIn(this)) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
