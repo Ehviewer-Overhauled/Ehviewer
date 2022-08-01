@@ -16,10 +16,11 @@
  * If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.hippo.ehviewer.ui.scene
+package com.hippo.ehviewer.ui
 
 import android.content.Context
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
@@ -30,14 +31,10 @@ import androidx.fragment.app.FragmentActivity
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 
-class SecurityScene : SolidScene() {
-    override fun needShowLeftDrawer(): Boolean {
-        return false
-    }
-
+class SecurityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (isAuthenticationSupported(requireContext()))
+        if (isAuthenticationSupported(this))
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
         else
             onSuccess()
@@ -52,7 +49,7 @@ class SecurityScene : SolidScene() {
             title = title,
             subtitle = subtitle,
             confirmationRequired = confirmationRequired,
-            executor = ContextCompat.getMainExecutor(requireContext()),
+            executor = ContextCompat.getMainExecutor(this),
             callback = AuthenticationCallback()
         )
     }
@@ -70,7 +67,7 @@ class SecurityScene : SolidScene() {
             errorCode: Int,
             errString: CharSequence
         ) {
-            requireActivity().finish()
+            moveTaskToBack(true)
         }
     }
 
@@ -84,8 +81,6 @@ class SecurityScene : SolidScene() {
 
     private fun onSuccess() {
         EhApplication.locked = false
-        if (stackIndex == 0)
-            startSceneForCheckStep(CHECK_STEP_SECURITY, arguments)
         finish()
     }
 }

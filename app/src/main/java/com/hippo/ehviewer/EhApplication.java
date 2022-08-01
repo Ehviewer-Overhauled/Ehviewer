@@ -107,7 +107,7 @@ public class EhApplication extends SceneApplication {
     private static final boolean DEBUG_PRINT_IMAGE_COUNT = false;
     private static final long DEBUG_PRINT_INTERVAL = 3000L;
 
-    public static boolean locked = false;
+    public static boolean locked = true;
 
     private static EhApplication instance;
 

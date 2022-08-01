@@ -146,6 +146,12 @@
             android:theme="@style/AppTheme" />
 
         <activity
+            android:name="com.hippo.ehviewer.ui.SecurityActivity"
+            android:configChanges="screenSize"
+            android:label="@string/settings"
+            android:theme="@style/AppTheme" />
+
+        <activity
             android:name="com.hippo.ehviewer.shortcuts.ShortcutsActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"

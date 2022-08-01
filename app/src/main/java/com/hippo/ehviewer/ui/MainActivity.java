@@ -47,7 +47,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
@@ -67,7 +66,6 @@ import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.ehviewer.ui.scene.GalleryPreviewsScene;
 import com.hippo.ehviewer.ui.scene.HistoryScene;
 import com.hippo.ehviewer.ui.scene.ProgressScene;
-import com.hippo.ehviewer.ui.scene.SecurityScene;
 import com.hippo.ehviewer.ui.scene.SelectSiteScene;
 import com.hippo.ehviewer.ui.scene.SignInScene;
 import com.hippo.ehviewer.ui.scene.SolidScene;
@@ -97,7 +95,7 @@ public final class MainActivity extends StageActivity
     private static final String KEY_NAV_CHECKED_ITEM = "nav_checked_item";
 
     static {
-        registerLaunchMode(SecurityScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
+        registerLaunchMode(SecurityActivity.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(SignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(WebViewSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(CookieSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
@@ -141,9 +139,7 @@ public final class MainActivity extends StageActivity
     @NonNull
     @Override
     protected Announcer getLaunchAnnouncer() {
-        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
-            return new Announcer(SecurityScene.class);
-        } else if (EhUtils.needSignedIn(this)) {
+        if (EhUtils.needSignedIn(this)) {
             return new Announcer(SignInScene.class);
         } else if (Settings.getSelectSite()) {
             return new Announcer(SelectSiteScene.class);
@@ -157,12 +153,7 @@ public final class MainActivity extends StageActivity
     // Sometimes scene can't show directly
     private Announcer processAnnouncer(Announcer announcer) {
         if (0 == getSceneCount()) {
-            if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this)) {
-                Bundle newArgs = new Bundle();
-                newArgs.putString(SecurityScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
-                newArgs.putBundle(SecurityScene.KEY_TARGET_ARGS, announcer.getArgs());
-                return new Announcer(SecurityScene.class).setArgs(newArgs);
-            } else if (EhUtils.needSignedIn(this)) {
+            if (EhUtils.needSignedIn(this)) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(SignInScene.KEY_TARGET_ARGS, announcer.getArgs());
@@ -418,9 +409,6 @@ public final class MainActivity extends StageActivity
 
     @Override
     protected void onResume() {
-        if (Settings.getSecurity() && SecurityScene.Companion.isAuthenticationSupported(this) && EhApplication.locked) {
-            startScene(new Announcer(SecurityScene.class), true);
-        }
         super.onResume();
         setNavCheckedItem(mNavCheckedItem);
         checkClipboardUrl();

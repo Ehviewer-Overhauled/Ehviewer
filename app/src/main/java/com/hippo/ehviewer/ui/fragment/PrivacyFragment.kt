@@ -22,7 +22,7 @@ import android.os.Bundle
 import androidx.preference.SwitchPreferenceCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.ui.scene.SecurityScene.Companion.isAuthenticationSupported
+import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupported
 
 /**
  * Created by Mo10 on 2018/2/10.

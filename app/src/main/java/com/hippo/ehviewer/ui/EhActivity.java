@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -123,6 +124,9 @@ public abstract class EhActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        if (Settings.getSecurity() && SecurityActivity.Companion.isAuthenticationSupported(this) && EhApplication.locked) {
+            startActivity(new Intent(this, SecurityActivity.class));
+        }
         super.onResume();
         if (Settings.getEnabledSecurity()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
