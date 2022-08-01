@@ -95,7 +95,6 @@ public final class MainActivity extends StageActivity
     private static final String KEY_NAV_CHECKED_ITEM = "nav_checked_item";
 
     static {
-        registerLaunchMode(SecurityActivity.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(SignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(WebViewSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(CookieSignInScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
