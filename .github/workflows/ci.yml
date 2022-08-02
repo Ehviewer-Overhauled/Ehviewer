@@ -18,9 +18,6 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Setup Android SDK Tools
-        uses: android-actions/setup-android@v2
-
       - name: Install NDK
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.0.8775105" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
