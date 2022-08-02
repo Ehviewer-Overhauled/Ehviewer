@@ -60,7 +60,6 @@ Here is the libraries
 - [jsoup](https://github.com/jhy/jsoup)
 - [okhttp](https://github.com/square/okhttp)
 - [roaster](https://github.com/forge/roaster)
-- [TapTargetView](https://github.com/KeepSafe/TapTargetView)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
 
