@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
 
       - name: Setup Java 11
         uses: actions/setup-java@v3
@@ -16,18 +18,14 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Setup Android SDK Tools
-        uses: android-actions/setup-android@v2
-
       - name: Install NDK
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.0.8775105" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
 
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
-      - run: |
-          git submodule update --init --recursive
-          gradle assembleRelease
+        with:
+          arguments: assembleRelease
 
       - name: Update ARM64
         uses: actions/upload-artifact@v3
