@@ -54,6 +54,7 @@ Here is the libraries
 - [AOSP&AndroidX](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
+- [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
 - [greenDAO](https://github.com/greenrobot/greenDAO)
