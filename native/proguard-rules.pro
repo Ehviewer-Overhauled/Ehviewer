@@ -1,2 +1,2 @@
--keep class com.hippo.* { *; }
--keep class com.hippo.image.* { *; }
+-keepclasseswithmembernames class * { native <methods>;}
+-keepclassmembers class com.hippo.image.Image {private <init>(long, int, int, int);}
