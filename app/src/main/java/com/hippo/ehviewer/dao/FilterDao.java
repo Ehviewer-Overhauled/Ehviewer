@@ -9,10 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface FilterDao {
-
-    String TABLENAME = "FILTER";
-
+public interface FilterDao extends BasicDao<Filter> {
     @Query("SELECT * FROM FILTER")
     List<Filter> list();
 
@@ -25,4 +22,9 @@ public interface FilterDao {
     @Delete
     void delete(Filter filter);
 
+    @Query("SELECT * FROM FILTER")
+    List<Filter> fakeList();
+
+    @Insert
+    void fakeInsert(Filter t);
 }

@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {BookmarkInfo.class, DownloadInfo.class, DownloadLabel.class, DownloadDirname.class, Filter.class, HistoryInfo.class, LocalFavoriteInfo.class, QuickSearch.class}, version = 4, exportSchema = false)
 public abstract class EhDatabase extends RoomDatabase {
-    public abstract BookmarksBao bookmarksBao();
+    public abstract BookmarksDao bookmarksBao();
 
     public abstract DownloadDirnameDao downloadDirnameDao();
 

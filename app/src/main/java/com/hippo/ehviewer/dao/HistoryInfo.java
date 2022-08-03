@@ -9,8 +9,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "HISTORY")
 public class HistoryInfo extends GalleryInfo {
-
-    public static final Creator<HistoryInfo> CREATOR = new Creator<HistoryInfo>() {
+    public static final Creator<HistoryInfo> CREATOR = new Creator<>() {
         @Override
         public HistoryInfo createFromParcel(Parcel source) {
             return new HistoryInfo(source);
@@ -158,5 +157,4 @@ public class HistoryInfo extends GalleryInfo {
         dest.writeInt(this.mode);
         dest.writeLong(this.time);
     }
-
 }

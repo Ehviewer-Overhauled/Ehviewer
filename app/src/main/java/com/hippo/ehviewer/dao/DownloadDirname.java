@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "DOWNLOAD_DIRNAME")
 public class DownloadDirname {
-
     @PrimaryKey
     @ColumnInfo(name = "GID")
     private long gid;
@@ -28,5 +27,4 @@ public class DownloadDirname {
     public void setDirname(String dirname) {
         this.dirname = dirname;
     }
-
 }

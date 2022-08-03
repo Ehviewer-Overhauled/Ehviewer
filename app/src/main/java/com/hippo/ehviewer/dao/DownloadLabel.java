@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "DOWNLOAD_LABELS")
 public class DownloadLabel {
-
     @PrimaryKey
     @ColumnInfo(name = "_id")
     private Long id;
@@ -38,5 +37,4 @@ public class DownloadLabel {
     public void setTime(long time) {
         this.time = time;
     }
-
 }

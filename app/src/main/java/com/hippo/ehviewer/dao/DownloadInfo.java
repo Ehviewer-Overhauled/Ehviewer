@@ -10,8 +10,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "DOWNLOADS")
 public class DownloadInfo extends GalleryInfo {
-
-    public static final Creator<DownloadInfo> CREATOR = new Creator<DownloadInfo>() {
+    public static final Creator<DownloadInfo> CREATOR = new Creator<>() {
         @Override
         public DownloadInfo createFromParcel(Parcel source) {
             return new DownloadInfo(source);
@@ -250,5 +249,4 @@ public class DownloadInfo extends GalleryInfo {
     public void setTotal(int total) {
         this.total = total;
     }
-
 }

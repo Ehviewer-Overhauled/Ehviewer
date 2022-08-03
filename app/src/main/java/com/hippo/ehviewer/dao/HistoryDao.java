@@ -9,8 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface HistoryDao {
-
+public interface HistoryDao extends BasicDao<HistoryInfo> {
     @Query("SELECT * FROM HISTORY WHERE GID = :gid")
     HistoryInfo load(long gid);
 
@@ -24,7 +23,7 @@ public interface HistoryDao {
     void update(HistoryInfo historyInfo);
 
     @Insert
-    void insert(HistoryInfo historyInfo);
+    long insert(HistoryInfo historyInfo);
 
     @Delete
     void delete(HistoryInfo historyInfos);
@@ -35,4 +34,9 @@ public interface HistoryDao {
     @Query("DELETE FROM HISTORY")
     void deleteAll();
 
+    @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
+    List<HistoryInfo> fakeList();
+
+    @Insert
+    void fakeInsert(HistoryInfo t);
 }

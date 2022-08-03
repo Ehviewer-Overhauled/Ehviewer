@@ -1,12 +1,12 @@
 package com.hippo.ehviewer.dao;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "QUICK_SEARCH")
 public class QuickSearch {
-
     @PrimaryKey
     @ColumnInfo(name = "_id")
     public Long id;
@@ -109,9 +109,9 @@ public class QuickSearch {
         this.time = time;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return name;
     }
-
 }

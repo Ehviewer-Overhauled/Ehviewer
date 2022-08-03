@@ -5,12 +5,10 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 
 @Dao
-public interface BookmarksBao {
-
+public interface BookmarksDao {
     @Insert
     void insert(BookmarkInfo bookmark);
 
     @Delete
     void delete(BookmarkInfo bookmark);
-
 }

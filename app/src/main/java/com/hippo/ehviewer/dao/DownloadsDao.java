@@ -9,10 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface DownloadsDao {
-
-    String TABLENAME = "DOWNLOADS";
-
+public interface DownloadsDao extends BasicDao<DownloadInfo> {
     @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC")
     List<DownloadInfo> list();
 
@@ -23,9 +20,14 @@ public interface DownloadsDao {
     void update(DownloadInfo downloadInfo);
 
     @Insert
-    void insert(DownloadInfo downloadInfo);
+    long insert(DownloadInfo downloadInfo);
 
     @Delete
     void delete(DownloadInfo downloadInfo);
 
+    @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC")
+    List<DownloadInfo> fakeList();
+
+    @Insert
+    void fakeInsert(DownloadInfo t);
 }

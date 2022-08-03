@@ -10,7 +10,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 @Entity(tableName = "LOCAL_FAVORITES")
 public class LocalFavoriteInfo extends GalleryInfo {
 
-    public static final Creator<LocalFavoriteInfo> CREATOR = new Creator<LocalFavoriteInfo>() {
+    public static final Creator<LocalFavoriteInfo> CREATOR = new Creator<>() {
         @Override
         public LocalFavoriteInfo createFromParcel(Parcel source) {
             return new LocalFavoriteInfo(source);
@@ -144,5 +144,4 @@ public class LocalFavoriteInfo extends GalleryInfo {
         super.writeToParcel(dest, flags);
         dest.writeLong(this.time);
     }
-
 }

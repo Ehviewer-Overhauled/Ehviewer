@@ -9,8 +9,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "BOOKMARKS")
 public class BookmarkInfo extends GalleryInfo {
-
-    public static final Creator<BookmarkInfo> CREATOR = new Creator<BookmarkInfo>() {
+    public static final Creator<BookmarkInfo> CREATOR = new Creator<>() {
         @Override
         public BookmarkInfo createFromParcel(Parcel source) {
             return new BookmarkInfo(source);
@@ -158,5 +157,4 @@ public class BookmarkInfo extends GalleryInfo {
         dest.writeInt(this.page);
         dest.writeLong(this.time);
     }
-
 }

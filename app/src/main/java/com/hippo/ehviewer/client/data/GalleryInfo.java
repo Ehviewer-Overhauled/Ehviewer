@@ -195,6 +195,7 @@ public class GalleryInfo implements Parcelable {
     }
 
     private void generateSLangFromTags() {
+        assert simpleTags != null;
         for (String tag : simpleTags) {
             for (int i = 0; i < S_LANGS.length; i++) {
                 if (S_LANG_TAGS[i].equals(tag)) {

@@ -9,7 +9,6 @@ import com.hippo.yorozuya.ObjectUtils;
 
 @Entity(tableName = "FILTER")
 public class Filter {
-
     @ColumnInfo(name = "MODE")
     public int mode;
     @ColumnInfo(name = "TEXT")
@@ -65,5 +64,4 @@ public class Filter {
         Filter filter = (Filter) o;
         return filter.mode == mode && ObjectUtils.equal(filter.text, text);
     }
-
 }

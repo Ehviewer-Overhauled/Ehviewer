@@ -29,6 +29,7 @@ import androidx.room.Room;
 
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
+import com.hippo.ehviewer.dao.BasicDao;
 import com.hippo.ehviewer.dao.DownloadDirname;
 import com.hippo.ehviewer.dao.DownloadDirnameDao;
 import com.hippo.ehviewer.dao.DownloadInfo;
@@ -43,15 +44,26 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo;
 import com.hippo.ehviewer.dao.LocalFavoritesDao;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.dao.QuickSearchDao;
+import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.yorozuya.IOUtils;
+import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.collect.SparseJLArray;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EhDB {
 
     private static final String TAG = EhDB.class.getSimpleName();
+
+    private static final int CUR_DB_VER = 4;
 
     private static final int MAX_HISTORY_COUNT = 200;
 
@@ -589,15 +601,159 @@ public class EhDB {
         db.filterDao().update(filter);
     }
 
-    public static synchronized boolean exportDB(Context context, Uri uri) {
+    private static <T> boolean copyDao(BasicDao<T> from, BasicDao<T> to) {
+        List<T> list = from.fakeList();
+        for (T item : list)
+            to.fakeInsert(item);
         return false;
+    }
+
+    public static synchronized boolean exportDB(Context context, Uri uri) {
+        final String ehExportName = "eh.export.db";
+
+        // Delete old export db
+        context.deleteDatabase(ehExportName);
+        EhDatabase newDb = Room.databaseBuilder(context, EhDatabase.class, ehExportName).allowMainThreadQueries().build();
+
+        try {
+            // Copy data to a export db
+            if (copyDao(db.downloadsDao(), newDb.downloadsDao()))
+                return false;
+            if (copyDao(db.downloadLabelDao(), newDb.downloadLabelDao()))
+                return false;
+            if (copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao()))
+                return false;
+            if (copyDao(db.historyDao(), newDb.historyDao()))
+                return false;
+            if (copyDao(db.quickSearchDao(), newDb.quickSearchDao()))
+                return false;
+            if (copyDao(db.localFavoritesDao(), newDb.localFavoritesDao()))
+                return false;
+            if (copyDao(db.filterDao(), newDb.filterDao()))
+                return false;
+
+            // Copy export db to data dir
+            File dbFile = context.getDatabasePath(ehExportName);
+            if (dbFile == null || !dbFile.isFile()) {
+                return false;
+            }
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                is = new FileInputStream(dbFile);
+                os = context.getContentResolver().openOutputStream(uri);
+                IOUtils.copy(is, os);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                IOUtils.closeQuietly(is);
+                IOUtils.closeQuietly(os);
+            }
+            // Delete failed file
+            return false;
+        } finally {
+            context.deleteDatabase(ehExportName);
+        }
     }
 
     /**
      * @return error string, null for no error
      */
     public static synchronized String importDB(Context context, Uri uri) {
-        return "";
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            File file = File.createTempFile("importDatabase", "");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            byte[] buff = new byte[1024];
+            int read;
+            if (inputStream != null) {
+                while ((read = inputStream.read(buff, 0, buff.length)) > 0) {
+                    outputStream.write(buff, 0, read);
+                }
+            } else {
+                return context.getString(R.string.cant_read_the_file);
+            }
+            inputStream.close();
+            outputStream.close();
+
+            SQLiteDatabase oldDB = SQLiteDatabase.openDatabase(
+                    file.getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+            int newVersion = CUR_DB_VER;
+            int oldVersion = oldDB.getVersion();
+            if (oldVersion < newVersion) {
+                upgradeDB(oldDB, oldVersion);
+                oldDB.setVersion(newVersion);
+            } else if (oldVersion > newVersion) {
+                return context.getString(R.string.cant_read_the_file);
+            }
+
+            String tmpDBName = "tmp.db";
+            context.deleteDatabase(tmpDBName);
+            EhDatabase oldRoomDatabase = Room.databaseBuilder(context, EhDatabase.class, tmpDBName)
+                    .createFromFile(file).allowMainThreadQueries().build();
+
+
+            // Downloads
+            DownloadManager manager = EhApplication.getDownloadManager(context);
+            List<DownloadInfo> downloadInfoList = oldRoomDatabase.downloadsDao().list();
+            manager.addDownload(downloadInfoList, false);
+
+            // Download label
+            List<DownloadLabel> downloadLabelList = oldRoomDatabase.downloadLabelDao().list();
+            manager.addDownloadLabel(downloadLabelList);
+
+            // Download dirname
+            List<DownloadDirname> downloadDirnameList = oldRoomDatabase.downloadDirnameDao().fakeList();
+            for (DownloadDirname dirname : downloadDirnameList) {
+                putDownloadDirname(dirname.getGid(), dirname.getDirname());
+            }
+
+            // History
+            List<HistoryInfo> historyInfoList = oldRoomDatabase.historyDao().list();
+            putHistoryInfo(historyInfoList);
+
+            // QuickSearch
+            List<QuickSearch> quickSearchList = oldRoomDatabase.quickSearchDao().list();
+            List<QuickSearch> currentQuickSearchList = db.quickSearchDao().list();
+            List<QuickSearch> importList = new ArrayList<>();
+            for (QuickSearch quickSearch : quickSearchList) {
+                String name = quickSearch.name;
+                for (QuickSearch q : currentQuickSearchList) {
+                    if (ObjectUtils.equal(q.name, name)) {
+                        // The same name
+                        name = null;
+                        break;
+                    }
+                }
+                if (null == name) {
+                    continue;
+                }
+                importList.add(quickSearch);
+            }
+            importQuickSearch(importList);
+
+            // LocalFavorites
+            List<LocalFavoriteInfo> localFavoriteInfoList = oldRoomDatabase.localFavoritesDao().list();
+            for (LocalFavoriteInfo info : localFavoriteInfoList) {
+                putLocalFavorites(info);
+            }
+
+            // Filter
+            List<Filter> filterList = oldRoomDatabase.filterDao().list();
+            List<Filter> currentFilterList = db.filterDao().list();
+            for (Filter filter : filterList) {
+                if (!currentFilterList.contains(filter)) {
+                    addFilter(filter);
+                }
+            }
+
+            return null;
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            // Ignore
+            return context.getString(R.string.cant_read_the_file);
+        }
     }
 
     private static class OldDBHelper extends SQLiteOpenHelper {

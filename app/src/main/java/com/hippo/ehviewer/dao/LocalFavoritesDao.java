@@ -8,10 +8,7 @@ import androidx.room.Query;
 import java.util.List;
 
 @Dao
-public interface LocalFavoritesDao {
-
-    String TABLENAME = "LOCAL_FAVORITES";
-
+public interface LocalFavoritesDao extends BasicDao<LocalFavoriteInfo> {
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
     List<LocalFavoriteInfo> list();
 
@@ -22,7 +19,7 @@ public interface LocalFavoritesDao {
     LocalFavoriteInfo load(long gid);
 
     @Insert
-    void insert(LocalFavoriteInfo localFavoriteInfo);
+    long insert(LocalFavoriteInfo localFavoriteInfo);
 
     @Delete
     void delete(LocalFavoriteInfo localFavoriteInfo);
@@ -30,4 +27,9 @@ public interface LocalFavoritesDao {
     @Query("DELETE FROM LOCAL_FAVORITES WHERE GID = :gid")
     void deleteByKey(long gid);
 
+    @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
+    List<LocalFavoriteInfo> fakeList();
+
+    @Insert
+    void fakeInsert(LocalFavoriteInfo t);
 }

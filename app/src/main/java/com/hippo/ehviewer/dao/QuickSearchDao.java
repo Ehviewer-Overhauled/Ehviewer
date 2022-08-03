@@ -9,10 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface QuickSearchDao {
-
-    String TABLENAME = "QUICK_SEARCH";
-
+public interface QuickSearchDao extends BasicDao<QuickSearch> {
     @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC")
     List<QuickSearch> list();
 
@@ -31,4 +28,9 @@ public interface QuickSearchDao {
     @Delete
     void delete(QuickSearch quickSearch);
 
+    @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC")
+    List<QuickSearch> fakeList();
+
+    @Insert
+    void fakeInsert(QuickSearch t);
 }

@@ -9,8 +9,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface DownloadLabelDao {
-
+public interface DownloadLabelDao extends BasicDao<DownloadLabel> {
     @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC")
     List<DownloadLabel> list();
 
@@ -28,4 +27,10 @@ public interface DownloadLabelDao {
 
     @Delete
     void delete(DownloadLabel downloadLabel);
+
+    @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC")
+    List<DownloadLabel> fakeList();
+
+    @Insert
+    void fakeInsert(DownloadLabel t);
 }
