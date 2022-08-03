@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "EhViewer"
-include ':app', ':daogenerator', ':native'
+include ':app', ':daogenerator'
