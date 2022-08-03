@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -21,26 +21,26 @@
   </a>
 </p>
 
-# Description
+# 說明
 
-EhViewer fork dedicated to lightweight and high-performance
+致力於輕量化與良好性能表現的 EhViewer 分支
 
-with Material Design 3 and Dynamic Color Support
+已針對性適配 Material Design 3 及其動態取色系統
 
-# Download
+# 下載
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="../../art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="../../art/get-it-on-fdroid.svg" width="200px"/></a>
 
-App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 and above, also the develop mainline. Version 1.7 support Android 11 and below, drop down some spicetify functions for Android 12 to make app useable on lower Android System
+App 分為 1.8 與 1.7 兩個版本。1.8 版本適配 Android 12 及以上系統，為開發主線；1.7 版本適配 Android 11 及以下版本，削減了 Android 12 及以上系統的獨有功能，使其能在低版本 Android 上正常工作
 
-# Screenshot
+# 截圖
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
+![screenshot-01](../../art/screenshot-01.png)
+![screenshot-02](../../art/screenshot-02.png)
 
-# Thanks
+# 感謝
 
-Here is the libraries
+本項目受到了諸多開源項目的幫助
 
 - [AOSP&AndroidX](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
@@ -55,7 +55,7 @@ Here is the libraries
 - [XZ Utils](https://tukaani.org/xz/)
 
 
-# License
+# 許可證書
 
     Copyright 2014-2019 Hippo Seven
     Copyright 2020-2022 NekoInverter
