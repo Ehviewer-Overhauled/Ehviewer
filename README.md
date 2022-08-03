@@ -57,7 +57,6 @@ Here is the libraries
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [greenDAO](https://github.com/greenrobot/greenDAO)
 - [jsoup](https://github.com/jhy/jsoup)
 - [okhttp](https://github.com/square/okhttp)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)

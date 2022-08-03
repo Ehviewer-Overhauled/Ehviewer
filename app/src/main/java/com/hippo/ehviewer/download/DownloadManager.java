@@ -516,7 +516,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         DownloadInfo info = mAllInfoMap.get(gid);
         if (info != null) {
             // Remove from DB
-            EhDB.removeDownloadInfo(info.gid);
+            EhDB.removeDownloadInfo(info);
 
             // Remove all list and map
             mAllInfoList.remove(info);
@@ -552,7 +552,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
             }
 
             // Remove from DB
-            EhDB.removeDownloadInfo(info.gid);
+            EhDB.removeDownloadInfo(info);
 
             // Remove from all info map
             mAllInfoList.remove(info);

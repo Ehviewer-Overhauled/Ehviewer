@@ -79,8 +79,6 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ViewUtils;
 
-import org.greenrobot.greendao.query.LazyList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +101,7 @@ public class HistoryScene extends ToolbarScene {
     @Nullable
     private RecyclerView.Adapter<?> mAdapter;
     @Nullable
-    private LazyList<HistoryInfo> mLazyList;
+    private List<HistoryInfo> mLazyList;
 
     private DownloadManager mDownloadManager;
     private DownloadManager.DownloadInfoListener mDownloadInfoListener;
@@ -255,7 +253,6 @@ public class HistoryScene extends ToolbarScene {
         super.onDestroyView();
 
         if (null != mLazyList) {
-            mLazyList.close();
             mLazyList = null;
             if (mAdapter != null) {
                 mAdapter.notifyDataSetChanged();
@@ -272,11 +269,7 @@ public class HistoryScene extends ToolbarScene {
 
     // Remember to notify
     private void updateLazyList() {
-        LazyList<HistoryInfo> lazyList = EhDB.getHistoryLazyList();
-        if (mLazyList != null) {
-            mLazyList.close();
-        }
-        mLazyList = lazyList;
+        mLazyList = EhDB.getHistoryLazyList();
     }
 
     private void updateView(boolean animation) {
