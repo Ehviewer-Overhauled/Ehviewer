@@ -24,10 +24,4 @@ public interface DownloadsDao extends BasicDao<DownloadInfo> {
 
     @Delete
     void delete(DownloadInfo downloadInfo);
-
-    @Query("SELECT * FROM DOWNLOADS ORDER BY TIME DESC")
-    List<DownloadInfo> fakeList();
-
-    @Insert
-    void fakeInsert(DownloadInfo t);
 }

@@ -27,10 +27,4 @@ public interface DownloadLabelDao extends BasicDao<DownloadLabel> {
 
     @Delete
     void delete(DownloadLabel downloadLabel);
-
-    @Query("SELECT * FROM DOWNLOAD_LABELS ORDER BY TIME ASC")
-    List<DownloadLabel> fakeList();
-
-    @Insert
-    void fakeInsert(DownloadLabel t);
 }

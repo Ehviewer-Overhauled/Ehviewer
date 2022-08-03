@@ -27,10 +27,4 @@ public interface QuickSearchDao extends BasicDao<QuickSearch> {
 
     @Delete
     void delete(QuickSearch quickSearch);
-
-    @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC")
-    List<QuickSearch> fakeList();
-
-    @Insert
-    void fakeInsert(QuickSearch t);
 }

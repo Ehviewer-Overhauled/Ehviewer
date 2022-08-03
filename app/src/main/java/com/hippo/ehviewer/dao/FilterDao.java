@@ -21,10 +21,4 @@ public interface FilterDao extends BasicDao<Filter> {
 
     @Delete
     void delete(Filter filter);
-
-    @Query("SELECT * FROM FILTER")
-    List<Filter> fakeList();
-
-    @Insert
-    void fakeInsert(Filter t);
 }

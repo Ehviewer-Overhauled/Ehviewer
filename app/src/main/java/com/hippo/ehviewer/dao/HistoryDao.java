@@ -33,10 +33,4 @@ public interface HistoryDao extends BasicDao<HistoryInfo> {
 
     @Query("DELETE FROM HISTORY")
     void deleteAll();
-
-    @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
-    List<HistoryInfo> fakeList();
-
-    @Insert
-    void fakeInsert(HistoryInfo t);
 }

@@ -26,10 +26,4 @@ public interface LocalFavoritesDao extends BasicDao<LocalFavoriteInfo> {
 
     @Query("DELETE FROM LOCAL_FAVORITES WHERE GID = :gid")
     void deleteByKey(long gid);
-
-    @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
-    List<LocalFavoriteInfo> fakeList();
-
-    @Insert
-    void fakeInsert(LocalFavoriteInfo t);
 }

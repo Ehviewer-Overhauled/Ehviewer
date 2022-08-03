@@ -25,8 +25,5 @@ public interface DownloadDirnameDao extends BasicDao<DownloadDirname> {
     void deleteAll();
 
     @Query("SELECT * FROM DOWNLOAD_DIRNAME")
-    List<DownloadDirname> fakeList();
-
-    @Insert
-    void fakeInsert(DownloadDirname t);
+    List<DownloadDirname> list();
 }

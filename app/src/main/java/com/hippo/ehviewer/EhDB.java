@@ -602,9 +602,9 @@ public class EhDB {
     }
 
     private static <T> boolean copyDao(BasicDao<T> from, BasicDao<T> to) {
-        List<T> list = from.fakeList();
+        List<T> list = from.list();
         for (T item : list)
-            to.fakeInsert(item);
+            to.insert(item);
         return false;
     }
 
@@ -704,7 +704,7 @@ public class EhDB {
             manager.addDownloadLabel(downloadLabelList);
 
             // Download dirname
-            List<DownloadDirname> downloadDirnameList = oldRoomDatabase.downloadDirnameDao().fakeList();
+            List<DownloadDirname> downloadDirnameList = oldRoomDatabase.downloadDirnameDao().list();
             for (DownloadDirname dirname : downloadDirnameList) {
                 putDownloadDirname(dirname.getGid(), dirname.getDirname());
             }
