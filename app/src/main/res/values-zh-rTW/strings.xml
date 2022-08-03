@@ -19,8 +19,8 @@
     <string name="app_name">EhViewer</string>
 
     <!-- Theme -->
-    <string name="theme_light">亮色主題</string>
-    <string name="theme_dark">暗色主題</string>
+    <string name="theme_light">淺色主題</string>
+    <string name="theme_dark">深色主題</string>
     <string name="theme_black">黑色主題</string>
 
     <string name="homepage">首頁</string>
@@ -144,7 +144,7 @@
     <string name="search_specify_tag">指定標籤</string>
     <string name="search_enable_advance">啟用進階選項</string>
 
-    <string name="search_tip">一般搜尋：就是搜尋。\n\n訂閱搜素：在訂閱中搜索。\n\n指定上傳者：列出該上傳者上傳的圖庫。其他選項會被忽略。\n\n指定標籤：列出含有該標籤的圖庫。其他選項會被忽略。</string>
+    <string name="search_tip">一般搜尋：就是搜尋。\n\n訂閱搜尋：在訂閱中搜尋。\n\n指定上傳者：列出該上傳者上傳的圖庫。其他選項會被忽略。\n\n指定標籤：列出含有該標籤的圖庫。其他選項會被忽略。</string>
 
     <string name="search_sname">搜尋圖庫</string>
     <string name="search_stags">搜尋圖庫的標籤</string>
@@ -183,7 +183,7 @@
     <string name="delete_quick_search_message">刪除“%s”嗎？</string>
     <string name="no_quick_search">快速搜尋會顯示在這裡</string>
     <string name="add_quick_search_tip">圖庫列表的狀態將被儲存為快速搜尋。如果你想儲存搜尋面板的狀態，請先進行搜尋。</string>
-    <string name="readme">讀我檔</string>
+    <string name="readme">ReadMe</string>
     <string name="image_search_not_quick_search">無法將圖片搜尋加入快速搜尋</string>
     <string name="duplicate_quick_search">已存在相同的快速搜尋，名稱為“%s”。</string>
     <string name="duplicate_name">已經由重複的名稱了</string>
@@ -422,8 +422,8 @@
     <string name="settings_my_tags">我的標籤</string>
     <string name="settings_my_tags_summary">EHentai 網站上的我的標籤</string>
     <string name="settings_eh_theme">主題</string>
-    <string name="settings_eh_theme_light">亮色</string>
-    <string name="settings_eh_theme_dark">暗色</string>
+    <string name="settings_eh_theme_light">淺色</string>
+    <string name="settings_eh_theme_dark">深色</string>
     <string name="settings_eh_theme_black">黑色</string>
     <string name="settings_eh_apply_nav_bar_theme_color">導航欄應用主題配色</string>
     <string name="settings_eh_gallery_site">圖庫站台</string>
@@ -525,7 +525,7 @@
     <string name="settings_advanced">進階</string>
     <string name="settings_advanced_save_parse_error_body">解析失敗時儲存網頁的內容</string>
     <string name="settings_advanced_save_parse_error_body_summary">網頁內容可能含有敏感的隱私資料</string>
-    <string name="settings_advanced_save_crash_log">應用崩潰時儲存錯誤日誌</string>
+    <string name="settings_advanced_save_crash_log">應用程式崩潰時儲存錯誤日誌</string>
     <string name="settings_advanced_save_crash_log_summary">錯誤日誌可以幫助開發者修正問題</string>
     <string name="settings_advanced_dump_logcat">傾印log</string>
     <string name="settings_advanced_dump_logcat_summary">儲存log紀錄至外接儲存裝置中</string>
@@ -591,7 +591,7 @@
     <string name="rewrite">改寫</string>
     <string name="language_japanese">日語</string>
     <string name="language_english">英語</string>
-    <string name="language_chinese">漢語</string>
+    <string name="language_chinese">中文</string>
     <string name="language_dutch">荷蘭語</string>
     <string name="language_french">法語</string>
     <string name="language_german">德語</string>
@@ -703,5 +703,60 @@
     <string name="settings_privacy_secure">不允許螢幕擷取</string>
     <string name="settings_privacy_secure_summary">啟用後，將無法對本程式進行螢幕擷取，同時，將不會在系統任務切換器中顯示該程式的預覽內容，重新啟動本程式以套用此變更</string>
     <string name="favorite_name">收藏圖庫</string>
+    
+    <string name="black_dark_theme">純黑深色主題</string>
+    <string name="download_filter">過濾</string>
+    <string name="download_all">全部</string>
+    <string name="download_start_all_reversed">全部開始（倒序）</string>
+    <string name="settings_download_download_delay">下載延時</string>
+    <string name="settings_download_download_delay_summary">每次下載延時 %s 毫秒</string>
+
+    <string name="no_browser_installed">請安裝一個瀏覽器。</string>
+    <string name="toplist_alltime">從始至終</string>
+    <string name="toplist_pastyear">過去一年</string>
+    <string name="toplist_pastmonth">過去一個月</string>
+    <string name="toplist_yesterday">昨日</string>
+    <string name="toplist">排行</string>
+    <string name="tag_vote_down">不，這不是</string>
+    <string name="tag_vote_up">是的，這很正確</string>
+    <string name="tag_vote_successfully">投票成功</string>
+    <string name="from_clipboard">從剪貼板匯入</string>
+    <string name="from_clipboard_error">未在剪貼板中發現 Cookies。</string>
+    <string name="delete_search_history">從搜索記錄中刪除“%s”？</string>
+    <string name="settings_advanced_dns_over_http_title">安全 DNS（DoH）</string>
+    <string name="settings_advanced_dns_over_http_summary">解決某些地區的 DNS 汙染問題</string>
+    <string name="settings_advanced_domain_fronting_title">域名前置</string>
+    <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
+    <string name="read_theme">色彩主題</string>
+    <string name="follow_app">跟隨應用</string>
+    <string name="settings_e_ink_mode_title">墨水屏模式</string>
+    <string name="settings_e_ink_mode_summary">為墨水屏做一些最佳化</string>
+    <string name="settings_advanced_clear_memory_cache_done">完成記憶體快取清理</string>
+    <string name="action_add_tag">增加標籤</string>
+    <string name="action_add_tag_tip">增加新標籤，用逗號「，」分割</string>
+    <string name="error_no_webview">WebView 不可用</string>
+    <string name="comment_user_uploader">%s （上傳者）</string>
+    <string name="settings_eh_metered_network_warning">流量計費網路警告</string>
+    <string name="metered_network_warning">正在使用流量計費網路</string>
+    <string name="read_from">從第 %d 頁閱讀</string>
+    <string name="settings_request_news_title">啟動時請求新聞頁面</string>
+    <string name="copy_trans">複製翻譯</string>
+    <string name="reset_download_location">恢復預設路徑</string>
+    <string name="pick_new_download_location">選擇新路徑</string>
+    <string name="dont_show_again">不再顯示</string>
+    <string name="open_settings">打開設置</string>
+    <string name="app_link_not_verified_message">對於 Android 12 及更新的版本，您需要手動增加連結到已驗證連結才能在 EhViewer 中打開 E-Hentai 連結。</string>
+    <string name="app_link_not_verified_title">應用連結未驗證</string>
+    <string name="open_by_default">預設打開</string>
+
+    <string name="show_library_version">依賴庫之版本</string>
+    <string name="settings_privacy_require_unlock">需要解鎖</string>
+    <string name="proxy_type_name">代理類型</string>
+    <string name="filter_label">屏蔽項類型</string>
+
+    <string name="archive_passwd">歸檔文件密碼</string>
+    <string name="archive_need_passwd">歸檔文件需要密碼</string>
+    <string name="passwd_wrong">密碼錯誤</string>
+    <string name="passwd_cannot_be_empty">密碼不能為空</string>
 
 </resources>
