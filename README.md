@@ -61,7 +61,6 @@ Here is the libraries
 - [jsoup](https://github.com/jhy/jsoup)
 - [okhttp](https://github.com/square/okhttp)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
-- [roaster](https://github.com/forge/roaster)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
 
