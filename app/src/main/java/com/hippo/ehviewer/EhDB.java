@@ -17,18 +17,14 @@
 package com.hippo.ehviewer;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Room;
 
 import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.dao.BasicDao;
 import com.hippo.ehviewer.dao.DownloadDirname;
 import com.hippo.ehviewer.dao.DownloadDirnameDao;
@@ -48,7 +44,6 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ObjectUtils;
-import com.hippo.yorozuya.collect.SparseJLArray;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,17 +55,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EhDB {
-
-    private static final String TAG = EhDB.class.getSimpleName();
-
     private static final int CUR_DB_VER = 4;
 
     private static final int MAX_HISTORY_COUNT = 200;
 
     private static EhDatabase db;
-
-    private static boolean sHasOldDB;
-    private static boolean sNewDB;
 
     private static void upgradeDB(SQLiteDatabase db, int oldVersion) {
         switch (oldVersion) {
@@ -112,207 +101,7 @@ public class EhDB {
     }
 
     public static void initialize(Context context) {
-        sHasOldDB = context.getDatabasePath("data").exists();
         db = Room.databaseBuilder(context, EhDatabase.class, "eh.db").allowMainThreadQueries().build();
-    }
-
-    public static boolean needMerge() {
-        return sNewDB && sHasOldDB;
-    }
-
-    public static void mergeOldDB(Context context) {
-        sNewDB = false;
-
-        OldDBHelper oldDBHelper = new OldDBHelper(context);
-        SQLiteDatabase oldDB;
-        try {
-            oldDB = oldDBHelper.getReadableDatabase();
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            return;
-        }
-
-        // Get GalleryInfo list
-        SparseJLArray<GalleryInfo> map = new SparseJLArray<>();
-        try {
-            Cursor cursor = oldDB.rawQuery("select * from " + OldDBHelper.TABLE_GALLERY, null);
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    while (!cursor.isAfterLast()) {
-                        GalleryInfo gi = new GalleryInfo();
-                        gi.gid = cursor.getInt(0);
-                        gi.token = cursor.getString(1);
-                        gi.title = cursor.getString(2);
-                        gi.posted = cursor.getString(3);
-                        gi.category = cursor.getInt(4);
-                        gi.thumb = cursor.getString(5);
-                        gi.uploader = cursor.getString(6);
-                        try {
-                            // In 0.6.x version, NaN is stored
-                            gi.rating = cursor.getFloat(7);
-                        } catch (Throwable e) {
-                            ExceptionUtils.throwIfFatal(e);
-                            gi.rating = -1.0f;
-                        }
-
-                        map.put(gi.gid, gi);
-
-                        cursor.moveToNext();
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
-
-        // Merge local favorites
-        try {
-            Cursor cursor = oldDB.rawQuery("select * from " + OldDBHelper.TABLE_LOCAL_FAVOURITE, null);
-            if (cursor != null) {
-                LocalFavoritesDao dao = db.localFavoritesDao();
-                if (cursor.moveToFirst()) {
-                    long i = 0L;
-                    while (!cursor.isAfterLast()) {
-                        // Get GalleryInfo first
-                        long gid = cursor.getInt(0);
-                        GalleryInfo gi = map.get(gid);
-                        if (gi == null) {
-                            Log.e(TAG, "Can't get GalleryInfo with gid: " + gid);
-                            cursor.moveToNext();
-                            continue;
-                        }
-
-                        LocalFavoriteInfo info = new LocalFavoriteInfo(gi);
-                        info.setTime(i);
-                        dao.insert(info);
-                        cursor.moveToNext();
-                        i++;
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
-
-
-        // Merge quick search
-        try {
-            Cursor cursor = oldDB.rawQuery("select * from " + OldDBHelper.TABLE_TAG, null);
-            if (cursor != null) {
-                QuickSearchDao dao = db.quickSearchDao();
-                if (cursor.moveToFirst()) {
-                    while (!cursor.isAfterLast()) {
-                        QuickSearch quickSearch = new QuickSearch();
-
-                        int mode = cursor.getInt(2);
-                        String search = cursor.getString(4);
-                        String tag = cursor.getString(7);
-                        if (mode == ListUrlBuilder.MODE_UPLOADER && search != null &&
-                                search.startsWith("uploader:")) {
-                            search = search.substring("uploader:".length());
-                        }
-
-                        quickSearch.setTime(cursor.getInt(0));
-                        quickSearch.setName(cursor.getString(1));
-                        quickSearch.setMode(mode);
-                        quickSearch.setCategory(cursor.getInt(3));
-                        quickSearch.setKeyword(mode == ListUrlBuilder.MODE_TAG ? tag : search);
-                        quickSearch.setAdvanceSearch(cursor.getInt(5));
-                        quickSearch.setMinRating(cursor.getInt(6));
-
-                        dao.insert(quickSearch);
-                        cursor.moveToNext();
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
-
-        // Merge download info
-        try {
-            Cursor cursor = oldDB.rawQuery("select * from " + OldDBHelper.TABLE_DOWNLOAD, null);
-            if (cursor != null) {
-                DownloadsDao dao = db.downloadsDao();
-                if (cursor.moveToFirst()) {
-                    long i = 0L;
-                    while (!cursor.isAfterLast()) {
-                        // Get GalleryInfo first
-                        long gid = cursor.getInt(0);
-                        GalleryInfo gi = map.get(gid);
-                        if (gi == null) {
-                            Log.e(TAG, "Can't get GalleryInfo with gid: " + gid);
-                            cursor.moveToNext();
-                            continue;
-                        }
-
-                        DownloadInfo info = new DownloadInfo(gi);
-                        int state = cursor.getInt(2);
-                        int legacy = cursor.getInt(3);
-                        if (state == DownloadInfo.STATE_FINISH && legacy > 0) {
-                            state = DownloadInfo.STATE_FAILED;
-                        }
-                        info.setState(state);
-                        info.setLegacy(legacy);
-                        if (cursor.getColumnCount() == 5) {
-                            info.setTime(cursor.getLong(4));
-                        } else {
-                            info.setTime(i);
-                        }
-                        dao.insert(info);
-                        cursor.moveToNext();
-                        i++;
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
-
-        try {
-            // Merge history info
-            Cursor cursor = oldDB.rawQuery("select * from " + OldDBHelper.TABLE_HISTORY, null);
-            if (cursor != null) {
-                HistoryDao dao = db.historyDao();
-                if (cursor.moveToFirst()) {
-                    while (!cursor.isAfterLast()) {
-                        // Get GalleryInfo first
-                        long gid = cursor.getInt(0);
-                        GalleryInfo gi = map.get(gid);
-                        if (gi == null) {
-                            Log.e(TAG, "Can't get GalleryInfo with gid: " + gid);
-                            cursor.moveToNext();
-                            continue;
-                        }
-
-                        HistoryInfo info = new HistoryInfo(gi);
-                        info.setMode(cursor.getInt(1));
-                        info.setTime(cursor.getLong(2));
-                        dao.insert(info);
-                        cursor.moveToNext();
-                    }
-                }
-                cursor.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
-
-        try {
-            oldDBHelper.close();
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
     }
 
     public static synchronized List<DownloadInfo> getAllDownloadInfo() {
@@ -587,9 +376,19 @@ public class EhDB {
     }
 
     public static synchronized boolean addFilter(Filter filter) {
-        db.filterDao().delete(filter);
-        db.filterDao().insert(filter);
-        return true;
+        Filter existFilter;
+        try {
+            existFilter = db.filterDao().load(filter.text, filter.mode);
+        } catch (Exception e) {
+            existFilter = null;
+        }
+        if (existFilter == null) {
+            filter.setId(null);
+            filter.setId(db.filterDao().insert(filter));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static synchronized void deleteFilter(Filter filter) {
@@ -753,30 +552,6 @@ public class EhDB {
             ExceptionUtils.throwIfFatal(e);
             // Ignore
             return context.getString(R.string.cant_read_the_file);
-        }
-    }
-
-    private static class OldDBHelper extends SQLiteOpenHelper {
-
-        private static final String DB_NAME = "data";
-        private static final int VERSION = 4;
-
-        private static final String TABLE_GALLERY = "gallery";
-        private static final String TABLE_LOCAL_FAVOURITE = "local_favourite";
-        private static final String TABLE_TAG = "tag";
-        private static final String TABLE_DOWNLOAD = "download";
-        private static final String TABLE_HISTORY = "history";
-
-        public OldDBHelper(Context context) {
-            super(context, DB_NAME, null, VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         }
     }
 }

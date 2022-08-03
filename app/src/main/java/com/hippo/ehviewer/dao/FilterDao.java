@@ -21,4 +21,7 @@ public interface FilterDao extends BasicDao<Filter> {
 
     @Delete
     void delete(Filter filter);
+
+    @Query("SELECT * FROM FILTER WHERE TEXT = :text AND MODE = :mode")
+    Filter load(String text, int mode);
 }

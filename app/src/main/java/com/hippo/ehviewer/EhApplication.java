@@ -337,10 +337,6 @@ public class EhApplication extends SceneApplication {
         EhEngine.initialize();
         BitmapUtils.initialize(this);
 
-        if (EhDB.needMerge()) {
-            EhDB.mergeOldDB(this);
-        }
-
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Settings.getLocale()));
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme());
 
