@@ -32,3 +32,6 @@
 -dontwarn org.conscrypt.Conscrypt
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+
+-keepclasseswithmembernames class * { native <methods>;}
+-keepclassmembers class com.hippo.image.Image {private <init>(long, int, int, int);}

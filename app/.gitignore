@@ -5,3 +5,4 @@ manifest-merger-release-report.txt
 /src/main/obj
 # Intellij
 *.iml
+/.cxx

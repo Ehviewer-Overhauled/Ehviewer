@@ -7,6 +7,7 @@ plugins {
 android {
     compileSdkVersion 33
     buildToolsVersion "33.0.0"
+    ndkVersion "25.0.8775105"
 
     Properties localProperties = new Properties()
     if (project.rootProject.file('local.properties').exists()) {
@@ -37,6 +38,22 @@ android {
         versionCode 180004
         versionName "1.8.0.4"
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=none'
+            }
+        }
+
+        ndk {
+            abiFilters 'arm64-v8a', 'x86_64', 'armeabi-v7a', 'x86'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
     }
 
     compileOptions {
@@ -164,7 +181,6 @@ dependencies {
     implementation 'dev.rikka.rikkax.material:material-preference:2.0.0'
     implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'org.jsoup:jsoup:1.15.2'
-    implementation projects.native
 }
 
 configurations.all {

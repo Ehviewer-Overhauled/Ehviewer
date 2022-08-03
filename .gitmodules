@@ -1,9 +1,9 @@
-[submodule "native/src/main/jni/libarchive"]
-	path = native/src/main/jni/libarchive
+[submodule "app/src/main/cpp/libarchive"]
+	path = app/src/main/cpp/libarchive
 	url = https://github.com/Ehviewer-Overhauled/libarchive
-[submodule "native/src/main/jni/liblzma"]
-	path = native/src/main/jni/liblzma
+[submodule "app/src/main/cpp/liblzma"]
+	path = app/src/main/cpp/liblzma
 	url = https://github.com/Ehviewer-Overhauled/xz
-[submodule "native/src/main/jni/nettle/nettle"]
-	path = native/src/main/jni/nettle/nettle
+[submodule "app/src/main/cpp/nettle/nettle"]
+	path = app/src/main/cpp/nettle/nettle
 	url = https://github.com/Ehviewer-Overhauled/nettle
