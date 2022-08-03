@@ -83,6 +83,7 @@ IMAGE *create(int32_t width, int32_t height, const void *data) {
     buffer = malloc(length);
     memcpy(buffer, data, length);
 
+    // plain->isAnimated = false; this is unnecessary since we use calloc
     plain->width = width;
     plain->height = height;
     plain->buffer = buffer;

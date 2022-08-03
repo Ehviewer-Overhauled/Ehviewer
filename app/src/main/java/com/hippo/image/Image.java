@@ -28,27 +28,22 @@ import java.util.ArrayList;
  */
 public final class Image {
     public static final int FORMAT_NORMAL = 0;
-
     public static final int FORMAT_ANIMATED = 1;
-
     private static final ArrayList<Image> imageList = new ArrayList<>();
     private static boolean needEvictAll = false;
-
-    private final int mFormat;
-    private final int mWidth;
-    private final int mHeight;
     private long mNativePtr;
 
-    private Image(long nativePtr, int format, int width, int height) {
+    private Image(long nativePtr) {
         if (needEvictAll)
             evictAll();
-
         mNativePtr = nativePtr;
-        mFormat = format;
-        mWidth = width;
-        mHeight = height;
-
         imageList.add(this);
+    }
+
+    private static Image newFromAddr(long addr) {
+        if (addr == 0)
+            return null;
+        return new Image(addr);
     }
 
     public static void lazyEvictAll() {
@@ -65,7 +60,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(FileDescriptor fd, boolean partially) {
-        return nativeDecode(fd);
+        return newFromAddr(nativeDecode(fd));
     }
 
     /**
@@ -73,7 +68,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(Integer fd, boolean partially) {
-        return nativeDecodeFdInt(fd);
+        return newFromAddr(nativeDecodeFdInt(fd));
     }
 
     /**
@@ -81,7 +76,7 @@ public final class Image {
      */
     @Nullable
     public static Image decodeAddr(Long addr, boolean partially) {
-        return nativeDecodeAddr(addr);
+        return newFromAddr(nativeDecodeAddr(addr));
     }
 
     /**
@@ -89,7 +84,7 @@ public final class Image {
      */
     @Nullable
     public static Image create(Bitmap bitmap) {
-        return nativeCreate(bitmap);
+        return newFromAddr(nativeCreate(bitmap));
     }
 
     /**
@@ -100,13 +95,13 @@ public final class Image {
         return imageList.size();
     }
 
-    private static native Image nativeDecode(FileDescriptor fd);
+    private static native long nativeDecode(FileDescriptor fd);
 
-    private static native Image nativeDecodeFdInt(int fd);
+    private static native long nativeDecodeFdInt(int fd);
 
-    private static native Image nativeDecodeAddr(long addr);
+    private static native long nativeDecodeAddr(long addr);
 
-    private static native Image nativeCreate(Bitmap bitmap);
+    private static native long nativeCreate(Bitmap bitmap);
 
     private static native void nativeRender(long nativePtr,
                                             int srcX, int srcY, Bitmap dst, int dstX, int dstY,
@@ -122,25 +117,34 @@ public final class Image {
 
     private static native void nativeRecycle(long nativePtr);
 
+    private static native int nativeGetFormat(long nativePtr);
+
+    private static native int nativeGetWidth(long nativePtr);
+
+    private static native int nativeGetHeight(long nativePtr);
+
     /**
      * Return the format of the image
      */
     public int getFormat() {
-        return mFormat;
+        checkRecycled();
+        return nativeGetFormat(mNativePtr);
     }
 
     /**
      * Return the width of the image
      */
     public int getWidth() {
-        return mWidth;
+        checkRecycled();
+        return nativeGetWidth(mNativePtr);
     }
 
     /**
      * Return the height of the image
      */
     public int getHeight() {
-        return mHeight;
+        checkRecycled();
+        return nativeGetHeight(mNativePtr);
     }
 
     private void checkRecycled() {

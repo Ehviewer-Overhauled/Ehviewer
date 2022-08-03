@@ -39,32 +39,19 @@ static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
     return fd;
 }
 
-jobject create_image_object(JNIEnv *env, void *ptr, int format, int width, int height) {
-    jclass image_clazz;
-    jmethodID constructor;
-
-    image_clazz = (*env)->FindClass(env, "com/hippo/image/Image");
-    constructor = (*env)->GetMethodID(env, image_clazz, "<init>", "(JIII)V");
-    return (*env)->NewObject(env, image_clazz, constructor,
-                             (jlong) (uintptr_t) ptr, (jint) format, (jint) width,
-                             (jint) height);
-}
-
-JNIEXPORT jobject JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env, jclass clazz, jint fd) {
     IMAGE *image = createFromFd(fd);
-    if (!image)
-        return NULL;
-    return create_image_object(env, image, image->isAnimated, image->width, image->height);
+    return (jlong) image;
 }
 
-JNIEXPORT jobject JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_hippo_image_Image_nativeDecode(JNIEnv *env, jclass clazz, jobject fd) {
     return Java_com_hippo_image_Image_nativeDecodeFdInt(env, clazz,
                                                         jniGetFDFromFileDescriptor(env, fd));
 }
 
-JNIEXPORT jobject JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitmap) {
     AndroidBitmapInfo info;
     void *pixels = NULL;
@@ -75,7 +62,7 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitma
 
     image = create(info.width, info.height, pixels);
     AndroidBitmap_unlockPixels(env, bitmap);
-    return create_image_object(env, image, 0, info.width, info.height);
+    return (jlong) image;
 }
 
 JNIEXPORT void JNICALL
@@ -141,10 +128,25 @@ void image_onUnload() {
     tile_buffer = NULL;
 }
 
-JNIEXPORT jobject JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr) {
     Memarea *memarea = (Memarea *) addr;
     IMAGE *image = createFromAddr(memarea->buffer, memarea->size);
     free(memarea);
-    return create_image_object(env, image, image->isAnimated, image->width, image->height);
+    return (jlong) image;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_hippo_image_Image_nativeGetFormat(JNIEnv *env, jclass clazz, jlong native_ptr) {
+    return ((IMAGE *) native_ptr)->isAnimated;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_hippo_image_Image_nativeGetWidth(JNIEnv *env, jclass clazz, jlong native_ptr) {
+    return ((IMAGE *) native_ptr)->width;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_hippo_image_Image_nativeGetHeight(JNIEnv *env, jclass clazz, jlong native_ptr) {
+    return ((IMAGE *) native_ptr)->height;
 }
