@@ -20,6 +20,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import java.util.regex.Pattern;
 
@@ -108,30 +111,52 @@ public class GalleryInfo implements Parcelable {
             return new GalleryInfo[size];
         }
     };
+    @PrimaryKey
+    @ColumnInfo(name = "GID")
     public long gid;
+    @ColumnInfo(name = "TOKEN")
     public String token;
+    @ColumnInfo(name = "TITLE")
     public String title;
+    @ColumnInfo(name = "TITLE_JPN")
     public String titleJpn;
+    @ColumnInfo(name = "THUMB")
     public String thumb;
+    @ColumnInfo(name = "CATEGORY")
     public int category;
+    @ColumnInfo(name = "POSTED")
     public String posted;
+    @ColumnInfo(name = "UPLOADER")
     public String uploader;
+    @Ignore
     public boolean disowned;
+    @ColumnInfo(name = "RATING")
     public float rating;
+    @Ignore
     public boolean rated;
     @Nullable
+    @Ignore
     public String[] simpleTags;
+    @Ignore
     public int pages;
+    @Ignore
     public int thumbWidth;
+    @Ignore
     public int thumbHeight;
+    @Ignore
     public int spanSize;
+    @Ignore
     public int spanIndex;
+    @Ignore
     public int spanGroupIndex;
     /**
      * language from title
      */
+    @ColumnInfo(name = "SIMPLE_LANGUAGE")
     public String simpleLanguage;
+    @Ignore
     public int favoriteSlot = -2;
+    @Ignore
     public String favoriteName;
 
     public GalleryInfo() {
