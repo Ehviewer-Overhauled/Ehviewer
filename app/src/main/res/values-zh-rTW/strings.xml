@@ -106,6 +106,7 @@
     <string name="content_layout_restore_tip">點擊重試</string>
     <string name="write_rationale">EhViewer 將請求裝置外部儲存空間的存取許可以下載圖庫。您願意授權嗎？</string>
     <string name="you_rejected_me">好難過</string>
+    <string name="analytics_explain">您同意讓開發者收集您的設備訊息與使用情況嗎？這將對開發有很大幫助並將為您啟用應用內更新。&lt;br&gt;&lt;br&gt;數據統計服務由 Microsoft AppCenter 提供，其隱私政策可在 &lt;a href=&quot;https://privacy.microsoft.com/zh-cn/privacystatement&quot;&gt;https://privacy.microsoft.com/zh-cn/privacystatement&lt;/a&gt; 查看。&lt;br&gt;&lt;br&gt;若您同意參與數據統計，您的設備訊息與應用使用情況將會被記錄，其包括但不限於：Android API 版本、設備型號、語言所在地、本應用版本號、會話時長、應用功能使用次數。開發者承諾以下訊息並不會被記錄：電話號碼、電子郵件地址、IMEI。&lt;br&gt;&lt;br&gt;在您同意參與數據統計之前，您的訊息不會被記錄。&lt;br&gt;&lt;br&gt;被記錄的數據會由 Microsoft AppCenter 進行分析，分析報表僅可被本程式開發者瀏覽。</string>
     <string name="get_it">知道了</string>
     <string name="accept">接受</string>
     <string name="reject">拒絕</string>
@@ -234,7 +235,10 @@
     <string name="add_to_favorite_failure">無法新增至收藏</string>
     <string name="remove_from_favorite_failure">無法從收藏中移除</string>
     <string name="filter_the_uploader">把上傳者“%s”加入濾除列表?</string>
+    <string name="filter_the_tag">隱藏標籤“%s”？</string>
     <string name="filter_added">已經新增篩選條件</string>
+    <string name="newer_version_avaliable">此圖庫有新版本可以使用。</string>
+    <string name="newer_version_title">%1$s, 增加於 %2$s</string>
 
     <!-- Rating -->
     <string name="rating10">太神啦!</string>
@@ -349,6 +353,7 @@
     <string name="rename_label_title">重新命名標籤</string>
     <string name="delete_label_title">刪除標籤</string>
     <string name="delete_label_message">將 “%s”刪除？</string>
+    <string name="rename_label">重新命名</string>
 
     <!-- History -->
     <string name="no_history">歷史紀錄將會顯示在這裡</string>
@@ -373,6 +378,7 @@
     <string name="set_pattern_protection">設定圖形解鎖</string>
     <string name="set_pattern_protection_tip">繪製圖案來設定繪圖解鎖\n留白以取消圖案保護</string>
     <string name="set">設定</string>
+    <string name="enable_biometric">允許使用生物識別解鎖</string>
 
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 設定</string>
@@ -400,6 +406,7 @@
     <string name="page_menu_refresh">@string/refresh</string>
     <string name="page_menu_share">@string/share</string>
     <string name="page_menu_save">儲存</string>
+    <string name="page_menu_save_to">儲存到…</string>
     <string name="page_menu_add_bookmark">新增書籤</string>
     <string name="gallery_menu_title">選單</string>
     <string name="share_image">分享圖片</string>
@@ -465,6 +472,7 @@
     <string name="settings_read_screen_rotation_default">系統預設</string>
     <string name="settings_read_screen_rotation_portrait">直向</string>
     <string name="settings_read_screen_rotation_landscape">橫向</string>
+    <string name="settings_read_screen_rotation_sensor">自動旋轉</string>
     <string name="settings_read_reading_direction">閱讀方向</string>
     <string name="settings_read_reading_direction_left_to_right">由左到右</string>
     <string name="settings_read_reading_direction_right_to_Left">由右到左</string>
@@ -490,6 +498,7 @@
     <string name="settings_read_reading_fullscreen">全螢幕</string>
     <string name="settings_read_custom_screen_lightness">自訂螢幕亮度</string>
     <string name="settings_read_screen_lightness">螢幕亮度</string>
+    <string name="settings_read_reverse_volume">翻轉音量鍵</string>
 
     <string name="settings_download">下載</string>
     <string name="settings_download_download_location">下載路徑</string>
@@ -702,6 +711,8 @@
     <string name="settings_privacy">隱私</string>
     <string name="settings_privacy_secure">不允許螢幕擷取</string>
     <string name="settings_privacy_secure_summary">啟用後，將無法對本程式進行螢幕擷取，同時，將不會在系統任務切換器中顯示該程式的預覽內容，重新啟動本程式以套用此變更</string>
+
+    <string name="download_service">下載服務</string>
     <string name="favorite_name">收藏圖庫</string>
     
     <string name="black_dark_theme">純黑深色主題</string>
