@@ -17,20 +17,13 @@
  * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IMAGE_JAVA_WRAPPER_H
-#define IMAGE_JAVA_WRAPPER_H
+#ifndef IMAGE_IMAGE_H
+#define IMAGE_IMAGE_H
 
 #include <stdbool.h>
-
-#define IMAGE_TILE_MAX_SIZE (512 * 512)
-
-typedef struct Memarea {
-    void *buffer;
-    long size;
-} Memarea;
 
 bool image_onLoad();
 
 void image_onUnload();
 
-#endif /* IMAGE_JAVA_WRAPPER_H */
+#endif /* IMAGE_IMAGE_H */

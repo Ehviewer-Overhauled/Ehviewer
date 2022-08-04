@@ -44,10 +44,7 @@ SET(LIBARCHIVE_CUSTOM_LIBS "liblzma" "nettle")
 # Build libarchive
 add_subdirectory(libarchive)
 
-# Build hippo's image lib
-add_subdirectory(image)
-
 # Build and link our app's native lib
-add_library(${PROJECT_NAME} SHARED main.c archive.c)
-target_include_directories(${PROJECT_NAME} PUBLIC image/image libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} image archive_static -Wl,--gc-sections)
+add_library(${PROJECT_NAME} SHARED main.c archive.c image.c)
+target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
+target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections)
