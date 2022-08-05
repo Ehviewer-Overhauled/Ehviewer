@@ -79,8 +79,9 @@ App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系�
 
 本项目受到了诸多开源项目的帮助
 
-- [AOSP](http://source.android.com/)
-- [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
+- [AOSP&AndroidX](http://source.android.com/)
+- [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
+- [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
 - [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/)
