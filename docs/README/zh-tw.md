@@ -80,7 +80,6 @@ App 分為 1.8 與 1.7 兩個版本。1.8 版本適配 Android 12 及以上系�
 本項目受到了諸多開源項目的幫助
 
 - [AOSP&AndroidX](http://source.android.com/)
-- [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)

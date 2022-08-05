@@ -80,7 +80,6 @@ App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 a
 Here is the libraries
 
 - [AOSP&AndroidX](http://source.android.com/)
-- [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
