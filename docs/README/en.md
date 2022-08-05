@@ -66,7 +66,7 @@ with Material Design 3 and Dynamic Color Support
 
 # Download
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on Google Play" src="art/get-it-on-github.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on Github" src="../../art/get-it-on-github.svg" width="200px"/></a>
 
 App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 and above, also the develop mainline. Version 1.7 support Android 11 and below, drop down some spicetify functions for Android 12 to make app useable on lower Android System
 

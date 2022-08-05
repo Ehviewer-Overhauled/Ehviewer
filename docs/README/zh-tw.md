@@ -66,7 +66,7 @@
 
 # 下載
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on Google Play" src="art/get-it-on-github.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on Github" src="../../art/get-it-on-github.svg" width="200px"/></a>
 
 App 分為 1.8 與 1.7 兩個版本。1.8 版本適配 Android 12 及以上系統，為開發主線；1.7 版本適配 Android 11 及以下版本，削減了 Android 12 及以上系統的獨有功能，使其能在低版本 Android 上正常工作
 
