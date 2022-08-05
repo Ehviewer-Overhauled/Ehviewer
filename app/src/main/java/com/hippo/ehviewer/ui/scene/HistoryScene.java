@@ -40,16 +40,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDefault;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionRemoveItem;
-import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -204,17 +194,9 @@ public class HistoryScene extends ToolbarScene {
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         mTip.setCompoundDrawables(null, drawable, null, null);
 
-        RecyclerViewTouchActionGuardManager guardManager = new RecyclerViewTouchActionGuardManager();
-        guardManager.setInterceptVerticalScrollingWhileAnimationRunning(true);
-        guardManager.setEnabled(true);
-        RecyclerViewSwipeManager swipeManager = new RecyclerViewSwipeManager();
         mAdapter = new HistoryAdapter();
         mAdapter.setHasStableIds(true);
-        mAdapter = swipeManager.createWrappedAdapter(mAdapter);
         mRecyclerView.setAdapter(mAdapter);
-        final GeneralItemAnimator animator = new SwipeDismissItemAnimator();
-        animator.setSupportsChangeAnimations(false);
-        mRecyclerView.setItemAnimator(animator);
         AutoStaggeredGridLayoutManager layoutManager = new AutoStaggeredGridLayoutManager(
                 0, StaggeredGridLayoutManager.VERTICAL);
         layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.getDetailSizeResId()));
@@ -227,8 +209,6 @@ public class HistoryScene extends ToolbarScene {
         int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
         MarginItemDecoration decoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
         mRecyclerView.addItemDecoration(decoration);
-        guardManager.attachRecyclerView(mRecyclerView);
-        swipeManager.attachRecyclerView(mRecyclerView);
 
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
@@ -495,7 +475,7 @@ public class HistoryScene extends ToolbarScene {
         }
     }
 
-    private static class HistoryHolder extends AbstractSwipeableItemViewHolder {
+    private static class HistoryHolder extends RecyclerView.ViewHolder {
 
         public final View card;
         public final LoadImageView thumb;
@@ -521,12 +501,6 @@ public class HistoryScene extends ToolbarScene {
             simpleLanguage = itemView.findViewById(R.id.simple_language);
             pages = itemView.findViewById(R.id.pages);
             downloaded = itemView.findViewById(R.id.downloaded);
-        }
-
-        @NonNull
-        @Override
-        public View getSwipeableContainerView() {
-            return card;
         }
     }
 
@@ -563,8 +537,7 @@ public class HistoryScene extends ToolbarScene {
         }
     }
 
-    private class HistoryAdapter extends RecyclerView.Adapter<HistoryHolder>
-            implements SwipeableItemAdapter<HistoryHolder> {
+    private class HistoryAdapter extends RecyclerView.Adapter<HistoryHolder> {
 
         private final LayoutInflater mInflater;
         private final int mListThumbWidth;
@@ -641,57 +614,6 @@ public class HistoryScene extends ToolbarScene {
         @Override
         public int getItemCount() {
             return null != mLazyList ? mLazyList.size() : 0;
-        }
-
-        @Override
-        public int onGetSwipeReactionType(@NonNull HistoryHolder holder, int position, int x, int y) {
-            return SwipeableItemConstants.REACTION_CAN_SWIPE_LEFT;
-        }
-
-        @Override
-        public void onSwipeItemStarted(@NonNull HistoryHolder holder, int position) {
-        }
-
-        @Override
-        public void onSetSwipeBackground(@NonNull HistoryHolder holder, int position, int type) {
-        }
-
-        @Override
-        public SwipeResultAction onSwipeItem(@NonNull HistoryHolder holder, int position, int result) {
-            switch (result) {
-                case SwipeableItemConstants.RESULT_SWIPED_LEFT:
-                    return new SwipeResultActionClear(position);
-                case SwipeableItemConstants.RESULT_SWIPED_RIGHT:
-                case SwipeableItemConstants.RESULT_CANCELED:
-                case SwipeableItemConstants.RESULT_NONE:
-                case SwipeableItemConstants.RESULT_SWIPED_DOWN:
-                case SwipeableItemConstants.RESULT_SWIPED_UP:
-                default:
-                    return new SwipeResultActionDefault();
-            }
-        }
-    }
-
-    private class SwipeResultActionClear extends SwipeResultActionRemoveItem {
-
-        private final int mPosition;
-
-        protected SwipeResultActionClear(int position) {
-            mPosition = position;
-        }
-
-        @Override
-        protected void onPerformAction() {
-            super.onPerformAction();
-            if (null == mLazyList || null == mAdapter) {
-                return;
-            }
-
-            HistoryInfo info = mLazyList.get(mPosition);
-            EhDB.deleteHistoryInfo(info);
-            updateLazyList();
-            mAdapter.notifyDataSetChanged();
-            updateView(true);
         }
     }
 }

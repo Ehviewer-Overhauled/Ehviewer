@@ -57,12 +57,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.conaco.DataContainer;
@@ -556,20 +550,11 @@ public class DownloadsScene extends ToolbarScene
 
         initLabels();
 
-        RecyclerViewDragDropManager dragDropManager = new RecyclerViewDragDropManager();
-        dragDropManager.setInitiateOnLongPress(true);
-        dragDropManager.setInitiateOnTouch(false);
-        dragDropManager.setDraggingItemAlpha(0.8f);
-
         mLabelAdapter = new DownloadLabelAdapter(inflater);
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         mLabelAdapter.setHasStableIds(true);
-        final GeneralItemAnimator animator = new DraggableItemAnimator();
-        recyclerView.setItemAnimator(animator);
-        recyclerView.setAdapter(dragDropManager.createWrappedAdapter(mLabelAdapter));
-        dragDropManager.attachRecyclerView(recyclerView);
-
+        recyclerView.setAdapter(mLabelAdapter);
 
         return view;
     }
@@ -892,7 +877,7 @@ public class DownloadsScene extends ToolbarScene
         holder.speed.setText(FileUtils.humanReadableByteCount(speed, false) + "/S");
     }
 
-    private static class DownloadLabelHolder extends AbstractDraggableItemViewHolder {
+    private static class DownloadLabelHolder extends RecyclerView.ViewHolder {
 
         private final TextView label;
         private final ImageView option;
@@ -971,7 +956,7 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
-    private class DownloadLabelAdapter extends RecyclerView.Adapter<DownloadLabelHolder> implements DraggableItemAdapter<DownloadLabelHolder> {
+    private class DownloadLabelAdapter extends RecyclerView.Adapter<DownloadLabelHolder> {
 
         private final LayoutInflater mInflater;
 
@@ -1070,43 +1055,6 @@ public class DownloadsScene extends ToolbarScene
         @Override
         public int getItemCount() {
             return mLabels != null ? mLabels.size() : 0;
-        }
-
-        @Override
-        public boolean onCheckCanStartDrag(@NonNull DownloadLabelHolder holder, int position, int x, int y) {
-            return position != 0 && x > holder.option.getX() && y > holder.option.getY();
-        }
-
-        @Override
-        public ItemDraggableRange onGetItemDraggableRange(@NonNull DownloadLabelHolder holder, int position) {
-            return new ItemDraggableRange(1, getItemCount() - 1);
-        }
-
-        @Override
-        public void onMoveItem(int fromPosition, int toPosition) {
-            Context context = getContext();
-            if (null == context || fromPosition == toPosition || toPosition == 0) {
-                return;
-            }
-
-            EhApplication.getDownloadManager(context).moveLabel(fromPosition - 1, toPosition - 1);
-            final String item = mLabels.remove(fromPosition);
-            mLabels.add(toPosition, item);
-        }
-
-        @Override
-        public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {
-            return dropPosition != 0;
-        }
-
-        @Override
-        public void onItemDragStarted(int position) {
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onItemDragFinished(int fromPosition, int toPosition, boolean result) {
-            notifyDataSetChanged();
         }
     }
 

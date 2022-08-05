@@ -61,12 +61,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
@@ -753,19 +747,11 @@ public final class GalleryListScene extends BaseScene
         Context context = getContext();
         AssertUtils.assertNotNull(context);
 
-        RecyclerViewDragDropManager dragDropManager = new RecyclerViewDragDropManager();
-        dragDropManager.setInitiateOnLongPress(true);
-        dragDropManager.setInitiateOnTouch(false);
-        dragDropManager.setDraggingItemAlpha(0.8f);
-
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
         qsDrawerAdapter.setHasStableIds(true);
-        final GeneralItemAnimator animator = new DraggableItemAnimator();
-        recyclerView.setItemAnimator(animator);
-        recyclerView.setAdapter(dragDropManager.createWrappedAdapter(qsDrawerAdapter));
-        dragDropManager.attachRecyclerView(recyclerView);
+        recyclerView.setAdapter(qsDrawerAdapter);
         mQuickSearchList = EhDB.getAllQuickSearch();
         tip.setText(R.string.quick_search_tip);
         if (mIsTopList) {
@@ -1492,7 +1478,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    private static class QsDrawerHolder extends AbstractDraggableItemViewHolder {
+    private static class QsDrawerHolder extends RecyclerView.ViewHolder {
 
         private final TextView key;
         private final ImageView option;
@@ -1537,7 +1523,7 @@ public final class GalleryListScene extends BaseScene
         }
     }
 
-    private class QsDrawerAdapter extends RecyclerView.Adapter<QsDrawerHolder> implements DraggableItemAdapter<QsDrawerHolder> {
+    private class QsDrawerAdapter extends RecyclerView.Adapter<QsDrawerHolder> {
 
         private final LayoutInflater mInflater;
 
@@ -1630,44 +1616,6 @@ public final class GalleryListScene extends BaseScene
         @Override
         public int getItemCount() {
             return !mIsTopList ? mQuickSearchList != null ? mQuickSearchList.size() : 0 : 4;
-        }
-
-        @Override
-        public boolean onCheckCanStartDrag(@NonNull QsDrawerHolder holder, int position, int x, int y) {
-            return !mIsTopList && x > holder.option.getX() && y > holder.option.getY();
-        }
-
-        @Override
-        public ItemDraggableRange onGetItemDraggableRange(@NonNull QsDrawerHolder holder, int position) {
-            return null;
-        }
-
-        @Override
-        public void onMoveItem(int fromPosition, int toPosition) {
-            if (fromPosition == toPosition) {
-                return;
-            }
-            if (null == mQuickSearchList) {
-                return;
-            }
-            EhDB.moveQuickSearch(fromPosition, toPosition);
-            final QuickSearch item = mQuickSearchList.remove(fromPosition);
-            mQuickSearchList.add(toPosition, item);
-        }
-
-        @Override
-        public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {
-            return true;
-        }
-
-        @Override
-        public void onItemDragStarted(int position) {
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onItemDragFinished(int fromPosition, int toPosition, boolean result) {
-            notifyDataSetChanged();
         }
     }
 
