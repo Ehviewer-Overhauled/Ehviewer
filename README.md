@@ -35,23 +35,23 @@
 
 <div align="center">
   <h3>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#description">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/tree/1.7.x.x#description">
     Description
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#download">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/tree/1.7.x.x#download">
     Download
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#screenshot">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/tree/1.7.x.x#screenshot">
     Screenshot
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#thanks">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/tree/1.7.x.x#thanks">
     Thanks
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#license">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/tree/1.7.x.x#license">
     License
     </a>
   </h3>
