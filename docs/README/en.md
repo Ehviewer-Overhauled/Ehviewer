@@ -79,16 +79,18 @@ App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 a
 
 Here is the libraries
 
-- [AOSP&AndroidX](http://source.android.com/)
+- [AOSP](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
-- [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
-- [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
+- [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/)
+- [apng](http://apng.sourceforge.net/)
+- [giflib](http://giflib.sourceforge.net)
 - [greenDAO](https://github.com/greenrobot/greenDAO)
 - [jsoup](https://github.com/jhy/jsoup)
+- [libjpeg-turbo](https://libjpeg-turbo.org/)
+- [libpng](http://www.libpng.org/pub/png/libpng.html)
 - [okhttp](https://github.com/square/okhttp)
-- [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [roaster](https://github.com/forge/roaster)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
