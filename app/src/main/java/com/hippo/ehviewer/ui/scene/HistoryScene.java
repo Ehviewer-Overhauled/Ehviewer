@@ -36,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -209,7 +210,8 @@ public class HistoryScene extends ToolbarScene {
         int paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
         MarginItemDecoration decoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
         mRecyclerView.addItemDecoration(decoration);
-
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new HistoryItemTouchHelperCallback());
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable handlerDrawable = new HandlerDrawable();
         handlerDrawable.setColor(ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorPrimary));
@@ -614,6 +616,32 @@ public class HistoryScene extends ToolbarScene {
         @Override
         public int getItemCount() {
             return null != mLazyList ? mLazyList.size() : 0;
+        }
+    }
+
+    private class HistoryItemTouchHelperCallback extends ItemTouchHelper.Callback {
+
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(0, ItemTouchHelper.LEFT);
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int mPosition = viewHolder.getBindingAdapterPosition();
+            if (null == mLazyList || mAdapter == null) {
+                return;
+            }
+            HistoryInfo info = mLazyList.get(mPosition);
+            EhDB.deleteHistoryInfo(info);
+            updateLazyList();
+            mAdapter.notifyItemRemoved(mPosition);
+            updateView(true);
         }
     }
 }
