@@ -22,21 +22,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -45,11 +41,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -77,7 +73,6 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.download.DownloadService;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.GalleryActivity;
-import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.io.UniFileInputStreamPipe;
 import com.hippo.scene.Announcer;
@@ -91,7 +86,6 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.LongList;
@@ -554,6 +548,8 @@ public class DownloadsScene extends ToolbarScene
         final EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         mLabelAdapter.setHasStableIds(true);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new DownloadLabelItemTouchHelperCallback());
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(mLabelAdapter);
 
         return view;
@@ -1010,36 +1006,15 @@ public class DownloadsScene extends ToolbarScene
                 });
                 if (position > 0) {
                     holder.option.setVisibility(View.VISIBLE);
-                    holder.itemView.setOnLongClickListener(v -> {
+                    holder.option.setOnClickListener(v -> {
                         if (context != null) {
-                            PopupMenu popupMenu = new PopupMenu(context, holder.option);
-                            popupMenu.inflate(R.menu.download_label_option);
-                            popupMenu.show();
-                            popupMenu.setOnMenuItemClickListener(item -> {
-                                int itemId = item.getItemId();
-                                if (itemId == R.id.menu_label_rename) {
-                                    EditTextDialogBuilder builder = new EditTextDialogBuilder(
-                                            context, label, getString(R.string.download_labels));
-                                    builder.setTitle(R.string.rename_label_title);
-                                    builder.setPositiveButton(android.R.string.ok, null);
-                                    AlertDialog dialog = builder.show();
-                                    new RenameLabelDialogHelper(builder, dialog, label);
-                                } else if (itemId == R.id.menu_label_remove) {
-                                    new MaterialAlertDialogBuilder(requireContext())
-                                            .setTitle(getString(R.string.delete_label_title))
-                                            .setMessage(getString(R.string.delete_label_message, label))
-                                            .setPositiveButton(R.string.delete, (dialog, which) -> {
-                                                mDownloadManager.deleteLabel(label);
-                                                mLabels.remove(position);
-                                                notifyDataSetChanged();
-                                            })
-                                            .setNegativeButton(android.R.string.cancel, null)
-                                            .show();
-                                }
-                                return false;
-                            });
+                            EditTextDialogBuilder builder = new EditTextDialogBuilder(
+                                    context, label, getString(R.string.download_labels));
+                            builder.setTitle(R.string.rename_label_title);
+                            builder.setPositiveButton(android.R.string.ok, null);
+                            AlertDialog dialog = builder.show();
+                            new RenameLabelDialogHelper(builder, dialog, label);
                         }
-                        return true;
                     });
                 } else {
                     holder.option.setVisibility(View.GONE);
@@ -1391,6 +1366,43 @@ public class DownloadsScene extends ToolbarScene
                     mLabelAdapter.notifyItemInserted(mLabels.size() - 1);
                 }
             }
+        }
+    }
+
+    private class DownloadLabelItemTouchHelperCallback extends ItemTouchHelper.Callback {
+
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT);
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getBindingAdapterPosition();
+            int toPosition = target.getBindingAdapterPosition();
+            Context context = getContext();
+            if (null == context || fromPosition == toPosition || toPosition == 0 || fromPosition == 0) {
+                return false;
+            }
+
+            EhApplication.getDownloadManager(context).moveLabel(fromPosition - 1, toPosition - 1);
+            final String item = mLabels.remove(fromPosition);
+            mLabels.add(toPosition, item);
+            mLabelAdapter.notifyDataSetChanged();
+            return true;
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getBindingAdapterPosition();
+            if (mDownloadManager == null)
+                return;
+            String label = mLabels.get(position);
+            mDownloadManager.deleteLabel(label);
+            mLabels.remove(position);
+            mLabelAdapter.notifyDataSetChanged();
         }
     }
 }
