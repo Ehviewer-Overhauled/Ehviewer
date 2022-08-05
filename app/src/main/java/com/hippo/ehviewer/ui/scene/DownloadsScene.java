@@ -1399,8 +1399,10 @@ public class DownloadsScene extends ToolbarScene
             int position = viewHolder.getBindingAdapterPosition();
             if (mDownloadManager == null)
                 return;
-            String label = mLabels.get(position);
-            mDownloadManager.deleteLabel(label);
+            if (position != 0) {
+                String label = mLabels.get(position);
+                mDownloadManager.deleteLabel(label);
+            }
             mLabels.remove(position);
             mLabelAdapter.notifyDataSetChanged();
         }
