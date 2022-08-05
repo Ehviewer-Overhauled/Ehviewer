@@ -18,13 +18,10 @@ package com.hippo.ehviewer.ui.scene;
 
 import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,10 +30,8 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -50,12 +45,12 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -103,7 +98,6 @@ import com.hippo.widget.FabLayout;
 import com.hippo.widget.SearchBarMover;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.LayoutUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 import com.hippo.yorozuya.StringUtils;
@@ -752,6 +746,8 @@ public final class GalleryListScene extends BaseScene
         final QsDrawerAdapter qsDrawerAdapter = new QsDrawerAdapter(inflater);
         qsDrawerAdapter.setHasStableIds(true);
         recyclerView.setAdapter(qsDrawerAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new GalleryListQSItemTouchHelperCallback(qsDrawerAdapter));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         mQuickSearchList = EhDB.getAllQuickSearch();
         tip.setText(R.string.quick_search_tip);
         if (mIsTopList) {
@@ -1554,34 +1550,6 @@ public final class GalleryListScene extends BaseScene
                     setState(STATE_NORMAL);
                     closeDrawer(Gravity.RIGHT);
                 });
-                holder.itemView.setOnLongClickListener(v -> {
-                    PopupMenu popupMenu = new PopupMenu(requireContext(), holder.option);
-                    popupMenu.inflate(R.menu.quicksearch_option);
-                    popupMenu.show();
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                        final QuickSearch quickSearch = mQuickSearchList.get(position);
-
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getItemId() == R.id.menu_qs_remove) {
-                                new MaterialAlertDialogBuilder(requireContext())
-                                        .setTitle(getString(R.string.delete_quick_search_title))
-                                        .setMessage(getString(R.string.delete_quick_search_message, quickSearch.name))
-                                        .setPositiveButton(R.string.delete, (dialog, which) -> {
-                                            EhDB.deleteQuickSearch(quickSearch);
-                                            mQuickSearchList.remove(position);
-                                            notifyDataSetChanged();
-                                        })
-                                        .setNegativeButton(android.R.string.cancel, null)
-                                        .show();
-                                return true;
-                            }
-                            return false;
-                        }
-                    });
-                    return true;
-                });
             } else {
                 int[] keywords = {11, 12, 13, 15};
                 int[] toplists = {R.string.toplist_alltime, R.string.toplist_pastyear, R.string.toplist_pastmonth, R.string.toplist_yesterday};
@@ -1799,6 +1767,49 @@ public final class GalleryListScene extends BaseScene
                 }
                 showActionFab();
             }
+        }
+    }
+
+    private class GalleryListQSItemTouchHelperCallback extends ItemTouchHelper.Callback {
+        private final QsDrawerAdapter mAdapter;
+
+        public GalleryListQSItemTouchHelperCallback(QsDrawerAdapter adapter) {
+            mAdapter = adapter;
+        }
+
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT);
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getBindingAdapterPosition();
+            int toPosition = target.getBindingAdapterPosition();
+            if (fromPosition == toPosition) {
+                return false;
+            }
+            if (null == mQuickSearchList) {
+                return false;
+            }
+            EhDB.moveQuickSearch(fromPosition, toPosition);
+            final QuickSearch item = mQuickSearchList.remove(fromPosition);
+            mQuickSearchList.add(toPosition, item);
+            mAdapter.notifyDataSetChanged();
+            return true;
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (mQuickSearchList == null)
+                return;
+            int position = viewHolder.getBindingAdapterPosition();
+            final QuickSearch quickSearch = mQuickSearchList.get(position);
+            EhDB.deleteQuickSearch(quickSearch);
+            mQuickSearchList.remove(position);
+            mAdapter.notifyDataSetChanged();
         }
     }
 }
