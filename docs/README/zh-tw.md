@@ -21,6 +21,31 @@
   </a>
 </p>
 
+<div align="center">
+  <h3>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md#說明">
+    說明
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md#下載">
+    下載
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md#截圖">
+    截圖
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md#感謝">
+    感謝
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md#許可證書">
+    許可證書
+    </a>
+  </h3>
+</div>
+
+
 # 說明
 
 致力於輕量化與良好性能表現的 EhViewer 分支

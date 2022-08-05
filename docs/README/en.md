@@ -21,6 +21,31 @@
   </a>
 </p>
 
+<div align="center">
+  <h3>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#description">
+    Description
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#download">
+    Download
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#screenshot">
+    Screenshot
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#thanks">
+    Thanks
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#license">
+    License
+    </a>
+  </h3>
+</div>
+
+
 # Description
 
 EhViewer fork dedicated to lightweight and high-performance

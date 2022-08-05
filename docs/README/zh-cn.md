@@ -21,6 +21,31 @@
   </a>
 </p>
 
+<div align="center">
+  <h3>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#描述">
+    描述
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#下载">
+    下载
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#截图">
+    截图
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#感谢">
+    感谢
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#许可证">
+    许可证
+    </a>
+  </h3>
+</div>
+
+
 # 描述
 
 致力于轻量化与良好性能表现的 EhViewer 分支
@@ -55,7 +80,7 @@ App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系�
 - [XZ Utils](https://tukaani.org/xz/)
 
 
-# 许可
+# 许可证
 
     Copyright 2014-2019 Hippo Seven
     Copyright 2020-2022 NekoInverter
