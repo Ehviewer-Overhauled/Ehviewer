@@ -1,5 +1,17 @@
+<p align="right">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md">
+  English
+  </a>
+  <span> | </span>
+  <strong>简体中文<strong>
+  <span> | <span>
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-tw.md">
+  正體中文
+  </a>
+</p>
+
 <h1 align="center">
-  <img src="art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -7,7 +19,7 @@
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml">
     <img src="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml/badge.svg" alt="Github Actions">
   </a>
-  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/master/LICENSE">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/LICENSE">
     <img src="https://img.shields.io/github/license/Ehviewer-Overhauled/Ehviewer" alt="LICENSE">
   </a>
   <a href="https://www.codefactor.io/repository/github/Ehviewer-Overhauled/ehviewer">
@@ -21,35 +33,51 @@
   </a>
 </p>
 
-# Description
+<div align="center">
+  <h3>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-cn.md#描述">
+    描述
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-cn.md#下载">
+    下载
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-cn.md#截图">
+    截图
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-cn.md#感谢">
+    感谢
+    </a>
+    <span> | </span>
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/zh-cn.md#许可证">
+    许可证
+    </a>
+  </h3>
+</div>
 
-致力於輕量化與良好性能表現的 EhViewer 分支
 
-已針對性適配 Material Design 3 及其動態取色系統
+# 描述
 
+致力于轻量化与良好性能表现的 EhViewer 分支
 
-EhViewer fork dedicated to lightweight and high-performance
+已针对性适配 Material Design 3 及其动态取色系统
 
-with Material Design 3 and Dynamic Color Support
+# 下载
 
-# Download
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on Google Play" src="art/get-it-on-github.svg" width="200px"/></a>
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
+App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系统，为开发主线；1.7 版本适配 Android 11 及以下版本，削减了 Android 12 及以上系统的独有功能，使其能在低版本 Android 上正常工作
 
-App 分為 1.8 與 1.7 兩個版本。1.8 版本適配 Android 12 及以上系統，為開發主線；1.7 版本適配 Android 11 及以下版本，削減了 Android 12 及以上系統的獨有功能，使其能在低版本 Android 上正常工作
+# 截图
 
-App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 and above, also the develop mainline. Version 1.7 support Android 11 and below, drop down some spicetify functions for Android 12 to make app useable on lower Android System
+![screenshot-01](../../art/screenshot-01.png)
+![screenshot-02](../../art/screenshot-02.png)
 
-# Screenshot
+# 感谢
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
-
-# Thanks
-
-本項目受到了諸多開源項目的幫助
-
-Here is the libraries
+本项目受到了诸多开源项目的帮助
 
 - [AOSP&AndroidX](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
@@ -57,16 +85,14 @@ Here is the libraries
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [greenDAO](https://github.com/greenrobot/greenDAO)
 - [jsoup](https://github.com/jhy/jsoup)
 - [okhttp](https://github.com/square/okhttp)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
-- [roaster](https://github.com/forge/roaster)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
 
 
-# License
+# 许可证
 
     Copyright 2014-2019 Hippo Seven
     Copyright 2020-2022 NekoInverter

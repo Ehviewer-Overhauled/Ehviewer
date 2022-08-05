@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">
-  <img src="art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -35,23 +35,23 @@
 
 <div align="center">
   <h3>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#description">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md#description">
     Description
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#download">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md#download">
     Download
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#screenshot">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md#screenshot">
     Screenshot
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#thanks">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md#thanks">
     Thanks
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#license">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.7.x.x/docs/README/en.md#license">
     License
     </a>
   </h3>
@@ -72,25 +72,23 @@ App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 a
 
 # Screenshot
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
+![screenshot-01](../../art/screenshot-01.png)
+![screenshot-02](../../art/screenshot-02.png)
 
 # Thanks
 
 Here is the libraries
 
-- [AOSP](http://source.android.com/)
+- [AOSP&AndroidX](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
+- [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
+- [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [Apache Commons Lang](https://commons.apache.org/proper/commons-lang/)
-- [apng](http://apng.sourceforge.net/)
-- [giflib](http://giflib.sourceforge.net)
 - [greenDAO](https://github.com/greenrobot/greenDAO)
 - [jsoup](https://github.com/jhy/jsoup)
-- [libjpeg-turbo](https://libjpeg-turbo.org/)
-- [libpng](http://www.libpng.org/pub/png/libpng.html)
 - [okhttp](https://github.com/square/okhttp)
+- [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [roaster](https://github.com/forge/roaster)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
