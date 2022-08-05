@@ -19,7 +19,7 @@
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml">
     <img src="https://github.com/Ehviewer-Overhauled/Ehviewer/actions/workflows/ci.yml/badge.svg" alt="Github Actions">
   </a>
-  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/master/LICENSE">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/LICENSE">
     <img src="https://img.shields.io/github/license/Ehviewer-Overhauled/Ehviewer" alt="LICENSE">
   </a>
   <a href="https://www.codefactor.io/repository/github/Ehviewer-Overhauled/ehviewer">
