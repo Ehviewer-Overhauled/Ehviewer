@@ -1,3 +1,15 @@
+<p align="right">
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md">
+  English
+  </a>
+  <span> | </span>
+  <strong>简体中文<strong>
+  <span> | <span>
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md">
+  正體中文
+  </a>
+</p>
+
 <h1 align="center">
   <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
