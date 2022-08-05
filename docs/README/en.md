@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">
-  <img src="art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -35,23 +35,23 @@
 
 <div align="center">
   <h3>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#description">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#description">
     Description
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#download">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#download">
     Download
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#screenshot">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#screenshot">
     Screenshot
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#thanks">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#thanks">
     Thanks
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#license">
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md#license">
     License
     </a>
   </h3>
@@ -66,14 +66,14 @@ with Material Design 3 and Dynamic Color Support
 
 # Download
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="../../art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="../../art/get-it-on-fdroid.svg" width="200px"/></a>
 
 App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 and above, also the develop mainline. Version 1.7 support Android 11 and below, drop down some spicetify functions for Android 12 to make app useable on lower Android System
 
 # Screenshot
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
+![screenshot-01](../../art/screenshot-01.png)
+![screenshot-02](../../art/screenshot-02.png)
 
 # Thanks
 

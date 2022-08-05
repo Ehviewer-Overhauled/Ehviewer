@@ -1,9 +1,9 @@
 <p align="right">
-  <strong>English<strong>
-  <span> | </span>
-  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md">
-  简体中文
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/en.md">
+  English
   </a>
+  <span> | </span>
+  <strong>简体中文<strong>
   <span> | <span>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md">
   正體中文
@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">
-  <img src="art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.png" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -35,49 +35,49 @@
 
 <div align="center">
   <h3>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#description">
-    Description
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#描述">
+    描述
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#download">
-    Download
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#下载">
+    下载
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#screenshot">
-    Screenshot
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#截图">
+    截图
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#thanks">
-    Thanks
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#感谢">
+    感谢
     </a>
     <span> | </span>
-    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer#license">
-    License
+    <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md#许可证">
+    许可证
     </a>
   </h3>
 </div>
 
 
-# Description
+# 描述
 
-EhViewer fork dedicated to lightweight and high-performance
+致力于轻量化与良好性能表现的 EhViewer 分支
 
-with Material Design 3 and Dynamic Color Support
+已针对性适配 Material Design 3 及其动态取色系统
 
-# Download
+# 下载
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="../../art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="../../art/get-it-on-fdroid.svg" width="200px"/></a>
 
-App is divided into two versions: 1.7 and 1.8 . Version 1.8 support Android 12 and above, also the develop mainline. Version 1.7 support Android 11 and below, drop down some spicetify functions for Android 12 to make app useable on lower Android System
+App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系统，为开发主线；1.7 版本适配 Android 11 及以下版本，削减了 Android 12 及以上系统的独有功能，使其能在低版本 Android 上正常工作
 
-# Screenshot
+# 截图
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
+![screenshot-01](../../art/screenshot-01.png)
+![screenshot-02](../../art/screenshot-02.png)
 
-# Thanks
+# 感谢
 
-Here is the libraries
+本项目受到了诸多开源项目的帮助
 
 - [AOSP&AndroidX](http://source.android.com/)
 - [android-advancedrecyclerview](https://github.com/h6ah4i/android-advancedrecyclerview)
@@ -92,7 +92,7 @@ Here is the libraries
 - [XZ Utils](https://tukaani.org/xz/)
 
 
-# License
+# 许可证
 
     Copyright 2014-2019 Hippo Seven
     Copyright 2020-2022 NekoInverter
