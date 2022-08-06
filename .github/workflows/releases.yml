@@ -41,3 +41,23 @@ jobs:
             app/build/outputs/apk/release/app-x86_64-release.apk
             app/build/outputs/apk/release/app-x86-release.apk
             app/build/outputs/apk/release/app-armeabi-v7a-release.apk
+
+      - name: Collect Apks
+        run: |
+          mkdir app/build/outputs/apk/release/fdroid
+          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk app/build/outputs/apk/release/fdroid/EhViewer-v$GITHUB_REF_NAME.apk
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk app/build/outputs/apk/release/fdroid/EhViewer-v$GITHUB_REF_NAME-armv7.apk
+
+      - name: Push Apks
+        uses: cpina/github-action-push-to-another-repository@v1.5
+        env:
+         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: app/build/outputs/apk/release/fdroid
+          destination-github-username: txyyh
+          destination-repository-name: fdroid-repo
+          user-name: 'github-actions[bot]'
+          user-email: 'github-actions[bot]@users.noreply.github.com'
+          target-branch: deploy
+          commit-message: Add apks from $GITHUB_REF
+          target-directory: fdroid/tmp-apks
