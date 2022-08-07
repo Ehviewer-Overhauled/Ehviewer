@@ -49,7 +49,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
-    private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Long> streams = new LinkedHashMap<>();
     private final AtomicInteger decodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private Thread archiveThread;
     private Thread decodeThread;
@@ -255,10 +255,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     }
                 }
 
-                int fd = archiveAccessor.extractToMemfd(index);
+                long addr = archiveAccessor.extracttoOutputStream(index);
 
                 synchronized (streams) {
-                    streams.put(index, fd);
+                    streams.put(index, addr);
                     streams.notify();
                 }
             }
@@ -270,7 +270,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                int fd;
+                Long addr;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -282,16 +282,16 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, Integer>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, Integer> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Long>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Long> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    fd = entry.getValue();
+                    addr = entry.getValue();
                     decodingIndex.lazySet(index);
                 }
 
                 try {
-                    Image image = Image.decode(fd, false);
+                    Image image = Image.decodeAddr(addr, true);
                     if (image != null) {
                         notifyPageSucceed(index, image);
                     } else {

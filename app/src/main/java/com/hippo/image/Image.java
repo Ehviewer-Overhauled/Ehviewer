@@ -72,6 +72,14 @@ public final class Image {
     }
 
     /**
+     * Decode image from {@code InputStream}
+     */
+    @Nullable
+    public static Image decodeAddr(Long addr, boolean partially) {
+        return newFromAddr(nativeDecodeAddr(addr));
+    }
+
+    /**
      * Create a plain image from Bitmap
      */
     @Nullable
@@ -90,6 +98,8 @@ public final class Image {
     private static native long nativeDecode(FileDescriptor fd);
 
     private static native long nativeDecodeFdInt(int fd);
+
+    private static native long nativeDecodeAddr(long addr);
 
     private static native long nativeCreate(Bitmap bitmap);
 

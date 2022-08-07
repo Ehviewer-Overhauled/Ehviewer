@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <syscall.h>
 #include <sys/mman.h>
 
 #include <jni.h>
@@ -104,7 +103,6 @@ JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, jlong size) {
     archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (archiveAddr == MAP_FAILED) {
-        archiveAddr = NULL;
         LOGE("%s%d", "mmap64 failed with errno ", errno);
         return 0;
     }
@@ -145,27 +143,35 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, 
     return r;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToMemfd(JNIEnv *_, jobject thiz, jint index) {
+typedef struct Memarea {
+    void *buffer;
+    long size;
+} Memarea;
+
+JNIEXPORT jlong JNICALL
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index) {
     struct archive_entry *entry;
     int ret;
     if (!arc || index < cur_index) {
         archive_alloc();
         cur_index = 0;
     }
-    int memfd = syscall(SYS_memfd_create, "ArchiveMemFD", 0);
+    Memarea *memarea = malloc(sizeof(Memarea));
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (cur_index++ == index) {
-            ret = archive_read_data_into_fd(arc, memfd);
+            memarea->size = (long) archive_entry_size(entry);
+            memarea->buffer = malloc(memarea->size);
+            ret = archive_read_data(arc, memarea->buffer, memarea->size);
+            if (ret != memarea->size)
+                LOGE("%s", "No enough data read, WTF?");
             if (ret < 0)
                 LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
             break;
         }
     }
-    lseek64(memfd, 0, SEEK_SET);
-    return memfd;
+    return (jlong) memarea;
 }
 
 JNIEXPORT void JNICALL
