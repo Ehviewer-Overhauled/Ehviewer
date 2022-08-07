@@ -23,6 +23,8 @@
 #include <zlib.h>
 #include <nettle/config.h>
 
+#include <android/fdsan.h>
+
 #include "image.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -35,6 +37,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (!image_onLoad(vm)) {
         return JNI_ERR;
     }
+
+    android_fdsan_set_error_level(ANDROID_FDSAN_ERROR_LEVEL_WARN_ONCE);
 
     return JNI_VERSION_1_6;
 }

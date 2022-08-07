@@ -21,10 +21,6 @@ package com.hippo;
 import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import android.system.Os;
-import android.system.OsConstants;
-
-import java.io.FileDescriptor;
 
 public class UriArchiveAccessor {
     ParcelFileDescriptor pfd;
@@ -43,7 +39,7 @@ public class UriArchiveAccessor {
 
     private native int openArchive(int fd, long size);
 
-    public native long extracttoOutputStream(int index);
+    public native int extractToMemfd(int index);
 
     public native boolean needPassword();
 

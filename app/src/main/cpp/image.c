@@ -19,8 +19,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <android/data_space.h>
+#include <android/fdsan.h>
 #include <android/imagedecoder.h>
 #include <android/log.h>
 
@@ -52,7 +54,6 @@ void image_onUnload() {
 
 typedef struct {
     AImageDecoder *decoder;
-    void *srcBuffer;
     size_t stride;
     int fd;
 } SOURCE;
@@ -72,7 +73,8 @@ static void recycleSource(SOURCE *src) {
     if (!src)
         return;
     AImageDecoder_delete(src->decoder);
-    free(src->srcBuffer);
+    if (!android_fdsan_get_owner_tag(src->fd))
+        close(src->fd);
     free(src);
 }
 
@@ -83,11 +85,6 @@ static void recycle(IMAGE *image) {
     free(image->buffer);
     free(image);
 }
-
-typedef struct Memarea {
-    void *buffer;
-    long size;
-} Memarea;
 
 bool copy_pixels(const void *src, int src_w, int src_h, int src_x, int src_y,
                  void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
@@ -212,17 +209,6 @@ IMAGE *createFromFd(int fd) {
     SOURCE *src = calloc(1, sizeof(SOURCE));
     src->decoder = decoder;
     src->fd = fd;
-    decodeCommon(image, src);
-    return image;
-}
-
-IMAGE *createFromAddr(void *addr, long size) {
-    AImageDecoder *decoder;
-    AImageDecoder_createFromBuffer((const void *) addr, size, &decoder);
-    IMAGE *image = calloc(1, sizeof(IMAGE));
-    SOURCE *src = calloc(1, sizeof(SOURCE));
-    src->decoder = decoder;
-    src->srcBuffer = addr;
     decodeCommon(image, src);
     return image;
 }
@@ -354,14 +340,6 @@ Java_com_hippo_image_Image_nativeIsOpaque(JNIEnv *env, jclass clazz, jlong ptr) 
 JNIEXPORT void JNICALL
 Java_com_hippo_image_Image_nativeRecycle(JNIEnv *env, jclass clazz, jlong ptr) {
     recycle((IMAGE *) ptr);
-}
-
-JNIEXPORT jlong JNICALL
-Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr) {
-    Memarea *memarea = (Memarea *) addr;
-    IMAGE *image = createFromAddr(memarea->buffer, memarea->size);
-    free(memarea);
-    return (jlong) image;
 }
 
 JNIEXPORT jint JNICALL
