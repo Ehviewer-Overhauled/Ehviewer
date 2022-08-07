@@ -15,6 +15,7 @@
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
@@ -31,15 +32,15 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/thumb_card"
             style="@style/Widget.Material3.CardView.Filled"
-            android:layout_width="@dimen/gallery_list_thumb_width"
-            android:layout_height="@dimen/gallery_list_thumb_height">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
             <com.hippo.ehviewer.widget.FixedThumb
                 android:id="@+id/thumb"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/gallery_list_thumb_width"
+                android:layout_height="@dimen/gallery_list_thumb_height"
                 app:alwaysCutAndScale="true"
-                app:retryType="click" />
+                app:retryType="click"/>
 
         </com.google.android.material.card.MaterialCardView>
 

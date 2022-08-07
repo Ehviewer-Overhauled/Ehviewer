@@ -77,10 +77,11 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.hippo.widget.LoadImageView
+                    <com.hippo.ehviewer.widget.FixedThumb
                         android:id="@+id/thumb"
                         android:layout_width="@dimen/gallery_detail_thumb_width"
-                        android:layout_height="@dimen/gallery_detail_thumb_height" />
+                        android:layout_height="@dimen/gallery_detail_thumb_height"
+                        app:alwaysCutAndScale="true"/>
 
                 </com.google.android.material.card.MaterialCardView>
 
