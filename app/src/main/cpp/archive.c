@@ -91,6 +91,7 @@ static int archive_alloc() {
     arc = archive_read_new();
     archive_read_support_format_all(arc);
     archive_read_support_filter_all(arc);
+    archive_read_set_option(arc, "zip", "ignorecrc32", "1");
     if (passwd)
         archive_read_add_passphrase(arc, passwd);
     return archive_read_open_memory(arc, archiveAddr, archiveSize);
