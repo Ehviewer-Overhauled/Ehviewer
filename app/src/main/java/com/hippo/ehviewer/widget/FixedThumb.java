@@ -53,11 +53,6 @@ public class FixedThumb extends LoadImageView {
         a.recycle();
     }
 
-    public void setFix(float minAspect, float maxAspect) {
-        this.minAspect = minAspect;
-        this.maxAspect = maxAspect;
-    }
-
     @Override
     public void onPreSetImageDrawable(Drawable drawable, boolean isTarget) {
         if (alwaysCutAndScale) {
