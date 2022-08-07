@@ -28,8 +28,6 @@ import java.io.FileDescriptor;
 
 public class UriArchiveAccessor {
     ParcelFileDescriptor pfd;
-    FileDescriptor fd;
-    long archiveAddr;
     Context ctx;
     Uri uri;
 
@@ -40,12 +38,10 @@ public class UriArchiveAccessor {
 
     public int open() throws Exception {
         pfd = ctx.getContentResolver().openFileDescriptor(uri, "r");
-        fd = pfd.getFileDescriptor();
-        archiveAddr = Os.mmap(0, pfd.getStatSize(), OsConstants.PROT_READ, OsConstants.MAP_PRIVATE, fd, 0);
-        return openArchive(archiveAddr, pfd.getStatSize());
+        return openArchive(pfd.getFd(), pfd.getStatSize());
     }
 
-    private native int openArchive(long addr, long size);
+    private native int openArchive(int fd, long size);
 
     public native long extracttoOutputStream(int index);
 
@@ -57,8 +53,6 @@ public class UriArchiveAccessor {
 
     public void close() throws Exception {
         closeArchive();
-        Os.munmap(archiveAddr, pfd.getStatSize());
-        Os.close(fd);
         pfd.close();
     }
 }

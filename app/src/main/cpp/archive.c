@@ -17,15 +17,17 @@
  * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <jni.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/mman.h>
+
+#include <jni.h>
 #include <android/log.h>
+
 #include <archive.h>
 #include <archive_entry.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <stdbool.h>
 
 #define LOG_TAG "libarchive_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG ,__VA_ARGS__)
@@ -98,11 +100,14 @@ static int archive_alloc() {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong addr, jlong size) {
-    archiveAddr = (void *) addr;
+Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, jlong size) {
+    archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (archiveAddr == MAP_FAILED) {
+        LOGE("%s%d", "mmap64 failed with errno ", errno);
+        return 0;
+    }
     archiveSize = size;
     env = _;
-    madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
     long r = archive_alloc();
     if (r) {
         r = 0;
@@ -121,7 +126,18 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jlong add
             default:
                 need_encrypt = false;
         }
-        LOGI("%s%d", "archive_read_has_encrypted_entries returns ", encryptRet);
+
+        // madvise for readahead optimization
+        int format = archive_format(arc);
+        switch (format) {
+            case ARCHIVE_FORMAT_ZIP:
+            case ARCHIVE_FORMAT_RAR:
+            case ARCHIVE_FORMAT_RAR_V5:
+                madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
+                break;
+            default:
+                ;
+        }
     }
     archive_release();
     return r;
@@ -145,7 +161,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (cur_index++ == index) {
-            memarea->size = archive_entry_size(entry);
+            memarea->size = (long) archive_entry_size(entry);
             memarea->buffer = malloc(memarea->size);
             ret = archive_read_data(arc, memarea->buffer, memarea->size);
             if (ret != memarea->size)
@@ -162,6 +178,7 @@ JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
     archive_release();
     free(passwd);
+    munmap(archiveAddr, archiveSize);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -179,17 +196,16 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *_, jobject thiz, jstri
     passwd = calloc(len, sizeof(char));
     strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
     archive_alloc();
+    void *tmpBuf = alloca(4096);
     while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (!archive_entry_is_encrypted(entry))
             continue;
-        void *tmpBuf = malloc(4096);
         if (archive_read_data(arc, tmpBuf, 4096) < ARCHIVE_OK) {
             LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
             ret = false;
         }
-        free(tmpBuf);
         break;
     }
     archive_release();
