@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">
-  <img src="../../art/launcher_icon-web.png" width="200">
+  <img src="../../art/launcher_icon-web.svg" width="200">
   <br>EhViewer<br>
 </h1>
 
