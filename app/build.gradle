@@ -92,7 +92,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    def activity_version = "1.6.0-alpha05"
+    def activity_version = "1.6.0-beta01"
     implementation "androidx.activity:activity:$activity_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
 
