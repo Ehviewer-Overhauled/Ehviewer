@@ -4,6 +4,10 @@
     "1.7.x.x"
   ],
 
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+
   "extends": [
     "config:base"
   ]
