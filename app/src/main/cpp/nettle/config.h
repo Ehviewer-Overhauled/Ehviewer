@@ -149,7 +149,7 @@
 #define PACKAGE_NAME "nettle"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "nettle 3.8"
+#define PACKAGE_STRING "nettle 3.8.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "nettle"
@@ -158,7 +158,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.8"
+#define PACKAGE_VERSION "3.8.1"
 
 /* The size of `long', as computed by sizeof. */
 #define SIZEOF_LONG __SIZEOF_LONG__
