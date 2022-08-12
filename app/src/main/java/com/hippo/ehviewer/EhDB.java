@@ -68,8 +68,6 @@ public class EhDB {
 
     private static final String TAG = EhDB.class.getSimpleName();
 
-    private static final int MAX_HISTORY_COUNT = 200;
-
     private static DaoSession sDaoSession;
 
     private static boolean sHasOldDB;
@@ -573,9 +571,6 @@ public class EhDB {
             info = new HistoryInfo(galleryInfo);
             info.time = System.currentTimeMillis();
             dao.insert(info);
-            List<HistoryInfo> list = dao.queryBuilder().orderDesc(HistoryDao.Properties.Time)
-                    .limit(-1).offset(MAX_HISTORY_COUNT).list();
-            dao.deleteInTx(list);
         }
     }
 
@@ -586,10 +581,6 @@ public class EhDB {
                 dao.insert(info);
             }
         }
-
-        List<HistoryInfo> list = dao.queryBuilder().orderDesc(HistoryDao.Properties.Time)
-                .limit(-1).offset(MAX_HISTORY_COUNT).list();
-        dao.deleteInTx(list);
     }
 
     public static synchronized void deleteHistoryInfo(HistoryInfo info) {
