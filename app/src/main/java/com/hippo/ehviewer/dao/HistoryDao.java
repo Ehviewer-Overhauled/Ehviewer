@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.dao;
 
+import androidx.paging.PagingSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -18,6 +19,9 @@ public interface HistoryDao extends BasicDao<HistoryInfo> {
 
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC LIMIT :limit OFFSET :offset")
     List<HistoryInfo> list(int offset, int limit);
+
+    @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
+    PagingSource<Integer, HistoryInfo> listLazy();
 
     @Update
     void update(HistoryInfo historyInfo);
