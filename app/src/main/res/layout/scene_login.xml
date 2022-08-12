@@ -73,7 +73,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autofillHints="password"
                     android:imeOptions="actionDone"
@@ -82,6 +82,15 @@
                     android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/TextAppearance.Material3.LabelLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="24dp"
+                android:maxWidth="@dimen/single_max_width"
+                android:text="@string/app_waring"/>
 
             <Space
                 android:layout_width="wrap_content"
