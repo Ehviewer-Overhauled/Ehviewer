@@ -832,4 +832,5 @@
     <string name="archive_need_passwd">Archive need password</string>
     <string name="passwd_wrong">Password Wrong</string>
     <string name="passwd_cannot_be_empty">Password can\'t be empty</string>
+    <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
 </resources>
