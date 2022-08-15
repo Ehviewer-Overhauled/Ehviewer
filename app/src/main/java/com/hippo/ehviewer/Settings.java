@@ -100,6 +100,11 @@ public class Settings {
     private static final int DEFAULT_VERSION_CODE = 0;
     private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String DEFAULT_DISPLAY_NAME = null;
+    public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
+    private static final int DEFAULT_LIST_THUMB_SIZE = 40;
+    private static int LIST_THUMB_SIZE = 40;
+
+    public static boolean LIST_THUMB_SIZE_INITED = false;
     private static final String KEY_AVATAR = "avatar";
     private static final String DEFAULT_AVATAR = null;
     private static final String KEY_SHOW_WARNING = "show_warning";
@@ -1167,5 +1172,15 @@ public class Settings {
 
     public static void putPasswdToArchivePasswds(String value) {
         putStringToStringSet(KEY_ARCHIVE_PASSWDS, value);
+    }
+
+    public static int getListThumbSize() {
+        if (LIST_THUMB_SIZE_INITED) {
+            return LIST_THUMB_SIZE;
+        }
+        int size = 3 * getInt(KEY_LIST_THUMB_SIZE, DEFAULT_LIST_THUMB_SIZE);
+        LIST_THUMB_SIZE = size;
+        LIST_THUMB_SIZE_INITED = true;
+        return size;
     }
 }

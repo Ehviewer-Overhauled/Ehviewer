@@ -38,6 +38,7 @@ public class EhFragment extends BasePreferenceFragment {
         Preference blackDarkTheme = findPreference(Settings.KEY_BLACK_DARK_THEME);
         Preference gallerySite = findPreference(Settings.KEY_GALLERY_SITE);
         Preference listMode = findPreference(Settings.KEY_LIST_MODE);
+        Preference listThumbSize = findPreference(Settings.KEY_LIST_THUMB_SIZE);
         Preference detailSize = findPreference(Settings.KEY_DETAIL_SIZE);
         Preference thumbSize = findPreference(Settings.KEY_THUMB_SIZE);
         Preference showTagTranslations = findPreference(Settings.KEY_SHOW_TAG_TRANSLATIONS);
@@ -46,6 +47,7 @@ public class EhFragment extends BasePreferenceFragment {
         theme.setOnPreferenceChangeListener(this);
         gallerySite.setOnPreferenceChangeListener(this);
         listMode.setOnPreferenceChangeListener(this);
+        listThumbSize.setOnPreferenceChangeListener(this);
         detailSize.setOnPreferenceChangeListener(this);
         thumbSize.setOnPreferenceChangeListener(this);
         showTagTranslations.setOnPreferenceChangeListener(this);
@@ -68,6 +70,10 @@ public class EhFragment extends BasePreferenceFragment {
             requireActivity().setResult(Activity.RESULT_OK);
             return true;
         } else if (Settings.KEY_LIST_MODE.equals(key)) {
+            requireActivity().setResult(Activity.RESULT_OK);
+            return true;
+        } else if (Settings.KEY_LIST_THUMB_SIZE.equals(key)) {
+            Settings.LIST_THUMB_SIZE_INITED = false;
             requireActivity().setResult(Activity.RESULT_OK);
             return true;
         } else if (Settings.KEY_DETAIL_SIZE.equals(key)) {

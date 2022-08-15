@@ -82,6 +82,15 @@
         app:entryValues="@array/list_mode_entry_values"
         app:iconSpaceReserved="false" />
 
+    <SeekBarPreference
+        android:defaultValue="40"
+        android:key="list_tile_size"
+        android:title="@string/list_tile_thumb_size"
+        android:max="60"
+        app:iconSpaceReserved="false"
+        app:min="30"
+        app:showSeekBarValue="true" />
+
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="detail_size"

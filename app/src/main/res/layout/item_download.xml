@@ -29,10 +29,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.hippo.ehviewer.widget.FixedThumb
+        <com.hippo.ehviewer.widget.ResizeableFixedThumb
             android:id="@+id/thumb"
-            android:layout_width="@dimen/gallery_list_thumb_width"
-            android:layout_height="@dimen/gallery_list_thumb_height"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:alwaysCutAndScale="true"
             app:retryType="longClick" />
 

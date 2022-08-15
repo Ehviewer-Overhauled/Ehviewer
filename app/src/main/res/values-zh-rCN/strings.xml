@@ -768,4 +768,5 @@
     <string name="archive_need_passwd">归档文件需要密码</string>
     <string name="passwd_wrong">密码错误</string>
     <string name="passwd_cannot_be_empty">密码不能为空</string>
+    <string name="list_tile_thumb_size">详情模式下缩略图大小</string>
 </resources>
