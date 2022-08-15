@@ -559,12 +559,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
 
         ViewGroup main = (ViewGroup) ViewUtils.$$(view, R.id.main);
         ScrollView mainView = (ScrollView) ViewUtils.$$(main, R.id.scroll_view);
-        mainView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if (mActionGroup != null && mHeader != null) {
-                //noinspection IntegerDivisionInFloatingPointContext
-                setLightStatusBar(mActionGroup.getY() - mHeader.findViewById(R.id.header_content).getPaddingTop() / 2 < scrollY);
-            }
-        });
         View progressView = ViewUtils.$$(main, R.id.progress_view);
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);
@@ -666,11 +660,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         EhApplication.getDownloadManager(context).addDownloadInfoListener(this);
 
         return view;
-    }
-
-    @Override
-    public boolean needWhiteStatusBar() {
-        return false;
     }
 
     @Override
@@ -841,19 +830,16 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
 
         switch (state) {
             case STATE_NORMAL:
-                setLightStatusBar(false);
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mBelowHeader
                 mViewTransition2.showView(0, animation);
                 break;
             case STATE_REFRESH:
-                setLightStatusBar(true);
                 // Show mProgressView
                 mViewTransition.showView(1, animation);
                 break;
             case STATE_REFRESH_HEADER:
-                setLightStatusBar(false);
                 // Show mMainView
                 mViewTransition.showView(0, animation);
                 // Show mProgress
@@ -862,7 +848,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
             default:
             case STATE_INIT:
             case STATE_FAILED:
-                setLightStatusBar(true);
                 // Show mFailedView
                 mViewTransition.showView(2, animation);
                 break;

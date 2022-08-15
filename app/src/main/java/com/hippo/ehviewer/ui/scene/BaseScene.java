@@ -56,7 +56,6 @@ public abstract class BaseScene extends SceneFragment {
     private View drawerView;
     @Nullable
     private SparseArray<Parcelable> drawerViewState;
-    private boolean needWhiteStatusBar = needWhiteStatusBar();
 
     public void addAboveSnackView(View view) {
         FragmentActivity activity = getActivity();
@@ -118,10 +117,6 @@ public abstract class BaseScene extends SceneFragment {
         return true;
     }
 
-    public boolean needWhiteStatusBar() {
-        return true;
-    }
-
     public int getNavCheckedItem() {
         return 0;
     }
@@ -176,14 +171,6 @@ public abstract class BaseScene extends SceneFragment {
         drawerView = null;
     }
 
-    public void setLightStatusBar(boolean set) {
-        var insetsController = getInsetsController();
-        if (insetsController != null) {
-            insetsController.setAppearanceLightStatusBars(set && (requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0);
-        }
-        needWhiteStatusBar = set;
-    }
-
     public void onDestroyDrawerView() {
     }
 
@@ -213,7 +200,11 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         hideSoftInput();
-        setLightStatusBar(needWhiteStatusBar);
+
+        insetsController = getInsetsController();
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars((requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0);
+        }
     }
 
     @Nullable
