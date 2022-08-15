@@ -87,12 +87,6 @@ public abstract class ToolbarScene extends BaseScene {
         }
     }
 
-    @Override
-    public boolean needWhiteStatusBar() {
-        return false;
-    }
-
-
     public int getMenuResId() {
         return 0;
     }

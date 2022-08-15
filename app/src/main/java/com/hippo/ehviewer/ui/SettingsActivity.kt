@@ -13,56 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui
 
-package com.hippo.ehviewer.ui;
+import android.content.res.Configuration
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.snackbar.Snackbar
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.fragment.SettingsFragment
+import com.hippo.ehviewer.ui.scene.BaseScene
 
-import android.os.Bundle;
-import android.view.MenuItem;
-
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
-import androidx.fragment.app.FragmentTransaction;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.fragment.SettingsFragment;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-
-public final class SettingsActivity extends EhActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_preference);
-        setSupportActionBar(findViewById(R.id.toolbar));
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
+class SettingsActivity : EhActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_preference)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        val bar = supportActionBar
+        bar?.setDisplayHomeAsUpEnabled(true)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
         if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
-                    .replace(R.id.fragment, new SettingsFragment())
-                    .commitAllowingStateLoss();
+            supportFragmentManager
+                .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
+                .replace(R.id.fragment, SettingsFragment())
+                .commitAllowingStateLoss()
         }
     }
 
-    public void showTip(@StringRes int id, int length) {
-        showTip(getString(id), length);
+    fun showTip(@StringRes id: Int, length: Int) {
+        showTip(getString(id), length)
     }
 
-    public void showTip(CharSequence message, int length) {
-        Snackbar.make(findViewById(R.id.snackbar), message,
-                length == BaseScene.LENGTH_LONG ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT).show();
+    fun showTip(message: CharSequence?, length: Int) {
+        Snackbar.make(
+            findViewById(R.id.snackbar), message!!,
+            if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
+        ).show()
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 }

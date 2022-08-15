@@ -288,7 +288,6 @@ public final class MainActivity extends StageActivity
 
         mStageLayout = (EhStageLayout) ViewUtils.$$(this, R.id.fragment_container);
         mDrawerLayout = (DrawerLayout) ViewUtils.$$(this, R.id.draw_view);
-        mDrawerLayout.setStatusBarBackgroundColor(0);
         mNavView = (NavigationView) ViewUtils.$$(this, R.id.nav_view);
         mRightDrawer = (DrawerView) ViewUtils.$$(this, R.id.right_drawer);
 
