@@ -56,7 +56,7 @@ body:
     id: ci
     attributes:
       label: EhViewer CI 版本 / EhViewer CI Version
-      description: 直接将对应 CI 下载页面网址填入即可 / Simply drop CI download page url here
+      description: 直接将对应 GitHub Action CI 下载页面网址填入即可 / Simply drop GitHub Action CI download page url here
       placeholder: https://github.com/Ehviewer-Overhauled/Ehviewer/actions/runs/XXXXXXXXXX
     validations:
       required: true
