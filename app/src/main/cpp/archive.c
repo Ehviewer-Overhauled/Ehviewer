@@ -17,6 +17,7 @@
  * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,8 +39,16 @@
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, LOG_TAG ,__VA_ARGS__)
 
 static JNIEnv *env;
-static int cur_index = 0; // Current entry we haven't read any data from it yet
-static struct archive *arc = NULL;
+
+typedef struct {
+    int next_index;
+    struct archive *arc;
+    struct archive_entry *entry;
+} archive_ctx;
+
+static archive_ctx **ctx_pool;
+#define CTX_POOL_SIZE 20
+
 static bool need_encrypt = false;
 static char *passwd = NULL;
 static void *archiveAddr = NULL;
@@ -68,39 +77,105 @@ static int filename_is_playable_file(const char *name) {
     return false;
 }
 
-static long archive_list_all_entries() {
-    struct archive_entry *entry;
+static long archive_list_all_entries(archive_ctx *ctx) {
     long count = 0;
-    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
-        if (filename_is_playable_file(archive_entry_pathname(entry)))
+    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
+        if (filename_is_playable_file(archive_entry_pathname(ctx->entry)))
             count++;
     }
     if (!count)
-        LOGE("%s", archive_error_string(arc));
+        LOGE("%s", archive_error_string(ctx->arc));
     return count;
 }
 
-static void archive_release() {
-    if (arc) {
-        archive_read_close(arc);
-        archive_read_free(arc);
-        arc = NULL;
+static void archive_release_ctx(archive_ctx *ctx) {
+    if (ctx) {
+        archive_read_close(ctx->arc);
+        archive_read_free(ctx->arc);
+        free(ctx);
     }
 }
 
-static int archive_alloc() {
-    archive_release();
-    arc = archive_read_new();
-    archive_read_support_format_all(arc);
-    archive_read_support_filter_all(arc);
-    archive_read_set_option(arc, "zip", "ignorecrc32", "1");
+static int archive_alloc_ctx(archive_ctx **ctxptr) {
+    archive_ctx *ctx;
+    int err;
+    ctx = calloc(1, sizeof(archive_ctx));
+    if (!ctx)
+        return -ENOMEM;
+    ctx->arc = archive_read_new();
+    if (!ctx->arc) {
+        free(ctx);
+        return -ENOMEM;
+    }
+    archive_read_support_format_all(ctx->arc);
+    archive_read_support_filter_all(ctx->arc);
+    archive_read_set_option(ctx->arc, "zip", "ignorecrc32", "1");
     if (passwd)
-        archive_read_add_passphrase(arc, passwd);
-    return archive_read_open_memory(arc, archiveAddr, archiveSize);
+        archive_read_add_passphrase(ctx->arc, passwd);
+    err = archive_read_open_memory(ctx->arc, archiveAddr, archiveSize);
+    if (err) {
+        archive_read_free(ctx->arc);
+        free(ctx);
+        return err;
+    }
+    *ctxptr = ctx;
+    return 0;
+}
+
+static void archive_skip_to_index(archive_ctx *ctx, int index) {
+    struct archive_entry *entry;
+    assert(!(ctx->next_index > index));
+    while (archive_read_next_header(ctx->arc, &entry) == ARCHIVE_OK) {
+        if (!filename_is_playable_file(archive_entry_pathname(entry)))
+            continue;
+        if (ctx->next_index++ == index) {
+            ctx->entry = entry;
+            return;
+        }
+    }
+}
+
+static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
+    archive_ctx *ctx = NULL;
+    for (int i = 0; i < CTX_POOL_SIZE; i++) {
+        if (!ctx_pool[i])
+            continue;
+        if (ctx_pool[i]->next_index > idx)
+            continue;
+        if (!ctx || ctx_pool[i]->next_index > ctx->next_index)
+            ctx = ctx_pool[i];
+        if (ctx->next_index == idx)
+            break;
+    }
+
+    if (!ctx) {
+        archive_ctx *victimCtx = NULL;
+        int victimIdx = 0;
+        int ret = archive_alloc_ctx(&ctx);
+        if (ret)
+            return ret;
+        for (int i = 0; i < CTX_POOL_SIZE; i++) {
+            if (!ctx_pool[i]) {
+                ctx_pool[i] = ctx;
+                goto done;
+            }
+            if (!victimCtx || ctx_pool[i]->next_index > victimCtx->next_index) {
+                victimCtx = ctx_pool[i];
+                victimIdx = i;
+            }
+        }
+        archive_release_ctx(victimCtx);
+        ctx_pool[victimIdx] = ctx;
+    }
+    done:
+    *ctxptr = ctx;
+    archive_skip_to_index(ctx, idx);
+    return 0;
 }
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, jlong size) {
+    archive_ctx *ctx;
     archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (archiveAddr == MAP_FAILED) {
         LOGE("%s%d", "mmap64 failed with errno ", errno);
@@ -108,16 +183,19 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, 
     }
     archiveSize = size;
     env = _;
-    long r = archive_alloc();
+    ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
+    long r = archive_alloc_ctx(&ctx);
     if (r) {
+        if (r == -ENOMEM)
+            LOGE("%s", "Mem alloc failed");
         r = 0;
-        LOGE("%s%s", "Archive open failed:", archive_error_string(arc));
+        LOGE("%s%s", "Archive open failed:", archive_error_string(ctx->arc));
     } else {
-        r = archive_list_all_entries();
+        r = archive_list_all_entries(ctx);
         LOGI("%s%ld%s", "Found ", r, " image entries in archive");
 
         // We must read through the file|vm then we can know whether it is encrypted
-        int encryptRet = archive_read_has_encrypted_entries(arc);
+        int encryptRet = archive_read_has_encrypted_entries(ctx->arc);
         switch (encryptRet) {
             case 1: // At lease 1 encrypted entry
                 need_encrypt = true;
@@ -128,18 +206,17 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, 
         }
 
         // madvise for readahead optimization
-        int format = archive_format(arc);
+        int format = archive_format(ctx->arc);
         switch (format) {
             case ARCHIVE_FORMAT_ZIP:
             case ARCHIVE_FORMAT_RAR:
             case ARCHIVE_FORMAT_RAR_V5:
                 madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
                 break;
-            default:
-                ;
+            default:;
         }
     }
-    archive_release();
+    archive_release_ctx(ctx);
     return r;
 }
 
@@ -150,34 +227,28 @@ typedef struct Memarea {
 
 JNIEXPORT jlong JNICALL
 Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index) {
-    struct archive_entry *entry;
+    archive_ctx *ctx;
     int ret;
-    if (!arc || index < cur_index) {
-        archive_alloc();
-        cur_index = 0;
-    }
+    ret = archive_get_ctx(&ctx, index);
+    if (ret)
+        return 0;
     Memarea *memarea = malloc(sizeof(Memarea));
-    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
-        if (!filename_is_playable_file(archive_entry_pathname(entry)))
-            continue;
-        if (cur_index++ == index) {
-            memarea->size = (long) archive_entry_size(entry);
-            memarea->buffer = malloc(memarea->size);
-            ret = archive_read_data(arc, memarea->buffer, memarea->size);
-            if (ret != memarea->size)
-                LOGE("%s", "No enough data read, WTF?");
-            if (ret < 0)
-                LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
-            break;
-        }
-    }
+    memarea->size = (long) archive_entry_size(ctx->entry);
+    memarea->buffer = malloc(memarea->size);
+    ret = archive_read_data(ctx->arc, memarea->buffer, memarea->size);
+    if (ret != memarea->size)
+        LOGE("%s", "No enough data read, WTF?");
+    if (ret < 0)
+        LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
     return (jlong) memarea;
 }
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
-    archive_release();
+    for (int i = 0; i < CTX_POOL_SIZE; i++)
+        archive_release_ctx(ctx_pool[i]);
     free(passwd);
+    free(ctx_pool);
     passwd = NULL;
     munmap(archiveAddr, archiveSize);
 }
@@ -190,25 +261,26 @@ Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *_, jobject thiz) {
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *_, jobject thiz, jstring str) {
     struct archive_entry *entry;
+    archive_ctx *ctx;
     jboolean ret = true;
     int len = (*env)->GetStringUTFLength(env, str);
     if (passwd)
         free(passwd);
     passwd = calloc(len, sizeof(char));
     strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
-    archive_alloc();
+    archive_alloc_ctx(&ctx);
     void *tmpBuf = alloca(4096);
-    while (archive_read_next_header(arc, &entry) == ARCHIVE_OK) {
+    while (archive_read_next_header(ctx->arc, &entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(entry)))
             continue;
         if (!archive_entry_is_encrypted(entry))
             continue;
-        if (archive_read_data(arc, tmpBuf, 4096) < ARCHIVE_OK) {
-            LOGE("%s%s", "Archive read failed:", archive_error_string(arc));
+        if (archive_read_data(ctx->arc, tmpBuf, 4096) < ARCHIVE_OK) {
+            LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
             ret = false;
         }
         break;
     }
-    archive_release();
+    archive_release_ctx(ctx);
     return ret;
 }
