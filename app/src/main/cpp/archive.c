@@ -178,6 +178,7 @@ JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
     archive_release();
     free(passwd);
+    passwd = NULL;
     munmap(archiveAddr, archiveSize);
 }
 
