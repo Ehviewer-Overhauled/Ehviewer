@@ -33,6 +33,10 @@ public final class Image {
     private static boolean needEvictAll = false;
     private long mNativePtr;
 
+    private boolean needRecycle = false;
+
+    private Integer nativeProcessCnt = 0;
+
     private Image(long nativePtr) {
         if (needEvictAll)
             evictAll();
@@ -127,30 +131,43 @@ public final class Image {
      * Return the format of the image
      */
     public int getFormat() {
-        checkRecycled();
-        return nativeGetFormat(mNativePtr);
+        checkRecycledAndLock();
+        int ret = nativeGetFormat(mNativePtr);
+        releaseNativeLock();
+        return ret;
     }
 
     /**
      * Return the width of the image
      */
     public int getWidth() {
-        checkRecycled();
-        return nativeGetWidth(mNativePtr);
+        checkRecycledAndLock();
+        int ret = nativeGetWidth(mNativePtr);
+        releaseNativeLock();
+        return ret;
     }
 
     /**
      * Return the height of the image
      */
     public int getHeight() {
-        checkRecycled();
-        return nativeGetHeight(mNativePtr);
+        checkRecycledAndLock();
+        int ret = nativeGetHeight(mNativePtr);
+        releaseNativeLock();
+        return ret;
     }
 
-    private void checkRecycled() {
+    private synchronized void checkRecycledAndLock() {
         if (mNativePtr == 0) {
             throw new IllegalStateException("The image is recycled.");
         }
+        nativeProcessCnt++;
+    }
+
+    private synchronized void releaseNativeLock() {
+        nativeProcessCnt--;
+        if (needRecycle)
+            recycle();
     }
 
     /**
@@ -158,8 +175,9 @@ public final class Image {
      */
     public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
                        int width, int height, boolean fillBlank, int defaultColor) {
-        checkRecycled();
+        checkRecycledAndLock();
         nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY, width, height);
+        releaseNativeLock();
     }
 
     /**
@@ -168,24 +186,27 @@ public final class Image {
      * width * height must <= 512 * 512 or do nothing
      */
     public void texImage(boolean init, int offsetX, int offsetY, int width, int height) {
-        checkRecycled();
+        checkRecycledAndLock();
         nativeTexImage(mNativePtr, init, offsetX, offsetY, width, height);
+        releaseNativeLock();
     }
 
     /**
      * Move to next frame. Do nothing for non-animation image
      */
     public void advance() {
-        checkRecycled();
+        checkRecycledAndLock();
         nativeAdvance(mNativePtr);
+        releaseNativeLock();
     }
 
     /**
      * Return current frame delay. 0 for non-animation image
      */
     public int getDelay() {
-        checkRecycled();
+        checkRecycledAndLock();
         int delay = nativeGetDelay(mNativePtr);
+        releaseNativeLock();
         return delay <= 10 ? 100 : delay;
     }
 
@@ -193,8 +214,10 @@ public final class Image {
      * Return is the image opaque
      */
     public boolean isOpaque() {
-        checkRecycled();
-        return nativeIsOpaque(mNativePtr);
+        checkRecycledAndLock();
+        boolean ret = nativeIsOpaque(mNativePtr);
+        releaseNativeLock();
+        return ret;
     }
 
     /**
@@ -204,6 +227,10 @@ public final class Image {
      */
     public synchronized void recycle() {
         if (mNativePtr != 0) {
+            if (nativeProcessCnt != 0) {
+                needRecycle = true;
+                return;
+            }
             nativeRecycle(mNativePtr);
             mNativePtr = 0;
             imageList.remove(this);
