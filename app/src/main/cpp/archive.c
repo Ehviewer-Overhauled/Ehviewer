@@ -39,8 +39,6 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG ,__VA_ARGS__)
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, LOG_TAG ,__VA_ARGS__)
 
-static JNIEnv *env;
-
 typedef struct {
     int using;
     int next_index;
@@ -69,7 +67,7 @@ const char supportExt[9][6] = {
         "heif"
 };
 
-static int filename_is_playable_file(const char *name) {
+static inline int filename_is_playable_file(const char *name) {
     const char *dotptr = strrchr(name, '.');
     if (!dotptr++)
         return false;
@@ -82,10 +80,9 @@ static int filename_is_playable_file(const char *name) {
 
 static long archive_list_all_entries(archive_ctx *ctx) {
     long count = 0;
-    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
+    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK)
         if (filename_is_playable_file(archive_entry_pathname(ctx->entry)))
             count++;
-    }
     if (!count)
         LOGE("%s", archive_error_string(ctx->arc));
     return count;
@@ -126,20 +123,20 @@ static int archive_alloc_ctx(archive_ctx **ctxptr) {
     return 0;
 }
 
-static void archive_skip_to_index(archive_ctx *ctx, int index) {
-    struct archive_entry *entry;
+static int archive_skip_to_index(archive_ctx *ctx, int index) {
     assert(!(ctx->next_index > index));
-    while (archive_read_next_header(ctx->arc, &entry) == ARCHIVE_OK) {
-        if (!filename_is_playable_file(archive_entry_pathname(entry)))
+    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
+        if (!filename_is_playable_file(archive_entry_pathname(ctx->entry)))
             continue;
         if (ctx->next_index++ == index) {
-            ctx->entry = entry;
-            return;
+            return ctx->next_index - 1;
         }
     }
+    return ARCHIVE_FATAL;
 }
 
 static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
+    int ret;
     archive_ctx *ctx = NULL;
     pthread_mutex_lock(&ctx_lock);
     for (int i = 0; i < CTX_POOL_SIZE; i++) {
@@ -162,7 +159,7 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
         archive_ctx *victimCtx = NULL;
         int victimIdx = 0;
         int replace = 1;
-        int ret = archive_alloc_ctx(&ctx);
+        ret = archive_alloc_ctx(&ctx);
         if (ret)
             return ret;
         pthread_mutex_lock(&ctx_lock);
@@ -185,23 +182,34 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
         }
         pthread_mutex_unlock(&ctx_lock);
     }
+    ret = archive_skip_to_index(ctx, idx);
+    if (ret != idx) {
+        ret = archive_errno(ctx->arc);
+        LOGE("Skip to index failed:%s", archive_error_string(ctx->arc));
+        archive_release_ctx(ctx);
+        return ret;
+    }
     *ctxptr = ctx;
-    archive_skip_to_index(ctx, idx);
     return 0;
 }
 
 JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, jlong size) {
-    archive_ctx *ctx;
+Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd, jlong size) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
+    archive_ctx *ctx = NULL;
     archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (archiveAddr == MAP_FAILED) {
         LOGE("%s%d", "mmap64 failed with errno ", errno);
         return 0;
     }
     archiveSize = size;
-    env = _;
     pthread_mutex_init(&ctx_lock, 0);
     ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
+    if (!ctx_pool) {
+        LOGE("Allocate archive ctx pool failed:ENOMEM");
+        return 0;
+    }
     long r = archive_alloc_ctx(&ctx);
     if (r) {
         if (r == -ENOMEM)
@@ -244,49 +252,74 @@ typedef struct Memarea {
 } Memarea;
 
 JNIEXPORT jlong JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz, jint index) {
-    archive_ctx *ctx;
+Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thiz, jint index) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
+    archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (ret)
         return 0;
     Memarea *memarea = malloc(sizeof(Memarea));
+    if (!memarea) {
+        ctx->using = 0;
+        LOGE("Allocate buffer for decompression failed:ENOMEM");
+        return 0;
+    }
     memarea->size = (long) archive_entry_size(ctx->entry);
     memarea->buffer = malloc(memarea->size);
+    if (!memarea->buffer) {
+        ctx->using = 0;
+        LOGE("Allocate buffer for decompression failed:ENOMEM");
+        free(memarea);
+        return 0;
+    }
     ret = archive_read_data(ctx->arc, memarea->buffer, memarea->size);
     ctx->using = 0;
+    if (ret == memarea->size)
+        return (jlong) memarea;
     if (ret != memarea->size)
         LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
         LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-    return (jlong) memarea;
+    free(memarea->buffer);
+    free(memarea);
+    return 0;
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
+Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
     for (int i = 0; i < CTX_POOL_SIZE; i++)
         archive_release_ctx(ctx_pool[i]);
     free(passwd);
     free(ctx_pool);
     pthread_mutex_destroy(&ctx_lock);
     passwd = NULL;
+    need_encrypt = false;
     munmap(archiveAddr, archiveSize);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *_, jobject thiz) {
+Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *env, jobject thiz) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
     return need_encrypt;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *_, jobject thiz, jstring str) {
+Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jstring str) {
+    (void)thiz; /* UNUSED */
     struct archive_entry *entry;
     archive_ctx *ctx;
     jboolean ret = true;
     int len = (*env)->GetStringUTFLength(env, str);
-    if (passwd)
-        free(passwd);
-    passwd = calloc(len, sizeof(char));
+    passwd = realloc(passwd, len * sizeof(char));
+    if (!passwd) {
+        LOGE("Allocate passwd buffer failed");
+        return false;
+    }
     strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
     archive_alloc_ctx(&ctx);
     void *tmpBuf = alloca(4096);
