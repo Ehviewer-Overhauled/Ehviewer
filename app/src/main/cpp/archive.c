@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <pthread.h>
 #include <sys/mman.h>
 
 #include <jni.h>
@@ -41,11 +42,13 @@
 static JNIEnv *env;
 
 typedef struct {
+    int using;
     int next_index;
     struct archive *arc;
     struct archive_entry *entry;
 } archive_ctx;
 
+pthread_mutex_t ctx_lock;
 static archive_ctx **ctx_pool;
 #define CTX_POOL_SIZE 20
 
@@ -103,6 +106,7 @@ static int archive_alloc_ctx(archive_ctx **ctxptr) {
     if (!ctx)
         return -ENOMEM;
     ctx->arc = archive_read_new();
+    ctx->using = 1;
     if (!ctx->arc) {
         free(ctx);
         return -ENOMEM;
@@ -137,8 +141,11 @@ static void archive_skip_to_index(archive_ctx *ctx, int index) {
 
 static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
     archive_ctx *ctx = NULL;
+    pthread_mutex_lock(&ctx_lock);
     for (int i = 0; i < CTX_POOL_SIZE; i++) {
         if (!ctx_pool[i])
+            continue;
+        if (ctx_pool[i]->using)
             continue;
         if (ctx_pool[i]->next_index > idx)
             continue;
@@ -147,27 +154,37 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
         if (ctx->next_index == idx)
             break;
     }
+    if (ctx)
+        ctx->using = 1;
+    pthread_mutex_unlock(&ctx_lock);
 
     if (!ctx) {
         archive_ctx *victimCtx = NULL;
         int victimIdx = 0;
+        int replace = 1;
         int ret = archive_alloc_ctx(&ctx);
         if (ret)
             return ret;
+        pthread_mutex_lock(&ctx_lock);
         for (int i = 0; i < CTX_POOL_SIZE; i++) {
             if (!ctx_pool[i]) {
                 ctx_pool[i] = ctx;
-                goto done;
+                replace = 0;
+                break;
             }
+            if (ctx_pool[i]->using)
+                continue;
             if (!victimCtx || ctx_pool[i]->next_index > victimCtx->next_index) {
                 victimCtx = ctx_pool[i];
                 victimIdx = i;
             }
         }
-        archive_release_ctx(victimCtx);
-        ctx_pool[victimIdx] = ctx;
+        if (replace) {
+            archive_release_ctx(victimCtx);
+            ctx_pool[victimIdx] = ctx;
+        }
+        pthread_mutex_unlock(&ctx_lock);
     }
-    done:
     *ctxptr = ctx;
     archive_skip_to_index(ctx, idx);
     return 0;
@@ -183,6 +200,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *_, jobject thiz, jint fd, 
     }
     archiveSize = size;
     env = _;
+    pthread_mutex_init(&ctx_lock, 0);
     ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
     long r = archive_alloc_ctx(&ctx);
     if (r) {
@@ -236,6 +254,7 @@ Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *_, jobject thiz,
     memarea->size = (long) archive_entry_size(ctx->entry);
     memarea->buffer = malloc(memarea->size);
     ret = archive_read_data(ctx->arc, memarea->buffer, memarea->size);
+    ctx->using = 0;
     if (ret != memarea->size)
         LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
@@ -249,6 +268,7 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *jniEnv, jobject thiz) {
         archive_release_ctx(ctx_pool[i]);
     free(passwd);
     free(ctx_pool);
+    pthread_mutex_destroy(&ctx_lock);
     passwd = NULL;
     munmap(archiveAddr, archiveSize);
 }

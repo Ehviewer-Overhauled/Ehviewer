@@ -28,7 +28,6 @@ import com.hippo.UriArchiveAccessor;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
-import com.hippo.glgallery.GalleryPageView;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.thread.PVLock;
@@ -48,11 +47,15 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     public static PVLock pv = new PVLock(0);
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
-    private final AtomicInteger extractingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private final LinkedHashMap<Integer, Long> streams = new LinkedHashMap<>();
-    private final AtomicInteger decodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
     private Thread archiveThread;
-    private Thread decodeThread;
+    private Thread[] decodeThread = new Thread[] {
+            new Thread(new DecodeTask()),
+            new Thread(new DecodeTask()),
+            new Thread(new DecodeTask()),
+            new Thread(new DecodeTask())
+    };
+
     private volatile int size = STATE_WAIT;
     private String error;
 
@@ -74,25 +77,22 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         int id = sIdGenerator.incrementAndGet();
 
         archiveThread = new PriorityThread(
-                new ArchiveTask(), "ArchiveTask" + '-' + id, Process.THREAD_PRIORITY_BACKGROUND);
+                new ArchiveHostTask(), "ArchiveTask" + '-' + id, Process.THREAD_PRIORITY_BACKGROUND);
         archiveThread.start();
-
-        decodeThread = new PriorityThread(
-                new DecodeTask(), "DecodeTask" + '-' + id, Process.THREAD_PRIORITY_BACKGROUND);
-        decodeThread.start();
+        for (Thread i : decodeThread) {
+            i.start();
+        }
     }
 
     @Override
     public void stop() {
         super.stop();
-
         if (archiveThread != null) {
             archiveThread.interrupt();
             archiveThread = null;
         }
-        if (decodeThread != null) {
-            decodeThread.interrupt();
-            decodeThread = null;
+        for (Thread i : decodeThread) {
+            i.interrupt();
         }
         try {
             archiveAccessor.close();
@@ -110,11 +110,11 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     protected void onRequest(int index) {
         boolean inDecodeTask;
         synchronized (streams) {
-            inDecodeTask = streams.containsKey(index) || index == decodingIndex.get();
+            inDecodeTask = streams.containsKey(index);
         }
 
         synchronized (requests) {
-            boolean inArchiveTask = requests.contains(index) || index == extractingIndex.get();
+            boolean inArchiveTask = requests.contains(index);
             if (!inArchiveTask && !inDecodeTask) {
                 requests.add(index);
                 requests.notify();
@@ -167,7 +167,14 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         return Integer.toString(index);
     }
 
-    private class ArchiveTask implements Runnable {
+    private class ArchiveHostTask implements Runnable {
+        public final Thread[] archiveThreads = new Thread[] {
+                new Thread(new ArchiveTask()),
+                new Thread(new ArchiveTask()),
+                new Thread(new ArchiveTask()),
+                new Thread(new ArchiveTask())
+        };
+
         private void waitPasswd() throws InterruptedException {
             showPasswd.sendEmptyMessage(0);
             pv.p();
@@ -225,7 +232,26 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     }
                 }
             }
+            for (Thread i : archiveThreads) {
+                i.start();
+            }
 
+            Object o = new Object();
+            synchronized (o) {
+                try {
+                    o.wait();
+                } catch (InterruptedException e) {
+                    for (Thread i : archiveThreads) {
+                        i.interrupt();
+                    }
+                }
+            }
+        }
+    }
+
+    private class ArchiveTask implements Runnable {
+        @Override
+        public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
                 synchronized (requests) {
@@ -239,12 +265,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
                     index = requests.pop();
-                    extractingIndex.lazySet(index);
                 }
 
                 // Check index valid
                 if (index < 0 || index >= size) {
-                    extractingIndex.lazySet(GalleryPageView.INVALID_INDEX);
                     notifyPageFailed(index, GetText.getString(R.string.error_out_of_range));
                     continue;
                 }
@@ -276,7 +300,6 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         try {
                             streams.wait();
                         } catch (InterruptedException e) {
-                            // Interrupted
                             break;
                         }
                         continue;
@@ -287,18 +310,13 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     iterator.remove();
                     index = entry.getKey();
                     addr = entry.getValue();
-                    decodingIndex.lazySet(index);
                 }
 
-                try {
-                    Image image = Image.decodeAddr(addr, true);
-                    if (image != null) {
-                        notifyPageSucceed(index, image);
-                    } else {
-                        notifyPageFailed(index, GetText.getString(R.string.error_decoding_failed));
-                    }
-                } finally {
-                    decodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
+                Image image = Image.decodeAddr(addr, true);
+                if (image != null) {
+                    notifyPageSucceed(index, image);
+                } else {
+                    notifyPageFailed(index, GetText.getString(R.string.error_decoding_failed));
                 }
             }
         }
