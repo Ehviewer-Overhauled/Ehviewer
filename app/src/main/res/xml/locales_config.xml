@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2022 Tarsin Norbin
+  ~
+  ~ This file is part of EhViewer
+  ~
+  ~ EhViewer is free software: you can redistribute it and/or modify it
+  ~ under the terms of the GNU GeneralPublic License as published
+  ~ by the Free Software Foundation,either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ EhViewer is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with EhViewer.
+  ~ If not, see <https://www.gnu.org/licenses/>.
+  -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="de" />
+    <locale android:name="es" />
+    <locale android:name="fr" />
+    <locale android:name="ja" />
+    <locale android:name="ko" />
+    <locale android:name="th" />
+    <locale android:name="zh-CN" />
+    <locale android:name="zh-HK" />
+    <locale android:name="zh-TW" />
+</locale-config>
