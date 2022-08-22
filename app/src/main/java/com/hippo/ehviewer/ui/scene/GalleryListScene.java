@@ -40,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -151,8 +152,8 @@ public final class GalleryListScene extends BaseScene
     private EasyRecyclerView mRecyclerView;
     @Nullable
     private SearchLayout mSearchLayout;
-    ActivityResultLauncher<String[]> selectImageLauncher = registerForActivityResult(
-            new ActivityResultContracts.OpenDocument(),
+    ActivityResultLauncher<PickVisualMediaRequest> selectImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.PickVisualMedia(),
             result -> mSearchLayout.setImageUri(result));
     @Nullable
     private SearchBar mSearchBar;
@@ -1334,7 +1335,9 @@ public final class GalleryListScene extends BaseScene
     @Override
     public void onSelectImage() {
         try {
-            selectImageLauncher.launch(new String[]{"image/*"});
+            PickVisualMediaRequest.Builder builder = new PickVisualMediaRequest.Builder();
+            builder.setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE);
+            selectImageLauncher.launch(builder.build());
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
