@@ -48,14 +48,13 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final LinkedHashMap<Integer, Long> streams = new LinkedHashMap<>();
-    private Thread archiveThread;
-    private Thread[] decodeThread = new Thread[] {
+    private final Thread[] decodeThread = new Thread[]{
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask())
     };
-
+    private Thread archiveThread;
     private volatile int size = STATE_WAIT;
     private String error;
 
@@ -168,7 +167,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     }
 
     private class ArchiveHostTask implements Runnable {
-        public final Thread[] archiveThreads = new Thread[] {
+        public final Thread[] archiveThreads = new Thread[]{
                 new Thread(new ArchiveTask()),
                 new Thread(new ArchiveTask()),
                 new Thread(new ArchiveTask()),

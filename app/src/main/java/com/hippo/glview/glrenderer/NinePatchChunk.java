@@ -30,9 +30,9 @@ class NinePatchChunk {
 
     public Rect mPaddings = new Rect();
 
-    public int mDivX[];
-    public int mDivY[];
-    public int mColor[];
+    public int[] mDivX;
+    public int[] mDivY;
+    public int[] mColor;
 
     private static void readIntArray(int[] data, ByteBuffer buffer) {
         for (int i = 0, n = data.length; i < n; ++i) {

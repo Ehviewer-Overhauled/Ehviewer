@@ -983,15 +983,13 @@ public final class GalleryView extends GLView implements GestureRecognizer.Liste
 
         private final Context mContext;
         private final Adapter mAdapter;
+        private final int mEdgeColor = Color.WHITE;
         private Listener mListener;
-
         private int mLayoutMode = LAYOUT_LEFT_TO_RIGHT;
         private int mScaleMode = SCALE_FIT;
         private int mStartPosition = START_POSITION_TOP_LEFT;
         private int mStartPage = 0;
-
         private int mBackgroundColor = Color.BLACK;
-        private int mEdgeColor = Color.WHITE;
         private int mPagerInterval = 48;
         private int mScrollInterval = 24;
         private int mPageMinHeight = 256;

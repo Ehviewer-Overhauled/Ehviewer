@@ -70,7 +70,8 @@ public class BasePreferenceFragment extends PreferenceFragmentCompat
                     .replace(R.id.fragment, classObj)
                     .addToBackStack(null)
                     .commitAllowingStateLoss();
-        } catch (ClassNotFoundException | IllegalAccessException | java.lang.InstantiationException ignored) {
+        } catch (ClassNotFoundException | IllegalAccessException |
+                 java.lang.InstantiationException ignored) {
         }
         return true;
     }

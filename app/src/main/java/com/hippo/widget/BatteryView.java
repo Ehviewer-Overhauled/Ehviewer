@@ -89,6 +89,13 @@ public class BatteryView extends AppCompatTextView {
             getHandler().post(mCharger);
             mIsChargerWorking = true;
         }
+    }
+
+    private void stopCharger() {
+        if (mIsChargerWorking) {
+            getHandler().removeCallbacks(mCharger);
+            mIsChargerWorking = false;
+        }
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -103,13 +110,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    private void stopCharger() {
-        if (mIsChargerWorking) {
-            getHandler().removeCallbacks(mCharger);
-            mIsChargerWorking = false;
-        }
-    }
 
     @Override
     protected void onAttachedToWindow() {

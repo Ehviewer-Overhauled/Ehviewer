@@ -97,16 +97,13 @@ public class Settings {
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_APP_LANGUAGE = "app_language";
+    public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
     private static final String TAG = Settings.class.getSimpleName();
     private static final String KEY_VERSION_CODE = "version_code";
     private static final int DEFAULT_VERSION_CODE = 0;
     private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String DEFAULT_DISPLAY_NAME = null;
-    public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
     private static final int DEFAULT_LIST_THUMB_SIZE = 40;
-    private static int LIST_THUMB_SIZE = 40;
-
-    public static boolean LIST_THUMB_SIZE_INITED = false;
     private static final String KEY_AVATAR = "avatar";
     private static final String DEFAULT_AVATAR = null;
     private static final String KEY_SHOW_WARNING = "show_warning";
@@ -279,11 +276,9 @@ public class Settings {
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
-
-
     private static final String KEY_ARCHIVE_PASSWDS = "archive_passwds";
-
-
+    public static boolean LIST_THUMB_SIZE_INITED = false;
+    private static int LIST_THUMB_SIZE = 40;
     private static Context sContext;
     private static SharedPreferences sSettingsPre;
     private static EhConfig sEhConfig;

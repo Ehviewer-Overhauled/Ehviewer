@@ -20,7 +20,7 @@ import android.os.Process;
 
 public class PriorityThread extends Thread {
 
-    private int mPriority;
+    private final int mPriority;
 
     public PriorityThread(Runnable runnable, int priority) {
         super(runnable);

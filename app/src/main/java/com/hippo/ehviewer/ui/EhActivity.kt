@@ -121,7 +121,7 @@ abstract class EhActivity : AppCompatActivity() {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    fun checkAndRequestNotificationPermission(){
+    fun checkAndRequestNotificationPermission() {
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS

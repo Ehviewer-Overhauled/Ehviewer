@@ -54,20 +54,16 @@ public class GLProgressView extends GLView {
     }
 
     private final GLPaint mGLPaint;
-
+    private final List<Animation> mAnimations;
     private float mCx;
     private float mCy;
     private float mRadiusX;
     private float mRadiusY;
-
     private float mTrimStart = 0.0f;
     private float mTrimEnd = 0.0f;
     private float mTrimOffset = 0.0f;
     private float mTrimRotation = 0.0f;
-
     private boolean mIndeterminate = false;
-
-    private List<Animation> mAnimations;
 
     public GLProgressView() {
         mGLPaint = new GLPaint();
