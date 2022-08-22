@@ -76,6 +76,8 @@ public class Settings {
     public static final String KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme";
     public static final String KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority";
     public static final String KEY_DOWNLOAD_SAVE_PATH = "image_path";
+
+    public static final String KEY_NOTIFICATION_REQUIRED = "notification_required";
     public static final String KEY_DOWNLOAD_SAVE_QUERY = "image_query";
     public static final String KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment";
     public static final String KEY_MEDIA_SCAN = "media_scan";
@@ -1182,5 +1184,13 @@ public class Settings {
         LIST_THUMB_SIZE = size;
         LIST_THUMB_SIZE_INITED = true;
         return size;
+    }
+
+    public static boolean getNotificationRequired() {
+        return getBoolean(KEY_NOTIFICATION_REQUIRED, false);
+    }
+
+    public static void putNotificationRequired() {
+        putBoolean(KEY_NOTIFICATION_REQUIRED, true);
     }
 }

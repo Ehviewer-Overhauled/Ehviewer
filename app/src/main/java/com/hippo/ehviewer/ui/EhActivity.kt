@@ -13,126 +13,139 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui
 
-package com.hippo.ehviewer.ui;
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.content.res.Resources.Theme
+import android.graphics.Color
+import android.os.Build
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.annotation.StyleRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupported
+import rikka.core.res.resolveColor
+import rikka.insets.WindowInsetsHelper
+import rikka.layoutinflater.view.LayoutInflaterFactory
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowInsets;
-import android.view.WindowManager;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-
-import rikka.core.res.ResourcesKt;
-import rikka.insets.WindowInsetsHelper;
-import rikka.layoutinflater.view.LayoutInflaterFactory;
-
-public abstract class EhActivity extends AppCompatActivity {
-
-    private static final String THEME_DEFAULT = "DEFAULT";
-    private static final String THEME_BLACK = "BLACK";
-
-    public static boolean isBlackNightTheme() {
-        return Settings.getBoolean("black_dark_theme", false);
-    }
-
-    public static String getTheme(Context context) {
-        if (isBlackNightTheme() && isNightMode(context.getResources().getConfiguration()))
-            return THEME_BLACK;
-        return THEME_DEFAULT;
-    }
-
-    public static boolean isNightMode(Configuration configuration) {
-        return (configuration.uiMode & Configuration.UI_MODE_NIGHT_YES) > 0;
-    }
-
+abstract class EhActivity : AppCompatActivity() {
     @StyleRes
-    public int getThemeStyleRes(Context context) {
-        if (THEME_BLACK.equals(getTheme(context))) {
-            return R.style.ThemeOverlay_Black;
-        }
-        return R.style.ThemeOverlay;
+    fun getThemeStyleRes(context: Context): Int {
+        return if (THEME_BLACK == getTheme(context)) {
+            R.style.ThemeOverlay_Black
+        } else R.style.ThemeOverlay
     }
 
-    @Override
-    protected void onApplyThemeResource(Resources.Theme theme, int resid, boolean first) {
-        if (getParent() == null) {
-            theme.applyStyle(resid, true);
+    override fun onApplyThemeResource(theme: Theme, resid: Int, first: Boolean) {
+        if (parent == null) {
+            theme.applyStyle(resid, true)
         } else {
             try {
-                theme.setTo(getParent().getTheme());
-            } catch (Exception ignored) {
+                theme.setTo(parent.theme)
+            } catch (ignored: Exception) {
             }
-            theme.applyStyle(resid, false);
+            theme.applyStyle(resid, false)
         }
-        theme.applyStyle(getThemeStyleRes(this), true);
-        super.onApplyThemeResource(theme, R.style.ThemeOverlay, first);
+        theme.applyStyle(getThemeStyleRes(this), true)
+        super.onApplyThemeResource(theme, R.style.ThemeOverlay, first)
     }
 
-    @Override
-    protected void onNightModeChanged(int mode) {
-        getTheme().applyStyle(getThemeStyleRes(this), true);
+    override fun onNightModeChanged(mode: Int) {
+        theme.applyStyle(getThemeStyleRes(this), true)
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        getLayoutInflater().setFactory2((new LayoutInflaterFactory(getDelegate())).addOnViewCreatedListener(WindowInsetsHelper.getLISTENER()));
-        super.onCreate(savedInstanceState);
-
-
-        Window window = getWindow();
-        window.setStatusBarColor(Color.TRANSPARENT);
-
-        window.getDecorView().post(() -> {
-            WindowInsets rootWindowInsets = window.getDecorView().getRootWindowInsets();
-            if (rootWindowInsets != null && rootWindowInsets.getSystemWindowInsetBottom() >= Resources.getSystem().getDisplayMetrics().density * 40) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        layoutInflater.factory2 =
+            LayoutInflaterFactory(delegate).addOnViewCreatedListener(
+                WindowInsetsHelper.LISTENER
+            )
+        super.onCreate(savedInstanceState)
+        val window = window
+        window.statusBarColor = Color.TRANSPARENT
+        window.decorView.post {
+            val rootWindowInsets = window.decorView.rootWindowInsets
+            if (rootWindowInsets != null && rootWindowInsets.systemWindowInsetBottom >= Resources.getSystem().displayMetrics.density * 40) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    window.setNavigationBarDividerColor(getColor(R.color.navigation_bar_divider));
+                    window.navigationBarDividerColor = getColor(R.color.navigation_bar_divider)
                 }
-                window.setNavigationBarColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.navigationBarColor) & 0x00ffffff | -0x20000000);
+                window.navigationBarColor =
+                    theme.resolveColor(android.R.attr.navigationBarColor) and 0x00ffffff or -0x20000000
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.setNavigationBarContrastEnforced(false);
+                    window.isNavigationBarContrastEnforced = false
                 }
             } else {
-                window.setNavigationBarColor(Color.TRANSPARENT);
+                window.navigationBarColor = Color.TRANSPARENT
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.setNavigationBarContrastEnforced(true);
+                    window.isNavigationBarContrastEnforced = true
                 }
             }
-        });
-
-        ((EhApplication) getApplication()).registerActivity(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ((EhApplication) getApplication()).unregisterActivity(this);
-    }
-
-    @Override
-    protected void onResume() {
-        if (Settings.getSecurity() && SecurityActivity.Companion.isAuthenticationSupported(this) && EhApplication.locked) {
-            startActivity(new Intent(this, SecurityActivity.class));
         }
-        super.onResume();
+        (application as EhApplication).registerActivity(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (application as EhApplication).unregisterActivity(this)
+    }
+
+    override fun onResume() {
+        if (Settings.getSecurity() && isAuthenticationSupported(this) && EhApplication.locked) {
+            startActivity(Intent(this, SecurityActivity::class.java))
+        }
+        super.onResume()
         if (Settings.getEnabledSecurity()) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                    WindowManager.LayoutParams.FLAG_SECURE);
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+            )
         } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        Settings.putNotificationRequired()
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    fun checkAndRequestNotificationPermission(){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        if (Settings.getNotificationRequired())
+            return
+        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    companion object {
+        private const val THEME_DEFAULT = "DEFAULT"
+        private const val THEME_BLACK = "BLACK"
+        private val isBlackNightTheme: Boolean
+            get() = Settings.getBoolean("black_dark_theme", false)
+
+        fun getTheme(context: Context): String {
+            return if (isBlackNightTheme && isNightMode(context.resources.configuration)) THEME_BLACK else THEME_DEFAULT
+        }
+
+        private fun isNightMode(configuration: Configuration): Boolean {
+            return configuration.uiMode and Configuration.UI_MODE_NIGHT_YES > 0
         }
     }
 }
