@@ -23,10 +23,10 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.yorozuya.Utilities;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public final class GalleryListUrlParser {
 
@@ -91,7 +91,11 @@ public final class GalleryListUrlParser {
             uploader = path.substring(prefixLength, index);
         }
 
-        uploader = URLDecoder.decode(uploader, StandardCharsets.UTF_8);
+        try {
+            uploader = URLDecoder.decode(uploader, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
 
         if (TextUtils.isEmpty(uploader)) {
             return null;
@@ -116,7 +120,11 @@ public final class GalleryListUrlParser {
             tag = path.substring(prefixLength, index);
         }
 
-        tag = URLDecoder.decode(tag, StandardCharsets.UTF_8);
+        try {
+            tag = URLDecoder.decode(tag, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
 
         if (TextUtils.isEmpty(tag)) {
             return null;

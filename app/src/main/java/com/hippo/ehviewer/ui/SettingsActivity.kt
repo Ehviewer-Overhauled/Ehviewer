@@ -33,8 +33,7 @@ class SettingsActivity : EhActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         val bar = supportActionBar
         bar?.setDisplayHomeAsUpEnabled(true)
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
-            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()

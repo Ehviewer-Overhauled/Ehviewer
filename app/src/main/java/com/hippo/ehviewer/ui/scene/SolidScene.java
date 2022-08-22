@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.hippo.ehviewer.Settings;
+import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.scene.Announcer;
 
 /**

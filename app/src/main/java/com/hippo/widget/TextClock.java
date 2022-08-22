@@ -101,13 +101,6 @@ public class TextClock extends AppCompatTextView {
 
     public CharSequence getFormat12Hour() {
         return mFormat12;
-    }
-
-    public void setFormat12Hour(CharSequence format) {
-        mFormat12 = format;
-
-        chooseFormat();
-        onTimeChanged();
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -119,6 +112,13 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
+
+    public void setFormat12Hour(CharSequence format) {
+        mFormat12 = format;
+
+        chooseFormat();
+        onTimeChanged();
+    }
 
     public CharSequence getFormat24Hour() {
         return mFormat24;
@@ -158,7 +158,19 @@ public class TextClock extends AppCompatTextView {
 
     public CharSequence getFormat() {
         return mFormat;
-    }
+    }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            chooseFormat();
+            onTimeChanged();
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            chooseFormat();
+            onTimeChanged();
+        }
+    };
 
     /**
      * Selects either one of {@link #getFormat12Hour()} or {@link #getFormat24Hour()}
@@ -203,19 +215,7 @@ public class TextClock extends AppCompatTextView {
                 onTimeChanged();
             }
         }
-    }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            chooseFormat();
-            onTimeChanged();
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            chooseFormat();
-            onTimeChanged();
-        }
-    };
+    }
 
     @Override
     protected void onDetachedFromWindow() {

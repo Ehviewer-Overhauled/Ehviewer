@@ -242,7 +242,7 @@ class SearchLayout @JvmOverloads constructor(
     override fun onTabReselected(tab: TabLayout.Tab) {}
 
     @IntDef(SEARCH_MODE_NORMAL, SEARCH_MODE_IMAGE)
-    @Retention(AnnotationRetention.SOURCE)
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     private annotation class SearchMode
     interface Helper {
         fun onChangeSearchMode()

@@ -19,12 +19,13 @@ package com.hippo.ehviewer.client.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.network.UrlBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 public class FavListUrlBuilder implements Parcelable {
 
@@ -92,13 +93,17 @@ public class FavListUrlBuilder implements Parcelable {
             ub.addQuery("favcat", "all");
         }
         if (!TextUtils.isEmpty(mKeyword)) {
-            ub.addQuery("f_search", URLEncoder.encode(mKeyword, StandardCharsets.UTF_8));
-            // Name
-            ub.addQuery("sn", "on");
-            // Tags
-            ub.addQuery("st", "on");
-            // Note
-            ub.addQuery("sf", "on");
+            try {
+                ub.addQuery("f_search", URLEncoder.encode(mKeyword, "UTF-8"));
+                // Name
+                ub.addQuery("sn", "on");
+                // Tags
+                ub.addQuery("st", "on");
+                // Note
+                ub.addQuery("sf", "on");
+            } catch (UnsupportedEncodingException e) {
+                Log.e(TAG, "Can't URLEncoder.encode " + mKeyword);
+            }
         }
         if (mIndex > 0) {
             ub.addQuery("page", Integer.toString(mIndex));

@@ -56,7 +56,7 @@ class VersionPreference @JvmOverloads constructor(
         }
 
         fun getMessage(): String {
-            return message
+            return message;
         }
 
         fun addLib(msg: String): NativeLibInfo {

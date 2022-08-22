@@ -32,11 +32,11 @@ import com.hippo.network.UrlBuilder;
 import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 public class ListUrlBuilder implements Cloneable, Parcelable {
 
@@ -383,8 +383,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                     break;
                 case "f_search":
                     try {
-                        keyword = URLDecoder.decode(value, StandardCharsets.UTF_8);
-                    } catch (IllegalArgumentException e) {
+                        keyword = URLDecoder.decode(value, "utf-8");
+                    } catch (UnsupportedEncodingException | IllegalArgumentException e) {
                         // Ignore
                     }
                     break;
@@ -514,7 +514,11 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 if (mKeyword != null) {
                     String keyword = mKeyword.trim();
                     if (!keyword.isEmpty()) {
-                        ub.addQuery("f_search", URLEncoder.encode(mKeyword, StandardCharsets.UTF_8));
+                        try {
+                            ub.addQuery("f_search", URLEncoder.encode(mKeyword, "UTF-8"));
+                        } catch (UnsupportedEncodingException e) {
+                            // Empty
+                        }
                     }
                 }
                 if (mSHash != null) {
@@ -561,7 +565,11 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
             case MODE_UPLOADER: {
                 StringBuilder sb = new StringBuilder(EhUrl.getHost());
                 sb.append("uploader/");
-                sb.append(URLEncoder.encode(mKeyword, StandardCharsets.UTF_8));
+                try {
+                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Empty
+                }
                 if (mPageIndex != 0) {
                     sb.append('/').append(mPageIndex);
                 }
@@ -570,7 +578,11 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
             case MODE_TAG: {
                 StringBuilder sb = new StringBuilder(EhUrl.getHost());
                 sb.append("tag/");
-                sb.append(URLEncoder.encode(mKeyword, StandardCharsets.UTF_8));
+                try {
+                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Empty
+                }
                 if (mPageIndex != 0) {
                     sb.append('/').append(mPageIndex);
                 }
@@ -583,7 +595,11 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
             case MODE_TOPLIST:
                 StringBuilder sb = new StringBuilder(EhUrl.HOST_E);
                 sb.append("toplist.php?tl=");
-                sb.append(URLEncoder.encode(mKeyword, StandardCharsets.UTF_8));
+                try {
+                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // Empty
+                }
                 if (mPageIndex != 0) {
                     sb.append("&p=").append(mPageIndex);
                 }

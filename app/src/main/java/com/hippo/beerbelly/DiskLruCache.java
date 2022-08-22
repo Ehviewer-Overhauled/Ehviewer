@@ -231,12 +231,6 @@ public final class DiskLruCache implements Closeable {
         cache = new DiskLruCache(directory, appVersion, valueCount, maxSize);
         cache.rebuildJournal();
         return cache;
-    }
-
-    private static void deleteIfExists(File file) throws IOException {
-        if (file.exists() && !file.delete()) {
-            throw new IOException();
-        }
     }    private final Callable<Void> cleanupCallable = new Callable<>() {
         public Void call() throws Exception {
             synchronized (DiskLruCache.this) {
@@ -252,6 +246,12 @@ public final class DiskLruCache implements Closeable {
             return null;
         }
     };
+
+    private static void deleteIfExists(File file) throws IOException {
+        if (file.exists() && !file.delete()) {
+            throw new IOException();
+        }
+    }
 
     private static void renameTo(File from, File to, boolean deleteDestination) throws IOException {
         if (deleteDestination) {

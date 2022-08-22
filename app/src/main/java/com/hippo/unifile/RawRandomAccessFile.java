@@ -25,7 +25,7 @@ import java.io.RandomAccessFile;
 
 class RawRandomAccessFile implements UniRandomAccessFile {
 
-    private final RandomAccessFile mFile;
+    private RandomAccessFile mFile;
 
     RawRandomAccessFile(RandomAccessFile file) {
         mFile = file;

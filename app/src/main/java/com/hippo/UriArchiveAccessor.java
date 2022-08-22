@@ -21,6 +21,10 @@ package com.hippo;
 import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.system.Os;
+import android.system.OsConstants;
+
+import java.io.FileDescriptor;
 
 public class UriArchiveAccessor {
     ParcelFileDescriptor pfd;

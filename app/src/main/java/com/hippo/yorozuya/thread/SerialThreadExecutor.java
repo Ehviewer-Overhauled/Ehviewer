@@ -28,9 +28,9 @@ public class SerialThreadExecutor implements Executor, Runnable {
 
     private final Lock mThreadLock = new ReentrantLock();
     private final Object mWaitLock = new Object();
-    private final long mKeepAliveMillis;
-    private final Queue<Runnable> mWorkQueue;
-    private final ThreadFactory mThreadFactory;
+    private long mKeepAliveMillis;
+    private Queue<Runnable> mWorkQueue;
+    private ThreadFactory mThreadFactory;
     // The worker
     private Thread mThread;
 

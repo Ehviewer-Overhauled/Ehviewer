@@ -38,7 +38,7 @@ import java.io.OutputStream;
 // TODO need more test
 class UriOutputStream extends FileOutputStream {
 
-    private final ParcelFileDescriptor mPfd;
+    private ParcelFileDescriptor mPfd;
 
     private UriOutputStream(ParcelFileDescriptor pfd, FileDescriptor fd) {
         super(fd);
