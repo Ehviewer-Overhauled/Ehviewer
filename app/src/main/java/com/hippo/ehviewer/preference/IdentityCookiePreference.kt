@@ -13,105 +13,92 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import android.content.*
+import android.os.Build
+import android.os.PersistableBundle
+import android.text.Html
+import android.util.AttributeSet
+import androidx.appcompat.app.AlertDialog
+import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.ui.SettingsActivity
+import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.preference.MessagePreference
+import okhttp3.Cookie
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.util.*
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.text.Html;
-import android.util.AttributeSet;
+class IdentityCookiePreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : MessagePreference(context, attrs) {
+    private val mActivity = context as SettingsActivity
+    private var message: String? = null
 
-import androidx.appcompat.app.AlertDialog;
-
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.client.EhCookieStore;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.ui.SettingsActivity;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-import com.hippo.preference.MessagePreference;
-import com.hippo.util.ClipboardUtil;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-
-public class IdentityCookiePreference extends MessagePreference {
-
-    @SuppressLint("StaticFieldLeak")
-    private final SettingsActivity mActivity;
-    private String message;
-
-    public IdentityCookiePreference(Context context) {
-        super(context);
-        mActivity = (SettingsActivity) context;
-        init();
-    }
-
-    public IdentityCookiePreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mActivity = (SettingsActivity) context;
-        init();
-    }
-
-    public IdentityCookiePreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        mActivity = (SettingsActivity) context;
-        init();
-    }
-
-    private void init() {
-        EhCookieStore store = EhApplication.getEhCookieStore(getContext());
-        List<Cookie> eCookies = store.getCookies(HttpUrl.get(EhUrl.HOST_E));
-        List<Cookie> exCookies = store.getCookies(HttpUrl.get(EhUrl.HOST_EX));
-        List<Cookie> cookies = new LinkedList<>(eCookies);
-        cookies.addAll(exCookies);
-
-        String ipbMemberId = null;
-        String ipbPassHash = null;
-        String igneous = null;
-
-        for (int i = 0, n = cookies.size(); i < n; i++) {
-            Cookie cookie = cookies.get(i);
-            switch (cookie.name()) {
-                case EhCookieStore.KEY_IPD_MEMBER_ID:
-                    ipbMemberId = cookie.value();
-                    break;
-                case EhCookieStore.KEY_IPD_PASS_HASH:
-                    ipbPassHash = cookie.value();
-                    break;
-                case EhCookieStore.KEY_IGNEOUS:
-                    igneous = cookie.value();
-                    break;
+    init {
+        val store = EhApplication.getEhCookieStore(context)
+        val eCookies = store.getCookies(EhUrl.HOST_E.toHttpUrl())
+        val exCookies = store.getCookies(EhUrl.HOST_EX.toHttpUrl())
+        val cookies: MutableList<Cookie> = LinkedList(eCookies)
+        cookies.addAll(exCookies)
+        var ipbMemberId: String? = null
+        var ipbPassHash: String? = null
+        var igneous: String? = null
+        var i = 0
+        val n = cookies.size
+        while (i < n) {
+            val cookie = cookies[i]
+            when (cookie.name) {
+                EhCookieStore.KEY_IPD_MEMBER_ID -> ipbMemberId = cookie.value
+                EhCookieStore.KEY_IPD_PASS_HASH -> ipbPassHash = cookie.value
+                EhCookieStore.KEY_IGNEOUS -> igneous = cookie.value
             }
+            i++
         }
-
         if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
-            message = EhCookieStore.KEY_IPD_MEMBER_ID + ": " + ipbMemberId + "<br>"
+            message = (EhCookieStore.KEY_IPD_MEMBER_ID + ": " + ipbMemberId + "<br>"
                     + EhCookieStore.KEY_IPD_PASS_HASH + ": " + ipbPassHash + "<br>"
-                    + EhCookieStore.KEY_IGNEOUS + ": " + igneous;
-            setDialogMessage(Html.fromHtml(getContext().getString(R.string.settings_eh_identity_cookies_signed, message), Html.FROM_HTML_MODE_LEGACY));
-            message = message.replace("<br>", "\n");
+                    + EhCookieStore.KEY_IGNEOUS + ": " + igneous)
+            setDialogMessage(
+                Html.fromHtml(
+                    context.getString(
+                        R.string.settings_eh_identity_cookies_signed,
+                        message
+                    ), Html.FROM_HTML_MODE_LEGACY
+                )
+            )
+            message = message!!.replace("<br>", "\n")
         } else {
-            setDialogMessage(getContext().getString(R.string.settings_eh_identity_cookies_tourist));
+            setDialogMessage(context.getString(R.string.settings_eh_identity_cookies_tourist))
         }
     }
 
-    @Override
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        super.onPrepareDialogBuilder(builder);
+    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
+        super.onPrepareDialogBuilder(builder)
         if (message != null) {
-            builder.setPositiveButton(R.string.settings_eh_identity_cookies_copy, (dialog, which) -> {
-                ClipboardUtil.addTextToClipboard(message);
-                mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT);
+            builder.setPositiveButton(R.string.settings_eh_identity_cookies_copy) { dialog: DialogInterface?, which: Int ->
+                val clipboardManager =
+                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clipData = ClipData.newPlainText(null, message)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                    clipData.apply {
+                        description.extras = PersistableBundle().apply {
+                            putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                        }
+                    }
+                clipboardManager?.setPrimaryClip(clipData)
 
-                IdentityCookiePreference.this.onClick(dialog, which);
-            });
-            builder.setNegativeButton(android.R.string.cancel, null);
+                // There is no need to notify user by toast since Tiramisu have its clipboard own logic
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                    mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
+                this@IdentityCookiePreference.onClick(dialog, which)
+            }
+            builder.setNegativeButton(android.R.string.cancel, null)
         } else {
-            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setPositiveButton(android.R.string.ok, null)
         }
     }
 }
