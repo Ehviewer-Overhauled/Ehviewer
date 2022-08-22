@@ -227,6 +227,8 @@ public class AdvancedFragment extends BasePreferenceFragment {
         Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);
         Preference clearMemoryCache = findPreference(KEY_CLEAR_MEMORY_CACHE);
         Preference appLanguage = findPreference(KEY_APP_LANGUAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            appLanguage.setVisible(false);
         Preference importData = findPreference(KEY_IMPORT_DATA);
         Preference exportData = findPreference(KEY_EXPORT_DATA);
         Preference openByDefault = findPreference(KEY_OPEN_BY_DEFAULT);
@@ -294,7 +296,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
-        if (KEY_APP_LANGUAGE.equals(key)) {
+        if (KEY_APP_LANGUAGE.equals(key) && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             if ("system".equals(newValue)) {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.wrap(Resources.getSystem().getConfiguration().getLocales()));
             } else {
