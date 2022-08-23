@@ -55,8 +55,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
-import com.hippo.conaco.DataContainer;
-import com.hippo.conaco.ProgressNotifier;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
@@ -885,73 +883,6 @@ public class DownloadsScene extends ToolbarScene
         }
     }
 
-    private static class ThumbDataContainer implements DataContainer {
-
-        private final DownloadInfo mInfo;
-        @Nullable
-        private UniFile mFile;
-
-        public ThumbDataContainer(@NonNull DownloadInfo info) {
-            mInfo = info;
-        }
-
-        private void ensureFile() {
-            if (mFile == null) {
-                UniFile dir = SpiderDen.getGalleryDownloadDir(mInfo);
-                if (dir != null && dir.isDirectory()) {
-                    mFile = dir.createFile(".thumb");
-                }
-            }
-        }
-
-        @Override
-        public boolean isEnabled() {
-            ensureFile();
-            return mFile != null;
-        }
-
-        @Override
-        public void onUrlMoved(String requestUrl, String responseUrl) {
-        }
-
-        @Override
-        public boolean save(InputStream is, long length, String mediaType, ProgressNotifier notify) {
-            ensureFile();
-            if (mFile == null) {
-                return false;
-            }
-
-            OutputStream os = null;
-            try {
-                os = mFile.openOutputStream();
-                IOUtils.copy(is, os);
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                IOUtils.closeQuietly(os);
-            }
-        }
-
-        @Override
-        public InputStreamPipe get() {
-            ensureFile();
-            if (mFile != null) {
-                return new UniFileInputStreamPipe(mFile);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public void remove() {
-            if (mFile != null) {
-                mFile.delete();
-            }
-        }
-    }
-
     private class DownloadLabelAdapter extends RecyclerView.Adapter<DownloadLabelHolder> {
 
         private final LayoutInflater mInflater;
@@ -1230,8 +1161,7 @@ public class DownloadsScene extends ToolbarScene
                 return;
             }
             DownloadInfo info = mList.get(position);
-            holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb,
-                    new ThumbDataContainer(info), true);
+            holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb, true);
             holder.title.setText(EhUtils.getSuitableTitle(info));
             holder.uploader.setText(info.uploader);
             holder.rating.setRating(info.rating);
