@@ -34,7 +34,6 @@ import androidx.core.content.ContextCompat;
 
 import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
-import com.hippo.conaco.DataContainer;
 import com.hippo.conaco.Unikery;
 import com.hippo.drawable.PreciselyClipDrawable;
 import com.hippo.ehviewer.EhApplication;
@@ -56,7 +55,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private Conaco<ImageBitmap> mConaco;
     private String mKey;
     private String mUrl;
-    private DataContainer mContainer;
     private boolean mUseNetwork;
     private int mOffsetX = Integer.MIN_VALUE;
     private int mOffsetY = Integer.MIN_VALUE;
@@ -109,7 +107,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
             if (mFailed) {
                 onFailure();
             } else if (mConaco.isLoading(this)) {
-                load(mKey, mUrl, mContainer, mUseNetwork);
+                load(mKey, mUrl, mUseNetwork);
             }
         }
     }
@@ -209,15 +207,11 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     public void load(String key, String url) {
-        load(key, url, null, true);
+        load(key, url, true);
     }
 
     public void load(String key, String url, boolean useNetwork) {
-        load(key, url, null, useNetwork);
-    }
-
-    public void load(String key, String url, DataContainer container, boolean useNetwork) {
-        if (url == null || (key == null && container == null)) {
+        if (url == null || (key == null)) {
             return;
         }
 
@@ -226,14 +220,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
 
         mKey = key;
         mUrl = url;
-        mContainer = container;
         mUseNetwork = useNetwork;
 
         ConacoTask.Builder<ImageBitmap> builder = new ConacoTask.Builder<ImageBitmap>()
                 .setUnikery(this)
                 .setKey(key)
                 .setUrl(url)
-                .setDataContainer(container)
                 .setUseNetwork(useNetwork);
         mConaco.load(builder);
     }
@@ -255,7 +247,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         mConaco.cancel(this);
         mKey = null;
         mUrl = null;
-        mContainer = null;
         clearDrawable();
     }
 
@@ -326,7 +317,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
             // Can't retry, so release
             mKey = null;
             mUrl = null;
-            mContainer = null;
         }
     }
 
@@ -363,12 +353,12 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
 
     @Override
     public void onClick(@NonNull View v) {
-        load(mKey, mUrl, mContainer, true);
+        load(mKey, mUrl, true);
     }
 
     @Override
     public boolean onLongClick(@NonNull View v) {
-        load(mKey, mUrl, mContainer, true);
+        load(mKey, mUrl, true);
         return true;
     }
 

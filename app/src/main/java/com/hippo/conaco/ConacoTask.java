@@ -51,7 +51,6 @@ public final class ConacoTask<V> {
     private final WeakReference<Unikery<V>> mUnikeryWeakReference;
     private final String mKey;
     private final String mUrl;
-    private final DataContainer mDataContainer;
     private final boolean mUseMemoryCache;
     private final boolean mUseDiskCache;
     private final boolean mUseNetwork;
@@ -73,7 +72,6 @@ public final class ConacoTask<V> {
         mUnikeryWeakReference = new WeakReference<>(builder.mUnikery);
         mKey = builder.mKey;
         mUrl = builder.mUrl;
-        mDataContainer = builder.mDataContainer;
         mUseMemoryCache = builder.mUseMemoryCache;
         mUseDiskCache = builder.mUseDiskCache;
         mUseNetwork = builder.mUseNetwork;
@@ -83,42 +81,6 @@ public final class ConacoTask<V> {
         mDiskExecutor = builder.mDiskExecutor;
         mNetworkExecutor = builder.mNetworkExecutor;
         mConaco = builder.mConaco;
-    }
-
-    private static void putFromDiskCacheToDataContainer(String key, ValueCache cache, DataContainer container) {
-        SimpleDiskCache diskCache = cache.getDiskCache();
-        if (diskCache != null) {
-            InputStreamPipe pipe = diskCache.getInputStreamPipe(key);
-            if (pipe != null) {
-                try {
-                    pipe.obtain();
-                    container.save(pipe.open(), -1L, null, null);
-                } catch (IOException e) {
-                    Log.d(TAG, "Can't save value from disk cache to data container");
-                    e.printStackTrace();
-                    container.remove();
-                } finally {
-                    pipe.close();
-                    pipe.release();
-                }
-            }
-        }
-    }
-
-    private static void putFromDataContainerToDiskCache(String key, ValueCache cache, DataContainer container) {
-        InputStreamPipe pipe = container.get();
-        if (pipe != null) {
-            try {
-                pipe.obtain();
-                cache.putRawToDisk(key, pipe.open());
-            } catch (IOException e) {
-                Log.w(TAG, "Can't save value from data container to disk cache", e);
-                cache.removeFromDisk(key);
-            } finally {
-                pipe.close();
-                pipe.release();
-            }
-        }
     }
 
     int getId() {
@@ -219,7 +181,6 @@ public final class ConacoTask<V> {
         private Unikery<T> mUnikery;
         private String mKey;
         private String mUrl;
-        private DataContainer mDataContainer;
         private boolean mUseMemoryCache = true;
         private boolean mUseDiskCache = true;
         private boolean mUseNetwork = true;
@@ -259,11 +220,6 @@ public final class ConacoTask<V> {
 
         public Builder<T> setUrl(String url) {
             mUrl = url;
-            return this;
-        }
-
-        public Builder<T> setDataContainer(DataContainer dataContainer) {
-            mDataContainer = dataContainer;
             return this;
         }
 
@@ -332,7 +288,7 @@ public final class ConacoTask<V> {
             if (mUnikery == null) {
                 throw new IllegalStateException("Must set unikery");
             }
-            if (mKey == null && mUrl == null && mDataContainer == null) {
+            if (mKey == null && mUrl == null) {
                 throw new IllegalStateException("At least one of mKey and mUrl and mDataContainer have to not be null");
             }
         }
@@ -352,26 +308,13 @@ public final class ConacoTask<V> {
             } else {
                 V value = null;
 
-                // First check data container
-                if (mDataContainer != null && mDataContainer.isEnabled()) {
-                    InputStreamPipe isp = mDataContainer.get();
-                    if (isp != null) {
-                        value = mHelper.decode(isp);
-                    }
-                }
-
                 // Then check disk cache
                 if (mKey != null) {
                     if (value == null && mUseDiskCache) {
                         value = mCache.getFromDisk(mKey);
-                        // Put back to data container
-                        if (value != null && mDataContainer != null && mDataContainer.isEnabled()) {
-                            putFromDiskCacheToDataContainer(mKey, mCache, mDataContainer);
-                        }
                     }
 
                     if (value != null && mUseMemoryCache && mHelper.useMemoryCache(mKey, value)) {
-                        // Put it to memory
                         mCache.putToMemory(mKey, value);
                     }
                 }
@@ -451,18 +394,6 @@ public final class ConacoTask<V> {
             }
         }
 
-        private boolean putToDataContainer(InputStream is, ResponseBody body) {
-            // Get media type
-            String mediaType;
-            MediaType mt = body.contentType();
-            if (mt != null) {
-                mediaType = mt.type() + '/' + mt.subtype();
-            } else {
-                mediaType = null;
-            }
-            return mDataContainer.save(is, body.contentLength(), mediaType, this);
-        }
-
         @Override
         protected V doInBackground(Void... params) {
             if (isNotNecessary(this)) {
@@ -489,7 +420,7 @@ public final class ConacoTask<V> {
                     return null;
                 }
 
-                if ((mDataContainer == null || !mDataContainer.isEnabled()) && mKey != null) {
+                if (mKey != null) {
                     if (putToDiskCache(is, body.contentLength())) {
                         // Get object from disk cache
                         value = mCache.getFromDisk(mKey);
@@ -506,37 +437,6 @@ public final class ConacoTask<V> {
                         mCache.removeFromDisk(mKey);
                         return null;
                     }
-                } else if (mDataContainer != null && mDataContainer.isEnabled()) {
-                    // Check url Moved
-                    HttpUrl requestHttpUrl = request.url();
-                    HttpUrl responseHttpUrl = response.request().url();
-                    if (!responseHttpUrl.equals(requestHttpUrl)) {
-                        mDataContainer.onUrlMoved(mUrl, responseHttpUrl.url().toString());
-                    }
-
-                    // Put to data container
-                    if (!putToDataContainer(is, body)) {
-                        return null;
-                    }
-
-                    // Get value from data container
-                    InputStreamPipe isp = mDataContainer.get();
-                    if (isp == null) {
-                        return null;
-                    }
-                    value = mHelper.decode(isp);
-                    if (value == null) {
-                        mDataContainer.remove();
-                    } else if (mKey != null) {
-                        // Put to disk cache
-                        putFromDataContainerToDiskCache(mKey, mCache, mDataContainer);
-
-                        if (mUseMemoryCache && mHelper.useMemoryCache(mKey, value)) {
-                            // Put it to memory
-                            mCache.putToMemory(mKey, value);
-                        }
-                    }
-                    return value;
                 } else {
                     return null;
                 }
