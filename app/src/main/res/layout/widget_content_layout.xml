@@ -60,6 +60,7 @@
             android:layout_gravity="bottom"
             android:indeterminate="true"
             android:visibility="gone"
+            app:fitsSystemWindowsInsets="end"
             app:hideAnimationBehavior="inward"
             app:showAnimationBehavior="outward" />
 
