@@ -184,14 +184,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                 mEditPanel,
                 mFabLayout
         ));
-
-        mRefreshLayout.setColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_purple,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_cyan,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_yellow);
+        mRefreshLayout.setColorSchemeColors(ResourcesKt.resolveColor(getTheme(), androidx.appcompat.R.attr.colorPrimary));
         mRefreshLayout.setOnRefreshListener(this);
 
         Context context = requireContext();

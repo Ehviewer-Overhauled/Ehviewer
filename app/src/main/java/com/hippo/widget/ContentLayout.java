@@ -102,27 +102,11 @@ public class ContentLayout extends FrameLayout {
         mFastScroller = mContentView.findViewById(R.id.fast_scroller);
         mRecyclerView = mRefreshLayout.findViewById(R.id.recycler_view);
 
+        mRefreshLayout.setColorSchemeColors(ResourcesKt.resolveColor(context.getTheme(), androidx.appcompat.R.attr.colorPrimary));
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
         drawable.setColor(ResourcesKt.resolveColor(context.getTheme(), androidx.appcompat.R.attr.colorPrimary));
         mFastScroller.setHandlerDrawable(drawable);
-
-        mRefreshLayout.setColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_purple,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_cyan,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_yellow);
-
-        Resources resources = getResources();
-        mBottomProgress.setIndicatorColor(
-                resources.getColor(R.color.loading_indicator_red),
-                resources.getColor(R.color.loading_indicator_blue),
-                resources.getColor(R.color.loading_indicator_green),
-                resources.getColor(R.color.loading_indicator_orange));
-        mBottomProgress.setIndeterminateAnimationType(LinearProgressIndicator.INDETERMINATE_ANIMATION_TYPE_CONTIGUOUS);
-
         mRecyclerViewOriginBottom = mRecyclerView.getPaddingBottom();
         mFastScrollerOriginBottom = mFastScroller.getPaddingBottom();
     }

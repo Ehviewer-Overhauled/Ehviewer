@@ -24,36 +24,11 @@
     <color name="yellow_800">#fff9a825</color>
     <color name="deep_orange_400">#ffff7043</color>
     <color name="brown_500">#ff795548</color>
-    <color name="loading_indicator_red">#ffe53935</color>
-    <color name="loading_indicator_purple">@color/purple_a700</color>
-    <color name="loading_indicator_blue">#ff1d87e4</color>
-    <color name="loading_indicator_cyan">@color/cyan_600</color>
-    <color name="loading_indicator_green">@color/light_green_600</color>
-    <color name="loading_indicator_yellow">@color/yellow_800</color>
-    <color name="loading_indicator_orange">@color/deep_orange_400</color>
-
     <color name="navigation_bar_divider">#1f000000</color>
-
-    <!-- Red -->
-    <!-- Orange -->
-    <!-- Yellow 700 -->
-    <!-- Green -->
-    <!-- Light Green -->
-    <!-- Blue -->
-    <!-- Indigo -->
-    <!-- Purple -->
-    <!-- Deep Purple 300 -->
-    <!-- Pink 300 -->
 
     <!-- divider -->
     <color name="divider">#20000000</color>
-
     <color name="divider_black">#20ffffff</color>
-    <!-- shadow -->
-
-    <!-- Gallery Activity -->
-
-    <!-- Lock pattern view -->
 
     <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
