@@ -18,18 +18,10 @@
     <color name="primary_drawable_black">#ccffffff</color>
     <color name="secondary_drawable_black">#3dffffff</color>
     <color name="red_500">#fff44336</color>
-    <color name="purple_a700">#ffaa00ff</color>
-    <color name="cyan_600">#ff00acc1</color>
-    <color name="light_green_600">#ff7cb342</color>
     <color name="yellow_800">#fff9a825</color>
-    <color name="deep_orange_400">#ffff7043</color>
     <color name="brown_500">#ff795548</color>
     <color name="navigation_bar_divider">#1f000000</color>
-
-    <!-- divider -->
     <color name="divider">#20000000</color>
     <color name="divider_black">#20ffffff</color>
-
-    <!--Shortcut background-->
     <color name="shortcut_bg">#F5F5F5</color>
 </resources>

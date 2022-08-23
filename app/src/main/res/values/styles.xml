@@ -18,8 +18,6 @@
 
     <style name="AppTheme" parent="Base.AppTheme" />
 
-    <!-- TextAppearance -->
-
     <!-- Progress View -->
     <style name="ProgressView">
         <item name="android:indeterminate">true</item>
