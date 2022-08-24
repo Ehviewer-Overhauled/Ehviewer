@@ -161,7 +161,7 @@ dependencies {
     implementation 'dev.rikka.rikkax.material:material-preference:2.0.0'
     implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation 'org.jsoup:jsoup:1.15.2'
+    implementation 'org.jsoup:jsoup:1.15.3'
     implementation projects.native
 }
 
