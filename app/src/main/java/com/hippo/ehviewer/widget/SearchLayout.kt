@@ -34,9 +34,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.easyrecyclerview.SimpleHolder
@@ -217,7 +217,7 @@ class SearchLayout @JvmOverloads constructor(
 
     override fun onClick(v: View) {
         if (mNormalSearchModeHelp === v) {
-            MaterialAlertDialogBuilder(context)
+            BaseDialogBuilder(context)
                 .setMessage(R.string.search_tip)
                 .show()
         }

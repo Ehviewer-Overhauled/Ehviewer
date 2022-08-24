@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.HandlerDrawable
@@ -200,7 +200,7 @@ class HistoryScene : ToolbarScene() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun showClearAllDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        BaseDialogBuilder(requireContext())
             .setMessage(R.string.clear_all_history)
             .setPositiveButton(R.string.clear_all) { _: DialogInterface?, which: Int ->
                 if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
@@ -260,7 +260,7 @@ class HistoryScene : ToolbarScene() {
             R.drawable.v_download_x24,
             if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
         )
-        MaterialAlertDialogBuilder(context)
+        BaseDialogBuilder(context)
             .setTitle(EhUtils.getSuitableTitle(gi))
             .setAdapter(
                 SelectItemWithIconAdapter(
@@ -277,7 +277,7 @@ class HistoryScene : ToolbarScene() {
                         startActivity(intent)
                     }
                     1 -> if (downloaded) {
-                        MaterialAlertDialogBuilder(context)
+                        BaseDialogBuilder(context)
                             .setTitle(R.string.download_remove_dialog_title)
                             .setMessage(
                                 getString(
@@ -319,7 +319,7 @@ class HistoryScene : ToolbarScene() {
                         }
                         val labels = labelList.toTypedArray()
                         val helper = MoveDialogHelper(labels, gi)
-                        MaterialAlertDialogBuilder(context)
+                        BaseDialogBuilder(context)
                             .setTitle(R.string.download_move_dialog_title)
                             .setItems(labels, helper)
                             .show()

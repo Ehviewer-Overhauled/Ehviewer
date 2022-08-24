@@ -26,7 +26,7 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.ehviewer.R;
 
 public class DialogWebChromeClient extends WebChromeClient {
@@ -39,7 +39,7 @@ public class DialogWebChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-        new MaterialAlertDialogBuilder(view.getContext())
+        new BaseDialogBuilder(view.getContext())
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm())
                 .setOnCancelListener(dialog -> result.cancel())
@@ -49,7 +49,7 @@ public class DialogWebChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-        new MaterialAlertDialogBuilder(view.getContext())
+        new BaseDialogBuilder(view.getContext())
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm())
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> result.cancel())
@@ -67,7 +67,7 @@ public class DialogWebChromeClient extends WebChromeClient {
         final EditText valueView = promptView.findViewById(R.id.value);
         valueView.setText(defaultValue);
 
-        new MaterialAlertDialogBuilder(context)
+        new BaseDialogBuilder(context)
                 .setView(promptView)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> result.confirm(valueView.getText().toString()))
                 .setOnCancelListener(dialog -> result.cancel())

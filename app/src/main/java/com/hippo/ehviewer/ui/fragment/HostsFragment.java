@@ -34,9 +34,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.Hosts;
 import com.hippo.ehviewer.R;
@@ -149,7 +149,8 @@ public class HostsFragment extends BaseFragment
                 ip.setText(arguments.getString(KEY_IP));
             }
 
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext()).setView(view);
+            BaseDialogBuilder builder = new BaseDialogBuilder(requireContext());
+            builder.setView(view);
             onCreateDialogBuilder(builder);
             AlertDialog dialog = builder.create();
             dialog.setOnShowListener(d -> onCreateDialog((AlertDialog) d));

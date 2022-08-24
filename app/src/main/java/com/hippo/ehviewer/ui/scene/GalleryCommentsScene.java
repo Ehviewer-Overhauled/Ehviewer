@@ -54,8 +54,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
@@ -290,7 +290,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             }
         }
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        BaseDialogBuilder builder = new BaseDialogBuilder(context);
         context = builder.getContext();
         final LayoutInflater inflater = LayoutInflater.from(context);
         EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
@@ -347,7 +347,7 @@ public final class GalleryCommentsScene extends ToolbarScene
             menuId.add(R.id.check_vote_status);
         }
 
-        new MaterialAlertDialogBuilder(context)
+        new BaseDialogBuilder(context)
                 .setItems(menu.toArray(new String[0]), (dialog, which) -> {
                     if (which < 0 || which >= menuId.size()) {
                         return;

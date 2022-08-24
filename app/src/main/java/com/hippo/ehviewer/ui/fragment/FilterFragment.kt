@@ -31,9 +31,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
+import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
@@ -112,7 +112,7 @@ class FilterFragment : BaseFragment() {
     }
 
     private fun showTipDialog() {
-        MaterialAlertDialogBuilder(requireActivity())
+        BaseDialogBuilder(requireActivity())
             .setTitle(R.string.filter)
             .setMessage(R.string.filter_tip)
             .setPositiveButton(android.R.string.ok, null)
@@ -120,7 +120,7 @@ class FilterFragment : BaseFragment() {
     }
 
     private fun showAddFilterDialog() {
-        val dialog = MaterialAlertDialogBuilder(requireActivity())
+        val dialog = BaseDialogBuilder(requireActivity())
             .setTitle(R.string.add_filter)
             .setView(R.layout.dialog_add_filter)
             .setPositiveButton(R.string.add, null)
@@ -131,7 +131,7 @@ class FilterFragment : BaseFragment() {
 
     private fun showDeleteFilterDialog(filter: Filter) {
         val message = getString(R.string.delete_filter, filter.text)
-        MaterialAlertDialogBuilder(requireActivity())
+        BaseDialogBuilder(requireActivity())
             .setMessage(message)
             .setPositiveButton(R.string.delete) { _: DialogInterface?, which: Int ->
                 if (DialogInterface.BUTTON_POSITIVE != which) {

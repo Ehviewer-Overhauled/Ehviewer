@@ -44,8 +44,8 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.hippo.Native;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.conaco.Conaco;
 import com.hippo.ehviewer.client.EhClient;
@@ -430,7 +430,7 @@ public class EhApplication extends SceneApplication {
         Activity activity = getTopActivity();
         if (activity != null) {
             activity.runOnUiThread(() -> {
-                AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
+                AlertDialog dialog = new BaseDialogBuilder(activity)
                         .setMessage(Html.fromHtml(html))
                         .setPositiveButton(android.R.string.ok, null)
                         .create();

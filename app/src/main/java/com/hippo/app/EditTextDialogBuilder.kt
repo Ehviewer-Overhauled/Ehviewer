@@ -23,7 +23,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.R
 
@@ -31,7 +30,7 @@ class EditTextDialogBuilder constructor(
     context: Context,
     text: String?,
     hint: String?
-) : MaterialAlertDialogBuilder(
+) : BaseDialogBuilder(
     context
 ), OnEditorActionListener {
     private val mTextInputLayout: TextInputLayout

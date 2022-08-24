@@ -18,7 +18,6 @@ package com.hippo.app
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.CheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hippo.ehviewer.R
 
 class CheckBoxDialogBuilder constructor(
@@ -26,7 +25,7 @@ class CheckBoxDialogBuilder constructor(
     message: String?,
     checkText: String?,
     checked: Boolean
-) : MaterialAlertDialogBuilder(
+) : BaseDialogBuilder(
     context
 ) {
     private val mCheckBox: CheckBox

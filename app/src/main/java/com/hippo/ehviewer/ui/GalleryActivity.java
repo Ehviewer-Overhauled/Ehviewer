@@ -67,8 +67,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
@@ -990,7 +990,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     private void showPageDialog(final int page) {
         Resources resources = GalleryActivity.this.getResources();
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GalleryActivity.this);
+        BaseDialogBuilder builder = new BaseDialogBuilder(GalleryActivity.this);
         builder.setTitle(resources.getString(R.string.page_menu_title, page + 1));
 
         final CharSequence[] items;
@@ -1286,7 +1286,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         private void onTapMenuArea() {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GalleryActivity.this);
+            BaseDialogBuilder builder = new BaseDialogBuilder(GalleryActivity.this);
             GalleryMenuHelper helper = new GalleryMenuHelper(builder.getContext());
             builder.setTitle(R.string.gallery_menu_title)
                     .setView(helper.getView())

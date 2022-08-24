@@ -51,8 +51,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
@@ -423,7 +423,7 @@ public class DownloadsScene extends ToolbarScene
 
         int id = item.getItemId();
         if (id == R.id.action_filter) {
-            new MaterialAlertDialogBuilder(requireActivity())
+            new BaseDialogBuilder(requireActivity())
                     .setSingleChoiceItems(R.array.download_state, mType + 1, (dialog, which) -> {
                         mType = which - 1;
                         updateForLabel();
@@ -446,7 +446,7 @@ public class DownloadsScene extends ToolbarScene
             openDrawer(Gravity.RIGHT);
             return true;
         } else if (id == R.id.action_reset_reading_progress) {
-            new MaterialAlertDialogBuilder(getContext())
+            new BaseDialogBuilder(getContext())
                     .setMessage(R.string.reset_reading_progress_message)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -519,7 +519,7 @@ public class DownloadsScene extends ToolbarScene
                 for (int i = 0, n = list.size(); i < n; i++) {
                     items[i + 2] = list.get(i).getLabel();
                 }
-                new MaterialAlertDialogBuilder(context)
+                new BaseDialogBuilder(context)
                         .setTitle(R.string.default_download_label)
                         .setItems(items, (dialog1, which) -> {
                             if (which == 0) {
@@ -706,7 +706,7 @@ public class DownloadsScene extends ToolbarScene
 
                     MoveDialogHelper helper = new MoveDialogHelper(labels, downloadInfoList);
 
-                    new MaterialAlertDialogBuilder(context)
+                    new BaseDialogBuilder(context)
                             .setTitle(R.string.download_move_dialog_title)
                             .setItems(labels, helper)
                             .show();

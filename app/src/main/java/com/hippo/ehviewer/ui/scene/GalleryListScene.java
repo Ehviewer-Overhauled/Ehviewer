@@ -55,8 +55,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
@@ -663,7 +663,7 @@ public final class GalleryListScene extends BaseScene
         if (null == context) {
             return;
         }
-        final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        final BaseDialogBuilder builder = new BaseDialogBuilder(context);
         builder.setMessage(R.string.add_quick_search_tip);
         builder.setTitle(R.string.readme);
         builder.show();
@@ -950,7 +950,7 @@ public final class GalleryListScene extends BaseScene
                 favourited ? R.drawable.v_heart_broken_x24 : R.drawable.v_heart_x24,
         };
 
-        new MaterialAlertDialogBuilder(context)
+        new BaseDialogBuilder(context)
                 .setTitle(EhUtils.getSuitableTitle(gi))
                 .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
                     switch (which) {
@@ -962,7 +962,7 @@ public final class GalleryListScene extends BaseScene
                             break;
                         case 1: // Download
                             if (downloaded) {
-                                new MaterialAlertDialogBuilder(context)
+                                new BaseDialogBuilder(context)
                                         .setTitle(R.string.download_remove_dialog_title)
                                         .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
                                         .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
@@ -989,7 +989,7 @@ public final class GalleryListScene extends BaseScene
 
                             MoveDialogHelper helper = new MoveDialogHelper(labels, gi);
 
-                            new MaterialAlertDialogBuilder(context)
+                            new BaseDialogBuilder(context)
                                     .setTitle(R.string.download_move_dialog_title)
                                     .setItems(labels, helper)
                                     .show();

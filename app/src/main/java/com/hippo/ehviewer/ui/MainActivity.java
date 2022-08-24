@@ -42,9 +42,9 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
@@ -337,7 +337,7 @@ public final class MainActivity extends StageActivity
             break;
         }
         if (hasUnverified) {
-            new MaterialAlertDialogBuilder(this)
+            new BaseDialogBuilder(this)
                     .setTitle(R.string.app_link_not_verified_title)
                     .setMessage(R.string.app_link_not_verified_message)
                     .setPositiveButton(R.string.open_settings, (dialogInterface, i) -> {
@@ -363,7 +363,7 @@ public final class MainActivity extends StageActivity
         if (null == uniFile || uniFile.ensureDir()) {
             return;
         }
-        new MaterialAlertDialogBuilder(this)
+        new BaseDialogBuilder(this)
                 .setTitle(R.string.waring)
                 .setMessage(R.string.invalid_download_location)
                 .setPositiveButton(R.string.get_it, null)
