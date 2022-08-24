@@ -98,7 +98,7 @@ android {
 }
 
 dependencies {
-    def activity_version = "1.6.0-beta01"
+    def activity_version = "1.6.0-rc01"
     implementation "androidx.activity:activity:$activity_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
 
