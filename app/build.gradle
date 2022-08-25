@@ -145,7 +145,7 @@ dependencies {
     implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
     implementation 'androidx.viewpager:viewpager:1.1.0-alpha01'
     implementation 'androidx.viewpager2:viewpager2:1.1.0-beta01'
-    implementation 'androidx.webkit:webkit:1.5.0-rc01'
+    implementation 'androidx.webkit:webkit:1.5.0'
 
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.7.0-beta01'
