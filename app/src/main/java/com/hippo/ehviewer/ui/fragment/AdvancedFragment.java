@@ -17,12 +17,13 @@
 package com.hippo.ehviewer.ui.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -39,6 +40,11 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.Settings;
+import com.hippo.ehviewer.client.EhClient;
+import com.hippo.ehviewer.client.EhRequest;
+import com.hippo.ehviewer.client.data.FavListUrlBuilder;
+import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -53,6 +59,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -64,6 +71,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
     private static final String KEY_IMPORT_DATA = "import_data";
     private static final String KEY_EXPORT_DATA = "export_data";
     private static final String KEY_OPEN_BY_DEFAULT = "open_by_default";
+    private static final String KEY_BACKUP_FAVORITE = "backup_favorite";
 
     ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument(),
@@ -231,6 +239,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         Preference importData = findPreference(KEY_IMPORT_DATA);
         Preference exportData = findPreference(KEY_EXPORT_DATA);
         Preference openByDefault = findPreference(KEY_OPEN_BY_DEFAULT);
+        Preference backupFavorite = findPreference(KEY_BACKUP_FAVORITE);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             openByDefault.setVisible(false);
@@ -242,6 +251,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         clearMemoryCache.setOnPreferenceClickListener(this);
         importData.setOnPreferenceClickListener(this);
         exportData.setOnPreferenceClickListener(this);
+        backupFavorite.setOnPreferenceClickListener(this);
 
         appLanguage.setOnPreferenceChangeListener(this);
     }
@@ -288,8 +298,60 @@ public class AdvancedFragment extends BasePreferenceFragment {
                 startActivity(intent);
             }
             return true;
+        } else if (KEY_BACKUP_FAVORITE.equals(key)) {
+            try {
+                showTip(R.string.backup_favorite_start, BaseScene.LENGTH_SHORT);
+                backupFavorite();
+            } catch (Exception e) {
+                ExceptionUtils.throwIfFatal(e);
+                showTip(R.string.backup_favorite_failed, BaseScene.LENGTH_SHORT);
+            }
+            return true;
         }
         return false;
+    }
+
+    private void backupFavorite() {
+        AtomicInteger page = new AtomicInteger(0);
+        Context context = requireContext();
+        Activity activity = requireActivity();
+        EhClient mClient = EhApplication.getEhClient(context);
+        FavListUrlBuilder favListUrlBuilder = new FavListUrlBuilder();
+        favListUrlBuilder.setIndex(page.get());
+
+        EhRequest request = new EhRequest();
+        request.setMethod(EhClient.METHOD_GET_FAVORITES);
+        request.setCallback(new EhClient.Callback() {
+            @Override
+            public void onSuccess(Object result) {
+                try {
+                    FavoritesParser.Result result1 = (FavoritesParser.Result) result;
+                    EhDB.putLocalFavorites(result1.galleryInfoList);
+                    Log.d("LocalFavorites", "now backup page " + page.get());
+                    if (!result1.galleryInfoList.isEmpty()) {
+                        favListUrlBuilder.setIndex(page.incrementAndGet());
+                        request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
+                        mClient.execute(request);
+                    } else {
+                        showTip(R.string.backup_favorite_success, BaseScene.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                    showTip(R.string.backup_favorite_failed, BaseScene.LENGTH_SHORT);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                showTip(R.string.backup_favorite_failed, BaseScene.LENGTH_SHORT);
+            }
+
+            @Override
+            public void onCancel() {
+                showTip(R.string.backup_favorite_failed, BaseScene.LENGTH_SHORT);
+            }
+        });
+        request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
+        mClient.execute(request);
     }
 
     @Override
