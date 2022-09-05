@@ -109,4 +109,10 @@
         android:title="@string/open_by_default"
         app:iconSpaceReserved="false" />
 
+    <Preference
+        android:key="backup_favorite"
+        android:summary="@string/backup_favorite_summary"
+        android:title="@string/backup_favorite"
+        app:iconSpaceReserved="false" />
+
 </PreferenceScreen>
