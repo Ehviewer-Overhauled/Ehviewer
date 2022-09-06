@@ -735,7 +735,7 @@
     <string name="delete_search_history">從搜索記錄中刪除“%s”？</string>
     <string name="settings_advanced_dns_over_http_title">安全 DNS（DoH）</string>
     <string name="settings_advanced_dns_over_http_summary">解決某些地區的 DNS 汙染問題</string>
-    <string name="settings_advanced_domain_fronting_title">域名前置</string>
+    <string name="settings_advanced_domain_fronting_title">域名前綴</string>
     <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
     <string name="read_theme">色彩主題</string>
     <string name="follow_app">跟隨應用</string>
@@ -754,7 +754,7 @@
     <string name="reset_download_location">恢復預設路徑</string>
     <string name="pick_new_download_location">選擇新路徑</string>
     <string name="dont_show_again">不再顯示</string>
-    <string name="open_settings">打開設置</string>
+    <string name="open_settings">打開設定</string>
     <string name="app_link_not_verified_message">對於 Android 12 及更新的版本，您需要手動增加連結到已驗證連結才能在 EhViewer 中打開 E-Hentai 連結。</string>
     <string name="app_link_not_verified_title">應用連結未驗證</string>
     <string name="open_by_default">預設打開</string>
@@ -762,11 +762,16 @@
     <string name="show_library_version">依賴庫之版本</string>
     <string name="settings_privacy_require_unlock">需要解鎖</string>
     <string name="proxy_type_name">代理類型</string>
-    <string name="filter_label">屏蔽項類型</string>
+    <string name="filter_label">隱藏項類型</string>
 
-    <string name="archive_passwd">歸檔文件密碼</string>
-    <string name="archive_need_passwd">歸檔文件需要密碼</string>
+    <string name="archive_passwd">封存文件密碼</string>
+    <string name="archive_need_passwd">封存文件需要密碼</string>
     <string name="passwd_wrong">密碼錯誤</string>
     <string name="passwd_cannot_be_empty">密碼不能為空</string>
     <string name="list_tile_thumb_size">詳情模式下縮圖大小</string>
+    <string name="backup_favorite">備份收藏列表</string>
+    <string name="backup_favorite_summary">備份雲端收藏列表到本機</string>
+    <string name="backup_favorite_failed">備份收藏列表失敗</string>
+    <string name="backup_favorite_success">備份收藏列表成功</string>
+    <string name="backup_favorite_start">正在備份收藏列表</string>
 </resources>
