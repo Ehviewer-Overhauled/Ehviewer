@@ -44,6 +44,19 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: more
+    attributes:
+      label: 备注 / Addition details
+      description: |
+        在此处写下其他您想说的内容
+        Describe addition details here
+      placeholder: |
+        其他有用的信息与附件
+        Additional details and attachments
+    validations:
+      required: false
+
   - type: input
     id: version
     attributes:
