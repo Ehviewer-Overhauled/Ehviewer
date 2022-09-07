@@ -33,7 +33,7 @@ body:
   - type: textarea
     id: more
     attributes:
-      label: 其他细节 / Addition details
+      label: 备注 / Addition details
       description: |
         在此处写下其他您想说的内容
         Describe addition details here
