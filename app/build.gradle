@@ -151,7 +151,7 @@ dependencies {
 
     implementation "androidx.loader:loader:1.1.0"
 
-    def nav_version = "2.5.1"
+    def nav_version = "2.5.2"
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
