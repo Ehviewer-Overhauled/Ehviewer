@@ -99,7 +99,7 @@ dependencies {
 
     implementation "androidx.annotation:annotation:1.4.0"
     implementation "androidx.annotation:annotation-experimental:1.2.0"
-    implementation "androidx.appcompat:appcompat:1.6.0-beta01"
+    implementation "androidx.appcompat:appcompat:1.6.0-rc01"
 
     def arch_core_version = "2.1.0"
     implementation "androidx.arch.core:core-common:$arch_core_version"
