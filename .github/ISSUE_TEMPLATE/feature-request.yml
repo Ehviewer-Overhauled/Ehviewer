@@ -1,8 +1,17 @@
 name: 功能请求 / Feature request
-description: 提出一个功能建议 / Suggest an idea for this project
+description: 提出一个功能建议 / Suggest an idea
 labels:
   - "enhancement"
 body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您愿意为 Ehviewer-Overhauled 做出贡献！
+        提交功能建议前，还请首先完成文末的自查步骤
+
+        Thanks for your contribution on Ehviewer-Overhauled Project!
+        Please finish verify steps which list in the end first before suggest an idea
+
   - type: textarea
     id: request
     attributes:
