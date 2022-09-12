@@ -1,8 +1,17 @@
 name: Bug 反馈 / Bug report
-description: 提交一个问题报告 / Create a bug report to help us improve
+description: 提交一个问题报告 / Create a bug report
 labels:
   - "bug"
 body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您愿意为 Ehviewer-Overhauled 做出贡献！
+        提交问题报告前，还请首先完成文末的自查步骤
+
+        Thanks for your contribution on Ehviewer-Overhauled Project!
+        Please finish verify steps which list in the end first before create bug report
+
   - type: textarea
     id: reproduce
     attributes:
