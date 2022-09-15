@@ -321,21 +321,4 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
-    <string-array name="unlock_delay">
-        <item>@string/settings_privacy_require_unlock_delay_immediately</item>
-        <item>@string/settings_privacy_require_unlock_delay_2_mins</item>
-        <item>@string/settings_privacy_require_unlock_delay_5_mins</item>
-        <item>@string/settings_privacy_require_unlock_delay_10_mins</item>
-        <item>@string/settings_privacy_require_unlock_delay_20_mins</item>
-        <item>@string/settings_privacy_require_unlock_delay_30_mins</item>
-    </string-array>
-    <string-array name="unlock_delay_values" translatable="false">
-        <item>0</item>
-        <item>120</item>
-        <item>300</item>
-        <item>600</item>
-        <item>1200</item>
-        <item>1800</item>
-    </string-array>
 </resources>

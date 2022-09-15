@@ -24,13 +24,15 @@
         android:title="@string/settings_privacy_require_unlock"
         app:iconSpaceReserved="false" />
 
-    <rikka.preference.SimpleMenuPreference
+    <SeekBarPreference
         android:defaultValue="0"
-        app:entries="@array/unlock_delay"
-        app:entryValues="@array/unlock_delay_values"
-        app:key="require_unlock_delay"
-        app:summary=""
-        app:title="@string/settings_privacy_require_unlock_delay" />
+        android:key="require_unlock_delay"
+        android:max="30"
+        android:progress="0"
+        android:summary=""
+        android:title="@string/settings_privacy_require_unlock_delay"
+        app:iconSpaceReserved="false"
+        app:showSeekBarValue="true" />
 
     <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"

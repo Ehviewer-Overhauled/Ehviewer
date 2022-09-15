@@ -1065,7 +1065,7 @@ public class Settings {
         putBoolean(KEY_SECURITY, value);
     }
     public static int getSecurityDelay() {
-        return getIntFromStr(KEY_SECURITY_DELAY, 0);
+        return getInt(KEY_SECURITY_DELAY, 0);
     }
 
     public static boolean getEnableFingerprint() {

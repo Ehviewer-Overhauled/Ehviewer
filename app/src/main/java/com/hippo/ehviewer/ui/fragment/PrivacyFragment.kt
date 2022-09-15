@@ -19,18 +19,18 @@
 package com.hippo.ehviewer.ui.fragment
 
 import android.os.Bundle
+import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreferenceCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupported
-import rikka.preference.SimpleMenuPreference
 
 /**
  * Created by Mo10 on 2018/2/10.
  */
 class PrivacyFragment : BasePreferenceFragment() {
     private lateinit var requireUnlock: SwitchPreferenceCompat
-    private lateinit var unlockDelay: SimpleMenuPreference
+    private lateinit var unlockDelay: SeekBarPreference
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.privacy_settings)
         requireUnlock = findPreference("require_unlock")!!
@@ -41,7 +41,7 @@ class PrivacyFragment : BasePreferenceFragment() {
             true
         }
         unlockDelay.setOnPreferenceChangeListener { _, newValue ->
-            setUnlockDelaySummary(newValue as String)
+            setUnlockDelaySummary(newValue as Int)
             true
         }
     }
@@ -62,20 +62,11 @@ class PrivacyFragment : BasePreferenceFragment() {
         return R.string.settings_privacy
     }
 
-    private fun setUnlockDelaySummary(value:String){
-        val delayTimeString = when (value) {
-            "0" -> getString(R.string.settings_privacy_require_unlock_delay_immediately)
-            "120" -> getString(R.string.settings_privacy_require_unlock_delay_2_mins)
-            "300" -> getString(R.string.settings_privacy_require_unlock_delay_5_mins)
-            "600" -> getString(R.string.settings_privacy_require_unlock_delay_10_mins)
-            "1200" -> getString(R.string.settings_privacy_require_unlock_delay_20_mins)
-            "1800" -> getString(R.string.settings_privacy_require_unlock_delay_30_mins)
-            else -> getString(R.string.settings_privacy_require_unlock_delay_immediately)
-        }
-        unlockDelay.summary = if (value == "0") {
+    private fun setUnlockDelaySummary(value: Int) {
+        unlockDelay.summary = if (value == 0) {
             getString(R.string.settings_privacy_require_unlock_delay_summary_immediately)
         } else {
-            getString(R.string.settings_privacy_require_unlock_delay_summary, delayTimeString)
+            getString(R.string.settings_privacy_require_unlock_delay_summary, value.toString())
         }
     }
 }

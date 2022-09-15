@@ -103,7 +103,7 @@ abstract class EhActivity : AppCompatActivity() {
     override fun onResume() {
         val locked_resume_time = System.currentTimeMillis() / 1000
         val locked_delay_time = locked_resume_time - locked_last_leave_time
-        if (Settings.getSecurity() && locked_delay_time >= Settings.getSecurityDelay()
+        if (Settings.getSecurity() && locked_delay_time >= Settings.getSecurityDelay() * 60
             && isAuthenticationSupported(this) && EhApplication.locked ) {
             startActivity(Intent(this, SecurityActivity::class.java))
         }

@@ -826,14 +826,8 @@
     <string name="show_library_version">Library Version</string>
     <string name="settings_privacy_require_unlock">Require Unlock</string>
     <string name="settings_privacy_require_unlock_delay">Lock Delay</string>
-    <string name="settings_privacy_require_unlock_delay_summary">No unlock is required when leaving EhViewer and returning within %s</string>
-    <string name="settings_privacy_require_unlock_delay_summary_immediately">Unlock is required whenever you return to EhViewer</string>
-    <string name="settings_privacy_require_unlock_delay_immediately">Immediately</string>
-    <string name="settings_privacy_require_unlock_delay_2_mins">2 Minutes</string>
-    <string name="settings_privacy_require_unlock_delay_5_mins">5 Minutes</string>
-    <string name="settings_privacy_require_unlock_delay_10_mins">10 Minutes</string>
-    <string name="settings_privacy_require_unlock_delay_20_mins">20 Minutes</string>
-    <string name="settings_privacy_require_unlock_delay_30_mins">30 Minutes</string>
+    <string name="settings_privacy_require_unlock_delay_summary">No unlock is required when leaving App and returning within %s minute(s)</string>
+    <string name="settings_privacy_require_unlock_delay_summary_immediately">Unlock is required whenever you return to this App</string>
     <string name="proxy_type_name">Proxy Type</string>
     <string name="filter_label">Blocker Type</string>
 
