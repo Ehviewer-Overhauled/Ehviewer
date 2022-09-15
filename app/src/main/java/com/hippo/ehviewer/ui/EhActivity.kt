@@ -32,6 +32,7 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.EhApplication.locked_last_leave_time
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupported
@@ -100,7 +101,10 @@ abstract class EhActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (Settings.getSecurity() && isAuthenticationSupported(this) && EhApplication.locked) {
+        val locked_resume_time = System.currentTimeMillis() / 1000
+        val locked_delay_time = locked_resume_time - locked_last_leave_time
+        if (Settings.getSecurity() && locked_delay_time >= Settings.getSecurityDelay() * 60
+            && isAuthenticationSupported(this) && EhApplication.locked ) {
             startActivity(Intent(this, SecurityActivity::class.java))
         }
         super.onResume()
@@ -112,6 +116,11 @@ abstract class EhActivity : AppCompatActivity() {
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        locked_last_leave_time = System.currentTimeMillis() / 1000
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

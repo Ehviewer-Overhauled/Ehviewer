@@ -19,6 +19,7 @@
 package com.hippo.ehviewer.ui.fragment
 
 import android.os.Bundle
+import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreferenceCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -28,20 +29,44 @@ import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupporte
  * Created by Mo10 on 2018/2/10.
  */
 class PrivacyFragment : BasePreferenceFragment() {
+    private lateinit var requireUnlock: SwitchPreferenceCompat
+    private lateinit var unlockDelay: SeekBarPreference
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.privacy_settings)
+        requireUnlock = findPreference("require_unlock")!!
+        unlockDelay = findPreference("require_unlock_delay")!!
+        requireUnlock.setOnPreferenceChangeListener { _, newValue ->
+            unlockDelay.isEnabled = newValue as Boolean
+            setUnlockDelaySummary(unlockDelay.value)
+            true
+        }
+        unlockDelay.setOnPreferenceChangeListener { _, newValue ->
+            setUnlockDelaySummary(newValue as Int)
+            true
+        }
     }
 
     override fun onStart() {
         super.onStart()
         if (!isAuthenticationSupported(requireContext())) {
             Settings.putSecurity(false)
-            findPreference<SwitchPreferenceCompat>("require_unlock")?.isEnabled = false
-            findPreference<SwitchPreferenceCompat>("require_unlock")?.isChecked = false
+            requireUnlock.isEnabled = false
+            requireUnlock.isChecked = false
+        } else {
+            unlockDelay.isEnabled = requireUnlock.isChecked == true
+            setUnlockDelaySummary(unlockDelay.value)
         }
     }
 
     override fun getFragmentTitle(): Int {
         return R.string.settings_privacy
+    }
+
+    private fun setUnlockDelaySummary(value: Int) {
+        unlockDelay.summary = if (value == 0) {
+            getString(R.string.settings_privacy_require_unlock_delay_summary_immediately)
+        } else {
+            getString(R.string.settings_privacy_require_unlock_delay_summary, value.toString())
+        }
     }
 }
