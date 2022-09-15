@@ -761,6 +761,15 @@
 
     <string name="show_library_version">依赖库之版本</string>
     <string name="settings_privacy_require_unlock">需要解锁</string>
+    <string name="settings_privacy_require_unlock_delay">锁定延迟</string>
+    <string name="settings_privacy_require_unlock_delay_summary">离开 EhViewer 并在 %s 内返回时不需要解锁</string>
+    <string name="settings_privacy_require_unlock_delay_summary_immediately">无论何时回到 EhViewer 均要求解锁</string>
+    <string name="settings_privacy_require_unlock_delay_immediately">立刻</string>
+    <string name="settings_privacy_require_unlock_delay_2_mins">2 分钟</string>
+    <string name="settings_privacy_require_unlock_delay_5_mins">5 分钟</string>
+    <string name="settings_privacy_require_unlock_delay_10_mins">10 分钟</string>
+    <string name="settings_privacy_require_unlock_delay_20_mins">20 分钟</string>
+    <string name="settings_privacy_require_unlock_delay_30_mins">30 分钟</string>
     <string name="proxy_type_name">代理类型</string>
     <string name="filter_label">屏蔽项类型</string>
 

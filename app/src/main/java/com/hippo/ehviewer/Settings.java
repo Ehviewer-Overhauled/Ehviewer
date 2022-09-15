@@ -90,6 +90,7 @@ public class Settings {
      ********************/
     public static final String KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body";
     public static final String KEY_SECURITY = "require_unlock";
+    public static final String KEY_SECURITY_DELAY = "require_unlock_delay";
     public static final String DEFAULT_SECURITY = "";
     public static final String KEY_ENABLE_FINGERPRINT = "enable_fingerprint";
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
@@ -1062,6 +1063,9 @@ public class Settings {
 
     public static void putSecurity(boolean value) {
         putBoolean(KEY_SECURITY, value);
+    }
+    public static int getSecurityDelay() {
+        return getIntFromStr(KEY_SECURITY_DELAY, 0);
     }
 
     public static boolean getEnableFingerprint() {
