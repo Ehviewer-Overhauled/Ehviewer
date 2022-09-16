@@ -9,11 +9,6 @@ android {
     buildToolsVersion "33.0.0"
     ndkVersion "25.1.8937393"
 
-    Properties localProperties = new Properties()
-    if (project.rootProject.file('local.properties').exists()) {
-        localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
-    }
-
     splits {
         abi {
             enable = true

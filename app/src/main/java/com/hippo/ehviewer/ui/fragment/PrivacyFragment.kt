@@ -52,6 +52,7 @@ class PrivacyFragment : BasePreferenceFragment() {
             Settings.putSecurity(false)
             requireUnlock.isEnabled = false
             requireUnlock.isChecked = false
+            unlockDelay.isEnabled = false
         } else {
             unlockDelay.isEnabled = requireUnlock.isChecked == true
             setUnlockDelaySummary(unlockDelay.value)
