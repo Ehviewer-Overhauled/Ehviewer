@@ -79,7 +79,7 @@ App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系�
 
 本项目受到了诸多开源项目的帮助
 
-- [AOSP&AndroidX](http://source.android.com/)
+- [AOSP & AndroidX](http://source.android.com/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
