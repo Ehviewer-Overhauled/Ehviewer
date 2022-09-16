@@ -32,7 +32,7 @@ import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.*
 
-class IdentityCookiePreference @JvmOverloads constructor(
+class AccountPreference @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : MessagePreference(context, attrs) {
     private val mActivity = context as SettingsActivity
@@ -94,7 +94,7 @@ class IdentityCookiePreference @JvmOverloads constructor(
                 // There is no need to notify user by toast since Tiramisu have its clipboard own logic
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
                     mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
-                this@IdentityCookiePreference.onClick(dialog, which)
+                this@AccountPreference.onClick(dialog, which)
             }
             builder.setNegativeButton(android.R.string.cancel, null)
         } else {

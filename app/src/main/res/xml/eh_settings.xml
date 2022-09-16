@@ -17,7 +17,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Preference
+    <com.hippo.ehviewer.preference.AccountPreference
         android:key="account"
         android:summary="@string/settings_eh_identity_cookies_tourist"
         android:title="@string/account_name"
@@ -27,12 +27,6 @@
         android:key="sign_out"
         android:summary="@string/settings_eh_sign_out_summary"
         android:title="@string/settings_eh_sign_out"
-        app:iconSpaceReserved="false" />
-
-    <com.hippo.ehviewer.preference.IdentityCookiePreference
-        android:key="identity_cookie"
-        android:summary="@string/settings_eh_identity_cookies_summary"
-        android:title="@string/settings_eh_identity_cookies"
         app:iconSpaceReserved="false" />
 
     <rikka.preference.SimpleMenuPreference
