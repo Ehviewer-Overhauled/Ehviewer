@@ -13,88 +13,79 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.app.Activity
+import android.content.res.Configuration
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.Preference
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhTagDatabase
 
-import android.app.Activity;
-import android.content.res.Configuration;
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.Preference;
-
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhTagDatabase;
-
-public class EhFragment extends BasePreferenceFragment {
-
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.eh_settings);
-
-        Preference theme = findPreference(Settings.KEY_THEME);
-        Preference blackDarkTheme = findPreference(Settings.KEY_BLACK_DARK_THEME);
-        Preference gallerySite = findPreference(Settings.KEY_GALLERY_SITE);
-        Preference listMode = findPreference(Settings.KEY_LIST_MODE);
-        Preference listThumbSize = findPreference(Settings.KEY_LIST_THUMB_SIZE);
-        Preference detailSize = findPreference(Settings.KEY_DETAIL_SIZE);
-        Preference thumbSize = findPreference(Settings.KEY_THUMB_SIZE);
-        Preference showTagTranslations = findPreference(Settings.KEY_SHOW_TAG_TRANSLATIONS);
-        Preference tagTranslationsSource = findPreference("tag_translations_source");
-
-        theme.setOnPreferenceChangeListener(this);
-        gallerySite.setOnPreferenceChangeListener(this);
-        listMode.setOnPreferenceChangeListener(this);
-        listThumbSize.setOnPreferenceChangeListener(this);
-        detailSize.setOnPreferenceChangeListener(this);
-        thumbSize.setOnPreferenceChangeListener(this);
-        showTagTranslations.setOnPreferenceChangeListener(this);
-        blackDarkTheme.setOnPreferenceChangeListener(this);
-
+class EhFragment : BasePreferenceFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.eh_settings)
+        val account = findPreference<Preference>(Settings.KEY_ACCOUNT)
+        val theme = findPreference<Preference>(Settings.KEY_THEME)
+        val blackDarkTheme = findPreference<Preference>(Settings.KEY_BLACK_DARK_THEME)
+        val gallerySite = findPreference<Preference>(Settings.KEY_GALLERY_SITE)
+        val listMode = findPreference<Preference>(Settings.KEY_LIST_MODE)
+        val listThumbSize = findPreference<Preference>(Settings.KEY_LIST_THUMB_SIZE)
+        val detailSize = findPreference<Preference>(Settings.KEY_DETAIL_SIZE)
+        val thumbSize = findPreference<Preference>(Settings.KEY_THUMB_SIZE)
+        val showTagTranslations = findPreference<Preference>(Settings.KEY_SHOW_TAG_TRANSLATIONS)
+        val tagTranslationsSource = findPreference<Preference>("tag_translations_source")
+        Settings.getDisplayName()?.let { account?.summary = it }
+        theme!!.onPreferenceChangeListener = this
+        gallerySite!!.onPreferenceChangeListener = this
+        listMode!!.onPreferenceChangeListener = this
+        listThumbSize!!.onPreferenceChangeListener = this
+        detailSize!!.onPreferenceChangeListener = this
+        thumbSize!!.onPreferenceChangeListener = this
+        showTagTranslations!!.onPreferenceChangeListener = this
+        blackDarkTheme!!.onPreferenceChangeListener = this
         if (!EhTagDatabase.isPossible(requireActivity())) {
-            getPreferenceScreen().removePreference(showTagTranslations);
-            getPreferenceScreen().removePreference(tagTranslationsSource);
+            preferenceScreen.removePreference(showTagTranslations)
+            preferenceScreen.removePreference(tagTranslationsSource!!)
         }
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String key = preference.getKey();
-        if (Settings.KEY_THEME.equals(key)) {
-            AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
-            requireActivity().recreate();
-            return true;
-        } else if (Settings.KEY_GALLERY_SITE.equals(key)) {
-            requireActivity().setResult(Activity.RESULT_OK);
-            return true;
-        } else if (Settings.KEY_LIST_MODE.equals(key)) {
-            requireActivity().setResult(Activity.RESULT_OK);
-            return true;
-        } else if (Settings.KEY_LIST_THUMB_SIZE.equals(key)) {
-            Settings.LIST_THUMB_SIZE_INITED = false;
-            requireActivity().setResult(Activity.RESULT_OK);
-            return true;
-        } else if (Settings.KEY_DETAIL_SIZE.equals(key)) {
-            requireActivity().setResult(Activity.RESULT_OK);
-        } else if (Settings.KEY_THUMB_SIZE.equals(key)) {
-            requireActivity().setResult(Activity.RESULT_OK);
-        } else if (Settings.KEY_SHOW_TAG_TRANSLATIONS.equals(key)) {
-            if (Boolean.TRUE.equals(newValue)) {
-                EhTagDatabase.update(requireActivity());
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        val key = preference.key
+        if (Settings.KEY_THEME == key) {
+            AppCompatDelegate.setDefaultNightMode(newValue as Int)
+            requireActivity().recreate()
+            return true
+        } else if (Settings.KEY_GALLERY_SITE == key) {
+            requireActivity().setResult(Activity.RESULT_OK)
+            return true
+        } else if (Settings.KEY_LIST_MODE == key) {
+            requireActivity().setResult(Activity.RESULT_OK)
+            return true
+        } else if (Settings.KEY_LIST_THUMB_SIZE == key) {
+            Settings.LIST_THUMB_SIZE_INITED = false
+            requireActivity().setResult(Activity.RESULT_OK)
+            return true
+        } else if (Settings.KEY_DETAIL_SIZE == key) {
+            requireActivity().setResult(Activity.RESULT_OK)
+        } else if (Settings.KEY_THUMB_SIZE == key) {
+            requireActivity().setResult(Activity.RESULT_OK)
+        } else if (Settings.KEY_SHOW_TAG_TRANSLATIONS == key) {
+            if (java.lang.Boolean.TRUE == newValue) {
+                EhTagDatabase.update(requireActivity())
             }
-        } else if (Settings.KEY_BLACK_DARK_THEME.equals(key)) {
-            if ((requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) > 0) {
-                requireActivity().recreate();
+        } else if (Settings.KEY_BLACK_DARK_THEME == key) {
+            if (requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES > 0) {
+                requireActivity().recreate()
             }
-            return true;
+            return true
         }
-        return true;
+        return true
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings_eh;
+    override fun getFragmentTitle(): Int {
+        return R.string.settings_eh
     }
 }

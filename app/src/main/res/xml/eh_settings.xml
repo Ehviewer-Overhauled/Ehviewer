@@ -17,6 +17,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <Preference
+        android:key="account"
+        android:summary="@string/settings_eh_identity_cookies_tourist"
+        android:title="@string/account_name"
+        app:iconSpaceReserved="false" />
+
     <com.hippo.ehviewer.preference.SignOutPreference
         android:key="sign_out"
         android:summary="@string/settings_eh_sign_out_summary"

@@ -841,4 +841,5 @@
     <string name="backup_favorite_failed">Backup favorite list failed</string>
     <string name="backup_favorite_success">backup favorite list success</string>
     <string name="backup_favorite_start">Now starting backup favorite list</string>
+    <string name="account_name">Account</string>
 </resources>
