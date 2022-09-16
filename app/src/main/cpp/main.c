@@ -43,23 +43,3 @@ JNIEXPORT void JNICALL
 JNI_OnUnload(JavaVM *vm, void *reserved) {
     image_onUnload();
 }
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_Native_getlibarchiveVersion(JNIEnv *env, jclass clazz) {
-    return (*env)->NewStringUTF(env, ARCHIVE_VERSION_STRING);
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_Native_getliblzmaVersion(JNIEnv *env, jclass clazz) {
-    return (*env)->NewStringUTF(env, lzma_version_string());
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_Native_getzlibVersion(JNIEnv *env, jclass clazz) {
-    return (*env)->NewStringUTF(env, ZLIB_VERSION);
-}
-
-JNIEXPORT jstring JNICALL
-Java_com_hippo_Native_getnettleVersion(JNIEnv *env, jclass clazz) {
-    return (*env)->NewStringUTF(env, PACKAGE_STRING);
-}
