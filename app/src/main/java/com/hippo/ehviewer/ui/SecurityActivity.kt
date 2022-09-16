@@ -32,8 +32,8 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 
 class SecurityActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onResume() {
+        super.onResume()
         if (isAuthenticationSupported(this))
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
         else

@@ -592,6 +592,8 @@ public class EhApplication extends SceneApplication {
     static class EhlifecycleObserver implements DefaultLifecycleObserver {
         @Override
         public void onPause(@NonNull LifecycleOwner owner) {
+            if (!locked)
+                locked_last_leave_time = System.currentTimeMillis() / 1000;
             locked = true;
         }
     }

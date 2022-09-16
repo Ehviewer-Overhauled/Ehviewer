@@ -118,11 +118,6 @@ abstract class EhActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        locked_last_leave_time = System.currentTimeMillis() / 1000
-    }
-
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
