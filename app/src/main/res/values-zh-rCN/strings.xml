@@ -391,7 +391,7 @@
     <string name="hosts">自定义 hosts.txt</string>
     <string name="hosts_tip">hosts.txt</string>
     <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3...)</string>
+    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
     <string name="add_host">添加 host</string>
     <string name="add_host_add">添加</string>
     <string name="edit_host">编辑 host</string>
@@ -421,8 +421,8 @@
     <string name="settings_eh_identity_cookies">身份 Cookie</string>
     <string name="settings_eh_identity_cookies_summary">可用于登录</string>
     <string name="settings_eh_identity_cookies_signed">身份 Cookie 可用于登录该账号。&lt;br&gt;&lt;b&gt;注意数据安全&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
-    <string name="settings_eh_identity_cookies_tourist">未登录</string>
-    <string name="settings_eh_identity_cookies_copy">复制</string>
+    <string name="settings_eh_identity_cookies_tourist">游客模式</string>
+    <string name="settings_eh_identity_cookies_copy">复制 Cookies</string>
     <string name="settings_u_config">EHentai 设置</string>
     <string name="settings_u_config_summary">EHentai 网站上的设置</string>
     <string name="settings_my_tags">我的标签</string>

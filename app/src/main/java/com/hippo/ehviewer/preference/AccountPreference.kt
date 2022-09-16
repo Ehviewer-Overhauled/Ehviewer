@@ -25,6 +25,7 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.preference.MessagePreference
@@ -79,7 +80,7 @@ class AccountPreference @JvmOverloads constructor(
     override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
         super.onPrepareDialogBuilder(builder)
         if (message != null) {
-            builder.setPositiveButton(R.string.settings_eh_identity_cookies_copy) { dialog: DialogInterface?, which: Int ->
+            builder.setNeutralButton(R.string.settings_eh_identity_cookies_copy) { dialog: DialogInterface?, which: Int ->
                 val clipboardManager =
                     context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clipData = ClipData.newPlainText(null, message)
@@ -96,9 +97,10 @@ class AccountPreference @JvmOverloads constructor(
                     mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
                 this@AccountPreference.onClick(dialog, which)
             }
-            builder.setNegativeButton(android.R.string.cancel, null)
-        } else {
-            builder.setPositiveButton(android.R.string.ok, null)
+        }
+        builder.setPositiveButton(R.string.settings_eh_sign_out) { _: DialogInterface?, _: Int ->
+            EhUtils.signOut(context)
+            mActivity.showTip(R.string.settings_eh_sign_out_tip, BaseScene.LENGTH_SHORT)
         }
     }
 }
