@@ -215,7 +215,7 @@ public final class GalleryListScene extends BaseScene
         }
     };
     // Double click back exit
-    private long mPressBackTime = 0;
+    private final long mPressBackTime = 0;
     private boolean mHasFirstRefresh = false;
     private int mNavCheckedId = 0;
     private DownloadManager mDownloadManager;

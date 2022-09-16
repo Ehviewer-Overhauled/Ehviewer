@@ -19,7 +19,6 @@
 package com.hippo.ehviewer.ui
 
 import android.content.Context
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL

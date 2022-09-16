@@ -290,16 +290,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
         outState.putInt(KEY_PAGE, mPage);
         outState.putInt(KEY_CURRENT_INDEX, mCurrentIndex);
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            result -> {
-                if (result && mSavingPage != -1) {
-                    saveImage(mSavingPage);
-                } else {
-                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-                }
-                mSavingPage = -1;
-            });
+    }
 
     @Override
     protected void attachBaseContext(@NonNull Context newBase) {
@@ -312,7 +303,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 break;
         }
         super.attachBaseContext(newBase);
-    }
+    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
 
     @Override
     @SuppressWarnings({"WrongConstant"})
@@ -410,7 +410,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                     if (scroll < 0.0f) {
                         if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
                             mGalleryView.pageLeft();
-                        } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT){
+                        } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
                             mGalleryView.pageRight();
                         } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
                             mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
@@ -1373,6 +1373,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             }
         }
     }
+
+
 
 
 }
