@@ -490,18 +490,17 @@ public class EhDB {
             EhDatabase oldRoomDatabase = Room.databaseBuilder(context, EhDatabase.class, tmpDBName)
                     .createFromFile(file).allowMainThreadQueries().build();
 
-
-            // Downloads
-            DownloadManager manager = EhApplication.getDownloadManager(context);
-            try {
-                List<DownloadInfo> downloadInfoList = oldRoomDatabase.downloadsDao().list();
-                manager.addDownload(downloadInfoList, false);
-            } catch (Exception ignored) {}
-
             // Download label
+            DownloadManager manager = EhApplication.getDownloadManager(context);
             try {
                 List<DownloadLabel> downloadLabelList = oldRoomDatabase.downloadLabelDao().list();
                 manager.addDownloadLabel(downloadLabelList);
+            } catch (Exception ignored) {}
+
+            // Downloads
+            try {
+                List<DownloadInfo> downloadInfoList = oldRoomDatabase.downloadsDao().list();
+                manager.addDownload(downloadInfoList, false);
             } catch (Exception ignored) {}
 
             // Download dirname
