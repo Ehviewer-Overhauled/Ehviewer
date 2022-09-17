@@ -55,7 +55,7 @@ class EhFragment : BasePreferenceFragment() {
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         val key = preference.key
         if (Settings.KEY_THEME == key) {
-            AppCompatDelegate.setDefaultNightMode(newValue as Int)
+            AppCompatDelegate.setDefaultNightMode((newValue as String).toInt())
             requireActivity().recreate()
             return true
         } else if (Settings.KEY_GALLERY_SITE == key) {
