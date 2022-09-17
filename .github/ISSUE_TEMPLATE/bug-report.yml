@@ -71,7 +71,7 @@ body:
     attributes:
       label: EhViewer 版本号 / EhViewer version code
       description: 您可以在设置 - 关于处找到版本号 / You can get version code in Settings - About
-      placeholder: 四位版本号 / 4 digits version code
+      placeholder: 1.6.9.13
     validations:
       required: true
 
