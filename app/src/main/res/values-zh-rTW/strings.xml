@@ -391,7 +391,7 @@
     <string name="hosts">自訂hosts.txt</string>
     <string name="hosts_tip">hosts.txt</string>
     <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3...)</string>
+    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
     <string name="add_host">加入 host</string>
     <string name="add_host_add">加入</string>
     <string name="edit_host">編輯 host</string>
@@ -421,8 +421,8 @@
     <string name="settings_eh_identity_cookies">身份識別 Cookie</string>
     <string name="settings_eh_identity_cookies_summary">可用於登入</string>
     <string name="settings_eh_identity_cookies_signed">身份 Cookie 可用於登入該帳號。&lt;br&gt;&lt;b&gt;請注意資料安全&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
-    <string name="settings_eh_identity_cookies_tourist">未登入</string>
-    <string name="settings_eh_identity_cookies_copy">複製</string>
+    <string name="settings_eh_identity_cookies_tourist">訪客模式</string>
+    <string name="settings_eh_identity_cookies_copy">複製 Cookies</string>
     <string name="settings_u_config">EHentai 設定</string>
     <string name="settings_u_config_summary">EHentai 網站上的設定</string>
     <string name="settings_my_tags">我的標籤</string>
@@ -761,6 +761,9 @@
 
     <string name="show_library_version">依賴庫之版本</string>
     <string name="settings_privacy_require_unlock">需要解鎖</string>
+    <string name="settings_privacy_require_unlock_delay">鎖定延遲</string>
+    <string name="settings_privacy_require_unlock_delay_summary">離開程式並在 %s 分鐘內返回時不需要解鎖</string>
+    <string name="settings_privacy_require_unlock_delay_summary_immediately">無論何時回到程式均要求解鎖</string>
     <string name="proxy_type_name">代理類型</string>
     <string name="filter_label">隱藏項類型</string>
 
