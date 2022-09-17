@@ -55,4 +55,25 @@
     </style>
 
     <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium" />
+
+    <!-- snackbar theme -->
+    <style name="Theme.App" parent="Theme.MaterialComponents.*">
+        <!-- above line has error -->
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
+    </style>
+
+    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Snackbar</item>
+        <item name="actionTextColorAlpha">1</item>
+    </style>
+
+    <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Snackbar" parent="">
+        <item name="colorPrimary">?attr/colorPrimaryInverse</item>
+        <item name="colorOnSurface">?attr/colorSurfaceInverse</item>
+    </style>
 </resources>
