@@ -195,8 +195,8 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd, jlong size) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     archive_ctx *ctx = NULL;
     archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (archiveAddr == MAP_FAILED) {
@@ -246,51 +246,40 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     return r;
 }
 
-typedef struct Memarea {
-    void *buffer;
-    long size;
-} Memarea;
-
 JNIEXPORT jlong JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint index) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (ret)
         return 0;
-    Memarea *memarea = malloc(sizeof(Memarea));
-    if (!memarea) {
+    long long size = archive_entry_size(ctx->entry);
+    void *buffer = malloc(size + sizeof(long long));
+    *(long long *) buffer = size;
+    if (!buffer) {
         ctx->using = 0;
         LOGE("Allocate buffer for decompression failed:ENOMEM");
+        free(buffer);
         return 0;
     }
-    memarea->size = (long) archive_entry_size(ctx->entry);
-    memarea->buffer = malloc(memarea->size);
-    if (!memarea->buffer) {
-        ctx->using = 0;
-        LOGE("Allocate buffer for decompression failed:ENOMEM");
-        free(memarea);
-        return 0;
-    }
-    ret = archive_read_data(ctx->arc, memarea->buffer, memarea->size);
+    ret = archive_read_data(ctx->arc, buffer + sizeof(long long), size);
     ctx->using = 0;
-    if (ret == memarea->size)
-        return (jlong) memarea;
-    if (ret != memarea->size)
+    if (ret == size)
+        return (jlong) buffer;
+    if (ret != size)
         LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
         LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-    free(memarea->buffer);
-    free(memarea);
+    free(buffer);
     return 0;
 }
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     for (int i = 0; i < CTX_POOL_SIZE; i++)
         archive_release_ctx(ctx_pool[i]);
     free(passwd);
@@ -303,14 +292,14 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
 
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *env, jobject thiz) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     return need_encrypt;
 }
 
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jstring str) {
-    (void)thiz; /* UNUSED */
+    (void) thiz; /* UNUSED */
     struct archive_entry *entry;
     archive_ctx *ctx;
     jboolean ret = true;
@@ -340,8 +329,8 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jst
 
 JNIEXPORT jstring JNICALL
 Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -353,9 +342,9 @@ Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint in
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz,jint index, jint fd) {
-    (void)env; /* UNUSED */
-    (void)thiz; /* UNUSED */
+Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint index, jint fd) {
+    (void) env; /* UNUSED */
+    (void) thiz; /* UNUSED */
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);

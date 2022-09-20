@@ -84,11 +84,6 @@ static void recycle(IMAGE *image) {
     free(image);
 }
 
-typedef struct Memarea {
-    void *buffer;
-    long size;
-} Memarea;
-
 bool copy_pixels(const void *src, int src_w, int src_h, int src_x, int src_y,
                  void *dst, int dst_w, int dst_h, int dst_x, int dst_y,
                  int width, int height) {
@@ -159,17 +154,17 @@ bool copy_pixels(const void *src, int src_w, int src_h, int src_x, int src_y,
     dst_blank_length = (size_t) (dst_y * dst_w + dst_x) * 4;
 
     // First line
-    dst_pos += (int)dst_blank_length;
+    dst_pos += (int) dst_blank_length;
     memcpy(dst + dst_pos, src + src_pos, line_stride);
-    dst_pos += (int)line_stride;
+    dst_pos += (int) line_stride;
     src_pos += src_stride;
 
     // Other lines
     dst_blank_length = (size_t) ((dst_w - width) * 4);
     for (line = 1; line < height; line++) {
-        dst_pos += (int)dst_blank_length;
+        dst_pos += (int) dst_blank_length;
         memcpy(dst + dst_pos, src + src_pos, line_stride);
-        dst_pos += (int)line_stride;
+        dst_pos += (int) line_stride;
         src_pos += src_stride;
     }
 
@@ -216,9 +211,9 @@ IMAGE *createFromFd(int fd) {
     return image;
 }
 
-IMAGE *createFromAddr(void *addr, long size) {
+IMAGE *createFromAddr(void *addr, long long size) {
     AImageDecoder *decoder;
-    AImageDecoder_createFromBuffer((const void *) addr, size, &decoder);
+    AImageDecoder_createFromBuffer((const void *) addr + sizeof(long long), size, &decoder);
     IMAGE *image = calloc(1, sizeof(IMAGE));
     SOURCE *src = calloc(1, sizeof(SOURCE));
     src->decoder = decoder;
@@ -278,7 +273,7 @@ Java_com_hippo_image_Image_nativeCreate(JNIEnv *env, jclass clazz, jobject bitma
     AndroidBitmap_getInfo(env, bitmap, &info);
     AndroidBitmap_lockPixels(env, bitmap, &pixels);
 
-    image = create((int)info.width, (int)info.height, pixels);
+    image = create((int) info.width, (int) info.height, pixels);
     AndroidBitmap_unlockPixels(env, bitmap);
     return (jlong) image;
 }
@@ -293,7 +288,8 @@ Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jlong ptr, ji
     AndroidBitmap_getInfo(env, dst, &info);
     AndroidBitmap_lockPixels(env, dst, &pixels);
 
-    render((IMAGE *) ptr, src_x, src_y, pixels, (int)info.width, (int)info.height, dst_x, dst_y, width,
+    render((IMAGE *) ptr, src_x, src_y, pixels, (int) info.width, (int) info.height, dst_x, dst_y,
+           width,
            height);
 
     AndroidBitmap_unlockPixels(env, dst);
@@ -338,9 +334,7 @@ Java_com_hippo_image_Image_nativeRecycle(JNIEnv *env, jclass clazz, jlong ptr) {
 
 JNIEXPORT jlong JNICALL
 Java_com_hippo_image_Image_nativeDecodeAddr(JNIEnv *env, jclass clazz, jlong addr) {
-    Memarea *memarea = (Memarea *) addr;
-    IMAGE *image = createFromAddr(memarea->buffer, memarea->size);
-    free(memarea);
+    IMAGE *image = createFromAddr((void *) addr, *(long long *) addr);
     return (jlong) image;
 }
 
