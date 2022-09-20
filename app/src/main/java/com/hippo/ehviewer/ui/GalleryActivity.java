@@ -858,7 +858,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         intent.setAction(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.putExtra(Intent.EXTRA_TEXT, EhUrl.getGalleryDetailUrl(mGalleryInfo.gid, mGalleryInfo.token));
+        if (mGalleryInfo != null)
+            intent.putExtra(Intent.EXTRA_TEXT, EhUrl.getGalleryDetailUrl(mGalleryInfo.gid, mGalleryInfo.token));
         intent.setDataAndType(uri, mimeType);
 
         try {

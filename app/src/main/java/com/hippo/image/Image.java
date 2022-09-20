@@ -20,6 +20,8 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
+import com.hippo.Native;
+
 import java.io.FileDescriptor;
 import java.util.ArrayList;
 
@@ -64,7 +66,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(FileDescriptor fd, boolean partially) {
-        return newFromAddr(nativeDecode(fd));
+        return newFromAddr(nativeDecode(Native.getFd(fd)));
     }
 
     /**
@@ -72,7 +74,7 @@ public final class Image {
      */
     @Nullable
     public static Image decode(Integer fd, boolean partially) {
-        return newFromAddr(nativeDecodeFdInt(fd));
+        return newFromAddr(nativeDecode(fd));
     }
 
     /**
@@ -99,9 +101,7 @@ public final class Image {
         return imageList.size();
     }
 
-    private static native long nativeDecode(FileDescriptor fd);
-
-    private static native long nativeDecodeFdInt(int fd);
+    private static native long nativeDecode(int fd);
 
     private static native long nativeDecodeAddr(long addr);
 

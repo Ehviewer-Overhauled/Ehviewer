@@ -252,7 +252,7 @@ typedef struct Memarea {
 } Memarea;
 
 JNIEXPORT jlong JNICALL
-Java_com_hippo_UriArchiveAccessor_extracttoOutputStream(JNIEnv *env, jobject thiz, jint index) {
+Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint index) {
     (void)env; /* UNUSED */
     (void)thiz; /* UNUSED */
     archive_ctx *ctx = NULL;
@@ -336,4 +336,31 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jst
     }
     archive_release_ctx(ctx);
     return ret;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
+    archive_ctx *ctx = NULL;
+    int ret;
+    ret = archive_get_ctx(&ctx, index);
+    if (ret)
+        return NULL;
+    jstring str = (*env)->NewStringUTF(env, archive_entry_pathname(ctx->entry));
+    ctx->using = 0;
+    return str;
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz,jint index, jint fd) {
+    (void)env; /* UNUSED */
+    (void)thiz; /* UNUSED */
+    archive_ctx *ctx = NULL;
+    int ret;
+    ret = archive_get_ctx(&ctx, index);
+    if (!ret) {
+        archive_read_data_into_fd(ctx->arc, fd);
+        ctx->using = 0;
+    }
 }

@@ -24,15 +24,19 @@ import android.os.Process;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.Native;
 import com.hippo.UriArchiveAccessor;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
+import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -143,28 +147,43 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     @NonNull
     @Override
     public String getImageFilename(int index) {
-        // TODO
-        return Integer.toString(index);
-    }
-
-    @Override
-    public boolean save(int index, @NonNull UniFile file) {
-        // TODO
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public UniFile save(int index, @NonNull UniFile dir, @NonNull String filename) {
-        // TODO
-        return null;
+        return FileUtils.getNameFromFilename(getImageFilenameWithExtension(index));
     }
 
     @NonNull
     @Override
     public String getImageFilenameWithExtension(int index) {
-        // TODO
-        return Integer.toString(index);
+        return FileUtils.sanitizeFilename(archiveAccessor.getFilename(index));
+    }
+
+    @Override
+    public boolean save(int index, @NonNull UniFile file) {
+        int fd;
+        FileOutputStream stream;
+        try {
+            stream = (FileOutputStream)file.openOutputStream();
+            fd = Native.getFd(stream.getFD());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        archiveAccessor.extractToFd(index, fd);
+        try {
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public UniFile save(int index, @NonNull UniFile dir, @NonNull String filename) {
+        String extension = FileUtils.getExtensionFromFilename(getImageFilenameWithExtension(index));
+        UniFile dst = dir.subFile(null != extension ? filename + "." + extension : filename);
+        save(index, dst);
+        return dst;
     }
 
     private class ArchiveHostTask implements Runnable {
@@ -279,7 +298,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     }
                 }
 
-                long addr = archiveAccessor.extracttoOutputStream(index);
+                long addr = archiveAccessor.extractToAddr(index);
 
                 synchronized (streams) {
                     streams.put(index, addr);

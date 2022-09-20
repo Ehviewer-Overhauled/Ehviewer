@@ -263,30 +263,10 @@ void advance(IMAGE *image) {
     }
 }
 
-static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
-    jint fd = -1;
-    jclass fdClass = (*env)->FindClass(env, "java/io/FileDescriptor");
-
-    if (fdClass != NULL) {
-        jfieldID fdClassDescriptorFieldID = (*env)->GetFieldID(env, fdClass, "descriptor", "I");
-        if (fdClassDescriptorFieldID != NULL && fileDescriptor != NULL) {
-            fd = (*env)->GetIntField(env, fileDescriptor, fdClassDescriptorFieldID);
-        }
-    }
-
-    return fd;
-}
-
 JNIEXPORT jlong JNICALL
-Java_com_hippo_image_Image_nativeDecodeFdInt(JNIEnv *env, jclass clazz, jint fd) {
+Java_com_hippo_image_Image_nativeDecode(JNIEnv *env, jclass clazz, jint fd) {
     IMAGE *image = createFromFd(fd);
     return (jlong) image;
-}
-
-JNIEXPORT jlong JNICALL
-Java_com_hippo_image_Image_nativeDecode(JNIEnv *env, jclass clazz, jobject fd) {
-    return Java_com_hippo_image_Image_nativeDecodeFdInt(env, clazz,
-                                                        jniGetFDFromFileDescriptor(env, fd));
 }
 
 JNIEXPORT jlong JNICALL

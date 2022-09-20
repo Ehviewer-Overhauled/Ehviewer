@@ -45,6 +45,6 @@ SET(LIBARCHIVE_CUSTOM_LIBS "liblzma" "nettle")
 add_subdirectory(libarchive)
 
 # Build and link our app's native lib
-add_library(${PROJECT_NAME} SHARED main.c archive.c image.c)
+add_library(${PROJECT_NAME} SHARED main.c archive.c image.c fdutils.c)
 target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
 target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections)
