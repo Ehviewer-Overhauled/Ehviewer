@@ -9,11 +9,11 @@ open class BaseDialogBuilder constructor(
     context: Context
 ) : MaterialAlertDialogBuilder(context) {
     override fun create(): AlertDialog {
-        return super.create().also { dialog ->
-            dialog.window?.let {
-                it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-                it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-                it.attributes.blurBehindRadius = 32
+        return super.create().apply {
+            window?.run {
+                addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+                addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                attributes.blurBehindRadius = 32
             }
         }
     }
