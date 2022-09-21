@@ -120,7 +120,7 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-saveable:$compose_version"
     implementation "androidx.compose.ui:ui:$compose_version"
 
-    implementation "androidx.compose.material3:material3:1.0.0-beta02"
+    implementation "androidx.compose.material3:material3:1.0.0-beta03"
 
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha03"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
