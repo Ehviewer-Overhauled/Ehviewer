@@ -257,8 +257,8 @@ Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint 
         return 0;
     long long size = archive_entry_size(ctx->entry);
     void *buffer = malloc(size + sizeof(long long));
-    *(long long *) buffer = size;
     if (!buffer) {
+        *(long long *) buffer = size;
         ctx->using = 0;
         LOGE("Allocate buffer for decompression failed:ENOMEM");
         free(buffer);
