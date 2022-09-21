@@ -112,7 +112,7 @@ dependencies {
     implementation "androidx.collection:collection:$collection_version"
     implementation "androidx.collection:collection-ktx:$collection_version"
 
-    def compose_version = "1.3.0-beta02"
+    def compose_version = "1.3.0-beta03"
     implementation "androidx.compose.animation:animation:$compose_version"
     implementation "androidx.compose.foundation:foundation:$compose_version"
     implementation "androidx.compose.foundation:foundation-layout:$compose_version"
