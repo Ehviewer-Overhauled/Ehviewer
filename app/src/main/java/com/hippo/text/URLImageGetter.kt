@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.text
 
-package com.hippo.text;
+import android.graphics.drawable.Drawable
+import android.text.Html.ImageGetter
+import com.hippo.conaco.Conaco
+import com.hippo.drawable.UnikeryDrawable
+import com.hippo.image.ImageBitmap
+import com.hippo.widget.ObservedTextView
 
-import android.graphics.drawable.Drawable;
-import android.text.Html;
-
-import com.hippo.conaco.Conaco;
-import com.hippo.drawable.UnikeryDrawable;
-import com.hippo.image.ImageBitmap;
-import com.hippo.widget.ObservedTextView;
-
-public class URLImageGetter implements Html.ImageGetter {
-
-    private final ObservedTextView mTextView;
-    private final Conaco<ImageBitmap> mConaco;
-
-    public URLImageGetter(ObservedTextView textView, Conaco<ImageBitmap> conaco) {
-        mTextView = textView;
-        mConaco = conaco;
-    }
-
-    @Override
-    public Drawable getDrawable(String source) {
-        UnikeryDrawable drawable = new UnikeryDrawable(mTextView, mConaco);
-        drawable.load(source);
-        return drawable;
+class URLImageGetter(
+    private val mTextView: ObservedTextView,
+    private val mConaco: Conaco<ImageBitmap>
+) : ImageGetter {
+    override fun getDrawable(source: String): Drawable {
+        return UnikeryDrawable(mTextView, mConaco).apply { load(source) }
     }
 }
