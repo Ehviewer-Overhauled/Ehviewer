@@ -40,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:alwaysCutAndScale="true"
-                app:retryType="click"/>
+                app:retryType="longClick"/>
 
         </com.google.android.material.card.MaterialCardView>
 
