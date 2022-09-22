@@ -112,7 +112,7 @@ dependencies {
     implementation "androidx.collection:collection:$collection_version"
     implementation "androidx.collection:collection-ktx:$collection_version"
 
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha03"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha04"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
 
     def core_version = "1.9.0"
