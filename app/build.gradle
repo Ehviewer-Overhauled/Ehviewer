@@ -119,7 +119,7 @@ dependencies {
     implementation "androidx.core:core:$core_version"
     implementation "androidx.core:core-ktx:$core_version"
 
-    implementation "androidx.customview:customview:1.2.0-alpha01"
+    implementation "androidx.customview:customview:1.2.0-alpha02"
     implementation "androidx.documentfile:documentfile:1.1.0-alpha01"
     implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
 
