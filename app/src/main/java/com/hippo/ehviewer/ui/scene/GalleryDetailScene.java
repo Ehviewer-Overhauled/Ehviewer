@@ -103,7 +103,7 @@ import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.AppHelper;
-import com.hippo.util.ClipboardUtil;
+import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.view.ViewTransition;
@@ -1454,11 +1454,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                     } else if (id == R.id.add_filter) {
                         showFilterTagDialog(tag);
                     } else if (id == R.id.copy) {
-                        ClipboardUtil.addTextToClipboard(tag);
-                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), tag, false, () -> showTip(R.string.copied_to_clipboard, LENGTH_SHORT));
                     } else if (id == R.id.copy_trans) {
-                        ClipboardUtil.addTextToClipboard(tv.getText().toString());
-                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), tv.getText().toString(), false, () -> showTip(R.string.copied_to_clipboard, LENGTH_SHORT));
                     }
                 }).show();
     }

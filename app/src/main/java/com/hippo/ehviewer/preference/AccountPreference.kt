@@ -16,8 +16,6 @@
 package com.hippo.ehviewer.preference
 
 import android.content.*
-import android.os.Build
-import android.os.PersistableBundle
 import android.text.Html
 import android.util.AttributeSet
 import androidx.appcompat.app.AlertDialog
@@ -29,6 +27,8 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.preference.MessagePreference
+import com.hippo.util.addTextToClipboard
+import com.hippo.util.getClipboardManager
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.*
@@ -81,20 +81,9 @@ class AccountPreference @JvmOverloads constructor(
         super.onPrepareDialogBuilder(builder)
         if (message != null) {
             builder.setNeutralButton(R.string.settings_eh_identity_cookies_copy) { dialog: DialogInterface?, which: Int ->
-                val clipboardManager =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                val clipData = ClipData.newPlainText(null, message)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                    clipData.apply {
-                        description.extras = PersistableBundle().apply {
-                            putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
-                        }
-                    }
-                clipboardManager?.setPrimaryClip(clipData)
-
-                // There is no need to notify user by toast since Tiramisu have its clipboard own logic
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                context.getClipboardManager().addTextToClipboard(message, true) {
                     mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
+                }
                 this@AccountPreference.onClick(dialog, which)
             }
         }

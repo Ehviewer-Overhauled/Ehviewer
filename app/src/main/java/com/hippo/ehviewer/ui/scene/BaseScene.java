@@ -42,6 +42,8 @@ import androidx.fragment.app.FragmentActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 
+import kotlin.Unit;
+
 public abstract class BaseScene extends SceneFragment {
 
     public static final int LENGTH_SHORT = 0;
@@ -106,11 +108,12 @@ public abstract class BaseScene extends SceneFragment {
         }
     }
 
-    public void showTip(@StringRes int id, int length) {
+    public Unit showTip(@StringRes int id, int length) {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).showTip(id, length);
         }
+        return null;
     }
 
     public boolean needShowLeftDrawer() {

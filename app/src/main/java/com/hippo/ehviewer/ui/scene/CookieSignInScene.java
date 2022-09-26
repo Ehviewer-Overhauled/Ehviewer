@@ -38,7 +38,7 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
-import com.hippo.util.ClipboardUtil;
+import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ViewUtils;
@@ -253,7 +253,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
 
     private void fillCookiesFromClipboard() {
         hideSoftInput();
-        String text = ClipboardUtil.getTextFromClipboard();
+        String text = ClipboardUtilKt.getTextFromClipboard(ClipboardUtilKt.getClipboardManager(getContext()), getContext());
         if (text == null) {
             showTip(R.string.from_clipboard_error, LENGTH_SHORT);
             return;

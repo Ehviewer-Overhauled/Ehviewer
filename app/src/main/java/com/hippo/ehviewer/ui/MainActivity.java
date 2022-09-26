@@ -77,7 +77,7 @@ import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.BitmapUtils;
-import com.hippo.util.ClipboardUtil;
+import com.hippo.util.ClipboardUtilKt;
 import com.hippo.widget.DrawerView;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.SimpleHandler;
@@ -259,7 +259,7 @@ public final class MainActivity extends StageActivity
                     String url = intent.getData().toString();
                     new EditTextDialogBuilder(this, url, "")
                             .setTitle(R.string.error_cannot_parse_the_url)
-                            .setPositiveButton(android.R.string.copy, (dialog, which) -> ClipboardUtil.addTextToClipboard(url))
+                            .setPositiveButton(android.R.string.copy, (dialog, which) -> ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(this), url, false, () -> null))
                             .show();
                 }
             }
@@ -456,7 +456,7 @@ public final class MainActivity extends StageActivity
     }
 
     private void checkClipboardUrlInternal() {
-        String text = ClipboardUtil.getUrlFromClipboard();
+        String text = ClipboardUtilKt.getUrlFromClipboard(ClipboardUtilKt.getClipboardManager(this), this);
         int hashCode = text != null ? text.hashCode() : 0;
 
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {

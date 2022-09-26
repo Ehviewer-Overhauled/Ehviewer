@@ -72,7 +72,7 @@ import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
-import com.hippo.util.ClipboardUtil;
+import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.util.TextUrl;
@@ -354,8 +354,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                     }
                     int id = menuId.get(which);
                     if (id == R.id.copy) {
-                        ClipboardUtil.addTextToClipboard(comment.comment);
-                        showTip(R.string.copied_to_clipboard, LENGTH_SHORT);
+                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), comment.comment, false, () -> showTip(R.string.copied_to_clipboard, LENGTH_SHORT));
                     } else if (id == R.id.vote_up) {
                         voteComment(comment.id, 1);
                     } else if (id == R.id.vote_down) {
