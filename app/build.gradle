@@ -132,7 +132,7 @@ dependencies {
     implementation "androidx.customview:customview:1.2.0-alpha02"
     implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
 
-    def fragment_version = "1.6.0-alpha02"
+    def fragment_version = "1.6.0-alpha03"
     implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
