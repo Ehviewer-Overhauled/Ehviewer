@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/actions"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -44,96 +45,62 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:divider="@drawable/spacer_keyline"
-            android:orientation="horizontal"
-            android:showDividers="middle">
+            android:orientation="horizontal">
 
-            <FrameLayout
-                android:id="@+id/heart_group"
+            <Button
+                android:id="@+id/heart"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true">
+                android:text="@string/favorited"
+                app:icon="@drawable/v_heart_primary_x48" />
 
-                <TextView
-                    android:id="@+id/heart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/favorited"
-                    android:textColor="?android:attr/textColorPrimary" />
+            <Button
+                android:id="@+id/heart_outline"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_favorited"
+                app:icon="@drawable/v_heart_outline_primary_x48" />
 
-                <TextView
-                    android:id="@+id/heart_outline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/not_favorited"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-            </FrameLayout>
-
-            <TextView
+            <Button
                 android:id="@+id/share"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
                 android:text="@string/share"
-                android:textColor="?android:attr/textColorPrimary" />
+                app:icon="@drawable/v_share_primary_x48" />
 
-            <TextView
+            <Button
                 android:id="@+id/torrent"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
-                android:textColor="?android:attr/textColorPrimary" />
+                app:icon="@drawable/v_utorrent_primary_x48" />
 
-            <TextView
+            <Button
                 android:id="@+id/archive"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
                 android:text="@string/archive"
-                android:textColor="?android:attr/textColorPrimary" />
+                app:icon="@drawable/v_archive_primary_x48" />
 
-            <TextView
+            <Button
                 android:id="@+id/similar"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
                 android:text="@string/similar_gallery"
-                android:textColor="?android:attr/textColorPrimary" />
+                app:icon="@drawable/v_similar_primary_x48" />
 
-            <TextView
+            <Button
                 android:id="@+id/search_cover"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:drawablePadding="8dp"
-                android:focusable="true"
-                android:gravity="center_horizontal"
                 android:text="@string/search_cover"
-                android:textColor="?android:attr/textColorPrimary" />
+                app:icon="@drawable/v_file_find_primary_x48" />
 
         </LinearLayout>
     </HorizontalScrollView>

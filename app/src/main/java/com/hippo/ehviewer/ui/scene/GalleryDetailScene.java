@@ -203,8 +203,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
     @Nullable
     private RatingBar mRating;
     @Nullable
-    private View mHeartGroup;
-    @Nullable
     private TextView mHeart;
     @Nullable
     private TextView mHeartOutline;
@@ -604,9 +602,8 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mNewerVersion = (TextView) ViewUtils.$$(mActions, R.id.newerVersion);
         mRatingText = (TextView) ViewUtils.$$(mActions, R.id.rating_text);
         mRating = (RatingBar) ViewUtils.$$(mActions, R.id.rating);
-        mHeartGroup = ViewUtils.$$(mActions, R.id.heart_group);
-        mHeart = (TextView) ViewUtils.$$(mHeartGroup, R.id.heart);
-        mHeartOutline = (TextView) ViewUtils.$$(mHeartGroup, R.id.heart_outline);
+        mHeart = (TextView) ViewUtils.$$(mActions, R.id.heart);
+        mHeartOutline = (TextView) ViewUtils.$$(mActions, R.id.heart_outline);
         mTorrent = (TextView) ViewUtils.$$(mActions, R.id.torrent);
         mArchive = (TextView) ViewUtils.$$(mActions, R.id.archive);
         mShare = (TextView) ViewUtils.$$(mActions, R.id.share);
@@ -614,15 +611,14 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mSimilar = (TextView) ViewUtils.$$(mActions, R.id.similar);
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
         mNewerVersion.setOnClickListener(this);
-        mHeartGroup.setOnClickListener(this);
-        mHeartGroup.setOnLongClickListener(this);
+        mHeart.setOnClickListener(this);
+        mHeartOutline.setOnClickListener(this);
         mTorrent.setOnClickListener(this);
         mArchive.setOnClickListener(this);
         mShare.setOnClickListener(this);
         mRate.setOnClickListener(this);
         mSimilar.setOnClickListener(this);
         mSearchCover.setOnClickListener(this);
-        ensureActionDrawable();
 
         mTags = (LinearLayout) ViewUtils.$$(belowHeader, R.id.tags);
         mNoTags = (TextView) ViewUtils.$$(mTags, R.id.no_tags);
@@ -695,7 +691,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mNewerVersion = null;
         mRatingText = null;
         mRating = null;
-        mHeartGroup = null;
         mHeart = null;
         mHeartOutline = null;
         mTorrent = null;
@@ -767,25 +762,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         EhApplication.getEhClient(context).execute(request);
 
         return true;
-    }
-
-    private void setActionDrawable(@Nullable TextView text, @DrawableRes int resId) {
-        if (text == null) return;
-        Context context = text.getContext();
-        Drawable drawable = ContextCompat.getDrawable(context, resId);
-        if (drawable == null) return;
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        text.setCompoundDrawables(null, drawable, null, null);
-    }
-
-    private void ensureActionDrawable() {
-        setActionDrawable(mHeart, R.drawable.v_heart_primary_x48);
-        setActionDrawable(mHeartOutline, R.drawable.v_heart_outline_primary_x48);
-        setActionDrawable(mTorrent, R.drawable.v_utorrent_primary_x48);
-        setActionDrawable(mArchive, R.drawable.v_archive_primary_x48);
-        setActionDrawable(mShare, R.drawable.v_share_primary_x48);
-        setActionDrawable(mSimilar, R.drawable.v_similar_primary_x48);
-        setActionDrawable(mSearchCover, R.drawable.v_file_find_primary_x48);
     }
 
     private boolean createCircularReveal() {
@@ -1244,7 +1220,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
             Bundle args = new Bundle();
             args.putParcelable(GalleryInfoScene.KEY_GALLERY_DETAIL, mGalleryDetail);
             startScene(new Announcer(GalleryInfoScene.class).setArgs(args));
-        } else if (mHeartGroup == v) {
+        } else if (mHeart == v || mHeartOutline == v) {
             if (mGalleryDetail != null && !mModifingFavorites) {
                 boolean remove = false;
                 if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
@@ -1491,25 +1467,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                 CommonOperations.startDownload(activity, galleryInfo, true);
             }
             return true;
-        } else if (mHeartGroup == v) {
-            if (mGalleryDetail != null && !mModifingFavorites) {
-                boolean remove = false;
-                if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
-                    mModifingFavorites = true;
-                    CommonOperations.removeFromFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(activity,
-                                    activity.getStageId(), getTag(), true));
-                    remove = true;
-                }
-                if (!remove) {
-                    mModifingFavorites = true;
-                    CommonOperations.addToFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(activity,
-                                    activity.getStageId(), getTag(), false), true);
-                }
-                // Update UI
-                updateFavoriteDrawable();
-            }
         } else {
             String tag = (String) v.getTag(R.id.tag);
             if (null != tag) {
