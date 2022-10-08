@@ -24,7 +24,7 @@
         <item name="dividerColor">@color/divider</item>
         <item name="drawableColorSecondary">?attr/colorOnSurface</item>
         <item name="drawableColorThemePrimary">?attr/colorPrimary</item>
-        <item name="tagGroupBackgroundColor">?attr/colorSecondaryContainer</item>
+        <item name="tagGroupBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="tagBackgroundColor">?attr/colorTertiaryContainer</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
