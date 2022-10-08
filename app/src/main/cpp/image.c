@@ -26,8 +26,6 @@
 
 #include <GLES2/gl2.h>
 
-#include "image.h"
-
 #define TAG "ImageDecoder_wrapper"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG ,__VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG ,__VA_ARGS__)
@@ -38,17 +36,7 @@
 
 #define IMAGE_TILE_MAX_SIZE (512 * 512)
 
-static void *tile_buffer = NULL;
-
-bool image_onLoad() {
-    tile_buffer = malloc(IMAGE_TILE_MAX_SIZE * 4);
-    return tile_buffer != NULL;
-}
-
-void image_onUnload() {
-    free(tile_buffer);
-    tile_buffer = NULL;
-}
+static char tile_buffer[IMAGE_TILE_MAX_SIZE * 4];
 
 typedef struct {
     AImageDecoder *decoder;
