@@ -53,7 +53,6 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -612,7 +611,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mSearchCover = (TextView) ViewUtils.$$(mActions, R.id.search_cover);
         mNewerVersion.setOnClickListener(this);
         mHeart.setOnClickListener(this);
+        mHeart.setOnLongClickListener(this);
         mHeartOutline.setOnClickListener(this);
+        mHeartOutline.setOnLongClickListener(this);
         mTorrent.setOnClickListener(this);
         mArchive.setOnClickListener(this);
         mShare.setOnClickListener(this);
@@ -1467,6 +1468,25 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                 CommonOperations.startDownload(activity, galleryInfo, true);
             }
             return true;
+        } else if (mHeart == v || mHeartOutline == v) {
+            if (mGalleryDetail != null && !mModifingFavorites) {
+                boolean remove = false;
+                if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
+                    mModifingFavorites = true;
+                    CommonOperations.removeFromFavorites(activity, mGalleryDetail,
+                            new ModifyFavoritesListener(activity,
+                                    activity.getStageId(), getTag(), true));
+                    remove = true;
+                }
+                if (!remove) {
+                    mModifingFavorites = true;
+                    CommonOperations.addToFavorites(activity, mGalleryDetail,
+                            new ModifyFavoritesListener(activity,
+                                    activity.getStageId(), getTag(), false), true);
+                }
+                // Update UI
+                updateFavoriteDrawable();
+            }
         } else {
             String tag = (String) v.getTag(R.id.tag);
             if (null != tag) {
