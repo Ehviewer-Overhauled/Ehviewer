@@ -43,12 +43,6 @@
         android:title="@string/settings_advanced_clear_download_path_cache"
         app:iconSpaceReserved="false" />
 
-    <Preference
-        android:key="clear_memory_cache"
-        android:summary="@string/settings_advanced_clear_memory_cache_summary"
-        android:title="@string/settings_advanced_clear_memory_cache"
-        app:iconSpaceReserved="false" />
-
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="320"
         android:key="read_cache_size"

@@ -66,7 +66,6 @@ import java.util.zip.ZipOutputStream;
 public class AdvancedFragment extends BasePreferenceFragment {
 
     private static final String KEY_DUMP_LOGCAT = "dump_logcat";
-    private static final String KEY_CLEAR_MEMORY_CACHE = "clear_memory_cache";
     private static final String KEY_APP_LANGUAGE = "app_language";
     private static final String KEY_IMPORT_DATA = "import_data";
     private static final String KEY_EXPORT_DATA = "export_data";
@@ -234,7 +233,6 @@ public class AdvancedFragment extends BasePreferenceFragment {
         addPreferencesFromResource(R.xml.advanced_settings);
 
         Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);
-        Preference clearMemoryCache = findPreference(KEY_CLEAR_MEMORY_CACHE);
         Preference appLanguage = findPreference(KEY_APP_LANGUAGE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             appLanguage.setVisible(false);
@@ -250,7 +248,6 @@ public class AdvancedFragment extends BasePreferenceFragment {
         }
 
         dumpLogcat.setOnPreferenceClickListener(this);
-        clearMemoryCache.setOnPreferenceClickListener(this);
         importData.setOnPreferenceClickListener(this);
         exportData.setOnPreferenceClickListener(this);
         backupFavorite.setOnPreferenceClickListener(this);
@@ -269,10 +266,6 @@ public class AdvancedFragment extends BasePreferenceFragment {
                 showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
             }
             return true;
-        } else if (KEY_CLEAR_MEMORY_CACHE.equals(key)) {
-            ((EhApplication) requireContext().getApplicationContext()).clearMemoryCache();
-            Runtime.getRuntime().gc();
-            showTip(R.string.settings_advanced_clear_memory_cache_done, BaseScene.LENGTH_SHORT);
         } else if (KEY_IMPORT_DATA.equals(key)) {
             try {
                 importDataLauncher.launch(new String[]{"*/*"});
