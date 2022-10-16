@@ -23,7 +23,7 @@ import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreferenceCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.ui.SecurityActivity.Companion.isAuthenticationSupported
+import com.hippo.ehviewer.ui.isAuthenticationSupported
 
 /**
  * Created by Mo10 on 2018/2/10.
@@ -48,7 +48,7 @@ class PrivacyFragment : BasePreferenceFragment() {
 
     override fun onStart() {
         super.onStart()
-        if (!isAuthenticationSupported(requireContext())) {
+        if (!requireContext().isAuthenticationSupported()) {
             Settings.putSecurity(false)
             requireUnlock.isEnabled = false
             requireUnlock.isChecked = false

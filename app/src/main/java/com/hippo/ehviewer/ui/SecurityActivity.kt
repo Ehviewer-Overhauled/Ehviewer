@@ -30,10 +30,16 @@ import androidx.fragment.app.FragmentActivity
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 
+fun Context.isAuthenticationSupported(): Boolean {
+    val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
+    return BiometricManager.from(this)
+        .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+}
+
 class SecurityActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
-        if (isAuthenticationSupported(this))
+        if (isAuthenticationSupported())
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
         else
             onSuccess()
@@ -67,14 +73,6 @@ class SecurityActivity : AppCompatActivity() {
             errString: CharSequence
         ) {
             moveTaskToBack(true)
-        }
-    }
-
-    companion object {
-        fun isAuthenticationSupported(context: Context): Boolean {
-            val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
-            return BiometricManager.from(context)
-                .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
         }
     }
 
