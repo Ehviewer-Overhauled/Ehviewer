@@ -1044,7 +1044,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
             mPreviewText.setText(R.string.no_previews);
             return;
-        } else if (gd.previewPages == 1 && previewSet.size() <= 60) {
+        } else if (gd.previewPages == 1) {
             mPreviewText.setText(R.string.no_more_previews);
         } else {
             mPreviewText.setText(R.string.more_previews);
@@ -1053,8 +1053,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         int columnWidth = resources.getDimensionPixelOffset(Settings.getThumbSizeResId());
         mGridLayout.setColumnSize(columnWidth);
         mGridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE);
-        int size = Math.min(60, previewSet.size());
-        for (int i = 0; i < size; i++) {
+        for (int i = 0, size = previewSet.size(); i < size; i++) {
             View view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false);
             mGridLayout.addView(view);
 
