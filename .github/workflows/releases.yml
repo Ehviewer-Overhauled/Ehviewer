@@ -15,11 +15,11 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Setup Java 19
+      - name: Setup Java 18
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 19
+          java-version: 18
 
       - name: Install NDK
         run: |
