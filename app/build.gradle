@@ -123,7 +123,7 @@ dependencies {
     implementation "androidx.documentfile:documentfile:1.1.0-alpha01"
     implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
 
-    def fragment_version = "1.5.3"
+    def fragment_version = "1.5.4"
     implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
