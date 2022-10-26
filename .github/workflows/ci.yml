@@ -24,10 +24,12 @@ jobs:
           java-version: 18
           
       - name: Install latest mold
+        uses: rui314/setup-mold@v1
+        
+      - name: Configure mold
         run: |
-          version=$(wget -q -O- https://api.github.com/repos/rui314/mold/releases/latest | jq -r .tag_name | sed 's/^v//')
-          echo "mold $version"
-          wget -q -O- https://github.com/rui314/mold/releases/download/v$version/mold-$version-$(uname -m)-linux.tar.gz | sudo tar -C /usr --strip-components=1 -xzf -
+          sudo ln -sf /usr/local/bin/mold /usr/bin/ld.mold
+          sudo ln -sf /usr/local/bin/mold /usr/bin/ld64.mold
 
       - name: Install NDK
         run: |
