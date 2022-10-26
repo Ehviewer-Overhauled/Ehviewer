@@ -13,6 +13,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inli
            -mllvm -polly-detect-profitability-min-per-loop-insts=40 \
            -mllvm -polly-invariant-load-hoisting")
 
+add_link_options("-fuse-ld=mold")
+
 # Build GNUTLS libnettle
 add_subdirectory(nettle)
 
@@ -47,4 +49,4 @@ add_subdirectory(libarchive)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED archive.c image.c fdutils.c)
 target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections -fuse-ld=mold)
+target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections)
