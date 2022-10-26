@@ -24,9 +24,6 @@ jobs:
           java-version: 18
           
       - uses: rui314/setup-mold@v1
-        with:
-          mold-version: 1.6.0
-          make-default: true
 
       - name: Install NDK
         run: |
