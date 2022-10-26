@@ -1,7 +1,7 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -flto \
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections \
            -mllvm -polly \
            -mllvm -polly-run-dce \
            -mllvm -polly-run-inliner \
@@ -47,4 +47,4 @@ add_subdirectory(libarchive)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED archive.c image.c fdutils.c)
 target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections)
+target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections -fuse-ld=mold)
