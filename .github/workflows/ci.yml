@@ -22,10 +22,16 @@ jobs:
         with:
           distribution: temurin
           java-version: 18
+          
+      - uses: rui314/setup-mold@v1
+        with:
+          mold-version: 1.6.0
+          make-default: true
 
       - name: Install NDK
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.1.8937393" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
+          ln -sf /bin/mold ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64/bin/mold
 
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
