@@ -23,12 +23,15 @@ jobs:
           distribution: temurin
           java-version: 18
           
-      - uses: rui314/setup-mold@v1
+      - name: Install latest mold
+        run: |
+          version=$(wget -q -O- https://api.github.com/repos/rui314/mold/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "mold $version"
+          wget -q -O- https://github.com/rui314/mold/releases/download/v$version/mold-$version-$(uname -m)-linux.tar.gz | sudo tar -C /usr --strip-components=1 -xzf -
 
       - name: Install NDK
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.1.8937393" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
-          ln -sf /usr/local/bin/mold ${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin/mold
 
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
