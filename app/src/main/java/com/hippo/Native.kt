@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo
 
-package com.hippo;
+import java.io.FileDescriptor
 
-import java.io.FileDescriptor;
-
-public class Native {
-    public static void initialize() {
-        System.loadLibrary("ehviewer");
+object Native {
+    @JvmStatic
+    fun initialize() {
+        System.loadLibrary("ehviewer")
     }
 
-    public static native int getFd(FileDescriptor fd);
+    @JvmStatic
+    external fun getFd(fd: FileDescriptor?): Int
 }

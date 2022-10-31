@@ -13,234 +13,255 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.image
 
-package com.hippo.image;
-
-import android.graphics.Bitmap;
-
-import androidx.annotation.Nullable;
-
-import com.hippo.Native;
-
-import java.io.FileDescriptor;
-import java.util.ArrayList;
+import android.graphics.Bitmap
+import com.hippo.Native.getFd
+import java.io.FileDescriptor
+import java.util.function.Consumer
 
 /**
- * The {@code Image} is a image which stored pixel data in native heap
+ * The `Image` is a image which stored pixel data in native heap
  */
-public final class Image {
-    public static final int FORMAT_NORMAL = 0;
-    public static final int FORMAT_ANIMATED = 1;
-    private static final ArrayList<Image> imageList = new ArrayList<>();
-    private static boolean needEvictAll = false;
-    private long mNativePtr;
+class Image private constructor(nativePtr: Long) {
+    private var mNativePtr: Long
+    private var needRecycle = false
+    private var nativeProcessCnt = 0
 
-    private boolean needRecycle = false;
-
-    private Integer nativeProcessCnt = 0;
-
-    private Image(long nativePtr) {
-        if (needEvictAll)
-            evictAll();
-        mNativePtr = nativePtr;
-        imageList.add(this);
+    init {
+        if (needEvictAll) evictAll()
+        mNativePtr = nativePtr
+        imageList.add(this)
     }
-
-    private static Image newFromAddr(long addr) {
-        if (addr == 0)
-            return null;
-        return new Image(addr);
-    }
-
-    public static void lazyEvictAll() {
-        needEvictAll = true;
-    }
-
-    private static void evictAll() {
-        (new ArrayList<>(imageList)).forEach(Image::recycle);
-        needEvictAll = false;
-    }
-
-    /**
-     * Decode image from {@code InputStream}
-     */
-    @Nullable
-    public static Image decode(FileDescriptor fd, boolean partially) {
-        return newFromAddr(nativeDecode(Native.getFd(fd)));
-    }
-
-    /**
-     * Decode image from {@code InputStream}
-     */
-    @Nullable
-    public static Image decode(Integer fd, boolean partially) {
-        return newFromAddr(nativeDecode(fd));
-    }
-
-    /**
-     * Decode image from {@code InputStream}
-     */
-    @Nullable
-    public static Image decodeAddr(Long addr, boolean partially) {
-        return newFromAddr(nativeDecodeAddr(addr));
-    }
-
-    /**
-     * Create a plain image from Bitmap
-     */
-    @Nullable
-    public static Image create(Bitmap bitmap) {
-        return newFromAddr(nativeCreate(bitmap));
-    }
-
-    /**
-     * Return all un-recycled {@code Image} instance count.
-     * It is useful for debug.
-     */
-    public static int getImageCount() {
-        return imageList.size();
-    }
-
-    private static native long nativeDecode(int fd);
-
-    private static native long nativeDecodeAddr(long addr);
-
-    private static native long nativeCreate(Bitmap bitmap);
-
-    private static native void nativeRender(long nativePtr,
-                                            int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-                                            int width, int height);
-
-    private static native void nativeTexImage(long nativePtr, boolean init, int offsetX, int offsetY, int width, int height);
-
-    private static native void nativeAdvance(long nativePtr);
-
-    private static native int nativeGetDelay(long nativePtr);
-
-    private static native boolean nativeIsOpaque(long nativePtr);
-
-    private static native void nativeRecycle(long nativePtr);
-
-    private static native int nativeGetFormat(long nativePtr);
-
-    private static native int nativeGetWidth(long nativePtr);
-
-    private static native int nativeGetHeight(long nativePtr);
 
     /**
      * Return the format of the image
      */
-    public int getFormat() {
-        checkRecycledAndLock();
-        int ret = nativeGetFormat(mNativePtr);
-        releaseNativeLock();
-        return ret;
-    }
+    val format: Int
+        get() {
+            checkRecycledAndLock()
+            val ret = nativeGetFormat(mNativePtr)
+            releaseNativeLock()
+            return ret
+        }
 
     /**
      * Return the width of the image
      */
-    public int getWidth() {
-        checkRecycledAndLock();
-        int ret = nativeGetWidth(mNativePtr);
-        releaseNativeLock();
-        return ret;
-    }
+    val width: Int
+        get() {
+            checkRecycledAndLock()
+            val ret = nativeGetWidth(mNativePtr)
+            releaseNativeLock()
+            return ret
+        }
 
     /**
      * Return the height of the image
      */
-    public int getHeight() {
-        checkRecycledAndLock();
-        int ret = nativeGetHeight(mNativePtr);
-        releaseNativeLock();
-        return ret;
-    }
-
-    private synchronized void checkRecycledAndLock() {
-        if (mNativePtr == 0) {
-            throw new IllegalStateException("The image is recycled.");
+    val height: Int
+        get() {
+            checkRecycledAndLock()
+            val ret = nativeGetHeight(mNativePtr)
+            releaseNativeLock()
+            return ret
         }
-        nativeProcessCnt++;
+
+    @Synchronized
+    private fun checkRecycledAndLock() {
+        check(mNativePtr != 0L) { "The image is recycled." }
+        nativeProcessCnt++
     }
 
-    private synchronized void releaseNativeLock() {
-        nativeProcessCnt--;
-        if (needRecycle)
-            recycle();
+    @Synchronized
+    private fun releaseNativeLock() {
+        nativeProcessCnt--
+        if (needRecycle) recycle()
     }
 
     /**
-     * Render the image to {@code Bitmap}
+     * Render the image to `Bitmap`
      */
-    public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-                       int width, int height, boolean fillBlank, int defaultColor) {
-        checkRecycledAndLock();
-        nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY, width, height);
-        releaseNativeLock();
+    fun render(
+        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
+        width: Int, height: Int, fillBlank: Boolean, defaultColor: Int
+    ) {
+        checkRecycledAndLock()
+        nativeRender(mNativePtr, srcX, srcY, dst, dstX, dstY, width, height)
+        releaseNativeLock()
     }
 
     /**
-     * Call {@code glTexImage2D} for init is true and
-     * call {@code glTexSubImage2D} for init is false.
+     * Call `glTexImage2D` for init is true and
+     * call `glTexSubImage2D` for init is false.
      * width * height must <= 512 * 512 or do nothing
      */
-    public void texImage(boolean init, int offsetX, int offsetY, int width, int height) {
-        checkRecycledAndLock();
-        nativeTexImage(mNativePtr, init, offsetX, offsetY, width, height);
-        releaseNativeLock();
+    fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
+        checkRecycledAndLock()
+        nativeTexImage(mNativePtr, init, offsetX, offsetY, width, height)
+        releaseNativeLock()
     }
 
     /**
      * Move to next frame. Do nothing for non-animation image
      */
-    public void advance() {
-        checkRecycledAndLock();
-        nativeAdvance(mNativePtr);
-        releaseNativeLock();
+    fun advance() {
+        checkRecycledAndLock()
+        nativeAdvance(mNativePtr)
+        releaseNativeLock()
     }
 
     /**
      * Return current frame delay. 0 for non-animation image
      */
-    public int getDelay() {
-        checkRecycledAndLock();
-        int delay = nativeGetDelay(mNativePtr);
-        releaseNativeLock();
-        return delay <= 10 ? 100 : delay;
-    }
+    val delay: Int
+        get() {
+            checkRecycledAndLock()
+            val delay = nativeGetDelay(mNativePtr)
+            releaseNativeLock()
+            return if (delay <= 10) 100 else delay
+        }
 
     /**
      * Return is the image opaque
      */
-    public boolean isOpaque() {
-        checkRecycledAndLock();
-        boolean ret = nativeIsOpaque(mNativePtr);
-        releaseNativeLock();
-        return ret;
-    }
+    val isOpaque: Boolean
+        get() {
+            checkRecycledAndLock()
+            val ret = nativeIsOpaque(mNativePtr)
+            releaseNativeLock()
+            return ret
+        }
 
     /**
      * Free the native object associated with this image.
      * It must be called when the image will not be used.
      * The image can't be used after this method is called.
      */
-    public synchronized void recycle() {
-        if (mNativePtr != 0) {
+    @Synchronized
+    fun recycle() {
+        if (mNativePtr != 0L) {
             if (nativeProcessCnt != 0) {
-                needRecycle = true;
-                return;
+                needRecycle = true
+                return
             }
-            nativeRecycle(mNativePtr);
-            mNativePtr = 0;
-            imageList.remove(this);
+            nativeRecycle(mNativePtr)
+            mNativePtr = 0
+            imageList.remove(this)
         }
     }
 
     /**
      * Returns true if this image has been recycled.
      */
-    public boolean isRecycled() {
-        return mNativePtr == 0;
+    val isRecycled: Boolean
+        get() = mNativePtr == 0L
+
+    companion object {
+        const val FORMAT_NORMAL = 0
+        const val FORMAT_ANIMATED = 1
+        private val imageList = ArrayList<Image>()
+        private var needEvictAll = false
+        private fun newFromAddr(addr: Long): Image? {
+            return if (addr == 0L) null else Image(addr)
+        }
+
+        @JvmStatic
+        fun lazyEvictAll() {
+            needEvictAll = true
+        }
+
+        private fun evictAll() {
+            ArrayList(imageList).forEach(
+                Consumer { obj: Image -> obj.recycle() })
+            needEvictAll = false
+        }
+
+        /**
+         * Decode image from `InputStream`
+         */
+        @JvmStatic
+        fun decode(fd: FileDescriptor?, partially: Boolean): Image? {
+            return newFromAddr(nativeDecode(getFd(fd)))
+        }
+
+        /**
+         * Decode image from `InputStream`
+         */
+        @JvmStatic
+        fun decode(fd: Int, partially: Boolean): Image? {
+            return newFromAddr(nativeDecode(fd))
+        }
+
+        /**
+         * Decode image from `InputStream`
+         */
+        @JvmStatic
+        fun decodeAddr(addr: Long, partially: Boolean): Image? {
+            return newFromAddr(nativeDecodeAddr(addr))
+        }
+
+        /**
+         * Create a plain image from Bitmap
+         */
+        @JvmStatic
+        fun create(bitmap: Bitmap): Image? {
+            return newFromAddr(nativeCreate(bitmap))
+        }
+
+        /**
+         * Return all un-recycled `Image` instance count.
+         * It is useful for debug.
+         */
+        @JvmStatic
+        val imageCount: Int
+            get() = imageList.size
+
+        @JvmStatic
+        private external fun nativeDecode(fd: Int): Long
+
+        @JvmStatic
+        private external fun nativeDecodeAddr(addr: Long): Long
+
+        @JvmStatic
+        private external fun nativeCreate(bitmap: Bitmap): Long
+
+        @JvmStatic
+        private external fun nativeRender(
+            nativePtr: Long,
+            srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
+            width: Int, height: Int
+        )
+
+        @JvmStatic
+        private external fun nativeTexImage(
+            nativePtr: Long,
+            init: Boolean,
+            offsetX: Int,
+            offsetY: Int,
+            width: Int,
+            height: Int
+        )
+
+        @JvmStatic
+        private external fun nativeAdvance(nativePtr: Long)
+
+        @JvmStatic
+        private external fun nativeGetDelay(nativePtr: Long): Int
+
+        @JvmStatic
+        private external fun nativeIsOpaque(nativePtr: Long): Boolean
+
+        @JvmStatic
+        private external fun nativeRecycle(nativePtr: Long)
+
+        @JvmStatic
+        private external fun nativeGetFormat(nativePtr: Long): Int
+
+        @JvmStatic
+        private external fun nativeGetWidth(nativePtr: Long): Int
+
+        @JvmStatic
+        private external fun nativeGetHeight(nativePtr: Long): Int
     }
 }

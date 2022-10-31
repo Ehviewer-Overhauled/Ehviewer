@@ -15,44 +15,26 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo
 
-package com.hippo;
+import android.content.Context
+import android.net.Uri
 
-import android.content.Context;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
-
-public class UriArchiveAccessor {
-    ParcelFileDescriptor pfd;
-    Context ctx;
-    Uri uri;
-
-    public UriArchiveAccessor(Context ctx, Uri uri) {
-        this.ctx = ctx;
-        this.uri = uri;
+class UriArchiveAccessor(var ctx: Context, var uri: Uri) {
+    val pfd by lazy { ctx.contentResolver.openFileDescriptor(uri, "r")!! }
+    fun open(): Int {
+        return openArchive(pfd.fd, pfd.statSize)
     }
 
-    public int open() throws Exception {
-        pfd = ctx.getContentResolver().openFileDescriptor(uri, "r");
-        return openArchive(pfd.getFd(), pfd.getStatSize());
-    }
-
-    private native int openArchive(int fd, long size);
-
-    public native long extractToAddr(int index);
-
-    public native void extractToFd(int index, int fd);
-
-    public native String getFilename(int index);
-
-    public native boolean needPassword();
-
-    public native boolean providePassword(String str);
-
-    private native void closeArchive();
-
-    public void close() throws Exception {
-        closeArchive();
-        pfd.close();
+    private external fun openArchive(fd: Int, size: Long): Int
+    external fun extractToAddr(index: Int): Long
+    external fun extractToFd(index: Int, fd: Int)
+    external fun getFilename(index: Int): String
+    external fun needPassword(): Boolean
+    external fun providePassword(str: String): Boolean
+    private external fun closeArchive()
+    fun close() {
+        closeArchive()
+        pfd.close()
     }
 }

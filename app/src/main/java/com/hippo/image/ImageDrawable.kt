@@ -13,88 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.image
 
-package com.hippo.image;
-
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.Drawable;
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.drawable.Animatable
+import android.graphics.drawable.Drawable
 
 /**
- * A drawable to draw {@link ImageBitmap}
+ * A drawable to draw [ImageBitmap]
  */
-public class ImageDrawable extends Drawable implements Animatable, ImageBitmap.Callback {
+class ImageDrawable(imageBitmap: ImageBitmap) : Drawable(), Animatable, ImageBitmap.Callback {
+    private val mImageBitmap: ImageBitmap
+    private val mPaint: Paint
 
-    private final ImageBitmap mImageBitmap;
-    private final Paint mPaint;
-
-    public ImageDrawable(ImageBitmap imageBitmap) throws Exception {
+    init {
         if (!imageBitmap.obtain()) {
-            throw new Exception();
+            throw Exception()
         }
-
-        mImageBitmap = imageBitmap;
-        mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        mImageBitmap = imageBitmap
+        mPaint = Paint(Paint.FILTER_BITMAP_FLAG)
 
         // Add callback
-        imageBitmap.addCallback(this);
+        imageBitmap.addCallback(this)
     }
 
-    public void recycle() {
-        mImageBitmap.removeCallback(this);
-        mImageBitmap.release();
+    fun recycle() {
+        mImageBitmap.removeCallback(this)
+        mImageBitmap.release()
     }
 
-    @Override
-    public void draw(Canvas canvas) {
-        mImageBitmap.draw(canvas, null, getBounds(), mPaint);
+    override fun draw(canvas: Canvas) {
+        mImageBitmap.draw(canvas, null, bounds, mPaint)
     }
 
-    @Override
-    public void setAlpha(int alpha) {
-        mPaint.setAlpha(alpha);
+    override fun setAlpha(alpha: Int) {
+        mPaint.alpha = alpha
     }
 
-    @Override
-    public void setColorFilter(ColorFilter colorFilter) {
-        mPaint.setColorFilter(colorFilter);
+    override fun setColorFilter(colorFilter: ColorFilter?) {
+        mPaint.colorFilter = colorFilter
     }
 
-    @Override
-    public int getOpacity() {
-        return mImageBitmap.isOpaque() ? PixelFormat.OPAQUE : PixelFormat.UNKNOWN;
+    override fun getOpacity(): Int {
+        return if (mImageBitmap.isOpaque) PixelFormat.OPAQUE else PixelFormat.UNKNOWN
     }
 
-    @Override
-    public int getIntrinsicWidth() {
-        return mImageBitmap.getWidth();
+    override fun getIntrinsicWidth(): Int {
+        return mImageBitmap.width
     }
 
-    @Override
-    public int getIntrinsicHeight() {
-        return mImageBitmap.getHeight();
+    override fun getIntrinsicHeight(): Int {
+        return mImageBitmap.height
     }
 
-    @Override
-    public void start() {
-        mImageBitmap.start();
+    override fun start() {
+        mImageBitmap.start()
     }
 
-    @Override
-    public void stop() {
-        mImageBitmap.stop();
+    override fun stop() {
+        mImageBitmap.stop()
     }
 
-    @Override
-    public boolean isRunning() {
-        return mImageBitmap.isRunning();
+    override fun isRunning(): Boolean {
+        return mImageBitmap.isRunning
     }
 
-    @Override
-    public void invalidateImage(ImageBitmap who) {
-        invalidateSelf();
+    override fun invalidateImage(who: ImageBitmap?) {
+        invalidateSelf()
     }
 }

@@ -13,115 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.image
 
-package com.hippo.image;
-
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.Animatable;
-import android.os.Handler;
-import android.os.Looper;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.io.FileDescriptor;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.drawable.Animatable
+import android.os.Handler
+import android.os.Looper
+import java.io.FileDescriptor
+import java.lang.ref.WeakReference
 
 /**
- * A image with {@link Image} for data and {@link Bitmap} for render.
+ * A image with [Image] for data and [Bitmap] for render.
  */
-public final class ImageBitmap implements Animatable, Runnable {
+class ImageBitmap : Animatable, Runnable {
+    private val mBitmap: Bitmap
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-    @NonNull
-    private final Bitmap mBitmap;
-    private final int mFormat;
-    private final boolean mIsOpaque;
-    private final Set<WeakReference<Callback>> mCallbackSet = new LinkedHashSet<>();
-    @Nullable
-    private Image mImage;
-    private int mReferences;
-    private int mAnimationReferences;
-    private boolean mRunning;
+    /**
+     * Return the format of the image
+     */
+    val format: Int
 
-    private ImageBitmap(@NonNull Image image) throws OutOfMemoryError {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        image.render(0, 0, mBitmap, 0, 0, width, height, false, 0);
-        mFormat = image.getFormat();
-        mIsOpaque = image.isOpaque();
+    /**
+     * Return image is opaque
+     */
+    val isOpaque: Boolean
+    private val mCallbackSet: MutableSet<WeakReference<Callback>> = LinkedHashSet()
+    private var mImage: Image? = null
+    private var mReferences = 0
+    private var mAnimationReferences = 0
+    private var mRunning = false
 
-        if (mFormat == 1) {
+    private constructor(image: Image) {
+        val width = image.width
+        val height = image.height
+        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        image.render(0, 0, mBitmap, 0, 0, width, height, false, 0)
+        format = image.format
+        isOpaque = image.isOpaque
+        if (format == 1) {
             // For animated image, save image object
-            mImage = image;
+            mImage = image
         } else {
             // Free the image
-            image.recycle();
+            image.recycle()
         }
     }
 
-    private ImageBitmap(@NonNull Bitmap bitmap) {
-        mFormat = Image.FORMAT_NORMAL;
-        mBitmap = bitmap;
-        mIsOpaque = !bitmap.hasAlpha();
-    }
-
-    /**
-     * Decode {@code InputStream}, then create image.
-     */
-    @Nullable
-    public static ImageBitmap decode(@NonNull FileDescriptor fd) {
-        Image image = Image.decode(fd, false);
-        if (image != null) {
-            return create(image);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Create {@code ImageBitmap} from {@code Image}.
-     * It is not recommended. Use {@link #decode(InputStream)} if you can.
-     *
-     * @param image the image should not be used before and
-     *              it must not be recycled. And the image should
-     *              not be used directly anymore.
-     */
-    @Nullable
-    public static ImageBitmap create(@NonNull Image image) {
-        if (!image.isRecycled()) {
-            try {
-                return new ImageBitmap(image);
-            } catch (OutOfMemoryError e) {
-                image.recycle();
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Create {@code ImageBitmap} from {@code Bitmap}.
-     *
-     * @param bitmap the bitmap should not be recycled
-     */
-    @Nullable
-    public static ImageBitmap create(@NonNull Bitmap bitmap) {
-        if (!bitmap.isRecycled()) {
-            return new ImageBitmap(bitmap);
-        } else {
-            return null;
-        }
+    private constructor(bitmap: Bitmap) {
+        format = Image.FORMAT_NORMAL
+        mBitmap = bitmap
+        isOpaque = !bitmap.hasAlpha()
     }
 
     /**
@@ -129,24 +74,26 @@ public final class ImageBitmap implements Animatable, Runnable {
      *
      * @return false for the image is recycled and obtain failed
      */
-    public synchronized boolean obtain() {
-        if (mBitmap.isRecycled()) {
-            return false;
+    @Synchronized
+    fun obtain(): Boolean {
+        return if (mBitmap.isRecycled) {
+            false
         } else {
-            ++mReferences;
-            return true;
+            ++mReferences
+            true
         }
     }
 
     /**
      * Release the image bitmap
      */
-    public synchronized void release() {
-        --mReferences;
-        if (mReferences <= 0 && !mBitmap.isRecycled()) {
-            mBitmap.recycle();
+    @Synchronized
+    fun release() {
+        --mReferences
+        if (mReferences <= 0 && !mBitmap.isRecycled) {
+            mBitmap.recycle()
             if (mImage != null) {
-                mImage.recycle();
+                mImage!!.recycle()
             }
         }
     }
@@ -154,176 +101,203 @@ public final class ImageBitmap implements Animatable, Runnable {
     /**
      * Add a callback for invalidating
      */
-    public void addCallback(@NonNull Callback callback) {
-        final Iterator<WeakReference<Callback>> iterator = mCallbackSet.iterator();
-        Callback c;
+    fun addCallback(callback: Callback) {
+        val iterator = mCallbackSet.iterator()
+        var c: Callback?
         while (iterator.hasNext()) {
-            c = iterator.next().get();
+            c = iterator.next().get()
             if (c == null) {
                 // Remove from the set if the reference has been cleared or
                 // it can't be used.
-                iterator.remove();
-            } else if (c == callback) {
-                return;
+                iterator.remove()
+            } else if (c === callback) {
+                return
             }
         }
-
-        mCallbackSet.add(new WeakReference<>(callback));
+        mCallbackSet.add(WeakReference(callback))
     }
 
     /**
      * Remove a callback
      */
-    public void removeCallback(@NonNull Callback callback) {
-        final Iterator<WeakReference<Callback>> iterator = mCallbackSet.iterator();
-        Callback c;
+    fun removeCallback(callback: Callback) {
+        val iterator = mCallbackSet.iterator()
+        var c: Callback?
         while (iterator.hasNext()) {
-            c = iterator.next().get();
+            c = iterator.next().get()
             if (c == null) {
                 // Remove from the set if the reference has been cleared or
                 // it can't be used.
-                iterator.remove();
-            } else if (c == callback) {
-                iterator.remove();
-                return;
+                iterator.remove()
+            } else if (c === callback) {
+                iterator.remove()
+                return
             }
         }
-    }
-
-    /**
-     * Return the format of the image
-     */
-    public int getFormat() {
-        return mFormat;
     }
 
     /**
      * Return image width
      */
-    public int getWidth() {
-        return mBitmap.getWidth();
-    }
+    val width: Int
+        get() = mBitmap.width
 
     /**
      * Return image height
      */
-    public int getHeight() {
-        return mBitmap.getHeight();
-    }
-
-    /**
-     * Return image is opaque
-     */
-    public boolean isOpaque() {
-        return mIsOpaque;
-    }
+    val height: Int
+        get() = mBitmap.height
 
     /**
      * Return image is animated
      */
-    public boolean isAnimated() {
-        return mImage != null;
-    }
+    val isAnimated: Boolean
+        get() = mImage != null
 
     /**
      * Draw image to canvas
      */
-    public void draw(Canvas canvas, float left, float top, @Nullable Paint paint) {
-        if (!mBitmap.isRecycled()) {
-            canvas.drawBitmap(mBitmap, left, top, paint);
-        }
-    }
-
-    /**
-     * Draw image to canvas
-     */
-    public void draw(Canvas canvas, @Nullable Rect src, @NonNull Rect dst, @Nullable Paint paint) {
-        if (!mBitmap.isRecycled()) {
-            canvas.drawBitmap(mBitmap, src, dst, paint);
+    fun draw(canvas: Canvas, left: Float, top: Float, paint: Paint?) {
+        if (!mBitmap.isRecycled) {
+            canvas.drawBitmap(mBitmap, left, top, paint)
         }
     }
 
     /**
      * Draw image to canvas
      */
-    public void draw(Canvas canvas, @Nullable Rect src, @NonNull RectF dst, @Nullable Paint paint) {
-        if (!mBitmap.isRecycled()) {
-            canvas.drawBitmap(mBitmap, src, dst, paint);
+    fun draw(canvas: Canvas, src: Rect?, dst: Rect, paint: Paint?) {
+        if (!mBitmap.isRecycled) {
+            canvas.drawBitmap(mBitmap, src, dst, paint)
         }
     }
 
     /**
-     * {@code start()} and {@code stop()} is a pair
+     * Draw image to canvas
      */
-    @Override
-    public void start() {
-        mAnimationReferences++;
-        if (mBitmap.isRecycled() || mImage == null || mRunning) {
-            return;
+    fun draw(canvas: Canvas, src: Rect?, dst: RectF, paint: Paint?) {
+        if (!mBitmap.isRecycled) {
+            canvas.drawBitmap(mBitmap, src, dst, paint)
         }
-        mRunning = true;
-        HANDLER.postDelayed(this, Math.max(0, mImage.getDelay()));
     }
 
     /**
-     * {@code start()} and {@code stop()} is a pair
+     * `start()` and `stop()` is a pair
      */
-    @Override
-    public void stop() {
-        mAnimationReferences--;
+    override fun start() {
+        mAnimationReferences++
+        if (mBitmap.isRecycled || mImage == null || mRunning) {
+            return
+        }
+        mRunning = true
+        HANDLER.postDelayed(this, Math.max(0, mImage!!.delay).toLong())
+    }
+
+    /**
+     * `start()` and `stop()` is a pair
+     */
+    override fun stop() {
+        mAnimationReferences--
         if (mAnimationReferences <= 0) {
-            mRunning = false;
-            HANDLER.removeCallbacks(this);
+            mRunning = false
+            HANDLER.removeCallbacks(this)
         }
     }
 
-    @Override
-    public boolean isRunning() {
-        return mRunning;
+    override fun isRunning(): Boolean {
+        return mRunning
     }
 
-    private boolean notifyUpdate() {
-        boolean hasCallback = false;
-        final Iterator<WeakReference<Callback>> iterator = mCallbackSet.iterator();
-        Callback callback;
+    private fun notifyUpdate(): Boolean {
+        var hasCallback = false
+        val iterator = mCallbackSet.iterator()
+        var callback: Callback?
         while (iterator.hasNext()) {
-            callback = iterator.next().get();
+            callback = iterator.next().get()
             if (callback != null) {
                 // Render bitmap int the first time
                 if (!hasCallback) {
-                    hasCallback = true;
-                    mImage.render(0, 0, mBitmap, 0, 0, mImage.getWidth(), mImage.getHeight(), false, 0);
+                    hasCallback = true
+                    mImage!!.render(0, 0, mBitmap, 0, 0, mImage!!.width, mImage!!.height, false, 0)
                 }
-                callback.invalidateImage(this);
+                callback.invalidateImage(this)
             } else {
                 // Remove from the set if the reference has been cleared or
                 // it can't be used.
-                iterator.remove();
+                iterator.remove()
             }
         }
-        return hasCallback;
+        return hasCallback
     }
 
-    @Override
-    public void run() {
+    override fun run() {
         // Check recycled
-        if (mBitmap.isRecycled() || mImage == null) {
-            mRunning = false;
-            return;
+        if (mBitmap.isRecycled || mImage == null) {
+            mRunning = false
+            return
         }
-
-        mImage.advance();
-
+        mImage!!.advance()
         if (notifyUpdate()) {
             if (mRunning) {
-                HANDLER.postDelayed(this, Math.max(0, mImage.getDelay()));
+                HANDLER.postDelayed(this, Math.max(0, mImage!!.delay).toLong())
             }
         } else {
-            mRunning = false;
+            mRunning = false
         }
     }
 
-    public interface Callback {
-        void invalidateImage(ImageBitmap who);
+    interface Callback {
+        fun invalidateImage(who: ImageBitmap?)
+    }
+
+    companion object {
+        private val HANDLER = Handler(Looper.getMainLooper())
+
+        /**
+         * Decode `InputStream`, then create image.
+         */
+        @JvmStatic
+        fun decode(fd: FileDescriptor): ImageBitmap? {
+            val image = Image.decode(fd, false)
+            return if (image != null) {
+                create(image)
+            } else {
+                null
+            }
+        }
+
+        /**
+         * Create `ImageBitmap` from `Image`.
+         * It is not recommended. Use [.decode] if you can.
+         *
+         * @param image the image should not be used before and
+         * it must not be recycled. And the image should
+         * not be used directly anymore.
+         */
+        fun create(image: Image): ImageBitmap? {
+            return if (!image.isRecycled) {
+                try {
+                    ImageBitmap(image)
+                } catch (e: OutOfMemoryError) {
+                    image.recycle()
+                    null
+                }
+            } else {
+                null
+            }
+        }
+
+        /**
+         * Create `ImageBitmap` from `Bitmap`.
+         *
+         * @param bitmap the bitmap should not be recycled
+         */
+        fun create(bitmap: Bitmap): ImageBitmap? {
+            return if (!bitmap.isRecycled) {
+                ImageBitmap(bitmap)
+            } else {
+                null
+            }
+        }
     }
 }
