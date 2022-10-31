@@ -20,7 +20,7 @@ package com.hippo
 import android.content.Context
 import android.net.Uri
 
-class UriArchiveAccessor(var ctx: Context, var uri: Uri) {
+class UriArchiveAccessor(ctx: Context, uri: Uri) {
     val pfd by lazy { ctx.contentResolver.openFileDescriptor(uri, "r")!! }
     fun open(): Int {
         return openArchive(pfd.fd, pfd.statSize)
