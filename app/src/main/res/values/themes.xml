@@ -32,6 +32,7 @@
         <item name="windowNoTitle">true</item>
         <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 
     <style name="ThemeOverlay" />
