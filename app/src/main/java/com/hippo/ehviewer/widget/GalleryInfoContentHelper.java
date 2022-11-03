@@ -86,6 +86,8 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
     @Override
     protected void onClearData() {
         map.clear();
+        maxGid = -1;
+        minGid = -1;
     }
 
     @Override
