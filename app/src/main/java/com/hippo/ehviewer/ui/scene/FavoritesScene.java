@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -1306,6 +1307,20 @@ public class FavoritesScene extends BaseScene implements
         protected void onClearData() {
             super.onClearData();
             nextPg = null;
+        }
+
+        @Override
+        protected Parcelable saveInstanceState(Parcelable superState) {
+            Bundle bundle = (Bundle) super.saveInstanceState(superState);
+            bundle.putString(KEY_NEXT_PAGE, nextPg);
+            return bundle;
+        }
+
+        @Override
+        protected Parcelable restoreInstanceState(Parcelable state) {
+            Bundle bundle = (Bundle) state;
+            nextPg = bundle.getString(KEY_NEXT_PAGE);
+            return super.restoreInstanceState(state);
         }
     }
 }
