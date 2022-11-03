@@ -108,6 +108,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     public void reset() {
         mMode = MODE_NORMAL;
         mNextGid = 0;
+        mPrevGid = 0;
         mCategory = EhUtils.NONE;
         mKeyword = null;
         mAdvanceSearch = -1;
