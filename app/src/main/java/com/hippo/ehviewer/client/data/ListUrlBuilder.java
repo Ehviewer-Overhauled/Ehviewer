@@ -64,7 +64,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     @Mode
     private int mMode = MODE_NORMAL;
 
-    private int mPageIndex = 0;
+    private int mNextGid = 0;
+    private int mPrevGid = 0;
 
     private int mCategory = EhUtils.NONE;
     private String mKeyword = null;
@@ -86,7 +87,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     @SuppressWarnings("WrongConstant")
     protected ListUrlBuilder(Parcel in) {
         this.mMode = in.readInt();
-        this.mPageIndex = in.readInt();
+        this.mNextGid = in.readInt();
         this.mCategory = in.readInt();
         this.mKeyword = in.readString();
         this.mAdvanceSearch = in.readInt();
@@ -105,7 +106,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
      */
     public void reset() {
         mMode = MODE_NORMAL;
-        mPageIndex = 0;
+        mNextGid = 0;
         mCategory = EhUtils.NONE;
         mKeyword = null;
         mAdvanceSearch = -1;
@@ -137,12 +138,12 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
         mMode = mode;
     }
 
-    public int getPageIndex() {
-        return mPageIndex;
+    public void setNextGid(int nextGid) {
+        mNextGid = nextGid;
     }
 
-    public void setPageIndex(int pageIndex) {
-        mPageIndex = pageIndex;
+    public void setPrevGid(int prevGid) {
+        mPrevGid = prevGid;
     }
 
     public int getCategory() {
@@ -233,7 +234,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
      */
     public void set(ListUrlBuilder lub) {
         mMode = lub.mMode;
-        mPageIndex = lub.mPageIndex;
+        mNextGid = lub.mNextGid;
+        mPrevGid = lub.mPrevGid;
         mCategory = lub.mCategory;
         mKeyword = lub.mKeyword;
         mAdvanceSearch = lub.mAdvanceSearch;
@@ -524,9 +526,11 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 if (mSHash != null) {
                     ub.addQuery("f_shash", mSHash);
                 }
-                // Page index
-                if (mPageIndex != 0) {
-                    ub.addQuery("page", mPageIndex);
+                if (mNextGid != 0) {
+                    ub.addQuery("next", mNextGid);
+                }
+                if (mPrevGid != 0) {
+                    ub.addQuery("prev", mPrevGid);
                 }
                 // Advance search
                 if (mAdvanceSearch != -1) {
@@ -570,8 +574,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 } catch (UnsupportedEncodingException e) {
                     // Empty
                 }
-                if (mPageIndex != 0) {
-                    sb.append('/').append(mPageIndex);
+                if (mNextGid != 0) {
+                    sb.append('/').append(mNextGid);
                 }
                 return sb.toString();
             }
@@ -583,8 +587,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 } catch (UnsupportedEncodingException e) {
                     // Empty
                 }
-                if (mPageIndex != 0) {
-                    sb.append('/').append(mPageIndex);
+                if (mNextGid != 0) {
+                    sb.append('/').append(mNextGid);
                 }
                 return sb.toString();
             }
@@ -600,8 +604,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                 } catch (UnsupportedEncodingException e) {
                     // Empty
                 }
-                if (mPageIndex != 0) {
-                    sb.append("&p=").append(mPageIndex);
+                if (mNextGid != 0) {
+                    sb.append("&p=").append(mNextGid);
                 }
                 return sb.toString();
         }
@@ -615,7 +619,8 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.mMode);
-        dest.writeInt(this.mPageIndex);
+        dest.writeInt(this.mNextGid);
+        dest.writeInt(this.mPrevGid);
         dest.writeInt(this.mCategory);
         dest.writeString(this.mKeyword);
         dest.writeInt(this.mAdvanceSearch);

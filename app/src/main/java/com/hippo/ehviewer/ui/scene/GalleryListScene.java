@@ -1374,7 +1374,7 @@ public final class GalleryListScene extends BaseScene
                     ? R.string.gallery_list_empty_hit_subscription
                     : R.string.gallery_list_empty_hit);
             mHelper.setEmptyString(emptyString);
-            mHelper.onGetPageData(taskId, result.pages, result.nextPage, result.galleryInfoList);
+            mHelper.onGetPageData(taskId, result.founds / 25, mHelper.pgCounter + 1, result.galleryInfoList);
         }
     }
 
@@ -1547,7 +1547,7 @@ public final class GalleryListScene extends BaseScene
                     }
 
                     mUrlBuilder.set(mQuickSearchList.get(position));
-                    mUrlBuilder.setPageIndex(0);
+                    mUrlBuilder.setNextGid(0);
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);
@@ -1564,7 +1564,7 @@ public final class GalleryListScene extends BaseScene
                     }
 
                     mUrlBuilder.setKeyword(String.valueOf(keywords[position]));
-                    mUrlBuilder.setPageIndex(0);
+                    mUrlBuilder.setNextGid(0);
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);
@@ -1694,15 +1694,18 @@ public final class GalleryListScene extends BaseScene
     }
 
     private class GalleryListHelper extends GalleryInfoContentHelper {
+        public int pgCounter = 0;
 
         @Override
         protected void getPageData(int taskId, int type, int page) {
+            pgCounter = page;
             MainActivity activity = getMainActivity();
             if (null == activity || null == mClient || null == mUrlBuilder) {
                 return;
             }
 
-            mUrlBuilder.setPageIndex(page);
+            if (page != 0)
+                mUrlBuilder.setNextGid(minGid);
             if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.getMode()) {
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_IMAGE_SEARCH);
