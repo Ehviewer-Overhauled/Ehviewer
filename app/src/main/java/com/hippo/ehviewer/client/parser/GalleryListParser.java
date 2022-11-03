@@ -53,6 +53,8 @@ public class GalleryListParser {
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
     private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("page=(\\d+)");
 
+    private static final Pattern PATTERN_GETINT = Pattern.compile("[^0-9]");
+
     private static final String[][] FAVORITE_SLOT_RGB = new String[][]{
             new String[]{"0", "0", "0"},
             new String[]{"240", "0", "0"},
@@ -297,38 +299,30 @@ public class GalleryListParser {
         return gi;
     }
 
+    private static int getInt(String str) {
+        var m = PATTERN_GETINT.matcher(str);
+        return Integer.parseInt(m.replaceAll("").trim());
+    }
+
     public static Result parse(@NonNull String body) throws Exception {
         Result result = new Result();
         Document d = Jsoup.parse(body);
 
         try {
-            Element ptt = d.getElementsByClass("ptt").first();
-            Elements es = ptt.child(0).child(0).children();
-            result.pages = Integer.parseInt(es.get(es.size() - 2).text().trim());
+            Element stt = d.getElementsByClass("searchtext").first();
+            assert stt != null;
+            result.founds = getInt(stt.text());
 
-            Element e = es.get(es.size() - 1);
-            if (e != null) {
-                e = e.children().first();
-                if (e != null) {
-                    String href = e.attr("href");
-                    Matcher matcher = PATTERN_NEXT_PAGE.matcher(href);
-                    if (matcher.find()) {
-                        result.nextPage = NumberUtils.parseIntSafely(matcher.group(1), 0);
-                    }
-                }
-            }
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             result.noWatchedTags = body.contains("<p>You do not have any watched tags");
             if (body.contains("No hits found</p>")) {
-                result.pages = 0;
+                result.founds = 0;
                 //noinspection unchecked
                 result.galleryInfoList = Collections.EMPTY_LIST;
                 return result;
-            } else if (d.getElementsByClass("ptt").isEmpty()) {
-                result.pages = 1;
             } else {
-                result.pages = Integer.MAX_VALUE;
+                result.founds = Integer.MAX_VALUE;
             }
         }
 
@@ -364,8 +358,7 @@ public class GalleryListParser {
     }
 
     public static class Result {
-        public int pages;
-        public int nextPage;
+        public int founds;
         public boolean noWatchedTags;
         public List<GalleryInfo> galleryInfoList;
     }

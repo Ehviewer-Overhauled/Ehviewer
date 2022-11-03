@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelper<GalleryInfo> {
+    public int maxGid = -1;
+    public int minGid = -1;
 
     private static final String KEY_DATA_MAP = "data_map";
     private final FavouriteStatusRouter.Listener listener;
@@ -59,6 +61,12 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
     @Override
     protected void onAddData(List<GalleryInfo> data) {
         for (GalleryInfo info : data) {
+            if (maxGid == -1)
+                maxGid = (int) info.gid;
+            if (minGid == -1)
+                minGid = (int) info.gid;
+            maxGid = (int) Math.max(maxGid, info.gid);
+            minGid = (int) Math.min(minGid, info.gid);
             map.put(info.gid, info);
         }
     }

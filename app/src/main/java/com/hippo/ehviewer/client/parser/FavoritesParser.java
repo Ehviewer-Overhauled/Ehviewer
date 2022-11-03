@@ -65,8 +65,6 @@ public class FavoritesParser {
         Result re = new Result();
         re.catArray = catArray;
         re.countArray = countArray;
-        re.pages = result.pages;
-        re.nextPage = result.nextPage;
         re.galleryInfoList = result.galleryInfoList;
 
         return re;
