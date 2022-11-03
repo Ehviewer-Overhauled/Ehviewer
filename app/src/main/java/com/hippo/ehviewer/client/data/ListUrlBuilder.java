@@ -590,7 +590,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
                     // Empty
                 }
                 if (mNextGid != 0) {
-                    sb.append('/').append(mNextGid);
+                    sb.append("?next=").append(mNextGid);
                 }
                 return sb.toString();
             }
