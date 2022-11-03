@@ -47,6 +47,10 @@ import java.util.Objects;
 
 public final class CommonOperations {
 
+    public static int getPagesForFounds(int founds, int per) {
+        return (int)Math.ceil((double) founds/per);
+    }
+
     private static void doAddToFavorites(Activity activity, GalleryInfo galleryInfo,
                                          int slot, EhClient.Callback<Void> listener) {
         if (slot == -1) {

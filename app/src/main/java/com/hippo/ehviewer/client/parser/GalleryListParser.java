@@ -51,7 +51,6 @@ public class GalleryListParser {
     private static final Pattern PATTERN_THUMB_SIZE = Pattern.compile("height:(\\d+)px;width:(\\d+)px");
     private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("background-color:rgba\\((\\d+),(\\d+),(\\d+),");
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
-    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("page=(\\d+)");
 
     private static final Pattern PATTERN_GETINT = Pattern.compile("[^0-9]");
 

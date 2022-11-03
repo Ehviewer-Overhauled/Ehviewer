@@ -88,6 +88,7 @@ public class ListUrlBuilder implements Cloneable, Parcelable {
     protected ListUrlBuilder(Parcel in) {
         this.mMode = in.readInt();
         this.mNextGid = in.readInt();
+        this.mPrevGid = in.readInt();
         this.mCategory = in.readInt();
         this.mKeyword = in.readString();
         this.mAdvanceSearch = in.readInt();
