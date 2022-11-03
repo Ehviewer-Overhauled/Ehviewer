@@ -31,8 +31,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class FavoritesParser {
+    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+-\\d+)");
 
     public static Result parse(String body) throws Exception {
         if (body.contains("This page requires you to log on.</p>")) {
@@ -59,10 +61,23 @@ public class FavoritesParser {
             e.printStackTrace();
             throw new ParseException("Parse favorites error", body);
         }
+        Result re = new Result();
+
+        try {
+            var d = Jsoup.parse(body);
+            var snv = d.getElementsByClass("searchnav").first();
+            assert snv != null;
+            var href = snv.child(3).child(0).attr("href");
+            var matcher = PATTERN_NEXT_PAGE.matcher(href);
+            if (matcher.find()) {
+                re.nextPage = matcher.group(1);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
         GalleryListParser.Result result = GalleryListParser.parse(body);
 
-        Result re = new Result();
         re.catArray = catArray;
         re.countArray = countArray;
         re.galleryInfoList = result.galleryInfoList;
@@ -73,8 +88,7 @@ public class FavoritesParser {
     public static class Result {
         public String[] catArray; // Size 10
         public int[] countArray; // Size 10
-        public int pages;
-        public int nextPage;
+        public String nextPage;
         public List<GalleryInfo> galleryInfoList;
     }
 }

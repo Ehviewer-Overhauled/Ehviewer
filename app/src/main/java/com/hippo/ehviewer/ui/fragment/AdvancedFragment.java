@@ -317,7 +317,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         Activity activity = requireActivity();
         EhClient mClient = EhApplication.getEhClient(context);
         FavListUrlBuilder favListUrlBuilder = new FavListUrlBuilder();
-        favListUrlBuilder.setIndex(page.get());
+        // favListUrlBuilder.setNext(page.get());
 
         EhRequest request = new EhRequest();
         request.setMethod(EhClient.METHOD_GET_FAVORITES);
@@ -329,7 +329,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                     EhDB.putLocalFavorites(result1.galleryInfoList);
                     Log.d("LocalFavorites", "now backup page " + page.get());
                     if (!result1.galleryInfoList.isEmpty()) {
-                        favListUrlBuilder.setIndex(page.incrementAndGet());
+                        // favListUrlBuilder.setNext(page.incrementAndGet());
                         request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
                         mClient.execute(request);
                     } else {

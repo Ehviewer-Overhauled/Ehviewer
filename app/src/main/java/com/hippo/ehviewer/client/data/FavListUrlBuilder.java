@@ -44,7 +44,7 @@ public class FavListUrlBuilder implements Parcelable {
         }
     };
     private static final String TAG = FavListUrlBuilder.class.getSimpleName();
-    private int mIndex;
+    private String mNext;
     private String mKeyword;
     private int mFavCat = FAV_CAT_ALL;
 
@@ -52,7 +52,7 @@ public class FavListUrlBuilder implements Parcelable {
     }
 
     protected FavListUrlBuilder(Parcel in) {
-        this.mIndex = in.readInt();
+        this.mNext = in.readString();
         this.mKeyword = in.readString();
         this.mFavCat = in.readInt();
     }
@@ -61,8 +61,8 @@ public class FavListUrlBuilder implements Parcelable {
         return favCat >= 0 && favCat <= 9;
     }
 
-    public void setIndex(int index) {
-        mIndex = index;
+    public void setNext(String next) {
+        mNext = next;
     }
 
     public String getKeyword() {
@@ -105,8 +105,8 @@ public class FavListUrlBuilder implements Parcelable {
                 Log.e(TAG, "Can't URLEncoder.encode " + mKeyword);
             }
         }
-        if (mIndex > 0) {
-            ub.addQuery("page", Integer.toString(mIndex));
+        if (mNext != null && !mNext.isEmpty()) {
+            ub.addQuery("next", mNext);
         }
         return ub.build();
     }
@@ -118,7 +118,7 @@ public class FavListUrlBuilder implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.mIndex);
+        dest.writeString(this.mNext);
         dest.writeString(this.mKeyword);
         dest.writeInt(this.mFavCat);
     }
