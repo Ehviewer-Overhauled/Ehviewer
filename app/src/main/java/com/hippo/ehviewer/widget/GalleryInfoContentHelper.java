@@ -37,6 +37,8 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
     private static final String KEY_DATA_MAP = "data_map";
     private static final String KEY_MAX_GID = "max_gid";
     private static final String KEY_MIN_GID = "min_gid";
+
+    public static final String KEY_NEXT_PAGE = "next_page";
     private final FavouriteStatusRouter.Listener listener;
     @SuppressLint("UseSparseArrays")
     private Map<Long, GalleryInfo> map = new HashMap<>();
