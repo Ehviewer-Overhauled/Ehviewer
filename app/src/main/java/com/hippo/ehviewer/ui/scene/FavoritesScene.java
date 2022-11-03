@@ -1181,7 +1181,7 @@ public class FavoritesScene extends BaseScene implements
 
     private class FavoritesHelper extends GalleryInfoContentHelper {
         public int pgCounter = 0;
-        public String nextPg = "";
+        public String nextPg = null;
 
         @Override
         protected void getPageData(final int taskId, int type, int page) {
@@ -1304,6 +1304,12 @@ public class FavoritesScene extends BaseScene implements
                     mSearchBarMover.showSearchBar();
                 }
             }
+        }
+
+        @Override
+        protected void onClearData() {
+            super.onClearData();
+            nextPg = null;
         }
     }
 }
