@@ -35,6 +35,8 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
     public int minGid = -1;
 
     private static final String KEY_DATA_MAP = "data_map";
+    private static final String KEY_MAX_GID = "max_gid";
+    private static final String KEY_MIN_GID = "min_gid";
     private final FavouriteStatusRouter.Listener listener;
     @SuppressLint("UseSparseArrays")
     private Map<Long, GalleryInfo> map = new HashMap<>();
@@ -98,6 +100,8 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
         FavouriteStatusRouter router = EhApplication.getFavouriteStatusRouter();
         int id = router.saveDataMap(map);
         bundle.putInt(KEY_DATA_MAP, id);
+        bundle.putInt(KEY_MIN_GID, minGid);
+        bundle.putInt(KEY_MAX_GID, maxGid);
 
         return bundle;
     }
@@ -114,6 +118,8 @@ public abstract class GalleryInfoContentHelper extends ContentLayout.ContentHelp
                 this.map = map;
             }
         }
+        minGid = bundle.getInt(KEY_MIN_GID);
+        maxGid = bundle.getInt(KEY_MAX_GID);
 
         return super.restoreInstanceState(state);
     }
