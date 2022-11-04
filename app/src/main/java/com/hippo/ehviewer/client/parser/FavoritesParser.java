@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class FavoritesParser {
-    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+-\\d+)");
+    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+(-\\d+)?)");
 
     public static Result parse(String body) throws Exception {
         if (body.contains("This page requires you to log on.</p>")) {
