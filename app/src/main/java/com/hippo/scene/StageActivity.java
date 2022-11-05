@@ -584,19 +584,17 @@ public abstract class StageActivity extends EhActivity {
         super.onProvideAssistContent(outContent);
         int size = mSceneTagList.size();
         String tag = mSceneTagList.get(size - 1);
-        SceneFragment scene;
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
         if (fragment == null) {
             Log.e(TAG, "onProvideAssistContent: Can't find scene by tag: " + tag);
             return;
         }
-        if (!(fragment instanceof SceneFragment)) {
-            Log.e(TAG, "onProvideAssistContent: The fragment is not SceneFragment");
-            return;
-        }
 
-        scene = (SceneFragment) fragment;
-        scene.onProvideAssistContent(outContent);
+        if (fragment instanceof SceneFragment scene) {
+            scene.onProvideAssistContent(outContent);
+        } else {
+            Log.e(TAG, "onProvideAssistContent: The fragment is not SceneFragment");
+        }
     }
 
     public SceneFragment findSceneByTag(String tag) {
