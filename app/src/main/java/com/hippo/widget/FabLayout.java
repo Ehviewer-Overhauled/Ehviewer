@@ -29,6 +29,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.ehviewer.R;
+import com.hippo.scene.StageActivity;
 import com.hippo.yorozuya.AnimationUtils;
 import com.hippo.yorozuya.SimpleAnimatorListener;
 
@@ -298,6 +299,7 @@ public class FabLayout extends ViewGroup implements View.OnClickListener {
                 mOnExpandListener.onExpand(expanded);
             }
         }
+        ((StageActivity)getContext()).updateBackPressCallBackStatus();
     }
 
 

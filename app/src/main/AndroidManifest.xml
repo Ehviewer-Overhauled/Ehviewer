@@ -37,6 +37,7 @@
         android:allowBackup="true"
         android:appCategory="image"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_scheme"
         android:hasFragileUserData="true"
         android:icon="@mipmap/ic_launcher"

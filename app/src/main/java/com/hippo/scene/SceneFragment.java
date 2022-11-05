@@ -61,6 +61,7 @@ public class SceneFragment extends Fragment {
         FragmentActivity activity = getActivity();
         if (activity instanceof StageActivity) {
             ((StageActivity) activity).startScene(announcer, horizontal);
+            ((StageActivity) activity).updateBackPressCallBackStatus();
         }
     }
 

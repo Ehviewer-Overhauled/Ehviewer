@@ -91,6 +91,7 @@ import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.ehviewer.widget.SearchLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
+import com.hippo.scene.StageActivity;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
@@ -778,6 +779,21 @@ public final class GalleryListScene extends BaseScene
         return view;
     }
 
+    public boolean isBackpressCanPreviewLauncherStatus() {
+        if (null != mFabLayout && mFabLayout.isExpanded()) {
+            return false;
+        }
+        switch (mState) {
+            case STATE_NORMAL:
+                return getStackIndex() == 0;
+            case STATE_SIMPLE_SEARCH:
+            case STATE_SEARCH:
+            case STATE_SEARCH_SHOW_LIST:
+                return false;
+        }
+        return false;
+    }
+
     @Override
     public void onBackPressed() {
         if (null != mFabLayout && mFabLayout.isExpanded()) {
@@ -1184,6 +1200,7 @@ public final class GalleryListScene extends BaseScene
                     break;
             }
         }
+        ((StageActivity)requireActivity()).updateBackPressCallBackStatus();
     }
 
     @Override

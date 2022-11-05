@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.EhActivity;
+import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 
@@ -57,6 +59,8 @@ public abstract class StageActivity extends EhActivity {
     private final AtomicInteger mIdGenerator = new AtomicInteger();
     private final SceneViewComparator mSceneViewComparator = new SceneViewComparator();
     private int mStageId = IntIdGenerator.INVALID_ID;
+
+    private OnBackPressedCallback callback;
 
     public static void registerLaunchMode(Class<?> clazz, @SceneFragment.LaunchMode int launchMode) {
         if (launchMode != SceneFragment.LAUNCH_MODE_STANDARD &&
@@ -140,6 +144,8 @@ public abstract class StageActivity extends EhActivity {
     protected final void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        callback = new BackPressCallBack(false);
+        getOnBackPressedDispatcher().addCallback(callback);
         if (savedInstanceState != null) {
             mStageId = savedInstanceState.getInt(KEY_STAGE_ID, IntIdGenerator.INVALID_ID);
             ArrayList<String> list = savedInstanceState.getStringArrayList(KEY_SCENE_TAG_LIST);
@@ -247,6 +253,7 @@ public abstract class StageActivity extends EhActivity {
 
     public void startScene(Announcer announcer) {
         startScene(announcer, false);
+        updateBackPressCallBackStatus();
     }
 
     public void startScene(Announcer announcer, boolean horizontal) {
@@ -461,6 +468,7 @@ public abstract class StageActivity extends EhActivity {
             // TODO Call onNewArguments when view created ?
             scene.onNewArguments(args);
         }
+        updateBackPressCallBackStatus();
     }
 
     int getSceneIndex(SceneFragment scene) {
@@ -477,6 +485,7 @@ public abstract class StageActivity extends EhActivity {
 
     public void finishScene(SceneFragment scene) {
         finishScene(scene.getTag());
+        updateBackPressCallBackStatus();
     }
 
     private void finishScene(String tag) {
@@ -558,25 +567,51 @@ public abstract class StageActivity extends EhActivity {
         } else {
             fragmentManager.beginTransaction().detach(fragment).attach(fragment).commitAllowingStateLoss();
         }
+        updateBackPressCallBackStatus();
     }
 
-    @Override
-    public void onBackPressed() {
-        int size = mSceneTagList.size();
-        String tag = mSceneTagList.get(size - 1);
-        SceneFragment scene;
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment == null) {
-            Log.e(TAG, "onBackPressed: Can't find scene by tag: " + tag);
-            return;
-        }
-        if (!(fragment instanceof SceneFragment)) {
-            Log.e(TAG, "onBackPressed: The fragment is not SceneFragment");
-            return;
+    private boolean shouldEnableBackPressCallBack() {
+        if (mSceneTagList.size() > 1)
+            return true;
+        if (mSceneTagList.size() == 0)
+            return false;
+        String tag = mSceneTagList.get(0);
+        GalleryListScene fragment = (GalleryListScene) getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment == null)
+            return false;
+        return !fragment.isBackpressCanPreviewLauncherStatus();
+    }
+
+    public void updateBackPressCallBackStatus() {
+        var isEnabled = callback.isEnabled();
+        var shouldEnable = shouldEnableBackPressCallBack();
+        if (isEnabled != shouldEnable)
+            callback.setEnabled(shouldEnable);
+    }
+
+    class BackPressCallBack extends OnBackPressedCallback {
+        public BackPressCallBack(boolean enabled) {
+            super(enabled);
         }
 
-        scene = (SceneFragment) fragment;
-        scene.onBackPressed();
+        @Override
+        public void handleOnBackPressed() {
+            int size = mSceneTagList.size();
+            String tag = mSceneTagList.get(size - 1);
+            SceneFragment scene;
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+            if (fragment == null) {
+                Log.e(TAG, "onBackPressed: Can't find scene by tag: " + tag);
+                return;
+            }
+            if (!(fragment instanceof SceneFragment)) {
+                Log.e(TAG, "onBackPressed: The fragment is not SceneFragment");
+                return;
+            }
+
+            scene = (SceneFragment) fragment;
+            scene.onBackPressed();
+        }
     }
 
     @Override
