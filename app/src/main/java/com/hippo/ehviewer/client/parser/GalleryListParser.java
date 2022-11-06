@@ -333,7 +333,7 @@ public class GalleryListParser {
             }
             if (list.isEmpty()) {
                 if (es.size() < 2 || !NO_UNFILTERED_TEXT.equals(es.get(1).text())) {
-                    throw new ParseException("No gallery", body);
+                    Log.d(TAG, "No gallery found");
                 }
             }
             result.galleryInfoList = list;
