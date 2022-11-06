@@ -225,19 +225,18 @@ class HistoryScene : ToolbarScene() {
         return false
     }
 
-    fun onItemClick(position: Int): Boolean {
+    fun onItemClick(gi: GalleryInfo): Boolean {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, mAdapter?.peek(position))
+        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
         val announcer = Announcer(GalleryDetailScene::class.java).setArgs(args)
         startScene(announcer)
         return true
     }
 
-    fun onItemLongClick(position: Int): Boolean {
+    fun onItemLongClick(gi: GalleryInfo): Boolean {
         val context = requireContext()
         val activity = mainActivity ?: return false
-        val gi: GalleryInfo = mAdapter?.peek(position) ?: return true
         val downloaded = mDownloadManager!!.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourited = gi.favoriteSlot != -2
         val items = if (downloaded) arrayOf<CharSequence>(
@@ -455,8 +454,8 @@ class HistoryScene : ToolbarScene() {
                 holder.thumb,
                 TransitionNameFactory.getThumbTransitionName(gid)
             )
-            holder.card.setOnClickListener { onItemClick(position) }
-            holder.card.setOnLongClickListener { onItemLongClick(position) }
+            holder.card.setOnClickListener { onItemClick(gi) }
+            holder.card.setOnLongClickListener { onItemLongClick(gi) }
         }
     }
 
