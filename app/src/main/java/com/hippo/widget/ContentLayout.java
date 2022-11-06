@@ -747,7 +747,7 @@ public class ContentLayout extends FrameLayout {
             getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage);
         }
 
-        private void doRefresh() {
+        protected void doRefresh() {
             mStartPage = 0;
             mEndPage = 1;
             mPages = 0;
