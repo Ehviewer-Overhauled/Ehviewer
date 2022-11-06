@@ -649,6 +649,7 @@ public class FavoritesScene extends BaseScene implements
                 .build();
         datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
         datePicker.addOnPositiveButtonClickListener(v -> {
+            mHelper.goTo(v);
         });
     }
 

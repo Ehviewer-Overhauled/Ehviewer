@@ -863,6 +863,7 @@ public final class GalleryListScene extends BaseScene
                 .build();
         datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
         datePicker.addOnPositiveButtonClickListener(v -> {
+            mHelper.goTo(v);
         });
     }
 
@@ -1702,6 +1703,8 @@ public final class GalleryListScene extends BaseScene
                 mUrlBuilder.setNextGid(minGid);
             else
                 mUrlBuilder.setNextGid(0);
+            mUrlBuilder.setJumpTo(jumpTo);
+            jumpTo = null;
             if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.getMode()) {
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_IMAGE_SEARCH);
