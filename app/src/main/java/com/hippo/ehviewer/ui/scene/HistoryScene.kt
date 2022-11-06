@@ -25,7 +25,6 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -39,7 +38,6 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.HandlerDrawable
-import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.*
 import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils
@@ -64,17 +62,57 @@ import rikka.core.res.resolveColor
 
 class HistoryScene : ToolbarScene() {
     private var mRecyclerView: EasyRecyclerView? = null
-    private var mViewTransition: ViewTransition? = null
-    private var mAdapter: HistoryAdapter? = null
-    private var mDownloadManager: DownloadManager? = null
-    private var mDownloadInfoListener: DownloadInfoListener? = null
-    private var mFavouriteStatusRouter: FavouriteStatusRouter? = null
-    private var mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener? = null
+    private val mAdapter: HistoryAdapter by lazy {
+        HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
+            override fun areItemsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
+                return oldItem.gid == newItem.gid
+            }
+
+            override fun areContentsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
+                return oldItem.gid == newItem.gid
+            }
+        })
+    }
+    private val mDownloadManager: DownloadManager by lazy {
+        EhApplication.getDownloadManager(requireContext())
+    }
+    private val mDownloadInfoListener: DownloadInfoListener by lazy {
+        object : DownloadInfoListener {
+            override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+                mAdapter.notifyDataSetChanged()
+            }
+
+            override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
+            override fun onUpdateAll() {}
+            override fun onReload() {
+                mAdapter.notifyDataSetChanged()
+            }
+
+            override fun onChange() {
+                mAdapter.notifyDataSetChanged()
+            }
+
+            override fun onRenameLabel(from: String, to: String) {}
+            override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+                mAdapter.notifyDataSetChanged()
+            }
+
+            override fun onUpdateLabels() {}
+        }
+    }
+    private val mFavouriteStatusRouter: FavouriteStatusRouter by lazy {
+        EhApplication.getFavouriteStatusRouter(requireContext())
+    }
+    private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener by lazy {
+        FavouriteStatusRouter.Listener { _: Long, _: Int ->
+            mAdapter.notifyDataSetChanged()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
-        mDownloadManager!!.removeDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter!!.removeListener(mFavouriteStatusRouterListener)
+        mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener)
+        mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 
     override fun getNavCheckedItem(): Int {
@@ -84,36 +122,8 @@ class HistoryScene : ToolbarScene() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val context = requireContext()
-        mDownloadManager = EhApplication.getDownloadManager(context)
-        mFavouriteStatusRouter = EhApplication.getFavouriteStatusRouter(context)
-        mDownloadInfoListener = object : DownloadInfoListener {
-            override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                mAdapter?.notifyDataSetChanged()
-            }
-
-            override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
-            override fun onUpdateAll() {}
-            override fun onReload() {
-                mAdapter?.notifyDataSetChanged()
-            }
-
-            override fun onChange() {
-                mAdapter?.notifyDataSetChanged()
-            }
-
-            override fun onRenameLabel(from: String, to: String) {}
-            override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                mAdapter?.notifyDataSetChanged()
-            }
-
-            override fun onUpdateLabels() {}
-        }
-        mDownloadManager!!.addDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouterListener = FavouriteStatusRouter.Listener { _: Long, _: Int ->
-            mAdapter?.notifyDataSetChanged()
-        }
-        mFavouriteStatusRouter!!.addListener(mFavouriteStatusRouterListener)
+        mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
+        mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
     }
 
     override fun onCreateViewWithToolbar(
@@ -125,7 +135,7 @@ class HistoryScene : ToolbarScene() {
         val recyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as EasyRecyclerView
         val mFastScroller = ViewUtils.`$$`(content, R.id.fast_scroller) as FastScroller
         val mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        mViewTransition = ViewTransition(content, mTip)
+        ViewTransition(content, mTip)
         val resources = requireContext().resources
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_history)
         drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
@@ -135,15 +145,6 @@ class HistoryScene : ToolbarScene() {
         ) {
             EhDB.getHistoryLazyList()
         }.flow.cachedIn(viewLifecycleOwner.lifecycleScope)
-        mAdapter = HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
-            override fun areItemsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
-                return oldItem.gid == newItem.gid
-            }
-
-            override fun areContentsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
-                return oldItem.gid == newItem.gid
-            }
-        })
         recyclerView.adapter = mAdapter
         val layoutManager = AutoStaggeredGridLayoutManager(
             0, StaggeredGridLayoutManager.VERTICAL
@@ -153,11 +154,6 @@ class HistoryScene : ToolbarScene() {
         recyclerView.layoutManager = layoutManager
         recyclerView.clipToPadding = false
         recyclerView.clipChildren = false
-        val interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
-        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
-        val decoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
-        recyclerView.addItemDecoration(decoration)
         val itemTouchHelper = ItemTouchHelper(HistoryItemTouchHelperCallback())
         itemTouchHelper.attachToRecyclerView(recyclerView)
         mFastScroller.attachToRecyclerView(recyclerView)
@@ -167,7 +163,7 @@ class HistoryScene : ToolbarScene() {
         mFastScroller.setHandlerDrawable(handlerDrawable)
         viewLifecycleOwner.lifecycleScope.launch {
             historyData.collectLatest { value ->
-                mAdapter!!.submitData(
+                mAdapter.submitData(
                     value
                 )
             }
@@ -185,8 +181,6 @@ class HistoryScene : ToolbarScene() {
         super.onDestroyView()
         mRecyclerView?.stopScroll()
         mRecyclerView = null
-        mViewTransition = null
-        mAdapter = null
     }
 
     @SuppressLint("RtlHardcoded")
@@ -203,20 +197,18 @@ class HistoryScene : ToolbarScene() {
         BaseDialogBuilder(requireContext())
             .setMessage(R.string.clear_all_history)
             .setPositiveButton(R.string.clear_all) { _: DialogInterface?, which: Int ->
-                if (DialogInterface.BUTTON_POSITIVE != which || null == mAdapter) {
+                if (DialogInterface.BUTTON_POSITIVE != which) {
                     return@setPositiveButton
                 }
                 EhDB.clearHistoryInfo()
-                mAdapter!!.refresh()
-                mAdapter!!.notifyDataSetChanged()
+                mAdapter.refresh()
+                mAdapter.notifyDataSetChanged()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        // Skip when in choice mode
-        context ?: return false
         val id = item.itemId
         if (id == R.id.action_clear_all) {
             showClearAllDialog()
@@ -237,7 +229,7 @@ class HistoryScene : ToolbarScene() {
     fun onItemLongClick(gi: GalleryInfo): Boolean {
         val context = requireContext()
         val activity = mainActivity ?: return false
-        val downloaded = mDownloadManager!!.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
+        val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourited = gi.favoriteSlot != -2
         val items = if (downloaded) arrayOf<CharSequence>(
             context.getString(R.string.read),
@@ -275,6 +267,7 @@ class HistoryScene : ToolbarScene() {
                         intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, gi)
                         startActivity(intent)
                     }
+
                     1 -> if (downloaded) {
                         BaseDialogBuilder(context)
                             .setTitle(R.string.download_remove_dialog_title)
@@ -285,7 +278,7 @@ class HistoryScene : ToolbarScene() {
                                 )
                             )
                             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                                mDownloadManager!!.deleteDownload(
+                                mDownloadManager.deleteDownload(
                                     gi.gid
                                 )
                             }
@@ -293,6 +286,7 @@ class HistoryScene : ToolbarScene() {
                     } else {
                         CommonOperations.startDownload(activity, gi, false)
                     }
+
                     2 -> if (favourited) {
                         CommonOperations.removeFromFavorites(
                             activity,
@@ -306,6 +300,7 @@ class HistoryScene : ToolbarScene() {
                             AddToFavoriteListener(context, activity.stageId, tag)
                         )
                     }
+
                     3 -> {
                         val labelRawList = EhApplication.getDownloadManager(context).labelList
                         val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
@@ -361,29 +356,16 @@ class HistoryScene : ToolbarScene() {
     }
 
     private class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val card: View
-        val thumb: LoadImageView
-        val title: TextView
-        val uploader: TextView
-        val rating: SimpleRatingView
-        val category: TextView
-        val posted: TextView
-        val simpleLanguage: TextView
-        val pages: TextView
-        val downloaded: ImageView
-
-        init {
-            card = itemView.findViewById(R.id.card)
-            thumb = itemView.findViewById(R.id.thumb)
-            title = itemView.findViewById(R.id.title)
-            uploader = itemView.findViewById(R.id.uploader)
-            rating = itemView.findViewById(R.id.rating)
-            category = itemView.findViewById(R.id.category)
-            posted = itemView.findViewById(R.id.posted)
-            simpleLanguage = itemView.findViewById(R.id.simple_language)
-            pages = itemView.findViewById(R.id.pages)
-            downloaded = itemView.findViewById(R.id.downloaded)
-        }
+        val card: View = itemView.findViewById(R.id.card)
+        val thumb: LoadImageView = itemView.findViewById(R.id.thumb)
+        val title: TextView = itemView.findViewById(R.id.title)
+        val uploader: TextView = itemView.findViewById(R.id.uploader)
+        val rating: SimpleRatingView = itemView.findViewById(R.id.rating)
+        val category: TextView = itemView.findViewById(R.id.category)
+        val posted: TextView = itemView.findViewById(R.id.posted)
+        val simpleLanguage: TextView = itemView.findViewById(R.id.simple_language)
+        val pages: TextView = itemView.findViewById(R.id.pages)
+        val downloaded: ImageView = itemView.findViewById(R.id.downloaded)
     }
 
     private inner class MoveDialogHelper(
@@ -431,7 +413,7 @@ class HistoryScene : ToolbarScene() {
             holder.rating.rating = gi.rating
             val category = holder.category
             val newCategoryText = EhUtils.getCategory(gi.category)
-            if (!newCategoryText!!.contentEquals(category.text)) {
+            if (!newCategoryText.contentEquals(category.text)) {
                 category.text = newCategoryText
                 category.setBackgroundColor(EhUtils.getCategoryColor(gi.category))
             }
@@ -446,14 +428,7 @@ class HistoryScene : ToolbarScene() {
                 holder.simpleLanguage.visibility = View.VISIBLE
             }
             holder.downloaded.visibility =
-                if (mDownloadManager!!.containDownloadInfo(gi.gid)) View.VISIBLE else View.GONE
-
-            // Update transition name
-            val gid = gi.gid
-            ViewCompat.setTransitionName(
-                holder.thumb,
-                TransitionNameFactory.getThumbTransitionName(gid)
-            )
+                if (mDownloadManager.containDownloadInfo(gi.gid)) View.VISIBLE else View.GONE
             holder.card.setOnClickListener { onItemClick(gi) }
             holder.card.setOnLongClickListener { onItemLongClick(gi) }
         }
@@ -477,12 +452,9 @@ class HistoryScene : ToolbarScene() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val mPosition = viewHolder.bindingAdapterPosition
-            if (mAdapter == null) {
-                return
-            }
-            val info: HistoryInfo = mAdapter!!.peek(mPosition)!!
-            EhDB.deleteHistoryInfo(info)
-            mAdapter!!.refresh()
+            val info: HistoryInfo? = mAdapter.peek(mPosition)
+            info?.let { EhDB.deleteHistoryInfo(info) }
+            mAdapter.refresh()
         }
     }
 }

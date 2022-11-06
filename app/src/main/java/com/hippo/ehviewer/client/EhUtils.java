@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.EhApplication;
@@ -94,6 +95,7 @@ public class EhUtils {
         return CATEGORY_VALUES[i];
     }
 
+    @NonNull
     public static String getCategory(int type) {
         int i;
         for (i = 0; i < CATEGORY_VALUES.length - 1; i++) {
