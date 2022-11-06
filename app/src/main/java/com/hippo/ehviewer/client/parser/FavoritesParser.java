@@ -65,9 +65,9 @@ public class FavoritesParser {
 
         try {
             var d = Jsoup.parse(body);
-            var snv = d.getElementsByClass("searchnav").first();
-            assert snv != null;
-            var href = snv.child(3).child(0).attr("href");
+            var next = d.getElementById("unext");
+            assert next != null;
+            var href = next.attr("href");
             var matcher = PATTERN_NEXT_PAGE.matcher(href);
             if (matcher.find()) {
                 re.nextPage = matcher.group(1);
