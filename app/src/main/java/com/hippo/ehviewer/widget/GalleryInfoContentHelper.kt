@@ -85,6 +85,12 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         minGid = -1
     }
 
+    override fun beforeRefresh() {
+        super.beforeRefresh()
+        maxGid = -1
+        minGid = -1
+    }
+
     override fun saveInstanceState(superState: Parcelable): Parcelable {
         val bundle = super.saveInstanceState(superState) as Bundle
 
