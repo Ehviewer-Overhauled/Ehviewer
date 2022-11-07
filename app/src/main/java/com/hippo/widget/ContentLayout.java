@@ -451,22 +451,36 @@ public class ContentLayout extends FrameLayout {
 
                 switch (mCurrentTaskType) {
                     case TYPE_REFRESH:
+                        mStartPage = 0;
+                        mEndPage = 1;
                         mPages = pages;
                         mNextPage = nextPage;
+                        mPageDivider.clear();
                         mPageDivider.add(data.size());
 
                         if (data.isEmpty()) {
+                            mData.clear();
+                            onClearData();
                             notifyDataSetChanged();
+
+                            // Not found
+                            // Ui change, show empty string
                             mRefreshLayout.setRefreshing(false);
                             mBottomProgress.hide();
                             showEmptyString();
                         } else {
+                            mData.clear();
+                            onClearData();
                             mData.addAll(data);
                             onAddData(data);
                             notifyDataSetChanged();
+
+                            // Ui change, show content
                             mRefreshLayout.setRefreshing(false);
                             mBottomProgress.hide();
                             showContent();
+
+                            // RecyclerView scroll
                             if (mRecyclerView.isAttachedToWindow()) {
                                 mRecyclerView.stopScroll();
                                 LayoutManagerUtils.scrollToPositionWithOffset(mRecyclerView.getLayoutManager(), 0, 0);
@@ -697,6 +711,10 @@ public class ContentLayout extends FrameLayout {
             mViewTransition.showView(0);
         }
 
+        protected void beforeRefresh() {
+
+        }
+
         private boolean isContentShowing() {
             return mViewTransition.getShownViewIndex() == 0;
         }
@@ -748,12 +766,7 @@ public class ContentLayout extends FrameLayout {
         }
 
         protected void doRefresh() {
-            mStartPage = 0;
-            mEndPage = 1;
-            mPages = 0;
-            mPageDivider.clear();
-            mData.clear();
-            onClearData();
+            beforeRefresh();
             mCurrentTaskId = mIdGenerator.nextId();
             mCurrentTaskType = TYPE_REFRESH;
             mCurrentTaskPage = 0;
