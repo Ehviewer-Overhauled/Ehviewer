@@ -1282,6 +1282,11 @@ public class FavoritesScene extends BaseScene implements
         @Override
         protected void onClearData() {
             super.onClearData();
+        }
+
+        @Override
+        protected void beforeRefresh() {
+            super.beforeRefresh();
             nextPg = null;
         }
 
