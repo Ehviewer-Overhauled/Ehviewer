@@ -31,6 +31,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -64,6 +65,7 @@ import androidx.core.view.ViewCompat;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.app.BaseDialogBuilder;
+import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
@@ -93,6 +95,7 @@ import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
 import com.hippo.ehviewer.gallery.EhGalleryProvider;
 import com.hippo.ehviewer.gallery.GalleryProvider2;
+import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.GalleryActivity;
 import com.hippo.ehviewer.ui.MainActivity;
@@ -101,9 +104,11 @@ import com.hippo.ehviewer.widget.GalleryRatingBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
+import com.hippo.unifile.UniFile;
 import com.hippo.util.AppHelper;
 import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.util.ReadableTime;
 import com.hippo.view.ViewTransition;
 import com.hippo.widget.AutoWrapLayout;
@@ -117,6 +122,7 @@ import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.IntList;
+import com.hippo.yorozuya.collect.LongList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -129,11 +135,9 @@ import java.util.List;
 
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
-
 public class GalleryDetailScene extends ToolbarScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
         View.OnLongClickListener {
-
     public final static String KEY_ACTION = "action";
     public static final String ACTION_GALLERY_INFO = "action_gallery_info";
     public static final String ACTION_GID_TOKEN = "action_gid_token";
@@ -422,6 +426,21 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         } else {
             return null;
         }
+    }
+
+    private static void deleteFileAsync(UniFile... files) {
+        //noinspection deprecation
+        new AsyncTask<UniFile, Void, Void>() {
+            @Override
+            protected Void doInBackground(UniFile... params) {
+                for (UniFile file : params) {
+                    if (file != null) {
+                        file.delete();
+                    }
+                }
+                return null;
+            }
+        }.executeOnExecutor(IoThreadPoolExecutor.getInstance(), files);
     }
 
     @Override
@@ -1180,10 +1199,14 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                 if (EhApplication.getDownloadManager(context).getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
                     CommonOperations.startDownload(activity, galleryInfo, false);
                 } else {
-                    new BaseDialogBuilder(context)
-                            .setTitle(R.string.download_remove_dialog_title)
-                            .setMessage(getString(R.string.download_remove_dialog_message, galleryInfo.title))
-                            .setPositiveButton(android.R.string.ok, (dialog1, which1) -> EhApplication.getDownloadManager(context).deleteDownload(galleryInfo.gid))
+                    CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
+                            getString(R.string.download_remove_dialog_message, galleryInfo.title),
+                            getString(R.string.download_remove_dialog_check_text),
+                            Settings.getRemoveImageFiles());
+                    DeleteDialogHelper helper = new DeleteDialogHelper(
+                            EhApplication.getDownloadManager(context), galleryInfo, builder);
+                    builder.setTitle(R.string.download_remove_dialog_title)
+                            .setPositiveButton(android.R.string.ok, helper)
                             .show();
                 }
             }
@@ -2134,6 +2157,39 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             EhApplication.getEhClient(context).execute(request);
+        }
+    }
+    private class DeleteDialogHelper implements DialogInterface.OnClickListener{
+        private final com.hippo.ehviewer.download.DownloadManager mDownloadManager;
+        private final GalleryInfo mGalleryInfo;
+        private final CheckBoxDialogBuilder mBuilder;
+
+        public DeleteDialogHelper(com.hippo.ehviewer.download.DownloadManager downloadManager,
+                                  GalleryInfo galleryInfo, CheckBoxDialogBuilder builder) {
+            mDownloadManager = downloadManager;
+            mGalleryInfo = galleryInfo;
+            mBuilder = builder;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which != DialogInterface.BUTTON_POSITIVE) {
+                return;
+            }
+
+            // Delete
+            if (null != mDownloadManager) {
+                mDownloadManager.deleteDownload(mGalleryInfo.gid);
+            }
+
+            // Delete image files
+            boolean checked = mBuilder.isChecked();
+            Settings.putRemoveImageFiles(checked);
+            if (checked) {
+                EhDB.removeDownloadDirname(mGalleryInfo.gid);
+                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo);
+                deleteFileAsync(file);
+            }
         }
     }
 }
