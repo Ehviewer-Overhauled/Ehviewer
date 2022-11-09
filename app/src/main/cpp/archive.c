@@ -108,8 +108,12 @@ static int archive_alloc_ctx(archive_ctx **ctxptr) {
         free(ctx);
         return -ENOMEM;
     }
-    archive_read_support_format_all(ctx->arc);
-    archive_read_support_filter_all(ctx->arc);
+    archive_read_support_format_tar(ctx->arc);
+    archive_read_support_format_7zip(ctx->arc);
+    archive_read_support_format_rar5(ctx->arc);
+    archive_read_support_format_zip(ctx->arc);
+    archive_read_support_filter_gzip(ctx->arc);
+    archive_read_support_filter_xz(ctx->arc);
     archive_read_set_option(ctx->arc, "zip", "ignorecrc32", "1");
     if (passwd)
         archive_read_add_passphrase(ctx->arc, passwd);
