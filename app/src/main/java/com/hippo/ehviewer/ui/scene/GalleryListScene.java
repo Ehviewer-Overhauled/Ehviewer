@@ -492,6 +492,8 @@ public final class GalleryListScene extends BaseScene
             mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_x24);
         }
 
+        mFabLayout.setSecondaryFabVisibilityAt(1, ListUrlBuilder.MODE_WHATS_HOT != builder.getMode());
+
         // Update normal search mode
         mSearchLayout.setNormalSearchMode(builder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION
                 ? R.id.search_subscription_search
