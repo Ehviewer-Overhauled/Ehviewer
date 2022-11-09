@@ -127,6 +127,11 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         doRefresh()
     }
 
+    fun goToPage(page: Int) {
+        jumpTo = page.toString()
+        doRefresh()
+    }
+
     companion object {
         private const val KEY_DATA_MAP = "data_map"
         private const val KEY_MAX_GID = "max_gid"
