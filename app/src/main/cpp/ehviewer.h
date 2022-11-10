@@ -30,6 +30,6 @@
 
 #define madvise_log_if_error(addr, len, advice) \
 if (madvise(addr, len, advice))                 \
-    LOGE("%s%p%s%zu%s%s%s", "madvise addr:", addr, "len:", len, "with MADV_WILLNEED failed with error: ", strerror(errno), ", Ignored")
+    LOGE("%s%p%s%zu%s%d%s%s%s", "madvise addr:", addr, "len:", len, "with advice ", advice, " failed with error: ", strerror(errno), ", Ignored")
 
 #endif /* EHVIEWER_EHVIEWER_H */
