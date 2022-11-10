@@ -120,14 +120,9 @@
 
     <string name="search_tip">Búsqueda normal: Solo busca.\n\nBúsqueda de suscripción: Buscar etiquetas suscriptas.n\nUploader especifico: Listar de galerías subidas por el uploader. Otras opciones serán ignoradas.\n\nEtiquetas específicas: Listar las galerías que contienen la etiqueta. Solo se acepta una etiqueta. Otras opciones serán ignoradas.</string>
 
-    <string name="search_sname">Buscar galerías</string>
-    <string name="search_stags">Buscar etiquetas de galería</string>
-    <string name="search_sdesc">Buscar descripción de galería</string>
-    <string name="search_storr">Buscar nombres de archivo torrent</string>
-    <string name="search_sto">Mostrar solo galerías con torrents</string>
-    <string name="search_sdt1">Buscar etiquetas Low-Power</string>
-    <string name="search_sdt2">Buscar etiquetas pobres</string>
     <string name="search_sh">Mostrar galerías borradas</string>
+    <string name="search_sdt">Buscar etiquetas Low-Power</string>
+    <string name="search_sto">Mostrar solo galerías con torrents</string>
     <string name="search_sr">Valoración mínima:</string>
     <string name="search_subscription_search">Búsqueda de etiquetas suscritas</string>
     <string name="select_image">Seleccionar imagen</string>

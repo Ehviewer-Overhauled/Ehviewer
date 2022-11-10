@@ -137,14 +137,9 @@
 
     <string name="search_tip">일반 검색: 그냥 검색합니다.\n\n업로더 지정: 해당 업로더가 업로드한 갤러리를 검색합니다. 다른 옵션은 무시됩니다.\n\n태그 지정: 해당 태그를 포함한 갤러리를 검색합니다. 하나의 태그만 지정할 수 있으며, 다른 옵션은 무시됩니다.</string>
 
-    <string name="search_sname">갤러리 검색</string>
-    <string name="search_stags">갤러래 태그 검색</string>
-    <string name="search_sdesc">갤러리 설명 검색</string>
-    <string name="search_storr">토렌트 파일 이름 검색</string>
-    <string name="search_sto">토렌트 파일이 있는 갤러리만 검색</string>
-    <string name="search_sdt1">Low-Power 태그 검색</string>
-    <string name="search_sdt2">Downvoted 태그 검색</string>
     <string name="search_sh">Expunged 갤러리 표시</string>
+    <string name="search_sdt">Low-Power 태그 검색</string>
+    <string name="search_sto">토렌트 파일이 있는 갤러리만 검색</string>
     <string name="search_sr">최소 평점:</string>
 
     <string name="select_image">이미지 선택</string>

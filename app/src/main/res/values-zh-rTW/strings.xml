@@ -146,14 +146,9 @@
 
     <string name="search_tip">一般搜尋：就是搜尋。\n\n訂閱搜尋：在訂閱中搜尋。\n\n指定上傳者：列出該上傳者上傳的圖庫。其他選項會被忽略。\n\n指定標籤：列出含有該標籤的圖庫。其他選項會被忽略。</string>
 
-    <string name="search_sname">搜尋圖庫</string>
-    <string name="search_stags">搜尋圖庫的標籤</string>
-    <string name="search_sdesc">搜尋圖庫的描述</string>
-    <string name="search_storr">搜尋種子檔名</string>
+    <string name="search_sh">只顯示已被移除的圖庫</string>
+    <string name="search_sdt">只搜尋標籤:低願力</string>
     <string name="search_sto">只顯示有種子的圖庫</string>
-    <string name="search_sdt1">搜尋標籤:低願力</string>
-    <string name="search_sdt2">搜尋標籤:被噓爆的</string>
-    <string name="search_sh">顯示已被移除的的圖庫</string>
     <string name="search_sr">最低評分：</string>
     <string name="search_sp">頁數：</string>
     <string name="search_sp_to">到</string>
