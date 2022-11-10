@@ -135,14 +135,9 @@
 
     <string name="search_tip">Recherche normale : faire recherche.\n\nRecherche dans les tags suivis : seulement rechercher dans les tags suivis.\n\nSpécifer un uploader : faire la liste des galeries mises en ligne par l\'uploader spécifié. Autres options sont ignorées.\n\nSpécifier un tag : faire la liste des galeries qui contiennent le tag spécifié. Vous ne pouvez spécifier qu\'un tag. Autres options sont ignorées.</string>
 
-    <string name="search_sname">Chercher une galerie</string>
-    <string name="search_stags">Chercher tags galerie</string>
-    <string name="search_sdesc">Chercher la description galerie</string>
-    <string name="search_storr">Chercher un nom de fiche torrent</string>
-    <string name="search_sto">Seulement montrer galeries avec des fiches torrent</string>
-    <string name="search_sdt1">Chercher des tags faibles</string>
-    <string name="search_sdt2">Chercher des tags peu acceptés</string>
     <string name="search_sh">Montrer les galeries supprimées</string>
+    <string name="search_sdt">Chercher des tags faibles</string>
+    <string name="search_sto">Seulement montrer galeries avec des fiches torrent</string>
     <string name="search_sr">Minimum note :</string>
     <string name="search_sp">Pages : </string>
     <string name="search_sp_to">à</string>
