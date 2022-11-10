@@ -32,12 +32,8 @@
 #include <archive_entry.h>
 
 #define LOG_TAG "libarchive_wrapper"
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG ,__VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG ,__VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG ,__VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG ,__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG ,__VA_ARGS__)
-#define LOGF(...) __android_log_print(ANDROID_LOG_FATAL, LOG_TAG ,__VA_ARGS__)
+
+#include "ehviewer.h"
 
 typedef struct {
     int using;
@@ -53,7 +49,7 @@ static archive_ctx **ctx_pool;
 static bool need_encrypt = false;
 static char *passwd = NULL;
 static void *archiveAddr = NULL;
-static jlong archiveSize = 0;
+static size_t archiveSize = 0;
 
 const char supportExt[9][6] = {
         "jpeg",
@@ -199,15 +195,16 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
 
 JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd, jlong size) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
     archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (archiveAddr == MAP_FAILED) {
-        LOGE("%s%d", "mmap64 failed with errno ", errno);
+        LOGE("%s%s", "mmap64 failed with error ", strerror(errno));
         return 0;
     }
     archiveSize = size;
+    madvise_log_if_error(archiveAddr, archiveSize, MADV_WILLNEED);
     pthread_mutex_init(&ctx_lock, 0);
     ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
     if (!ctx_pool) {
@@ -235,25 +232,27 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
                 need_encrypt = false;
         }
 
-        // madvise for readahead optimization
         int format = archive_format(ctx->arc);
         switch (format) {
             case ARCHIVE_FORMAT_ZIP:
-            case ARCHIVE_FORMAT_RAR:
             case ARCHIVE_FORMAT_RAR_V5:
-                madvise(archiveAddr, archiveSize, MADV_SEQUENTIAL | MADV_WILLNEED);
+                madvise_log_if_error(archiveAddr, archiveSize, MADV_SEQUENTIAL);
+                break;
+            case ARCHIVE_FORMAT_7ZIP: // Seek is bad
+                madvise_log_if_error(archiveAddr, archiveSize, MADV_RANDOM);
                 break;
             default:;
         }
     }
+
     archive_release_ctx(ctx);
     return r;
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint index) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -281,8 +280,8 @@ Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint 
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     for (int i = 0; i < CTX_POOL_SIZE; i++)
         archive_release_ctx(ctx_pool[i]);
     free(passwd);
@@ -295,14 +294,14 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
 
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *env, jobject thiz) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     return need_encrypt;
 }
 
 JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jstring str) {
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(thiz);
     struct archive_entry *entry;
     archive_ctx *ctx;
     jboolean ret = true;
@@ -332,8 +331,8 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jst
 
 JNIEXPORT jstring JNICALL
 Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -346,8 +345,8 @@ Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint in
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint index, jint fd) {
-    (void) env; /* UNUSED */
-    (void) thiz; /* UNUSED */
+    EH_UNUSED(env);
+    EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
