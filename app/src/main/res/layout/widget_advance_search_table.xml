@@ -26,38 +26,9 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/advance_search_table_item_margin"
             android:layout_weight="1"
-            android:checked="true"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:text="@string/search_sname" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_weight="1"
-            android:checked="true"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/search_stags" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/search_sdesc" />
+            android:text="@string/search_sh" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:layout_width="0dp"
@@ -67,7 +38,7 @@
             android:layout_weight="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:text="@string/search_storr" />
+            android:text="@string/search_sdt" />
     </LinearLayout>
 
     <LinearLayout
@@ -85,43 +56,6 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="@string/search_sto" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/search_sdt1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/advance_search_table_item_margin"
-        android:layout_marginBottom="@dimen/advance_search_table_item_margin">
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="@dimen/advance_search_table_item_margin"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/search_sdt2" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/advance_search_table_item_margin"
-            android:layout_weight="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/search_sh" />
     </LinearLayout>
 
     <LinearLayout

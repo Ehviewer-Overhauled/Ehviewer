@@ -266,36 +266,16 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                     enableAdvanceSearch = true
                 }
 
-                "f_sname" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SNAME
+                "f_sh" -> if ("on" == value) {
+                    advanceSearch = advanceSearch or AdvanceSearchTable.SH
                 }
 
-                "f_stags" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.STAGS
-                }
-
-                "f_sdesc" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SDESC
-                }
-
-                "f_storr" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.STORR
+                "f_sdt" -> if ("on" == value) {
+                    advanceSearch = advanceSearch or AdvanceSearchTable.SDT
                 }
 
                 "f_sto" -> if ("on" == value) {
                     advanceSearch = advanceSearch or AdvanceSearchTable.STO
-                }
-
-                "f_sdt1" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SDT1
-                }
-
-                "f_sdt2" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SDT2
-                }
-
-                "f_sh" -> if ("on" == value) {
-                    advanceSearch = advanceSearch or AdvanceSearchTable.SH
                 }
 
                 "f_sfl" -> if ("on" == value) {
@@ -385,26 +365,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 // Advance search
                 if (advanceSearch != -1) {
                     ub.addQuery("advsearch", "1")
-                    if (advanceSearch and AdvanceSearchTable.SNAME != 0) ub.addQuery(
-                        "f_sname",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STAGS != 0) ub.addQuery(
-                        "f_stags",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.SDESC != 0) ub.addQuery(
-                        "f_sdesc",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STORR != 0) ub.addQuery(
-                        "f_storr",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STO != 0) ub.addQuery("f_sto", "on")
-                    if (advanceSearch and AdvanceSearchTable.SDT1 != 0) ub.addQuery("f_sdt1", "on")
-                    if (advanceSearch and AdvanceSearchTable.SDT2 != 0) ub.addQuery("f_sdt2", "on")
                     if (advanceSearch and AdvanceSearchTable.SH != 0) ub.addQuery("f_sh", "on")
+                    if (advanceSearch and AdvanceSearchTable.SDT != 0) ub.addQuery("f_sdt", "on")
+                    if (advanceSearch and AdvanceSearchTable.STO != 0) ub.addQuery("f_sto", "on")
                     if (advanceSearch and AdvanceSearchTable.SFL != 0) ub.addQuery("f_sfl", "on")
                     if (advanceSearch and AdvanceSearchTable.SFU != 0) ub.addQuery("f_sfu", "on")
                     if (advanceSearch and AdvanceSearchTable.SFT != 0) ub.addQuery("f_sft", "on")
@@ -497,26 +460,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 }
                 if (advanceSearch != -1) {
                     ub.addQuery("advsearch", "1")
-                    if (advanceSearch and AdvanceSearchTable.SNAME != 0) ub.addQuery(
-                        "f_sname",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STAGS != 0) ub.addQuery(
-                        "f_stags",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.SDESC != 0) ub.addQuery(
-                        "f_sdesc",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STORR != 0) ub.addQuery(
-                        "f_storr",
-                        "on"
-                    )
-                    if (advanceSearch and AdvanceSearchTable.STO != 0) ub.addQuery("f_sto", "on")
-                    if (advanceSearch and AdvanceSearchTable.SDT1 != 0) ub.addQuery("f_sdt1", "on")
-                    if (advanceSearch and AdvanceSearchTable.SDT2 != 0) ub.addQuery("f_sdt2", "on")
                     if (advanceSearch and AdvanceSearchTable.SH != 0) ub.addQuery("f_sh", "on")
+                    if (advanceSearch and AdvanceSearchTable.SDT != 0) ub.addQuery("f_sdt", "on")
+                    if (advanceSearch and AdvanceSearchTable.STO != 0) ub.addQuery("f_sto", "on")
                     if (advanceSearch and AdvanceSearchTable.SFL != 0) ub.addQuery("f_sfl", "on")
                     if (advanceSearch and AdvanceSearchTable.SFU != 0) ub.addQuery("f_sfu", "on")
                     if (advanceSearch and AdvanceSearchTable.SFT != 0) ub.addQuery("f_sft", "on")
