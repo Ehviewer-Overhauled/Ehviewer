@@ -98,14 +98,9 @@
     <string name="search_specify_uploader">Einen Uploader spezifizieren</string>
     <string name="search_specify_tag">Ein Etikett spezifizieren</string>
     <string name="search_enable_advance">Erweitere Optionen aktivieren</string>
-    <string name="search_sname">Nach Galerie suchen</string>
-    <string name="search_stags">Nach Galerie-Etikett suchen</string>
-    <string name="search_sdesc">Nach Galeriebeschreibungen suchen</string>
-    <string name="search_storr">Nach Torrentdateien suchen</string>
-    <string name="search_sto">Nur die Galerien mit Torrentdateien anzeigen</string>
-    <string name="search_sdt1">Nach unwichtigen Etiketten suchen</string>
-    <string name="search_sdt2">Nach unerwünschten Etiketten suchen</string>
     <string name="search_sh">Gelöschte Galerien anzeigen</string>
+    <string name="search_sdt">Nach unwichtigen Etiketten suchen</string>
+    <string name="search_sto">Nur die Galerien mit Torrentdateien anzeigen</string>
     <string name="search_sr">Mindestpunktzahl: </string>
     <string name="search_sp">Seiten: </string>
     <string name="search_sp_to">zu</string>

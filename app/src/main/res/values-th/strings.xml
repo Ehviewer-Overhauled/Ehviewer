@@ -137,14 +137,9 @@
 
     <string name="search_tip">ค้นหาแบบธรรมดา: ค้นหาแบบง๊ายง่าย\n\nระบุผู้อัพโหลด: ค้นหาแกลเลอรี่ที่อัพโหลดโดยระบุชื่อผู้ใช้ของคนอัพโหลด โดยตัวเลือกอื่นๆจะถูกข้ามไป\n\nระบุป้ายกำกับ: ค้นหาแกลเลอรี่ที่ถูกใส่ป้ายกำกับหรือแท็กไว้ในแต่ละแกลเลอรี่ ระบุได้เพียงหนึ่งป้ายกำกับ ตัวเลือกอื่นๆจะถูกข้ามไป</string>
 
-    <string name="search_sname">ค้นหาแกลเลอรี่</string>
-    <string name="search_stags">ค้นหาแท็กของแกลเลอรี่</string>
-    <string name="search_sdesc">ค้นหาคำอธิบายของแกลเลอรี่</string>
-    <string name="search_storr">ค้นหาชื่อไฟล์ Torrent</string>
-    <string name="search_sto">แสดงผลเฉพาะแกลเลอรี่ที่มีไฟล์ Torrents</string>
-    <string name="search_sdt1">ค้นหาแท็กที่ไม่โด่งดัง</string>
-    <string name="search_sdt2">ค้นหาแท็กที่ถูกโหวตไม่เห็นด้วย</string>
     <string name="search_sh">แสดงแกลเลอรี่ที่ถูกลบออก</string>
+    <string name="search_sdt">ค้นหาแท็กที่ไม่โด่งดัง</string>
+    <string name="search_sto">แสดงผลเฉพาะแกลเลอรี่ที่มีไฟล์ Torrents</string>
     <string name="search_sr">เรตติ้งขั้นต่ำ:</string>
 
     <string name="select_image">เลือกรูปภาพ</string>
