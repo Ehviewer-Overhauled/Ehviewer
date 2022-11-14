@@ -28,7 +28,7 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_horizontal" />
 
-    <com.google.android.material.slider.Slider
+    <com.hippo.app.HapticSlider
         android:id="@+id/slider"
         android:layout_width="0dp"
         android:layout_height="48dp"
