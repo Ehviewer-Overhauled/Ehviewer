@@ -64,6 +64,22 @@
                 app:icon="@drawable/v_heart_outline_primary_x48" />
 
             <Button
+                android:id="@+id/similar"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/similar_gallery"
+                app:icon="@drawable/v_similar_primary_x48" />
+
+            <Button
+                android:id="@+id/search_cover"
+                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_cover"
+                app:icon="@drawable/v_file_find_primary_x48" />
+
+            <Button
                 android:id="@+id/share"
                 style="@style/Widget.Material3.Button.IconButton.Outlined"
                 android:layout_width="wrap_content"
@@ -85,22 +101,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/archive"
                 app:icon="@drawable/v_archive_primary_x48" />
-
-            <Button
-                android:id="@+id/similar"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/similar_gallery"
-                app:icon="@drawable/v_similar_primary_x48" />
-
-            <Button
-                android:id="@+id/search_cover"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_cover"
-                app:icon="@drawable/v_file_find_primary_x48" />
 
         </LinearLayout>
     </HorizontalScrollView>
