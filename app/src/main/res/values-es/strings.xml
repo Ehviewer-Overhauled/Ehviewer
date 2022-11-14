@@ -83,7 +83,6 @@
     <string name="skip_signing_in">Saltar inicio de sesión</string>
     <string name="sign_in_failed">Inicio de sesión fallido</string>
     <string name="sign_in_failed_plain">Tal ves sea debido a un error de actualización de el sitio web o algo mal sucedió. Puedes intentar iniciar sesión vía WebView, ingresar una cookie o saltar el inicio de sesión presionando el botón de abajo.\nEs posible que te salga un \"Panda Triste\" después de saltar el inicio de sesión. Intente \"Ingresar vía cookies\" primero si ha iniciado sesión en la versión 0.6.x de HeViewer.</string>
-    <string name="press_twice_exit">Presione una vez más para salir</string>
     <string name="content_layout_restore_tip">Pulsar para reintentar</string>
     <string name="write_rationale">EhViewer solicitará el permiso WRITE_EXTERNAL_STORAGE para descargar galerías. ¿Desea conceder el permiso?</string>
     <string name="you_rejected_me">Me has rechazado :(</string>
