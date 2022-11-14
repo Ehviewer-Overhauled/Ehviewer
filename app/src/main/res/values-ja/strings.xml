@@ -89,7 +89,6 @@
     <string name="skip_signing_in">ログインをスキップ</string>
     <string name="sign_in_failed">ログインに失敗しました。</string>
     <string name="sign_in_failed_plain">このエラーの原因は、ウェブサイトがメンテ中であることか、または不明なエラーが発生したことである可能性があります。ログインボタンの下でWebでログインするか、Cookieを入力してログインするか、またはログインをスキップしてみてください。ログインをスキップすると「Sad Panda」エラーが発生することがあります。0.6.xバージョンでログインした場合、Cookieでログインすることをおすすめします。</string>
-    <string name="press_twice_exit">もう一度押して終了します</string>
     <string name="content_layout_restore_tip">クリックしてもう一度試す</string>
     <string name="write_rationale">EhViewerはギャラリーをダウンロードするためのWRITE_EXTERNAL_STORAGE権限を請求します。許可してもらえないでしょうか？</string>
     <string name="you_rejected_me">痛い</string>
