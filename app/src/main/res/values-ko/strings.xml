@@ -95,7 +95,6 @@
     <string name="skip_signing_in">로그인 없이 사용</string>
     <string name="sign_in_failed">로그인 실패</string>
     <string name="sign_in_failed_plain">뭔가가 잘못되었습니다. 웹사이트가 업데이트 중일 수 있습니다. WebView 또는 쿠키를 사용하여 로그인하거나 아래 버튼을 눌러 로그인을 건너뛸 수 있습니다. 그러나 로그인을 건너뛰면 "슬픈 팬더"를 보게 될 것입니다.</string>
-    <string name="press_twice_exit">한 번 더 누르면 종료됩니다.</string>
     <string name="content_layout_restore_tip">다시 시도하려면 누르기</string>
     <string name="write_rationale">앱이 갤러리를 다운로드하려면 WRITE_EXTERNAL_STORAGE 권한이 필요합니다. 권한을 허용하시겠습니까?</string>
     <string name="you_rejected_me">안돼요</string>
