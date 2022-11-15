@@ -341,6 +341,8 @@ public class FavoritesScene extends BaseScene implements
             mSearchBar.setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName));
         }
 
+        mFabLayout.setSecondaryFabVisibilityAt(1, favCat != FavListUrlBuilder.FAV_CAT_LOCAL);
+
         mOldFavCat = favCatName;
         mOldKeyword = keyword;
 
