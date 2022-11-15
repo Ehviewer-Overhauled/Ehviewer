@@ -833,12 +833,14 @@ public class FavoritesScene extends BaseScene implements
             }
 
             updateSearchBar();
-            int pages = 0;
             assert mUrlBuilder != null;
-            if (FavListUrlBuilder.isValidFavCat(mUrlBuilder.getFavCat()))
-                pages = CommonOperations.getPagesForFounds(mFavCountArray[mUrlBuilder.getFavCat()], 50);
-            else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_ALL)
-                pages = CommonOperations.getPagesForFounds(mFavCountSum, 50);
+
+            int pages = 0;
+            if (result.nextPage == null)
+                pages = mHelper.pgCounter + 1;
+            else
+                pages = Integer.MAX_VALUE;
+
             mHelper.nextPg = result.nextPage;
             mHelper.onGetPageData(taskId, pages, mHelper.pgCounter + 1, result.galleryInfoList);
 
