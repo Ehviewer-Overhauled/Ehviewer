@@ -51,8 +51,8 @@ public class GalleryListParser {
     private static final Pattern PATTERN_THUMB_SIZE = Pattern.compile("height:(\\d+)px;width:(\\d+)px");
     private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("background-color:rgba\\((\\d+),(\\d+),(\\d+),");
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
-
-    private static final Pattern PATTERN_GETINT = Pattern.compile("[^0-9]");
+    private static final Pattern PATTERN_PREV_PAGE = Pattern.compile("prev=(\\d+)");
+    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+)");
 
     private static final String[][] FAVORITE_SLOT_RGB = new String[][]{
             new String[]{"0", "0", "0"},
@@ -298,21 +298,33 @@ public class GalleryListParser {
         return gi;
     }
 
-    private static int getInt(String str) {
-        var m = PATTERN_GETINT.matcher(str);
-        return Integer.parseInt(m.replaceAll("").trim());
-    }
-
     public static Result parse(@NonNull String body) throws Exception {
+
         Result result = new Result();
         Document d = Jsoup.parse(body);
-
-        result.founds = Integer.MAX_VALUE;
-        result.noWatchedTags = body.contains("<p>You do not have any watched tags");
-        if (body.contains("No hits found</p>")) {
-            result.founds = 0;
-            result.galleryInfoList = Collections.EMPTY_LIST;
-            return result;
+        try {
+            Element prev = d.getElementById("uprev");
+            Element next = d.getElementById("unext");
+            assert prev != null;
+            assert next != null;
+            Matcher matcherPrev = PATTERN_PREV_PAGE.matcher(prev.attr("href"));
+            Matcher matcherNext = PATTERN_NEXT_PAGE.matcher(next.attr("href"));
+            if (matcherPrev.find()) result.prevGid = NumberUtils.parseIntSafely(matcherPrev.group(1), 0);
+            if (matcherNext.find()) result.nextGid = NumberUtils.parseIntSafely(matcherNext.group(1), 0);
+            result.founds = Integer.MAX_VALUE;
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            result.noWatchedTags = body.contains("<p>You do not have any watched tags");
+            if (body.contains("No hits found</p>")) {
+                result.founds = 0;
+                //noinspection unchecked
+                result.galleryInfoList = Collections.EMPTY_LIST;
+                return result;
+            } else if (d.getElementsByClass("ptt").isEmpty()) {
+                result.founds = 1;
+            } else {
+                result.founds = Integer.MAX_VALUE;
+            }
         }
 
         try {
@@ -348,6 +360,8 @@ public class GalleryListParser {
 
     public static class Result {
         public int founds;
+        public int prevGid;
+        public int nextGid;
         public boolean noWatchedTags;
         public List<GalleryInfo> galleryInfoList;
     }
