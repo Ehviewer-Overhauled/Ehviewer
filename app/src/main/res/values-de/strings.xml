@@ -99,7 +99,6 @@
     <string name="search_specify_tag">Ein Etikett spezifizieren</string>
     <string name="search_enable_advance">Erweitere Optionen aktivieren</string>
     <string name="search_sh">Gelöschte Galerien anzeigen</string>
-    <string name="search_sdt">Nach unwichtigen Etiketten suchen</string>
     <string name="search_sto">Nur die Galerien mit Torrentdateien anzeigen</string>
     <string name="search_sr">Mindestpunktzahl: </string>
     <string name="search_sp">Seiten: </string>
@@ -111,7 +110,6 @@
     <string name="select_image">Bild wählen</string>
     <string name="search_uss">Ähnlichkeitscan aktivieren</string>
     <string name="search_osc">Nur nach Umschläge suchen</string>
-    <string name="search_se">Die gelöschten Galerien anzeigen</string>
     <string name="select_image_first">Wähle ein Bild</string>
     <string name="add_to_favourites">Zu den Favoriten hinzufügen</string>
     <string name="stop_downloading">Download stoppen</string>

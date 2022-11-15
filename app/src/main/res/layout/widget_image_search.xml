@@ -72,17 +72,6 @@
 
         <TableRow>
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/search_se"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/advance_search_table_item_margin"
-                android:layout_weight="1"
-                android:checked="false"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:text="@string/search_se" />
-
             <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
