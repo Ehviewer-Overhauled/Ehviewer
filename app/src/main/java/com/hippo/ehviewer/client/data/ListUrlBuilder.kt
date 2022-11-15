@@ -36,8 +36,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
     @get:Mode
     @Mode
     var mode = MODE_NORMAL
-    private var mNextGid = 0
     private var mPrevGid = 0
+    private var mNextGid = 0
     private var mJumpTo: String? = null
     var category = EhUtils.NONE
     private var mKeyword: String? = null
@@ -54,8 +54,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
     constructor()
     protected constructor(parcel: Parcel) {
         mode = parcel.readInt()
-        mNextGid = parcel.readInt()
         mPrevGid = parcel.readInt()
+        mNextGid = parcel.readInt()
         mJumpTo = parcel.readString()
         this.category = parcel.readInt()
         mKeyword = parcel.readString()
@@ -72,8 +72,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
 
     fun reset() {
         mode = MODE_NORMAL
-        mNextGid = 0
         mPrevGid = 0
+        mNextGid = 0
         mJumpTo = null
         this.category = EhUtils.NONE
         mKeyword = null
@@ -94,6 +94,10 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         } catch (e: CloneNotSupportedException) {
             throw IllegalStateException(e)
         }
+    }
+
+    fun setPrevGid(prevGid: Int) {
+        mPrevGid = prevGid
     }
 
     fun setNextGid(nextGid: Int) {
@@ -117,8 +121,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
      */
     fun set(lub: ListUrlBuilder) {
         mode = lub.mode
-        mNextGid = lub.mNextGid
         mPrevGid = lub.mPrevGid
+        mNextGid = lub.mNextGid
         mJumpTo = lub.mJumpTo
         this.category = lub.category
         mKeyword = lub.mKeyword
@@ -349,14 +353,14 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 }
                 mJumpTo?.let {
                     ub.addQuery("seek", mJumpTo!!)
-                    mNextGid = 0
                     mPrevGid = 0
-                }
-                if (mNextGid != 0) {
-                    ub.addQuery("next", mNextGid)
+                    mNextGid = 0
                 }
                 if (mPrevGid != 0) {
                     ub.addQuery("prev", mPrevGid)
+                }
+                if (mNextGid != 0) {
+                    ub.addQuery("next", mNextGid)
                 }
                 // Advance search
                 if (advanceSearch != -1) {
@@ -389,6 +393,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 } catch (e: UnsupportedEncodingException) {
                     // Empty
                 }
+                if (mPrevGid != 0) {
+                    sb.append("?prev=").append(mPrevGid)
+                }
                 if (mNextGid != 0) {
                     sb.append("?next=").append(mNextGid)
                 }
@@ -402,6 +409,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                     sb.append(URLEncoder.encode(mKeyword, "UTF-8"))
                 } catch (e: UnsupportedEncodingException) {
                     // Empty
+                }
+                if (mPrevGid != 0) {
+                    sb.append("?prev=").append(mPrevGid)
                 }
                 if (mNextGid != 0) {
                     sb.append("?next=").append(mNextGid)
@@ -447,11 +457,11 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 if (mSHash != null) {
                     ub.addQuery("f_shash", mSHash!!)
                 }
-                if (mNextGid != 0) {
-                    ub.addQuery("next", mNextGid)
-                }
                 if (mPrevGid != 0) {
                     ub.addQuery("prev", mPrevGid)
+                }
+                if (mNextGid != 0) {
+                    ub.addQuery("next", mNextGid)
                 }
                 if (advanceSearch != -1) {
                     ub.addQuery("advsearch", "1")
@@ -481,8 +491,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(mode)
-        dest.writeInt(mNextGid)
         dest.writeInt(mPrevGid)
+        dest.writeInt(mNextGid)
         dest.writeString(mJumpTo)
         dest.writeInt(this.category)
         dest.writeString(mKeyword)

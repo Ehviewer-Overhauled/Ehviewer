@@ -861,7 +861,7 @@ public final class GalleryListScene extends BaseScene
         }
 
         if (ListUrlBuilder.MODE_TOPLIST == mUrlBuilder.getMode()) {
-            final int page = (mHelper.getPageForTop() == 0 ? mHelper.pgCounter : mHelper.getPageForTop()) + 1;
+            final int page = mHelper.getPageForTop() + 1;
             final int pages = 200;
             String hint = getString(R.string.go_to_hint, page, pages);
             final EditTextDialogBuilder builder = new EditTextDialogBuilder(context, null, hint);
@@ -878,12 +878,12 @@ public final class GalleryListScene extends BaseScene
                 String text = builder.getText().trim();
                 int goTo;
                 try {
-                    goTo = Integer.parseInt(text);
+                    goTo = Integer.parseInt(text) - 1;
                 } catch (NumberFormatException e) {
                     builder.setError(getString(R.string.error_invalid_number));
                     return;
                 }
-                if (goTo <= 0 || goTo > pages) {
+                if (goTo < 0 || goTo >= pages) {
                     builder.setError(getString(R.string.error_out_of_range));
                     return;
                 }
@@ -1405,7 +1405,16 @@ public final class GalleryListScene extends BaseScene
                     ? R.string.gallery_list_empty_hit_subscription
                     : R.string.gallery_list_empty_hit);
             mHelper.setEmptyString(emptyString);
-            mHelper.onGetPageData(taskId, CommonOperations.getPagesForFounds(result.founds, 25), mHelper.pgCounter + 1, result.galleryInfoList);
+
+            int pages = 0;
+            if (mIsTopList)
+                pages = 200;
+            else if (result.nextGid == 0)
+                pages = mHelper.pgCounter + 1;
+            else
+                pages = result.founds;
+
+            mHelper.onGetPageData(taskId, pages, mHelper.pgCounter + 1, result.galleryInfoList);
         }
     }
 
@@ -1741,7 +1750,7 @@ public final class GalleryListScene extends BaseScene
                 mUrlBuilder.setNextGid(0);
 
             if (jumpTo != null && mIsTopList) {
-                pgCounter = Integer.parseInt(jumpTo) - 1;
+                pgCounter = Integer.parseInt(jumpTo);
                 mUrlBuilder.setNextGid(pgCounter);
             }
             mUrlBuilder.setJumpTo(jumpTo);
