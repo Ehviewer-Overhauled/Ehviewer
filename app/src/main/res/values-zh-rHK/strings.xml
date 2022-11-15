@@ -146,7 +146,6 @@
     <string name="search_tip">一般搜索：就是搜索。\n\n訂閲搜素：在訂閲中搜索。\n\n指定上傳者：列出該上傳者上傳的畫廊。其他選項會被忽略。\n\n指定標籤：列出含有該標籤的畫廊。其他選項會被忽略。</string>
 
     <string name="search_sh">僅顯示被刪除的畫廊</string>
-    <string name="search_sdt">僅搜索低願力標籤</string>
     <string name="search_sto">僅顯示有種子的畫廊</string>
     <string name="search_sr">最低評分：</string>
     <string name="search_sp">頁數：</string>
@@ -159,7 +158,6 @@
     <string name="select_image">選擇圖片</string>
     <string name="search_uss">使用相似搜索</string>
     <string name="search_osc">只搜索封面</string>
-    <string name="search_se">顯示被刪除的畫廊</string>
     <string name="select_image_first">請先選擇圖片</string>
 
     <string name="add_to_favourites">收藏</string>

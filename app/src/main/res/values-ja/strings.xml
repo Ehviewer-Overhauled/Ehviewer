@@ -133,7 +133,6 @@
     <string name="search_tip">普通検索：検索します。\n\n購読検索：購読しているタグで検索します。\n\nアップローダを検索：このアップローダーがアップロードしたギャラリーをリストします。他のオプションは無視されます。\n\nタグを検索：指定したタグを含むギャラリーをリストします。他のオプションは無視されます。</string>
 
     <string name="search_sh">削除済みのギャラリーを表示</string>
-    <string name="search_sdt">低希望タグを検索</string>
     <string name="search_sto">Torrentのあるギャラリーのみを表示</string>
     <string name="search_sr">評価の下限：</string>
     <string name="search_sp">ページ：</string>
@@ -147,7 +146,6 @@
     <string name="select_image">画像を選択</string>
     <string name="search_uss">類似検索を有効化</string>
     <string name="search_osc">カバーのみを検索</string>
-    <string name="search_se">削除済みのギャラリーを表示</string>
     <string name="select_image_first">画像を選択してください</string>
 
     <string name="add_to_favourites">お気に入りに追加</string>

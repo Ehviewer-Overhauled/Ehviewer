@@ -1154,7 +1154,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                 lub.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
                 lub.setImagePath(temp.getPath());
                 lub.setUseSimilarityScan(true);
-                lub.setShowExpunged(true);
                 GalleryListScene.startScene(this, lub);
             }
         } catch (FileNotFoundException e) {
