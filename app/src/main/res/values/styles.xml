@@ -15,10 +15,8 @@
   -->
 
 <resources>
-
     <style name="AppTheme" parent="Base.AppTheme" />
-
-    <!-- Progress View -->
+    
     <style name="ProgressView">
         <item name="android:indeterminate">true</item>
         <item name="android:minWidth">48dp</item>
@@ -55,4 +53,13 @@
     </style>
 
     <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium" />
+
+    <style name="Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="materialThemeOverlay">@style/SnackbarTheme</item>
+        <item name="actionTextColorAlpha">1</item>
+    </style>
+
+    <style name="SnackbarButton" parent="Widget.Material3.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
+    </style>
 </resources>

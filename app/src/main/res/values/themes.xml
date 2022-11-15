@@ -15,11 +15,6 @@
   -->
 
 <resources>
-
-    <!-- ========== -->
-    <!-- Base Theme -->
-    <!-- ========== -->
-
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="dividerColor">@color/divider</item>
         <item name="drawableColorSecondary">?attr/colorOnSurface</item>
@@ -32,6 +27,8 @@
         <item name="windowNoTitle">true</item>
         <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
+        <item name="snackbarStyle">@style/Snackbar</item>
+        <item name="snackbarButtonStyle">@style/SnackbarButton</item>
         <item name="android:forceDarkAllowed">false</item>
     </style>
 
@@ -46,12 +43,13 @@
         <item name="drawableColorThemePrimary">@color/primary_drawable_black</item>
     </style>
 
-    <!-- ============ -->
-    <!-- Widget Theme -->
-    <!-- ============ -->
-
     <style name="RatingBarTheme" parent="ThemeOverlay.Material3">
         <item name="colorControlNormal">@color/yellow_800</item>
         <item name="colorControlActivated">@color/yellow_800</item>
+    </style>
+
+    <style name="SnackbarTheme" parent="ThemeOverlay.Material3.Snackbar">
+        <item name="colorPrimary">?attr/colorPrimaryInverse</item>
+        <item name="colorOnSurface">?attr/colorSurfaceInverse</item>
     </style>
 </resources>
