@@ -108,12 +108,11 @@ public abstract class BaseScene extends SceneFragment {
         }
     }
 
-    public Unit showTip(@StringRes int id, int length) {
+    public void showTip(@StringRes int id, int length) {
         FragmentActivity activity = getActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).showTip(id, length);
         }
-        return null;
     }
 
     public boolean needShowLeftDrawer() {

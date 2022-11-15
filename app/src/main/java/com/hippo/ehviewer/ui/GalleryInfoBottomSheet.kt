@@ -30,7 +30,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.ui.scene.BaseScene.LENGTH_SHORT
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 
@@ -127,13 +126,9 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
             } else {
                 requireContext().getClipboardManager().addTextToClipboard(
                     mValues[position],
-                    false
-                ) {
-                    (requireActivity() as MainActivity).showTip(
-                        R.string.copied_to_clipboard,
-                        LENGTH_SHORT
-                    )
-                }
+                    false,
+                    activity
+                )
                 if (position == INDEX_URL) {
                     // Save it to avoid detect the gallery
                     Settings.putClipboardTextHashCode(mValues[position].hashCode())

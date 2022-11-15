@@ -354,7 +354,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                     }
                     int id = menuId.get(which);
                     if (id == R.id.copy) {
-                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), comment.comment, false, () -> showTip(R.string.copied_to_clipboard, LENGTH_SHORT));
+                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), comment.comment, false, getActivity());
                     } else if (id == R.id.vote_up) {
                         voteComment(comment.id, 1);
                     } else if (id == R.id.vote_down) {

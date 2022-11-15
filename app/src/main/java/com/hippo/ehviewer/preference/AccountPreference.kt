@@ -81,9 +81,7 @@ class AccountPreference @JvmOverloads constructor(
         super.onPrepareDialogBuilder(builder)
         if (message != null) {
             builder.setNeutralButton(R.string.settings_eh_identity_cookies_copy) { dialog: DialogInterface?, which: Int ->
-                context.getClipboardManager().addTextToClipboard(message, true) {
-                    mActivity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
-                }
+                context.getClipboardManager().addTextToClipboard(message, true, mActivity)
                 this@AccountPreference.onClick(dialog, which)
             }
         }

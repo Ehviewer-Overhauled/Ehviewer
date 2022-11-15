@@ -256,7 +256,7 @@ public final class MainActivity extends StageActivity
                     String url = intent.getData().toString();
                     new EditTextDialogBuilder(this, url, "")
                             .setTitle(R.string.error_cannot_parse_the_url)
-                            .setPositiveButton(android.R.string.copy, (dialog, which) -> ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(this), url, false, () -> null))
+                            .setPositiveButton(android.R.string.copy, (dialog, which) -> ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(this), url, false, this))
                             .show();
                 }
             }
