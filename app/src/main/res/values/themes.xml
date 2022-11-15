@@ -15,6 +15,7 @@
   -->
 
 <resources>
+
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="dividerColor">@color/divider</item>
         <item name="drawableColorSecondary">?attr/colorOnSurface</item>
@@ -30,6 +31,7 @@
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
         <item name="android:forceDarkAllowed">false</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
     <style name="ThemeOverlay" />
@@ -51,5 +53,9 @@
     <style name="SnackbarTheme" parent="ThemeOverlay.Material3.Snackbar">
         <item name="colorPrimary">?attr/colorPrimaryInverse</item>
         <item name="colorOnSurface">?attr/colorSurfaceInverse</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

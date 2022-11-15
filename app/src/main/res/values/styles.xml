@@ -15,8 +15,9 @@
   -->
 
 <resources>
+
     <style name="AppTheme" parent="Base.AppTheme" />
-    
+
     <style name="ProgressView">
         <item name="android:indeterminate">true</item>
         <item name="android:minWidth">48dp</item>

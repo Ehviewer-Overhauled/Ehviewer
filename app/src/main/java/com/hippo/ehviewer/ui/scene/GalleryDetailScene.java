@@ -122,7 +122,6 @@ import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.IntList;
-import com.hippo.yorozuya.collect.LongList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1240,9 +1239,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                         .show();
             }
         } else if (mInfo == v) {
-            Bundle args = new Bundle();
-            args.putParcelable(GalleryInfoScene.KEY_GALLERY_DETAIL, mGalleryDetail);
-            startScene(new Announcer(GalleryInfoScene.class).setArgs(args));
+            assert mGalleryDetail != null;
+            var galleryInfoBottomSheet = new GalleryInfoBottomSheet(mGalleryDetail);
+            galleryInfoBottomSheet.show(requireActivity().getSupportFragmentManager(), GalleryInfoBottomSheet.TAG);
         } else if (mHeart == v || mHeartOutline == v) {
             if (mGalleryDetail != null && !mModifingFavorites) {
                 boolean remove = false;
