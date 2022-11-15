@@ -24,7 +24,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
@@ -38,7 +37,7 @@ import com.hippo.util.getClipboardManager
 class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment() {
     private var mKeys: ArrayList<String> = arrayListOf()
     private var mValues: ArrayList<String> = arrayListOf()
-    private var mRecyclerView: EasyRecyclerView? = null
+    private var mRecyclerView: RecyclerView? = null
     private val mDetail: GalleryDetail = detail
 
     override fun onCreateView(
@@ -53,7 +52,7 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
             addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             attributes.blurBehindRadius = 32
         }
-        val recyclerView = view.findViewById(R.id.recycler_view) as EasyRecyclerView
+        val recyclerView = view.findViewById(R.id.recycler_view) as RecyclerView
         val adapter = InfoAdapter()
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
