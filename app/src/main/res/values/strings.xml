@@ -188,7 +188,6 @@
     <string name="search_tip">Normal search: Simply search.\n\nSubscription search: Search in subscriptions.\n\nSpecify uploader: Search for galleries uploaded by the specified uploader. All other options will be ignored.\n\nSpecify tag: Search for galleries that contain the specified tag. Only one tag accepted. Other options will be ignored.</string>
 
     <string name="search_sh">Only Show Expunged Galleries</string>
-    <string name="search_sdt">Only Search Low-Power Tags</string>
     <string name="search_sto">Only Show Galleries With Torrents</string>
     <string name="search_sr">Minimum Rating:</string>
     <string name="search_sp">Pages:</string>
@@ -203,7 +202,6 @@
     <string name="select_image">Select image</string>
     <string name="search_uss">Use similarity scan</string>
     <string name="search_osc">Only search covers</string>
-    <string name="search_se">Show expunged</string>
     <string name="select_image_first">Please select image first</string>
 
     <string name="add_to_favourites">Add to favourites</string>

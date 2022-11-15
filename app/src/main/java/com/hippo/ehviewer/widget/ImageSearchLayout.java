@@ -58,7 +58,6 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
     private View mSelectImage;
     private CheckBox mSearchUSS;
     private CheckBox mSearchOSC;
-    private CheckBox mSearchSE;
 
     private Helper mHelper;
 
@@ -93,7 +92,6 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         mSelectImage = ViewUtils.$$(this, R.id.select_image);
         mSearchUSS = (CheckBox) ViewUtils.$$(this, R.id.search_uss);
         mSearchOSC = (CheckBox) ViewUtils.$$(this, R.id.search_osc);
-        mSearchSE = (CheckBox) ViewUtils.$$(this, R.id.search_se);
 
         mSelectImage.setOnClickListener(this);
     }
@@ -182,7 +180,6 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         builder.setImagePath(mImagePath);
         builder.setUseSimilarityScan(mSearchUSS.isChecked());
         builder.setOnlySearchCovers(mSearchOSC.isChecked());
-        builder.setShowExpunged(mSearchSE.isChecked());
     }
 
     @Override
