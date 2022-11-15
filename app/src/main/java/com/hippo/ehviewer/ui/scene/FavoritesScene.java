@@ -1219,7 +1219,11 @@ public class FavoritesScene extends BaseScene implements
                 final String keyword = mUrlBuilder.getKeyword();
                 SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
             } else {
-                mUrlBuilder.setNext(nextPg);
+                mUrlBuilder.setNext(jumpTo == null ? nextPg : Integer.toString(minGid));
+
+                mUrlBuilder.setJumpTo(jumpTo);
+                jumpTo = null;
+
                 String url = mUrlBuilder.build();
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_GET_FAVORITES);
