@@ -1453,9 +1453,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                     } else if (id == R.id.add_filter) {
                         showFilterTagDialog(tag);
                     } else if (id == R.id.copy) {
-                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), tag, false, getActivity());
+                        ClipboardUtilKt.addTextToClipboard(requireActivity(), tag, false);
                     } else if (id == R.id.copy_trans) {
-                        ClipboardUtilKt.addTextToClipboard(ClipboardUtilKt.getClipboardManager(getContext()), tv.getText().toString(), false, getActivity());
+                        ClipboardUtilKt.addTextToClipboard(requireActivity(), tv.getText().toString(), false);
                     }
                 }).show();
     }

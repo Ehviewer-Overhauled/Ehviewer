@@ -17,7 +17,6 @@
  */
 package com.hippo.util
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
@@ -35,20 +34,21 @@ fun Context.getClipboardManager(): ClipboardManager {
     return getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 }
 
-fun ClipboardManager.addTextToClipboard(text: String?, isSensitive: Boolean, activity: Activity?) {
-    setPrimaryClip(ClipData.newPlainText(null, text).apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive)
-            description.extras = PersistableBundle().apply {
-                putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
-            }
-    })
-
+fun Context.addTextToClipboard(text: String?, isSensitive: Boolean) {
+    getClipboardManager().apply {
+        setPrimaryClip(ClipData.newPlainText(null, text).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive)
+                description.extras = PersistableBundle().apply {
+                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+        })
+    }
     // Avoid double notify user since system have done that on Tiramisu above
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-        if (activity is MainActivity) {
-            activity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
-        } else if (activity is SettingsActivity) {
-            activity.showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
+        if (this is MainActivity) {
+            showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
+        } else if (this is SettingsActivity) {
+            showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
         }
 }
 

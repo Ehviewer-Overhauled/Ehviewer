@@ -124,10 +124,9 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
             if (position == INDEX_PARENT) {
                 UrlOpener.openUrl(context, mValues[position], true)
             } else {
-                requireContext().getClipboardManager().addTextToClipboard(
+                activity?.addTextToClipboard(
                     mValues[position],
                     false,
-                    activity
                 )
                 if (position == INDEX_URL) {
                     // Save it to avoid detect the gallery
