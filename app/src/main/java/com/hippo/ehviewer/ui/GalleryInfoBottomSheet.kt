@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hippo.ehviewer.ui.scene
+package com.hippo.ehviewer.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,7 +31,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.BaseScene.LENGTH_SHORT
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
@@ -171,7 +170,7 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoHolder {
             return InfoHolder(
                 mInflater.inflate(
-                    if (viewType == Companion.TYPE_HEADER) R.layout.item_gallery_info_header else R.layout.item_gallery_info_data,
+                    if (viewType == TYPE_HEADER) R.layout.item_gallery_info_header else R.layout.item_gallery_info_data,
                     parent,
                     false
                 )
