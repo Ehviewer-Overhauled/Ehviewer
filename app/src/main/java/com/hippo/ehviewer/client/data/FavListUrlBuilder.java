@@ -45,6 +45,7 @@ public class FavListUrlBuilder implements Parcelable {
     };
     private static final String TAG = FavListUrlBuilder.class.getSimpleName();
     private String mNext;
+    private String mJumpTo;
     private String mKeyword;
     private int mFavCat = FAV_CAT_ALL;
 
@@ -53,6 +54,7 @@ public class FavListUrlBuilder implements Parcelable {
 
     protected FavListUrlBuilder(Parcel in) {
         this.mNext = in.readString();
+        this.mJumpTo = in.readString();
         this.mKeyword = in.readString();
         this.mFavCat = in.readInt();
     }
@@ -63,6 +65,10 @@ public class FavListUrlBuilder implements Parcelable {
 
     public void setNext(String next) {
         mNext = next;
+    }
+
+    public void setJumpTo(String jumpTo) {
+        mJumpTo = jumpTo;
     }
 
     public String getKeyword() {
@@ -108,6 +114,9 @@ public class FavListUrlBuilder implements Parcelable {
         if (mNext != null && !mNext.isEmpty()) {
             ub.addQuery("next", mNext);
         }
+        if (mJumpTo != null && !mJumpTo.isEmpty()) {
+            ub.addQuery("seek", mJumpTo);
+        }
         return ub.build();
     }
 
@@ -119,6 +128,7 @@ public class FavListUrlBuilder implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.mNext);
+        dest.writeString(this.mJumpTo);
         dest.writeString(this.mKeyword);
         dest.writeInt(this.mFavCat);
     }
