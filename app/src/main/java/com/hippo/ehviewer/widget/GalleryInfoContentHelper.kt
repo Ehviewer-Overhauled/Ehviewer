@@ -124,12 +124,12 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val date = calendar.time
         val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         jumpTo = format.format(date)
-        doRefresh()
+        doGoToPage(Int.MAX_VALUE / 2)
     }
 
     fun goToPage(page: Int) {
         jumpTo = page.toString()
-        doRefresh()
+        doGoToPage(page)
     }
 
     companion object {

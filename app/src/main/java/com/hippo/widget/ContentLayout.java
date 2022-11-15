@@ -877,6 +877,15 @@ public class ContentLayout extends FrameLayout {
             }
         }
 
+        protected void doGoToPage(int page) {
+            mRefreshLayout.setRefreshing(false);
+            mBottomProgress.hide();
+            mCurrentTaskId = mIdGenerator.nextId();
+            mCurrentTaskType = TYPE_SOMEWHERE;
+            mCurrentTaskPage = page;
+            getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage);
+        }
+
         protected Parcelable saveInstanceState(Parcelable superState) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(KEY_SUPER, superState);
