@@ -29,7 +29,6 @@ class AdvanceSearchTable @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : LinearLayout(context, attrs) {
     private var mSh: CheckBox
-    private var mSdt: CheckBox
     private var mSto: CheckBox
     private var mSr: CheckBox
     private var mMinRating: TextInputLayout
@@ -47,20 +46,18 @@ class AdvanceSearchTable @JvmOverloads constructor(
         inflater.inflate(R.layout.widget_advance_search_table, this)
         val row0 = getChildAt(0) as ViewGroup
         mSh = row0.getChildAt(0) as CheckBox
-        mSdt = row0.getChildAt(1) as CheckBox
+        mSto = row0.getChildAt(1) as CheckBox
         val row1 = getChildAt(1) as ViewGroup
-        mSto = row1.getChildAt(0) as CheckBox
+        mSr = row1.getChildAt(0) as CheckBox
+        mMinRating = row1.getChildAt(1) as TextInputLayout
         val row2 = getChildAt(2) as ViewGroup
-        mSr = row2.getChildAt(0) as CheckBox
-        mMinRating = row2.getChildAt(1) as TextInputLayout
-        val row3 = getChildAt(3) as ViewGroup
-        mSp = row3.getChildAt(0) as CheckBox
-        mSpf = row3.getChildAt(1) as EditText
-        mSpt = row3.getChildAt(3) as EditText
-        val row5 = getChildAt(5) as ViewGroup
-        mSfl = row5.getChildAt(0) as CheckBox
-        mSfu = row5.getChildAt(1) as CheckBox
-        mSft = row5.getChildAt(2) as CheckBox
+        mSp = row2.getChildAt(0) as CheckBox
+        mSpf = row2.getChildAt(1) as EditText
+        mSpt = row2.getChildAt(3) as EditText
+        val row4 = getChildAt(4) as ViewGroup
+        mSfl = row4.getChildAt(0) as CheckBox
+        mSfu = row4.getChildAt(1) as CheckBox
+        mSft = row4.getChildAt(2) as CheckBox
 
         mSpt.setOnEditorActionListener { v: TextView, _: Int, _: KeyEvent? ->
             val nextView = v.focusSearch(
@@ -87,7 +84,6 @@ class AdvanceSearchTable @JvmOverloads constructor(
         get() {
             var advanceSearch = 0
             if (mSh.isChecked) advanceSearch = advanceSearch or SH
-            if (mSdt.isChecked) advanceSearch = advanceSearch or SDT
             if (mSto.isChecked) advanceSearch = advanceSearch or STO
             if (mSfl.isChecked) advanceSearch = advanceSearch or SFL
             if (mSfu.isChecked) advanceSearch = advanceSearch or SFU
@@ -96,7 +92,6 @@ class AdvanceSearchTable @JvmOverloads constructor(
         }
         set(advanceSearch) {
             mSh.isChecked = NumberUtils.int2boolean(advanceSearch and SH)
-            mSdt.isChecked = NumberUtils.int2boolean(advanceSearch and SDT)
             mSto.isChecked = NumberUtils.int2boolean(advanceSearch and STO)
             mSfl.isChecked = NumberUtils.int2boolean(advanceSearch and SFL)
             mSfu.isChecked = NumberUtils.int2boolean(advanceSearch and SFU)
@@ -150,8 +145,7 @@ class AdvanceSearchTable @JvmOverloads constructor(
 
     companion object {
         const val SH = 0x1
-        const val SDT = 0x2
-        const val STO = 0x4
+        const val STO = 0x2
         const val SFL = 0x100
         const val SFU = 0x200
         const val SFT = 0x400

@@ -232,7 +232,6 @@ public final class MainActivity extends StageActivity
                         builder.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
                         builder.setImagePath(temp.getPath());
                         builder.setUseSimilarityScan(true);
-                        builder.setShowExpunged(true);
                         startScene(processAnnouncer(GalleryListScene.getStartAnnouncer(builder)));
                         return true;
                     }
