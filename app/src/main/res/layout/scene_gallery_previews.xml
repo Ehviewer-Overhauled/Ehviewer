@@ -19,6 +19,5 @@
     android:id="@+id/content_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    app:fitsSystemWindowsInsets="bottom|top" />
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:fitsSystemWindowsInsets="bottom" />
