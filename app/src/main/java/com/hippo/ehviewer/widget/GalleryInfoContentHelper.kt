@@ -136,7 +136,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         private const val KEY_DATA_MAP = "data_map"
         private const val KEY_MAX_GID = "max_gid"
         private const val KEY_MIN_GID = "min_gid"
-        const val KEY_PREV_PAGE = "prev_page"
-        const val KEY_NEXT_PAGE = "next_page"
+        const val KEY_UPPER_PAGE = "upper_page"
+        const val KEY_LOWER_PAGE = "lower_page"
     }
 }
