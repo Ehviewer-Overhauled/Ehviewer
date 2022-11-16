@@ -132,6 +132,7 @@ class HistoryScene : ToolbarScene() {
         val view = inflater.inflate(R.layout.scene_history, container, false)
         val content = ViewUtils.`$$`(view, R.id.content)
         val recyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as RecyclerView
+        setLiftOnScrollTargetView(recyclerView)
         val mFastScroller = ViewUtils.`$$`(content, R.id.fast_scroller) as FastScroller
         val mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
         ViewTransition(content, mTip)

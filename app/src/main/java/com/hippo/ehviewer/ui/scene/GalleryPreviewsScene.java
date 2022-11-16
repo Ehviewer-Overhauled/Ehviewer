@@ -139,6 +139,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
                 R.layout.scene_gallery_previews, container, false);
         mContentLayout.hideFastScroll();
         mRecyclerView = mContentLayout.getRecyclerView();
+        setLiftOnScrollTargetView(mRecyclerView);
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);

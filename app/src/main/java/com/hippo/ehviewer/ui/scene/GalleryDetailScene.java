@@ -571,6 +571,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         ViewGroup main = (ViewGroup) ViewUtils.$$(view, R.id.main);
         NestedScrollView mainView = (NestedScrollView) ViewUtils.$$(main, R.id.scroll_view);
+        setLiftOnScrollTargetView(mainView);
         View progressView = ViewUtils.$$(main, R.id.progress_view);
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);

@@ -172,6 +172,7 @@ public final class GalleryCommentsScene extends ToolbarScene
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_comments, container, false);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
+        setLiftOnScrollTargetView(mRecyclerView);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
         mEditPanel = ViewUtils.$$(view, R.id.edit_panel);
         mSendImage = (ImageView) ViewUtils.$$(mEditPanel, R.id.send);

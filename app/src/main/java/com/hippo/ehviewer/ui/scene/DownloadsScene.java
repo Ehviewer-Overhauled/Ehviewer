@@ -311,6 +311,7 @@ public class DownloadsScene extends ToolbarScene
 
         View content = ViewUtils.$$(view, R.id.content);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(content, R.id.recycler_view);
+        setLiftOnScrollTargetView(mRecyclerView);
         mFastScroller = (FastScroller) ViewUtils.$$(content, R.id.fast_scroller);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mTip = (TextView) ViewUtils.$$(view, R.id.tip);

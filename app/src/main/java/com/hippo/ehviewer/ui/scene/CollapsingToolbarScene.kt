@@ -13,6 +13,7 @@ abstract class CollapsingToolbarScene : ToolbarScene() {
     ): View? {
         val view = inflater.inflate(R.layout.scene_collapsing_toolbar, container, false) as ViewGroup
         mToolbar = view.findViewById(R.id.toolbar)
+        mAppBarLayout = view.findViewById(R.id.appbar)
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
         return view.apply { addView(contentView, 0) }
     }

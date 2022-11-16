@@ -28,6 +28,7 @@ import com.hippo.ehviewer.R
 
 abstract class ToolbarScene : BaseScene() {
     protected var mToolbar: Toolbar? = null
+    protected var mAppBarLayout: AppBarLayout? = null
     private var mTempTitle: CharSequence? = null
 
     abstract fun onCreateViewWithToolbar(
@@ -41,6 +42,7 @@ abstract class ToolbarScene : BaseScene() {
     ): View? {
         val view = inflater.inflate(R.layout.scene_toolbar, container, false) as ViewGroup
         mToolbar = view.findViewById(R.id.toolbar)
+        mAppBarLayout = view.findViewById(R.id.appbar)
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
         return view.apply { addView(contentView, 0) }
     }
@@ -84,5 +86,9 @@ abstract class ToolbarScene : BaseScene() {
     fun setTitle(title: CharSequence?) {
         mToolbar?.title = title
         mTempTitle = title
+    }
+
+    fun setLiftOnScrollTargetView(view: View?) {
+        mAppBarLayout?.setLiftOnScrollTargetView(view)
     }
 }
