@@ -17,247 +17,211 @@
   ~
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/header"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <View
-            android:id="@+id/color_bg"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:elevation="4dp"
-            app:fitsSystemWindowsInsets="top" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="28dp" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/TextAppearance.Material3.HeadlineSmall"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_width="540dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginTop="@dimen/keyline_margin"
             android:layout_marginRight="@dimen/keyline_margin"
-            android:ellipsize="end"
-            android:maxLines="5" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.Material3.CardView.Elevated"
-                android:layout_width="540dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/keyline_margin"
-                android:layout_marginTop="@dimen/keyline_margin"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:layout_marginBottom="@dimen/keyline_margin"
-                app:fitsSystemWindowsInsets="top">
+            android:layout_marginBottom="@dimen/keyline_margin"
+            app:fitsSystemWindowsInsets="top">
 
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/header_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/header_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/thumb_card"
-                        style="@style/Widget.Material3.CardView.Filled"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/thumb_card"
+                    style="@style/Widget.Material3.CardView.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.hippo.widget.LoadImageView
+                        android:id="@+id/thumb"
+                        android:layout_width="256dp"
+                        android:layout_height="@dimen/gallery_detail_thumb_height" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/info"
+                    style="@style/Widget.Material3.CardView.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:nextFocusRight="@+id/read"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:padding="8dp">
 
-                        <com.hippo.widget.LoadImageView
-                            android:id="@+id/thumb"
-                            android:layout_width="256dp"
-                            android:layout_height="@dimen/gallery_detail_thumb_height" />
 
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/info"
-                        style="@style/Widget.Material3.CardView.Filled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="@dimen/keyline_margin"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:nextFocusRight="@+id/read"
-                        android:orientation="vertical"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <TextView
+                            android:id="@+id/language"
+                            style="@style/TextAppearance.Material3.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp">
+                            android:gravity="left"
+                            android:singleLine="true"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/size"
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:gravity="right"
+                            android:singleLine="true"
+                            app:layout_constraintBaseline_toBaselineOf="@id/language"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="1.0"
+                            app:layout_constraintStart_toEndOf="@id/language" />
 
 
-                            <TextView
-                                android:id="@+id/language"
-                                style="@style/TextAppearance.Material3.BodySmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="left"
-                                android:singleLine="true"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+                            android:id="@+id/favoredTimes"
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="left"
+                            android:singleLine="true"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/language" />
 
-                            <TextView
-                                android:id="@+id/size"
-                                style="@style/TextAppearance.Material3.BodySmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:gravity="right"
-                                android:singleLine="true"
-                                app:layout_constraintBaseline_toBaselineOf="@id/language"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintHorizontal_bias="1.0"
-                                app:layout_constraintStart_toEndOf="@id/language" />
-
-
-                            <TextView
-                                android:id="@+id/favoredTimes"
-                                style="@style/TextAppearance.Material3.BodySmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:gravity="left"
-                                android:singleLine="true"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/language" />
-
-                            <TextView
-                                android:id="@+id/pages"
-                                style="@style/TextAppearance.Material3.BodySmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
-                                android:gravity="right"
-                                android:singleLine="true"
-                                app:layout_constraintBaseline_toBaselineOf="@id/favoredTimes"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintHorizontal_bias="1.0"
-                                app:layout_constraintStart_toEndOf="@id/favoredTimes" />
+                        <TextView
+                            android:id="@+id/pages"
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:gravity="right"
+                            android:singleLine="true"
+                            app:layout_constraintBaseline_toBaselineOf="@id/favoredTimes"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="1.0"
+                            app:layout_constraintStart_toEndOf="@id/favoredTimes" />
 
 
-                            <TextView
-                                android:id="@+id/posted"
-                                style="@style/TextAppearance.Material3.BodySmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:gravity="left"
-                                android:singleLine="true"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/favoredTimes" />
+                        <TextView
+                            android:id="@+id/posted"
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="left"
+                            android:singleLine="true"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/favoredTimes" />
 
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/uploader"
-                        style="@style/Widget.Material3.Chip.Assist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/keyline_margin"
-                        android:ellipsize="end"
-                        android:nextFocusRight="@+id/read"
-                        android:nextFocusDown="@+id/rate"
-                        android:singleLine="true"
-                        android:textAllCaps="true"
-                        app:chipIcon="@drawable/file_upload_black_24dp"
-                        app:ensureMinTouchTargetSize="true"
-                        app:layout_constraintBottom_toBottomOf="@id/thumb_card"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/uploader"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:ellipsize="end"
+                    android:nextFocusRight="@+id/read"
+                    android:nextFocusDown="@+id/rate"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
+                    app:chipIcon="@drawable/file_upload_black_24dp"
+                    app:ensureMinTouchTargetSize="true"
+                    app:layout_constraintBottom_toBottomOf="@id/thumb_card"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/category"
-                        style="@style/Widget.Material3.Chip.Assist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/keyline_margin"
-                        android:ellipsize="end"
-                        android:nextFocusRight="@+id/read"
-                        android:singleLine="true"
-                        android:textAllCaps="true"
-                        app:chipIcon="@drawable/ic_baseline_label_24"
-                        app:ensureMinTouchTargetSize="true"
-                        app:layout_constraintBottom_toTopOf="@id/uploader"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/category"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_margin"
+                    android:ellipsize="end"
+                    android:nextFocusRight="@+id/read"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
+                    app:chipIcon="@drawable/ic_baseline_label_24"
+                    app:ensureMinTouchTargetSize="true"
+                    app:layout_constraintBottom_toTopOf="@id/uploader"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:id="@+id/action_card"
+        <LinearLayout
+            android:id="@+id/action_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/keyline_margin"
+            android:layout_marginRight="@dimen/keyline_margin"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/read"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/keyline_margin"
-                android:layout_marginRight="@dimen/keyline_margin"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:insetLeft="40dp"
+                android:insetTop="16dp"
+                android:insetRight="40dp"
+                android:text="@string/read">
 
-                <Button
-                    android:id="@+id/read"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:insetLeft="40dp"
-                    android:insetTop="16dp"
-                    android:insetRight="40dp"
-                    android:text="@string/read">
+                <requestFocus />
+            </Button>
 
-                    <requestFocus />
-                </Button>
-
-                <Button
-                    android:id="@+id/download"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:insetLeft="40dp"
-                    android:insetTop="16dp"
-                    android:insetRight="40dp"
-                    android:nextFocusDown="@+id/torrent" />
+            <Button
+                android:id="@+id/download"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:insetLeft="40dp"
+                android:insetTop="16dp"
+                android:insetRight="40dp"
+                android:nextFocusDown="@+id/torrent" />
 
 
-                <android.widget.Space
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp" />
+            <android.widget.Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
 
 
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

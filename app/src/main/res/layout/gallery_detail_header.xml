@@ -14,223 +14,189 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/header"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <View
-            android:id="@+id/color_bg"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:elevation="4dp"
-            app:fitsSystemWindowsInsets="top" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="28dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Material3.CardView.Elevated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginLeft="@dimen/keyline_margin"
+        android:layout_marginTop="@dimen/keyline_margin"
+        android:layout_marginRight="@dimen/keyline_margin"
+        android:layout_marginBottom="@dimen/keyline_margin"
+        app:fitsSystemWindowsInsets="top">
 
-        <TextView
-            android:id="@+id/title"
-            style="@style/TextAppearance.Material3.HeadlineSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/keyline_margin"
-            android:layout_marginRight="@dimen/keyline_margin"
-            android:ellipsize="end"
-            android:maxLines="5" />
-
-        <com.google.android.material.card.MaterialCardView
-            style="@style/Widget.Material3.CardView.Elevated"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/header_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/keyline_margin"
-            android:layout_marginTop="@dimen/keyline_margin"
-            android:layout_marginRight="@dimen/keyline_margin"
-            android:layout_marginBottom="@dimen/keyline_margin"
-            app:fitsSystemWindowsInsets="top">
+            android:layout_height="wrap_content">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/header_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/thumb_card"
-                    style="@style/Widget.Material3.CardView.Filled"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.hippo.ehviewer.widget.FixedThumb
-                        android:id="@+id/thumb"
-                        android:layout_width="@dimen/gallery_detail_thumb_width"
-                        android:layout_height="@dimen/gallery_detail_thumb_height"
-                        app:alwaysCutAndScale="true"/>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/info"
-                    style="@style/Widget.Material3.CardView.Filled"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="@dimen/keyline_margin"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:id="@+id/language"
-                            style="@style/TextAppearance.Material3.LabelMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="start"
-                            android:singleLine="true"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/size"
-                            style="@style/TextAppearance.Material3.LabelMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:gravity="end"
-                            android:singleLine="true"
-                            app:layout_constraintBaseline_toBaselineOf="@id/language"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="1.0"
-                            app:layout_constraintStart_toEndOf="@id/language" />
-
-
-                        <TextView
-                            android:id="@+id/favoredTimes"
-                            style="@style/TextAppearance.Material3.LabelMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="start"
-                            android:singleLine="true"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/language" />
-
-                        <TextView
-                            android:id="@+id/pages"
-                            style="@style/TextAppearance.Material3.LabelMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:gravity="end"
-                            android:singleLine="true"
-                            app:layout_constraintBaseline_toBaselineOf="@id/favoredTimes"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="1.0"
-                            app:layout_constraintStart_toEndOf="@id/favoredTimes" />
-
-
-                        <TextView
-                            android:id="@+id/posted"
-                            style="@style/TextAppearance.Material3.LabelMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:singleLine="true"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/favoredTimes" />
-
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/uploader"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/keyline_margin"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textAllCaps="true"
-                    app:chipIcon="@drawable/file_upload_black_24dp"
-                    app:ensureMinTouchTargetSize="true"
-                    app:layout_constraintBottom_toBottomOf="@id/thumb_card"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/category"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/keyline_margin"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textAllCaps="true"
-                    app:chipIcon="@drawable/ic_baseline_label_24"
-                    app:chipSpacingHorizontal="8dp"
-                    app:ensureMinTouchTargetSize="true"
-                    app:layout_constraintBottom_toTopOf="@id/uploader"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <LinearLayout
-            android:id="@+id/action_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/keyline_margin"
-            android:layout_marginRight="@dimen/keyline_margin"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/download"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="0dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/thumb_card"
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <Button
-                android:id="@+id/read"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="0dp"
+                <com.hippo.ehviewer.widget.FixedThumb
+                    android:id="@+id/thumb"
+                    android:layout_width="@dimen/gallery_detail_thumb_width"
+                    android:layout_height="@dimen/gallery_detail_thumb_height"
+                    app:alwaysCutAndScale="true" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/info"
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/keyline_margin"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="@string/read" />
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        </LinearLayout>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/language"
+                        style="@style/TextAppearance.Material3.LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:singleLine="true"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/size"
+                        style="@style/TextAppearance.Material3.LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        app:layout_constraintBaseline_toBaselineOf="@id/language"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toEndOf="@id/language" />
+
+
+                    <TextView
+                        android:id="@+id/favoredTimes"
+                        style="@style/TextAppearance.Material3.LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="start"
+                        android:singleLine="true"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/language" />
+
+                    <TextView
+                        android:id="@+id/pages"
+                        style="@style/TextAppearance.Material3.LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        app:layout_constraintBaseline_toBaselineOf="@id/favoredTimes"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toEndOf="@id/favoredTimes" />
+
+
+                    <TextView
+                        android:id="@+id/posted"
+                        style="@style/TextAppearance.Material3.LabelMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/favoredTimes" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/uploader"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_margin"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAllCaps="true"
+                app:chipIcon="@drawable/file_upload_black_24dp"
+                app:ensureMinTouchTargetSize="true"
+                app:layout_constraintBottom_toBottomOf="@id/thumb_card"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/category"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_margin"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAllCaps="true"
+                app:chipIcon="@drawable/ic_baseline_label_24"
+                app:chipSpacingHorizontal="8dp"
+                app:ensureMinTouchTargetSize="true"
+                app:layout_constraintBottom_toTopOf="@id/uploader"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/action_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/keyline_margin"
+        android:layout_marginRight="@dimen/keyline_margin"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/download"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/read"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/read" />
+
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>

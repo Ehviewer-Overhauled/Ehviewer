@@ -129,7 +129,7 @@ class HistoryScene : ToolbarScene() {
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = inflater.inflate(R.layout.scene_history, container, false)
         val content = ViewUtils.`$$`(view, R.id.content)
         val recyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as EasyRecyclerView

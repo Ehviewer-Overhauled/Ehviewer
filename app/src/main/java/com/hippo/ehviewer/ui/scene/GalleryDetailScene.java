@@ -163,13 +163,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
     private ViewTransition mViewTransition;
     // Header
     @Nullable
-    private FrameLayout mHeader;
-    @Nullable
-    private View mColorBg;
+    private LinearLayout mHeader;
     @Nullable
     private LoadImageView mThumb;
-    @Nullable
-    private TextView mTitle;
     @Nullable
     private TextView mUploader;
     @Nullable
@@ -587,10 +583,8 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mTip.setCompoundDrawables(null, drawable, null, null);
         mTip.setOnClickListener(this);
 
-        mHeader = (FrameLayout) ViewUtils.$$(mainView, R.id.header);
-        mColorBg = ViewUtils.$$(mHeader, R.id.color_bg);
+        mHeader = (LinearLayout) ViewUtils.$$(mainView, R.id.header);
         mThumb = (LoadImageView) ViewUtils.$$(mHeader, R.id.thumb);
-        mTitle = (TextView) ViewUtils.$$(mHeader, R.id.title);
         mUploader = (TextView) ViewUtils.$$(mHeader, R.id.uploader);
         mCategory = (TextView) ViewUtils.$$(mHeader, R.id.category);
         mActionGroup = (ViewGroup) ViewUtils.$$(mHeader, R.id.action_card);
@@ -659,11 +653,9 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         if (prepareData()) {
             if (mGalleryDetail != null) {
                 bindViewSecond();
-                setTransitionName();
                 adjustViewVisibility(STATE_NORMAL, false);
             } else if (mGalleryInfo != null) {
                 bindViewFirst();
-                setTransitionName();
                 adjustViewVisibility(STATE_REFRESH_HEADER, false);
             } else {
                 adjustViewVisibility(STATE_REFRESH, false);
@@ -690,9 +682,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         mViewTransition = null;
 
         mHeader = null;
-        mColorBg = null;
         mThumb = null;
-        mTitle = null;
         mUploader = null;
         mCategory = null;
         mActionGroup = null;
@@ -784,33 +774,6 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         return true;
     }
 
-    private boolean createCircularReveal() {
-        if (mColorBg == null) {
-            return false;
-        }
-
-        int w = mColorBg.getWidth();
-        int h = mColorBg.getHeight();
-        if (ViewCompat.isAttachedToWindow(mColorBg) && w != 0 && h != 0) {
-            Resources resources = getContext().getResources();
-            int keylineMargin = resources.getDimensionPixelSize(R.dimen.keyline_margin);
-            int thumbWidth = resources.getDimensionPixelSize(R.dimen.gallery_detail_thumb_width);
-            int thumbHeight = resources.getDimensionPixelSize(R.dimen.gallery_detail_thumb_height);
-
-            int x = thumbWidth / 2 + keylineMargin;
-            int y = thumbHeight / 2 + keylineMargin;
-
-            int radiusX = Math.max(Math.abs(x), Math.abs(w - x));
-            int radiusY = Math.max(Math.abs(y), Math.abs(h - y));
-            float radius = (float) Math.hypot(radiusX, radiusY);
-
-            ViewAnimationUtils.createCircularReveal(mColorBg, x, y, 0, radius).setDuration(300).start();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private void adjustViewVisibility(int state, boolean animation) {
         if (state == mState) {
             return;
@@ -848,27 +811,20 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                 mViewTransition.showView(2, animation);
                 break;
         }
-
-        if ((oldState == STATE_INIT || oldState == STATE_FAILED || oldState == STATE_REFRESH) &&
-                (state == STATE_NORMAL || state == STATE_REFRESH_HEADER) && ResourcesKt.resolveBoolean(getTheme(), androidx.appcompat.R.attr.isLightTheme, false)) {
-            if (!createCircularReveal()) {
-                SimpleHandler.getInstance().post(this::createCircularReveal);
-            }
-        }
     }
 
     private void bindViewFirst() {
         if (mGalleryDetail != null) {
             return;
         }
-        if (mThumb == null || mTitle == null || mUploader == null || mCategory == null) {
+        if (mThumb == null || mUploader == null || mCategory == null) {
             return;
         }
 
         if (ACTION_GALLERY_INFO.equals(mAction) && mGalleryInfo != null) {
             GalleryInfo gi = mGalleryInfo;
             mThumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
-            mTitle.setText(EhUtils.getSuitableTitle(gi));
+            setTitle(EhUtils.getSuitableTitle(gi));
             mUploader.setText(gi.uploader);
             mUploader.setAlpha(gi.disowned ? .5f : 1f);
             mCategory.setText(EhUtils.getCategory(gi.category));
@@ -916,7 +872,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
                     })
                     .show();
         }
-        if (mThumb == null || mTitle == null || mUploader == null || mCategory == null ||
+        if (mThumb == null || mUploader == null || mCategory == null ||
                 mLanguage == null || mPages == null || mSize == null || mPosted == null ||
                 mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null || mNewerVersion == null) {
             return;
@@ -925,7 +881,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         Resources resources = getResources();
 
         mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
-        mTitle.setText(EhUtils.getSuitableTitle(gd));
+        setTitle(EhUtils.getSuitableTitle(gd));
         mUploader.setText(gd.uploader);
         mUploader.setAlpha(gd.disowned ? .5f : 1f);
         mCategory.setText(EhUtils.getCategory(gd.category));
@@ -1093,10 +1049,8 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
     private void setTransitionName() {
         long gid = getGid();
 
-        if (gid != -1 && mThumb != null &&
-                mTitle != null && mUploader != null && mCategory != null) {
+        if (gid != -1 && mThumb != null && mUploader != null && mCategory != null) {
             ViewCompat.setTransitionName(mThumb, TransitionNameFactory.getThumbTransitionName(gid));
-            ViewCompat.setTransitionName(mTitle, TransitionNameFactory.getTitleTransitionName(gid));
             ViewCompat.setTransitionName(mUploader, TransitionNameFactory.getUploaderTransitionName(gid));
             ViewCompat.setTransitionName(mCategory, TransitionNameFactory.getCategoryTransitionName(gid));
         }
