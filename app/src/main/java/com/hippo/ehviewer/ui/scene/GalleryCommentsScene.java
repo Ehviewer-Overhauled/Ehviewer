@@ -170,7 +170,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     @Override
     public View onCreateViewWithToolbar(LayoutInflater inflater,
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.scene_gallery_comments, container, false);
+        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.scene_gallery_comments, container, false);
         mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
         setLiftOnScrollTargetView(mRecyclerView);
         TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
@@ -180,6 +180,15 @@ public final class GalleryCommentsScene extends ToolbarScene
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
         mRefreshLayout = (SwipeRefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
+
+
+        // Workaround for fab and edittext render out of screen
+        view.removeView(mFabLayout);
+        view.removeView((View) mEditPanel.getParent());
+        assert container != null;
+        container.addView(mFabLayout);
+        container.addView((View) mEditPanel.getParent());
+
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mEditPanel,

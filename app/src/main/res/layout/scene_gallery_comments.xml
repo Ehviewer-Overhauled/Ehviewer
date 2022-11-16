@@ -47,42 +47,47 @@
         android:text="@string/no_one_comments_gallery"
         app:fitsSystemWindowsInsets="bottom" />
 
-    <LinearLayout
-        android:id="@+id/edit_panel"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?attr/colorPrimaryContainer"
-        android:elevation="4dp"
-        android:orientation="horizontal"
-        android:visibility="invisible"
-        app:fitsSystemWindowsInsets="bottom">
+        android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/edit_text"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/edit_panel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@null"
-            android:gravity="left|center_vertical"
-            android:inputType="textMultiLine"
-            android:maxHeight="112dp"
-            android:minHeight="56dp"
-            android:padding="@dimen/keyline_margin"
-            android:textColor="?colorOnPrimarySurface" />
-
-        <ImageView
-            android:id="@+id/send"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
             android:layout_gravity="bottom"
-            android:background="?selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="16dp"
-            app:tint="?colorOnPrimarySurface" />
+            android:background="?attr/colorPrimaryContainer"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:visibility="invisible"
+            app:fitsSystemWindowsInsets="bottom">
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/edit_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="left|center_vertical"
+                android:inputType="textMultiLine"
+                android:maxHeight="112dp"
+                android:minHeight="56dp"
+                android:padding="@dimen/keyline_margin"
+                android:textColor="?colorOnPrimarySurface" />
+
+            <ImageView
+                android:id="@+id/send"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="bottom"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="16dp"
+                app:tint="?colorOnPrimarySurface" />
+
+        </LinearLayout>
+    </FrameLayout>
 
     <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
