@@ -35,7 +35,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.*
@@ -61,7 +60,7 @@ import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
 
 class HistoryScene : ToolbarScene() {
-    private var mRecyclerView: EasyRecyclerView? = null
+    private var mRecyclerView: RecyclerView? = null
     private val mAdapter: HistoryAdapter by lazy {
         HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
             override fun areItemsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
@@ -132,7 +131,7 @@ class HistoryScene : ToolbarScene() {
     ): View {
         val view = inflater.inflate(R.layout.scene_history, container, false)
         val content = ViewUtils.`$$`(view, R.id.content)
-        val recyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as EasyRecyclerView
+        val recyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as RecyclerView
         val mFastScroller = ViewUtils.`$$`(content, R.id.fast_scroller) as FastScroller
         val mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
         ViewTransition(content, mTip)
@@ -373,7 +372,6 @@ class HistoryScene : ToolbarScene() {
         private val mGi: GalleryInfo
     ) : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
-            mRecyclerView?.outOfCustomChoiceMode()
             val downloadManager = EhApplication.getDownloadManager(requireContext())
             val downloadInfo = downloadManager.getDownloadInfo(mGi.gid) ?: return
             val label = if (which == 0) null else mLabels[which]

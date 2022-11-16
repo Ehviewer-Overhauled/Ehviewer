@@ -88,8 +88,12 @@ public class ContentLayout extends FrameLayout {
         init(context);
     }
 
+    protected int getLayout() {
+        return R.layout.widget_content_layout;
+    }
+
     private void init(Context context) {
-        ((Activity) context).getLayoutInflater().inflate(R.layout.widget_content_layout, this);
+        ((Activity) context).getLayoutInflater().inflate(getLayout(), this);
         setClipChildren(false);
         setClipToPadding(false);
 

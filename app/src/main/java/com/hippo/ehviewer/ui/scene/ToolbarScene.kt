@@ -23,10 +23,11 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.appbar.AppBarLayout
 import com.hippo.ehviewer.R
 
 abstract class ToolbarScene : BaseScene() {
-    private var mToolbar: Toolbar? = null
+    protected var mToolbar: Toolbar? = null
     private var mTempTitle: CharSequence? = null
 
     abstract fun onCreateViewWithToolbar(
@@ -41,7 +42,7 @@ abstract class ToolbarScene : BaseScene() {
         val view = inflater.inflate(R.layout.scene_toolbar, container, false) as ViewGroup
         mToolbar = view.findViewById(R.id.toolbar)
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
-        return view.apply { addView(contentView, 1) }
+        return view.apply { addView(contentView, 0) }
     }
 
     override fun onDestroyView() {

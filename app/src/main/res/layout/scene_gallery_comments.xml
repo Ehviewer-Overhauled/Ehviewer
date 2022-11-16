@@ -29,10 +29,11 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="?actionBarSize"
             android:clipToPadding="false"
             android:paddingLeft="@dimen/keyline_margin"
             android:paddingRight="@dimen/keyline_margin"
-            app:fitsSystemWindowsInsets="bottom" />
+            app:fitsSystemWindowsInsets="bottom|top" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

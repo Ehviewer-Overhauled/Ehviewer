@@ -61,6 +61,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
@@ -120,7 +121,6 @@ import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.IntIdGenerator;
-import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.IntList;
 
@@ -135,7 +135,7 @@ import java.util.List;
 
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
-public class GalleryDetailScene extends ToolbarScene implements View.OnClickListener,
+public class GalleryDetailScene extends CollapsingToolbarScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
         View.OnLongClickListener {
     public final static String KEY_ACTION = "action";
@@ -570,7 +570,7 @@ public class GalleryDetailScene extends ToolbarScene implements View.OnClickList
         View view = inflater.inflate(R.layout.scene_gallery_detail, container, false);
 
         ViewGroup main = (ViewGroup) ViewUtils.$$(view, R.id.main);
-        ScrollView mainView = (ScrollView) ViewUtils.$$(main, R.id.scroll_view);
+        NestedScrollView mainView = (NestedScrollView) ViewUtils.$$(main, R.id.scroll_view);
         View progressView = ViewUtils.$$(main, R.id.progress_view);
         mTip = (TextView) ViewUtils.$$(main, R.id.tip);
         mViewTransition = new ViewTransition(mainView, progressView, mTip);
