@@ -69,6 +69,8 @@ public class Settings {
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhUtils.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
+    private static final String KEY_PREVIEW_NUM = "preview_num";
+    private static final int DEFAULT_PREVIEW_NUM = 60;
     /********************
      ****** Privacy and Security
      ********************/
@@ -581,6 +583,10 @@ public class Settings {
 
     public static void putShowTagTranslations(boolean value) {
         putBoolean(KEY_SHOW_TAG_TRANSLATIONS, value);
+    }
+
+    public static int getPreviewNum() {
+        return getInt(KEY_PREVIEW_NUM, DEFAULT_PREVIEW_NUM);
     }
 
     public static int getDefaultCategories() {

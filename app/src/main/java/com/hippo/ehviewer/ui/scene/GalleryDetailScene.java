@@ -1013,6 +1013,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     private void bindPreviews(GalleryDetail gd) {
         LayoutInflater inflater = getLayoutInflater();
         Resources resources = getResourcesOrNull();
+        int previewNum = Settings.getPreviewNum();
         if (null == inflater || null == resources || null == mGridLayout || null == mPreviewText) {
             return;
         }
@@ -1022,7 +1023,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
             mPreviewText.setText(R.string.no_previews);
             return;
-        } else if (gd.previewPages == 1 && previewSet.size() <= 60) {
+        } else if (gd.previewPages == 1 && previewSet.size() <= previewNum) {
             mPreviewText.setText(R.string.no_more_previews);
         } else {
             mPreviewText.setText(R.string.more_previews);
@@ -1031,7 +1032,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         int columnWidth = resources.getDimensionPixelOffset(Settings.getThumbSizeResId());
         mGridLayout.setColumnSize(columnWidth);
         mGridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE);
-        int size = Math.min(60, previewSet.size());
+        int size = Math.min(previewNum, previewSet.size());
         for (int i = 0; i < size; i++) {
             View view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false);
             mGridLayout.addView(view);
