@@ -18,21 +18,29 @@ package com.hippo.ehviewer.ui
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.fragment.SettingsFragment
 import com.hippo.ehviewer.ui.scene.BaseScene
 
 class SettingsActivity : EhActivity() {
+    private var mFab: FloatingActionButton? = null
+    private var mContentText: TextView? = null
+    private var mAppbarLayout: AppBarLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference)
         setSupportActionBar(findViewById(R.id.toolbar))
-        val bar = supportActionBar
-        bar?.setDisplayHomeAsUpEnabled(true)
+        mContentText = findViewById(R.id.tip)
+        mFab = findViewById(R.id.fab)
+        mAppbarLayout = findViewById(R.id.appbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
             (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
         if (savedInstanceState == null) {
@@ -61,5 +69,17 @@ class SettingsActivity : EhActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun getMFab(): FloatingActionButton {
+        return mFab!!
+    }
+
+    fun getMContentText(): TextView {
+        return mContentText!!
+    }
+
+    fun resetAppbarLiftStatus() {
+        mAppbarLayout?.setExpanded(true)
     }
 }

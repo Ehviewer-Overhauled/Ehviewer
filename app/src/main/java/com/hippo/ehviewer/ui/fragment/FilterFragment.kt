@@ -20,7 +20,12 @@ package com.hippo.ehviewer.ui.fragment
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -31,10 +36,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputLayout
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
@@ -66,26 +69,23 @@ class FilterFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.activity_filter, container, false)
-        val recyclerView: RecyclerView =
-            ViewUtils.`$$`(view, R.id.recycler_view) as EasyRecyclerView
-        val tip = ViewUtils.`$$`(view, R.id.tip) as TextView
+    ): View {
+        val recyclerView =
+            inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
+        val tip = getTipView(R.string.filter)
         mViewTransition = ViewTransition(recyclerView, tip)
-        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
+        val fab = getFabViewAndShow()
         val drawable = ContextCompat.getDrawable(requireActivity(), R.drawable.big_filter)
-        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         tip.setCompoundDrawables(null, drawable, null, null)
         mAdapter.setHasStableIds(true)
         recyclerView.adapter = mAdapter
-        recyclerView.clipToPadding = false
-        recyclerView.clipChildren = false
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.setHasFixedSize(true)
         val defaultItemAnimator = recyclerView.itemAnimator as DefaultItemAnimator?
         defaultItemAnimator?.supportsChangeAnimations = false
         fab.setOnClickListener { showAddFilterDialog() }
-        return view
+        return recyclerView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,9 +106,9 @@ class FilterFragment : BaseFragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         mViewTransition = null
         requireActivity().removeMenuProvider(mMenuProvider)
+        super.onDestroyView()
     }
 
     private fun showTipDialog() {

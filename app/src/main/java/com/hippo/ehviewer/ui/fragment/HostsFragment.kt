@@ -15,269 +15,214 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import android.util.Pair
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
+import com.hippo.app.BaseDialogBuilder
+import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.Hosts
+import com.hippo.ehviewer.R
+import com.hippo.view.ViewTransition
 
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputLayout;
-import com.hippo.app.BaseDialogBuilder;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.Hosts;
-import com.hippo.ehviewer.R;
-import com.hippo.view.ViewTransition;
-import com.hippo.yorozuya.ViewUtils;
-
-import java.util.List;
-import java.util.Locale;
-
-public class HostsFragment extends BaseFragment
-        implements View.OnClickListener {
-
-    private static final String DIALOG_TAG_ADD_HOST = AddHostDialogFragment.class.getName();
-    private static final String DIALOG_TAG_EDIT_HOST = EditHostDialogFragment.class.getName();
-
-    private static final String KEY_HOST = "com.hippo.ehviewer.ui.fragment.HostsFragment.HOST";
-    private static final String KEY_IP = "com.hippo.ehviewer.ui.fragment.HostsFragment.IP";
-
-    private Hosts hosts;
-    private List<Pair<String, String>> data;
-
-    private ViewTransition mViewTransition;
-    private HostsAdapter adapter;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        hosts = EhApplication.getHosts(requireContext());
-        data = hosts.getAll();
+class HostsFragment : BaseFragment(), View.OnClickListener {
+    private var hosts: Hosts? = null
+    private var data: List<Pair<String, String>>? = null
+    private var mViewTransition: ViewTransition? = null
+    private var adapter: HostsAdapter? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EhApplication.getHosts(requireContext()).apply {
+            hosts = this
+            data = all
+        }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_hosts, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
-        mViewTransition = new ViewTransition(recyclerView, tip);
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-
-        adapter = new HostsAdapter();
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false));
-        recyclerView.setHasFixedSize(true);
-
-        fab.setOnClickListener(this);
-
-        return view;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val recyclerView = inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
+        val tip = getTipView(R.string.hosts)
+        mViewTransition = ViewTransition(recyclerView, tip)
+        val fab = getFabViewAndShow()
+        adapter = HostsAdapter()
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
+        recyclerView.setHasFixedSize(true)
+        fab.setOnClickListener(this)
+        return recyclerView
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        updateView(false);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        updateView(false)
     }
 
-    public boolean onItemClick(int position) {
-        Pair<String, String> pair = data.get(position);
-        Bundle args = new Bundle();
-        args.putString(KEY_HOST, pair.first);
-        args.putString(KEY_IP, pair.second);
-
-        DialogFragment fragment = new EditHostDialogFragment();
-        fragment.setArguments(args);
-        fragment.show(getChildFragmentManager(), DIALOG_TAG_EDIT_HOST);
-
-        return true;
+    fun onItemClick(position: Int): Boolean {
+        val pair = data!![position]
+        val args = Bundle()
+        args.putString(KEY_HOST, pair.first)
+        args.putString(KEY_IP, pair.second)
+        val fragment: DialogFragment = EditHostDialogFragment()
+        fragment.arguments = args
+        fragment.show(childFragmentManager, DIALOG_TAG_EDIT_HOST)
+        return true
     }
 
-    @Override
-    public void onClick(View v) {
-        new AddHostDialogFragment().show(getChildFragmentManager(), DIALOG_TAG_ADD_HOST);
+    override fun onClick(v: View) {
+        AddHostDialogFragment().show(childFragmentManager, DIALOG_TAG_ADD_HOST)
     }
 
-    private void updateView(boolean animation) {
+    private fun updateView(animation: Boolean) {
         if (null == mViewTransition) {
-            return;
+            return
         }
-
-        data = hosts.getAll();
-        if (data.isEmpty()) {
-            mViewTransition.showView(1, animation);
+        data = hosts!!.all
+        if ((data as MutableList<Pair<String, String>>?)?.isEmpty() == true) {
+            mViewTransition!!.showView(1, animation)
         } else {
-            mViewTransition.showView(0, animation);
+            mViewTransition!!.showView(0, animation)
         }
-        adapter.notifyDataSetChanged();
+        adapter!!.notifyDataSetChanged()
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.hosts;
+    override fun getFragmentTitle(): Int {
+        return R.string.hosts
     }
 
-    public abstract static class HostDialogFragment extends DialogFragment {
-
-        private HostsFragment hostsFragment;
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            hostsFragment = (HostsFragment) getParentFragment();
-            View view = getLayoutInflater().inflate(R.layout.dialog_hosts, null, false);
-            TextView host = view.findViewById(R.id.host);
-            TextView ip = view.findViewById(R.id.ip);
-
-            Bundle arguments = getArguments();
+    abstract class HostDialogFragment : DialogFragment() {
+        private var hostsFragment: HostsFragment? = null
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            hostsFragment = parentFragment as HostsFragment?
+            val view = layoutInflater.inflate(R.layout.dialog_hosts, null, false)
+            val host = view.findViewById<TextView>(R.id.host)
+            val ip = view.findViewById<TextView>(R.id.ip)
+            val arguments = arguments
             if (savedInstanceState == null && arguments != null) {
-                host.setText(arguments.getString(KEY_HOST));
-                ip.setText(arguments.getString(KEY_IP));
+                host.text = arguments.getString(KEY_HOST)
+                ip.text = arguments.getString(KEY_IP)
             }
-
-            BaseDialogBuilder builder = new BaseDialogBuilder(requireContext());
-            builder.setView(view);
-            onCreateDialogBuilder(builder);
-            AlertDialog dialog = builder.create();
-            dialog.setOnShowListener(d -> onCreateDialog((AlertDialog) d));
-
-            return dialog;
+            val builder = BaseDialogBuilder(requireContext())
+            builder.setView(view)
+            onCreateDialogBuilder(builder)
+            val dialog = builder.create()
+            dialog.setOnShowListener { d: DialogInterface -> onCreateDialog(d as AlertDialog) }
+            return dialog
         }
 
-        protected abstract void onCreateDialogBuilder(AlertDialog.Builder builder);
-
-        protected abstract void onCreateDialog(AlertDialog dialog);
-
-        protected void put(AlertDialog dialog) {
-            TextView host = dialog.findViewById(R.id.host);
-            TextView ip = dialog.findViewById(R.id.ip);
+        protected abstract fun onCreateDialogBuilder(builder: AlertDialog.Builder)
+        protected abstract fun onCreateDialog(dialog: AlertDialog)
+        protected fun put(dialog: AlertDialog) {
+            val host = dialog.findViewById<TextView>(R.id.host)
+            val ip = dialog.findViewById<TextView>(R.id.ip)
             if (host == null || ip == null) {
-                return;
+                return
             }
-            String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
-            String ipString = ip.getText().toString().trim();
-
+            val hostString = host.text.toString().trim { it <= ' ' }.lowercase()
+            val ipString = ip.text.toString().trim { it <= ' ' }
             if (!Hosts.isValidHost(hostString)) {
-                TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
-                if (hostInputLayout == null) {
-                    return;
-                }
-                hostInputLayout.setError(getString(R.string.invalid_host));
-                return;
+                val hostInputLayout =
+                    dialog.findViewById<TextInputLayout>(R.id.host_input_layout) ?: return
+                hostInputLayout.error = getString(R.string.invalid_host)
+                return
             }
-
             if (!Hosts.isValidIp(ipString)) {
-                TextInputLayout ipInputLayout = dialog.findViewById(R.id.ip_input_layout);
-                if (ipInputLayout == null) {
-                    return;
-                }
-                ipInputLayout.setError(getString(R.string.invalid_ip));
-                return;
+                val ipInputLayout =
+                    dialog.findViewById<TextInputLayout>(R.id.ip_input_layout) ?: return
+                ipInputLayout.error = getString(R.string.invalid_ip)
+                return
             }
-
-            hostsFragment.hosts.put(hostString, ipString);
-            hostsFragment.updateView(true);
-
-            dialog.dismiss();
+            hostsFragment!!.hosts!!.put(hostString, ipString)
+            hostsFragment!!.updateView(true)
+            dialog.dismiss()
         }
 
-        protected void delete(AlertDialog dialog) {
-            TextView host = dialog.findViewById(R.id.host);
-            if (host == null) {
-                return;
-            }
-            String hostString = host.getText().toString().trim().toLowerCase(Locale.US);
-
-            hostsFragment.hosts.delete(hostString);
-            hostsFragment.updateView(true);
-
-            dialog.dismiss();
+        protected fun delete(dialog: AlertDialog) {
+            val host = dialog.findViewById<TextView>(R.id.host) ?: return
+            val hostString = host.text.toString().trim { it <= ' ' }.lowercase()
+            hostsFragment!!.hosts!!.delete(hostString)
+            hostsFragment!!.updateView(true)
+            dialog.dismiss()
         }
     }
 
-    public static class AddHostDialogFragment extends HostDialogFragment {
-
-        @Override
-        protected void onCreateDialogBuilder(AlertDialog.Builder builder) {
-            builder.setTitle(R.string.add_host);
-            builder.setPositiveButton(R.string.add_host_add, null);
-            builder.setNegativeButton(android.R.string.cancel, null);
+    class AddHostDialogFragment : HostDialogFragment() {
+        override fun onCreateDialogBuilder(builder: AlertDialog.Builder) {
+            builder.setTitle(R.string.add_host)
+            builder.setPositiveButton(R.string.add_host_add, null)
+            builder.setNegativeButton(android.R.string.cancel, null)
         }
 
-        @Override
-        protected void onCreateDialog(AlertDialog dialog) {
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> put(dialog));
+        override fun onCreateDialog(dialog: AlertDialog) {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                .setOnClickListener { put(dialog) }
         }
     }
 
-    public static class EditHostDialogFragment extends HostDialogFragment {
-
-        @Override
-        protected void onCreateDialogBuilder(AlertDialog.Builder builder) {
-            builder.setTitle(R.string.edit_host);
-            builder.setPositiveButton(R.string.edit_host_confirm, null);
-            builder.setNegativeButton(R.string.edit_host_delete, null);
+    class EditHostDialogFragment : HostDialogFragment() {
+        override fun onCreateDialogBuilder(builder: AlertDialog.Builder) {
+            builder.setTitle(R.string.edit_host)
+            builder.setPositiveButton(R.string.edit_host_confirm, null)
+            builder.setNegativeButton(R.string.edit_host_delete, null)
         }
 
-        @Override
-        protected void onCreateDialog(AlertDialog dialog) {
-            TextInputLayout hostInputLayout = dialog.findViewById(R.id.host_input_layout);
-            if (hostInputLayout == null) {
-                return;
-            }
-            hostInputLayout.setEnabled(false);
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> put(dialog));
-            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> delete(dialog));
+        override fun onCreateDialog(dialog: AlertDialog) {
+            val hostInputLayout =
+                dialog.findViewById<TextInputLayout>(R.id.host_input_layout) ?: return
+            hostInputLayout.isEnabled = false
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                .setOnClickListener { put(dialog) }
+            dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                .setOnClickListener { delete(dialog) }
         }
     }
 
-    private static class HostsHolder extends RecyclerView.ViewHolder {
+    private class HostsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val host: TextView
+        val ip: TextView
 
-        public final TextView host;
-        public final TextView ip;
-
-        public HostsHolder(View itemView) {
-            super(itemView);
-            host = itemView.findViewById(R.id.host);
-            ip = itemView.findViewById(R.id.ip);
+        init {
+            host = itemView.findViewById(R.id.host)
+            ip = itemView.findViewById(R.id.ip)
         }
     }
 
-    private class HostsAdapter extends RecyclerView.Adapter<HostsHolder> {
-
-        private final LayoutInflater inflater = getLayoutInflater();
-
-        @NonNull
-        @Override
-        public HostsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new HostsHolder(inflater.inflate(R.layout.item_hosts, parent, false));
+    private inner class HostsAdapter : RecyclerView.Adapter<HostsHolder>() {
+        private val inflater = layoutInflater
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HostsHolder {
+            return HostsHolder(inflater.inflate(R.layout.item_hosts, parent, false))
         }
 
-        @Override
-        public void onBindViewHolder(@NonNull HostsHolder holder, int position) {
-            Pair<String, String> pair = data.get(position);
-            holder.host.setText(pair.first);
-            holder.ip.setText(pair.second);
-            holder.itemView.setOnClickListener(v -> onItemClick(position));
+        override fun onBindViewHolder(holder: HostsHolder, position: Int) {
+            val pair = data!![position]
+            holder.host.text = pair.first
+            holder.ip.text = pair.second
+            holder.itemView.setOnClickListener { onItemClick(position) }
         }
 
-        @Override
-        public int getItemCount() {
-            return data.size();
+        override fun getItemCount(): Int {
+            return data!!.size
         }
+    }
+
+    companion object {
+        private val DIALOG_TAG_ADD_HOST = AddHostDialogFragment::class.java.name
+        private val DIALOG_TAG_EDIT_HOST = EditHostDialogFragment::class.java.name
+        private const val KEY_HOST = "com.hippo.ehviewer.ui.fragment.HostsFragment.HOST"
+        private const val KEY_IP = "com.hippo.ehviewer.ui.fragment.HostsFragment.IP"
     }
 }
