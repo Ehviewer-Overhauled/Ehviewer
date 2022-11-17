@@ -73,7 +73,7 @@
                 android:maxHeight="112dp"
                 android:minHeight="56dp"
                 android:padding="@dimen/keyline_margin"
-                android:textColor="?colorOnPrimarySurface" />
+                android:textColor="?colorOnPrimaryContainer" />
 
             <ImageView
                 android:id="@+id/send"
@@ -84,7 +84,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="16dp"
-                app:tint="?colorOnPrimarySurface" />
+                app:tint="?colorOnPrimaryContainer" />
 
         </LinearLayout>
     </FrameLayout>
