@@ -439,13 +439,6 @@
     <string name="settings_eh_thumb_resolution">缩略图分辨率</string>
     <string name="settings_eh_thumb_resolution_summary">%s，指定分辨率可能使获取缩略图失败</string>
     <string name="settings_eh_thumb_resolution_auto">自动</string>
-    <string name="settings_eh_fix_thumb_url">修正缩略图链接</string>
-    <string name="settings_eh_default_categories">主页分类显示</string>
-    <string name="settings_eh_default_categories_summary">默认在主页所显示的分类</string>
-    <string name="settings_eh_excluded_tag_namespaces">排除标签组</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">在默认搜索中排除指定标签组</string>
-    <string name="settings_eh_excluded_languages">排除语言</string>
-    <string name="settings_eh_excluded_languages_summary">在主页与搜索中隐藏指定语言的画廊</string>
     <string name="settings_eh_show_jpn_title">显示日文标题</string>
     <string name="settings_eh_show_jpn_title_summary">需同时在 EHentai 网站设置中启用 Japanese Title</string>
     <string name="settings_eh_show_gallery_pages">显示画廊页数</string>

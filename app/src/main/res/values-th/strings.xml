@@ -395,13 +395,6 @@
     <string name="settings_eh_thumb_resolution">ความละเอียดภาพตัวอย่าง</string>
     <string name="settings_eh_thumb_resolution_summary">ค่าตอนนี้เป็น %s. การตั้งความละเอียดที่แน่นอนอาจจะส่งผลต่อการโหลดตัวอย่างที่อาจจะไม่สำเร็จด้วย</string>
     <string name="settings_eh_thumb_resolution_auto">อัตโนมัติ</string>
-    <string name="settings_eh_fix_thumb_url">แก้ลิงค์ภาพตัวอย่าง</string>
-    <string name="settings_eh_default_categories">หมวดหมู่บนหน้าแรก</string>
-    <string name="settings_eh_default_categories_summary">หมวดหมู่จะแสดงเป็นค่าเริ่มต้นบนหน้าแรก</string>
-    <string name="settings_eh_excluded_languages">ภาษาที่ยกเว้น</string>
-    <string name="settings_eh_excluded_languages_summary">ซ่อนแกลเลอรี่ที่มีภาษาต่างๆจากรายการแกลเลอรี่และการค้นหา</string>
-    <string name="settings_eh_excluded_tag_namespaces">แท็กเนมสเปซที่ยกเว้น</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">แยกเนมสเปซที่ตั้งไว้ออกจากที่ค้นหาแท็กที่เป็นค่าเริ่มต้น</string>
     <string name="settings_eh_show_jpn_title">แสดงชื่อเรื่องญี่ปุ่น</string>
     <string name="settings_eh_show_gallery_pages">แสดงจำนวนหน้าของแกลเลอรี่</string>
     <string name="settings_eh_show_gallery_pages_summary">แสดงจำนวนหน้าที่มีอยู่ในแต่ละแกลเลอรี่</string>

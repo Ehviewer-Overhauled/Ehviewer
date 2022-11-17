@@ -439,13 +439,6 @@
     <string name="settings_eh_thumb_resolution">縮圖解析度</string>
     <string name="settings_eh_thumb_resolution_summary">%s，指定解析度可能會使縮圖取得失敗</string>
     <string name="settings_eh_thumb_resolution_auto">自動</string>
-    <string name="settings_eh_fix_thumb_url">修正縮圖連結</string>
-    <string name="settings_eh_default_categories">顯示在首頁的分類</string>
-    <string name="settings_eh_default_categories_summary">顯示在首頁的分類就跟預設一樣</string>
-    <string name="settings_eh_excluded_tag_namespaces">除標籤命名空間</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">在預設標籤搜尋中排除特定的標籤命名空間</string>
-    <string name="settings_eh_excluded_languages">排除語言</string>
-    <string name="settings_eh_excluded_languages_summary">在首頁與搜尋中隱藏指定語言的圖庫</string>
     <string name="settings_eh_show_jpn_title">顯示日文標題</string>
     <string name="settings_eh_show_jpn_title_summary">需同時在 EHentai 網站設定中啟用 Japanese Title</string>
     <string name="settings_eh_show_gallery_pages">顯示圖庫頁數</string>

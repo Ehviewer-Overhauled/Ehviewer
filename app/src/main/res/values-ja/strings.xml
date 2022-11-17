@@ -389,13 +389,6 @@
     <string name="settings_eh_thumb_resolution">サムネイル解像度</string>
     <string name="settings_eh_thumb_resolution_summary">%s。解像度を正しく設定しないと、サムネイルを取得できない場合があります</string>
     <string name="settings_eh_thumb_resolution_auto">自動</string>
-    <string name="settings_eh_fix_thumb_url">サムネイルリンクを修正</string>
-    <string name="settings_eh_default_categories">ホームページに表示されるカテゴリ</string>
-    <string name="settings_eh_default_categories_summary">ホームページに表示されるデフォルトカテゴリ</string>
-    <string name="settings_eh_excluded_tag_namespaces">タグセットを除外</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">指定したタグセットをデフォルト検索から除外</string>
-    <string name="settings_eh_excluded_languages">言語を除外</string>
-    <string name="settings_eh_excluded_languages_summary">指定した言語のギャラリーをホームページと検索から隠す</string>
     <string name="settings_eh_show_jpn_title">日本語タイトルを表示</string>
     <string name="settings_eh_filter">ギャラリーをブロック</string>
     <string name="settings_eh_filter_summary">タイトル、アップローダ、もしくはタグで望ましくないギャラリーを除外</string>
