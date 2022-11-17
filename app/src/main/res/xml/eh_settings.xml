@@ -128,6 +128,13 @@
 
     <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
+        android:key="show_gallery_comments"
+        android:summary="@string/settings_eh_show_gallery_comments_summary"
+        android:title="@string/settings_eh_show_gallery_comments"
+        app:iconSpaceReserved="false" />
+
+    <rikka.material.preference.MaterialSwitchPreference
+        android:defaultValue="false"
         android:key="show_tag_translations"
         android:summary="@string/settings_eh_show_tag_translations_summary"
         android:title="@string/settings_eh_show_tag_translations"

@@ -386,6 +386,8 @@
     <string name="settings_eh_show_jpn_title_summary">需同时在 EHentai 网站设置中启用 Japanese Title</string>
     <string name="settings_eh_show_gallery_pages">显示画廊页数</string>
     <string name="settings_eh_show_gallery_pages_summary">在画廊列表中显示页数</string>
+    <string name="settings_eh_show_gallery_comments">显示画廊评论</string>
+    <string name="settings_eh_show_gallery_comments_summary">在画廊详情页中显示评论</string>
     <string name="settings_eh_show_tag_translations">显示标签翻译</string>
     <string name="settings_eh_show_tag_translations_summary">显示翻译后的标签而非原始文字（需花费时间来下载数据文件）</string>
     <string name="settings_eh_tag_translations_source">补充翻译（由 EhTagTranslation 提供）</string>

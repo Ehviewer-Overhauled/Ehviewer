@@ -62,6 +62,8 @@ public class Settings {
     public static final String KEY_DETAIL_SIZE = "detail_size";
     public static final String KEY_THUMB_SIZE = "thumb_size";
     public static final String KEY_THUMB_RESOLUTION = "thumb_resolution";
+    private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
+    private static final boolean DEFAULT_SHOW_COMMENTS = true;
     public static final String KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations";
     public static final String KEY_DEFAULT_CATEGORIES = "default_categories";
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhUtils.ALL_CATEGORY;
@@ -555,6 +557,10 @@ public class Settings {
 
     public static int getThumbResolution() {
         return getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION);
+    }
+
+    public static boolean getShowComments() {
+        return getBoolean(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS);
     }
 
     public static boolean getRequestNews() {
