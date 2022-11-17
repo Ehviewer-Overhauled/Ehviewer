@@ -100,6 +100,8 @@
     <dimen name="fab_size">56dp</dimen>
     <dimen name="fab_min_size">40dp</dimen>
 
+    <dimen name="fab_rv_padding_size">80dp</dimen>
+
     <!-- Slider -->
     <dimen name="slider_bubble_width">26dp</dimen>
     <dimen name="slider_bubble_height">32dp</dimen>
