@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.app.BaseDialogBuilder;
@@ -109,6 +110,9 @@ import com.hippo.yorozuya.ViewUtils;
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -892,7 +896,11 @@ public final class GalleryListScene extends BaseScene
                 dialog.dismiss();
             });
         } else {
+            LocalDateTime local = LocalDateTime.of(2005, 1, 1, 0, 0);
+            var constraintsBuilder = new CalendarConstraints.Builder().setStart(local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()).setEnd(MaterialDatePicker.todayInUtcMilliseconds());
+
             var datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setCalendarConstraints(constraintsBuilder.build())
                     .setTitleText(R.string.go_to)
                     .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                     .build();
