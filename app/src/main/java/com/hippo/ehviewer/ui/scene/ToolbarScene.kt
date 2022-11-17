@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.size
 import com.google.android.material.appbar.AppBarLayout
 import com.hippo.ehviewer.R
 
@@ -62,6 +63,18 @@ abstract class ToolbarScene : BaseScene() {
                 setOnMenuItemClickListener { item: MenuItem -> onMenuItemClick(item) }
             }
             setNavigationOnClickListener { onNavigationClick() }
+        }
+    }
+
+    fun hideMenu() {
+        mToolbar?.menu?.clear()
+    }
+
+    fun showMenu(menuResId: Int) {
+        if (mToolbar?.menu?.size != 0) return
+        mToolbar?.apply {
+            inflateMenu(menuResId)
+            setOnMenuItemClickListener { item: MenuItem -> onMenuItemClick(item) }
         }
     }
 

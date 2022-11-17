@@ -45,6 +45,7 @@ import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.client.EhUrl;
+import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryPreview;
 import com.hippo.ehviewer.client.data.PreviewSet;
@@ -190,11 +191,8 @@ public class GalleryPreviewsScene extends ToolbarScene {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_previews);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-    }
-
-    @Override
-    public int getMenuResId() {
-        return R.menu.scene_gallery_previews;
+        if (((GalleryDetail)mGalleryInfo).previewPages > 2)
+            showMenu(R.menu.scene_gallery_previews);
     }
 
     @Override
