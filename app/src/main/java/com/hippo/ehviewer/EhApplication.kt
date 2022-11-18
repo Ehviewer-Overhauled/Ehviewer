@@ -170,6 +170,9 @@ class EhApplication : SceneApplication() {
     }
 
     fun showEventPane(html: String) {
+        if (Settings.getHideHvEvents() && html.contains("You have encountered a monster!")) {
+            return;
+        }
         val activity = topActivity
         activity?.runOnUiThread {
             val dialog = BaseDialogBuilder(activity)

@@ -609,7 +609,8 @@
     <string name="settings_eh_metered_network_warning">流量计费网络警告</string>
     <string name="metered_network_warning">正在使用流量计费网络</string>
     <string name="read_from">从第 %d 页阅读</string>
-    <string name="settings_request_news_title">启动时请求新闻页面</string>
+    <string name="settings_eh_request_news">启动时请求新闻页面</string>
+    <string name="settings_eh_hide_hv_events">隐藏 HV 事件通知</string>
     <string name="copy_trans">复制翻译</string>
     <string name="reset_download_location">恢复默认路径</string>
     <string name="pick_new_download_location">选择新路径</string>

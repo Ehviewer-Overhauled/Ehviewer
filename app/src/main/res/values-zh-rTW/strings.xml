@@ -604,7 +604,7 @@
     <string name="settings_eh_metered_network_warning">流量計費網路警告</string>
     <string name="metered_network_warning">正在使用流量計費網路</string>
     <string name="read_from">從第 %d 頁閱讀</string>
-    <string name="settings_request_news_title">啟動時請求新聞頁面</string>
+    <string name="settings_eh_request_news">啟動時請求新聞頁面</string>
     <string name="copy_trans">複製翻譯</string>
     <string name="reset_download_location">恢復預設路徑</string>
     <string name="pick_new_download_location">選擇新路徑</string>

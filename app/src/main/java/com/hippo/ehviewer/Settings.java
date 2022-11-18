@@ -67,6 +67,8 @@ public class Settings {
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhConfig.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
+    private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
+    private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
     /********************
      ****** Privacy and Security
      ********************/
@@ -549,6 +551,10 @@ public class Settings {
 
     public static boolean getRequestNews() {
         return getBoolean(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS);
+    }
+
+    public static boolean getHideHvEvents() {
+        return getBoolean(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS);
     }
 
     public static boolean getShowJpnTitle() {
