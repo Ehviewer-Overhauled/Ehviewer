@@ -317,27 +317,25 @@ public class HistoryScene extends ToolbarScene {
         return false;
     }
 
-    public boolean onItemClick(View view, int position) {
+    public boolean onItemClick(View view, GalleryInfo gi) {
         if (null == mLazyList) {
             return false;
         }
 
         Bundle args = new Bundle();
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, mLazyList.get(position));
+        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
         startScene(announcer);
         return true;
     }
 
-    public boolean onItemLongClick(int position) {
+    public boolean onItemLongClick(GalleryInfo gi) {
         final Context context = getContext();
         final MainActivity activity = getMainActivity();
         if (null == context || null == activity || null == mLazyList) {
             return false;
         }
-
-        final GalleryInfo gi = mLazyList.get(position);
 
         if (gi == null) {
             return true;
@@ -601,8 +599,8 @@ public class HistoryScene extends ToolbarScene {
             long gid = gi.gid;
             ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gid));
 
-            holder.card.setOnClickListener(v -> onItemClick(holder.itemView, position));
-            holder.card.setOnLongClickListener(v -> onItemLongClick(position));
+            holder.card.setOnClickListener(v -> onItemClick(holder.itemView, gi));
+            holder.card.setOnLongClickListener(v -> onItemLongClick(gi));
         }
 
         @Override
