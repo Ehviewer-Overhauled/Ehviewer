@@ -16,6 +16,7 @@
 
 package com.hippo.drawable;
 
+import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -25,7 +26,6 @@ import com.hippo.conaco.Conaco;
 import com.hippo.conaco.ConacoTask;
 import com.hippo.conaco.Unikery;
 import com.hippo.image.ImageBitmap;
-import com.hippo.image.ImageDrawable;
 import com.hippo.widget.ObservedTextView;
 
 public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap>,
@@ -36,6 +36,8 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
     private final Conaco<ImageBitmap> mConaco;
     private int mTaskId = Unikery.INVALID_ID;
     private String mUrl;
+
+    private ImageBitmap imageBitmap;
 
     public UnikeryDrawable(ObservedTextView textView, Conaco<ImageBitmap> conaco) {
         mTextView = textView;
@@ -62,11 +64,11 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
     }
 
     private void clearDrawable() {
-        Drawable drawable = getDrawable();
-        if (drawable instanceof ImageDrawable) {
-            ((ImageDrawable) drawable).recycle();
-        }
         setDrawable(null);
+        if (imageBitmap != null) {
+            imageBitmap.release();
+            imageBitmap = null;
+        }
     }
 
     @Override
@@ -123,9 +125,9 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
 
     @Override
     public boolean onGetValue(@NonNull ImageBitmap value, int source) {
-        ImageDrawable drawable;
+        Drawable drawable;
         try {
-            drawable = new ImageDrawable(value);
+            drawable = value.getDrawable();
         } catch (Exception e) {
             Log.d(TAG, "The ImageBitmap is recycled", e);
             return false;
@@ -134,7 +136,9 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
         clearDrawable();
 
         setDrawable(drawable);
-        drawable.start();
+        imageBitmap = value;
+        if (drawable instanceof AnimatedImageDrawable animatedImageDrawable)
+            animatedImageDrawable.start();
 
         return true;
     }

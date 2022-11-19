@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -39,7 +40,6 @@ import com.hippo.drawable.PreciselyClipDrawable;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.image.ImageBitmap;
-import com.hippo.image.ImageDrawable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -63,6 +63,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private int mRetryType;
     private boolean mFailed;
     private boolean mLoadFromDrawable = false;
+    private ImageBitmap imageBitmap;
 
     public LoadImageView(Context context) {
         super(context);
@@ -130,10 +131,9 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         }
     }
 
-    private ImageDrawable getImageDrawable() {
+    private Drawable getImageDrawable() {
         Drawable drawable = getDrawable();
-        if (drawable instanceof TransitionDrawable) {
-            TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
+        if (drawable instanceof TransitionDrawable transitionDrawable) {
             if (transitionDrawable.getNumberOfLayers() == 2) {
                 drawable = transitionDrawable.getDrawable(1);
             }
@@ -141,22 +141,17 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         if (drawable instanceof PreciselyClipDrawable) {
             drawable = ((PreciselyClipDrawable) drawable).getWrappedDrawable();
         }
-        if (drawable instanceof ImageDrawable) {
-            return (ImageDrawable) drawable;
-        } else {
-            return null;
-        }
+        return drawable;
     }
 
     private void clearDrawable() {
-        // Recycle ImageDrawable
-        ImageDrawable imageDrawable = getImageDrawable();
-        if (imageDrawable != null) {
-            imageDrawable.recycle();
-        }
-
         // Set drawable null
         setImageDrawable(null);
+        // Recycle ImageDrawable
+        if (imageBitmap != null) {
+            imageBitmap.release();
+            imageBitmap = null;
+        }
     }
 
     private void clearRetry() {
@@ -274,7 +269,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     public boolean onGetValue(@NonNull ImageBitmap value, int source) {
         Drawable drawable;
         try {
-            drawable = new ImageDrawable(value);
+            drawable = value.getDrawable();
         } catch (Exception e) {
             // The image might be recycled because it is removed from memory cache.
             Log.d(TAG, "The image is recycled", e);
@@ -298,6 +293,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         } else {
             setImageDrawable(drawable);
         }
+        imageBitmap = value;
 
         return true;
     }
@@ -327,25 +323,25 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
 
     @Override
     public void start() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            drawable.start();
+        Drawable drawable = getImageDrawable();
+        if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+            animatedImageDrawable.start();
         }
     }
 
     @Override
     public void stop() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            drawable.stop();
+        Drawable drawable = getImageDrawable();
+        if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+            animatedImageDrawable.stop();
         }
     }
 
     @Override
     public boolean isRunning() {
-        ImageDrawable drawable = getImageDrawable();
-        if (drawable != null) {
-            return drawable.isRunning();
+        Drawable drawable = getImageDrawable();
+        if (drawable instanceof AnimatedImageDrawable animatedImageDrawable) {
+            return animatedImageDrawable.isRunning();
         } else {
             return false;
         }

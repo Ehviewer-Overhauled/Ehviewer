@@ -27,7 +27,7 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
     }
 
     private external fun openArchive(fd: Int, size: Long): Int
-    external fun extractToAddr(index: Int): Long
+    external fun extractToMemfd(index: Int): Int
     external fun extractToFd(index: Int, fd: Int)
     external fun getFilename(index: Int): String
     external fun needPassword(): Boolean

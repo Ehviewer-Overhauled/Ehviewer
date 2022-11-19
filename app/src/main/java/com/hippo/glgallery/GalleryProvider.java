@@ -57,7 +57,6 @@ public abstract class GalleryProvider {
     public void stop() {
         OSUtils.checkMainLoop();
         mImageCache.evictAll();
-        Image.lazyEvictAll();
     }
 
     public void setGLRoot(GLRoot glRoot) {
@@ -246,7 +245,7 @@ public abstract class GalleryProvider {
         }
 
         public void add(Integer key, ImageWrapper value) {
-            if (value.getFormat() != Image.FORMAT_ANIMATED)
+            if (!value.getAnimated())
                 if (value.obtain())
                     put(key, value);
         }

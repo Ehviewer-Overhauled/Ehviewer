@@ -1678,9 +1678,7 @@ public final class SpiderQueen implements Runnable {
 
                 if (is != null) {
                     try {
-                        image = Image.decode(((FileInputStream) is).getFD(), true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        image = Image.decode(((FileInputStream) is), false);
                     } finally {
                         try {
                             is.close();

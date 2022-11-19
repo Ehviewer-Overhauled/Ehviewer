@@ -19,6 +19,7 @@ package com.hippo.ehviewer.gallery;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.os.Process;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,8 @@ import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -51,7 +54,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     public static PVLock pv = new PVLock(0);
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
-    private final LinkedHashMap<Integer, Long> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
     private Thread archiveThread;
     private Thread[] decodeThread = new Thread[] {
             new Thread(new DecodeTask()),
@@ -298,10 +301,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     }
                 }
 
-                long addr = archiveAccessor.extractToAddr(index);
+                int fd = archiveAccessor.extractToMemfd(index);
 
                 synchronized (streams) {
-                    streams.put(index, addr);
+                    streams.put(index, fd);
                     streams.notify();
                 }
             }
@@ -313,7 +316,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                Long addr;
+                int fd;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -324,14 +327,15 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, Long>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, Long> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Integer>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Integer> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    addr = entry.getValue();
+                    fd = entry.getValue();
                 }
 
-                Image image = Image.decodeAddr(addr, true);
+                Image image;
+                image = Image.decode(new FileInputStream(ParcelFileDescriptor.adoptFd(fd).getFileDescriptor()), false); // we take ownership here since this memfd is anon fd
                 if (image != null) {
                     notifyPageSucceed(index, image);
                 } else {

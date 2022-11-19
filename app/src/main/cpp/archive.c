@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include <syscall.h>
 
 #include <jni.h>
 #include <android/log.h>
@@ -249,8 +250,8 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     return r;
 }
 
-JNIEXPORT jlong JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint index) {
+JNIEXPORT jint JNICALL
+Java_com_hippo_UriArchiveAccessor_extractToMemfd(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
@@ -258,24 +259,13 @@ Java_com_hippo_UriArchiveAccessor_extractToAddr(JNIEnv *env, jobject thiz, jint 
     ret = archive_get_ctx(&ctx, index);
     if (ret)
         return 0;
-    long long size = archive_entry_size(ctx->entry);
-    void *buffer = malloc(size + sizeof(long long));
-    if (!buffer) {
-        ctx->using = 0;
-        LOGE("Allocate buffer for decompression failed:ENOMEM");
-        return 0;
-    }
-    *(long long *) buffer = size;
-    ret = archive_read_data(ctx->arc, buffer + sizeof(long long), size);
+    int memfd = syscall(SYS_memfd_create, "ArchiveMemFD", 0);
+    ret = archive_read_data_into_fd(ctx->arc, memfd);
     ctx->using = 0;
-    if (ret == size)
-        return (jlong) buffer;
-    if (ret != size)
-        LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
         LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-    free(buffer);
-    return 0;
+    lseek64(memfd, 0, SEEK_SET);
+    return memfd;
 }
 
 JNIEXPORT void JNICALL
