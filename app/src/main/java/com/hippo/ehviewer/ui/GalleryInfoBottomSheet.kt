@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -47,9 +48,11 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
         parseDetail()
         val view = inflater.inflate(R.layout.scene_gallery_info, container, false)
         dialog?.window?.run {
-            addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            attributes.blurBehindRadius = 32
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+                addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                attributes.blurBehindRadius = 32
+            }
         }
         val recyclerView = view.findViewById(R.id.recycler_view) as RecyclerView
         val adapter = InfoAdapter()
