@@ -28,11 +28,6 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.core.graphics.component1
-import androidx.core.graphics.component2
-import androidx.core.graphics.component3
-import androidx.core.graphics.component4
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
@@ -84,10 +79,7 @@ class Image private constructor(source: Source?, drawable: Drawable? = null,
 
     private fun updateBitmap() {
         prepareBitmap()
-        val (oldLeft, oldTop, oldRight, oldBottom) = mObtainedDrawable!!.bounds
-        mObtainedDrawable!!.setBounds(0, 0, width, height)
         mObtainedDrawable!!.draw(Canvas(mBitmap!!))
-        mObtainedDrawable!!.setBounds(oldLeft, oldTop, oldRight, oldBottom)
     }
 
     fun render(
@@ -99,7 +91,7 @@ class Image private constructor(source: Source?, drawable: Drawable? = null,
             updateBitmap()
             mBitmap!!
         } else {
-            mObtainedDrawable!!.toBitmap()
+            (mObtainedDrawable as BitmapDrawable).bitmap
         }
         nativeRender(
             bitmap,
@@ -119,7 +111,7 @@ class Image private constructor(source: Source?, drawable: Drawable? = null,
             updateBitmap()
             mBitmap!!
         } else {
-            mObtainedDrawable!!.toBitmap()
+            (mObtainedDrawable as BitmapDrawable).bitmap
         }
         nativeTexImage(
             bitmap,

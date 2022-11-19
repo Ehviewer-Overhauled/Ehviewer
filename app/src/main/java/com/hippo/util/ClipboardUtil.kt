@@ -59,7 +59,7 @@ fun ClipboardManager.getTextFromClipboard(context: Context): String? {
 }
 
 fun ClipboardManager.getUrlFromClipboard(context: Context): String? {
-    if (primaryClipDescription?.classificationStatus == ClipDescription.CLASSIFICATION_COMPLETE) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && primaryClipDescription?.classificationStatus == ClipDescription.CLASSIFICATION_COMPLETE) {
         if ((primaryClipDescription?.getConfidenceScore(TextClassifier.TYPE_URL)
                 ?.let { it <= 0 }) == true
         ) {
