@@ -66,6 +66,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            app:srcCompat="@drawable/v_check_all_dark_x24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            style="@style/Widget.Material3.FloatingActionButton.Small.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
             app:srcCompat="@drawable/v_download_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
