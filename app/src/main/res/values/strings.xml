@@ -606,6 +606,12 @@
     <string name="settings_advanced_import_data">Import data</string>
     <string name="settings_advanced_import_data_summary">Load data which were previously saved</string>
     <string name="settings_advanced_import_data_successfully">Data imported successfully</string>
+    <string name="settings_advanced_backup_favorite">Backup favorite list</string>
+    <string name="settings_advanced_backup_favorite_summary">Backup remote favorite list to local</string>
+    <string name="settings_advanced_backup_favorite_start">Backing up favorite list %s</string>
+    <string name="settings_advanced_backup_favorite_nothing">Nothing to backup</string>
+    <string name="settings_advanced_backup_favorite_success">Backup favorite list success</string>
+    <string name="settings_advanced_backup_favorite_failed">Backup favorite list failed</string>
 
     <string name="settings_about">About</string>
     <string name="settings_about_declaration" translatable="false">EhViewer</string>
@@ -828,10 +834,5 @@
     <string name="passwd_wrong">Password Wrong</string>
     <string name="passwd_cannot_be_empty">Password can\'t be empty</string>
     <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
-    <string name="backup_favorite">Backup favorite list</string>
-    <string name="backup_favorite_summary">Backup remote favorite list to local</string>
-    <string name="backup_favorite_failed">Backup favorite list failed</string>
-    <string name="backup_favorite_success">backup favorite list success</string>
-    <string name="backup_favorite_start">Now starting backup favorite list</string>
     <string name="account_name">Account</string>
 </resources>

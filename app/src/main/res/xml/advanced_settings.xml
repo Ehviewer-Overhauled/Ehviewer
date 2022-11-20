@@ -99,14 +99,14 @@
         app:iconSpaceReserved="false" />
 
     <Preference
-        android:key="open_by_default"
-        android:title="@string/open_by_default"
+        android:key="backup_favorite"
+        android:summary="@string/settings_advanced_backup_favorite_summary"
+        android:title="@string/settings_advanced_backup_favorite"
         app:iconSpaceReserved="false" />
 
     <Preference
-        android:key="backup_favorite"
-        android:summary="@string/backup_favorite_summary"
-        android:title="@string/backup_favorite"
+        android:key="open_by_default"
+        android:title="@string/open_by_default"
         app:iconSpaceReserved="false" />
 
 </PreferenceScreen>
