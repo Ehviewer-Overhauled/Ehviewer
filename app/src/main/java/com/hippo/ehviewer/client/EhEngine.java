@@ -245,12 +245,6 @@ public class EhEngine {
                 }
             }
         }
-
-        if (Settings.getFixThumbUrl()) {
-            for (GalleryInfo info : list) {
-                info.thumb = EhUrl.getFixedPreviewThumbUrl(info.thumb);
-            }
-        }
     }
 
     public static GalleryListParser.Result getGalleryList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,

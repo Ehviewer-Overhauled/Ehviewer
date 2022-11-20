@@ -342,13 +342,6 @@
     <string name="settings_eh_thumb_resolution">Resolución de vista previa</string>
     <string name="settings_eh_thumb_resolution_summary">%s, las resoluciones especiales podrían causar errores en la vista previa</string>
     <string name="settings_eh_thumb_resolution_auto">Automático</string>
-    <string name="settings_eh_fix_thumb_url">Reparar URL de vistas previas</string>
-    <string name="settings_eh_default_categories">Categorías en la página de inicio</string>
-    <string name="settings_eh_default_categories_summary">Categorías que se muestran en la página de inicio por defecto.</string>
-    <string name="settings_eh_excluded_languages">Idiomas excluidos</string>
-    <string name="settings_eh_excluded_languages_summary">Ocultar galerías en ciertos idiomas de la lista de galerías y búsquedas</string>
-    <string name="settings_eh_excluded_tag_namespaces">Excluir etiquetas espacios de nombres</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">Excluir ciertos espacios de nombres de una búsqueda de etiquetas por defecto</string>
     <string name="settings_eh_show_jpn_title">Mostrar títulos en japonés</string>
     <string name="settings_eh_show_jpn_title_summary">Es necesario habilitar los títulos en japonés en la propia página de EHentai</string>
     <string name="settings_eh_show_gallery_pages">Mostrar número de páginas de la galería</string>
