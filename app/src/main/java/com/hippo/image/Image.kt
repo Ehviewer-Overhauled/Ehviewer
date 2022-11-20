@@ -32,18 +32,20 @@ import androidx.core.graphics.drawable.toDrawable
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
 
-class Image private constructor(source: Source?, drawable: Drawable? = null,
-                                val hardware: Boolean = true
+class Image private constructor(
+    source: Source?, drawable: Drawable? = null,
+    val hardware: Boolean = true
 ) {
     internal var mObtainedDrawable: Drawable?
     private var mBitmap: Bitmap? = null
+
     init {
         mObtainedDrawable = null
         source?.let {
             mObtainedDrawable = ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, _, _ ->
                 decoder.allocator = if (hardware) ALLOCATOR_DEFAULT else ALLOCATOR_SOFTWARE
-            // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
-            // Idk it will cause how much performance regression
+                // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
+                // Idk it will cause how much performance regression
             } // Should we lazy decode it?
         }
         if (mObtainedDrawable == null) {

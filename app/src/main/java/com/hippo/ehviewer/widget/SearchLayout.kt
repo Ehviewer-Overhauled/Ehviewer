@@ -187,12 +187,15 @@ class SearchLayout @JvmOverloads constructor(
                     R.id.search_subscription_search -> {
                         urlBuilder.mode = ListUrlBuilder.MODE_SUBSCRIPTION
                     }
+
                     R.id.search_specify_uploader -> {
                         urlBuilder.mode = ListUrlBuilder.MODE_UPLOADER
                     }
+
                     R.id.search_specify_tag -> {
                         urlBuilder.mode = ListUrlBuilder.MODE_TAG
                     }
+
                     else -> {
                         urlBuilder.mode = ListUrlBuilder.MODE_NORMAL
                     }
@@ -208,6 +211,7 @@ class SearchLayout @JvmOverloads constructor(
                     urlBuilder.pageTo = mTableAdvanceSearch.pageTo
                 }
             }
+
             SEARCH_MODE_IMAGE -> {
                 urlBuilder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
                 mImageView.formatListUrlBuilder(urlBuilder)
@@ -242,7 +246,7 @@ class SearchLayout @JvmOverloads constructor(
     override fun onTabReselected(tab: TabLayout.Tab) {}
 
     @IntDef(SEARCH_MODE_NORMAL, SEARCH_MODE_IMAGE)
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     private annotation class SearchMode
     interface Helper {
         fun onChangeSearchMode()
@@ -291,11 +295,13 @@ class SearchLayout @JvmOverloads constructor(
                         ViewUtils.removeFromParent(mNormalView)
                         content.addView(mNormalView)
                     }
+
                     ITEM_TYPE_NORMAL_ADVANCE -> {
                         title.setText(R.string.search_advance)
                         ViewUtils.removeFromParent(mAdvanceView)
                         content.addView(mAdvanceView)
                     }
+
                     ITEM_TYPE_IMAGE -> {
                         title.setText(R.string.search_image)
                         ViewUtils.removeFromParent(mImageView)

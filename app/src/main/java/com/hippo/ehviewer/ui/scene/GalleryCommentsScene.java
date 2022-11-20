@@ -387,8 +387,7 @@ public final class GalleryCommentsScene extends ToolbarScene
         }
 
         RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
-        if (holder instanceof ActualCommentHolder) {
-            ActualCommentHolder commentHolder = (ActualCommentHolder) holder;
+        if (holder instanceof ActualCommentHolder commentHolder) {
             ClickableSpan span = commentHolder.comment.getCurrentSpan();
             commentHolder.comment.clearCurrentSpan();
 

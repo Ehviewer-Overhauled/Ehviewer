@@ -89,20 +89,7 @@ public class BatteryView extends AppCompatTextView {
             getHandler().post(mCharger);
             mIsChargerWorking = true;
         }
-    }    private final Runnable mCharger = new Runnable() {
-
-        private int level = 0;
-
-        @Override
-        public void run() {
-            level += 2;
-            if (level > 100) {
-                level = 0;
-            }
-            mDrawable.setElect(level, false);
-            getHandler().postDelayed(mCharger, 200);
-        }
-    };
+    }
 
     private void stopCharger() {
         if (mIsChargerWorking) {
@@ -120,7 +107,20 @@ public class BatteryView extends AppCompatTextView {
 
             registerReceiver();
         }
-    }
+    }    private final Runnable mCharger = new Runnable() {
+
+        private int level = 0;
+
+        @Override
+        public void run() {
+            level += 2;
+            if (level > 100) {
+                level = 0;
+            }
+            mDrawable.setElect(level, false);
+            getHandler().postDelayed(mCharger, 200);
+        }
+    };
 
     @Override
     protected void onDetachedFromWindow() {

@@ -589,31 +589,6 @@ public abstract class StageActivity extends EhActivity {
             callback.setEnabled(shouldEnable);
     }
 
-    class BackPressCallBack extends OnBackPressedCallback {
-        public BackPressCallBack(boolean enabled) {
-            super(enabled);
-        }
-
-        @Override
-        public void handleOnBackPressed() {
-            int size = mSceneTagList.size();
-            String tag = mSceneTagList.get(size - 1);
-            SceneFragment scene;
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-            if (fragment == null) {
-                Log.e(TAG, "onBackPressed: Can't find scene by tag: " + tag);
-                return;
-            }
-            if (!(fragment instanceof SceneFragment)) {
-                Log.e(TAG, "onBackPressed: The fragment is not SceneFragment");
-                return;
-            }
-
-            scene = (SceneFragment) fragment;
-            scene.onBackPressed();
-        }
-    }
-
     @Override
     public void onProvideAssistContent(AssistContent outContent) {
         super.onProvideAssistContent(outContent);
@@ -654,6 +629,31 @@ public abstract class StageActivity extends EhActivity {
             return null;
         }
         return fragment.getClass();
+    }
+
+    class BackPressCallBack extends OnBackPressedCallback {
+        public BackPressCallBack(boolean enabled) {
+            super(enabled);
+        }
+
+        @Override
+        public void handleOnBackPressed() {
+            int size = mSceneTagList.size();
+            String tag = mSceneTagList.get(size - 1);
+            SceneFragment scene;
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+            if (fragment == null) {
+                Log.e(TAG, "onBackPressed: Can't find scene by tag: " + tag);
+                return;
+            }
+            if (!(fragment instanceof SceneFragment)) {
+                Log.e(TAG, "onBackPressed: The fragment is not SceneFragment");
+                return;
+            }
+
+            scene = (SceneFragment) fragment;
+            scene.onBackPressed();
+        }
     }
 
     private final class SceneViewComparator implements Comparator<View> {

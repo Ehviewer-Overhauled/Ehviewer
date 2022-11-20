@@ -64,8 +64,7 @@ public final class LayoutManagerUtils {
             RecyclerView.LayoutManager layoutManager, Context context, int position,
             int millisecondsPerInch) {
         SimpleSmoothScroller smoothScroller;
-        if (layoutManager instanceof LinearLayoutManager) {
-            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+        if (layoutManager instanceof final LinearLayoutManager linearLayoutManager) {
             smoothScroller = new SimpleSmoothScroller(context, millisecondsPerInch) {
                 @Override
                 public PointF computeScrollVectorForPosition(int targetPosition) {
@@ -73,8 +72,7 @@ public final class LayoutManagerUtils {
                 }
             };
 
-        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-            final StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
+        } else if (layoutManager instanceof final StaggeredGridLayoutManager staggeredGridLayoutManager) {
             smoothScroller = new SimpleSmoothScroller(context, millisecondsPerInch) {
                 @Override
                 public PointF computeScrollVectorForPosition(int targetPosition) {

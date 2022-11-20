@@ -15,7 +15,8 @@
  */
 package com.hippo.ehviewer.preference
 
-import android.content.*
+import android.content.Context
+import android.content.DialogInterface
 import android.text.Html
 import android.util.AttributeSet
 import androidx.appcompat.app.AlertDialog
@@ -28,10 +29,9 @@ import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.preference.MessagePreference
 import com.hippo.util.addTextToClipboard
-import com.hippo.util.getClipboardManager
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import java.util.*
+import java.util.LinkedList
 
 class AccountPreference @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

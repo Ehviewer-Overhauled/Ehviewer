@@ -477,8 +477,7 @@ public final class MainActivity extends StageActivity
 
     @SuppressLint("RtlHardcoded")
     public void createDrawerView(SceneFragment scene) {
-        if (scene instanceof BaseScene && mRightDrawer != null && mDrawerLayout != null) {
-            BaseScene baseScene = (BaseScene) scene;
+        if (scene instanceof BaseScene baseScene && mRightDrawer != null && mDrawerLayout != null) {
             mRightDrawer.removeAllViews();
             View drawerView = baseScene.createDrawerView(
                     baseScene.getLayoutInflater(), mRightDrawer, null);
@@ -495,8 +494,7 @@ public final class MainActivity extends StageActivity
     public void onSceneViewDestroyed(SceneFragment scene) {
         super.onSceneViewDestroyed(scene);
 
-        if (scene instanceof BaseScene) {
-            BaseScene baseScene = (BaseScene) scene;
+        if (scene instanceof BaseScene baseScene) {
             baseScene.destroyDrawerView();
         }
     }

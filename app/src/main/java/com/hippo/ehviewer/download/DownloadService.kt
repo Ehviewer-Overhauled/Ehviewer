@@ -498,6 +498,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                     }
                     mNotifyManager.notify(mId, mBuilder.build())
                 }
+
                 OPS_CANCEL -> mNotifyManager.cancel(mId)
                 OPS_START_FOREGROUND -> mService.startForeground(mId, mBuilder.build())
             }

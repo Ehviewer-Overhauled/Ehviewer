@@ -58,10 +58,9 @@ public class Filter {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Filter)) {
+        if (!(o instanceof Filter filter)) {
             return false;
         }
-        Filter filter = (Filter) o;
         return filter.mode == mode && ObjectUtils.equal(filter.text, text);
     }
 }

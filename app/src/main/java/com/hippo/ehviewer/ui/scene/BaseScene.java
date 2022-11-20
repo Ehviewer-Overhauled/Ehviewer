@@ -42,8 +42,6 @@ import androidx.fragment.app.FragmentActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 
-import kotlin.Unit;
-
 public abstract class BaseScene extends SceneFragment {
 
     public static final int LENGTH_SHORT = 0;

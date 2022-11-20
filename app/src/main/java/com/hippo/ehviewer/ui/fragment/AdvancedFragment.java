@@ -35,15 +35,15 @@ import androidx.preference.Preference;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.BuildConfig;
-import com.hippo.ehviewer.client.data.FavListUrlBuilder;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
+import com.hippo.ehviewer.client.EhClient;
+import com.hippo.ehviewer.client.EhRequest;
+import com.hippo.ehviewer.client.data.FavListUrlBuilder;
+import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.ui.scene.BaseScene;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -69,9 +69,6 @@ public class AdvancedFragment extends BasePreferenceFragment {
     private static final String KEY_EXPORT_DATA = "export_data";
     private static final String KEY_OPEN_BY_DEFAULT = "open_by_default";
     private static final String KEY_BACKUP_FAVORITE = "backup_favorite";
-    private int favTotal;
-    private int favIndex;
-
     ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument(),
             uri -> {
@@ -227,6 +224,8 @@ public class AdvancedFragment extends BasePreferenceFragment {
                     }
                 }
             });
+    private int favTotal;
+    private int favIndex;
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
@@ -340,7 +339,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            favIndex ++;
+                            favIndex++;
                             favListUrlBuilder.setNext(favResult.nextPage);
                             request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
                             mClient.execute(request);

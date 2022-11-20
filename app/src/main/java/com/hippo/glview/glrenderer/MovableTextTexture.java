@@ -96,7 +96,7 @@ public final class MovableTextTexture extends SpriteTexture {
         int y = 0;
         for (int i = 0; i < length; i++) {
             int offset = i * 4;
-            rects[offset + 0] = x;
+            rects[offset] = x;
             rects[offset + 1] = y;
             rects[offset + 2] = (int) widths[i];
             rects[offset + 3] = height;

@@ -299,7 +299,7 @@ public class FabLayout extends ViewGroup implements View.OnClickListener {
                 mOnExpandListener.onExpand(expanded);
             }
         }
-        ((StageActivity)getContext()).updateBackPressCallBackStatus();
+        ((StageActivity) getContext()).updateBackPressCallBackStatus();
     }
 
 
@@ -427,8 +427,7 @@ public class FabLayout extends ViewGroup implements View.OnClickListener {
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle) {
-            final Bundle savedState = (Bundle) state;
+        if (state instanceof final Bundle savedState) {
             super.onRestoreInstanceState(savedState.getParcelable(STATE_KEY_SUPER));
             setAutoCancel(savedState.getBoolean(STATE_KEY_AUTO_CANCEL));
             setExpanded(savedState.getBoolean(STATE_KEY_EXPANDED), false);

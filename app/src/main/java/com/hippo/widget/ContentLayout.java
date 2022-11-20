@@ -18,7 +18,6 @@ package com.hippo.widget;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -915,8 +914,7 @@ public class ContentLayout extends FrameLayout {
         }
 
         protected Parcelable restoreInstanceState(Parcelable state) {
-            if (state instanceof Bundle) {
-                Bundle bundle = (Bundle) state;
+            if (state instanceof Bundle bundle) {
                 mViewTransition.showView(bundle.getInt(KEY_SHOWN_VIEW), false);
                 mTipView.setText(bundle.getString(KEY_TIP));
 

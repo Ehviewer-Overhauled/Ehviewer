@@ -476,8 +476,7 @@ public class SearchBar extends MaterialCardView implements View.OnClickListener,
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle) {
-            final Bundle savedState = (Bundle) state;
+        if (state instanceof final Bundle savedState) {
             super.onRestoreInstanceState(savedState.getParcelable(STATE_KEY_SUPER));
             setState(savedState.getInt(STATE_KEY_STATE), false);
         }

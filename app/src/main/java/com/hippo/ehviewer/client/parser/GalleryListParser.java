@@ -309,8 +309,10 @@ public class GalleryListParser {
             assert next != null;
             Matcher matcherPrev = PATTERN_PREV_PAGE.matcher(prev.attr("href"));
             Matcher matcherNext = PATTERN_NEXT_PAGE.matcher(next.attr("href"));
-            if (matcherPrev.find()) result.prevGid = NumberUtils.parseIntSafely(matcherPrev.group(1), 0);
-            if (matcherNext.find()) result.nextGid = NumberUtils.parseIntSafely(matcherNext.group(1), 0);
+            if (matcherPrev.find())
+                result.prevGid = NumberUtils.parseIntSafely(matcherPrev.group(1), 0);
+            if (matcherNext.find())
+                result.nextGid = NumberUtils.parseIntSafely(matcherNext.group(1), 0);
             result.founds = Integer.MAX_VALUE;
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);

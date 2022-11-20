@@ -94,8 +94,7 @@ public class RadioGridGroup extends SimpleGridLayout {
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
-        if (child instanceof RadioButton) {
-            final RadioButton button = (RadioButton) child;
+        if (child instanceof final RadioButton button) {
             if (button.isChecked()) {
                 mProtectFromCheckedChange = true;
                 if (mCheckedId != -1) {

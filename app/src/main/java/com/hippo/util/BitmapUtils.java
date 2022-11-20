@@ -42,7 +42,7 @@ public final class BitmapUtils {
         final Runtime runtime = Runtime.getRuntime();
         final long used = runtime.totalMemory() - runtime.freeMemory();
 
-        final long total = activityManager.getMemoryClass() * 1024 * 1024;
+        final long total = (long) activityManager.getMemoryClass() * 1024 * 1024;
 
         return total - used;
     }
@@ -87,7 +87,7 @@ public final class BitmapUtils {
                     }
                     return null;
                 }
-                if (width * height * 3 > m) {
+                if ((long) width * height * 3 > m) {
                     scaleM = (int) Math.ceil(Math.sqrt(width * height * 3 / (float) m));
                 }
             }

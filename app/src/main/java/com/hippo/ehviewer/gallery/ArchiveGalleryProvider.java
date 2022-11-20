@@ -36,7 +36,6 @@ import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,14 +54,13 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
     private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
-    private Thread archiveThread;
-    private Thread[] decodeThread = new Thread[] {
+    private final Thread[] decodeThread = new Thread[]{
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask())
     };
-
+    private Thread archiveThread;
     private volatile int size = STATE_WAIT;
     private String error;
 
@@ -164,7 +162,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         int fd;
         FileOutputStream stream;
         try {
-            stream = (FileOutputStream)file.openOutputStream();
+            stream = (FileOutputStream) file.openOutputStream();
             fd = Native.getFd(stream.getFD());
         } catch (IOException e) {
             e.printStackTrace();
@@ -190,7 +188,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     }
 
     private class ArchiveHostTask implements Runnable {
-        public final Thread[] archiveThreads = new Thread[] {
+        public final Thread[] archiveThreads = new Thread[]{
                 new Thread(new ArchiveTask()),
                 new Thread(new ArchiveTask()),
                 new Thread(new ArchiveTask()),

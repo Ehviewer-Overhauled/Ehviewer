@@ -191,7 +191,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_previews);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        if (((GalleryDetail)mGalleryInfo).previewPages > 2)
+        if (((GalleryDetail) mGalleryInfo).previewPages > 2)
             showMenu(R.menu.scene_gallery_previews);
     }
 

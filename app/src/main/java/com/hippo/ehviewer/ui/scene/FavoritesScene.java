@@ -118,21 +118,6 @@ public class FavoritesScene extends BaseScene implements
     @Nullable
     @ViewLifeCircle
     private FabLayout mFabLayout;
-    private final Runnable showNormalFabsRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (mFabLayout != null) {
-                mFabLayout.setSecondaryFabVisibilityAt(0, true);
-                mFabLayout.setSecondaryFabVisibilityAt(1, true);
-                mFabLayout.setSecondaryFabVisibilityAt(2, true);
-                mFabLayout.setSecondaryFabVisibilityAt(3, false);
-                mFabLayout.setSecondaryFabVisibilityAt(4, false);
-                mFabLayout.setSecondaryFabVisibilityAt(5, false);
-                mFabLayout.setSecondaryFabVisibilityAt(6, false);
-            }
-            updateJumpFab();
-        }
-    };
     @Nullable
     @ViewLifeCircle
     private FavoritesAdapter mAdapter;
@@ -163,6 +148,21 @@ public class FavoritesScene extends BaseScene implements
     @Nullable
     @WholeLifeCircle
     private FavListUrlBuilder mUrlBuilder;
+    private final Runnable showNormalFabsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mFabLayout != null) {
+                mFabLayout.setSecondaryFabVisibilityAt(0, true);
+                mFabLayout.setSecondaryFabVisibilityAt(1, true);
+                mFabLayout.setSecondaryFabVisibilityAt(2, true);
+                mFabLayout.setSecondaryFabVisibilityAt(3, false);
+                mFabLayout.setSecondaryFabVisibilityAt(4, false);
+                mFabLayout.setSecondaryFabVisibilityAt(5, false);
+                mFabLayout.setSecondaryFabVisibilityAt(6, false);
+            }
+            updateJumpFab();
+        }
+    };
     private int mFavLocalCount = 0;
     private int mFavCountSum = 0;
     private boolean mHasFirstRefresh;

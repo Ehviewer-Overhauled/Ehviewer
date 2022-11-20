@@ -113,7 +113,7 @@ public final class SearchDatabase {
      *
      * @param maxEntries Max entries to leave in the table. 0 means remove all entries.
      */
-    protected void truncateHistory(int maxEntries) {
+    private void truncateHistory(int maxEntries) {
         if (maxEntries < 0) {
             throw new IllegalArgumentException();
         }

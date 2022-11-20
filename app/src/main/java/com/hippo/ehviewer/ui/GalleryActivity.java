@@ -303,16 +303,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 break;
         }
         super.attachBaseContext(newBase);
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            result -> {
-                if (result && mSavingPage != -1) {
-                    saveImage(mSavingPage);
-                } else {
-                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
-                }
-                mSavingPage = -1;
-            });
+    }
 
     @Override
     @SuppressWarnings({"WrongConstant"})
@@ -404,26 +395,25 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             if (mGalleryView == null) {
                 return false;
             }
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_SCROLL:
-                    float scroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL) * 300;
-                    if (scroll < 0.0f) {
-                        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                            mGalleryView.pageLeft();
-                        } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
-                            mGalleryView.pageRight();
-                        } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
-                            mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
-                        }
-                    } else {
-                        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                            mGalleryView.pageRight();
-                        } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
-                            mGalleryView.pageLeft();
-                        } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
-                            mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
-                        }
+            if (event.getAction() == MotionEvent.ACTION_SCROLL) {
+                float scroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL) * 300;
+                if (scroll < 0.0f) {
+                    if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
+                        mGalleryView.pageLeft();
+                    } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
+                        mGalleryView.pageRight();
+                    } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
+                        mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
                     }
+                } else {
+                    if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
+                        mGalleryView.pageRight();
+                    } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
+                        mGalleryView.pageLeft();
+                    } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
+                        mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
+                    }
+                }
             }
             return false;
         });
@@ -521,7 +511,16 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mSeekBar = null;
 
         SimpleHandler.getInstance().removeCallbacks(mHideSliderRunnable);
-    }
+    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && mSavingPage != -1) {
+                    saveImage(mSavingPage);
+                } else {
+                    Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show();
+                }
+                mSavingPage = -1;
+            });
 
     @Override
     protected void onPause() {

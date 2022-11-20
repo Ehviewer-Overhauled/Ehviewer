@@ -495,13 +495,15 @@ public class EhDB {
             try {
                 List<DownloadLabel> downloadLabelList = oldRoomDatabase.downloadLabelDao().list();
                 manager.addDownloadLabel(downloadLabelList);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // Downloads
             try {
                 List<DownloadInfo> downloadInfoList = oldRoomDatabase.downloadsDao().list();
                 manager.addDownload(downloadInfoList, false);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // Download dirname
             try {
@@ -509,13 +511,15 @@ public class EhDB {
                 for (DownloadDirname dirname : downloadDirnameList) {
                     putDownloadDirname(dirname.getGid(), dirname.getDirname());
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // History
             try {
                 List<HistoryInfo> historyInfoList = oldRoomDatabase.historyDao().list();
                 putHistoryInfo(historyInfoList);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // QuickSearch
             try {
@@ -537,7 +541,8 @@ public class EhDB {
                     importList.add(quickSearch);
                 }
                 importQuickSearch(importList);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // LocalFavorites
             try {
@@ -545,7 +550,8 @@ public class EhDB {
                 for (LocalFavoriteInfo info : localFavoriteInfoList) {
                     putLocalFavorites(info);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             // Filter
             try {
@@ -556,7 +562,8 @@ public class EhDB {
                         addFilter(filter);
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             return null;
         } catch (Throwable e) {

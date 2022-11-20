@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public final class ObjectUtils {
@@ -33,7 +34,7 @@ public final class ObjectUtils {
      * Returns true if two possibly-null objects are equal.
      */
     public static boolean equal(@Nullable Object a, @Nullable Object b) {
-        return a == b || (a != null && a.equals(b));
+        return Objects.equals(a, b);
     }
 
     /**
@@ -109,48 +110,39 @@ public final class ObjectUtils {
         writer.write('[');
         writer.write('\n');
 
-        if (array instanceof Object[]) {
-            Object[] a = (Object[]) array;
+        if (array instanceof Object[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dump(a[i], writer, newPrefix, false);
             }
-        } else if (array instanceof boolean[]) {
-            boolean[] a = (boolean[]) array;
+        } else if (array instanceof boolean[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpBoolean(a[i], writer, newPrefix);
             }
-        } else if (array instanceof byte[]) {
-            byte[] a = (byte[]) array;
+        } else if (array instanceof byte[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpByte(a[i], writer, newPrefix);
             }
-        } else if (array instanceof char[]) {
-            char[] a = (char[]) array;
+        } else if (array instanceof char[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpChar(a[i], writer, newPrefix);
             }
-        } else if (array instanceof short[]) {
-            short[] a = (short[]) array;
+        } else if (array instanceof short[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpShort(a[i], writer, newPrefix);
             }
-        } else if (array instanceof int[]) {
-            int[] a = (int[]) array;
+        } else if (array instanceof int[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpInt(a[i], writer, newPrefix);
             }
-        } else if (array instanceof long[]) {
-            long[] a = (long[]) array;
+        } else if (array instanceof long[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpLong(a[i], writer, newPrefix);
             }
-        } else if (array instanceof float[]) {
-            float[] a = (float[]) array;
+        } else if (array instanceof float[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpFloat(a[i], writer, newPrefix);
             }
-        } else if (array instanceof double[]) {
-            double[] a = (double[]) array;
+        } else if (array instanceof double[] a) {
             for (int i = 0, l = a.length; i < l; i++) {
                 dumpDouble(a[i], writer, newPrefix);
             }
@@ -162,8 +154,7 @@ public final class ObjectUtils {
             for (Object o : (Set) array) {
                 dump(o, writer, newPrefix);
             }
-        } else if (array instanceof Map) {
-            Map map = (Map) array;
+        } else if (array instanceof Map map) {
             for (Object key : map.keySet()) {
                 Object value = map.get(key);
                 writer.write(newPrefix);

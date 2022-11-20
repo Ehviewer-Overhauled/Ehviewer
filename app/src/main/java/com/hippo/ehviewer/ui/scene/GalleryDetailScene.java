@@ -41,15 +41,12 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -135,6 +132,7 @@ import java.util.List;
 
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
+
 public class GalleryDetailScene extends CollapsingToolbarScene implements View.OnClickListener,
         com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener,
         View.OnLongClickListener {
@@ -284,6 +282,21 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         return null;
     }
 
+    private static void deleteFileAsync(UniFile... files) {
+        //noinspection deprecation
+        new AsyncTask<UniFile, Void, Void>() {
+            @Override
+            protected Void doInBackground(UniFile... params) {
+                for (UniFile file : params) {
+                    if (file != null) {
+                        file.delete();
+                    }
+                }
+                return null;
+            }
+        }.executeOnExecutor(IoThreadPoolExecutor.getInstance(), files);
+    }
+
     @StringRes
     private int getRatingText(float rating) {
         int resId;
@@ -422,21 +435,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } else {
             return null;
         }
-    }
-
-    private static void deleteFileAsync(UniFile... files) {
-        //noinspection deprecation
-        new AsyncTask<UniFile, Void, Void>() {
-            @Override
-            protected Void doInBackground(UniFile... params) {
-                for (UniFile file : params) {
-                    if (file != null) {
-                        file.delete();
-                    }
-                }
-                return null;
-            }
-        }.executeOnExecutor(IoThreadPoolExecutor.getInstance(), files);
     }
 
     @Override
@@ -1294,8 +1292,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
         } else {
             Object o = v.getTag(R.id.tag);
-            if (o instanceof String) {
-                String tag = (String) o;
+            if (o instanceof String tag) {
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_TAG);
                 lub.setKeyword(tag);
@@ -2113,7 +2110,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             EhApplication.getEhClient(context).execute(request);
         }
     }
-    private class DeleteDialogHelper implements DialogInterface.OnClickListener{
+
+    private class DeleteDialogHelper implements DialogInterface.OnClickListener {
         private final com.hippo.ehviewer.download.DownloadManager mDownloadManager;
         private final GalleryInfo mGalleryInfo;
         private final CheckBoxDialogBuilder mBuilder;

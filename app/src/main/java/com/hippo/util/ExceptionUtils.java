@@ -42,8 +42,7 @@ public final class ExceptionUtils {
             return GetText.getString(R.string.error_timeout);
         } else if (e instanceof UnknownHostException) {
             return GetText.getString(R.string.error_unknown_host);
-        } else if (e instanceof StatusCodeException) {
-            StatusCodeException sce = (StatusCodeException) e;
+        } else if (e instanceof StatusCodeException sce) {
             StringBuilder sb = new StringBuilder();
             sb.append(GetText.getString(R.string.error_bad_status_code, sce.getResponseCode()));
             if (sce.isIdentifiedResponseCode()) {

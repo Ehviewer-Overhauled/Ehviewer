@@ -104,17 +104,13 @@ final class DocumentsContractApi19 {
             return true;
         }
 
+        // Writable normal files considered writable
         if (DocumentsContract.Document.MIME_TYPE_DIR.equals(type)
                 && (flags & DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE) != 0) {
             // Directories that allow create considered writable
             return true;
-        } else if (!TextUtils.isEmpty(type)
-                && (flags & DocumentsContract.Document.FLAG_SUPPORTS_WRITE) != 0) {
-            // Writable normal files considered writable
-            return true;
-        }
-
-        return false;
+        } else return !TextUtils.isEmpty(type)
+                && (flags & DocumentsContract.Document.FLAG_SUPPORTS_WRITE) != 0;
     }
 
     public static boolean delete(Context context, Uri self) {

@@ -143,6 +143,8 @@ public final class GalleryListScene extends BaseScene
     private final static int STATE_SEARCH = 2;
     private final static int STATE_SEARCH_SHOW_LIST = 3;
     private static final long ANIMATE_TIME = 300L;
+    // Double click back exit
+    private final long mPressBackTime = 0;
     /*---------------
      Whole life cycle
      ---------------*/
@@ -223,8 +225,6 @@ public final class GalleryListScene extends BaseScene
             }
         }
     };
-    // Double click back exit
-    private final long mPressBackTime = 0;
     private boolean mHasFirstRefresh = false;
     private int mNavCheckedId = 0;
     private DownloadManager mDownloadManager;
@@ -1235,7 +1235,7 @@ public final class GalleryListScene extends BaseScene
                     break;
             }
         }
-        ((StageActivity)requireActivity()).updateBackPressCallBackStatus();
+        ((StageActivity) requireActivity()).updateBackPressCallBackStatus();
     }
 
     @Override

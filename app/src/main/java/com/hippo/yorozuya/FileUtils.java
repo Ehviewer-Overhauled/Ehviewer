@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public final class FileUtils {
@@ -154,7 +155,7 @@ public final class FileUtils {
         OutputStream os = null;
         try {
             os = new FileOutputStream(file);
-            os.write(str.getBytes("utf-8"));
+            os.write(str.getBytes(StandardCharsets.UTF_8));
             return true;
         } catch (IOException e) {
             e.printStackTrace();

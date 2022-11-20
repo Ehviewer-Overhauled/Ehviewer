@@ -202,8 +202,7 @@ public final class ViewUtils {
             return view;
         }
 
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0, n = viewGroup.getChildCount(); i < n; i++) {
                 View child = viewGroup.getChildAt(i);
                 View result = getChild(child, id);
@@ -379,8 +378,7 @@ public final class ViewUtils {
      */
     public static int getIndexInParent(View view) {
         ViewParent parent = view.getParent();
-        if (parent instanceof ViewGroup) {
-            ViewGroup viewParent = (ViewGroup) parent;
+        if (parent instanceof ViewGroup viewParent) {
             int count = viewParent.getChildCount();
             for (int i = 0; i < count; i++) {
                 View v = viewParent.getChildAt(i);
@@ -405,8 +403,7 @@ public final class ViewUtils {
     }
 
     public static void setEnabledRecursively(View view, boolean enabled) {
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0, n = viewGroup.getChildCount(); i < n; i++) {
                 setEnabledRecursively(viewGroup.getChildAt(i), enabled);
             }
@@ -422,9 +419,8 @@ public final class ViewUtils {
         writer.write(prefix);
         writer.write(view.getClass().getName());
         writer.write('\n');
-        if (view instanceof ViewGroup) {
+        if (view instanceof ViewGroup viewGroup) {
             String newPrefix = prefix + "    ";
-            ViewGroup viewGroup = (ViewGroup) view;
             for (int i = 0, count = viewGroup.getChildCount(); i < count; i++) {
                 View child = viewGroup.getChildAt(i);
                 dumpViewHierarchy(child, writer, newPrefix);

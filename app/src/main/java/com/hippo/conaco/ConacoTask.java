@@ -25,7 +25,6 @@ import androidx.annotation.UiThread;
 
 import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.okhttp.ChromeRequestBuilder;
-import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
 
 import java.io.IOException;
@@ -35,8 +34,6 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.Executor;
 
 import okhttp3.Call;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

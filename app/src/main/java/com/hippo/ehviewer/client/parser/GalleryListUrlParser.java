@@ -17,6 +17,7 @@
 package com.hippo.ehviewer.client.parser;
 
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.hippo.ehviewer.client.EhUrl;
@@ -27,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public final class GalleryListUrlParser {
 
@@ -91,10 +93,15 @@ public final class GalleryListUrlParser {
             uploader = path.substring(prefixLength, index);
         }
 
-        try {
-            uploader = URLDecoder.decode(uploader, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            uploader = URLDecoder.decode(uploader, StandardCharsets.UTF_8);
+        } else {
+            try {
+                uploader = URLDecoder.decode(uploader, StandardCharsets.UTF_8.displayName());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         if (TextUtils.isEmpty(uploader)) {
@@ -120,10 +127,15 @@ public final class GalleryListUrlParser {
             tag = path.substring(prefixLength, index);
         }
 
-        try {
-            tag = URLDecoder.decode(tag, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            tag = URLDecoder.decode(tag, StandardCharsets.UTF_8);
+        } else {
+            try {
+                tag = URLDecoder.decode(tag, StandardCharsets.UTF_8.displayName());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         if (TextUtils.isEmpty(tag)) {

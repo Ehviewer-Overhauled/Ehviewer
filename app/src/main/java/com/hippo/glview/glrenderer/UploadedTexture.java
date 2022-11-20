@@ -279,8 +279,7 @@ public abstract class UploadedTexture extends BasicTexture {
 
         @Override
         public boolean equals(Object object) {
-            if (!(object instanceof BorderKey)) return false;
-            BorderKey o = (BorderKey) object;
+            if (!(object instanceof BorderKey o)) return false;
             return vertical == o.vertical
                     && config == o.config && length == o.length;
         }

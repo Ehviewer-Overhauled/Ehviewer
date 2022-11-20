@@ -62,7 +62,6 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.EhActivity;
-import com.hippo.image.Image;
 import com.hippo.image.ImageBitmap;
 import com.hippo.network.StatusCodeException;
 import com.hippo.scene.SceneApplication;
@@ -187,10 +186,9 @@ public class EhApplication extends SceneApplication {
                         TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init((KeyStore) null);
                 TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager trustManager)) {
                     throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
                 }
-                X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
                 builder.sslSocketFactory(new EhSSLSocketFactory(), trustManager);
             } catch (Exception e) {
                 e.printStackTrace();
