@@ -15,7 +15,6 @@
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
@@ -40,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:alwaysCutAndScale="true"
-                app:retryType="click"/>
+                app:retryType="click" />
 
         </com.google.android.material.card.MaterialCardView>
 

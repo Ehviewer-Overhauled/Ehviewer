@@ -79,8 +79,8 @@
     <SeekBarPreference
         android:defaultValue="40"
         android:key="list_tile_size"
-        android:title="@string/list_tile_thumb_size"
         android:max="60"
+        android:title="@string/list_tile_thumb_size"
         app:iconSpaceReserved="false"
         app:min="20"
         app:showSeekBarValue="true" />

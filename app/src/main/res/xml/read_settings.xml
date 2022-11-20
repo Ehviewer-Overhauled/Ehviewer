@@ -121,8 +121,8 @@
         android:defaultValue="50"
         android:dependency="custom_screen_lightness"
         android:key="screen_lightness"
-        android:title="@string/settings_read_screen_lightness"
         android:max="200"
+        android:title="@string/settings_read_screen_lightness"
         app:iconSpaceReserved="false"
         app:showSeekBarValue="true" />
 

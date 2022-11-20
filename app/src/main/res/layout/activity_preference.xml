@@ -49,8 +49,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
         android:textSize="@dimen/text_super_large"
+        android:visibility="gone"
         app:fitsSystemWindowsInsets="bottom" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

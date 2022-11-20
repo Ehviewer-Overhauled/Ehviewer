@@ -88,9 +88,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:paddingTop="24dp"
                 android:maxWidth="@dimen/single_max_width"
-                android:text="@string/app_waring"/>
+                android:paddingTop="24dp"
+                android:text="@string/app_waring" />
 
             <Space
                 android:layout_width="wrap_content"

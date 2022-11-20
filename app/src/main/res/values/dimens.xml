@@ -103,8 +103,6 @@
     <dimen name="fab_rv_padding_size">80dp</dimen>
 
     <!-- Slider -->
-    <dimen name="slider_bubble_width">26dp</dimen>
-    <dimen name="slider_bubble_height">32dp</dimen>
 
     <dimen name="corner_fab_margin">16dp</dimen>
 
