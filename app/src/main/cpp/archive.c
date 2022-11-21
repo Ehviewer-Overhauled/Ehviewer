@@ -250,8 +250,8 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     return r;
 }
 
-JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToMemfd(JNIEnv *env, jobject thiz, jint index) {
+JNIEXPORT jobject JNICALL
+Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
@@ -259,13 +259,23 @@ Java_com_hippo_UriArchiveAccessor_extractToMemfd(JNIEnv *env, jobject thiz, jint
     ret = archive_get_ctx(&ctx, index);
     if (ret)
         return 0;
-    int memfd = syscall(SYS_memfd_create, "ArchiveMemFD", 0);
-    ret = archive_read_data_into_fd(ctx->arc, memfd);
+    long long size = archive_entry_size(ctx->entry);
+    void *buffer = malloc(size);
+    if (!buffer) {
+        ctx->using = 0;
+        LOGE("Allocate buffer for decompression failed:ENOMEM");
+        return 0;
+    }
+    ret = archive_read_data(ctx->arc, buffer, size);
     ctx->using = 0;
+    if (ret == size)
+        return (*env)->NewDirectByteBuffer(env, buffer, size);
+    if (ret != size)
+        LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
         LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-    lseek64(memfd, 0, SEEK_SET);
-    return memfd;
+    free(buffer);
+    return 0;
 }
 
 JNIEXPORT void JNICALL
@@ -344,4 +354,10 @@ Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint in
         archive_read_data_into_fd(ctx->arc, fd);
         ctx->using = 0;
     }
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, jobject buffer) {
+    void *addr = (*env)->GetDirectBufferAddress(env, buffer);
+    free(addr);
 }

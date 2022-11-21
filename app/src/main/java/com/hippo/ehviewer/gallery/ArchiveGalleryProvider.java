@@ -39,6 +39,7 @@ import com.hippo.yorozuya.thread.PriorityThread;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
     public static PVLock pv = new PVLock(0);
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
-    private final LinkedHashMap<Integer, Integer> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, ByteBuffer> streams = new LinkedHashMap<>();
     private final Thread[] decodeThread = new Thread[]{
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
@@ -299,10 +300,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     }
                 }
 
-                int fd = archiveAccessor.extractToMemfd(index);
+                ByteBuffer buffer = archiveAccessor.extractToByteBuffer(index);
 
                 synchronized (streams) {
-                    streams.put(index, fd);
+                    streams.put(index, buffer);
                     streams.notify();
                 }
             }
@@ -314,7 +315,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                int fd;
+                ByteBuffer buffer;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -325,15 +326,18 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, Integer>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, Integer> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, ByteBuffer>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, ByteBuffer> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    fd = entry.getValue();
+                    buffer = entry.getValue();
                 }
 
                 Image image;
-                image = Image.decode(new FileInputStream(ParcelFileDescriptor.adoptFd(fd).getFileDescriptor()), false); // we take ownership here since this memfd is anon fd
+                image = Image.decode(buffer, false, () -> {
+                    archiveAccessor.releaseByteBuffer(buffer);
+                    return null;
+                });
                 if (image != null) {
                     notifyPageSucceed(index, image);
                 } else {

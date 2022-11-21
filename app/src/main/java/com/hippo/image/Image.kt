@@ -30,11 +30,13 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toDrawable
 import java.io.FileInputStream
+import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
 class Image private constructor(
     source: Source?, drawable: Drawable? = null,
-    val hardware: Boolean = true
+    val hardware: Boolean = true,
+    val release: () -> Unit? = {}
 ) {
     internal var mObtainedDrawable: Drawable?
     private var mBitmap: Bitmap? = null
@@ -72,6 +74,7 @@ class Image private constructor(
         mObtainedDrawable = null
         mBitmap?.recycle()
         mBitmap = null
+        release()
     }
 
     private fun prepareBitmap() {
@@ -153,6 +156,14 @@ class Image private constructor(
                 )
             )
             return Image(src, hardware = hardware)
+        }
+
+        @JvmStatic
+        fun decode(buffer: ByteBuffer, hardware: Boolean = true, release: () -> Unit? = {}): Image {
+            val src = ImageDecoder.createSource(buffer)
+            return Image(src, hardware = hardware) {
+                release()
+            }
         }
 
         @JvmStatic
