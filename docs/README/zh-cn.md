@@ -68,8 +68,6 @@
 
 <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="../../art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="../../art/get-it-on-fdroid.svg" width="200px"/></a>
 
-App 分为 1.8 与 1.7 两个版本。1.8 版本适配 Android 12 及以上系统，为开发主线；1.7 版本适配 Android 11 及以下版本，削减了 Android 12 及以上系统的独有功能，使其能在低版本 Android 上正常工作
-
 # 截图
 
 ![screenshot-01](../../art/screenshot-01.png)
