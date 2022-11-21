@@ -253,7 +253,7 @@
     <string name="apply_tip">Zum Speichern der Einstellungen auf Häkchen tippen</string>
     <string name="hosts">Angepasstes hosts.txt</string>
     <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3...)</string>
+    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
     <string name="add_host">Host hinzufügen</string>
     <string name="add_host_add">Hinzufügen</string>
     <string name="edit_host">Host bearbeiten</string>

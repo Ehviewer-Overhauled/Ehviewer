@@ -525,7 +525,7 @@
     <string name="settings_privacy_secure_summary">Quand cette option est activée, vous ne pouvez prendre aucune capture d\'écran de l\'application, et le systéme n\'affiche pas le contenu d\'écran dans le sélecteur de tâches.\n\nRedémarrage de l\'application est nécessaire pour appliquer le changement</string>
     <string name="hosts">Personnalisé hosts.txt</string>
     <string name="hosts_host">Hôte</string>
-    <string name="hosts_ip">IP1(+IP2+IP3...)</string>
+    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
     <string name="add_host">Ajouter hôte</string>
     <string name="add_host_add">Ajouter</string>
     <string name="edit_host">Modifier hôte</string>
