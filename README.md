@@ -72,8 +72,6 @@ Also thanks @txyyh for her help in docs, release notes, design and 1.7.x.x maint
 
 <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
 
-There are two development branches: 1.8.x.x and 1.7.x.x . Version 1.8 only support platform api 31 (aka Android S) and above, also the develop mainline. Version 1.7 should only be used on Android 11 and below, since these platforms lack native api of image decoding.
-
 # Screenshot
 
 ![screenshot-01](art/screenshot-01.png)
