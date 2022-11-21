@@ -29,17 +29,21 @@ import androidx.core.graphics.drawable.DrawableCompat;
 
 public class DrawableWrapper extends Drawable implements Drawable.Callback {
     private Drawable mDrawable;
+    private Rect mBounds;
 
     public DrawableWrapper(Drawable drawable) {
         this.setWrappedDrawable(drawable);
     }
 
     public void draw(@NonNull Canvas canvas) {
-        this.mDrawable.draw(canvas);
+        synchronized (mDrawable) {
+            mDrawable.setBounds(mBounds);
+            mDrawable.draw(canvas);
+        }
     }
 
     protected void onBoundsChange(Rect bounds) {
-        this.mDrawable.setBounds(bounds);
+        mBounds = bounds;
     }
 
     public int getChangingConfigurations() {
