@@ -22,6 +22,7 @@ import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -36,9 +37,13 @@ public class DrawableWrapper extends Drawable implements Drawable.Callback {
     }
 
     public void draw(@NonNull Canvas canvas) {
-        synchronized (mDrawable) {
-            mDrawable.setBounds(mBounds);
-            mDrawable.draw(canvas);
+        if (mDrawable instanceof BitmapDrawable bitmapDrawable) {
+            canvas.drawBitmap(bitmapDrawable.getBitmap(), null, mBounds, bitmapDrawable.getPaint());
+        } else {
+            synchronized (mDrawable) {
+                mDrawable.setBounds(mBounds);
+                mDrawable.draw(canvas);
+            }
         }
     }
 
