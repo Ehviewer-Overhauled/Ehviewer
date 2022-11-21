@@ -64,10 +64,6 @@ EhViewer fork dedicated to lightweight and high-performance
 
 with Material Design 3 and Dynamic Color Support
 
-Maintained by Tarsin Norbin aka 飛鳥澪 (asuka-mio)
-
-Also thanks @txyyh for her help in docs, release notes, design and 1.7.x.x maintenance
-
 # Download
 
 <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
