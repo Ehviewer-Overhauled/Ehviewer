@@ -32,11 +32,11 @@ jobs:
 
       - name: Rename Apks
         run: |
-          cp app/build/outputs/apk/release/app-universal-release.apk app/build/outputs/apk/release/EhViewer-universal-A12+.apk
-          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk app/build/outputs/apk/release/EhViewer-arm64-v8a-A12+.apk
-          cp app/build/outputs/apk/release/app-x86_64-release.apk app/build/outputs/apk/release/EhViewer-x86_64-A12+.apk
-          cp app/build/outputs/apk/release/app-x86-release.apk app/build/outputs/apk/release/EhViewer-x86-A12+.apk
-          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk app/build/outputs/apk/release/EhViewer-armeabi-v7a-A12+.apk
+          cp app/build/outputs/apk/release/app-universal-release.apk app/build/outputs/apk/release/EhViewer-universal.apk
+          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk app/build/outputs/apk/release/EhViewer-arm64-v8a.apk
+          cp app/build/outputs/apk/release/app-x86_64-release.apk app/build/outputs/apk/release/EhViewer-x86_64.apk
+          cp app/build/outputs/apk/release/app-x86-release.apk app/build/outputs/apk/release/EhViewer-x86.apk
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk app/build/outputs/apk/release/EhViewer-armeabi-v7a.apk
 
       - name: Releases
         uses: softprops/action-gh-release@v1
@@ -44,11 +44,11 @@ jobs:
           body: Bump Version
           discussion_category_name: Announcements
           files: |
-            app/build/outputs/apk/release/EhViewer-universal-A12+.apk
-            app/build/outputs/apk/release/EhViewer-arm64-v8a-A12+.apk
-            app/build/outputs/apk/release/EhViewer-x86_64-A12+.apk
-            app/build/outputs/apk/release/EhViewer-x86-A12+.apk
-            app/build/outputs/apk/release/EhViewer-armeabi-v7a-A12+.apk
+            app/build/outputs/apk/release/EhViewer-universal.apk
+            app/build/outputs/apk/release/EhViewer-arm64-v8a.apk
+            app/build/outputs/apk/release/EhViewer-x86_64.apk
+            app/build/outputs/apk/release/EhViewer-x86.apk
+            app/build/outputs/apk/release/EhViewer-armeabi-v7a.apk
 
       - name: Collect Apks
         run: |
