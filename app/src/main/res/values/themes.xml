@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="dividerColor">@color/divider</item>
@@ -30,7 +30,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
-        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
