@@ -333,11 +333,13 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                     buffer = entry.getValue();
                 }
 
-                Image image;
-                image = Image.decode(buffer, false, () -> {
-                    archiveAccessor.releaseByteBuffer(buffer);
-                    return null;
-                });
+                Image image = null;
+                if (buffer != null) {
+                    image = Image.decode(buffer, false, () -> {
+                        archiveAccessor.releaseByteBuffer(buffer);
+                        return null;
+                    });
+                }
                 if (image != null) {
                     notifyPageSucceed(index, image);
                 } else {

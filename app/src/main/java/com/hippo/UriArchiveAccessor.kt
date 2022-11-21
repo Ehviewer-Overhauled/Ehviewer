@@ -28,7 +28,7 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
     }
 
     private external fun openArchive(fd: Int, size: Long): Int
-    external fun extractToByteBuffer(index: Int): ByteBuffer
+    external fun extractToByteBuffer(index: Int): ByteBuffer?
 
     external fun releaseByteBuffer(buffer: ByteBuffer)
     external fun extractToFd(index: Int, fd: Int)
