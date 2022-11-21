@@ -14,19 +14,20 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
 
         android:id="@+id/action_add"
         android:icon="@drawable/v_plus_dark_x24"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/settings" />
 
     <item
         android:id="@+id/action_default_download_label"
         android:icon="@drawable/v_download_box_dark_x24"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="@string/default_download_label" />
 
 </menu>
