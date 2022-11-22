@@ -314,6 +314,11 @@ public class DownloadsScene extends ToolbarScene
         setLiftOnScrollTargetView(mRecyclerView);
         mFastScroller = (FastScroller) ViewUtils.$$(content, R.id.fast_scroller);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
+
+        // Workaround
+        ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        container.addView(mFabLayout);
+
         mTip = (TextView) ViewUtils.$$(view, R.id.tip);
         mViewTransition = new ViewTransition(content, mTip);
 
@@ -389,6 +394,7 @@ public class DownloadsScene extends ToolbarScene
         }
         if (null != mFabLayout) {
             removeAboveSnackView(mFabLayout);
+            ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
             mFabLayout = null;
         }
 
