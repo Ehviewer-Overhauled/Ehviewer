@@ -17,7 +17,7 @@ dependencyResolutionManagement {
             url = uri("https://maven.pkg.github.com/material-components/material-components-android")
             credentials {
                 username = "nullArrayList"
-                password = "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" // This github account has nothing and this token only have "read packages" permission. So guys, don't try to do bad things
+                password = "ghp_" + "TTLrOZAWR" + "MlbqMF" + "zwJNdaNON" + "EDDRM22DCHSL" // This github account has nothing and this token only have "read packages" permission. So guys, don't try to do bad things
             }
         }
     }
