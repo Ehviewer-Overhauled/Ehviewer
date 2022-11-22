@@ -114,20 +114,14 @@ class EhDns(context: Context) : Dns {
         host: String,
         vararg ips: Pair<String, Boolean>
     ) {
-        map[host] = ips.mapNotNull {
-            if (Settings.getDF() && it.second) null else Hosts.toInetAddress(host, it.first)
+        map[host] = ips.mapNotNull { pair ->
+            Hosts.toInetAddress(host, pair.first).takeUnless { Settings.getDF() && pair.second }
         }
     }
 
     @Throws(UnknownHostException::class)
     override fun lookup(hostname: String): List<InetAddress> {
-        var inetAddresses = hosts[hostname]
-        inetAddresses ?: run {
-            if (Settings.getBuiltInHosts()) {
-                inetAddresses = builtInHosts[hostname]
-            }
-        }
-        inetAddresses ?: return Dns.SYSTEM.lookup(hostname)
-        return inetAddresses!! // Should never be null here
+        return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.getBuiltInHosts() }
+        ?: Dns.SYSTEM.lookup(hostname)
     }
 }
