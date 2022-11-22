@@ -32,7 +32,7 @@
             android:clipToPadding="false"
             android:paddingLeft="@dimen/keyline_margin"
             android:paddingRight="@dimen/keyline_margin"
-            app:fitsSystemWindowsInsets="top|end" />
+            app:fitsSystemWindowsInsets="top|bottom" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
