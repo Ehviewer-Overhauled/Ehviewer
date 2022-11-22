@@ -406,7 +406,6 @@
     <string name="clipboard_gallery_url_snack_action">Gehen</string>
     <string name="settings_advanced_read_cache_size">Größe des Lesezwischenspeichers</string>
     <string name="settings_advanced_built_in_hosts_title">Standard-hosts.txt</string>
-    <string name="settings_about_declaration" translatable="false">EhViewer</string>
     <string name="settings_about_declaration_summary">EhViewer verbindet sich in keiner Weise mit E-Hentai.org.</string>
     <string name="settings_about_source">Quellcode</string>
     <string name="settings_about_version">Versionnummer</string>

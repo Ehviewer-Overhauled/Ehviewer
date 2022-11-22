@@ -429,7 +429,6 @@
     <string name="settings_advanced_import_data_successfully">データをインポートしました</string>
 
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_about_declaration" translatable="false">EhViewer</string>
     <string name="settings_about_declaration_summary">EhViewerはE-Hentai.orgと一切の関係がございません。</string>
     <string name="settings_about_author">開発者</string>
     <string name="settings_about_latest_release">最新バージョン</string>
