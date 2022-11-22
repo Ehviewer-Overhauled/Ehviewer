@@ -23,5 +23,4 @@
     <color name="navigation_bar_divider">#1f000000</color>
     <color name="divider">#20000000</color>
     <color name="divider_black">#20ffffff</color>
-    <color name="shortcut_bg">#F5F5F5</color>
 </resources>
