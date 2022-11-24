@@ -1765,23 +1765,24 @@ public final class GalleryListScene extends BaseScene
                 return;
             }
 
+            int prevGid = 0, nextGid = 0;
             if (mIsTopList) {
-                mUrlBuilder.setNextGid(page);
                 if (jumpTo != null) {
                     pgCounter = Integer.parseInt(jumpTo);
-                    mUrlBuilder.setNextGid(pgCounter);
+                    nextGid = pgCounter;
+                } else {
+                    nextGid = page;
                 }
-            } else {
-                int prevGid = 0, nextGid = 0;
-                if (page != 0) {
-                    if (page >= mHelper.getPageForTop())
-                        nextGid = minGid;
-                    else
-                        prevGid = maxGid;
-                }
-                mUrlBuilder.setPrevGid(prevGid);
-                mUrlBuilder.setNextGid(nextGid);
+            } else if (jumpTo != null) {
+                nextGid = minGid;
+            } else if (page != 0) {
+                if (page >= mHelper.getPageForTop())
+                    nextGid = minGid;
+                else
+                    prevGid = maxGid;
             }
+            mUrlBuilder.setPrevGid(prevGid);
+            mUrlBuilder.setNextGid(nextGid);
 
             mUrlBuilder.setJumpTo(jumpTo);
             jumpTo = null;
