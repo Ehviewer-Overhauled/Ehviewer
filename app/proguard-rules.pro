@@ -14,10 +14,6 @@
 -keep,allowoptimization class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { }
 -keep,allowoptimization class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { }
 
--keepnames class com.hippo.ehviewer.ui.scene.* { }
-
--keepattributes SourceFile,LineNumberTable
-
 -renamesourcefileattribute
 -repackageclasses
 -allowaccessmodification
