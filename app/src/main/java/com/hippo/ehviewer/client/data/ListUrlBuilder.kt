@@ -399,6 +399,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 if (mNextGid != 0) {
                     sb.append("?next=").append(mNextGid)
                 }
+                if (mJumpTo != null) {
+                    sb.append("&seek=").append(mJumpTo)
+                }
                 sb.toString()
             }
 
@@ -415,6 +418,9 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 }
                 if (mNextGid != 0) {
                     sb.append("?next=").append(mNextGid)
+                }
+                if (mJumpTo != null) {
+                    sb.append("&seek=").append(mJumpTo)
                 }
                 sb.toString()
             }
