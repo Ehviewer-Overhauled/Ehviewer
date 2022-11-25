@@ -16,8 +16,6 @@
 package com.hippo.ehviewer.widget
 
 import android.annotation.SuppressLint
-import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
 import android.os.Bundle
 import android.os.Parcelable
 import com.hippo.ehviewer.EhApplication
@@ -25,7 +23,12 @@ import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.yorozuya.IntIdGenerator
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.max
+import kotlin.math.min
 
 abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
     @JvmField
@@ -64,8 +67,8 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
             info?.let {
                 if (maxGid == -1) maxGid = info.gid.toInt()
                 if (minGid == -1) minGid = info.gid.toInt()
-                maxGid = Math.max(maxGid.toLong(), info.gid).toInt()
-                minGid = Math.min(minGid.toLong(), info.gid).toInt()
+                maxGid = max(maxGid.toLong(), info.gid).toInt()
+                minGid = min(minGid.toLong(), info.gid).toInt()
                 map[info.gid] = info
             }
         }
@@ -121,11 +124,9 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
     }
 
     fun goTo(time: Long) {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = time
-        val date = calendar.time
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        jumpTo = format.format(date)
+        val formatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
+        jumpTo = formatter.format(Instant.ofEpochMilli(time))
         doGoToPage(Int.MAX_VALUE / 2)
     }
 

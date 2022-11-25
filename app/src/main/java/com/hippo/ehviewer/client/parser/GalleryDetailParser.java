@@ -46,14 +46,12 @@ import org.jsoup.select.Elements;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,9 +62,6 @@ public class GalleryDetailParser {
     private static final Pattern PATTERN_TORRENT = Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download[^<]+(\\d+)[^<]+</a");
     private static final Pattern PATTERN_ARCHIVE = Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Archive Download</a>");
     private static final Pattern PATTERN_COVER = Pattern.compile("width:(\\d+)px; height:(\\d+)px.+?url\\((.+?)\\)");
-    private static final Pattern PATTERN_TAG_GROUP = Pattern.compile("<tr><td[^<>]+>([\\w\\s]+):</td><td>(?:<div[^<>]+><a[^<>]+>[\\w\\s]+</a></div>)+</td></tr>");
-    private static final Pattern PATTERN_TAG = Pattern.compile("<div[^<>]+><a[^<>]+>([\\w\\s]+)</a></div>");
-    private static final Pattern PATTERN_COMMENT = Pattern.compile("<div class=\"c3\">Posted on ([^<>]+) by: &nbsp; <a[^<>]+>([^<>]+)</a>.+?<div class=\"c6\"[^>]*>(.+?)</div><div class=\"c[78]\"");
     private static final Pattern PATTERN_PAGES = Pattern.compile("<tr><td[^<>]*>Length:</td><td[^<>]*>([\\d,]+) pages</td></tr>");
     private static final Pattern PATTERN_PREVIEW_PAGES = Pattern.compile("<td[^>]+><a[^>]+>([\\d,]+)</a></td><td[^>]+>(?:<a[^>]+>)?&gt;(?:</a>)?</td>");
     private static final Pattern PATTERN_NORMAL_PREVIEW = Pattern.compile("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"");
@@ -76,15 +71,12 @@ public class GalleryDetailParser {
     private static final GalleryTagGroup[] EMPTY_GALLERY_TAG_GROUP_ARRAY = new GalleryTagGroup[0];
     private static final GalleryCommentList EMPTY_GALLERY_COMMENT_ARRAY = new GalleryCommentList(new GalleryComment[0], false);
 
-    private static final DateFormat WEB_COMMENT_DATE_FORMAT = new SimpleDateFormat("dd MMMMM yyyy, HH:mm", Locale.US);
+    private static final DateTimeFormatter WEB_COMMENT_DATE_FORMAT = DateTimeFormatter
+            .ofPattern("dd MMMM yyyy, HH:mm", Locale.US).withZone(ZoneOffset.UTC);
     private static final String OFFENSIVE_STRING =
             "<p>(And if you choose to ignore this warning, you lose all rights to complain about it in the future.)</p>";
     private static final String PINING_STRING =
             "<p>This gallery is pining for the fjords.</p>";
-
-    static {
-        WEB_COMMENT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     public static GalleryDetail parse(String body) throws EhException {
         if (body.contains(OFFENSIVE_STRING)) {
@@ -196,14 +188,13 @@ public class GalleryDetailParser {
             gd.posted = "";
             gd.parent = "";
             gd.visible = "";
-            gd.visible = "";
             gd.size = "";
             gd.pages = 0;
             gd.favoriteCount = 0;
             try {
                 Elements es = gdd.child(0).child(0).children();
                 for (int i = 0, n = es.size(); i < n; i++) {
-                    parseDetailInfo(gd, es.get(i), body);
+                    parseDetailInfo(gd, es.get(i));
                 }
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
@@ -291,7 +282,7 @@ public class GalleryDetailParser {
         }
     }
 
-    private static void parseDetailInfo(GalleryDetail gd, Element e, String body) {
+    private static void parseDetailInfo(GalleryDetail gd, Element e) {
         Elements es = e.children();
         if (es.size() < 2) {
             return;
@@ -321,20 +312,16 @@ public class GalleryDetailParser {
             }
         } else if (key.startsWith("Favorited")) {
             switch (value) {
-                case "Never":
-                    gd.favoriteCount = 0;
-                    break;
-                case "Once":
-                    gd.favoriteCount = 1;
-                    break;
-                default:
+                case "Never" -> gd.favoriteCount = 0;
+                case "Once" -> gd.favoriteCount = 1;
+                default -> {
                     int index = value.indexOf(' ');
                     if (index == -1) {
                         gd.favoriteCount = 0;
                     } else {
                         gd.favoriteCount = NumberUtils.parseIntSafely(value.substring(0, index), 0);
                     }
-                    break;
+                }
             }
         }
     }
@@ -375,6 +362,7 @@ public class GalleryDetailParser {
     public static GalleryTagGroup[] parseTagGroups(Document document) {
         try {
             Element taglist = document.getElementById("taglist");
+            assert taglist != null;
             Elements tagGroups = taglist.child(0).child(0).children();
             return parseTagGroups(tagGroups);
         } catch (Throwable e) {
@@ -394,36 +382,11 @@ public class GalleryDetailParser {
                     list.add(group);
                 }
             }
-            return list.toArray(new GalleryTagGroup[list.size()]);
+            return list.toArray(new GalleryTagGroup[0]);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             e.printStackTrace();
             return EMPTY_GALLERY_TAG_GROUP_ARRAY;
-        }
-    }
-
-    /**
-     * Parse tag groups with regular expressions
-     */
-    @NonNull
-    private static GalleryTagGroup[] parseTagGroups(String body) throws EhException {
-        List<GalleryTagGroup> list = new LinkedList<>();
-
-        Matcher m = PATTERN_TAG_GROUP.matcher(body);
-        while (m.find()) {
-            GalleryTagGroup tagGroup = new GalleryTagGroup();
-            tagGroup.groupName = ParserUtils.trim(m.group(1));
-            parseGroup(tagGroup, m.group(0));
-            list.add(tagGroup);
-        }
-
-        return list.toArray(new GalleryTagGroup[list.size()]);
-    }
-
-    private static void parseGroup(GalleryTagGroup tagGroup, String body) {
-        Matcher m = PATTERN_TAG.matcher(body);
-        while (m.find()) {
-            tagGroup.addTag(ParserUtils.trim(m.group(1)));
         }
     }
 
@@ -444,17 +407,15 @@ public class GalleryDetailParser {
                 }
                 for (Element e : c4.children()) {
                     switch (e.text()) {
-                        case "Vote+":
+                        case "Vote+" -> {
                             comment.voteUpAble = true;
                             comment.voteUpEd = !StringUtils.trim(e.attr("style")).isEmpty();
-                            break;
-                        case "Vote-":
+                        }
+                        case "Vote-" -> {
                             comment.voteDownAble = true;
                             comment.voteDownEd = !StringUtils.trim(e.attr("style")).isEmpty();
-                            break;
-                        case "Edit":
-                            comment.editable = true;
-                            break;
+                        }
+                        case "Edit" -> comment.editable = true;
                     }
                 }
             }
@@ -475,7 +436,7 @@ public class GalleryDetailParser {
             Element c3 = JsoupUtils.getElementByClass(element, "c3");
             String temp = c3.ownText();
             temp = temp.substring("Posted on ".length(), temp.length() - " by:".length());
-            comment.time = WEB_COMMENT_DATE_FORMAT.parse(temp).getTime();
+            comment.time = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(temp)).toEpochMilli();
             // user
             comment.user = c3.child(0).text();
             // comment
@@ -485,7 +446,7 @@ public class GalleryDetailParser {
             if (c8 != null) {
                 Element e = c8.children().first();
                 if (e != null) {
-                    comment.lastEdited = WEB_COMMENT_DATE_FORMAT.parse(temp).getTime();
+                    comment.lastEdited = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(temp)).toEpochMilli();
                 }
             }
             return comment;
@@ -503,6 +464,7 @@ public class GalleryDetailParser {
     public static GalleryCommentList parseComments(Document document) {
         try {
             Element cdiv = document.getElementById("cdiv");
+            assert cdiv != null;
             Elements c1s = cdiv.getElementsByClass("c1");
 
             List<GalleryComment> list = new ArrayList<>(c1s.size());
@@ -515,20 +477,21 @@ public class GalleryDetailParser {
 
             Element chd = cdiv.getElementById("chd");
             MutableBoolean hasMore = new MutableBoolean(false);
+            assert chd != null;
             NodeTraversor.traverse(new NodeVisitor() {
                 @Override
-                public void head(Node node, int depth) {
+                public void head(@NonNull Node node, int depth) {
                     if (node instanceof Element && ((Element) node).text().equals("click to show all")) {
                         hasMore.value = true;
                     }
                 }
 
                 @Override
-                public void tail(Node node, int depth) {
+                public void tail(@NonNull Node node, int depth) {
                 }
             }, chd);
 
-            return new GalleryCommentList(list.toArray(new GalleryComment[list.size()]), hasMore.value);
+            return new GalleryCommentList(list.toArray(new GalleryComment[0]), hasMore.value);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             e.printStackTrace();
@@ -537,37 +500,13 @@ public class GalleryDetailParser {
     }
 
     /**
-     * Parse comments with regular expressions
-     */
-    @NonNull
-    public static GalleryComment[] parseComments(String body) {
-        List<GalleryComment> list = new LinkedList<>();
-
-        Matcher m = PATTERN_COMMENT.matcher(body);
-        while (m.find()) {
-            String webDateString = ParserUtils.trim(m.group(1));
-            Date date;
-            try {
-                date = WEB_COMMENT_DATE_FORMAT.parse(webDateString);
-            } catch (java.text.ParseException e) {
-                date = new Date(0L);
-            }
-            GalleryComment comment = new GalleryComment();
-            comment.time = date.getTime();
-            comment.user = ParserUtils.trim(m.group(2));
-            comment.comment = m.group(3);
-            list.add(comment);
-        }
-
-        return list.toArray(new GalleryComment[list.size()]);
-    }
-
-    /**
      * Parse preview pages with html parser
      */
     public static int parsePreviewPages(Document document, String body) throws ParseException {
         try {
-            Elements elements = document.getElementsByClass("ptt").first().child(0).child(0).children();
+            Element ptt = document.getElementsByClass("ptt").first();
+            assert ptt != null;
+            Elements elements = ptt.child(0).child(0).children();
             return Integer.parseInt(elements.get(elements.size() - 2).text());
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
@@ -634,9 +573,10 @@ public class GalleryDetailParser {
         try {
             LargePreviewSet largePreviewSet = new LargePreviewSet();
             Element gdt = d.getElementById("gdt");
+            assert gdt != null;
             Elements gdtls = gdt.getElementsByClass("gdtl");
             int n = gdtls.size();
-            if (n <= 0) {
+            if (n == 0) {
                 throw new ParseException("Can't parse large preview", body);
             }
             for (int i = 0; i < n; i++) {
