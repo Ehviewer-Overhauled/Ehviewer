@@ -19,19 +19,18 @@ package com.hippo.ehviewer.client.parser;
 import com.hippo.yorozuya.NumberUtils;
 import com.hippo.yorozuya.StringUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class ParserUtils {
 
-    public static final DateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+    public static final DateTimeFormatter formatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm", Locale.US).withZone(ZoneOffset.UTC);
 
     public static synchronized String formatDate(long time) {
-        sDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return sDateFormat.format(new Date(time));
+        return formatter.format(Instant.ofEpochMilli(time));
     }
 
     public static String trim(String str) {
@@ -50,7 +49,4 @@ public class ParserUtils {
         return NumberUtils.parseLongSafely(trim(str).replace(",", ""), defValue);
     }
 
-    public static float parseFloat(String str, float defValue) {
-        return NumberUtils.parseFloatSafely(trim(str).replace(",", ""), defValue);
-    }
 }
