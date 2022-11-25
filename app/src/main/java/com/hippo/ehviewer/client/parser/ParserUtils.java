@@ -23,12 +23,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class ParserUtils {
 
     public static final DateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 
     public static synchronized String formatDate(long time) {
+        sDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sDateFormat.format(new Date(time));
     }
 
