@@ -62,6 +62,7 @@ import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.EhActivity;
+import com.hippo.image.Image;
 import com.hippo.image.ImageBitmap;
 import com.hippo.network.StatusCodeException;
 import com.hippo.scene.SceneApplication;
@@ -325,6 +326,7 @@ public class EhApplication extends SceneApplication {
 
         super.onCreate();
 
+        Image.initialize(this);
         Native.initialize();
         GetText.initialize(this);
         StatusCodeException.initialize(this);

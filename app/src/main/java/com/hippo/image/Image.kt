@@ -17,12 +17,14 @@
  */
 package com.hippo.image
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ALLOCATOR_DEFAULT
 import android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
 import android.graphics.PixelFormat
 import android.graphics.drawable.AnimatedImageDrawable
@@ -32,6 +34,7 @@ import androidx.core.graphics.drawable.toDrawable
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import kotlin.math.max
 
 class Image private constructor(
     source: Source?, drawable: Drawable? = null,
@@ -44,11 +47,22 @@ class Image private constructor(
     init {
         mObtainedDrawable = null
         source?.let {
-            mObtainedDrawable = ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, _, _ ->
-                decoder.allocator = if (hardware) ALLOCATOR_DEFAULT else ALLOCATOR_SOFTWARE
-                // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
-                // Idk it will cause how much performance regression
-            } // Should we lazy decode it?
+            mObtainedDrawable =
+                ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, src: Source ->
+                    decoder.allocator = if (hardware) ALLOCATOR_DEFAULT else ALLOCATOR_SOFTWARE
+                    // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
+                    // Idk it will cause how much performance regression
+
+                    decoder.setTargetSampleSize(
+                        max(
+                            max(
+                                info.size.width / screenWidth,
+                                info.size.height / screenHeight
+                            ), 1
+                        )
+                    )
+                    // Don't
+                } // Should we lazy decode it?
         }
         if (mObtainedDrawable == null) {
             mObtainedDrawable = drawable!!
@@ -147,6 +161,15 @@ class Image private constructor(
         }
 
     companion object {
+        var screenWidth: Int = 0
+        var screenHeight: Int = 0
+
+        @JvmStatic
+        fun initialize(context: Context) {
+            screenWidth = context.resources.displayMetrics.widthPixels
+            screenHeight = context.resources.displayMetrics.heightPixels
+        }
+
         @JvmStatic
         fun decode(stream: FileInputStream, hardware: Boolean = true): Image {
             val src = ImageDecoder.createSource(
