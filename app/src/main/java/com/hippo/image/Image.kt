@@ -56,8 +56,8 @@ class Image private constructor(
                     decoder.setTargetSampleSize(
                         max(
                             max(
-                                info.size.width / screenWidth,
-                                info.size.height / screenHeight
+                                info.size.width / (2 * screenWidth),
+                                info.size.height / (2 * screenHeight)
                             ), 1
                         )
                     )
