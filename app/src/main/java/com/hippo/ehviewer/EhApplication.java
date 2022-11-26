@@ -172,15 +172,6 @@ public class EhApplication extends SceneApplication {
                     .cookieJar(getEhCookieStore(application))
                     .cache(getOkHttpCache(application))
                     .dns(new EhDns(application))
-                    .addNetworkInterceptor(chain -> {
-                        try {
-                            return chain.proceed(chain.request());
-                        } catch (NullPointerException e) {
-                            // crash on meizu devices due to old Android version
-                            // https://github.com/square/okhttp/issues/3301#issuecomment-348415095
-                            throw new IOException(e.getMessage());
-                        }
-                    })
                     .proxySelector(getEhProxySelector(application));
             try {
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
