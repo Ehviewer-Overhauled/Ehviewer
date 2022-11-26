@@ -44,7 +44,7 @@ class EhDns(context: Context) : Dns {
             builtInHosts,
             "e-hentai.org",
             Pair("104.20.134.21", true),
-            Pair("104.20.135.21", true),
+            Pair("104.20.135.21", false),
             Pair("172.67.0.127", false),
         )
         put(
