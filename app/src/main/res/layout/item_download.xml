@@ -19,8 +19,7 @@
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="2dp"
-    android:background="?selectableItemBackground"
+    android:layout_margin="4dp"
     android:checkable="true"
     android:clickable="true"
     android:focusable="true">
