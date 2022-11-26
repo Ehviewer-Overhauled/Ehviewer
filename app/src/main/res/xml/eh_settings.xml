@@ -127,7 +127,7 @@
         app:iconSpaceReserved="false" />
 
     <rikka.material.preference.MaterialSwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="show_gallery_comments"
         android:summary="@string/settings_eh_show_gallery_comments_summary"
         android:title="@string/settings_eh_show_gallery_comments"
