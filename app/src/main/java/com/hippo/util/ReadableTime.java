@@ -23,6 +23,7 @@ import com.hippo.ehviewer.R;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -128,7 +129,7 @@ public final class ReadableTime {
 
     public static String getFilenamableTime(long time) {
         synchronized (sDateFormatLock) {
-            return FILENAMABLE_DATE_FORMAT.format(Instant.ofEpochMilli(time));
+            return FILENAMABLE_DATE_FORMAT.format(Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()));
         }
     }
 }
