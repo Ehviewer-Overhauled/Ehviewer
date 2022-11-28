@@ -3,6 +3,10 @@
   English
   </a>
   <span> | </span>
+  <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/pt-br.md">
+  Português
+  </a>
+  <span> | </span>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-cn.md">
   简体中文
   </a>
