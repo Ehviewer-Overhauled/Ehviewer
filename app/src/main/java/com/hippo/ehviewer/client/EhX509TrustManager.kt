@@ -15,30 +15,23 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import android.annotation.SuppressLint
+import java.security.cert.X509Certificate
+import javax.net.ssl.X509TrustManager
 
-import android.annotation.SuppressLint;
-
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.X509TrustManager;
-
-public class EhX509TrustManager implements X509TrustManager {
+@SuppressLint("CustomX509TrustManager")
+class EhX509TrustManager : X509TrustManager {
     @SuppressLint("TrustAllX509TrustManager")
-    @Override
-    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-
+    override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
     }
 
     @SuppressLint("TrustAllX509TrustManager")
-    @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-
+    override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
     }
 
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
+    override fun getAcceptedIssuers(): Array<X509Certificate?> {
+        return arrayOfNulls(0)
     }
 }

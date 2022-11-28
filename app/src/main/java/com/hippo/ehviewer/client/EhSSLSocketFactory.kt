@@ -15,65 +15,58 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import android.util.Log
+import java.net.InetAddress
+import java.net.Socket
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 
-import android.util.Log;
-
-import com.hippo.ehviewer.Settings;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-
-public class EhSSLSocketFactory extends SSLSocketFactory {
-    @Override
-    public String[] getDefaultCipherSuites() {
-        return ((SSLSocketFactory) getDefault()).getDefaultCipherSuites();
+class EhSSLSocketFactory : SSLSocketFactory() {
+    private val sslSocketFactory = getDefault() as SSLSocketFactory
+    override fun getDefaultCipherSuites(): Array<String> {
+        return sslSocketFactory.defaultCipherSuites
     }
 
-    @Override
-    public String[] getSupportedCipherSuites() {
-        return ((SSLSocketFactory) getDefault()).getSupportedCipherSuites();
+    override fun getSupportedCipherSuites(): Array<String> {
+        return sslSocketFactory.supportedCipherSuites
     }
 
-    @Override
-    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        SSLSocketFactory defaultFactory = (SSLSocketFactory) getDefault();
-        if (!Settings.getDF()) {
-            return defaultFactory.createSocket(s, host, port, autoClose);
-        }
-        String address = s.getInetAddress().getHostAddress();
-        SSLSocket socket = (SSLSocket) defaultFactory.createSocket(s, address, port, autoClose);
-        SSLSession sslSession = socket.getSession();
-        Log.d("EhSSLSocketFactory", "Host: " + host + " Address: " + address + " Protocol:" + sslSession.getProtocol() + " CipherSuite:" + sslSession.getCipherSuite());
-        socket.setEnabledProtocols(socket.getSupportedProtocols());
-        return socket;
+    override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket {
+        val address = s.inetAddress.hostAddress
+        val socket = sslSocketFactory.createSocket(s, address, port, autoClose) as SSLSocket
+        val sslSession = socket.session
+        Log.d(
+            "EhSSLSocketFactory",
+            "Host: " + host + " Address: " + address + " Protocol:" + sslSession.protocol + " CipherSuite:" + sslSession.cipherSuite
+        )
+        return socket
     }
 
-    @Override
-    public Socket createSocket(String host, int port) throws IOException {
-        return getDefault().createSocket(host, port);
+    override fun createSocket(host: String, port: Int): Socket {
+        return sslSocketFactory.createSocket(host, port)
     }
 
-    @Override
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return getDefault().createSocket(host, port, localHost, localPort);
+    override fun createSocket(
+        host: String,
+        port: Int,
+        localHost: InetAddress,
+        localPort: Int
+    ): Socket {
+        return sslSocketFactory.createSocket(host, port, localHost, localPort)
     }
 
-    @Override
-    public Socket createSocket(InetAddress host, int port) throws IOException {
-        return getDefault().createSocket(host, port);
+    override fun createSocket(host: InetAddress, port: Int): Socket {
+        return sslSocketFactory.createSocket(host, port)
     }
 
-    @Override
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return getDefault().createSocket(address, port, localAddress, localPort);
+    override fun createSocket(
+        address: InetAddress,
+        port: Int,
+        localAddress: InetAddress,
+        localPort: Int
+    ): Socket {
+        return sslSocketFactory.createSocket(address, port, localAddress, localPort)
     }
-
-
 }

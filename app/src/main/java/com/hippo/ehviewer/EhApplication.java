@@ -77,14 +77,12 @@ import com.hippo.yorozuya.OSUtils;
 import com.hippo.yorozuya.SimpleHandler;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -165,27 +163,29 @@ public class EhApplication extends SceneApplication {
         EhApplication application = ((EhApplication) context.getApplicationContext());
         if (application.mOkHttpClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
-                    .callTimeout(10, TimeUnit.SECONDS)
                     .cookieJar(getEhCookieStore(application))
                     .cache(getOkHttpCache(application))
                     .dns(new EhDns(application))
                     .proxySelector(getEhProxySelector(application));
-            try {
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
-                        TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init((KeyStore) null);
-                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager trustManager)) {
-                    throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
+
+            if (Settings.getDF()) {
+                X509TrustManager trustManager;
+                try {
+                    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                            TrustManagerFactory.getDefaultAlgorithm());
+                    trustManagerFactory.init((KeyStore) null);
+                    TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+                    if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager trustManager1)) {
+                        throw new IllegalStateException("Unexpected default trust managers:" + Arrays.toString(trustManagers));
+                    }
+                    trustManager = trustManager1;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    trustManager = new EhX509TrustManager();
                 }
                 builder.sslSocketFactory(new EhSSLSocketFactory(), trustManager);
-            } catch (Exception e) {
-                e.printStackTrace();
-                builder.sslSocketFactory(new EhSSLSocketFactory(), new EhX509TrustManager());
             }
+
             application.mOkHttpClient = builder.build();
         }
         return application.mOkHttpClient;
