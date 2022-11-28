@@ -154,6 +154,7 @@ public abstract class StageActivity extends EhActivity {
                 mDelaySceneTagList.addAll(list);
             }
             mIdGenerator.lazySet(savedInstanceState.getInt(KEY_NEXT_ID));
+            updateBackPressCallBackStatus();
         }
 
         if (mStageId == IntIdGenerator.INVALID_ID) {
@@ -561,12 +562,8 @@ public abstract class StageActivity extends EhActivity {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fragmentManager.beginTransaction().detach(fragment).commitAllowingStateLoss();
-            fragmentManager.beginTransaction().attach(fragment).commitAllowingStateLoss();
-        } else {
-            fragmentManager.beginTransaction().detach(fragment).attach(fragment).commitAllowingStateLoss();
-        }
+        fragmentManager.beginTransaction().detach(fragment).commitAllowingStateLoss();
+        fragmentManager.beginTransaction().attach(fragment).commitAllowingStateLoss();
         updateBackPressCallBackStatus();
     }
 
