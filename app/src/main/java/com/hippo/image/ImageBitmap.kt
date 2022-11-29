@@ -17,8 +17,10 @@
  */
 package com.hippo.image
 
+import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import java.io.FileInputStream
+import kotlin.jvm.Throws
 
 class ImageBitmap private constructor(image: Image) {
     private var mImage: Image? = image
@@ -55,6 +57,7 @@ class ImageBitmap private constructor(image: Image) {
         get() = mImage!!.height
 
     companion object {
+        @Throws(ImageDecoder.DecodeException::class)
         @JvmStatic
         fun decode(stream: FileInputStream): ImageBitmap {
             val image = Image.decode(stream)

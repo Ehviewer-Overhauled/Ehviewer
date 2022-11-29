@@ -24,6 +24,7 @@ import android.graphics.Canvas
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ALLOCATOR_DEFAULT
 import android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+import android.graphics.ImageDecoder.DecodeException
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
 import android.graphics.PixelFormat
@@ -34,6 +35,7 @@ import androidx.core.graphics.drawable.toDrawable
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import kotlin.jvm.Throws
 import kotlin.math.max
 
 class Image private constructor(
@@ -170,6 +172,7 @@ class Image private constructor(
             screenHeight = context.resources.displayMetrics.heightPixels
         }
 
+        @Throws(DecodeException::class)
         @JvmStatic
         fun decode(stream: FileInputStream, hardware: Boolean = true): Image {
             val src = ImageDecoder.createSource(
@@ -181,6 +184,7 @@ class Image private constructor(
             return Image(src, hardware = hardware)
         }
 
+        @Throws(DecodeException::class)
         @JvmStatic
         fun decode(buffer: ByteBuffer, hardware: Boolean = true, release: () -> Unit? = {}): Image {
             val src = ImageDecoder.createSource(buffer)

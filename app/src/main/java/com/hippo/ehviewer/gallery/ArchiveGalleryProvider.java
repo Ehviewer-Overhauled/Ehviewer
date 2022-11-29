@@ -17,9 +17,9 @@
 package com.hippo.ehviewer.gallery;
 
 import android.content.Context;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.os.Process;
 
 import androidx.annotation.NonNull;
@@ -36,7 +36,6 @@ import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -335,10 +334,15 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
 
                 Image image = null;
                 if (buffer != null) {
-                    image = Image.decode(buffer, false, () -> {
+                    try {
+                        image = Image.decode(buffer, false, () -> {
+                            archiveAccessor.releaseByteBuffer(buffer);
+                            return null;
+                        });
+                    } catch (ImageDecoder.DecodeException e) {
                         archiveAccessor.releaseByteBuffer(buffer);
-                        return null;
-                    });
+                        e.printStackTrace();
+                    }
                 }
                 if (image != null) {
                     notifyPageSucceed(index, image);

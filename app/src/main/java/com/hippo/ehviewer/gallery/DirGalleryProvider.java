@@ -261,11 +261,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
                 is = files[index].openInputStream();
                 Image image = Image.decode((FileInputStream) is, false);
                 mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
-                if (image != null) {
-                    notifyPageSucceed(index, image);
-                } else {
-                    notifyPageFailed(index, GetText.getString(R.string.error_decoding_failed));
-                }
+                notifyPageSucceed(index, image);
             } catch (IOException e) {
                 mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
                 notifyPageFailed(index, GetText.getString(R.string.error_reading_failed));
