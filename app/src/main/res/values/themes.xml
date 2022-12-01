@@ -22,16 +22,25 @@
         <item name="drawableColorThemePrimary">?attr/colorPrimary</item>
         <item name="tagGroupBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="tagBackgroundColor">?attr/colorTertiaryContainer</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+
         <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">true</item>
+
+        <!-- Apply blur on Android 12 above -->
+        <item name="materialCalendarTheme">@style/MaterialCalendarTheme</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/MaterialAlertDialogTheme</item>
     </style>
 
     <style name="ThemeOverlay" />
@@ -55,7 +64,19 @@
         <item name="colorOnSurface">?attr/colorSurfaceInverse</item>
     </style>
 
+    <!-- Apply blur on Android 12 above -->
     <style name="BottomSheetDialogTheme" parent="ThemeOverlay.Material3.BottomSheetDialog">
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
+    </style>
+
+    <style name="MaterialAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
+    </style>
+
+    <style name="MaterialCalendarTheme" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
     </style>
 </resources>

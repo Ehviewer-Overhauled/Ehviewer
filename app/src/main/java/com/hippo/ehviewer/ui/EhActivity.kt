@@ -22,7 +22,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.content.res.Resources.Theme
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -71,22 +70,14 @@ abstract class EhActivity : AppCompatActivity() {
                 WindowInsetsHelper.LISTENER
             )
         super.onCreate(savedInstanceState)
-        window.statusBarColor = Color.TRANSPARENT
         window.decorView.post {
             val rootWindowInsets = window.decorView.rootWindowInsets
             if (rootWindowInsets != null && rootWindowInsets.systemWindowInsetBottom >= Resources.getSystem().displayMetrics.density * 40) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    window.navigationBarDividerColor = getColor(R.color.navigation_bar_divider)
-                }
+                window.navigationBarDividerColor = getColor(R.color.navigation_bar_divider)
                 window.navigationBarColor =
                     theme.resolveColor(android.R.attr.navigationBarColor) and 0x00ffffff or -0x20000000
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     window.isNavigationBarContrastEnforced = false
-                }
-            } else {
-                window.navigationBarColor = Color.TRANSPARENT
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.isNavigationBarContrastEnforced = true
                 }
             }
         }

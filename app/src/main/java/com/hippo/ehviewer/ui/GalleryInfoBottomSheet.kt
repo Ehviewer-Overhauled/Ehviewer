@@ -46,13 +46,6 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
     ): View? {
         parseDetail()
         val view = inflater.inflate(R.layout.scene_gallery_info, container, false)
-        dialog?.window?.run {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-                addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-                attributes.blurBehindRadius = 32
-            }
-        }
         val recyclerView = view.findViewById(R.id.recycler_view) as RecyclerView
         val adapter = InfoAdapter()
         recyclerView.adapter = adapter
