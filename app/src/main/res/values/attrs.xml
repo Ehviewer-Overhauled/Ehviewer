@@ -18,10 +18,7 @@
 
     <declare-styleable name="Theme">
         <attr name="dividerColor" format="color" />
-        <attr name="drawableColorSecondary" format="color" />
         <attr name="drawableColorThemePrimary" format="color" />
-        <attr name="contentColorThemePrimary" format="color" />
-        <attr name="contentColorThemeAccent" format="color" />
         <attr name="tagGroupBackgroundColor" format="color" />
         <attr name="tagBackgroundColor" format="color" />
     </declare-styleable>
