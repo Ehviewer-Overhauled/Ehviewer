@@ -128,12 +128,13 @@ class Image private constructor(
 
     fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
         check(!hardware) { "Hardware buffer cannot be used in glgallery" }
-        val bitmap: Bitmap = if (animated) {
+        val bitmap: Bitmap? = if (animated) {
             updateBitmap()
-            mBitmap!!
+            mBitmap
         } else {
-            (mObtainedDrawable as BitmapDrawable).bitmap
+            (mObtainedDrawable as BitmapDrawable?)?.bitmap
         }
+        bitmap ?: return
         nativeTexImage(
             bitmap,
             init,
