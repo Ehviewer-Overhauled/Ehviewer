@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.IntDef
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -329,7 +330,7 @@ class SearchLayout @JvmOverloads constructor(
 
     inner class IdentifiedChip @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null
-    ) : Chip(context, attrs, R.attr.filterChipStyle) {
+    ) : Chip(ContextThemeWrapper(context, com.google.android.material.R.style.Widget_Material3_Chip_Filter), attrs) {
         var idt = 0
     }
 

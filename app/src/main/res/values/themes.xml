@@ -21,7 +21,6 @@
         <item name="tagGroupBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="tagBackgroundColor">?attr/colorTertiaryContainer</item>
 
-        <item name="filterChipStyle">@style/Widget.Material3.Chip.Filter</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>

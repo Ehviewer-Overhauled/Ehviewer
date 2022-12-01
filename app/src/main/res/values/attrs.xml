@@ -135,6 +135,4 @@
         <attr name="draggable" format="boolean" />
     </declare-styleable>
 
-    <attr name="filterChipStyle" />
-
 </resources>
