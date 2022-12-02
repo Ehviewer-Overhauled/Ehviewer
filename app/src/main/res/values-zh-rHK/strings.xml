@@ -373,9 +373,6 @@
     <string name="settings_eh_detail_size_long">長</string>
     <string name="settings_eh_detail_size_short">短</string>
     <string name="settings_eh_thumb_size">縮略圖大小</string>
-    <string name="settings_eh_thumb_size_large">大</string>
-    <string name="settings_eh_thumb_size_middle">中</string>
-    <string name="settings_eh_thumb_size_small">小</string>
     <string name="settings_eh_thumb_resolution">縮略圖分辨率</string>
     <string name="settings_eh_thumb_resolution_summary">%s，指定分辨率可能使獲取縮略圖失敗</string>
     <string name="settings_eh_thumb_resolution_auto">自動</string>

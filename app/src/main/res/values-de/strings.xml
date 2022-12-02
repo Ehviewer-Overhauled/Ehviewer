@@ -285,9 +285,6 @@
     <string name="settings_eh_detail_size_long">Lange</string>
     <string name="settings_eh_detail_size_short">Kurz</string>
     <string name="settings_eh_thumb_size">Größe des Miniaturbilds</string>
-    <string name="settings_eh_thumb_size_large">Groß</string>
-    <string name="settings_eh_thumb_size_middle">Mittel</string>
-    <string name="settings_eh_thumb_size_small">Klein</string>
     <string name="settings_eh_thumb_resolution">Auflösung der Miniaturbilder</string>
     <string name="settings_eh_thumb_resolution_summary">Nun %s. Mit abnormale Auflösung kann die Miniaturbilder nicht normalerweise geladen werden.</string>
     <string name="settings_eh_thumb_resolution_auto">Automatisch</string>

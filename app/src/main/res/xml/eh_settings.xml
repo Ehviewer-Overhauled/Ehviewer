@@ -94,14 +94,15 @@
         app:entryValues="@array/detail_size_entry_values"
         app:iconSpaceReserved="false" />
 
-    <rikka.preference.SimpleMenuPreference
-        android:defaultValue="1"
-        android:key="thumb_size"
-        android:summary="%s"
+    <SeekBarPreference
+        android:defaultValue="120"
+        android:key="thumb_size_"
+        android:max="400"
+        app:seekBarIncrement="80"
         android:title="@string/settings_eh_thumb_size"
-        app:entries="@array/thumb_size_entries"
-        app:entryValues="@array/thumb_size_entry_values"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:min="80"
+        app:showSeekBarValue="true" />
 
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
@@ -149,12 +150,12 @@
     <SeekBarPreference
         android:defaultValue="60"
         android:key="preview_num"
-        android:title="@string/settings_eh_preview_num"
         android:max="200"
-        app:singleLineTitle="false"
+        android:title="@string/settings_eh_preview_num"
         app:iconSpaceReserved="false"
         app:min="10"
-        app:showSeekBarValue="true" />
+        app:showSeekBarValue="true"
+        app:singleLineTitle="false" />
 
     <Preference
         android:key="com.hippo.ehviewer.ui.fragment.FilterFragment"

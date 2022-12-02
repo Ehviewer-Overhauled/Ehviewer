@@ -56,10 +56,6 @@
     <dimen name="gallery_list_column_width_long">480dp</dimen>
     <dimen name="gallery_list_column_width_short">320dp</dimen>
 
-    <dimen name="gallery_grid_column_width_large">160dp</dimen>
-    <dimen name="gallery_grid_column_width_middle">120dp</dimen>
-    <dimen name="gallery_grid_column_width_small">80dp</dimen>
-
     <!-- 4dp - 4dp, 4dp for card padding -->
     <dimen name="search_layout_interval">0dp</dimen>
     <!-- 8dp - 4dp, 4dp for card padding -->

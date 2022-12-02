@@ -320,9 +320,6 @@
     <string name="settings_eh_detail_size_long">길게</string>
     <string name="settings_eh_detail_size_short">짧게</string>
     <string name="settings_eh_thumb_size">섬네일 크기</string>
-    <string name="settings_eh_thumb_size_large">크게</string>
-    <string name="settings_eh_thumb_size_middle">중간</string>
-    <string name="settings_eh_thumb_size_small">작게</string>
     <string name="settings_eh_thumb_resolution">섬네일 해상도</string>
     <string name="settings_eh_thumb_resolution_summary">특정 해상도로 설정하면 섬네일을 불러오지 못할 수 있습니다. 현재 설정\u003a \u005b%s\u005d</string>
     <string name="settings_eh_thumb_resolution_auto">자동</string>

@@ -340,9 +340,6 @@
     <string name="settings_eh_detail_size_long">Long</string>
     <string name="settings_eh_detail_size_short">Court</string>
     <string name="settings_eh_thumb_size">Taille des mimniatures</string>
-    <string name="settings_eh_thumb_size_large">Large</string>
-    <string name="settings_eh_thumb_size_middle">Moyenne</string>
-    <string name="settings_eh_thumb_size_small">Pétite</string>
     <string name="settings_eh_thumb_resolution">Résolution des miniatures</string>
     <string name="settings_eh_thumb_resolution_summary">Auctuellement %s. Certaines résolutions spéciales êmpechent de les charger correctement.</string>
     <string name="settings_eh_thumb_resolution_auto">Auto</string>

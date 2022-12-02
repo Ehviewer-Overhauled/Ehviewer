@@ -338,9 +338,6 @@
     <string name="settings_eh_detail_size_long">長い</string>
     <string name="settings_eh_detail_size_short">短い</string>
     <string name="settings_eh_thumb_size">サムネイルサイズ</string>
-    <string name="settings_eh_thumb_size_large">大</string>
-    <string name="settings_eh_thumb_size_middle">中</string>
-    <string name="settings_eh_thumb_size_small">小</string>
     <string name="settings_eh_thumb_resolution">サムネイル解像度</string>
     <string name="settings_eh_thumb_resolution_summary">%s。解像度を正しく設定しないと、サムネイルを取得できない場合があります</string>
     <string name="settings_eh_thumb_resolution_auto">自動</string>
