@@ -152,6 +152,7 @@
         android:key="preview_num"
         android:max="200"
         android:title="@string/settings_eh_preview_num"
+        android:summary="@string/settings_eh_preview_num_summary"
         app:iconSpaceReserved="false"
         app:min="10"
         app:showSeekBarValue="true"
