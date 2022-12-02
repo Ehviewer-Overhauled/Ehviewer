@@ -142,7 +142,7 @@ public class GalleryListParser {
         }
 
         // Tags
-        Elements gts = e.getElementsByClass("gt");
+        Elements gts = e.select(".gt, .gtl");
         if (gts.size() != 0) {
             ArrayList<String> tags = new ArrayList<>();
             for (Element gt : gts) {
