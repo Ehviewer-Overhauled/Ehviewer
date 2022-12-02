@@ -52,6 +52,8 @@ static char *passwd = NULL;
 static void *archiveAddr = NULL;
 static size_t archiveSize = 0;
 
+#define POPULATE_THRESHOLD (512 * 1024 * 1024) // 512 MiB
+
 const char supportExt[9][6] = {
         "jpeg",
         "jpg",
@@ -199,7 +201,10 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
-    archiveAddr = mmap64(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    int mmap_flags = MAP_PRIVATE;
+    if (size <= POPULATE_THRESHOLD)
+        mmap_flags |= MAP_POPULATE;
+    archiveAddr = mmap64(0, size, PROT_READ, mmap_flags, fd, 0);
     if (archiveAddr == MAP_FAILED) {
         LOGE("%s%s", "mmap64 failed with error ", strerror(errno));
         return 0;
