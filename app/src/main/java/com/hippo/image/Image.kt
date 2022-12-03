@@ -45,6 +45,7 @@ class Image private constructor(
 ) {
     internal var mObtainedDrawable: Drawable?
     private var mBitmap: Bitmap? = null
+    private var mCanvas: Canvas? = null
 
     init {
         mObtainedDrawable = null
@@ -88,6 +89,7 @@ class Image private constructor(
         }
         mObtainedDrawable?.callback = null
         mObtainedDrawable = null
+        mCanvas = null
         mBitmap?.recycle()
         mBitmap = null
         release()
@@ -96,11 +98,12 @@ class Image private constructor(
     private fun prepareBitmap() {
         if (mBitmap != null) return
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        mCanvas = Canvas(mBitmap!!)
     }
 
     private fun updateBitmap() {
         prepareBitmap()
-        mObtainedDrawable!!.draw(Canvas(mBitmap!!))
+        mObtainedDrawable!!.draw(mCanvas!!)
     }
 
     fun render(
@@ -154,7 +157,7 @@ class Image private constructor(
     val delay: Int
         get() {
             if (animated)
-                return 100
+                return 10
             return 0
         }
 
