@@ -78,6 +78,7 @@ with Material Design 3 and Dynamic Color Support
 Here is the libraries
 
 - [AOSP & AndroidX](http://source.android.com/)
+- [Coil](https://coil-kt.github.io/coil/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)

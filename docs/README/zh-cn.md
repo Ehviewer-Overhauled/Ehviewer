@@ -78,6 +78,7 @@
 本项目受到了诸多开源项目的帮助
 
 - [AOSP & AndroidX](http://source.android.com/)
+- [Coil](https://coil-kt.github.io/coil/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
 - [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
