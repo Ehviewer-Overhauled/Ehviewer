@@ -51,11 +51,11 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
                 info.favoriteSlot = slot
             }
         }
-        EhApplication.getFavouriteStatusRouter().addListener(listener)
+        EhApplication.favouriteStatusRouter.addListener(listener)
     }
 
     fun destroy() {
-        EhApplication.getFavouriteStatusRouter().removeListener(listener)
+        EhApplication.favouriteStatusRouter.removeListener(listener)
     }
 
     override fun onAddData(data: GalleryInfo?) {
@@ -100,7 +100,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val bundle = super.saveInstanceState(superState) as Bundle
 
         // TODO It's a bad design
-        val router = EhApplication.getFavouriteStatusRouter()
+        val router = EhApplication.favouriteStatusRouter
         val id = router.saveDataMap(map)
         bundle.putInt(KEY_DATA_MAP, id)
         bundle.putInt(KEY_MIN_GID, minGid)
@@ -112,7 +112,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val bundle = state as Bundle
         val id = bundle.getInt(KEY_DATA_MAP, IntIdGenerator.INVALID_ID)
         if (id != IntIdGenerator.INVALID_ID) {
-            val router = EhApplication.getFavouriteStatusRouter()
+            val router = EhApplication.favouriteStatusRouter
             val map = router.restoreDataMap(id)
             if (map != null) {
                 this.map = map

@@ -339,9 +339,9 @@ public final class GalleryListScene extends BaseScene
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient(context);
-        mDownloadManager = EhApplication.getDownloadManager(context);
-        mFavouriteStatusRouter = EhApplication.getFavouriteStatusRouter(context);
+        mClient = EhApplication.getEhClient();
+        mDownloadManager = EhApplication.getDownloadManager();
+        mFavouriteStatusRouter = EhApplication.getFavouriteStatusRouter();
 
         mDownloadInfoListener = new DownloadManager.DownloadInfoListener() {
             @Override
@@ -1030,7 +1030,7 @@ public final class GalleryListScene extends BaseScene
                             }
                             break;
                         case 3: // Move
-                            List<DownloadLabel> labelRawList = EhApplication.getDownloadManager(context).getLabelList();
+                            List<DownloadLabel> labelRawList = EhApplication.getDownloadManager().getLabelList();
                             List<String> labelList = new ArrayList<>(labelRawList.size() + 1);
                             labelList.add(getString(R.string.default_download_label_name));
                             for (int i = 0, n = labelRawList.size(); i < n; i++) {
@@ -1571,7 +1571,7 @@ public final class GalleryListScene extends BaseScene
                 mRecyclerView.outOfCustomChoiceMode();
             }
 
-            DownloadManager downloadManager = EhApplication.getDownloadManager(context);
+            DownloadManager downloadManager = EhApplication.getDownloadManager();
             DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
             if (downloadInfo == null) {
                 return;

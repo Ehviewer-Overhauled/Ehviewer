@@ -162,7 +162,7 @@ public class DownloadsScene extends ToolbarScene
         if (context == null) {
             return;
         }
-        List<DownloadLabel> listLabel = EhApplication.getDownloadManager(context).getLabelList();
+        List<DownloadLabel> listLabel = EhApplication.getDownloadManager().getLabelList();
         mLabels = new ArrayList<>(listLabel.size() + 1);
         // Add default label name
         mLabels.add(getString(R.string.default_download_label_name));
@@ -214,7 +214,7 @@ public class DownloadsScene extends ToolbarScene
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mDownloadManager = EhApplication.getDownloadManager(context);
+        mDownloadManager = EhApplication.getDownloadManager();
         mDownloadManager.addDownloadInfoListener(this);
 
         if (savedInstanceState == null) {
@@ -233,7 +233,7 @@ public class DownloadsScene extends ToolbarScene
         if (null == manager) {
             Context context = getContext();
             if (null != context) {
-                manager = EhApplication.getDownloadManager(context);
+                manager = EhApplication.getDownloadManager();
             }
         } else {
             mDownloadManager = null;
@@ -697,7 +697,7 @@ public class DownloadsScene extends ToolbarScene
                     break;
                 }
                 case 4: {// Move
-                    List<DownloadLabel> labelRawList = EhApplication.getDownloadManager(context).getLabelList();
+                    List<DownloadLabel> labelRawList = EhApplication.getDownloadManager().getLabelList();
                     List<String> labelList = new ArrayList<>(labelRawList.size() + 1);
                     labelList.add(getString(R.string.default_download_label_name));
                     for (int i = 0, n = labelRawList.size(); i < n; i++) {
@@ -906,7 +906,7 @@ public class DownloadsScene extends ToolbarScene
                 String label = mLabels.get(position);
                 if (mDownloadManager == null) {
                     if (context != null) {
-                        mDownloadManager = EhApplication.getDownloadManager(context);
+                        mDownloadManager = EhApplication.getDownloadManager();
                     }
                 }
                 List<DownloadInfo> list = null;
@@ -1040,7 +1040,7 @@ public class DownloadsScene extends ToolbarScene
             } else {
                 label = mLabels[which];
             }
-            EhApplication.getDownloadManager(context).changeLabel(mDownloadInfoList, label);
+            EhApplication.getDownloadManager().changeLabel(mDownloadInfoList, label);
             if (mLabelAdapter != null) {
                 mLabelAdapter.notifyDataSetChanged();
             }
@@ -1162,7 +1162,7 @@ public class DownloadsScene extends ToolbarScene
                 return;
             }
             DownloadInfo info = mList.get(position);
-            holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb, true);
+            holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb);
             holder.title.setText(EhUtils.getSuitableTitle(info));
             holder.uploader.setText(info.uploader);
             holder.rating.setRating(info.rating);
@@ -1246,12 +1246,12 @@ public class DownloadsScene extends ToolbarScene
                 mBuilder.setError(getString(R.string.label_text_is_empty));
             } else if (getString(R.string.default_download_label_name).equals(text)) {
                 mBuilder.setError(getString(R.string.label_text_is_invalid));
-            } else if (EhApplication.getDownloadManager(context).containLabel(text)) {
+            } else if (EhApplication.getDownloadManager().containLabel(text)) {
                 mBuilder.setError(getString(R.string.label_text_exist));
             } else {
                 mBuilder.setError(null);
                 mDialog.dismiss();
-                EhApplication.getDownloadManager(context).renameLabel(mOriginalLabel, text);
+                EhApplication.getDownloadManager().renameLabel(mOriginalLabel, text);
                 if (mLabelAdapter != null) {
                     initLabels();
                     mLabelAdapter.notifyDataSetChanged();
@@ -1286,12 +1286,12 @@ public class DownloadsScene extends ToolbarScene
                 mBuilder.setError(getString(R.string.label_text_is_empty));
             } else if (getString(R.string.default_download_label_name).equals(text)) {
                 mBuilder.setError(getString(R.string.label_text_is_invalid));
-            } else if (EhApplication.getDownloadManager(context).containLabel(text)) {
+            } else if (EhApplication.getDownloadManager().containLabel(text)) {
                 mBuilder.setError(getString(R.string.label_text_exist));
             } else {
                 mBuilder.setError(null);
                 mDialog.dismiss();
-                EhApplication.getDownloadManager(context).addLabel(text);
+                EhApplication.getDownloadManager().addLabel(text);
                 initLabels();
                 if (mLabelAdapter != null && mLabels != null) {
                     mLabelAdapter.notifyItemInserted(mLabels.size() - 1);
@@ -1317,7 +1317,7 @@ public class DownloadsScene extends ToolbarScene
                 return false;
             }
 
-            EhApplication.getDownloadManager(context).moveLabel(fromPosition - 1, toPosition - 1);
+            EhApplication.getDownloadManager().moveLabel(fromPosition - 1, toPosition - 1);
             final String item = mLabels.remove(fromPosition);
             mLabels.add(toPosition, item);
             mLabelAdapter.notifyDataSetChanged();

@@ -96,7 +96,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient(context);
+        mClient = EhApplication.getEhClient();
         if (savedInstanceState == null) {
             onInit();
         } else {

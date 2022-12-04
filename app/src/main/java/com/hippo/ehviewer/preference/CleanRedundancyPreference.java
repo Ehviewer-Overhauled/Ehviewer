@@ -55,7 +55,7 @@ public class CleanRedundancyPreference extends TaskPreference {
 
         public ClearTask(@NonNull Context context) {
             super(context);
-            mManager = EhApplication.getDownloadManager(context.getApplicationContext());
+            mManager = EhApplication.getDownloadManager();
         }
 
         // True for cleared

@@ -31,7 +31,6 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.locked_last_leave_time
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import rikka.core.res.resolveColor
@@ -91,7 +90,7 @@ abstract class EhActivity : AppCompatActivity() {
 
     override fun onResume() {
         val locked_resume_time = System.currentTimeMillis() / 1000
-        val locked_delay_time = locked_resume_time - locked_last_leave_time
+        val locked_delay_time = locked_resume_time - EhApplication.locked_last_leave_time
         if (locked_delay_time < Settings.getSecurityDelay() * 60) {
             EhApplication.locked = false
         } else if (Settings.getSecurity() && isAuthenticationSupported() && EhApplication.locked) {

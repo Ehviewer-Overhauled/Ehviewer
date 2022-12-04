@@ -74,8 +74,8 @@ public class RestoreDownloadPreference extends TaskPreference {
 
         public RestoreTask(@NonNull Context context) {
             super(context);
-            mManager = EhApplication.getDownloadManager(context.getApplicationContext());
-            mHttpClient = EhApplication.getOkHttpClient(context.getApplicationContext());
+            mManager = EhApplication.getDownloadManager();
+            mHttpClient = EhApplication.getOkHttpClient();
         }
 
         private RestoreItem getRestoreItem(UniFile file) {

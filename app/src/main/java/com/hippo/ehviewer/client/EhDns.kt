@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import android.content.Context
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.Hosts
 import com.hippo.ehviewer.Settings
@@ -23,8 +22,8 @@ import okhttp3.Dns
 import java.net.InetAddress
 import java.net.UnknownHostException
 
-class EhDns(context: Context) : Dns {
-    private val hosts = EhApplication.getHosts(context)
+class EhDns : Dns {
+    private val hosts = EhApplication.hosts
     private val builtInHosts: MutableMap<String, List<InetAddress>> = mutableMapOf()
 
     init {

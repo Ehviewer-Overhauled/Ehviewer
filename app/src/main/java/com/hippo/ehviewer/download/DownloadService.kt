@@ -67,7 +67,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                 .setName(getString(R.string.download_service))
                 .build()
         )
-        mDownloadManager = EhApplication.getDownloadManager(applicationContext)
+        mDownloadManager = EhApplication.downloadManager
         mDownloadManager!!.setDownloadListener(this)
         ensureDownloadingBuilder()
         mDownloadingBuilder!!.setContentTitle(getString(R.string.download_service))

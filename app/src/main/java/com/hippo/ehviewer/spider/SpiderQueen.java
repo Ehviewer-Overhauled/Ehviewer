@@ -158,8 +158,8 @@ public final class SpiderQueen implements Runnable {
     private volatile int mDownloadPage = -1;
 
     private SpiderQueen(EhApplication application, @NonNull GalleryInfo galleryInfo) {
-        mHttpClient = EhApplication.getOkHttpClient(application);
-        mSpiderInfoCache = EhApplication.getSpiderInfoCache(application);
+        mHttpClient = EhApplication.getOkHttpClient();
+        mSpiderInfoCache = EhApplication.getSpiderInfoCache();
         mGalleryInfo = galleryInfo;
         mSpiderDen = new SpiderDen(mGalleryInfo);
 

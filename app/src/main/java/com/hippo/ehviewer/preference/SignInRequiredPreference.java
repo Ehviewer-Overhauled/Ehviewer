@@ -58,7 +58,7 @@ public class SignInRequiredPreference extends Preference implements Preference.O
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        EhCookieStore store = EhApplication.getEhCookieStore(getContext());
+        EhCookieStore store = EhApplication.getEhCookieStore();
         HttpUrl e = HttpUrl.get(EhUrl.HOST_E);
         HttpUrl ex = HttpUrl.get(EhUrl.HOST_EX);
 

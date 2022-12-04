@@ -188,7 +188,7 @@ public class FavoritesScene extends BaseScene implements
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient(context);
+        mClient = EhApplication.getEhClient();
         mFavCatArray = Settings.getFavCat();
         mFavCountArray = Settings.getFavCount();
         mFavLocalCount = Settings.getFavLocalCount();

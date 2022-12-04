@@ -161,7 +161,7 @@ class ProxyPreference @JvmOverloads constructor(
         Settings.putProxyIp(ip)
         Settings.putProxyPort(port)
         updateSummary(type, ip, port)
-        EhApplication.getEhProxySelector(getContext()).updateProxy()
+        EhApplication.ehProxySelector.updateProxy()
         dialog.dismiss()
     }
 }

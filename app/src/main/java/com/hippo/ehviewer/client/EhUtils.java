@@ -133,14 +133,14 @@ public class EhUtils {
     }
 
     public static void signOut(Context context) {
-        EhApplication.getEhCookieStore(context).signOut();
+        EhApplication.getEhCookieStore().signOut();
         Settings.putAvatar(null);
         Settings.putDisplayName(null);
         Settings.putNeedSignIn(true);
     }
 
     public static boolean needSignedIn(Context context) {
-        return Settings.getNeedSignIn() && !EhApplication.getEhCookieStore(context).hasSignedIn();
+        return Settings.getNeedSignIn() && !EhApplication.getEhCookieStore().hasSignedIn();
     }
 
     public static String getSuitableTitle(GalleryInfo gi) {

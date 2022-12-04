@@ -53,7 +53,7 @@ public final class CommonOperations {
             EhDB.putLocalFavorites(galleryInfo);
             listener.onSuccess(null);
         } else if (slot >= 0 && slot <= 9) {
-            EhClient client = EhApplication.getEhClient(activity);
+            EhClient client = EhApplication.getEhClient();
             EhRequest request = new EhRequest();
             request.setMethod(EhClient.METHOD_ADD_FAVORITES);
             request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "");
@@ -100,7 +100,7 @@ public final class CommonOperations {
     public static void removeFromFavorites(Activity activity, GalleryInfo galleryInfo,
                                            final EhClient.Callback<Void> listener) {
         EhDB.removeLocalFavorites(galleryInfo.gid);
-        EhClient client = EhApplication.getEhClient(activity);
+        EhClient client = EhApplication.getEhClient();
         EhRequest request = new EhRequest();
         request.setMethod(EhClient.METHOD_ADD_FAVORITES);
         request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "");
@@ -114,13 +114,13 @@ public final class CommonOperations {
 
     public static void startDownload(final MainActivity activity, final List<GalleryInfo> galleryInfos, boolean forceDefault) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Objects.requireNonNull(EhApplication.getInstance().getTopActivity()).checkAndRequestNotificationPermission();
+            Objects.requireNonNull(EhApplication.getApplication().getTopActivity()).checkAndRequestNotificationPermission();
         }
         doStartDownload(activity, galleryInfos, forceDefault);
     }
 
     private static void doStartDownload(final MainActivity activity, final List<GalleryInfo> galleryInfos, boolean forceDefault) {
-        final DownloadManager dm = EhApplication.getDownloadManager(activity);
+        final DownloadManager dm = EhApplication.getDownloadManager();
 
         LongList toStart = new LongList();
         List<GalleryInfo> toAdd = new ArrayList<>();

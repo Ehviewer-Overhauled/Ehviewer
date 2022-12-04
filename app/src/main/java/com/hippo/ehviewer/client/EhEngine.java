@@ -361,7 +361,7 @@ public class EhEngine {
             body = response.body().string();
             String html = EventPaneParser.parse(body);
             if (html != null) {
-                EhApplication.getInstance().showEventPane(html);
+                EhApplication.getApplication().showEventPane(html);
             }
             return GalleryDetailParser.parse(body);
         } catch (Throwable e) {

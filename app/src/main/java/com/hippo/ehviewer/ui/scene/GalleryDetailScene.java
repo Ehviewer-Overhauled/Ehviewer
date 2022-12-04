@@ -555,7 +555,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (gid != -1) {
             Context context = getContext();
             AssertUtils.assertNotNull(context);
-            mDownloadState = EhApplication.getDownloadManager(context).getDownloadState(gid);
+            mDownloadState = EhApplication.getDownloadManager().getDownloadState(gid);
         } else {
             mDownloadState = DownloadInfo.STATE_INVALID;
         }
@@ -663,7 +663,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             adjustViewVisibility(STATE_FAILED, false);
         }
 
-        EhApplication.getDownloadManager(context).addDownloadInfoListener(this);
+        EhApplication.getDownloadManager().addDownloadInfoListener(this);
 
         return view;
     }
@@ -674,7 +674,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        EhApplication.getDownloadManager(context).removeDownloadInfoListener(this);
+        EhApplication.getDownloadManager().removeDownloadInfoListener(this);
 
         mTip = null;
         mViewTransition = null;
@@ -737,7 +737,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         // Get from cache
-        mGalleryDetail = EhApplication.getGalleryDetailCache(context).get(gid);
+        mGalleryDetail = EhApplication.getGalleryDetailCache().get(gid);
         if (mGalleryDetail != null) {
             return true;
         }
@@ -767,7 +767,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                 .setArgs(url)
                 .setCallback(callback);
-        EhApplication.getEhClient(context).execute(request);
+        EhApplication.getEhClient().execute(request);
 
         return true;
     }
@@ -878,6 +878,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         Resources resources = getResources();
 
+        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
         setTitle(EhUtils.getSuitableTitle(gd));
         mUploader.setText(gd.uploader);
         mUploader.setAlpha(gd.disowned ? .5f : 1f);
@@ -1148,7 +1149,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } else if (mDownload == v) {
             GalleryInfo galleryInfo = getGalleryInfo();
             if (galleryInfo != null) {
-                if (EhApplication.getDownloadManager(context).getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
+                if (EhApplication.getDownloadManager().getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
                     CommonOperations.startDownload(activity, galleryInfo, false);
                 } else {
                     CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
@@ -1156,7 +1157,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                             getString(R.string.download_remove_dialog_check_text),
                             Settings.getRemoveImageFiles());
                     DeleteDialogHelper helper = new DeleteDialogHelper(
-                            EhApplication.getDownloadManager(context), galleryInfo, builder);
+                            EhApplication.getDownloadManager(), galleryInfo, builder);
                     builder.setTitle(R.string.download_remove_dialog_title)
                             .setPositiveButton(android.R.string.ok, helper)
                             .show();
@@ -1424,7 +1425,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, tag, vote)
                 .setCallback(new VoteTagListener(context,
                         activity.getStageId(), getTag()));
-        EhApplication.getEhClient(context).execute(request);
+        EhApplication.getEhClient().execute(request);
     }
 
     @Override
@@ -1527,7 +1528,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             return;
         }
 
-        int downloadState = EhApplication.getDownloadManager(context).getDownloadState(gid);
+        int downloadState = EhApplication.getDownloadManager().getDownloadState(gid);
         if (downloadState == mDownloadState) {
             return;
         }
@@ -1645,7 +1646,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             getApplication().removeGlobalStuff(this);
 
             // Put gallery detail to cache
-            EhApplication.getGalleryDetailCache(getApplication()).put(result.gid, result);
+            EhApplication.getGalleryDetailCache().put(result.gid, result);
 
             // Add history
             EhDB.putHistoryInfo(result);
@@ -1725,7 +1726,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 scene.onRateGallerySuccess(result);
             } else {
                 // Update rating in cache
-                GalleryDetail gd = EhApplication.getGalleryDetailCache(getApplication()).get(mGid);
+                GalleryDetail gd = EhApplication.getGalleryDetailCache().get(mGid);
                 if (gd != null) {
                     gd.rating = result.rating;
                     gd.ratingCount = result.ratingCount;
@@ -1854,7 +1855,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     mRequest = new EhRequest().setMethod(EhClient.METHOD_ARCHIVE_LIST)
                             .setArgs(url, mGid, mToken)
                             .setCallback(this);
-                    EhApplication.getEhClient(context).execute(mRequest);
+                    EhApplication.getEhClient().execute(mRequest);
                 } else {
                     bind(mArchiveList);
                 }
@@ -1893,7 +1894,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
                 request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res);
                 request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag()));
-                EhApplication.getEhClient(context).execute(request);
+                EhApplication.getEhClient().execute(request);
             }
 
             if (mDialog != null) {
@@ -1971,7 +1972,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     mRequest = new EhRequest().setMethod(EhClient.METHOD_GET_TORRENT_LIST)
                             .setArgs(url, mGid, mToken)
                             .setCallback(this);
-                    EhApplication.getEhClient(context).execute(mRequest);
+                    EhApplication.getEhClient().execute(mRequest);
                 } else {
                     bind(mTorrentList);
                 }
@@ -2012,7 +2013,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                         FileUtils.sanitizeFilename(name + ".torrent"));
                 r.allowScanningByMediaScanner();
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                r.addRequestHeader("Cookie", EhApplication.getEhCookieStore(context).getCookieHeader(HttpUrl.get(url)));
+                r.addRequestHeader("Cookie", EhApplication.getEhCookieStore().getCookieHeader(HttpUrl.get(url)));
                 DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                 if (dm != null) {
                     try {
@@ -2107,7 +2108,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                             mGalleryDetail.gid, mGalleryDetail.token, mRatingBar.getRating())
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
-            EhApplication.getEhClient(context).execute(request);
+            EhApplication.getEhClient().execute(request);
         }
     }
 

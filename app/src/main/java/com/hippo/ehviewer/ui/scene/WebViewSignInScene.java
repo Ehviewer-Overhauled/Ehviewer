@@ -118,7 +118,7 @@ public class WebViewSignInScene extends SolidScene {
         }
 
         private void addCookie(Context context, String domain, Cookie cookie) {
-            EhApplication.getEhCookieStore(context).addCookie(EhCookieStore.newCookie(cookie, domain, true, true, true));
+            EhApplication.getEhCookieStore().addCookie(EhCookieStore.newCookie(cookie, domain, true, true, true));
         }
 
         @Override

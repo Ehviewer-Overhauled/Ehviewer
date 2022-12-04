@@ -491,7 +491,7 @@ public class EhDB {
                     .createFromFile(file).allowMainThreadQueries().build();
 
             // Download label
-            DownloadManager manager = EhApplication.getDownloadManager(context);
+            DownloadManager manager = EhApplication.getDownloadManager();
             try {
                 List<DownloadLabel> downloadLabelList = oldRoomDatabase.downloadLabelDao().list();
                 manager.addDownloadLabel(downloadLabelList);

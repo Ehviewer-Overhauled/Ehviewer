@@ -246,7 +246,6 @@ public class Settings {
      ****** Update
      ********************/
     private static final String KEY_BETA_UPDATE_CHANNEL = "beta_update_channel";
-    private static final boolean DEFAULT_BETA_UPDATE_CHANNEL = EhApplication.BETA;
     private static final String KEY_SKIP_UPDATE_VERSION = "skip_update_version";
     private static final int DEFAULT_SKIP_UPDATE_VERSION = 0;
     private static final boolean DEFAULT_SAVE_PARSE_ERROR_BODY = true;
@@ -422,14 +421,6 @@ public class Settings {
 
     public static void putIntToStr(String key, int value) {
         sSettingsPre.edit().putString(key, Integer.toString(value)).apply();
-    }
-
-    public static int getVersionCode() {
-        return getInt(KEY_VERSION_CODE, DEFAULT_VERSION_CODE);
-    }
-
-    public static void putVersionCode(int value) {
-        putInt(KEY_VERSION_CODE, value);
     }
 
     @Nullable
@@ -1022,10 +1013,6 @@ public class Settings {
         }
 
         return true;
-    }
-
-    public static boolean getBetaUpdateChannel() {
-        return getBoolean(KEY_BETA_UPDATE_CHANNEL, DEFAULT_BETA_UPDATE_CHANNEL);
     }
 
     public static void putBetaUpdateChannel(boolean value) {

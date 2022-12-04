@@ -61,7 +61,7 @@ public class EhClient {
 
     public EhClient(Context context) {
         mRequestThreadPool = IoThreadPoolExecutor.getInstance();
-        mOkHttpClient = EhApplication.getOkHttpClient(context);
+        mOkHttpClient = EhApplication.getOkHttpClient();
     }
 
     public void execute(EhRequest request) {

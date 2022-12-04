@@ -84,7 +84,7 @@ public class MyTagsFragment extends BaseFragment {
 
         // Copy cookies from okhttp cookie store to CookieManager
         url = EhUrl.getMyTagsUrl();
-        EhCookieStore store = EhApplication.getEhCookieStore(requireContext());
+        EhCookieStore store = EhApplication.getEhCookieStore();
         for (Cookie cookie : store.getCookies(HttpUrl.parse(url))) {
             cookieManager.setCookie(url, cookie.toString());
         }

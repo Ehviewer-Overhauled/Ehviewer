@@ -50,7 +50,7 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
         View view = inflater.inflate(R.layout.scene_select_site, container, false);
 
         mButtonGroup = (MaterialButtonToggleGroup) ViewUtils.$$(view, R.id.button_group);
-        if (EhApplication.getEhCookieStore(requireContext()).hasSignedIn()) {
+        if (EhApplication.getEhCookieStore().hasSignedIn()) {
             ((MaterialButton) view.findViewById(R.id.site_ex)).setChecked(true);
         } else {
             ((MaterialButton) view.findViewById(R.id.site_e)).setChecked(true);

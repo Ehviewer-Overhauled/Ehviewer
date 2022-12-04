@@ -85,7 +85,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
         setType(type);
 
-        mDownloadManager = EhApplication.getDownloadManager(inflater.getContext());
+        mDownloadManager = EhApplication.getDownloadManager();
     }
 
     private void adjustPaddings() {
