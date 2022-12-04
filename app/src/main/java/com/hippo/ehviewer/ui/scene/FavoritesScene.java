@@ -47,7 +47,6 @@ import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.annotation.Implemented;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
 import com.hippo.drawable.DrawerArrowDrawable;
@@ -452,14 +451,12 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(FastScroller.OnDragHandlerListener.class)
     public void onStartDragHandler() {
         // Lock right drawer
         setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
     }
 
     @Override
-    @Implemented(FastScroller.OnDragHandlerListener.class)
     public void onEndDragHandler() {
         // Restore right drawer
         if (null != mRecyclerView && !mRecyclerView.isInCustomChoice()) {
@@ -535,25 +532,21 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(SearchBarMover.Helper.class)
     public boolean isValidView(RecyclerView recyclerView) {
         return recyclerView == mRecyclerView;
     }
 
     @Override
-    @Implemented(SearchBarMover.Helper.class)
     public RecyclerView getValidRecyclerView() {
         return mRecyclerView;
     }
 
     @Override
-    @Implemented(SearchBarMover.Helper.class)
     public boolean forceShowSearchBar() {
         return false;
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onClickTitle() {
         // Skip if in search mode
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -566,7 +559,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onClickLeftIcon() {
         // Skip if in search mode
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -581,7 +573,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onClickRightIcon() {
         // Skip if in search mode
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -600,12 +591,10 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onSearchEditTextClick() {
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onApplySearch(String query) {
         // Skip if in search mode
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -629,7 +618,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(SearchBar.Helper.class)
     public void onSearchEditTextBackPressed() {
         onBackPressed();
     }
@@ -644,7 +632,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(FabLayout.OnClickFabListener.class)
     public void onClickPrimaryFab(FabLayout view, FloatingActionButton fab) {
         if (mRecyclerView != null && mFabLayout != null) {
             if (mRecyclerView.isInCustomChoice()) {
@@ -686,7 +673,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(FabLayout.OnClickFabListener.class)
     public void onClickSecondaryFab(FabLayout view, FloatingActionButton fab, int position) {
         Context context = getContext();
         if (null == context || null == mRecyclerView || null == mHelper) {
@@ -785,7 +771,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(EasyRecyclerView.CustomChoiceListener.class)
     public void onIntoCustomChoice(EasyRecyclerView view) {
         if (mFabLayout != null) {
             showSelectionFabs();
@@ -802,7 +787,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(EasyRecyclerView.CustomChoiceListener.class)
     public void onOutOfCustomChoice(EasyRecyclerView view) {
         if (mFabLayout != null) {
             showNormalFabs();
@@ -818,7 +802,6 @@ public class FavoritesScene extends BaseScene implements
     }
 
     @Override
-    @Implemented(EasyRecyclerView.CustomChoiceListener.class)
     public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
 
         if (view.getCheckedItemCount() == 0) {

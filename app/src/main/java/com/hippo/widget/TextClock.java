@@ -112,6 +112,13 @@ public class TextClock extends AppCompatTextView {
 
     public CharSequence getFormat24Hour() {
         return mFormat24;
+    }
+
+    public void setFormat24Hour(CharSequence format) {
+        mFormat24 = format;
+
+        chooseFormat();
+        onTimeChanged();
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -123,13 +130,6 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-
-    public void setFormat24Hour(CharSequence format) {
-        mFormat24 = format;
-
-        chooseFormat();
-        onTimeChanged();
-    }
 
     public boolean is24HourModeEnabled() {
         return DateFormat.is24HourFormat(getContext());
@@ -227,6 +227,15 @@ public class TextClock extends AppCompatTextView {
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
 
         getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
+    }
+
+    private void registerObserver() {
+        final ContentResolver resolver = getContext().getContentResolver();
+        resolver.registerContentObserver(Settings.System.CONTENT_URI, true, mFormatChangeObserver);
+    }
+
+    private void unregisterReceiver() {
+        getContext().unregisterReceiver(mIntentReceiver);
     }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -240,15 +249,6 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
-    private void registerObserver() {
-        final ContentResolver resolver = getContext().getContentResolver();
-        resolver.registerContentObserver(Settings.System.CONTENT_URI, true, mFormatChangeObserver);
-    }
-
-    private void unregisterReceiver() {
-        getContext().unregisterReceiver(mIntentReceiver);
-    }
 
     private void unregisterObserver() {
         final ContentResolver resolver = getContext().getContentResolver();

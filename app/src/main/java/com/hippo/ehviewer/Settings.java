@@ -62,15 +62,11 @@ public class Settings {
     public static final String KEY_DETAIL_SIZE = "detail_size";
     public static final String KEY_THUMB_SIZE = "thumb_size_";
     public static final String KEY_THUMB_RESOLUTION = "thumb_resolution";
-    private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
-    private static final boolean DEFAULT_SHOW_COMMENTS = true;
     public static final String KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations";
     public static final String KEY_DEFAULT_CATEGORIES = "default_categories";
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhUtils.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
-    private static final String KEY_PREVIEW_NUM = "preview_num";
-    private static final int DEFAULT_PREVIEW_NUM = 60;
     /********************
      ****** Privacy and Security
      ********************/
@@ -82,7 +78,6 @@ public class Settings {
     public static final String KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme";
     public static final String KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority";
     public static final String KEY_DOWNLOAD_SAVE_PATH = "image_path";
-
     public static final String KEY_NOTIFICATION_REQUIRED = "notification_required";
     public static final String KEY_DOWNLOAD_SAVE_QUERY = "image_query";
     public static final String KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment";
@@ -105,6 +100,10 @@ public class Settings {
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_APP_LANGUAGE = "app_language";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
+    private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
+    private static final boolean DEFAULT_SHOW_COMMENTS = true;
+    private static final String KEY_PREVIEW_NUM = "preview_num";
+    private static final int DEFAULT_PREVIEW_NUM = 60;
     private static final String TAG = Settings.class.getSimpleName();
     private static final String KEY_VERSION_CODE = "version_code";
     private static final int DEFAULT_VERSION_CODE = 0;

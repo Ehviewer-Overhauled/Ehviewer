@@ -246,6 +246,10 @@ public final class DiskLruCache implements Closeable {
         if (!from.renameTo(to)) {
             throw new IOException();
         }
+    }
+
+    private static String inputStreamToString(InputStream in) throws IOException {
+        return Util.readFully(new InputStreamReader(in, Util.UTF_8));
     }    private final Callable<Void> cleanupCallable = new Callable<>() {
         public Void call() throws Exception {
             synchronized (DiskLruCache.this) {
@@ -261,10 +265,6 @@ public final class DiskLruCache implements Closeable {
             return null;
         }
     };
-
-    private static String inputStreamToString(InputStream in) throws IOException {
-        return Util.readFully(new InputStreamReader(in, Util.UTF_8));
-    }
 
     private void readJournal() throws IOException {
         StrictLineReader reader = new StrictLineReader(new FileInputStream(journalFile), Util.US_ASCII);

@@ -316,7 +316,7 @@ public class DownloadsScene extends ToolbarScene
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
 
         // Workaround
-        ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
         container.addView(mFabLayout);
 
         mTip = (TextView) ViewUtils.$$(view, R.id.tip);
@@ -394,7 +394,7 @@ public class DownloadsScene extends ToolbarScene
         }
         if (null != mFabLayout) {
             removeAboveSnackView(mFabLayout);
-            ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+            ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
             mFabLayout = null;
         }
 

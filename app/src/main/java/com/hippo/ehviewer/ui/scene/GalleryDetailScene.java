@@ -115,15 +115,11 @@ import com.hippo.widget.ObservedTextView;
 import com.hippo.widget.SimpleGridAutoSpanLayout;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.FileUtils;
-import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
 import com.hippo.yorozuya.collect.IntList;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -1098,7 +1094,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
         File temp = AppConfig.createTempFile();
         if (null == temp) {
-            return;
         }
 
         /*

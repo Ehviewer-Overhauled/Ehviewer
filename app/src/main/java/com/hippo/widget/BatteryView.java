@@ -107,6 +107,17 @@ public class BatteryView extends AppCompatTextView {
 
             registerReceiver();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        if (mAttached) {
+            unregisterReceiver();
+            stopCharger();
+            mAttached = false;
+        }
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -121,17 +132,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        if (mAttached) {
-            unregisterReceiver();
-            stopCharger();
-            mAttached = false;
-        }
-    }
 
     private void registerReceiver() {
         final IntentFilter filter = new IntentFilter();

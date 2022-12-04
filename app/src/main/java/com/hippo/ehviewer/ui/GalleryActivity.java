@@ -511,6 +511,15 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mSeekBar = null;
 
         SimpleHandler.getInstance().removeCallbacks(mHideSliderRunnable);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mGLRootView != null) {
+            mGLRootView.onPause();
+        }
     }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -521,15 +530,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 }
                 mSavingPage = -1;
             });
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (mGLRootView != null) {
-            mGLRootView.onPause();
-        }
-    }
 
     @Override
     protected void onResume() {

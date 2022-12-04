@@ -330,7 +330,12 @@ class SearchLayout @JvmOverloads constructor(
 
     inner class IdentifiedChip @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null
-    ) : Chip(ContextThemeWrapper(context, com.google.android.material.R.style.Widget_Material3_Chip_Filter), attrs) {
+    ) : Chip(
+        ContextThemeWrapper(
+            context,
+            com.google.android.material.R.style.Widget_Material3_Chip_Filter
+        ), attrs
+    ) {
         var idt = 0
     }
 
