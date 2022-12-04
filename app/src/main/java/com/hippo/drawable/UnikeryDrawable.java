@@ -18,31 +18,23 @@ package com.hippo.drawable;
 
 import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.hippo.conaco.Conaco;
-import com.hippo.conaco.ConacoTask;
-import com.hippo.conaco.Unikery;
-import com.hippo.image.ImageBitmap;
 import com.hippo.widget.ObservedTextView;
 
-public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap>,
-        ObservedTextView.OnWindowAttachListener {
+import coil.Coil;
+import coil.request.Disposable;
+import coil.request.ImageRequest;
+
+public class UnikeryDrawable extends WrapDrawable implements ObservedTextView.OnWindowAttachListener {
 
     private static final String TAG = UnikeryDrawable.class.getSimpleName();
     private final ObservedTextView mTextView;
-    private final Conaco<ImageBitmap> mConaco;
-    private int mTaskId = Unikery.INVALID_ID;
     private String mUrl;
+    private Disposable task;
 
-    private ImageBitmap imageBitmap;
-
-    public UnikeryDrawable(ObservedTextView textView, Conaco<ImageBitmap> conaco) {
+    public UnikeryDrawable(ObservedTextView textView) {
         mTextView = textView;
         mTextView.setOnWindowAttachListener(this);
-        mConaco = conaco;
     }
 
     @Override
@@ -52,23 +44,29 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
 
     @Override
     public void onDetachedFromWindow() {
-        mConaco.cancel(this);
+        if (task != null && !task.isDisposed())
+            task.dispose();
         clearDrawable();
     }
 
     public void load(String url) {
         if (url != null) {
             mUrl = url;
-            mConaco.load(new ConacoTask.Builder<ImageBitmap>().setUnikery(this).setUrl(url).setKey(url));
+            var imageLoader = Coil.imageLoader(mTextView.getContext());
+            var request = new ImageRequest.Builder(mTextView.getContext()).data(url).memoryCacheKey(url).diskCacheKey(url).target(
+                    drawable -> null,
+                    drawable -> null,
+                    drawable -> {
+                        onGetValue(drawable);
+                        return null;
+                    }
+            ).build();
+            task = imageLoader.enqueue(request);
         }
     }
 
     private void clearDrawable() {
         setDrawable(null);
-        if (imageBitmap != null) {
-            imageBitmap.release();
-            imageBitmap = null;
-        }
     }
 
     @Override
@@ -92,64 +90,15 @@ public class UnikeryDrawable extends WrapDrawable implements Unikery<ImageBitmap
     }
 
     @Override
-    public int getTaskId() {
-        return mTaskId;
-    }
-
-    @Override
-    public void setTaskId(int id) {
-        mTaskId = id;
-    }
-
-    @Override
     public void invalidateSelf() {
         CharSequence cs = mTextView.getText();
         mTextView.setText(cs);
     }
 
-    @Override
-    public void onMiss(int source) {
-    }
-
-    @Override
-    public void onRequest() {
-    }
-
-    @Override
-    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {
-    }
-
-    @Override
-    public void onWait() {
-    }
-
-    @Override
-    public boolean onGetValue(@NonNull ImageBitmap value, int source) {
-        Drawable drawable;
-        try {
-            drawable = value.getDrawable();
-        } catch (Exception e) {
-            Log.d(TAG, "The ImageBitmap is recycled", e);
-            return false;
-        }
-
+    public void onGetValue(Drawable drawable) {
         clearDrawable();
-
         setDrawable(drawable);
-        imageBitmap = value;
         if (drawable instanceof AnimatedImageDrawable animatedImageDrawable)
             animatedImageDrawable.start();
-
-        return true;
-    }
-
-    @Override
-    public void onFailure() {
-        // Empty
-    }
-
-    @Override
-    public void onCancel() {
-        // Empty
     }
 }

@@ -47,7 +47,6 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import com.hippo.Native;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.beerbelly.SimpleDiskCache;
-import com.hippo.conaco.Conaco;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhDns;
@@ -63,7 +62,6 @@ import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.image.Image;
-import com.hippo.image.ImageBitmap;
 import com.hippo.network.StatusCodeException;
 import com.hippo.scene.SceneApplication;
 import com.hippo.unifile.UniFile;
@@ -88,6 +86,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import coil.Coil;
+import coil.ImageLoader;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -119,8 +119,6 @@ public class EhApplication extends SceneApplication {
     private EhProxySelector mEhProxySelector;
     private OkHttpClient mOkHttpClient;
     private Cache mOkHttpCache;
-    private ImageBitmapHelper mImageBitmapHelper;
-    private Conaco<ImageBitmap> mConaco;
     private LruCache<Long, GalleryDetail> mGalleryDetailCache;
     private SimpleDiskCache mSpiderInfoCache;
     private DownloadManager mDownloadManager;
@@ -200,35 +198,8 @@ public class EhApplication extends SceneApplication {
         return application.mOkHttpCache;
     }
 
-    @NonNull
-    public static ImageBitmapHelper getImageBitmapHelper(@NonNull Context context) {
-        EhApplication application = ((EhApplication) context.getApplicationContext());
-        if (application.mImageBitmapHelper == null) {
-            application.mImageBitmapHelper = new ImageBitmapHelper();
-        }
-        return application.mImageBitmapHelper;
-    }
-
     private static int getMemoryCacheMaxSize() {
         return Math.min(20 * 1024 * 1024, (int) OSUtils.getAppMaxMemory());
-    }
-
-    @NonNull
-    public static Conaco<ImageBitmap> getConaco(@NonNull Context context) {
-        EhApplication application = ((EhApplication) context.getApplicationContext());
-        if (application.mConaco == null) {
-            Conaco.Builder<ImageBitmap> builder = new Conaco.Builder<>();
-            builder.hasMemoryCache = true;
-            builder.memoryCacheMaxSize = getMemoryCacheMaxSize();
-            builder.hasDiskCache = true;
-            builder.diskCacheDir = new File(context.getCacheDir(), "thumb");
-            builder.diskCacheMaxSize = 320 * 1024 * 1024; // 320MB
-            builder.okHttpClient = getOkHttpClient(context);
-            builder.objectHelper = getImageBitmapHelper(context);
-            builder.debug = DEBUG_CONACO;
-            application.mConaco = builder.build();
-        }
-        return application.mConaco;
     }
 
     @NonNull
@@ -328,6 +299,8 @@ public class EhApplication extends SceneApplication {
         EhDB.initialize(this);
         EhEngine.initialize();
         BitmapUtils.initialize(this);
+
+        Coil.setImageLoader(new ImageLoader.Builder(this).okHttpClient(getOkHttpClient(this)).build());
 
         // Locales can be managed by system automatically above Snow Cone v2
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
@@ -458,9 +431,6 @@ public class EhApplication extends SceneApplication {
     }
 
     public void clearMemoryCache() {
-        if (null != mConaco) {
-            mConaco.getBeerBelly().clearMemory();
-        }
         if (null != mGalleryDetailCache) {
             mGalleryDetailCache.evictAll();
         }

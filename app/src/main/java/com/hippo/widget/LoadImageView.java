@@ -25,7 +25,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
@@ -33,26 +32,22 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.hippo.conaco.Conaco;
-import com.hippo.conaco.ConacoTask;
-import com.hippo.conaco.Unikery;
 import com.hippo.drawable.PreciselyClipDrawable;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
-import com.hippo.image.ImageBitmap;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class LoadImageView extends FixedAspectImageView implements Unikery<ImageBitmap>,
-        View.OnClickListener, View.OnLongClickListener, Animatable {
+import coil.Coil;
+import coil.request.Disposable;
+import coil.request.ImageRequest;
+
+public class LoadImageView extends FixedAspectImageView implements View.OnClickListener, View.OnLongClickListener, Animatable {
 
     public static final int RETRY_TYPE_NONE = 0;
     public static final int RETRY_TYPE_CLICK = 1;
     public static final int RETRY_TYPE_LONG_CLICK = 2;
     private static final String TAG = LoadImageView.class.getSimpleName();
-    private int mTaskId = Unikery.INVALID_ID;
-    private Conaco<ImageBitmap> mConaco;
     private String mKey;
     private String mUrl;
     private boolean mUseNetwork;
@@ -63,7 +58,8 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private int mRetryType;
     private boolean mFailed;
     private boolean mLoadFromDrawable = false;
-    private ImageBitmap imageBitmap;
+
+    private Disposable task = null;
 
     public LoadImageView(Context context) {
         super(context);
@@ -84,20 +80,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0);
         setRetryType(a.getInt(R.styleable.LoadImageView_retryType, 0));
         a.recycle();
-
-        if (!isInEditMode()) {
-            mConaco = EhApplication.getConaco(context);
-        }
-    }
-
-    @Override
-    public int getTaskId() {
-        return mTaskId;
-    }
-
-    @Override
-    public void setTaskId(int id) {
-        mTaskId = id;
     }
 
     @Override
@@ -107,7 +89,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         if (!mLoadFromDrawable) {
             if (mFailed) {
                 onFailure();
-            } else if (mConaco.isLoading(this)) {
+            } else if (task != null && task.isDisposed()) {
                 load(mKey, mUrl, mUseNetwork);
             }
         }
@@ -118,13 +100,9 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         super.onDetachedFromWindow();
 
         if (!mLoadFromDrawable) {
-            if (mConaco.isLoading(this)) {
-                try {
-                    // Cancel
-                    mConaco.cancel(this);
-                } catch (Exception e) {
-                    // Ignore
-                }
+            if (task != null && !task.isDisposed()) {
+                // Cancel
+                task.dispose();
                 // Clear drawable
                 clearDrawable();
             }
@@ -147,11 +125,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     private void clearDrawable() {
         // Set drawable null
         setImageDrawable(null);
-        // Recycle ImageDrawable
-        if (imageBitmap != null) {
-            imageBitmap.release();
-            imageBitmap = null;
-        }
     }
 
     private void clearRetry() {
@@ -217,12 +190,22 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         mUrl = url;
         mUseNetwork = useNetwork;
 
-        ConacoTask.Builder<ImageBitmap> builder = new ConacoTask.Builder<ImageBitmap>()
-                .setUnikery(this)
-                .setKey(key)
-                .setUrl(url)
-                .setUseNetwork(useNetwork);
-        mConaco.load(builder);
+        var imageLoader = Coil.imageLoader(getContext());
+        var request = new ImageRequest.Builder(getContext()).data(url).memoryCacheKey(key).diskCacheKey(key).target(
+                drawable -> {
+                    onWait();
+                    return null;
+                },
+                drawable -> {
+                    onFailure();
+                    return null;
+                },
+                drawable -> {
+                    onGetValue(drawable);
+                    return null;
+                }
+        ).build();
+        task = imageLoader.enqueue(request);
     }
 
     public void load(Drawable drawable) {
@@ -239,43 +222,17 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
     }
 
     public void unload() {
-        mConaco.cancel(this);
+        task.dispose();
         mKey = null;
         mUrl = null;
         clearDrawable();
     }
 
-    @Override
-    public void onMiss(int source) {
-        if (source == Conaco.SOURCE_MEMORY) {
-            clearDrawable();
-        }
-    }
-
-    @Override
-    public void onRequest() {
-    }
-
-    @Override
-    public void onProgress(long singleReceivedSize, long receivedSize, long totalSize) {
-    }
-
-    @Override
     public void onWait() {
         clearDrawable();
     }
 
-    @Override
-    public boolean onGetValue(@NonNull ImageBitmap value, int source) {
-        Drawable drawable;
-        try {
-            drawable = value.getDrawable();
-        } catch (Exception e) {
-            // The image might be recycled because it is removed from memory cache.
-            Log.d(TAG, "The image is recycled", e);
-            return false;
-        }
-
+    public void onGetValue(Drawable drawable) {
         clearDrawable();
 
         if (Integer.MIN_VALUE != mOffsetX) {
@@ -283,7 +240,7 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         }
 
         onPreSetImageDrawable(drawable, true);
-        if ((source == Conaco.SOURCE_DISK || source == Conaco.SOURCE_NETWORK) && isShown()) {
+        if (isShown()) {
             Drawable[] layers = new Drawable[2];
             layers[0] = new ColorDrawable(Color.TRANSPARENT);
             layers[1] = drawable;
@@ -293,12 +250,8 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         } else {
             setImageDrawable(drawable);
         }
-        imageBitmap = value;
-
-        return true;
     }
 
-    @Override
     public void onFailure() {
         mFailed = true;
         clearDrawable();
@@ -316,7 +269,6 @@ public class LoadImageView extends FixedAspectImageView implements Unikery<Image
         }
     }
 
-    @Override
     public void onCancel() {
         mFailed = false;
     }

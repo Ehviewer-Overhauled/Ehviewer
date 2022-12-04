@@ -65,7 +65,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.CheckBoxDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
-import com.hippo.beerbelly.BeerBelly;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
@@ -883,7 +882,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         Resources resources = getResources();
 
-        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
         setTitle(EhUtils.getSuitableTitle(gd));
         mUploader.setText(gd.uploader);
         mUploader.setAlpha(gd.disowned ? .5f : 1f);
@@ -1004,7 +1002,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ObservedTextView c = v.findViewById(R.id.comment);
             c.setMaxLines(5);
             c.setText(Html.fromHtml(comment.comment, Html.FROM_HTML_MODE_LEGACY,
-                    new URLImageGetter(c, EhApplication.getConaco(context)), null));
+                    new URLImageGetter(c), null));
             v.setBackgroundColor(Color.TRANSPARENT);
         }
     }
@@ -1102,8 +1100,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (null == temp) {
             return;
         }
-        BeerBelly beerBelly = EhApplication.getConaco(context).getBeerBelly();
 
+        /*
         OutputStream os = null;
         try {
             os = new FileOutputStream(temp);
@@ -1119,6 +1117,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } finally {
             IOUtils.closeQuietly(os);
         }
+
+         */
     }
 
     @Override
