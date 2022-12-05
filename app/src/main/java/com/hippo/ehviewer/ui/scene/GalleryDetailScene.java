@@ -1135,7 +1135,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             GalleryListScene.startScene(this, lub);
         } else if (mCategory == v) {
             int category = getCategory();
-            if (category == -1) {
+            if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
                 return;
             }
             ListUrlBuilder lub = new ListUrlBuilder();
