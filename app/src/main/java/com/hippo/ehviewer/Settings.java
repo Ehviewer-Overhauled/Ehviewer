@@ -64,7 +64,7 @@ public class Settings {
     public static final String KEY_THUMB_RESOLUTION = "thumb_resolution";
     public static final String KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations";
     public static final String KEY_DEFAULT_CATEGORIES = "default_categories";
-    public static final int DEFAULT_DEFAULT_CATEGORIES = EhUtils.ALL_CATEGORY;
+    public static final int DEFAULT_DEFAULT_CATEGORIES = EhConfig.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
     /********************

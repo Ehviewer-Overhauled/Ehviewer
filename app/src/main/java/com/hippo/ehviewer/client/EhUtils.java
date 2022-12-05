@@ -32,10 +32,8 @@ import java.util.regex.Pattern;
 public class EhUtils {
 
     public static final int NONE = -1; // Use it for homepage
-    public static final int UNKNOWN = 0x400;
-
-    public static final int ALL_CATEGORY = EhUtils.UNKNOWN - 1;
-    //DOUJINSHI|MANGA|ARTIST_CG|GAME_CG|WESTERN|NON_H|IMAGE_SET|COSPLAY|ASIAN_PORN|MISC;
+    public static final int PRIVATE = 0x400;
+    public static final int UNKNOWN = 0x800;
 
     public static final int BG_COLOR_DOUJINSHI = 0xfff44336;
     public static final int BG_COLOR_MANGA = 0xffff9800;
@@ -68,6 +66,7 @@ public class EhUtils {
             EhConfig.ASIAN_PORN,
             EhConfig.NON_H,
             EhConfig.WESTERN,
+            PRIVATE,
             UNKNOWN};
 
     private static final String[][] CATEGORY_STRINGS = {
@@ -81,6 +80,7 @@ public class EhUtils {
             new String[]{"asianporn", "Asian Porn"},
             new String[]{"non-h"},
             new String[]{"western"},
+            new String[]{"private"},
             new String[]{"unknown"}
     };
 
