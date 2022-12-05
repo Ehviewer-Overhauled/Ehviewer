@@ -125,6 +125,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import coil.Coil;
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
 
@@ -1093,28 +1094,17 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (-1L == gid) {
             return;
         }
-        File temp = AppConfig.createTempFile();
-        if (null == temp) {
-        }
 
-        /*
-        OutputStream os = null;
         try {
-            os = new FileOutputStream(temp);
-            if (beerBelly.pullFromDiskCache(EhCacheKeyFactory.getThumbKey(gid), os)) {
-                ListUrlBuilder lub = new ListUrlBuilder();
-                lub.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
-                lub.setImagePath(temp.getPath());
-                lub.setUseSimilarityScan(true);
-                GalleryListScene.startScene(this, lub);
-            }
-        } catch (FileNotFoundException e) {
-            // Ignore
-        } finally {
-            IOUtils.closeQuietly(os);
+            var path = Coil.imageLoader(context).getDiskCache().get(EhCacheKeyFactory.getThumbKey(gid)).getData();
+            ListUrlBuilder lub = new ListUrlBuilder();
+            lub.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
+            lub.setImagePath(path.toString());
+            lub.setUseSimilarityScan(true);
+            GalleryListScene.startScene(this, lub);
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-
-         */
     }
 
     @Override
