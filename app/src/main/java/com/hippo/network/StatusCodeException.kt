@@ -15,8 +15,8 @@
  */
 package com.hippo.network
 
-import android.content.Context
 import android.util.SparseArray
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 
 class StatusCodeException(val responseCode: Int) : Exception() {
@@ -33,9 +33,8 @@ class StatusCodeException(val responseCode: Int) : Exception() {
         private val ERROR_MESSAGE_ARRAY = SparseArray<String>(24)
         private const val DEFAULT_ERROR_MESSAGE = "Error response code"
 
-        @JvmStatic
-        fun initialize(context: Context) {
-            val resources = context.applicationContext.resources
+        init {
+            val resources = EhApplication.application.resources
             ERROR_MESSAGE_ARRAY.append(400, resources.getString(R.string.error_status_code_400))
             ERROR_MESSAGE_ARRAY.append(401, resources.getString(R.string.error_status_code_401))
             ERROR_MESSAGE_ARRAY.append(402, resources.getString(R.string.error_status_code_402))
@@ -62,5 +61,4 @@ class StatusCodeException(val responseCode: Int) : Exception() {
             ERROR_MESSAGE_ARRAY.append(505, resources.getString(R.string.error_status_code_505))
         }
     }
-
 }

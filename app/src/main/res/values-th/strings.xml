@@ -74,7 +74,7 @@
     <string name="app_waring">เนื้อหาภายในแอปพลิเคชั่นนี้มาจากอินเทอร์เน็ตทั้งหมด อาจมีเนื้อหาบางอย่างที่มีผลต่อร่างกายหรือจิตใจของคุณ คุณจะต้องยอมรับความเสี่ยงที่ดังกล่าว และดำเนินการต่อไป</string>
     <string name="error_username_cannot_empty">ชื่อผู้ใช้ห้ามเว้นว่างไว้</string>
     <string name="error_password_cannot_empty">รหัสผ่านห้ามเว้นว่างไว้</string>
-    <string name="skip_signing_in">ดำเนินการต่อโดยไม่ต้องลงชื่อเข้าระบบ</string>
+    <string name="tourist_mode">ดำเนินการต่อโดยไม่ต้องลงชื่อเข้าระบบ</string>
     <string name="sign_in_failed">การลงชื่อเข้าใช้ล้มเหลว</string>
     <string name="get_it">เข้าใจแล้ว ไม่ต้องแสดงอีก</string>
 

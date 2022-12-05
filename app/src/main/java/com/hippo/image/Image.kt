@@ -17,7 +17,6 @@
  */
 package com.hippo.image
 
-import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -32,6 +31,7 @@ import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toDrawable
+import com.hippo.ehviewer.EhApplication
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
@@ -169,8 +169,8 @@ class Image private constructor(
         var screenWidth: Int = 0
         var screenHeight: Int = 0
 
-        @JvmStatic
-        fun initialize(context: Context) {
+        init {
+            val context = EhApplication.application
             screenWidth = context.resources.displayMetrics.widthPixels
             screenHeight = context.resources.displayMetrics.heightPixels
         }

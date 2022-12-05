@@ -86,20 +86,16 @@ class EhApplication : SceneApplication() {
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
-                // Always save crash file if onCreate() is not done
-                if (!initialized || Settings.getSaveCrashLog()) {
+                if (Settings.getSaveCrashLog()) {
                     Crash.saveCrashLog(application, e)
                 }
             } catch (ignored: Throwable) {
             }
-
             handler?.uncaughtException(t, e)
         }
         super.onCreate()
-        Image.initialize(this)
         Native.initialize()
         GetText.initialize(this)
-        StatusCodeException.initialize(this)
         Settings.initialize(this)
         ReadableTime.initialize(this)
         AppConfig.initialize(this)

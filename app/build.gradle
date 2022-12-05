@@ -50,6 +50,12 @@ android {
     kotlinOptions {
         jvmTarget = '19'
         freeCompilerArgs += [
+                // https://kotlinlang.org/docs/compiler-reference.html#progressive
+                "-progressive",
+                // Generate smaller bytecode by not generating runtime not-null assertions.
+                "-Xno-call-assertions",
+                "-Xno-param-assertions",
+                "-Xno-receiver-assertions",
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
         ]
