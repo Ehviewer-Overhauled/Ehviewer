@@ -254,10 +254,12 @@ public class GalleryListParser {
             if (children.size() > uploaderIndex) {
                 Element div = children.get(uploaderIndex);
                 if (div != null) {
-                    gi.disowned = "opacity:0.5".equals(div.attr("style"));
+                    gi.disowned = div.attr("style").contains("opacity:0.5");
                     Element a = div.children().first();
                     if (a != null) {
                         gi.uploader = a.text().trim();
+                    } else {
+                        gi.uploader = div.text().trim();
                     }
                 }
             }

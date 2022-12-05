@@ -412,6 +412,11 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
     }
 
+    // Judging by the uploader to exclude the cooldown period
+    private boolean getDisowned() {
+        return getUploader().equals("(Disowned)");
+    }
+
     // -1 for error
     private int getCategory() {
         if (mGalleryDetail != null) {
@@ -1121,7 +1126,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
         } else if (mUploader == v) {
             String uploader = getUploader();
-            if (TextUtils.isEmpty(uploader)) {
+            if (TextUtils.isEmpty(uploader) || getDisowned()) {
                 return;
             }
             ListUrlBuilder lub = new ListUrlBuilder();
@@ -1426,6 +1431,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         if (mUploader == v) {
+            if (TextUtils.isEmpty(getUploader()) || getDisowned()) {
+                return false;
+            }
             showFilterUploaderDialog();
         } else if (mDownload == v) {
             GalleryInfo galleryInfo = getGalleryInfo();
