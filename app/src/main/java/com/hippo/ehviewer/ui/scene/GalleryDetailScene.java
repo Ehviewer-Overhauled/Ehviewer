@@ -884,7 +884,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         Resources resources = getResources();
 
-        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb);
+        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb, true);
         setTitle(EhUtils.getSuitableTitle(gd));
         mUploader.setText(gd.uploader);
         mUploader.setAlpha(gd.disowned ? .5f : 1f);

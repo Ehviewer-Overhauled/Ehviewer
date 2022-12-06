@@ -126,7 +126,8 @@ open class LoadImageView @JvmOverloads constructor(
         mClipHeight = Integer.MIN_VALUE
     }
 
-    fun load(key: String, url: String) {
+    @JvmOverloads
+    fun load(key: String, url: String, isLoaded: Boolean = false) {
         if ((mRequest?.data as? String?) == url)
             return
         mFailed = false
@@ -135,7 +136,7 @@ open class LoadImageView @JvmOverloads constructor(
             ImageRequest.Builder(context).data(url).memoryCacheKey(key).diskCacheKey(key).target(
                 { onWait() },
                 { onFailure() },
-                { onGetValue(it) }
+                { onGetValue(it, isLoaded) }
             ).build().also { load(it) }
     }
 
@@ -153,7 +154,7 @@ open class LoadImageView @JvmOverloads constructor(
         clearDrawable()
     }
 
-    private fun onGetValue(drawable: Drawable) {
+    private fun onGetValue(drawable: Drawable, isLoaded: Boolean) {
         var drawable = drawable
         clearDrawable()
 
@@ -162,7 +163,7 @@ open class LoadImageView @JvmOverloads constructor(
         }
 
         onPreSetImageDrawable(drawable, true)
-        if (isShown) {
+        if (isShown && !isLoaded) {
             val layers = arrayOfNulls<Drawable>(2)
             layers[0] = ColorDrawable(Color.TRANSPARENT)
             layers[1] = drawable
