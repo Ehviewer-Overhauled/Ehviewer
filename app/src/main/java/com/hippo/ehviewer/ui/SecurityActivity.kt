@@ -45,39 +45,68 @@ class SecurityActivity : AppCompatActivity() {
             onSuccess()
     }
 
+    @Synchronized
     private fun startAuthentication(
         title: String,
         subtitle: String? = null,
         confirmationRequired: Boolean = true,
     ) {
+        if (isAuthenticating) return
+        isAuthenticating = true
         startClass2BiometricOrCredentialAuthentication(
             title = title,
             subtitle = subtitle,
             confirmationRequired = confirmationRequired,
             executor = ContextCompat.getMainExecutor(this),
-            callback = AuthenticationCallback()
+            callback = callback(
+                { _, _, _ -> onFailed() },
+                { _, _ -> onSuccess() },
+                { onFailed() }
+            )
         )
     }
 
-    inner class AuthenticationCallback : AuthPromptCallback() {
-        override fun onAuthenticationSucceeded(
+    inline fun callback(
+        crossinline onAuthenticationError: (
+            activity: FragmentActivity?,
+            errorCode: Int,
+            errString: CharSequence
+        ) -> Unit,
+        crossinline onAuthenticationSucceeded: (
             activity: FragmentActivity?,
             result: BiometricPrompt.AuthenticationResult
-        ) {
-            onSuccess()
-        }
-
+        ) -> Unit,
+        crossinline onAuthenticationFailed: (
+            activity: FragmentActivity?
+        ) -> Unit
+    ) = object : AuthPromptCallback() {
         override fun onAuthenticationError(
             activity: FragmentActivity?,
             errorCode: Int,
             errString: CharSequence
-        ) {
-            moveTaskToBack(true)
-        }
+        ) = onAuthenticationError(activity, errorCode, errString)
+
+        override fun onAuthenticationSucceeded(
+            activity: FragmentActivity?,
+            result: BiometricPrompt.AuthenticationResult
+        ) = onAuthenticationSucceeded(activity, result)
+
+        override fun onAuthenticationFailed(activity: FragmentActivity?) =
+            onAuthenticationFailed(activity)
     }
 
     private fun onSuccess() {
+        isAuthenticating = false
         EhApplication.locked = false
         finish()
+    }
+
+    private fun onFailed() {
+        moveTaskToBack(true)
+        isAuthenticating = false
+    }
+
+    companion object {
+        private var isAuthenticating = false
     }
 }
