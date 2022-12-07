@@ -71,7 +71,7 @@ open class LoadImageView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        task?.run { if (!isDisposed) dispose() }
+        task?.dispose()
         clearDrawable()
     }
 
@@ -132,6 +132,7 @@ open class LoadImageView @JvmOverloads constructor(
             return
         mFailed = false
         clearRetry()
+        task?.dispose()
         mRequest =
             ImageRequest.Builder(context).data(url).memoryCacheKey(key).diskCacheKey(key).target(
                 { onWait() },
