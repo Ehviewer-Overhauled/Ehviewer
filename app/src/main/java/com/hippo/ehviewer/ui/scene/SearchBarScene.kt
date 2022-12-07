@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchBar
 import com.google.android.material.search.SearchView
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -40,6 +41,8 @@ abstract class SearchBarScene : ToolbarScene() {
             inflater.inflate(R.layout.scene_searchbar, container, false) as ViewGroup
         mToolbar = view.findViewById(R.id.toolbar)
         mAppBarLayout = view.findViewById(R.id.appbar)
+        mAppBarLayout?.statusBarForeground = MaterialShapeDrawable.createWithElevationOverlay(context)
+
         mSearchView = view.findViewById(R.id.searchview)
         mRecyclerView = view.findViewById(R.id.search_bar_list)
         mSearchView?.editText?.addTextChangedListener {
