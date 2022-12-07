@@ -19,7 +19,8 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false">
+    android:paddingTop="16dp"
+    app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
     <com.hippo.widget.ContentLayout
         android:id="@+id/content_layout"
@@ -31,15 +32,6 @@
         android:id="@+id/search_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_fitsSystemWindowsInsets="top|bottom" />
-
-    <com.hippo.ehviewer.widget.SearchBar
-        android:id="@+id/search_bar"
-        style="@style/Widget.Material3.CardView.Filled"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/gallery_search_bar_margin_h"
-        android:layout_marginVertical="@dimen/gallery_search_bar_margin_v"
         app:layout_fitsSystemWindowsInsets="top|bottom" />
 
     <com.hippo.widget.FabLayout
