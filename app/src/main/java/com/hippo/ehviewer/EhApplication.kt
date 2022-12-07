@@ -49,8 +49,6 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.image.Image
-import com.hippo.network.StatusCodeException
 import com.hippo.scene.SceneApplication
 import com.hippo.util.BitmapUtils
 import com.hippo.util.ExceptionUtils
@@ -78,6 +76,10 @@ class EhApplication : SceneApplication() {
         } else {
             null
         }
+
+    fun recreateAllActivity() {
+        mActivityList.forEach { it.recreate() }
+    }
 
     @SuppressLint("StaticFieldLeak")
     override fun onCreate() {
