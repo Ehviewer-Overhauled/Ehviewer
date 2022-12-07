@@ -48,7 +48,6 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
-import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.ehviewer.EhApplication;
@@ -117,9 +116,6 @@ public class FavoritesScene extends SearchBarScene implements
     @Nullable
     @ViewLifeCircle
     private FavoritesHelper mHelper;
-    @Nullable
-    @ViewLifeCircle
-    private DrawerArrowDrawable mLeftDrawable;
     private AddDeleteDrawable mActionFabDrawable;
     @Nullable
     private DrawerLayout mDrawerLayout;
@@ -276,8 +272,6 @@ public class FavoritesScene extends SearchBarScene implements
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
-        setNavigationDrawable(mLeftDrawable);
         setAllowEmptySearch(false);
         updateSearchBar();
         updateJumpFab();
@@ -375,7 +369,6 @@ public class FavoritesScene extends SearchBarScene implements
         }
 
         mAdapter = null;
-        mLeftDrawable = null;
 
         mOldFavCat = null;
         mOldKeyword = null;
@@ -728,21 +721,19 @@ public class FavoritesScene extends SearchBarScene implements
     }
 
     private void enterSearchMode(boolean animation) {
-        if (mSearchMode || mLeftDrawable == null) {
+        if (mSearchMode) {
             return;
         }
         mSearchMode = true;
         showSearchBar();
-        mLeftDrawable.setArrow(ANIMATE_TIME);
     }
 
     private void exitSearchMode(boolean animation) {
-        if (!mSearchMode || mLeftDrawable == null) {
+        if (!mSearchMode) {
             return;
         }
         mSearchMode = false;
         showSearchBar();
-        mLeftDrawable.setMenu(ANIMATE_TIME);
     }
 
     private void onGetFavoritesSuccess(FavoritesParser.Result result, int taskId) {

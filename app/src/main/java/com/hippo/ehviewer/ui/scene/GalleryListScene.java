@@ -65,7 +65,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.drawable.AddDeleteDrawable;
-import com.hippo.drawable.DrawerArrowDrawable;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.ehviewer.EhApplication;
@@ -192,8 +191,6 @@ public final class GalleryListScene extends SearchBarScene
     private GalleryListAdapter mAdapter;
     @Nullable
     private GalleryListHelper mHelper;
-    @Nullable
-    private DrawerArrowDrawable mLeftDrawable;
     @Nullable
     private AddDeleteDrawable mActionFabDrawable;
     @Nullable
@@ -583,12 +580,10 @@ public final class GalleryListScene extends SearchBarScene
         fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
-        mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
         setOnApplySearch((query) -> {
             onApplySearch(query);
             return null;
         });
-        setNavigationDrawable(mLeftDrawable);
         setSearchBarHint();
         setSearchBarSuggestionProvider();
 
@@ -653,7 +648,6 @@ public final class GalleryListScene extends SearchBarScene
         mAdapter = null;
         mSearchLayout = null;
         mViewTransition = null;
-        mLeftDrawable = null;
         mActionFabDrawable = null;
     }
 
