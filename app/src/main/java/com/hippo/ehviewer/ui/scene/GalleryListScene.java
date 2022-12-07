@@ -555,7 +555,7 @@ public final class GalleryListScene extends SearchBarScene
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchLayout = (SearchLayout) ViewUtils.$$(mainLayout, R.id.search_layout);
         mFabLayout = (FabLayout) ViewUtils.$$(mainLayout, R.id.fab_layout);
-        mSearchFab = ViewUtils.$$(mainLayout, R.id.search_fab);
+        mSearchFab = ViewUtils.$$(container, R.id.search_fab);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mFabLayout,
@@ -606,6 +606,12 @@ public final class GalleryListScene extends SearchBarScene
         int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
         mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
+        mSearchFab.setOnClickListener( (v) -> {
+            if (STATE_NORMAL != mState) {
+                onApplySearch();
+                hideSoftInput();
+            }
+        });
 
         // Update list url builder
         onUpdateUrlBuilder();
@@ -943,6 +949,18 @@ public final class GalleryListScene extends SearchBarScene
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
             mActionFabDrawable.setAdd(ANIMATE_TIME);
         }
+    }
+
+    @Override
+    public void onSearchViewExpanded() {
+        super.onSearchViewExpanded();
+        selectSearchFab(true);
+    }
+
+    @Override
+    public void onSearchViewHidden() {
+        super.onSearchViewHidden();
+        if (mState == STATE_NORMAL) selectActionFab(true);
     }
 
     public boolean onItemLongClick(int position) {

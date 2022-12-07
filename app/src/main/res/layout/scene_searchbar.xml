@@ -46,4 +46,22 @@
 
     </com.google.android.material.search.SearchView>
 
+    <com.hippo.widget.FabLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingRight="@dimen/corner_fab_margin"
+        android:paddingBottom="@dimen/corner_fab_margin"
+        app:fitsSystemWindowsInsets="top|bottom">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX="0"
+            android:scaleY="0"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/v_magnify_x24" />
+
+    </com.hippo.widget.FabLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

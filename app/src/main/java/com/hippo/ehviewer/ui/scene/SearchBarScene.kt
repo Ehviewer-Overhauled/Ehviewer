@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.CallSuper
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,12 +56,25 @@ abstract class SearchBarScene : ToolbarScene() {
         mRecyclerView?.adapter = mSuggestionAdapter
         val layoutManager = LinearLayoutManager(context)
         mRecyclerView?.layoutManager = layoutManager
-        mSearchView?.addTransitionListener { _, _, _ ->
-            (requireActivity() as StageActivity).updateBackPressCallBackStatus()
-            updateSuggestions()
+        mSearchView?.addTransitionListener { _, _, newState ->
+            if (newState == SearchView.TransitionState.SHOWING)
+                onSearchViewExpanded()
+            else if (newState == SearchView.TransitionState.HIDING)
+                onSearchViewHidden()
         }
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
         return view.apply { addView(contentView, 0) }
+    }
+
+    @CallSuper
+    open fun onSearchViewExpanded() {
+        (requireActivity() as StageActivity).updateBackPressCallBackStatus()
+        updateSuggestions()
+    }
+
+    @CallSuper
+    open fun onSearchViewHidden() {
+        (requireActivity() as StageActivity).updateBackPressCallBackStatus()
     }
 
     fun setSearchBarHint(hint: String?) {
@@ -91,7 +105,7 @@ abstract class SearchBarScene : ToolbarScene() {
         onApplySearch = lambda
     }
 
-    private fun onApplySearch() {
+    fun onApplySearch() {
         val query = mSearchView?.text.toString().trim()
         if (!mAllowEmptySearch && query.isEmpty()) {
             return
