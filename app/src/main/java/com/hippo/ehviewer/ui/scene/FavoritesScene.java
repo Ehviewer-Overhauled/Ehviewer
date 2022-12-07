@@ -34,7 +34,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -69,12 +68,10 @@ import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
 import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
-import com.hippo.ehviewer.widget.SearchBar;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
-import com.hippo.widget.SearchBarMover;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.ObjectUtils;
 import com.hippo.yorozuya.SimpleHandler;
@@ -91,8 +88,8 @@ import rikka.core.res.ResourcesKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("RtlHardcoded")
-public class FavoritesScene extends BaseScene implements
-        FastScroller.OnDragHandlerListener, SearchBarMover.Helper, SearchBar.Helper,
+public class FavoritesScene extends SearchBarScene implements
+        FastScroller.OnDragHandlerListener,
         FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
         EasyRecyclerView.CustomChoiceListener {
 
@@ -113,9 +110,6 @@ public class FavoritesScene extends BaseScene implements
     private EasyRecyclerView mRecyclerView;
     @Nullable
     @ViewLifeCircle
-    private SearchBar mSearchBar;
-    @Nullable
-    @ViewLifeCircle
     private FabLayout mFabLayout;
     @Nullable
     @ViewLifeCircle
@@ -123,9 +117,6 @@ public class FavoritesScene extends BaseScene implements
     @Nullable
     @ViewLifeCircle
     private FavoritesHelper mHelper;
-    @Nullable
-    @ViewLifeCircle
-    private SearchBarMover mSearchBarMover;
     @Nullable
     @ViewLifeCircle
     private DrawerArrowDrawable mLeftDrawable;
@@ -246,16 +237,19 @@ public class FavoritesScene extends BaseScene implements
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
+    public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
         mContentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getMainActivity();
         AssertUtils.assertNotNull(activity);
+        setOnApplySearch((query) -> {
+            onApplySearch(query);
+            return null;
+        });
         mDrawerLayout = (DrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
-        mSearchBar = (SearchBar) ViewUtils.$$(view, R.id.search_bar);
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
@@ -283,13 +277,10 @@ public class FavoritesScene extends BaseScene implements
                 fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
 
         mLeftDrawable = new DrawerArrowDrawable(context, ResourcesKt.resolveColor(getTheme(), android.R.attr.colorControlNormal));
-        mSearchBar.setLeftDrawable(mLeftDrawable);
-        mSearchBar.setRightDrawable(ContextCompat.getDrawable(context, R.drawable.v_magnify_x24));
-        mSearchBar.setHelper(this);
-        mSearchBar.setAllowEmptySearch(false);
+        setNavigationDrawable(mLeftDrawable);
+        setAllowEmptySearch(false);
         updateSearchBar();
         updateJumpFab();
-        mSearchBarMover = new SearchBarMover(this, mSearchBar, mRecyclerView);
 
         int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
         mActionFabDrawable = new AddDeleteDrawable(context, colorID);
@@ -320,7 +311,7 @@ public class FavoritesScene extends BaseScene implements
     // They changed, call it
     private void updateSearchBar() {
         Context context = getContext();
-        if (null == context || null == mUrlBuilder || null == mSearchBar || null == mFavCatArray) {
+        if (null == context || null == mUrlBuilder || null == mFavCatArray) {
             return;
         }
 
@@ -337,17 +328,17 @@ public class FavoritesScene extends BaseScene implements
         String keyword = mUrlBuilder.getKeyword();
         if (TextUtils.isEmpty(keyword)) {
             if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-                mSearchBar.setTitle(getString(R.string.favorites_title, favCatName));
+                setSearchBarHint(getString(R.string.favorites_title, favCatName));
             }
         } else {
             if (!ObjectUtils.equal(favCatName, mOldFavCat) || !ObjectUtils.equal(keyword, mOldKeyword)) {
-                mSearchBar.setTitle(getString(R.string.favorites_title_2, favCatName, keyword));
+                setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword));
             }
         }
 
         // Update hint
         if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-            mSearchBar.setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName));
+            setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName));
         }
 
         mOldFavCat = favCatName;
@@ -384,10 +375,6 @@ public class FavoritesScene extends BaseScene implements
         }
 
         mAdapter = null;
-
-        mSearchBar = null;
-
-        mSearchBarMover = null;
         mLeftDrawable = null;
 
         mOldFavCat = null;
@@ -445,6 +432,8 @@ public class FavoritesScene extends BaseScene implements
             mFabLayout.toggle();
         } else if (mSearchMode) {
             exitSearchMode(true);
+        } else if (isSearchViewShown()) {
+            hideSearchView();
         } else {
             finish();
         }
@@ -463,9 +452,7 @@ public class FavoritesScene extends BaseScene implements
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
         }
 
-        if (mSearchBarMover != null) {
-            mSearchBarMover.returnSearchBarPosition();
-        }
+        showSearchBar();
     }
 
     public boolean onItemClick(View view, int position) {
@@ -531,70 +518,6 @@ public class FavoritesScene extends BaseScene implements
         return true;
     }
 
-    @Override
-    public boolean isValidView(RecyclerView recyclerView) {
-        return recyclerView == mRecyclerView;
-    }
-
-    @Override
-    public RecyclerView getValidRecyclerView() {
-        return mRecyclerView;
-    }
-
-    @Override
-    public boolean forceShowSearchBar() {
-        return false;
-    }
-
-    @Override
-    public void onClickTitle() {
-        // Skip if in search mode
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            return;
-        }
-
-        if (!mSearchMode) {
-            enterSearchMode(true);
-        }
-    }
-
-    @Override
-    public void onClickLeftIcon() {
-        // Skip if in search mode
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            return;
-        }
-
-        if (mSearchMode) {
-            exitSearchMode(true);
-        } else {
-            toggleDrawer(Gravity.LEFT);
-        }
-    }
-
-    @Override
-    public void onClickRightIcon() {
-        // Skip if in search mode
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            return;
-        }
-
-        if (!mSearchMode) {
-            enterSearchMode(true);
-        } else if (mSearchBar != null) {
-            if (mSearchBar.getEditText().length() == 0) {
-                exitSearchMode(true);
-            } else {
-                mSearchBar.applySearch();
-            }
-        }
-    }
-
-    @Override
-    public void onSearchEditTextClick() {
-    }
-
-    @Override
     public void onApplySearch(String query) {
         // Skip if in search mode
         if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -615,11 +538,6 @@ public class FavoritesScene extends BaseScene implements
         mUrlBuilder.setKeyword(query);
         updateSearchBar();
         mHelper.refresh();
-    }
-
-    @Override
-    public void onSearchEditTextBackPressed() {
-        onBackPressed();
     }
 
     @Override
@@ -810,28 +728,25 @@ public class FavoritesScene extends BaseScene implements
     }
 
     private void enterSearchMode(boolean animation) {
-        if (mSearchMode || mSearchBar == null || mSearchBarMover == null || mLeftDrawable == null) {
+        if (mSearchMode || mLeftDrawable == null) {
             return;
         }
         mSearchMode = true;
-        mSearchBar.setState(SearchBar.STATE_SEARCH_LIST, animation);
-        mSearchBarMover.returnSearchBarPosition(animation);
+        showSearchBar();
         mLeftDrawable.setArrow(ANIMATE_TIME);
     }
 
     private void exitSearchMode(boolean animation) {
-        if (!mSearchMode || mSearchBar == null || mSearchBarMover == null || mLeftDrawable == null) {
+        if (!mSearchMode || mLeftDrawable == null) {
             return;
         }
         mSearchMode = false;
-        mSearchBar.setState(SearchBar.STATE_NORMAL, animation);
-        mSearchBarMover.returnSearchBarPosition();
+        showSearchBar();
         mLeftDrawable.setMenu(ANIMATE_TIME);
     }
 
     private void onGetFavoritesSuccess(FavoritesParser.Result result, int taskId) {
-        if (mHelper != null && mSearchBarMover != null &&
-                mHelper.isCurrentTask(taskId)) {
+        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
 
             if (mFavCatArray != null) {
                 System.arraycopy(result.catArray, 0, mFavCatArray, 0, 10);
@@ -878,8 +793,7 @@ public class FavoritesScene extends BaseScene implements
     }
 
     private void onGetFavoritesFailure(Exception e, int taskId) {
-        if (mHelper != null && mSearchBarMover != null &&
-                mHelper.isCurrentTask(taskId)) {
+        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
             mHelper.onGetException(taskId, e);
         }
     }
@@ -1315,9 +1229,7 @@ public class FavoritesScene extends BaseScene implements
 
         @Override
         public void onShowView(View hiddenView, View shownView) {
-            if (null != mSearchBarMover) {
-                mSearchBarMover.showSearchBar();
-            }
+            showSearchBar();
         }
 
         @Override
@@ -1326,11 +1238,9 @@ public class FavoritesScene extends BaseScene implements
         }
 
         @Override
-        protected void onScrollToPosition(int postion) {
-            if (0 == postion) {
-                if (null != mSearchBarMover) {
-                    mSearchBarMover.showSearchBar();
-                }
+        protected void onScrollToPosition(int position) {
+            if (0 == position) {
+                showSearchBar();
             }
         }
 
