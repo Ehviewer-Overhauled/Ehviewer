@@ -247,6 +247,8 @@ public class FavoritesScene extends SearchBarScene implements
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
+        ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        container.addView(mFabLayout);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mFabLayout
@@ -364,6 +366,7 @@ public class FavoritesScene extends SearchBarScene implements
             mRecyclerView = null;
         }
         if (null != mFabLayout) {
+            ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
             removeAboveSnackView(mFabLayout);
             mFabLayout = null;
         }
