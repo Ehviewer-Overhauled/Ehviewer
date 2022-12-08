@@ -18,4 +18,9 @@ abstract class CollapsingToolbarScene : ToolbarScene() {
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
         return view.apply { addView(contentView, 0) }
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mAppBarLayout?.setExpanded(false, true)
+    }
 }
