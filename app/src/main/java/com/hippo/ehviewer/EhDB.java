@@ -398,11 +398,10 @@ public class EhDB {
         db.filterDao().update(filter);
     }
 
-    private static <T> boolean copyDao(BasicDao<T> from, BasicDao<T> to) {
+    private static <T> void copyDao(BasicDao<T> from, BasicDao<T> to) {
         List<T> list = from.list();
         for (T item : list)
             to.insert(item);
-        return false;
     }
 
     public static synchronized boolean exportDB(Context context, Uri uri) {
@@ -414,20 +413,18 @@ public class EhDB {
 
         try {
             // Copy data to a export db
-            if (copyDao(db.downloadsDao(), newDb.downloadsDao()))
-                return false;
-            if (copyDao(db.downloadLabelDao(), newDb.downloadLabelDao()))
-                return false;
-            if (copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao()))
-                return false;
-            if (copyDao(db.historyDao(), newDb.historyDao()))
-                return false;
-            if (copyDao(db.quickSearchDao(), newDb.quickSearchDao()))
-                return false;
-            if (copyDao(db.localFavoritesDao(), newDb.localFavoritesDao()))
-                return false;
-            if (copyDao(db.filterDao(), newDb.filterDao()))
-                return false;
+            copyDao(db.downloadsDao(), newDb.downloadsDao());
+            copyDao(db.downloadLabelDao(), newDb.downloadLabelDao());
+            copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao());
+            copyDao(db.historyDao(), newDb.historyDao());
+            copyDao(db.quickSearchDao(), newDb.quickSearchDao());
+            copyDao(db.localFavoritesDao(), newDb.localFavoritesDao());
+            copyDao(db.filterDao(), newDb.filterDao());
+
+            // Close export db so we can copy it
+            if (newDb.isOpen()) {
+                newDb.close();
+            }
 
             // Copy export db to data dir
             File dbFile = context.getDatabasePath(ehExportName);
@@ -447,6 +444,7 @@ public class EhDB {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(os);
             }
+
             // Delete failed file
             return false;
         } finally {
@@ -460,6 +458,8 @@ public class EhDB {
     public static synchronized String importDB(Context context, Uri uri) {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
+
+            // Copy file to cache dir
             File file = File.createTempFile("importDatabase", "");
             FileOutputStream outputStream = new FileOutputStream(file);
             byte[] buff = new byte[1024];
@@ -474,6 +474,7 @@ public class EhDB {
             inputStream.close();
             outputStream.close();
 
+            // Check database version
             SQLiteDatabase oldDB = SQLiteDatabase.openDatabase(
                     file.getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
             int newVersion = CUR_DB_VER;
@@ -482,9 +483,10 @@ public class EhDB {
                 upgradeDB(oldDB, oldVersion);
                 oldDB.setVersion(newVersion);
             } else if (oldVersion > newVersion) {
-                return context.getString(R.string.cant_read_the_file);
+                return context.getString(R.string.db_version_too_high);
             }
 
+            // Crete temp room database from cache file
             String tmpDBName = "tmp.db";
             context.deleteDatabase(tmpDBName);
             EhDatabase oldRoomDatabase = Room.databaseBuilder(context, EhDatabase.class, tmpDBName)
@@ -564,6 +566,12 @@ public class EhDB {
                 }
             } catch (Exception ignored) {
             }
+
+            // Delete temp database
+            if (oldRoomDatabase.isOpen()) {
+                oldRoomDatabase.close();
+            }
+            context.deleteDatabase(tmpDBName);
 
             return null;
         } catch (Throwable e) {

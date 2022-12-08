@@ -554,6 +554,7 @@
     <string name="proxy_invalid_port">Invalid port</string>
 
     <string name="cant_read_the_file">Can\'t read the file</string>
+    <string name="db_version_too_high">Database version too high</string>
 
     <string name="app_language_system">System Language (Default)</string>
     <string name="app_language_de">Deutsch</string>
