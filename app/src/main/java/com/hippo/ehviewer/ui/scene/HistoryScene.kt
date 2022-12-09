@@ -43,7 +43,6 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.HistoryInfo
-import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryActivity
@@ -59,6 +58,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
 
+@SuppressLint("NotifyDataSetChanged")
 class HistoryScene : ToolbarScene() {
     private var mRecyclerView: RecyclerView? = null
     private val mAdapter: HistoryAdapter by lazy {
@@ -131,7 +131,7 @@ class HistoryScene : ToolbarScene() {
         setLiftOnScrollTargetView(recyclerView)
         val mFastScroller = ViewUtils.`$$`(content, R.id.fast_scroller) as FastScroller
         val mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        ViewTransition(content, mTip)
+        val mViewTransition = ViewTransition(content, mTip)
         val resources = requireContext().resources
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_history)
         drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
@@ -162,6 +162,15 @@ class HistoryScene : ToolbarScene() {
                 mAdapter.submitData(
                     value
                 )
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            mAdapter.onPagesUpdatedFlow.collectLatest {
+                if (mAdapter.itemCount == 0) {
+                    mViewTransition.showView(1, true)
+                } else {
+                    mViewTransition.showView(0, true)
+                }
             }
         }
         return view
