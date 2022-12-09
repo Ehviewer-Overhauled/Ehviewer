@@ -21,7 +21,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ImageDecoder
-import android.graphics.ImageDecoder.ALLOCATOR_DEFAULT
 import android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
 import android.graphics.ImageDecoder.DecodeException
 import android.graphics.ImageDecoder.ImageInfo
@@ -39,10 +38,9 @@ import kotlin.math.max
 
 class Image private constructor(
     source: Source?, drawable: Drawable? = null,
-    val hardware: Boolean = true,
     val release: () -> Unit? = {}
 ) {
-    internal var mObtainedDrawable: Drawable?
+    private var mObtainedDrawable: Drawable?
     private var mBitmap: Bitmap? = null
     private var mCanvas: Canvas? = null
 
@@ -51,7 +49,7 @@ class Image private constructor(
         source?.let {
             mObtainedDrawable =
                 ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, src: Source ->
-                    decoder.allocator = if (hardware) ALLOCATOR_DEFAULT else ALLOCATOR_SOFTWARE
+                    decoder.allocator = ALLOCATOR_SOFTWARE
                     // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
                     // Idk it will cause how much performance regression
 
@@ -63,7 +61,6 @@ class Image private constructor(
                             ), 1
                         )
                     )
-                    // Don't
                 } // Should we lazy decode it?
         }
         if (mObtainedDrawable == null) {
@@ -105,31 +102,7 @@ class Image private constructor(
         mObtainedDrawable!!.draw(mCanvas!!)
     }
 
-    fun render(
-        srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
-        width: Int, height: Int
-    ) {
-        check(!hardware) { "Hardware buffer cannot be used in glgallery" }
-        val bitmap: Bitmap = if (animated) {
-            updateBitmap()
-            mBitmap!!
-        } else {
-            (mObtainedDrawable as BitmapDrawable).bitmap
-        }
-        nativeRender(
-            bitmap,
-            srcX,
-            srcY,
-            dst,
-            dstX,
-            dstY,
-            width,
-            height
-        )
-    }
-
     fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
-        check(!hardware) { "Hardware buffer cannot be used in glgallery" }
         val bitmap: Bitmap? = if (animated) {
             updateBitmap()
             mBitmap
@@ -177,36 +150,29 @@ class Image private constructor(
 
         @Throws(DecodeException::class)
         @JvmStatic
-        fun decode(stream: FileInputStream, hardware: Boolean = true): Image {
+        fun decode(stream: FileInputStream): Image {
             val src = ImageDecoder.createSource(
                 stream.channel.map(
                     FileChannel.MapMode.READ_ONLY, 0,
                     stream.available().toLong()
                 )
             )
-            return Image(src, hardware = hardware)
+            return Image(src)
         }
 
         @Throws(DecodeException::class)
         @JvmStatic
-        fun decode(buffer: ByteBuffer, hardware: Boolean = true, release: () -> Unit? = {}): Image {
+        fun decode(buffer: ByteBuffer, release: () -> Unit? = {}): Image {
             val src = ImageDecoder.createSource(buffer)
-            return Image(src, hardware = hardware) {
+            return Image(src) {
                 release()
             }
         }
 
         @JvmStatic
         fun create(bitmap: Bitmap): Image {
-            return Image(null, bitmap.toDrawable(Resources.getSystem()), false)
+            return Image(null, bitmap.toDrawable(Resources.getSystem()))
         }
-
-        @JvmStatic
-        private external fun nativeRender(
-            bitmap: Bitmap,
-            srcX: Int, srcY: Int, dst: Bitmap, dstX: Int, dstY: Int,
-            width: Int, height: Int
-        )
 
         @JvmStatic
         private external fun nativeTexImage(

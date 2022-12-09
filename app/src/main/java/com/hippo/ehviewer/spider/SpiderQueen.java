@@ -1679,7 +1679,7 @@ public final class SpiderQueen implements Runnable {
 
                 if (is != null) {
                     try {
-                        image = Image.decode(((FileInputStream) is), false);
+                        image = Image.decode(((FileInputStream) is));
                     } catch (ImageDecoder.DecodeException e) {
                         e.printStackTrace();
                     } finally {

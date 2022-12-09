@@ -123,15 +123,6 @@ public class ImageWrapper {
     }
 
     /**
-     * @see Image#render(int, int, Bitmap, int, int, int, int)
-     */
-    public void render(int srcX, int srcY, Bitmap dst, int dstX, int dstY,
-                       int width, int height, boolean fillBlank, int defaultColor) {
-        mImage.render(srcX + mCut.left, srcY + mCut.top, dst, dstX, dstY,
-                width, height);
-    }
-
-    /**
      * @see Image#texImage(boolean, int, int, int, int)
      */
     public void texImage(boolean init, int offsetX, int offsetY, int width, int height) {

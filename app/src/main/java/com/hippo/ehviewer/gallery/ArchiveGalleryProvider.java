@@ -335,7 +335,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                 Image image = null;
                 if (buffer != null) {
                     try {
-                        image = Image.decode(buffer, false, () -> {
+                        image = Image.decode(buffer, () -> {
                             archiveAccessor.releaseByteBuffer(buffer);
                             return null;
                         });

@@ -259,7 +259,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
             InputStream is = null;
             try {
                 is = files[index].openInputStream();
-                Image image = Image.decode((FileInputStream) is, false);
+                Image image = Image.decode((FileInputStream) is);
                 mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
                 notifyPageSucceed(index, image);
             } catch (IOException e) {

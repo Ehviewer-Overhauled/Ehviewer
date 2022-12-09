@@ -123,29 +123,6 @@ bool copy_pixels(const void *src, int src_w, int src_h, int src_x, int src_y,
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_nativeRender(JNIEnv *env, jclass clazz, jobject srcBitmap, jint src_x,
-                                        jint src_y, jobject dst, jint dst_x, jint dst_y, jint width,
-                                        jint height) {
-    AndroidBitmapInfo dstInfo;
-    AndroidBitmapInfo srcInfo;
-    void *srcPixels = NULL;
-    void *dstPixels = NULL;
-
-    AndroidBitmap_lockPixels(env, srcBitmap, &srcPixels);
-    AndroidBitmap_lockPixels(env, dst, &dstPixels);
-    AndroidBitmap_getInfo(env, srcBitmap, &srcInfo);
-    AndroidBitmap_getInfo(env, dst, &dstInfo);
-
-    copy_pixels(srcPixels, srcInfo.width, srcInfo.height, src_x, src_y, dstPixels, dstInfo.width,
-                dstInfo.height, dst_x, dst_y,
-                width,
-                height);
-
-    AndroidBitmap_unlockPixels(env, dst);
-    AndroidBitmap_unlockPixels(env, srcBitmap);
-}
-
-JNIEXPORT void JNICALL
 Java_com_hippo_image_Image_nativeTexImage(JNIEnv *env, jclass clazz, jobject bitmap, jboolean init,
                                           jint offset_x, jint offset_y, jint width, jint height) {
     if (width * height > IMAGE_TILE_MAX_SIZE)
