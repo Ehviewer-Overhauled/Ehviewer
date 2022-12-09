@@ -36,7 +36,6 @@ import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +80,7 @@ public abstract class StageActivity extends EhActivity {
             return false;
         }
 
-        Class clazz;
+        Class<?> clazz;
         try {
             clazz = Class.forName(clazzStr);
         } catch (ClassNotFoundException e) {
@@ -188,7 +187,7 @@ public abstract class StageActivity extends EhActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_STAGE_ID, mStageId);
         outState.putStringArrayList(KEY_SCENE_TAG_LIST, mSceneTagList);
@@ -480,7 +479,7 @@ public abstract class StageActivity extends EhActivity {
     }
 
     void sortSceneViews(List<View> views) {
-        Collections.sort(views, mSceneViewComparator);
+        views.sort(mSceneViewComparator);
     }
 
     public void finishScene(SceneFragment scene) {
@@ -572,10 +571,10 @@ public abstract class StageActivity extends EhActivity {
         if (mSceneTagList.size() == 0)
             return false;
         String tag = mSceneTagList.get(0);
-        GalleryListScene fragment = (GalleryListScene) getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment == null)
-            return false;
-        return !fragment.isBackpressCanPreviewLauncherStatus();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment instanceof GalleryListScene)
+            return !((GalleryListScene) fragment).isBackpressCanPreviewLauncherStatus();
+        return false;
     }
 
     public void updateBackPressCallBackStatus() {
