@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer.client;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.hippo.ehviewer.EhApplication;
@@ -57,16 +56,16 @@ public class EhClient {
     public static final int METHOD_VOTE_TAG = 19;
 
     private final ThreadPoolExecutor mRequestThreadPool;
-    private final OkHttpClient mOkHttpClient;
+    private static final OkHttpClient mOkHttpClient = EhApplication.getOkHttpClient();
 
-    public EhClient(Context context) {
+    public EhClient() {
         mRequestThreadPool = IoThreadPoolExecutor.getInstance();
-        mOkHttpClient = EhApplication.getOkHttpClient();
     }
 
+    @SuppressWarnings("unchecked")
     public void execute(EhRequest request) {
         if (!request.isCancelled()) {
-            Task task = new Task(request.getMethod(), request.getCallback(), request.getEhConfig());
+            Task task = new Task(request.getMethod(), request.getCallback());
             task.executeOnExecutor(mRequestThreadPool, request.getArgs());
             request.task = task;
         } else {
@@ -83,18 +82,17 @@ public class EhClient {
         void onCancel();
     }
 
-    public class Task extends AsyncTask<Object, Void, Object> {
+    @SuppressWarnings("deprecation")
+    public static class Task extends AsyncTask<Object, Void, Object> {
 
         private final int mMethod;
         private final AtomicReference<Call> mCall = new AtomicReference<>();
         private final AtomicBoolean mStop = new AtomicBoolean();
-        private Callback mCallback;
-        private EhConfig mEhConfig;
+        private Callback<Object> mCallback;
 
-        public Task(int method, Callback callback, EhConfig ehConfig) {
+        public Task(int method, Callback<Object> callback) {
             mMethod = method;
             mCallback = callback;
-            mEhConfig = ehConfig;
         }
 
         // Called in Job thread
@@ -105,10 +103,6 @@ public class EhClient {
             } else {
                 mCall.lazySet(call);
             }
-        }
-
-        public EhConfig getEhConfig() {
-            return mEhConfig;
         }
 
         public void stop() {
@@ -133,7 +127,6 @@ public class EhClient {
 
                 // Clear
                 mCallback = null;
-                mEhConfig = null;
                 mCall.lazySet(null);
             }
         }
@@ -141,53 +134,50 @@ public class EhClient {
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                switch (mMethod) {
-                    case METHOD_SIGN_IN:
-                        return EhEngine.signIn(this, mOkHttpClient, (String) params[0], (String) params[1]);
-                    case METHOD_GET_GALLERY_LIST:
-                        return EhEngine.getGalleryList(this, mOkHttpClient, (String) params[0]);
-                    case METHOD_GET_GALLERY_DETAIL:
-                        return EhEngine.getGalleryDetail(this, mOkHttpClient, (String) params[0]);
-                    case METHOD_GET_PREVIEW_SET:
-                        return EhEngine.getPreviewSet(this, mOkHttpClient, (String) params[0]);
-                    case METHOD_GET_RATE_GALLERY:
-                        return EhEngine.rateGallery(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (Float) params[4]);
-                    case METHOD_GET_COMMENT_GALLERY:
-                        return EhEngine.commentGallery(this, mOkHttpClient, (String) params[0], (String) params[1], (String) params[2]);
-                    case METHOD_GET_GALLERY_TOKEN:
-                        return EhEngine.getGalleryToken(this, mOkHttpClient, (Long) params[0], (String) params[1], (Integer) params[2]);
-                    case METHOD_GET_FAVORITES:
-                        return EhEngine.getFavorites(this, mOkHttpClient, (String) params[0], (Boolean) params[1]);
-                    case METHOD_ADD_FAVORITES:
-                        return EhEngine.addFavorites(this, mOkHttpClient, (Long) params[0], (String) params[1], (Integer) params[2], (String) params[3]);
-                    case METHOD_ADD_FAVORITES_RANGE:
-                        return EhEngine.addFavoritesRange(this, mOkHttpClient, (long[]) params[0], (String[]) params[1], (Integer) params[2]);
-                    case METHOD_MODIFY_FAVORITES:
-                        return EhEngine.modifyFavorites(this, mOkHttpClient, (String) params[0], (long[]) params[1], (Integer) params[2], (Boolean) params[3]);
-                    case METHOD_GET_TORRENT_LIST:
-                        return EhEngine.getTorrentList(this, mOkHttpClient, (String) params[0], (Long) params[1], (String) params[2]);
-                    case METHOD_GET_PROFILE:
-                        return EhEngine.getProfile(this, mOkHttpClient);
-                    case METHOD_VOTE_COMMENT:
-                        return EhEngine.voteComment(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (Long) params[4], (Integer) params[5]);
-                    case METHOD_IMAGE_SEARCH:
-                        return EhEngine.imageSearch(this, mOkHttpClient, (File) params[0], (Boolean) params[1], (Boolean) params[2], (Boolean) params[3]);
-                    case METHOD_ARCHIVE_LIST:
-                        return EhEngine.getArchiveList(this, mOkHttpClient, (String) params[0], (Long) params[1], (String) params[2]);
-                    case METHOD_DOWNLOAD_ARCHIVE:
-                        return EhEngine.downloadArchive(this, mOkHttpClient, (Long) params[0], (String) params[1], (String) params[2], (String) params[3]);
-                    case METHOD_VOTE_TAG:
-                        return EhEngine.voteTag(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (String) params[4], (Integer) params[5]);
-                    default:
-                        return new IllegalStateException("Can't detect method " + mMethod);
-                }
+                return switch (mMethod) {
+                    case METHOD_SIGN_IN ->
+                            EhEngine.signIn(this, mOkHttpClient, (String) params[0], (String) params[1]);
+                    case METHOD_GET_GALLERY_LIST ->
+                            EhEngine.getGalleryList(this, mOkHttpClient, (String) params[0]);
+                    case METHOD_GET_GALLERY_DETAIL ->
+                            EhEngine.getGalleryDetail(this, mOkHttpClient, (String) params[0]);
+                    case METHOD_GET_PREVIEW_SET ->
+                            EhEngine.getPreviewSet(this, mOkHttpClient, (String) params[0]);
+                    case METHOD_GET_RATE_GALLERY ->
+                            EhEngine.rateGallery(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (Float) params[4]);
+                    case METHOD_GET_COMMENT_GALLERY ->
+                            EhEngine.commentGallery(this, mOkHttpClient, (String) params[0], (String) params[1], (String) params[2]);
+                    case METHOD_GET_GALLERY_TOKEN ->
+                            EhEngine.getGalleryToken(this, mOkHttpClient, (Long) params[0], (String) params[1], (Integer) params[2]);
+                    case METHOD_GET_FAVORITES ->
+                            EhEngine.getFavorites(this, mOkHttpClient, (String) params[0]);
+                    case METHOD_ADD_FAVORITES ->
+                            EhEngine.addFavorites(this, mOkHttpClient, (Long) params[0], (String) params[1], (Integer) params[2], (String) params[3]);
+                    case METHOD_ADD_FAVORITES_RANGE ->
+                            EhEngine.addFavoritesRange(this, mOkHttpClient, (long[]) params[0], (String[]) params[1], (Integer) params[2]);
+                    case METHOD_MODIFY_FAVORITES ->
+                            EhEngine.modifyFavorites(this, mOkHttpClient, (String) params[0], (long[]) params[1], (Integer) params[2]);
+                    case METHOD_GET_TORRENT_LIST ->
+                            EhEngine.getTorrentList(this, mOkHttpClient, (String) params[0], (Long) params[1], (String) params[2]);
+                    case METHOD_GET_PROFILE -> EhEngine.getProfile(this, mOkHttpClient);
+                    case METHOD_VOTE_COMMENT ->
+                            EhEngine.voteComment(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (Long) params[4], (Integer) params[5]);
+                    case METHOD_IMAGE_SEARCH ->
+                            EhEngine.imageSearch(this, mOkHttpClient, (File) params[0], (Boolean) params[1], (Boolean) params[2], (Boolean) params[3]);
+                    case METHOD_ARCHIVE_LIST ->
+                            EhEngine.getArchiveList(this, mOkHttpClient, (String) params[0], (Long) params[1], (String) params[2]);
+                    case METHOD_DOWNLOAD_ARCHIVE ->
+                            EhEngine.downloadArchive(this, mOkHttpClient, (Long) params[0], (String) params[1], (String) params[2], (String) params[3]);
+                    case METHOD_VOTE_TAG ->
+                            EhEngine.voteTag(this, mOkHttpClient, (Long) params[0], (String) params[1], (Long) params[2], (String) params[3], (String) params[4], (Integer) params[5]);
+                    default -> new IllegalStateException("Can't detect method " + mMethod);
+                };
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
                 return e;
             }
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected void onPostExecute(Object result) {
             if (mCallback != null) {
@@ -205,7 +195,6 @@ public class EhClient {
 
             // Clear
             mCallback = null;
-            mEhConfig = null;
             mCall.lazySet(null);
         }
     }

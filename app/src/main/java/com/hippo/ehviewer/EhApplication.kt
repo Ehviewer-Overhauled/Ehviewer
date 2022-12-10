@@ -164,12 +164,13 @@ class EhApplication : SceneApplication() {
                 val request = EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build()
                 val call = okHttpClient.newCall(request)
                 try {
-                    val response = call.execute()
-                    val responseBody = response.body
-                    val body = responseBody.string()
-                    val html = EventPaneParser.parse(body)
-                    if (html != null) {
-                        showEventPane(html)
+                    call.execute().use { response ->
+                        val responseBody = response.body
+                        val body = responseBody.string()
+                        val html = EventPaneParser.parse(body)
+                        if (html != null) {
+                            showEventPane(html)
+                        }
                     }
                 } catch (e: Throwable) {
                     e.printStackTrace()
@@ -180,7 +181,7 @@ class EhApplication : SceneApplication() {
 
     fun showEventPane(html: String) {
         if (Settings.getHideHvEvents() && html.contains("You have encountered a monster!")) {
-            return;
+            return
         }
         val activity = topActivity
         activity?.runOnUiThread {
@@ -272,7 +273,7 @@ class EhApplication : SceneApplication() {
         val ehCookieStore by lazy { EhCookieStore(application) }
 
         @JvmStatic
-        val ehClient by lazy { EhClient(application) }
+        val ehClient by lazy { EhClient() }
 
         @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
