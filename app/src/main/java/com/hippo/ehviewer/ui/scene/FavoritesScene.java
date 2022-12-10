@@ -86,7 +86,7 @@ import java.util.List;
 import rikka.core.res.ResourcesKt;
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
-@SuppressLint("RtlHardcoded")
+@SuppressLint({"NotifyDataSetChanged", "RtlHardcoded"})
 public class FavoritesScene extends SearchBarScene implements
         FastScroller.OnDragHandlerListener,
         FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
@@ -102,8 +102,6 @@ public class FavoritesScene extends SearchBarScene implements
     private final List<GalleryInfo> mModifyGiList = new ArrayList<>();
     public int current; // -1 for error
     public int limit; // -1 for error
-    @Nullable
-    private ContentLayout mContentLayout;
     @Nullable
     @ViewLifeCircle
     private EasyRecyclerView mRecyclerView;
@@ -231,12 +229,12 @@ public class FavoritesScene extends SearchBarScene implements
         mUrlBuilder = null;
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
-        mContentLayout = view.findViewById(R.id.content_layout);
+        ContentLayout mContentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getMainActivity();
         AssertUtils.assertNotNull(activity);
         setOnApplySearch((query) -> {
@@ -248,6 +246,7 @@ public class FavoritesScene extends SearchBarScene implements
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
         ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        AssertUtils.assertNotNull(container);
         container.addView(mFabLayout);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
@@ -291,7 +290,7 @@ public class FavoritesScene extends SearchBarScene implements
         // Restore search mode
         if (mSearchMode) {
             mSearchMode = false;
-            enterSearchMode(false);
+            enterSearchMode();
         }
 
         // Only refresh for the first time
@@ -427,7 +426,7 @@ public class FavoritesScene extends SearchBarScene implements
         } else if (mFabLayout != null && mFabLayout.isExpanded()) {
             mFabLayout.toggle();
         } else if (mSearchMode) {
-            exitSearchMode(true);
+            exitSearchMode();
         } else if (isSearchViewShown()) {
             hideSearchView();
         } else {
@@ -451,7 +450,7 @@ public class FavoritesScene extends SearchBarScene implements
         showSearchBar();
     }
 
-    public boolean onItemClick(View view, int position) {
+    public boolean onItemClick(int position) {
         if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
             // Skip if in search mode
             if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -470,12 +469,7 @@ public class FavoritesScene extends SearchBarScene implements
                 return true;
             }
 
-            // Ensure outOfCustomChoiceMode to avoid error
-            //if (mRecyclerView != null) {
-            //    mRecyclerView.isInCustomChoice();
-            //}
-
-            exitSearchMode(true);
+            exitSearchMode();
 
             mUrlBuilder.setKeyword(null);
             mUrlBuilder.setFavCat(newFavCat);
@@ -524,12 +518,7 @@ public class FavoritesScene extends SearchBarScene implements
             return;
         }
 
-        // Ensure outOfCustomChoiceMode to avoid error
-        //if (mRecyclerView != null) {
-        //    mRecyclerView.isInCustomChoice();
-        //}
-
-        exitSearchMode(true);
+        exitSearchMode();
 
         mUrlBuilder.setKeyword(query);
         updateSearchBar();
@@ -566,7 +555,7 @@ public class FavoritesScene extends SearchBarScene implements
         long fromDate = local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli();
         long toDate = MaterialDatePicker.todayInUtcMilliseconds();
 
-        ArrayList listValidators = new ArrayList<>();
+        ArrayList<CalendarConstraints.DateValidator> listValidators = new ArrayList<>();
         listValidators.add(DateValidatorPointForward.from(fromDate));
         listValidators.add(DateValidatorPointBackward.before(toDate));
 
@@ -581,9 +570,7 @@ public class FavoritesScene extends SearchBarScene implements
                 .setSelection(toDate)
                 .build();
         datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
-        datePicker.addOnPositiveButtonClickListener(v -> {
-            mHelper.goTo(v);
-        });
+        datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v));
     }
 
     @Override
@@ -623,11 +610,9 @@ public class FavoritesScene extends SearchBarScene implements
         }
 
         switch (position) {
-            case 3: { // Check all
-                mRecyclerView.checkAll();
-                break;
-            }
-            case 4: { // Download
+            case 3 -> // Check all
+                    mRecyclerView.checkAll();
+            case 4 -> { // Download
                 Activity activity = getMainActivity();
                 if (activity != null) {
                     CommonOperations.startDownload(getMainActivity(), mModifyGiList, false);
@@ -636,9 +621,8 @@ public class FavoritesScene extends SearchBarScene implements
                 if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
                     mRecyclerView.outOfCustomChoiceMode();
                 }
-                break;
             }
-            case 5: { // Delete
+            case 5 -> { // Delete
                 DeleteDialogHelper helper = new DeleteDialogHelper();
                 new BaseDialogBuilder(context)
                         .setTitle(R.string.delete_favorites_dialog_title)
@@ -646,9 +630,8 @@ public class FavoritesScene extends SearchBarScene implements
                         .setPositiveButton(android.R.string.ok, helper)
                         .setOnCancelListener(helper)
                         .show();
-                break;
             }
-            case 6: { // Move
+            case 6 -> { // Move
                 MoveDialogHelper helper = new MoveDialogHelper();
                 // First is local favorite, the other 10 is cloud favorite
                 String[] array = new String[11];
@@ -659,7 +642,6 @@ public class FavoritesScene extends SearchBarScene implements
                         .setItems(array, helper)
                         .setOnCancelListener(helper)
                         .show();
-                break;
             }
         }
     }
@@ -723,7 +705,7 @@ public class FavoritesScene extends SearchBarScene implements
         }
     }
 
-    private void enterSearchMode(boolean animation) {
+    private void enterSearchMode() {
         if (mSearchMode) {
             return;
         }
@@ -731,7 +713,7 @@ public class FavoritesScene extends SearchBarScene implements
         showSearchBar();
     }
 
-    private void exitSearchMode(boolean animation) {
+    private void exitSearchMode() {
         if (!mSearchMode) {
             return;
         }
@@ -756,9 +738,8 @@ public class FavoritesScene extends SearchBarScene implements
             }
 
             updateSearchBar();
-            assert mUrlBuilder != null;
 
-            int pages = 0;
+            int pages;
             if (result.nextPage == null)
                 pages = mHelper.pgCounter + 1;
             else
@@ -967,7 +948,7 @@ public class FavoritesScene extends SearchBarScene implements
                 holder.value.setText(Integer.toString(mFavCountArray[position - 2]));
                 holder.itemView.setEnabled(true);
             }
-            holder.itemView.setOnClickListener(v -> onItemClick(holder.itemView, position));
+            holder.itemView.setOnClickListener(v -> onItemClick(position));
         }
 
         @Override
@@ -1080,7 +1061,7 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         void onItemClick(View view, int position) {
-            FavoritesScene.this.onItemClick(view, position);
+            FavoritesScene.this.onItemClick(position);
         }
 
         @Override
@@ -1114,8 +1095,8 @@ public class FavoritesScene extends SearchBarScene implements
 
                 boolean local = mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL;
 
+                long[] gidArray = new long[mModifyGiList.size()];
                 if (mModifyAdd) {
-                    long[] gidArray = new long[mModifyGiList.size()];
                     String[] tokenArray = new String[mModifyGiList.size()];
                     for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
                         GalleryInfo gi = mModifyGiList.get(i);
@@ -1133,7 +1114,6 @@ public class FavoritesScene extends SearchBarScene implements
                     request.setArgs(gidArray, tokenArray, mModifyFavCat);
                     mClient.execute(request);
                 } else {
-                    long[] gidArray = new long[mModifyGiList.size()];
                     for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
                         gidArray[i] = mModifyGiList.get(i).gid;
                     }
@@ -1153,7 +1133,7 @@ public class FavoritesScene extends SearchBarScene implements
                     request.setCallback(new GetFavoritesListener(getContext(),
                             activity.getStageId(), getTag(),
                             taskId, local, mUrlBuilder.getKeyword()));
-                    request.setArgs(url, gidArray, mModifyFavCat, Settings.getShowJpnTitle());
+                    request.setArgs(url, gidArray, mModifyFavCat);
                     mClient.execute(request);
                 }
             } else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
@@ -1164,7 +1144,7 @@ public class FavoritesScene extends SearchBarScene implements
                 if (jumpTo != null) {
                     next = Integer.toString(minGid);
                     operation = 0;
-                } else if (page != 0) {
+                } else if (page != 0 && mHelper != null) {
                     if (page >= mHelper.getPageForTop()) {
                         next = lowerPage;
                         operation = 1;
@@ -1185,7 +1165,7 @@ public class FavoritesScene extends SearchBarScene implements
                 request.setCallback(new GetFavoritesListener(getContext(),
                         activity.getStageId(), getTag(),
                         taskId, false, mUrlBuilder.getKeyword()));
-                request.setArgs(url, Settings.getShowJpnTitle());
+                request.setArgs(url);
                 mClient.execute(request);
             }
         }
@@ -1251,16 +1231,18 @@ public class FavoritesScene extends SearchBarScene implements
             operation = 0;
         }
 
+        @NonNull
         @Override
-        protected Parcelable saveInstanceState(Parcelable superState) {
+        protected Parcelable saveInstanceState(@NonNull Parcelable superState) {
             Bundle bundle = (Bundle) super.saveInstanceState(superState);
             bundle.putString(KEY_UPPER_PAGE, upperPage);
             bundle.putString(KEY_LOWER_PAGE, lowerPage);
             return bundle;
         }
 
+        @NonNull
         @Override
-        protected Parcelable restoreInstanceState(Parcelable state) {
+        protected Parcelable restoreInstanceState(@NonNull Parcelable state) {
             Bundle bundle = (Bundle) state;
             upperPage = bundle.getString(KEY_UPPER_PAGE);
             lowerPage = bundle.getString(KEY_LOWER_PAGE);
