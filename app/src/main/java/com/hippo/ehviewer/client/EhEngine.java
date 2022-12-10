@@ -185,8 +185,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -263,8 +262,7 @@ public class EhEngine {
         Headers headers = null;
         GalleryListParser.Result result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -326,8 +324,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -354,8 +351,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -387,8 +383,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -429,8 +424,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -466,8 +460,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -510,8 +503,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -524,7 +516,7 @@ public class EhEngine {
     }
 
     public static FavoritesParser.Result getFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                      String url, boolean callApi) throws Throwable {
+                                                      String url) throws Throwable {
         String referer = EhUrl.getReferer();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -539,8 +531,7 @@ public class EhEngine {
         Headers headers = null;
         FavoritesParser.Result result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -592,8 +583,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -617,7 +607,7 @@ public class EhEngine {
     }
 
     public static FavoritesParser.Result modifyFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                         String url, long[] gidArray, int dstCat, boolean callApi) throws Throwable {
+                                                         String url, long[] gidArray, int dstCat) throws Throwable {
         String catStr;
         if (dstCat == -1) {
             catStr = "delete";
@@ -648,8 +638,7 @@ public class EhEngine {
         Headers headers = null;
         FavoritesParser.Result result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -681,8 +670,7 @@ public class EhEngine {
         Headers headers = null;
         Pair<String, String>[] result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -712,8 +700,7 @@ public class EhEngine {
         Headers headers = null;
         Pair<String, Pair<String, String>[]> result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -754,8 +741,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -788,8 +774,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -816,8 +801,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -857,8 +841,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -898,8 +881,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -962,8 +944,7 @@ public class EhEngine {
         Headers headers = null;
         GalleryListParser.Result result;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
 
             Log.d(TAG, "" + response.request().url());
 
@@ -997,8 +978,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
@@ -1039,8 +1019,7 @@ public class EhEngine {
         String body = null;
         Headers headers = null;
         int code = -1;
-        try {
-            Response response = call.execute();
+        try (Response response = call.execute()) {
             code = response.code();
             headers = response.headers();
             body = response.body().string();
