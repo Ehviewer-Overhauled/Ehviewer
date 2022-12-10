@@ -16,6 +16,7 @@
 
 package com.hippo.ehviewer.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -70,7 +71,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
     private static final String KEY_OPEN_BY_DEFAULT = "open_by_default";
     private static final String KEY_BACKUP_FAVORITE = "backup_favorite";
     ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument(),
+            new ActivityResultContracts.CreateDocument("application/vnd.sqlite3"),
             uri -> {
                 if (uri != null) {
                     try {
@@ -107,7 +108,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                 }
             });
     ActivityResultLauncher<String> dumpLogcatLauncher = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument(),
+            new ActivityResultContracts.CreateDocument("application/zip"),
             uri -> {
                 if (uri != null) {
                     try {
@@ -291,7 +292,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
             return true;
         } else if (KEY_OPEN_BY_DEFAULT.equals(key)) {
             try {
-                Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                @SuppressLint("InlinedApi") Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
                         Uri.parse("package:" + requireContext().getPackageName()));
                 startActivity(intent);
             } catch (Throwable t) {
@@ -312,36 +313,35 @@ public class AdvancedFragment extends BasePreferenceFragment {
 
         EhRequest request = new EhRequest();
         request.setMethod(EhClient.METHOD_GET_FAVORITES);
-        request.setCallback(new EhClient.Callback() {
+        request.setCallback(new EhClient.Callback<FavoritesParser.Result>() {
             @Override
-            public void onSuccess(Object result) {
+            public void onSuccess(FavoritesParser.Result result) {
                 try {
-                    FavoritesParser.Result favResult = (FavoritesParser.Result) result;
-                    if (favResult.galleryInfoList.isEmpty()) {
+                    if (result.galleryInfoList.isEmpty()) {
                         showTip(R.string.settings_advanced_backup_favorite_nothing, BaseScene.LENGTH_SHORT);
                     } else {
-                        if (favTotal == 0 && favResult.countArray != null) {
+                        if (favTotal == 0 && result.countArray != null) {
                             int totalFav = 0;
                             for (int i = 0; i < 10; i++) {
-                                totalFav = totalFav + favResult.countArray[i];
+                                totalFav = totalFav + result.countArray[i];
                             }
-                            favTotal = (int) Math.ceil((double) totalFav / favResult.galleryInfoList.size());
+                            favTotal = (int) Math.ceil((double) totalFav / result.galleryInfoList.size());
                         }
 
                         String status = "(" + favIndex + "/" + favTotal + ")";
                         showTip(GetText.getString(R.string.settings_advanced_backup_favorite_start, status), BaseScene.LENGTH_SHORT);
                         Log.d("LocalFavorites", "now backup page " + status);
-                        EhDB.putLocalFavorites(favResult.galleryInfoList);
+                        EhDB.putLocalFavorites(result.galleryInfoList);
 
-                        if (favResult.nextPage != null) {
+                        if (result.nextPage != null) {
                             try {
                                 Thread.sleep(Settings.getDownloadDelay());
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                             favIndex++;
-                            favListUrlBuilder.setNext(favResult.nextPage);
-                            request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
+                            favListUrlBuilder.setNext(result.nextPage);
+                            request.setArgs(favListUrlBuilder.build());
                             mClient.execute(request);
                         } else {
                             showTip(R.string.settings_advanced_backup_favorite_success, BaseScene.LENGTH_SHORT);
@@ -363,7 +363,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
             }
         });
 
-        request.setArgs(favListUrlBuilder.build(), Settings.getShowJpnTitle());
+        request.setArgs(favListUrlBuilder.build());
         mClient.execute(request);
     }
 
