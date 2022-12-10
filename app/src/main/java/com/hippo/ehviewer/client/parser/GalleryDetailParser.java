@@ -78,6 +78,23 @@ public class GalleryDetailParser {
     private static final String PINING_STRING =
             "<p>This gallery is pining for the fjords.</p>";
 
+    private static final String[] LANGUAGES = {
+            "English",
+            "Chinese",
+            "Spanish",
+            "Korean",
+            "Russian",
+            "French",
+            "Portuguese",
+            "Thai",
+            "German",
+            "Italian",
+            "Vietnamese",
+            "Polish",
+            "Hungarian",
+            "Dutch",
+    };
+
     public static GalleryDetail parse(String body) throws EhException {
         if (body.contains(OFFENSIVE_STRING)) {
             throw new OffensiveException();
@@ -100,6 +117,15 @@ public class GalleryDetailParser {
         galleryDetail.comments = parseComments(document);
         galleryDetail.previewPages = parsePreviewPages(document, body);
         galleryDetail.previewSet = parsePreviewSet(document, body);
+
+        // Generate simpleLanguage for local favorites
+        for (int i = 0; i < LANGUAGES.length; i++) {
+            if (galleryDetail.language.equals(LANGUAGES[i])) {
+                galleryDetail.simpleLanguage = GalleryInfo.S_LANGS[i];
+                break;
+            }
+        }
+
         return galleryDetail;
     }
 
@@ -191,14 +217,9 @@ public class GalleryDetailParser {
             gd.size = "";
             gd.pages = 0;
             gd.favoriteCount = 0;
-            try {
-                Elements es = gdd.child(0).child(0).children();
-                for (int i = 0, n = es.size(); i < n; i++) {
-                    parseDetailInfo(gd, es.get(i));
-                }
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                // Ignore
+            Elements es = gdd.child(0).child(0).children();
+            for (int i = 0, n = es.size(); i < n; i++) {
+                parseDetailInfo(gd, es.get(i));
             }
 
             // Rating count
