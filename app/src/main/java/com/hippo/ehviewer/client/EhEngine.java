@@ -813,6 +813,55 @@ public class EhEngine {
         }
     }
 
+    public static Void getUConfig(@Nullable EhClient.Task task,
+                                                  OkHttpClient okHttpClient) throws Throwable {
+        String url = EhUrl.getUConfigUrl();
+        Log.d(TAG, url);
+        Request request = new EhRequestBuilder(url, null).build();
+        Call call = okHttpClient.newCall(request);
+
+        // Put call
+        if (null != task) {
+            task.setCall(call);
+        }
+
+        String body = null;
+        Headers headers = null;
+        int code = -1;
+        try (Response response = call.execute()) {
+            code = response.code();
+            headers = response.headers();
+            body = response.body().string();
+            request = response.request();
+            throwException(call, code, headers, body, null);
+        } catch (Throwable e) {
+            ExceptionUtils.throwIfFatal(e);
+            throwException(call, code, headers, body, e);
+            throw e;
+        }
+
+        // TODO Use a better way to handle 302
+        if (!request.url().toString().equals(url)) {
+            Log.d(TAG, "Redirected! Retry " + url);
+            request = new EhRequestBuilder(url, null).build();
+            call = okHttpClient.newCall(request);
+            if (null != task) task.setCall(call);
+
+            try (Response response = call.execute()) {
+                code = response.code();
+                headers = response.headers();
+                body = response.body().string();
+                throwException(call, code, headers, body, null);
+            } catch (Throwable e) {
+                ExceptionUtils.throwIfFatal(e);
+                throwException(call, code, headers, body, e);
+                throw e;
+            }
+        }
+
+        return null;
+    }
+
     public static VoteCommentParser.Result voteComment(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
                                                        long apiUid, String apiKey, long gid, String token, long commentId, int commentVote) throws Throwable {
         final JSONObject json = new JSONObject();
