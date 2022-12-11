@@ -83,10 +83,7 @@ import com.hippo.ehviewer.gallery.GalleryProvider2;
 import com.hippo.ehviewer.widget.GalleryGuideView;
 import com.hippo.ehviewer.widget.GalleryHeader;
 import com.hippo.ehviewer.widget.ReversibleSeekBar;
-import com.hippo.glgallery.GalleryProvider;
-import com.hippo.glgallery.GalleryView;
-import com.hippo.glgallery.SimpleAdapter;
-import com.hippo.glview.view.GLRootView;
+import com.hippo.gallery.GalleryProvider;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -111,8 +108,7 @@ import java.lang.ref.WeakReference;
 import rikka.core.res.ConfigurationKt;
 import rikka.core.res.ResourcesKt;
 
-public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener,
-        GalleryView.Listener {
+public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChangeListener {
 
     public static final String ACTION_DIR = "dir";
     public static final String ACTION_EH = "eh";
@@ -165,13 +161,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
             });
     @Nullable
-    private GLRootView mGLRootView;
-    @Nullable
-    private GalleryView mGalleryView;
-    @Nullable
     private GalleryProvider2 mGalleryProvider;
-    @Nullable
-    private GalleryAdapter mGalleryAdapter;
     @Nullable
     private WindowInsetsControllerCompat insetsController;
     @Nullable
@@ -345,34 +335,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         setContentView(R.layout.activity_gallery);
-        mGLRootView = (GLRootView) ViewUtils.$$(this, R.id.gl_root_view);
-        mGalleryAdapter = new GalleryAdapter(mGLRootView, mGalleryProvider);
-        Resources resources = getResources();
-        mGalleryView = new GalleryView.Builder(this, mGalleryAdapter)
-                .setListener(this)
-                .setLayoutMode(Settings.getReadingDirection())
-                .setScaleMode(Settings.getPageScaling())
-                .setStartPosition(Settings.getStartPosition())
-                .setStartPage(startPage)
-                .setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground))
-                .setPagerInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_pager_interval) : 0)
-                .setScrollInterval(Settings.getShowPageInterval() ? resources.getDimensionPixelOffset(R.dimen.gallery_scroll_interval) : 0)
-                .setPageMinHeight(resources.getDimensionPixelOffset(R.dimen.gallery_page_min_height))
-                .setPageInfoInterval(resources.getDimensionPixelOffset(R.dimen.gallery_page_info_interval))
-                .setProgressColor(ResourcesUtils.getAttrColor(this, androidx.appcompat.R.attr.colorPrimary))
-                .setProgressSize(resources.getDimensionPixelOffset(R.dimen.gallery_progress_size))
-                .setPageTextColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary))
-                .setPageTextSize(resources.getDimensionPixelOffset(R.dimen.gallery_page_text_size))
-                .setPageTextTypeface(Typeface.DEFAULT)
-                .setErrorTextColor(resources.getColor(R.color.red_500))
-                .setErrorTextSize(resources.getDimensionPixelOffset(R.dimen.gallery_error_text_size))
-                .setDefaultErrorString(resources.getString(R.string.error_unknown))
-                .setEmptyString(resources.getString(R.string.error_empty))
-                .build();
-
-        mGLRootView.setContentPane(mGalleryView);
-        mGalleryProvider.setListener(mGalleryAdapter);
-        mGalleryProvider.setGLRoot(mGLRootView);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         insetsController = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
@@ -391,32 +353,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         mMaskView = (ColorView) ViewUtils.$$(this, R.id.mask);
-        mMaskView.setOnGenericMotionListener((view, event) -> {
-            if (mGalleryView == null) {
-                return false;
-            }
-            if (event.getAction() == MotionEvent.ACTION_SCROLL) {
-                float scroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL) * 300;
-                if (scroll < 0.0f) {
-                    if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                        mGalleryView.pageLeft();
-                    } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
-                        mGalleryView.pageRight();
-                    } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
-                        mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
-                    }
-                } else {
-                    if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                        mGalleryView.pageRight();
-                    } else if (mLayoutMode == GalleryView.LAYOUT_LEFT_TO_RIGHT) {
-                        mGalleryView.pageLeft();
-                    } else if (mLayoutMode == GalleryView.LAYOUT_TOP_TO_BOTTOM) {
-                        mGalleryView.onScroll(0, -scroll, 0, -scroll, 0, -scroll);
-                    }
-                }
-            }
-            return false;
-        });
         mClock = ViewUtils.$$(this, R.id.clock);
         mProgress = (TextView) ViewUtils.$$(this, R.id.progress);
         mBattery = ViewUtils.$$(this, R.id.battery);
@@ -432,9 +368,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
         mSize = mGalleryProvider.size();
         mCurrentIndex = startPage;
-        if (mGalleryView != null) {
-            mLayoutMode = mGalleryView.getLayoutMode();
-        }
         updateSlider();
 
         // Update keep screen on
@@ -489,12 +422,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mGLRootView = null;
-        mGalleryView = null;
-        if (mGalleryAdapter != null) {
-            mGalleryAdapter.clearUploader();
-            mGalleryAdapter = null;
-        }
         if (mGalleryProvider != null) {
             mGalleryProvider.setListener(null);
             mGalleryProvider.stop();
@@ -516,20 +443,13 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mGLRootView != null) {
-            mGLRootView.onPause();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (mGLRootView != null) {
-            mGLRootView.onResume();
-        }
-    }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
+    }
+    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
                 if (result && mSavingPage != -1) {
@@ -548,67 +468,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (mGalleryView == null) {
-            return super.onKeyDown(keyCode, event);
-        }
-
-        // Check volume
-        if (Settings.getVolumePage()) {
-            if (Settings.getReverseVolumePage()) {
-                if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                    keyCode = KeyEvent.KEYCODE_VOLUME_DOWN;
-                } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                    keyCode = KeyEvent.KEYCODE_VOLUME_UP;
-                }
-            }
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                    mGalleryView.pageRight();
-                } else {
-                    mGalleryView.pageLeft();
-                }
-                return true;
-            } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                    mGalleryView.pageLeft();
-                } else {
-                    mGalleryView.pageRight();
-                }
-                return true;
-            }
-        }
-
-        // Check keyboard and Dpad
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_PAGE_UP:
-            case KeyEvent.KEYCODE_DPAD_UP:
-                if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                    mGalleryView.pageRight();
-                } else {
-                    mGalleryView.pageLeft();
-                }
-                return true;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                mGalleryView.pageLeft();
-                return true;
-            case KeyEvent.KEYCODE_PAGE_DOWN:
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-                    mGalleryView.pageLeft();
-                } else {
-                    mGalleryView.pageRight();
-                }
-                return true;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                mGalleryView.pageRight();
-                return true;
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_SPACE:
-            case KeyEvent.KEYCODE_MENU:
-                onTapMenuArea();
-                return true;
-        }
-
         return super.onKeyDown(keyCode, event);
     }
 
@@ -651,41 +510,11 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @SuppressLint("SetTextI18n")
-    private void updateSlider() {
-        if (mSeekBar == null || mRightText == null || mLeftText == null || mSize <= 0 || mCurrentIndex < 0) {
-            return;
-        }
-
-        TextView start;
-        TextView end;
-        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-            start = mRightText;
-            end = mLeftText;
-            mSeekBar.setReverse(true);
-        } else {
-            start = mLeftText;
-            end = mRightText;
-            mSeekBar.setReverse(false);
-        }
-        start.setText(Integer.toString(mCurrentIndex + 1));
-        end.setText(Integer.toString(mSize));
-        mSeekBar.setMax(mSize - 1);
-        mSeekBar.setProgress(mCurrentIndex);
-    }
+    private void updateSlider() {}
 
     @Override
     @SuppressLint("SetTextI18n")
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        TextView start;
-        if (mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT) {
-            start = mRightText;
-        } else {
-            start = mLeftText;
-        }
-        if (fromUser && null != start) {
-            start.setText(Integer.toString(progress + 1));
-        }
-    }
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
@@ -693,39 +522,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-        SimpleHandler.getInstance().postDelayed(mHideSliderRunnable, HIDE_SLIDER_DELAY);
-        int progress = seekBar.getProgress();
-        if (progress != mCurrentIndex && null != mGalleryView) {
-            mGalleryView.setCurrentPage(progress);
-        }
-    }
+    public void onStopTrackingTouch(SeekBar seekBar) {}
 
-    @Override
-    public void onUpdateCurrentIndex(int index) {
-        if (null != mGalleryProvider) {
-            mGalleryProvider.putStartPage(index);
-        }
-
-        NotifyTask task = mNotifyTaskPool.pop();
-        if (task == null) {
-            task = new NotifyTask();
-        }
-        task.setData(NotifyTask.KEY_CURRENT_INDEX, index);
-        SimpleHandler.getInstance().post(task);
-    }
-
-    @Override
-    public void onTapSliderArea() {
-        NotifyTask task = mNotifyTaskPool.pop();
-        if (task == null) {
-            task = new NotifyTask();
-        }
-        task.setData(NotifyTask.KEY_TAP_SLIDER_AREA, 0);
-        SimpleHandler.getInstance().post(task);
-    }
-
-    @Override
     public void onTapMenuArea() {
         NotifyTask task = mNotifyTaskPool.pop();
         if (task == null) {
@@ -735,7 +533,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         SimpleHandler.getInstance().post(task);
     }
 
-    @Override
     public void onTapErrorText(int index) {
         NotifyTask task = mNotifyTaskPool.pop();
         if (task == null) {
@@ -745,7 +542,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         SimpleHandler.getInstance().post(task);
     }
 
-    @Override
     public void onLongPressPage(int index) {
         NotifyTask task = mNotifyTaskPool.pop();
         if (task == null) {
@@ -1153,9 +949,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mScreenLightness = mView.findViewById(R.id.screen_lightness);
 
             mScreenRotation.setSelection(Settings.getScreenRotation());
-            mReadingDirection.setSelection(Settings.getReadingDirection());
-            mScaleMode.setSelection(Settings.getPageScaling());
-            mStartPosition.setSelection(Settings.getStartPosition());
             mReadTheme.setSelection(Settings.getReadTheme());
             mKeepScreenOn.setChecked(Settings.getKeepScreenOn());
             mShowClock.setChecked(Settings.getShowClock());
@@ -1179,92 +972,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
 
         @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (mGalleryView == null) {
-                return;
-            }
-
-            int screenRotation = mScreenRotation.getSelectedItemPosition();
-            int layoutMode = GalleryView.sanitizeLayoutMode(mReadingDirection.getSelectedItemPosition());
-            int scaleMode = GalleryView.sanitizeScaleMode(mScaleMode.getSelectedItemPosition());
-            int startPosition = GalleryView.sanitizeStartPosition(mStartPosition.getSelectedItemPosition());
-            int readTheme = mReadTheme.getSelectedItemPosition();
-            boolean keepScreenOn = mKeepScreenOn.isChecked();
-            boolean showClock = mShowClock.isChecked();
-            boolean showProgress = mShowProgress.isChecked();
-            boolean showBattery = mShowBattery.isChecked();
-            boolean showPageInterval = mShowPageInterval.isChecked();
-            boolean volumePage = mVolumePage.isChecked();
-            boolean reverseVolumePage = mReverseVolumePage.isChecked();
-            boolean readingFullscreen = mReadingFullscreen.isChecked();
-            boolean customScreenLightness = mCustomScreenLightness.isChecked();
-            int screenLightness = mScreenLightness.getProgress();
-
-            boolean oldReadingFullscreen = Settings.getReadingFullscreen();
-            int oldReadTheme = Settings.getReadTheme();
-
-            Settings.putScreenRotation(screenRotation);
-            Settings.putReadingDirection(layoutMode);
-            Settings.putPageScaling(scaleMode);
-            Settings.putStartPosition(startPosition);
-            Settings.putReadTheme(readTheme);
-            Settings.putKeepScreenOn(keepScreenOn);
-            Settings.putShowClock(showClock);
-            Settings.putShowProgress(showProgress);
-            Settings.putShowBattery(showBattery);
-            Settings.putShowPageInterval(showPageInterval);
-            Settings.putVolumePage(volumePage);
-            Settings.putReverseVolumePage(reverseVolumePage);
-            Settings.putReadingFullscreen(readingFullscreen);
-            Settings.putCustomScreenLightness(customScreenLightness);
-            Settings.putScreenLightness(screenLightness);
-
-            int orientation;
-            switch (screenRotation) {
-                default:
-                case 0:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-                    break;
-                case 1:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-                    break;
-                case 2:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-                    break;
-                case 3:
-                    orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR;
-                    break;
-            }
-            setRequestedOrientation(orientation);
-            mGalleryView.setLayoutMode(layoutMode);
-            mGalleryView.setScaleMode(scaleMode);
-            mGalleryView.setStartPosition(startPosition);
-            if (keepScreenOn) {
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            } else {
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            }
-            if (mClock != null) {
-                mClock.setVisibility(showClock ? View.VISIBLE : View.GONE);
-            }
-            if (mProgress != null) {
-                mProgress.setVisibility(showProgress ? View.VISIBLE : View.GONE);
-            }
-            if (mBattery != null) {
-                mBattery.setVisibility(showBattery ? View.VISIBLE : View.GONE);
-            }
-            mGalleryView.setPagerInterval(showPageInterval ? getResources().getDimensionPixelOffset(R.dimen.gallery_pager_interval) : 0);
-            mGalleryView.setScrollInterval(showPageInterval ? getResources().getDimensionPixelOffset(R.dimen.gallery_scroll_interval) : 0);
-            setScreenLightness(customScreenLightness, screenLightness);
-
-            // Update slider
-            mLayoutMode = layoutMode;
-            updateSlider();
-
-            if (oldReadingFullscreen != readingFullscreen || oldReadTheme != readTheme) {
-                recreate();
-            }
-        }
+        public void onClick(DialogInterface dialog, int which) {}
     }
 
     private class NotifyTask implements Runnable {
@@ -1351,30 +1059,4 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             mNotifyTaskPool.push(this);
         }
     }
-
-    private class GalleryAdapter extends SimpleAdapter {
-
-        public GalleryAdapter(@NonNull GLRootView glRootView, @NonNull GalleryProvider provider) {
-            super(glRootView, provider);
-        }
-
-        @Override
-        public void onDataChanged() {
-            super.onDataChanged();
-
-            if (mGalleryProvider != null) {
-                int size = mGalleryProvider.size();
-                NotifyTask task = mNotifyTaskPool.pop();
-                if (task == null) {
-                    task = new NotifyTask();
-                }
-                task.setData(NotifyTask.KEY_SIZE, size);
-                SimpleHandler.getInstance().post(task);
-            }
-        }
-    }
-
-
-
-
 }

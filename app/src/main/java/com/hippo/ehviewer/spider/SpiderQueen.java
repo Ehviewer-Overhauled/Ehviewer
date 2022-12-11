@@ -49,8 +49,7 @@ import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.ehviewer.gallery.GalleryProvider2;
-import com.hippo.glgallery.GalleryPageView;
-import com.hippo.glgallery.GalleryProvider;
+import com.hippo.gallery.GalleryProvider;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
@@ -167,7 +166,7 @@ public final class SpiderQueen implements Runnable {
         mPreloadNumber = MathUtils.clamp(Settings.getPreloadImage(), 0, 100);
 
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {
-            mDecodeIndexArray[i] = GalleryPageView.INVALID_INDEX;
+            mDecodeIndexArray[i] = -1;
         }
 
         mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
@@ -1596,7 +1595,7 @@ public final class SpiderQueen implements Runnable {
 
         private void resetDecodeIndex() {
             synchronized (mDecodeRequestQueue) {
-                mDecodeIndexArray[mThreadIndex] = GalleryPageView.INVALID_INDEX;
+                mDecodeIndexArray[mThreadIndex] = -1;
             }
         }
 

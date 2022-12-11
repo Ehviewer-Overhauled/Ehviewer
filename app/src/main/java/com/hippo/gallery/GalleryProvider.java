@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.hippo.glgallery;
+package com.hippo.gallery;
 
+import android.graphics.drawable.Drawable;
 import android.util.LruCache;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.UiThread;
 
-import com.hippo.glview.glrenderer.GLCanvas;
-import com.hippo.glview.image.ImageWrapper;
-import com.hippo.glview.view.GLRoot;
 import com.hippo.image.Image;
 import com.hippo.yorozuya.ConcurrentPool;
 import com.hippo.yorozuya.OSUtils;
@@ -39,7 +37,6 @@ public abstract class GalleryProvider {
     private final ConcurrentPool<NotifyTask> mNotifyTaskPool = new ConcurrentPool<>(5);
     private final ImageCache mImageCache = new ImageCache();
     private volatile Listener mListener;
-    private volatile GLRoot mGLRoot;
     private boolean mStarted = false;
 
     @UiThread
@@ -58,25 +55,9 @@ public abstract class GalleryProvider {
         mImageCache.evictAll();
     }
 
-    public void setGLRoot(GLRoot glRoot) {
-        mGLRoot = glRoot;
-    }
-
-    /**
-     * @return {@link #STATE_WAIT} for wait,
-     * {@link #STATE_ERROR} for error, {@link #getError()} to get error message,
-     * 0 for empty
-     */
     public abstract int size();
 
-    public final void request(int index) {
-        ImageWrapper imageWrapper = mImageCache.get(index);
-        if (imageWrapper != null) {
-            notifyPageSucceed(index, imageWrapper);
-        } else {
-            onRequest(index);
-        }
-    }
+    public final void request(int index) {}
 
     public final void forceRequest(int index) {
         onForceRequest(index);
@@ -118,13 +99,9 @@ public abstract class GalleryProvider {
         notify(NotifyTask.TYPE_PERCENT, index, percent, null, null);
     }
 
-    public void notifyPageSucceed(int index, Image image) {
-        ImageWrapper imageWrapper = new ImageWrapper(image);
-        mImageCache.add(index, imageWrapper);
-        notifyPageSucceed(index, imageWrapper);
-    }
+    public void notifyPageSucceed(int index, Image image) {}
 
-    public void notifyPageSucceed(int index, ImageWrapper image) {
+    public void notifyPageSucceed(int index, Drawable image) {
         notify(NotifyTask.TYPE_SUCCEED, index, 0.0f, image, null);
     }
 
@@ -132,23 +109,11 @@ public abstract class GalleryProvider {
         notify(NotifyTask.TYPE_FAILED, index, 0.0f, null, error);
     }
 
-    private void notify(@NotifyTask.Type int type, int index, float percent, ImageWrapper image, String error) {
+    private void notify(@NotifyTask.Type int type, int index, float percent, Drawable image, String error) {
         Listener listener = mListener;
         if (listener == null) {
             return;
         }
-
-        GLRoot glRoot = mGLRoot;
-        if (glRoot == null) {
-            return;
-        }
-
-        NotifyTask task = mNotifyTaskPool.pop();
-        if (task == null) {
-            task = new NotifyTask(listener, mNotifyTaskPool);
-        }
-        task.setData(type, index, percent, image, error);
-        glRoot.addOnGLIdleListener(task);
     }
 
     public interface Listener {
@@ -159,14 +124,14 @@ public abstract class GalleryProvider {
 
         void onPagePercent(int index, float percent);
 
-        void onPageSucceed(int index, ImageWrapper image);
+        void onPageSucceed(int index, Drawable image);
 
         void onPageFailed(int index, String error);
 
         void onDataChanged(int index);
     }
 
-    private static class NotifyTask implements GLRoot.OnGLIdleListener {
+    private static class NotifyTask {
 
         public static final int TYPE_DATA_CHANGED = 0;
         public static final int TYPE_WAIT = 1;
@@ -179,7 +144,7 @@ public abstract class GalleryProvider {
         private int mType;
         private int mIndex;
         private float mPercent;
-        private ImageWrapper mImage;
+        private Drawable mImage;
         private String mError;
 
         public NotifyTask(Listener listener, ConcurrentPool<NotifyTask> pool) {
@@ -187,45 +152,12 @@ public abstract class GalleryProvider {
             mPool = pool;
         }
 
-        public void setData(@Type int type, int index, float percent, ImageWrapper image, String error) {
+        public void setData(@Type int type, int index, float percent, Drawable image, String error) {
             mType = type;
             mIndex = index;
             mPercent = percent;
             mImage = image;
             mError = error;
-        }
-
-        @Override
-        public boolean onGLIdle(GLCanvas canvas, boolean renderRequested) {
-            switch (mType) {
-                case TYPE_DATA_CHANGED:
-                    if (mIndex < 0) {
-                        mListener.onDataChanged();
-                    } else {
-                        mListener.onDataChanged(mIndex);
-                    }
-                    break;
-                case TYPE_WAIT:
-                    mListener.onPageWait(mIndex);
-                    break;
-                case TYPE_PERCENT:
-                    mListener.onPagePercent(mIndex, mPercent);
-                    break;
-                case TYPE_SUCCEED:
-                    mListener.onPageSucceed(mIndex, mImage);
-                    break;
-                case TYPE_FAILED:
-                    mListener.onPageFailed(mIndex, mError);
-                    break;
-            }
-
-            // Clean data
-            mImage = null;
-            mError = null;
-            // Push back
-            mPool.push(this);
-
-            return false;
         }
 
         @IntDef({TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED})
@@ -234,30 +166,19 @@ public abstract class GalleryProvider {
         }
     }
 
-    private static class ImageCache extends LruCache<Integer, ImageWrapper> {
-
+    private static class ImageCache extends LruCache<Integer, Drawable> {
         private static final int CACHE_SIZE = 512 * 1024 * 1024;
 
         public ImageCache() {
             super(CACHE_SIZE);
         }
 
-        public void add(Integer key, ImageWrapper value) {
-            if (!value.getAnimated())
-                if (value.obtain())
-                    put(key, value);
-        }
+        public void add(Integer key, Drawable value) {}
 
         @Override
-        protected int sizeOf(Integer key, ImageWrapper value) {
-            return value.getWidth() * value.getHeight() * 4;
-        }
+        protected int sizeOf(Integer key, Drawable value) { return Integer.MAX_VALUE; }
 
         @Override
-        protected void entryRemoved(boolean evicted, Integer key, ImageWrapper oldValue, ImageWrapper newValue) {
-            if (oldValue != null) {
-                oldValue.release();
-            }
-        }
+        protected void entryRemoved(boolean evicted, Integer key, Drawable oldValue, Drawable newValue) {}
     }
 }

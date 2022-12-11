@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
-import com.hippo.glgallery.GalleryPageView;
 import com.hippo.image.Image;
 import com.hippo.unifile.FilenameFilter;
 import com.hippo.unifile.UniFile;
@@ -60,7 +59,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
     };
     private final UniFile mDir;
     private final Stack<Integer> mRequests = new Stack<>();
-    private final AtomicInteger mDecodingIndex = new AtomicInteger(GalleryPageView.INVALID_INDEX);
+    private final AtomicInteger mDecodingIndex = new AtomicInteger(-1);
     private final AtomicReference<UniFile[]> mFileList = new AtomicReference<>();
     @Nullable
     private Thread mBgThread;
@@ -251,7 +250,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
 
             // Check index valid
             if (index < 0 || index >= files.length) {
-                mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
+                mDecodingIndex.lazySet(-1);
                 notifyPageFailed(index, GetText.getString(R.string.error_out_of_range));
                 continue;
             }
@@ -260,15 +259,15 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
             try {
                 is = files[index].openInputStream();
                 Image image = Image.decode((FileInputStream) is);
-                mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
+                mDecodingIndex.lazySet(-1);
                 notifyPageSucceed(index, image);
             } catch (IOException e) {
-                mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
+                mDecodingIndex.lazySet(-1);
                 notifyPageFailed(index, GetText.getString(R.string.error_reading_failed));
             } finally {
                 IOUtils.closeQuietly(is);
             }
-            mDecodingIndex.lazySet(GalleryPageView.INVALID_INDEX);
+            mDecodingIndex.lazySet(-1);
         }
 
         // Clear file list
