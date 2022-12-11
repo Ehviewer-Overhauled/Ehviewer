@@ -18,6 +18,7 @@ package com.hippo.ehviewer
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.ComponentCallbacks2
 import android.os.Build
 import android.text.Html
@@ -26,12 +27,13 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
+import androidx.core.content.getSystemService
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import coil.Coil
 import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.hippo.Native
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.beerbelly.SimpleDiskCache
@@ -57,6 +59,7 @@ import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,7 +72,7 @@ import java.util.Arrays
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
-class EhApplication : SceneApplication() {
+class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderFactory {
     private val mIdGenerator = IntIdGenerator()
     private val mGlobalStuffMap = HashMap<Int, Any>()
     private val mActivityList = ArrayList<Activity>()
@@ -88,7 +91,7 @@ class EhApplication : SceneApplication() {
     @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("StaticFieldLeak")
     override fun onCreate() {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(EhlifecycleObserver())
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         application = this
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
@@ -100,7 +103,7 @@ class EhApplication : SceneApplication() {
             }
             handler?.uncaughtException(t, e)
         }
-        super.onCreate()
+        super<SceneApplication>.onCreate()
         Native.initialize()
         GetText.initialize(this)
         Settings.initialize(this)
@@ -110,7 +113,6 @@ class EhApplication : SceneApplication() {
         EhDB.initialize(this)
         EhEngine.initialize()
         BitmapUtils.initialize(this)
-        Coil.setImageLoader(ImageLoader.Builder(this).okHttpClient(okHttpClient).build())
 
         // Locales can be managed by system automatically above Snow Cone v2
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
@@ -252,12 +254,22 @@ class EhApplication : SceneApplication() {
         mActivityList.remove(activity)
     }
 
-    internal class EhlifecycleObserver : DefaultLifecycleObserver {
-        override fun onPause(owner: LifecycleOwner) {
-            if (!locked)
-                locked_last_leave_time = System.currentTimeMillis() / 1000
-            locked = true
-        }
+    override fun onPause(owner: LifecycleOwner) {
+        if (!locked)
+            locked_last_leave_time = System.currentTimeMillis() / 1000
+        locked = true
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this).apply {
+            okHttpClient(okHttpClient)
+            allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
+            // Coil spawns a new thread for every image load by default
+            fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
+            decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
+            transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
+        }.build()
     }
 
     companion object {
