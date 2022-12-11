@@ -206,5 +206,5 @@ configurations.all {
     exclude group: 'dev.rikka.rikkax.appcompat', module: 'appcompat'
     exclude group: 'dev.rikka.rikkax.material', module: 'material'
     exclude group: 'androidx.compose.material'
-    exclude group: 'com.github.chrisbanes', module: 'image-decoder'
+    exclude group: 'com.github.tachiyomiorg', module: 'image-decoder'
 }
