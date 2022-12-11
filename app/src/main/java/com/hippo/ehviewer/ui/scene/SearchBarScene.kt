@@ -53,7 +53,7 @@ abstract class SearchBarScene : ToolbarScene() {
             (mToolbar as SearchBar).text = mSearchView!!.text
             mSearchView?.hide()
             onApplySearch()
-            false
+            true
         }
         mSuggestionList = ArrayList()
         mSuggestionAdapter = SuggestionAdapter(LayoutInflater.from(context))
@@ -220,7 +220,7 @@ abstract class SearchBarScene : ToolbarScene() {
 
     }
 
-    inner class TagSuggestion constructor(var mHint: String, var mKeyword: String) : Suggestion() {
+    inner class TagSuggestion constructor(private var mHint: String, private var mKeyword: String) : Suggestion() {
 
         override fun getText(textView: TextView): CharSequence {
             return if (textView.id == android.R.id.text1) {
