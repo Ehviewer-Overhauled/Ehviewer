@@ -196,10 +196,15 @@ dependencies {
     implementation 'io.coil-kt:coil:2.2.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jsoup:jsoup:1.15.3'
+
+    // Tachiyomi Reader
+    implementation 'com.github.tachiyomiorg:subsampling-scale-image-view:846abe0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 }
 
 configurations.all {
     exclude group: 'dev.rikka.rikkax.appcompat', module: 'appcompat'
     exclude group: 'dev.rikka.rikkax.material', module: 'material'
     exclude group: 'androidx.compose.material'
+    exclude group: 'com.github.chrisbanes', module: 'image-decoder'
 }
