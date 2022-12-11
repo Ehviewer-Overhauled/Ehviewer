@@ -44,6 +44,7 @@ public class LocalFavoriteInfo extends GalleryInfo {
     }
 
     public LocalFavoriteInfo() {
+        this.favoriteSlot = -1;
     }
 
     public long getGid() {
