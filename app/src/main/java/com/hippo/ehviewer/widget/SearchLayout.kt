@@ -28,7 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.IntDef
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -97,7 +96,7 @@ class SearchLayout @JvmOverloads constructor(
         val mCategoryStored = mSharePref.getInt(SEARCH_CATEGORY_PREF, EhConfig.ALL_CATEGORY)
         mCategoryGroup = mNormalView.findViewById(R.id.search_category_chipgroup)
         for (mPair in mCategoryTable) {
-            val mChip = IdentifiedChip(context)
+            val mChip = inflate(context, R.layout.filter_chip, null) as IdentifiedChip
             mChip.isCheckable = true
             mChip.setText(mPair.second)
             mChip.idt = mPair.first
@@ -328,17 +327,6 @@ class SearchLayout @JvmOverloads constructor(
         }
     }
 
-    inner class IdentifiedChip @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null
-    ) : Chip(
-        ContextThemeWrapper(
-            context,
-            com.google.android.material.R.style.Widget_Material3_Chip_Filter
-        ), attrs
-    ) {
-        var idt = 0
-    }
-
     companion object {
         const val SEARCH_MODE_NORMAL = 0
         const val SEARCH_MODE_IMAGE = 1
@@ -368,4 +356,12 @@ class SearchLayout @JvmOverloads constructor(
             )
         )
     }
+}
+
+class IdentifiedChip @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : Chip(
+    context, attrs
+) {
+    var idt = 0
 }
