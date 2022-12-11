@@ -61,7 +61,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
             new Thread(new DecodeTask())
     };
     private Thread archiveThread;
-    private volatile int size = STATE_WAIT;
+    private volatile int size = com.hippo.gallery.GalleryProvider.STATE_WAIT;
     private String error;
 
     public ArchiveGalleryProvider(Context context, Uri uri) {
@@ -217,7 +217,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                 size = 0;
             }
             if (size <= 0) {
-                size = STATE_ERROR;
+                size = com.hippo.gallery.GalleryProvider.STATE_ERROR;
                 error = GetText.getString(R.string.error_reading_failed);
                 notifyDataChanged();
                 return;

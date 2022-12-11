@@ -63,7 +63,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
     private final AtomicReference<UniFile[]> mFileList = new AtomicReference<>();
     @Nullable
     private Thread mBgThread;
-    private volatile int mSize = STATE_WAIT;
+    private volatile int mSize = com.hippo.gallery.GalleryProvider.STATE_WAIT;
     private String mError;
 
     public DirGalleryProvider(@NonNull UniFile dir) {
@@ -212,7 +212,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
         UniFile[] files = mDir.listFiles(imageFilter);
 
         if (files == null) {
-            mSize = STATE_ERROR;
+            mSize = com.hippo.gallery.GalleryProvider.STATE_ERROR;
             mError = GetText.getString(R.string.error_not_folder_path);
 
             // Notify to to show error

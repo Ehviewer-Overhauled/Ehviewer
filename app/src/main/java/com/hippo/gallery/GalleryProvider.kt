@@ -14,171 +14,160 @@
  * limitations under the License.
  */
 
-package com.hippo.gallery;
+package com.hippo.gallery
 
-import android.graphics.drawable.Drawable;
-import android.util.LruCache;
+import android.graphics.drawable.Drawable
+import android.util.LruCache
+import androidx.annotation.IntDef
+import androidx.annotation.UiThread
+import com.hippo.image.Image
+import com.hippo.yorozuya.ConcurrentPool
+import com.hippo.yorozuya.OSUtils
 
-import androidx.annotation.IntDef;
-import androidx.annotation.UiThread;
-
-import com.hippo.image.Image;
-import com.hippo.yorozuya.ConcurrentPool;
-import com.hippo.yorozuya.OSUtils;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-public abstract class GalleryProvider {
-
-    public static final int STATE_WAIT = -1;
-    public static final int STATE_ERROR = -2;
-
-    private final ConcurrentPool<NotifyTask> mNotifyTaskPool = new ConcurrentPool<>(5);
-    private final ImageCache mImageCache = new ImageCache();
-    private volatile Listener mListener;
-    private boolean mStarted = false;
+abstract class GalleryProvider {
+    private val mNotifyTaskPool = ConcurrentPool<NotifyTask>(5)
+    private val mImageCache = ImageCache()
+    @Volatile
+    private var mListener: Listener? = null
+    private var mStarted = false
+    abstract val error: String
 
     @UiThread
-    public void start() {
-        OSUtils.checkMainLoop();
-
-        if (mStarted) {
-            throw new IllegalStateException("Can't start it twice");
-        }
-        mStarted = true;
+    open fun start() {
+        OSUtils.checkMainLoop()
+        check(!mStarted) { "Can't start it twice" }
+        mStarted = true
     }
 
     @UiThread
-    public void stop() {
-        OSUtils.checkMainLoop();
-        mImageCache.evictAll();
+    open fun stop() {
+        OSUtils.checkMainLoop()
+        mImageCache.evictAll()
     }
 
-    public abstract int size();
+    abstract fun size(): Int
 
-    public final void request(int index) {}
+    fun request(index: Int) {}
 
-    public final void forceRequest(int index) {
-        onForceRequest(index);
+    fun forceRequest(index: Int) {
+        onForceRequest(index)
     }
 
-    public void removeCache(int index) {
-        mImageCache.remove(index);
+    fun removeCache(index: Int) {
+        mImageCache.remove(index)
     }
 
-    protected abstract void onRequest(int index);
+    protected abstract fun onRequest(index: Int)
 
-    protected abstract void onForceRequest(int index);
+    protected abstract fun onForceRequest(index: Int)
 
-    public final void cancelRequest(int index) {
-        onCancelRequest(index);
+    fun cancelRequest(index: Int) {
+        onCancelRequest(index)
     }
 
-    protected abstract void onCancelRequest(int index);
+    protected abstract fun onCancelRequest(index: Int)
 
-    public abstract String getError();
-
-    public void setListener(Listener listener) {
-        mListener = listener;
+    fun setListener(listener: Listener) {
+        mListener = listener
     }
 
-    public void notifyDataChanged() {
-        notify(NotifyTask.TYPE_DATA_CHANGED, -1, 0.0f, null, null);
+    fun notifyDataChanged() {
+        notify(NotifyTask.TYPE_DATA_CHANGED, -1, 0.0f, null, null)
     }
 
-    public void notifyDataChanged(int index) {
-        notify(NotifyTask.TYPE_DATA_CHANGED, index, 0.0f, null, null);
+    fun notifyDataChanged(index: Int) {
+        notify(NotifyTask.TYPE_DATA_CHANGED, index, 0.0f, null, null)
     }
 
-    public void notifyPageWait(int index) {
-        notify(NotifyTask.TYPE_WAIT, index, 0.0f, null, null);
+    fun notifyPageWait(index: Int) {
+        notify(NotifyTask.TYPE_WAIT, index, 0.0f, null, null)
     }
 
-    public void notifyPagePercent(int index, float percent) {
-        notify(NotifyTask.TYPE_PERCENT, index, percent, null, null);
+    fun notifyPagePercent(index: Int, percent: Float) {
+        notify(NotifyTask.TYPE_PERCENT, index, percent, null, null)
     }
 
-    public void notifyPageSucceed(int index, Image image) {}
-
-    public void notifyPageSucceed(int index, Drawable image) {
-        notify(NotifyTask.TYPE_SUCCEED, index, 0.0f, image, null);
+    fun notifyPageSucceed(index: Int, image: Image) {
+        mImageCache.put(index, image)
+        notify(NotifyTask.TYPE_SUCCEED, index, 0.0f, image, null)
     }
 
-    public void notifyPageFailed(int index, String error) {
-        notify(NotifyTask.TYPE_FAILED, index, 0.0f, null, error);
+    fun notifyPageFailed(index: Int, error: String) {
+        notify(NotifyTask.TYPE_FAILED, index, 0.0f, null, error)
     }
 
-    private void notify(@NotifyTask.Type int type, int index, float percent, Drawable image, String error) {
-        Listener listener = mListener;
-        if (listener == null) {
-            return;
-        }
+    private fun notify(
+        @NotifyTask.Type type: Int,
+        index: Int,
+        percent: Float,
+        image: Image?,
+        error: String?
+    ) {
+        val listener = mListener ?: return
     }
 
-    public interface Listener {
+    interface Listener {
 
-        void onDataChanged();
+        fun onDataChanged()
 
-        void onPageWait(int index);
+        fun onPageWait(index: Int)
 
-        void onPagePercent(int index, float percent);
+        fun onPagePercent(index: Int, percent: Float)
 
-        void onPageSucceed(int index, Drawable image);
+        fun onPageSucceed(index: Int, image: Drawable)
 
-        void onPageFailed(int index, String error);
+        fun onPageFailed(index: Int, error: String)
 
-        void onDataChanged(int index);
+        fun onDataChanged(index: Int)
     }
 
-    private static class NotifyTask {
-
-        public static final int TYPE_DATA_CHANGED = 0;
-        public static final int TYPE_WAIT = 1;
-        public static final int TYPE_PERCENT = 2;
-        public static final int TYPE_SUCCEED = 3;
-        public static final int TYPE_FAILED = 4;
-        private final Listener mListener;
-        private final ConcurrentPool<NotifyTask> mPool;
+    private class NotifyTask(
+        private val mListener: Listener,
+        private val mPool: ConcurrentPool<NotifyTask>
+    ) {
         @Type
-        private int mType;
-        private int mIndex;
-        private float mPercent;
-        private Drawable mImage;
-        private String mError;
+        private var mType: Int = 0
+        private var mIndex: Int = 0
+        private var mPercent: Float = 0.toFloat()
+        private var mImage: Drawable? = null
+        private var mError: String? = null
 
-        public NotifyTask(Listener listener, ConcurrentPool<NotifyTask> pool) {
-            mListener = listener;
-            mPool = pool;
+        fun setData(@Type type: Int, index: Int, percent: Float, image: Drawable, error: String) {
+            mType = type
+            mIndex = index
+            mPercent = percent
+            mImage = image
+            mError = error
         }
 
-        public void setData(@Type int type, int index, float percent, Drawable image, String error) {
-            mType = type;
-            mIndex = index;
-            mPercent = percent;
-            mImage = image;
-            mError = error;
-        }
-
-        @IntDef({TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface Type {
+        @IntDef(TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Type
+        companion object {
+            const val TYPE_DATA_CHANGED = 0
+            const val TYPE_WAIT = 1
+            const val TYPE_PERCENT = 2
+            const val TYPE_SUCCEED = 3
+            const val TYPE_FAILED = 4
         }
     }
 
-    private static class ImageCache extends LruCache<Integer, Drawable> {
-        private static final int CACHE_SIZE = 512 * 1024 * 1024;
-
-        public ImageCache() {
-            super(CACHE_SIZE);
+    private class ImageCache : LruCache<Int, Image>(CACHE_SIZE) {
+        override fun sizeOf(key: Int?, value: Image): Int {
+            return value.height * value.width * 4
         }
 
-        public void add(Integer key, Drawable value) {}
+        override fun entryRemoved(evicted: Boolean, key: Int?, oldValue: Image?, newValue: Image?) {
+            oldValue?.recycle()
+        }
 
-        @Override
-        protected int sizeOf(Integer key, Drawable value) { return Integer.MAX_VALUE; }
+        companion object {
+            private const val CACHE_SIZE = 512 * 1024 * 1024
+        }
+    }
 
-        @Override
-        protected void entryRemoved(boolean evicted, Integer key, Drawable oldValue, Drawable newValue) {}
+    companion object {
+        const val STATE_WAIT = -1
+        const val STATE_ERROR = -2
     }
 }

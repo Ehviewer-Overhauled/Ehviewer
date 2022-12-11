@@ -102,7 +102,7 @@
         </activity>
 
         <activity
-            android:name="com.hippo.ehviewer.eu.kanade.tachiyomi.ui.reader.ReaderActivity"
+            android:name="eu.kanade.tachiyomi.ui.reader.ReaderActivity"
             android:configChanges="screenSize"
             android:exported="true"
             android:launchMode="singleTask">
