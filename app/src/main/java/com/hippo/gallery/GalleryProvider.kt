@@ -67,7 +67,7 @@ abstract class GalleryProvider {
 
     protected abstract fun onCancelRequest(index: Int)
 
-    fun setListener(listener: Listener) {
+    fun setListener(listener: Listener?) {
         mListener = listener
     }
 
