@@ -234,7 +234,7 @@ public class EhDB {
 
     public static synchronized List<GalleryInfo> searchLocalFavorites(String query) {
         LocalFavoritesDao dao = db.localFavoritesDao();
-        List<LocalFavoriteInfo> list = dao.list();
+        List<LocalFavoriteInfo> list = dao.list("%" + query + "%");
         return new ArrayList<>(list);
     }
 
@@ -293,11 +293,6 @@ public class EhDB {
         }
     }
 
-    public static synchronized void updateQuickSearch(QuickSearch quickSearch) {
-        QuickSearchDao dao = db.quickSearchDao();
-        dao.update(quickSearch);
-    }
-
     public static synchronized void deleteQuickSearch(QuickSearch quickSearch) {
         QuickSearchDao dao = db.quickSearchDao();
         dao.delete(quickSearch);
@@ -325,10 +320,6 @@ public class EhDB {
         list.get(start).setTime(toTime);
 
         dao.update(list);
-    }
-
-    public static synchronized List<HistoryInfo> getHistoryList() {
-        return db.historyDao().list();
     }
 
     public static synchronized PagingSource<Integer, HistoryInfo> getHistoryLazyList() {
