@@ -45,7 +45,7 @@ import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.HistoryInfo
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
-import com.hippo.ehviewer.ui.GalleryActivity
+import com.hippo.ehviewer.ui.ReaderActivity
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.SimpleRatingView
 import com.hippo.scene.Announcer
@@ -267,9 +267,9 @@ class HistoryScene : ToolbarScene() {
             ) { _: DialogInterface?, which: Int ->
                 when (which) {
                     0 -> {
-                        val intent = Intent(activity, GalleryActivity::class.java)
-                        intent.action = GalleryActivity.ACTION_EH
-                        intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, gi)
+                        val intent = Intent(activity, ReaderActivity::class.java)
+                        intent.action = ReaderActivity.ACTION_EH
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
                         startActivity(intent)
                     }
 

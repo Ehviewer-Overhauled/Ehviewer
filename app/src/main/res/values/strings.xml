@@ -696,4 +696,15 @@
     <string name="passwd_cannot_be_empty">Password can\'t be empty</string>
     <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
     <string name="account_name">Account</string>
+
+    <!-- Tachiyomi Reader-->
+    <string name="action_settings">Settings</string>
+    <string name="pref_rotation_type">Default rotation type</string>
+    <string name="pref_crop_borders">Crop borders</string>
+    <string name="viewer">Reading mode</string>
+    <string name="action_menu">Menu</string>
+    <string name="nav_zone_prev">Prev</string>
+    <string name="nav_zone_next">Next</string>
+    <string name="nav_zone_left">Left</string>
+    <string name="nav_zone_right">Right</string>
 </resources>
