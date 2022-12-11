@@ -520,6 +520,15 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         if (mGLRootView != null) {
             mGLRootView.onPause();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mGLRootView != null) {
+            mGLRootView.onResume();
+        }
     }    ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -530,15 +539,6 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 }
                 mSavingPage = -1;
             });
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (mGLRootView != null) {
-            mGLRootView.onResume();
-        }
-    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {

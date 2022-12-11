@@ -267,11 +267,6 @@ public final class GalleryListScene extends SearchBarScene
         }
     }
 
-    @Override
-    public int getMenuResId() {
-        return R.menu.scene_gallery_list_searchbar_menu;
-    }
-
     public static void startScene(SceneFragment scene, ListUrlBuilder lub) {
         scene.startScene(getStartAnnouncer(lub));
     }
@@ -281,6 +276,11 @@ public final class GalleryListScene extends SearchBarScene
         args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER);
         args.putParcelable(KEY_LIST_URL_BUILDER, lub);
         return new Announcer(GalleryListScene.class).setArgs(args);
+    }
+
+    @Override
+    public int getMenuResId() {
+        return R.menu.scene_gallery_list_searchbar_menu;
     }
 
     @Override
@@ -558,7 +558,7 @@ public final class GalleryListScene extends SearchBarScene
                 mFabLayout,
                 (View) mSearchFab.getParent()
         ));
-        ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
         container.addView(mFabLayout);
 
         int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
@@ -601,7 +601,7 @@ public final class GalleryListScene extends SearchBarScene
         int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
         mActionFabDrawable = new AddDeleteDrawable(context, colorID);
         mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
-        mSearchFab.setOnClickListener( (v) -> {
+        mSearchFab.setOnClickListener((v) -> {
             if (STATE_NORMAL != mState) {
                 onApplySearch();
                 hideSoftInput();
@@ -640,7 +640,7 @@ public final class GalleryListScene extends SearchBarScene
             mRecyclerView = null;
         }
         if (null != mFabLayout) {
-            ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+            ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
             removeAboveSnackView(mFabLayout);
             mFabLayout = null;
         }

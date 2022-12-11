@@ -16,7 +16,6 @@
 
 package com.hippo.glview.image;
 
-import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.Log;
 

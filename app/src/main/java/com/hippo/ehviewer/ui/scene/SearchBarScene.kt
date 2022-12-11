@@ -41,7 +41,8 @@ abstract class SearchBarScene : ToolbarScene() {
             inflater.inflate(R.layout.scene_searchbar, container, false) as ViewGroup
         mToolbar = view.findViewById(R.id.toolbar)
         mAppBarLayout = view.findViewById(R.id.appbar)
-        mAppBarLayout?.statusBarForeground = MaterialShapeDrawable.createWithElevationOverlay(context)
+        mAppBarLayout?.statusBarForeground =
+            MaterialShapeDrawable.createWithElevationOverlay(context)
 
         mSearchView = view.findViewById(R.id.searchview)
         mRecyclerView = view.findViewById(R.id.search_bar_list)

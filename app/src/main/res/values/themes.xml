@@ -60,16 +60,22 @@
     <!-- Apply blur on Android 12 above -->
     <style name="BottomSheetDialogTheme" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
-        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">
+            20px
+        </item>
     </style>
 
     <style name="MaterialAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
-        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">
+            20px
+        </item>
     </style>
 
     <style name="MaterialCalendarTheme" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
-        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">20px</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">
+            20px
+        </item>
     </style>
 </resources>

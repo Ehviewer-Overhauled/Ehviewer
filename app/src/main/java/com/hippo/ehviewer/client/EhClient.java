@@ -55,9 +55,8 @@ public class EhClient {
     public static final int METHOD_DOWNLOAD_ARCHIVE = 18;
     public static final int METHOD_VOTE_TAG = 19;
     public static final int METHOD_GET_UCONFIG = 20;
-
-    private final ThreadPoolExecutor mRequestThreadPool;
     private static final OkHttpClient mOkHttpClient = EhApplication.getOkHttpClient();
+    private final ThreadPoolExecutor mRequestThreadPool;
 
     public EhClient() {
         mRequestThreadPool = IoThreadPoolExecutor.getInstance();

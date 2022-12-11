@@ -18,12 +18,12 @@
     android:id="@+id/card"
     style="@style/Widget.Material3.CardView.Filled"
     android:layout_width="match_parent"
-    app:cardBackgroundColor="@android:color/transparent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     android:checkable="true"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    app:cardBackgroundColor="@android:color/transparent">
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -119,6 +119,10 @@ public class TextClock extends AppCompatTextView {
 
         chooseFormat();
         onTimeChanged();
+    }
+
+    public boolean is24HourModeEnabled() {
+        return DateFormat.is24HourFormat(getContext());
     }    private final Runnable mTicker = new Runnable() {
         @Override
         public void run() {
@@ -130,10 +134,6 @@ public class TextClock extends AppCompatTextView {
             getHandler().postAtTime(mTicker, next);
         }
     };
-
-    public boolean is24HourModeEnabled() {
-        return DateFormat.is24HourFormat(getContext());
-    }
 
     public String getTimeZone() {
         return mTimeZone;
@@ -236,6 +236,16 @@ public class TextClock extends AppCompatTextView {
 
     private void unregisterReceiver() {
         getContext().unregisterReceiver(mIntentReceiver);
+    }
+
+    private void unregisterObserver() {
+        final ContentResolver resolver = getContext().getContentResolver();
+        resolver.unregisterContentObserver(mFormatChangeObserver);
+    }
+
+    private void onTimeChanged() {
+        mTime.setTimeInMillis(System.currentTimeMillis());
+        setText(DateFormat.format(mFormat, mTime));
     }    private final ContentObserver mFormatChangeObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -249,16 +259,6 @@ public class TextClock extends AppCompatTextView {
             onTimeChanged();
         }
     };
-
-    private void unregisterObserver() {
-        final ContentResolver resolver = getContext().getContentResolver();
-        resolver.unregisterContentObserver(mFormatChangeObserver);
-    }
-
-    private void onTimeChanged() {
-        mTime.setTimeInMillis(System.currentTimeMillis());
-        setText(DateFormat.format(mFormat, mTime));
-    }
 
 
 

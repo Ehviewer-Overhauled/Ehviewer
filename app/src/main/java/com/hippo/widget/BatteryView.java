@@ -118,6 +118,12 @@ public class BatteryView extends AppCompatTextView {
             stopCharger();
             mAttached = false;
         }
+    }
+
+    private void registerReceiver() {
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
     }    private final Runnable mCharger = new Runnable() {
 
         private int level = 0;
@@ -132,12 +138,6 @@ public class BatteryView extends AppCompatTextView {
             getHandler().postDelayed(mCharger, 200);
         }
     };
-
-    private void registerReceiver() {
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-    }
 
     private void unregisterReceiver() {
         getContext().unregisterReceiver(mIntentReceiver);

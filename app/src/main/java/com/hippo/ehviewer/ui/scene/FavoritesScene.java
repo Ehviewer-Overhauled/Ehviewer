@@ -232,7 +232,7 @@ public class FavoritesScene extends SearchBarScene implements
     @NonNull
     @Override
     public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_favorites, container, false);
         ContentLayout mContentLayout = view.findViewById(R.id.content_layout);
         MainActivity activity = getMainActivity();
@@ -245,7 +245,7 @@ public class FavoritesScene extends SearchBarScene implements
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
-        ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+        ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
         AssertUtils.assertNotNull(container);
         container.addView(mFabLayout);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
@@ -365,7 +365,7 @@ public class FavoritesScene extends SearchBarScene implements
             mRecyclerView = null;
         }
         if (null != mFabLayout) {
-            ((ViewGroup)mFabLayout.getParent()).removeView(mFabLayout);
+            ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
             removeAboveSnackView(mFabLayout);
             mFabLayout = null;
         }

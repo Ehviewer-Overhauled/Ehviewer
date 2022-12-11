@@ -27,7 +27,6 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.hippo.ehviewer.client.EhConfig;
-import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
@@ -67,8 +66,6 @@ public class Settings {
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhConfig.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
-    private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
-    private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
     /********************
      ****** Privacy and Security
      ********************/
@@ -102,6 +99,8 @@ public class Settings {
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_APP_LANGUAGE = "app_language";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
+    private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
+    private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
     private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
     private static final boolean DEFAULT_SHOW_COMMENTS = true;
     private static final String KEY_PREVIEW_NUM = "preview_num";

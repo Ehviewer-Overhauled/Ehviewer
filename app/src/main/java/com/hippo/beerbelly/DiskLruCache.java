@@ -250,21 +250,7 @@ public final class DiskLruCache implements Closeable {
 
     private static String inputStreamToString(InputStream in) throws IOException {
         return Util.readFully(new InputStreamReader(in, Util.UTF_8));
-    }    private final Callable<Void> cleanupCallable = new Callable<>() {
-        public Void call() throws Exception {
-            synchronized (DiskLruCache.this) {
-                if (journalWriter == null) {
-                    return null; // Closed.
-                }
-                trimToSize();
-                if (journalRebuildRequired()) {
-                    rebuildJournal();
-                    redundantOpCount = 0;
-                }
-            }
-            return null;
-        }
-    };
+    }
 
     private void readJournal() throws IOException {
         StrictLineReader reader = new StrictLineReader(new FileInputStream(journalFile), Util.US_ASCII);
@@ -304,7 +290,21 @@ public final class DiskLruCache implements Closeable {
         } finally {
             Util.closeQuietly(reader);
         }
-    }
+    }    private final Callable<Void> cleanupCallable = new Callable<>() {
+        public Void call() throws Exception {
+            synchronized (DiskLruCache.this) {
+                if (journalWriter == null) {
+                    return null; // Closed.
+                }
+                trimToSize();
+                if (journalRebuildRequired()) {
+                    rebuildJournal();
+                    redundantOpCount = 0;
+                }
+            }
+            return null;
+        }
+    };
 
     private void readJournalLine(String line) throws IOException {
         int firstSpace = line.indexOf(' ');

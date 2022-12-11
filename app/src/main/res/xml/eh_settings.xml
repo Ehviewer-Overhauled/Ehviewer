@@ -98,10 +98,10 @@
         android:defaultValue="120"
         android:key="thumb_size_"
         android:max="400"
-        app:seekBarIncrement="80"
         android:title="@string/settings_eh_thumb_size"
         app:iconSpaceReserved="false"
         app:min="80"
+        app:seekBarIncrement="80"
         app:showSeekBarValue="true" />
 
     <rikka.preference.SimpleMenuPreference
@@ -151,8 +151,8 @@
         android:defaultValue="60"
         android:key="preview_num"
         android:max="200"
-        android:title="@string/settings_eh_preview_num"
         android:summary="@string/settings_eh_preview_num_summary"
+        android:title="@string/settings_eh_preview_num"
         app:iconSpaceReserved="false"
         app:min="10"
         app:showSeekBarValue="true"

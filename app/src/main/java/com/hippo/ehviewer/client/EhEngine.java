@@ -814,7 +814,7 @@ public class EhEngine {
     }
 
     public static Void getUConfig(@Nullable EhClient.Task task,
-                                                  OkHttpClient okHttpClient) throws Throwable {
+                                  OkHttpClient okHttpClient) throws Throwable {
         String url = EhUrl.getUConfigUrl();
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, null).build();
