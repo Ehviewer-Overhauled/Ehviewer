@@ -19,6 +19,7 @@ package com.hippo.ehviewer.client.parser;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryComment;
 import com.hippo.ehviewer.client.data.GalleryCommentList;
@@ -67,6 +68,7 @@ public class GalleryDetailParser {
     private static final Pattern PATTERN_NORMAL_PREVIEW = Pattern.compile("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"");
     private static final Pattern PATTERN_LARGE_PREVIEW = Pattern.compile("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"");
     private static final Pattern PATTERN_NEWER_DATE = Pattern.compile(", added (.+?)<br />");
+    private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("/fav.png\\); background-position:0px -(\\d+)px");
 
     private static final GalleryTagGroup[] EMPTY_GALLERY_TAG_GROUP_ARRAY = new GalleryTagGroup[0];
     private static final GalleryCommentList EMPTY_GALLERY_COMMENT_ARRAY = new GalleryCommentList(new GalleryComment[0], false);
@@ -251,14 +253,23 @@ public class GalleryDetailParser {
 
             // isFavorited
             Element gdf = gm.getElementById("gdf");
-            gd.isFavorited = null != gdf && !StringUtils.trim(gdf.text()).equals("Add to Favorites");
+            gd.isFavorited = false;
             if (gdf != null) {
                 final String favoriteName = StringUtils.trim(gdf.text());
                 if (favoriteName.equals("Add to Favorites")) {
                     gd.favoriteName = null;
                 } else {
+                    gd.isFavorited = true;
                     gd.favoriteName = StringUtils.trim(gdf.text());
+
+                    matcher = PATTERN_FAVORITE_SLOT.matcher(body);
+                    if (matcher.find()) {
+                        gd.favoriteSlot = (NumberUtils.parseIntSafely(matcher.group(1), 2) - 2) / 19;
+                    }
                 }
+            }
+            if (gd.favoriteSlot == -2 && EhDB.containLocalFavorites(gd.gid)) {
+                gd.favoriteSlot = -1;
             }
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
