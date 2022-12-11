@@ -45,7 +45,7 @@ import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.HistoryInfo
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
-import com.hippo.ehviewer.ui.ReaderActivity
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.SimpleRatingView
 import com.hippo.scene.Announcer

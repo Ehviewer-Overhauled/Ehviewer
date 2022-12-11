@@ -29,7 +29,7 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import com.hippo.ehviewer.ui.ReaderActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
@@ -57,18 +57,18 @@ public final class UrlOpener {
                 if (result != null) {
                     if (result.gid == galleryDetail.gid) {
                         intent = new Intent(context, ReaderActivity.class);
-                        intent.setAction(ReaderActivity.Companion.getACTION_EH());
-                        intent.putExtra(ReaderActivity.Companion.getKEY_GALLERY_INFO(), galleryDetail);
-                        intent.putExtra(ReaderActivity.Companion.getKEY_PAGE(), result.page);
+                        intent.setAction(ReaderActivity.ACTION_EH);
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail);
+                        intent.putExtra(ReaderActivity.KEY_PAGE, result.page);
                         context.startActivity(intent);
                         return;
                     }
                 } else if (url.startsWith("#c")) {
                     try {
                         intent = new Intent(context, ReaderActivity.class);
-                        intent.setAction(ReaderActivity.Companion.getACTION_EH());
-                        intent.putExtra(ReaderActivity.Companion.getKEY_GALLERY_INFO(), galleryDetail);
-                        intent.putExtra(ReaderActivity.Companion.getKEY_PAGE(), Integer.parseInt(url.replace("#c", "")) - 1);
+                        intent.setAction(ReaderActivity.ACTION_EH);
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail);
+                        intent.putExtra(ReaderActivity.KEY_PAGE, Integer.parseInt(url.replace("#c", "")) - 1);
                         context.startActivity(intent);
                         return;
                     } catch (NumberFormatException e) {

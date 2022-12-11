@@ -93,7 +93,7 @@ import com.hippo.ehviewer.gallery.EhGalleryProvider;
 import com.hippo.ehviewer.gallery.GalleryProvider2;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.ReaderActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
@@ -867,9 +867,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             Snackbar.make(requireActivity().findViewById(R.id.snackbar), getString(R.string.read_from, mPage), Snackbar.LENGTH_LONG)
                     .setAction(R.string.read, v -> {
                         Intent intent = new Intent(requireContext(), ReaderActivity.class);
-                        intent.setAction(ReaderActivity.Companion.getACTION_EH());
-                        intent.putExtra(ReaderActivity.Companion.getKEY_GALLERY_INFO(), mGalleryDetail);
-                        intent.putExtra(ReaderActivity.Companion.getKEY_PAGE(), mPage);
+                        intent.setAction(ReaderActivity.ACTION_EH);
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryDetail);
+                        intent.putExtra(ReaderActivity.KEY_PAGE, mPage);
                         startActivity(intent);
                     })
                     .show();
@@ -1165,8 +1165,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
             if (galleryInfo != null) {
                 Intent intent = new Intent(activity, ReaderActivity.class);
-                intent.setAction(ReaderActivity.Companion.getACTION_EH());
-                intent.putExtra(ReaderActivity.Companion.getKEY_GALLERY_INFO(), galleryInfo);
+                intent.setAction(ReaderActivity.ACTION_EH);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
                 startActivity(intent);
             }
         } else if (mNewerVersion == v) {
@@ -1299,9 +1299,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             if (null != galleryInfo && o instanceof Integer) {
                 int index = (Integer) o;
                 Intent intent = new Intent(context, ReaderActivity.class);
-                intent.setAction(ReaderActivity.Companion.getACTION_EH());
-                intent.putExtra(ReaderActivity.Companion.getKEY_GALLERY_INFO(), galleryInfo);
-                intent.putExtra(ReaderActivity.Companion.getKEY_PAGE(), index);
+                intent.setAction(ReaderActivity.ACTION_EH);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
+                intent.putExtra(ReaderActivity.KEY_PAGE, index);
                 startActivity(intent);
             }
         }

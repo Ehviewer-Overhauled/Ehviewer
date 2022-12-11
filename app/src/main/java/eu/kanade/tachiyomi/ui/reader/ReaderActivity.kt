@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hippo.ehviewer.ui
+package eu.kanade.tachiyomi.ui.reader
 
 import android.Manifest
 import android.app.assist.AssistContent
@@ -31,22 +31,18 @@ import android.os.Handler
 import android.os.Message
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.view.WindowManager
 import android.webkit.MimeTypeMap
 import android.widget.Toast
-
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-
-import com.hippo.app.BaseDialogBuilder
+import androidx.lifecycle.lifecycleScope
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.ReaderActivityBinding
@@ -54,12 +50,14 @@ import com.hippo.ehviewer.gallery.ArchiveGalleryProvider
 import com.hippo.ehviewer.gallery.DirGalleryProvider
 import com.hippo.ehviewer.gallery.EhGalleryProvider
 import com.hippo.ehviewer.gallery.GalleryProvider2
+import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
-import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -82,35 +80,32 @@ class ReaderActivity : EhActivity() {
             val filepath =
                 AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
             val cachefile = File(filepath)
-
             val resolver = contentResolver
-
-            IoThreadPoolExecutor.getInstance().execute {
-                var `is`: InputStream? = null
-                var os: OutputStream? = null
-                try {
-                    `is` = FileInputStream(cachefile)
-                    os = resolver.openOutputStream(uri)
-                    IOUtils.copy(`is`, os)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } finally {
-                    IOUtils.closeQuietly(`is`)
-                    IOUtils.closeQuietly(os)
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@ReaderActivity,
-                            getString(R.string.image_saved, uri.path),
-                            Toast.LENGTH_SHORT
-                        ).show()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    var `is`: InputStream? = null
+                    var os: OutputStream? = null
+                    try {
+                        `is` = FileInputStream(cachefile)
+                        os = resolver.openOutputStream(uri)
+                        IOUtils.copy(`is`, os)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    } finally {
+                        IOUtils.closeQuietly(`is`)
+                        IOUtils.closeQuietly(os)
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@ReaderActivity,
+                                getString(R.string.image_saved, uri.path),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
+                    cachefile.delete()
                 }
-
-                cachefile.delete()
             }
         }
-
-
     }
     private var mGalleryProvider: GalleryProvider2? = null
     private var mSize: Int = 0
@@ -175,7 +170,6 @@ class ReaderActivity : EhActivity() {
 
     private fun onInit() {
         val intent = intent ?: return
-
         mAction = intent.action
         mFilename = intent.getStringExtra(KEY_FILENAME)
         mUri = intent.data
@@ -213,31 +207,25 @@ class ReaderActivity : EhActivity() {
         } else {
             onRestore(savedInstanceState)
         }
-
         binding = ReaderActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         builder = EditTextDialogBuilder(this, null, getString(R.string.archive_passwd))
         builder!!.setTitle(getString(R.string.archive_need_passwd))
         builder!!.setPositiveButton(getString(android.R.string.ok), null)
         dialog = builder!!.create()
         dialog!!.setCanceledOnTouchOutside(false)
-
         if (mGalleryProvider == null) {
             finish()
             return
         }
-
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
-
         mGalleryProvider!!.start()
 
         // Get start page
-        val startPage: Int
-        if (savedInstanceState == null) {
-            startPage = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
+        val startPage: Int = if (savedInstanceState == null) {
+            if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         } else {
-            startPage = mCurrentIndex
+            mCurrentIndex
         }
 
         mSize = mGalleryProvider!!.size()
@@ -458,55 +446,6 @@ class ReaderActivity : EhActivity() {
 
     }
 
-    private fun showPageDialog(page: Int) {
-        val resources = this@ReaderActivity.resources
-        val builder = BaseDialogBuilder(this@ReaderActivity)
-        builder.setTitle(resources.getString(R.string.page_menu_title, page + 1))
-
-        val items: Array<CharSequence>
-        items = arrayOf(
-            getString(R.string.page_menu_refresh),
-            getString(R.string.page_menu_share),
-            getString(android.R.string.copy),
-            getString(R.string.page_menu_save),
-            getString(R.string.page_menu_save_to)
-        )
-        pageDialogListener(builder, items, page)
-        builder.show()
-    }
-
-    private fun pageDialogListener(
-        builder: AlertDialog.Builder,
-        items: Array<CharSequence>,
-        page: Int
-    ) {
-        builder.setItems(items) { dialog, which ->
-            if (mGalleryProvider == null) {
-                return@setItems
-            }
-
-            when (which) {
-                0 // Refresh
-                -> {
-                    mGalleryProvider!!.removeCache(page)
-                    mGalleryProvider!!.forceRequest(page)
-                }
-
-                1 // Share
-                -> shareImage(page)
-
-                2 // Copy
-                -> copyImage(page)
-
-                3 // Save
-                -> saveImage(page)
-
-                4 // Save to
-                -> saveImageTo(page)
-            }
-        }
-    }
-
     override fun onProvideAssistContent(outContent: AssistContent) {
         super.onProvideAssistContent(outContent)
 
@@ -567,13 +506,13 @@ class ReaderActivity : EhActivity() {
     }
 
     companion object {
-        val ACTION_DIR = "dir"
-        val ACTION_EH = "eh"
-        val KEY_ACTION = "action"
-        val KEY_FILENAME = "filename"
-        val KEY_URI = "uri"
-        val KEY_GALLERY_INFO = "gallery_info"
-        val KEY_PAGE = "page"
-        val KEY_CURRENT_INDEX = "current_index"
+        const val ACTION_DIR = "dir"
+        const val ACTION_EH = "eh"
+        const val KEY_ACTION = "action"
+        const val KEY_FILENAME = "filename"
+        const val KEY_URI = "uri"
+        const val KEY_GALLERY_INFO = "gallery_info"
+        const val KEY_PAGE = "page"
+        const val KEY_CURRENT_INDEX = "current_index"
     }
 }
