@@ -52,10 +52,14 @@ import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.scene.SceneApplication
 import com.hippo.util.BitmapUtils
 import com.hippo.util.ExceptionUtils
-import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -81,6 +85,7 @@ class EhApplication : SceneApplication() {
         mActivityList.forEach { it.recreate() }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("StaticFieldLeak")
     override fun onCreate() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(EhlifecycleObserver())
@@ -112,33 +117,37 @@ class EhApplication : SceneApplication() {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Settings.getLocale()))
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
 
-        IoThreadPoolExecutor.getInstance().execute {
-            try {
-                val downloadLocation = Settings.getDownloadLocation()
-                if (Settings.getMediaScan()) {
-                    CommonOperations.removeNoMediaFile(downloadLocation)
-                } else {
-                    CommonOperations.ensureNoMediaFile(downloadLocation)
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val downloadLocation = Settings.getDownloadLocation()
+                    if (Settings.getMediaScan()) {
+                        CommonOperations.removeNoMediaFile(downloadLocation)
+                    } else {
+                        CommonOperations.ensureNoMediaFile(downloadLocation)
+                    }
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    ExceptionUtils.throwIfFatal(t)
                 }
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                ExceptionUtils.throwIfFatal(t)
-            }
 
-            // Clear temp files
-            try {
-                clearTempDir()
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                ExceptionUtils.throwIfFatal(t)
+                // Clear temp files
+                try {
+                    clearTempDir()
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    ExceptionUtils.throwIfFatal(t)
+                }
             }
+        }
+        GlobalScope.launch {
+            theDawnOfNewDay()
         }
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
         initialized = true
-        theDawnOfNewDay()
     }
 
-    private fun theDawnOfNewDay() {
+    private suspend fun theDawnOfNewDay() {
         if (!Settings.getRequestNews()) {
             return
         }
@@ -150,7 +159,7 @@ class EhApplication : SceneApplication() {
                 EhCookieStore.KEY_IPD_PASS_HASH
             )
         ) {
-            IoThreadPoolExecutor.getInstance().execute {
+            withContext(Dispatchers.IO) {
                 val referer = EhUrl.REFERER_E
                 val request = EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build()
                 val call = okHttpClient.newCall(request)
