@@ -35,6 +35,7 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.math.max
+import kotlin.math.min
 
 class Image private constructor(
     source: Source?, drawable: Drawable? = null,
@@ -55,7 +56,7 @@ class Image private constructor(
 
                     decoder.setTargetSampleSize(
                         max(
-                            max(
+                            min(
                                 info.size.width / (2 * screenWidth),
                                 info.size.height / (2 * screenHeight)
                             ), 1
