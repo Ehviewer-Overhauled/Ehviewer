@@ -21,7 +21,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -76,11 +75,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
     @Nullable
     private GalleryInfo mGalleryInfo;
 
-    /*---------------
-     View life cycle
-     ---------------*/
-    @Nullable
-    private ContentLayout mContentLayout;
     @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
@@ -132,11 +126,11 @@ public class GalleryPreviewsScene extends ToolbarScene {
         outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateViewWithToolbar(LayoutInflater inflater,
                                         @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mContentLayout = (ContentLayout) inflater.inflate(
+        ContentLayout mContentLayout = (ContentLayout) inflater.inflate(
                 R.layout.scene_gallery_previews, container, false);
         mContentLayout.hideFastScroll();
         mRecyclerView = mContentLayout.getRecyclerView();
@@ -144,7 +138,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        Resources resources = context.getResources();
 
         mAdapter = new GalleryPreviewAdapter();
         mRecyclerView.setAdapter(mAdapter);
@@ -191,12 +184,14 @@ public class GalleryPreviewsScene extends ToolbarScene {
         super.onViewCreated(view, savedInstanceState);
         setTitle(R.string.gallery_previews);
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
-        if (((GalleryDetail) mGalleryInfo).previewPages > 2)
-            showMenu(R.menu.scene_gallery_previews);
+        if (mGalleryInfo != null) {
+            if (((GalleryDetail) mGalleryInfo).previewPages > 2)
+                showMenu(R.menu.scene_gallery_previews);
+        }
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onMenuItemClick(@NonNull MenuItem item) {
         Context context = getContext();
         if (null == context) {
             return false;
@@ -368,6 +363,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
             return GalleryPreviewsScene.this.getContext();
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         @Override
         protected void notifyDataSetChanged() {
             if (mAdapter != null) {
@@ -376,9 +372,9 @@ public class GalleryPreviewsScene extends ToolbarScene {
         }
 
         @Override
-        protected void notifyItemRangeRemoved(int positionStart, int itemCount) {
+        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
             if (mAdapter != null) {
-                mAdapter.notifyItemRangeRemoved(positionStart, itemCount);
+                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
             }
         }
 
@@ -386,13 +382,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
         protected void notifyItemRangeInserted(int positionStart, int itemCount) {
             if (mAdapter != null) {
                 mAdapter.notifyItemRangeInserted(positionStart, itemCount);
-            }
-        }
-
-        @Override
-        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
-            if (mAdapter != null) {
-                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
             }
         }
 
