@@ -54,7 +54,7 @@
     <string name="error_timeout">超时</string>
     <string name="error_unknown_host">未知主机</string>
     <string name="error_redirection">太多重定向</string>
-    <string name="error_socket">网络错误</string>
+    <string name="error_socket">网络错误\n\n尝试在 设置->高级 中关闭域名前置后重启应用</string>
     <string name="error_unknown">奇怪的错误</string>
     <string name="error_cant_find_activity">找不到相应的应用</string>
     <string name="error_cannot_parse_the_url">无法解析链接</string>
