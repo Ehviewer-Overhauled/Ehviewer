@@ -131,7 +131,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
             if (object instanceof Float) {
                 notifyPagePercent(index, (Float) object);
             } else if (object instanceof String) {
-                notifyPageFailed(index, (String) object);
+                notifyPageFailed(index);
             } else if (object == null) {
                 notifyPageWait(index);
             }
@@ -145,7 +145,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
             if (object instanceof Float) {
                 notifyPagePercent(index, (Float) object);
             } else if (object instanceof String) {
-                notifyPageFailed(index, (String) object);
+                notifyPageFailed(index);
             } else if (object == null) {
                 notifyPageWait(index);
             }
@@ -192,7 +192,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
 
     @Override
     public void onPageFailure(int index, String error, int finished, int downloaded, int total) {
-        notifyPageFailed(index, error);
+        notifyPageFailed(index);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
 
     @Override
     public void onGetImageFailure(int index, String error) {
-        notifyPageFailed(index, error);
+        notifyPageFailed(index);
     }
 
     private static class ReleaseTask implements Runnable {

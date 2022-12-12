@@ -9,10 +9,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.WebtoonLayoutManager
+import com.hippo.gallery.GalleryProvider
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
-import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
-import eu.kanade.tachiyomi.ui.reader.model.StencilPage
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.MainScope
@@ -138,27 +137,19 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      * activity of the change and requests the preload of the next chapter if this is the last page.
      */
     private fun onPageSelected(page: ReaderPage) {
-        val pages = page.chapter.pages ?: return
-        logcat { "onPageSelected: ${page.number}/${pages.size}" }
-        activity.onPageSelected(page)
-
-        // Skip preload on StencilPage
-        if (page is StencilPage) {
-            return
-        }
     }
 
     /**
      * Tells this viewer to set the given [chapter] as active.
      */
-    override fun setChapters(chapter: ReaderChapter) {
-        logcat { "setChapters" }
-        adapter.setChapters(chapter)
+    override fun setGalleryProvider(provider: GalleryProvider) {
+        adapter.setChapters(provider)
 
         if (recycler.isGone) {
             logcat { "Recycler first layout" }
-            val pages = chapter.pages ?: return
-            moveToPage(pages[min(chapter.requestedPage, pages.lastIndex)])
+            if (provider.size() <= 0)
+                return
+            moveToPage(0)
             recycler.isVisible = true
         }
     }
@@ -166,7 +157,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     /**
      * Tells this viewer to move to the given [page].
      */
-    override fun moveToPage(page: ReaderPage) {
+    override fun moveToPage(page: Int) {
         logcat { "moveToPage" }
         val position = adapter.items.indexOf(page)
         if (position != -1) {
@@ -255,16 +246,5 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
             max(0, position - 3),
             min(position + 3, adapter.itemCount - 1),
         )
-    }
-
-    fun onLongStripSplit(currentStrip: Any?, newStrips: List<StencilPage>) {
-        activity.runOnUiThread {
-            // Need to insert on UI thread else images will go blank
-            adapter.onLongStripSplit(currentStrip, newStrips)
-        }
-    }
-
-    private fun cleanupSplitStrips() {
-        adapter.cleanupSplitStrips()
     }
 }

@@ -1,12 +1,8 @@
 package eu.kanade.tachiyomi.ui.reader.model
 
+import com.hippo.image.Image
 import eu.kanade.tachiyomi.source.model.Page
-import java.io.InputStream
 
-open class ReaderPage(
-    index: Int,
-    var stream: (() -> InputStream)? = null,
-) : Page(index) {
-
-    open lateinit var chapter: ReaderChapter
+class ReaderPage(index: Int) : Page(index) {
+    lateinit var image: Image
 }

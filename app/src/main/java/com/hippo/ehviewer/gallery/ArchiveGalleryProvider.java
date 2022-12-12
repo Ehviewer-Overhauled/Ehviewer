@@ -289,7 +289,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
 
                 // Check index valid
                 if (index < 0 || index >= size) {
-                    notifyPageFailed(index, GetText.getString(R.string.error_out_of_range));
+                    notifyPageFailed(index);
                     continue;
                 }
 
@@ -347,7 +347,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                 if (image != null) {
                     notifyPageSucceed(index, image);
                 } else {
-                    notifyPageFailed(index, GetText.getString(R.string.error_decoding_failed));
+                    notifyPageFailed(index);
                 }
             }
         }

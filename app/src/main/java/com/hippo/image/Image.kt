@@ -32,7 +32,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class Image private constructor(source: Source?, val release: () -> Unit = {}) {
-    private var mObtainedDrawable: Drawable?
+    public var mObtainedDrawable: Drawable?
 
     init {
         mObtainedDrawable = null

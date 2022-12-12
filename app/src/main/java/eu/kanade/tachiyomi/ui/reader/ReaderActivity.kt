@@ -39,9 +39,7 @@ import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.animation.AnimationUtils
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
@@ -58,8 +56,6 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
-import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
-import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -236,6 +232,7 @@ class ReaderActivity : EhActivity() {
 
         val pager = WebtoonViewer(this)
         binding.viewerContainer.addView(pager.getView())
+        pager.setGalleryProvider(mGalleryProvider!!)
 
         // Get start page
         val startPage: Int = if (savedInstanceState == null) {
@@ -251,7 +248,6 @@ class ReaderActivity : EhActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (mGalleryProvider != null) {
-            mGalleryProvider!!.setListener(null)
             mGalleryProvider!!.stop()
             mGalleryProvider = null
         }
@@ -300,7 +296,7 @@ class ReaderActivity : EhActivity() {
      * bottom menu and delegates the change to the presenter.
      */
     @SuppressLint("SetTextI18n")
-    fun onPageSelected(page: ReaderPage) {
+    fun onPageSelected(page: Int) {
 
     }
 
@@ -308,7 +304,7 @@ class ReaderActivity : EhActivity() {
      * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
      * actions to perform is shown.
      */
-    fun onPageLongTap(page: ReaderPage) {
+    fun onPageLongTap(page: Int) {
     }
 
 

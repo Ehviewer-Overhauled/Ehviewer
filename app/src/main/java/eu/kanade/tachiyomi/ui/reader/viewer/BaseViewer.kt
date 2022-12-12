@@ -3,8 +3,7 @@ package eu.kanade.tachiyomi.ui.reader.viewer
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
-import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import com.hippo.gallery.GalleryProvider
 
 /**
  * Interface for implementing a viewer.
@@ -22,14 +21,14 @@ interface BaseViewer {
     fun destroy() {}
 
     /**
-     * Tells this viewer to set the given [chapters] as active.
+     * Tells this viewer to set the given [provider] as active.
      */
-    fun setChapters(chapters: ReaderChapter)
+    fun setGalleryProvider(provider: GalleryProvider)
 
     /**
      * Tells this viewer to move to the given [page].
      */
-    fun moveToPage(page: ReaderPage)
+    fun moveToPage(page: Int)
 
     /**
      * Called from the containing activity when a key [event] is received. It should return true

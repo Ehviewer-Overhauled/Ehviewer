@@ -16,19 +16,14 @@
 
 package com.hippo.gallery
 
-import android.graphics.drawable.Drawable
-import android.util.LruCache
-import androidx.annotation.IntDef
 import androidx.annotation.UiThread
 import com.hippo.image.Image
-import com.hippo.yorozuya.ConcurrentPool
 import com.hippo.yorozuya.OSUtils
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
+import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
-abstract class GalleryProvider : PageLoader() {
-    private val mImageCache = ImageCache()
-    @Volatile
-    private var mListener: Listener? = null
+abstract class GalleryProvider {
+    private val mPages by lazy { (0..size()).map { ReaderPage(it) } }
     private var mStarted = false
     abstract val error: String
 
@@ -42,7 +37,6 @@ abstract class GalleryProvider : PageLoader() {
     @UiThread
     open fun stop() {
         OSUtils.checkMainLoop()
-        mImageCache.evictAll()
     }
 
     abstract fun size(): Int
@@ -51,10 +45,6 @@ abstract class GalleryProvider : PageLoader() {
 
     fun forceRequest(index: Int) {
         onForceRequest(index)
-    }
-
-    fun removeCache(index: Int) {
-        mImageCache.remove(index)
     }
 
     protected abstract fun onRequest(index: Int)
@@ -67,103 +57,28 @@ abstract class GalleryProvider : PageLoader() {
 
     protected abstract fun onCancelRequest(index: Int)
 
-    fun setListener(listener: Listener?) {
-        mListener = listener
-    }
-
-    fun notifyDataChanged() {
-        notify(NotifyTask.TYPE_DATA_CHANGED, -1, 0.0f, null, null)
-    }
+    fun notifyDataChanged() {}
 
     fun notifyDataChanged(index: Int) {
-        notify(NotifyTask.TYPE_DATA_CHANGED, index, 0.0f, null, null)
+        mPages[index].status.value = Page.State.READY
     }
 
     fun notifyPageWait(index: Int) {
-        notify(NotifyTask.TYPE_WAIT, index, 0.0f, null, null)
+        mPages[index].status.value = Page.State.QUEUE
     }
 
     fun notifyPagePercent(index: Int, percent: Float) {
-        notify(NotifyTask.TYPE_PERCENT, index, percent, null, null)
+        mPages[index].status.compareAndSet(Page.State.QUEUE, Page.State.DOWNLOAD_IMAGE)
+        mPages[index].progress.value = percent
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        mImageCache.put(index, image)
-        notify(NotifyTask.TYPE_SUCCEED, index, 0.0f, image, null)
+        mPages[index].image = image
+        mPages[index].status.value = Page.State.READY
     }
 
-    fun notifyPageFailed(index: Int, error: String) {
-        notify(NotifyTask.TYPE_FAILED, index, 0.0f, null, error)
-    }
-
-    private fun notify(
-        @NotifyTask.Type type: Int,
-        index: Int,
-        percent: Float,
-        image: Image?,
-        error: String?
-    ) {
-        val listener = mListener ?: return
-    }
-
-    interface Listener {
-
-        fun onDataChanged()
-
-        fun onPageWait(index: Int)
-
-        fun onPagePercent(index: Int, percent: Float)
-
-        fun onPageSucceed(index: Int, image: Drawable)
-
-        fun onPageFailed(index: Int, error: String)
-
-        fun onDataChanged(index: Int)
-    }
-
-    private class NotifyTask(
-        private val mListener: Listener,
-        private val mPool: ConcurrentPool<NotifyTask>
-    ) {
-        @Type
-        private var mType: Int = 0
-        private var mIndex: Int = 0
-        private var mPercent: Float = 0.toFloat()
-        private var mImage: Drawable? = null
-        private var mError: String? = null
-
-        fun setData(@Type type: Int, index: Int, percent: Float, image: Drawable, error: String) {
-            mType = type
-            mIndex = index
-            mPercent = percent
-            mImage = image
-            mError = error
-        }
-
-        @IntDef(TYPE_DATA_CHANGED, NotifyTask.TYPE_WAIT, TYPE_PERCENT, TYPE_SUCCEED, TYPE_FAILED)
-        @Retention(AnnotationRetention.SOURCE)
-        annotation class Type
-        companion object {
-            const val TYPE_DATA_CHANGED = 0
-            const val TYPE_WAIT = 1
-            const val TYPE_PERCENT = 2
-            const val TYPE_SUCCEED = 3
-            const val TYPE_FAILED = 4
-        }
-    }
-
-    private class ImageCache : LruCache<Int, Image>(CACHE_SIZE) {
-        override fun sizeOf(key: Int?, value: Image): Int {
-            return value.height * value.width * 4
-        }
-
-        override fun entryRemoved(evicted: Boolean, key: Int?, oldValue: Image?, newValue: Image?) {
-            oldValue?.recycle()
-        }
-
-        companion object {
-            private const val CACHE_SIZE = 512 * 1024 * 1024
-        }
+    fun notifyPageFailed(index: Int) {
+        mPages[index].status.value = Page.State.ERROR
     }
 
     companion object {
