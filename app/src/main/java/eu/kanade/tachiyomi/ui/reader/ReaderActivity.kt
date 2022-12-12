@@ -74,9 +74,9 @@ import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
-import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.copy
@@ -255,7 +255,10 @@ class ReaderActivity : EhActivity() {
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
 
-        viewer = WebtoonViewer(this)
+        val viewerMode =
+            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+        binding.actionReadingMode.setImageResource(viewerMode.iconRes)
+        viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
         binding.viewerContainer.addView(viewer?.getView())
         viewer?.setGalleryProvider(mGalleryProvider!!)
 
@@ -615,7 +618,8 @@ class ReaderActivity : EhActivity() {
         } else {
             if (readerPreferences.fullscreen().get()) {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                windowInsetsController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 
             if (animate) {
