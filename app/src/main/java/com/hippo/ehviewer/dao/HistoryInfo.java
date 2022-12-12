@@ -20,8 +20,10 @@ public class HistoryInfo extends GalleryInfo {
             return new HistoryInfo[size];
         }
     };
+
+    // Use MODE for favoriteSlot
     @ColumnInfo(name = "MODE")
-    public int mode;
+    private int mode;
     @ColumnInfo(name = "TIME")
     public long time;
 
@@ -43,10 +45,11 @@ public class HistoryInfo extends GalleryInfo {
         this.rating = galleryInfo.rating;
         this.simpleTags = galleryInfo.simpleTags;
         this.simpleLanguage = galleryInfo.simpleLanguage;
+        this.favoriteSlot = galleryInfo.favoriteSlot;
     }
 
     public HistoryInfo(int mode, long time) {
-        this.mode = mode;
+        this.favoriteSlot = mode - 2;
         this.time = time;
     }
 
@@ -131,11 +134,11 @@ public class HistoryInfo extends GalleryInfo {
     }
 
     public int getMode() {
-        return mode;
+        return favoriteSlot + 2;
     }
 
     public void setMode(int mode) {
-        this.mode = mode;
+        this.favoriteSlot = mode - 2;
     }
 
     public long getTime() {
