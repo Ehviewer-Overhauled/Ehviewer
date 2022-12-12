@@ -198,10 +198,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.3'
 
     // Tachiyomi Reader
-    implementation ('com.github.tachiyomiorg:subsampling-scale-image-view:846abe0') {
-        exclude group: 'com.github.tachiyomiorg', module: 'image-decoder'
-    }
-    implementation 'com.github.tachiyomiorg:image-decoder:7879b45'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 }
 
