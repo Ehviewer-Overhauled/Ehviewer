@@ -23,7 +23,7 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
 abstract class GalleryProvider {
-    private val mPages by lazy { (0..size()).map { ReaderPage(it) } }
+    val mPages by lazy { (0..size()).map { ReaderPage(it) } }
     private var mStarted = false
     abstract val error: String
 
@@ -41,7 +41,9 @@ abstract class GalleryProvider {
 
     abstract fun size(): Int
 
-    fun request(index: Int) {}
+    fun request(index: Int) {
+        onRequest(index)
+    }
 
     fun forceRequest(index: Int) {
         onForceRequest(index)
@@ -60,7 +62,7 @@ abstract class GalleryProvider {
     fun notifyDataChanged() {}
 
     fun notifyDataChanged(index: Int) {
-        mPages[index].status.value = Page.State.READY
+        onRequest(index)
     }
 
     fun notifyPageWait(index: Int) {
@@ -73,7 +75,7 @@ abstract class GalleryProvider {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        mPages[index].image = image
+        mPages[index].image.value = image
         mPages[index].status.value = Page.State.READY
     }
 

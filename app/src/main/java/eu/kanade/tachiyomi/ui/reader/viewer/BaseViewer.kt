@@ -4,6 +4,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
 /**
  * Interface for implementing a viewer.
@@ -28,7 +29,7 @@ interface BaseViewer {
     /**
      * Tells this viewer to move to the given [page].
      */
-    fun moveToPage(page: Int)
+    fun moveToPage(page: ReaderPage)
 
     /**
      * Called from the containing activity when a key [event] is received. It should return true

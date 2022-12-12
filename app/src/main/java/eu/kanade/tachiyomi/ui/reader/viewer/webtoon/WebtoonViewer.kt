@@ -149,7 +149,6 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
             logcat { "Recycler first layout" }
             if (provider.size() <= 0)
                 return
-            moveToPage(0)
             recycler.isVisible = true
         }
     }
@@ -157,7 +156,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     /**
      * Tells this viewer to move to the given [page].
      */
-    override fun moveToPage(page: Int) {
+    override fun moveToPage(page: ReaderPage) {
         logcat { "moveToPage" }
         val position = adapter.items.indexOf(page)
         if (position != -1) {

@@ -34,6 +34,7 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
     fun setChapters(chapter: GalleryProvider) {
         val newItems = mutableListOf<Any>()
         currentChapter = chapter
+        newItems.addAll(chapter.mPages)
         updateItems(newItems)
     }
 
@@ -82,6 +83,7 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = items[position]
+        currentChapter!!.request(position)
         when (holder) {
             is WebtoonPageHolder -> holder.bind(item as ReaderPage)
         }

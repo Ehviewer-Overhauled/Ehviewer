@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
+import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,6 +16,10 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.util.system.dpToPx
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.InputStream
 
@@ -57,9 +62,10 @@ class WebtoonPageHolder(
      */
     private var page: ReaderPage? = null
 
+    private var job: Job? = null
+
     init {
         refreshLayoutParams()
-
         frame.onImageLoaded = { onImageDecoded() }
         frame.onImageLoadError = { onImageDecodeError() }
         frame.onScaleChanged = { viewer.activity.hideMenu() }
@@ -70,6 +76,13 @@ class WebtoonPageHolder(
      */
     fun bind(page: ReaderPage) {
         this.page = page
+        MainScope().launch {
+            page.image.collectLatest {
+                it?.apply {
+                    mObtainedDrawable?.let { setImage(it) }
+                }
+            }
+        }
         refreshLayoutParams()
     }
 
@@ -106,9 +119,11 @@ class WebtoonPageHolder(
             Page.State.DOWNLOAD_IMAGE -> {
                 setDownloading()
             }
+
             Page.State.READY -> {
-                setImage()
+
             }
+
             Page.State.ERROR -> {
                 setError()
             }
@@ -145,10 +160,10 @@ class WebtoonPageHolder(
     /**
      * Called when the page is ready.
      */
-    private fun setImage() {
+    private fun setImage(drawable: Drawable) {
         progressIndicator.setProgress(0)
         removeErrorLayout()
-        frame.setImage(page!!.image.mObtainedDrawable!!, ReaderPageImageView.Config(10))
+        frame.setImage(drawable, ReaderPageImageView.Config(10))
     }
 
     private fun process(imageStream: BufferedInputStream): InputStream {
@@ -202,7 +217,8 @@ class WebtoonPageHolder(
     private fun initErrorLayout(withOpenInWebView: Boolean): ReaderErrorBinding {
         if (errorLayout == null) {
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), frame, true)
-            errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
+            errorLayout?.root?.layoutParams =
+                FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
         }
         return errorLayout!!
     }
