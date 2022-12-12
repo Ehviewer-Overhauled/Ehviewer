@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
+import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -98,7 +99,7 @@ class WebtoonPageHolder(
                 bottomMargin = 15.dpToPx
             }
 
-            val margin = 0
+            val margin = Resources.getSystem().displayMetrics.widthPixels * (viewer.config.sidePadding / 100f)
             marginEnd = margin.toInt()
             marginStart = margin.toInt()
         }
@@ -182,7 +183,7 @@ class WebtoonPageHolder(
      */
     private fun setError() {
         progressContainer.isVisible = false
-        initErrorLayout(withOpenInWebView = false)
+        initErrorLayout()
     }
 
     /**
@@ -197,7 +198,7 @@ class WebtoonPageHolder(
      */
     private fun onImageDecodeError() {
         progressContainer.isVisible = false
-        initErrorLayout(withOpenInWebView = true)
+        initErrorLayout()
     }
 
     /**
@@ -220,11 +221,13 @@ class WebtoonPageHolder(
     /**
      * Initializes a button to retry pages.
      */
-    private fun initErrorLayout(withOpenInWebView: Boolean): ReaderErrorBinding {
+    private fun initErrorLayout(): ReaderErrorBinding {
         if (errorLayout == null) {
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), frame, true)
-            errorLayout?.root?.layoutParams =
-                FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
+            errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
+            errorLayout?.actionRetry?.setOnClickListener {
+                TODO()
+            }
         }
         return errorLayout!!
     }

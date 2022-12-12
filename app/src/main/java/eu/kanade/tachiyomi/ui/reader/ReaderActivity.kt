@@ -233,7 +233,7 @@ class ReaderActivity : EhActivity() {
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
 
-        val pager = VerticalPagerViewer(this)
+        val pager = WebtoonViewer(this)
         binding.viewerContainer.addView(pager.getView())
         pager.setGalleryProvider(mGalleryProvider!!)
 
