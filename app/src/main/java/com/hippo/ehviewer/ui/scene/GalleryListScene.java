@@ -1714,6 +1714,13 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         @Override
+        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
+            if (null != mAdapter) {
+                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
+            }
+        }
+
+        @Override
         public void onShowView(View hiddenView, View shownView) {
             showSearchBar();
             showActionFab();

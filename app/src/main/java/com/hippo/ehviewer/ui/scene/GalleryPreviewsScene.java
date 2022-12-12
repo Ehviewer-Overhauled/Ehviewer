@@ -390,6 +390,13 @@ public class GalleryPreviewsScene extends ToolbarScene {
         }
 
         @Override
+        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
+            if (mAdapter != null) {
+                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
+            }
+        }
+
+        @Override
         protected boolean isDuplicate(GalleryPreview d1, GalleryPreview d2) {
             return false;
         }

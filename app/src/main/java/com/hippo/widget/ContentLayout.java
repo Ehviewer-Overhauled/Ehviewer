@@ -334,6 +334,8 @@ public class ContentLayout extends FrameLayout {
 
         protected abstract void notifyItemRangeInserted(int positionStart, int itemCount);
 
+        protected abstract void notifyItemRangeChanged(int positionStart, int itemCount);
+
         protected void onScrollToPosition(int postion) {
         }
 
@@ -527,6 +529,7 @@ public class ContentLayout extends FrameLayout {
                             mData.addAll(0, data);
                             onAddData(data);
                             notifyItemRangeInserted(0, data.size());
+                            notifyItemRangeChanged(data.size(), mData.size() - data.size());
 
                             // Ui change, show content
                             mRefreshLayout.setRefreshing(false);
