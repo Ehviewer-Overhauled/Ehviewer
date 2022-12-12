@@ -709,4 +709,17 @@
     <string name="nav_zone_right">Right</string>
     <string name="decode_image_error">The image couldn\'t be loaded</string>
     <string name="action_retry">Retry</string>
+    <string name="label_default">Default</string>
+    <string name="rotation_free">Free</string>
+    <string name="rotation_portrait">Portrait</string>
+    <string name="rotation_reverse_portrait">Reverse portrait</string>
+    <string name="rotation_landscape">Landscape</string>
+    <string name="rotation_force_portrait">Locked portrait</string>
+    <string name="rotation_force_landscape">Locked landscape</string>
+    <string name="left_to_right_viewer">Left to right</string>
+    <string name="right_to_left_viewer">Right to left</string>
+    <string name="vertical_viewer">Vertical</string>
+    <string name="webtoon_viewer">Webtoon</string>
+    <string name="vertical_plus_viewer">Continuous vertical</string>
+    <string name="pager_viewer">Paged</string>
 </resources>
