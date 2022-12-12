@@ -32,6 +32,12 @@ import android.os.Handler
 import android.os.Message
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.view.HapticFeedbackConstants
+import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,7 +45,15 @@ import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.slider.Slider
+import com.google.android.material.transition.MaterialContainerTransform
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
@@ -56,10 +70,15 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
+import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
-import eu.kanade.tachiyomi.ui.reader.viewer.pager.L2RPagerViewer
-import eu.kanade.tachiyomi.ui.reader.viewer.pager.VerticalPagerViewer
+import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
+import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
+import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
+import eu.kanade.tachiyomi.util.system.isNightMode
+import eu.kanade.tachiyomi.util.view.copy
+import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,6 +88,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.WeakReference
+import kotlin.math.max
 
 class ReaderActivity : EhActivity() {
     lateinit var binding: ReaderActivityBinding
@@ -233,9 +253,9 @@ class ReaderActivity : EhActivity() {
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
 
-        val pager = WebtoonViewer(this)
-        binding.viewerContainer.addView(pager.getView())
-        pager.setGalleryProvider(mGalleryProvider!!)
+        viewer = WebtoonViewer(this)
+        binding.viewerContainer.addView(viewer?.getView())
+        viewer?.setGalleryProvider(mGalleryProvider!!)
 
         // Get start page
         val startPage: Int = if (savedInstanceState == null) {
@@ -246,70 +266,20 @@ class ReaderActivity : EhActivity() {
 
         mSize = mGalleryProvider!!.size()
         mCurrentIndex = startPage
+        initializeMenu()
+        // Draw edge-to-edge
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        viewer?.destroy()
+        viewer = null
         if (mGalleryProvider != null) {
             mGalleryProvider!!.stop()
             mGalleryProvider = null
         }
     }
-
-    /**
-     * Sets the visibility of the menu according to [visible] and with an optional parameter to
-     * [animate] the views.
-     */
-    fun setMenuVisibility(visible: Boolean, animate: Boolean = true) {
-        menuVisible = visible
-        if (visible) {
-        } else {
-        }
-    }
-
-
-    /**
-     * Called from the viewer to toggle the visibility of the menu. It's implemented on the
-     * viewer because each one implements its own touch and key events.
-     */
-    fun toggleMenu() {
-        setMenuVisibility(!menuVisible)
-    }
-
-    /**
-     * Called from the viewer to show the menu.
-     */
-    fun showMenu() {
-        if (!menuVisible) {
-            setMenuVisibility(true)
-        }
-    }
-
-    /**
-     * Called from the viewer to hide the menu.
-     */
-    fun hideMenu() {
-        if (menuVisible) {
-            setMenuVisibility(false)
-        }
-    }
-
-    /**
-     * Called from the viewer whenever a [page] is marked as active. It updates the values of the
-     * bottom menu and delegates the change to the presenter.
-     */
-    @SuppressLint("SetTextI18n")
-    fun onPageSelected(page: ReaderPage) {
-
-    }
-
-    /**
-     * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
-     * actions to perform is shown.
-     */
-    fun onPageLongTap(page: ReaderPage) {
-    }
-
 
     private fun shareImage(page: Int) {
         if (null == mGalleryProvider) {
@@ -584,5 +554,253 @@ class ReaderActivity : EhActivity() {
         const val KEY_GALLERY_INFO = "gallery_info"
         const val KEY_PAGE = "page"
         const val KEY_CURRENT_INDEX = "current_index"
+    }
+
+    /* Tachiyomi funcs */
+
+    var isScrollingThroughPages = false
+        private set
+
+    /**
+     * Viewer used to display the pages (pager, webtoon, ...).
+     */
+    var viewer: BaseViewer? = null
+        private set
+
+    private val windowInsetsController by lazy {
+        WindowInsetsControllerCompat(
+            window,
+            binding.root
+        )
+    }
+
+    /**
+     * Sets the visibility of the menu according to [visible] and with an optional parameter to
+     * [animate] the views.
+     */
+    fun setMenuVisibility(visible: Boolean, animate: Boolean = true) {
+        menuVisible = visible
+        if (visible) {
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+            binding.readerMenu.isVisible = true
+
+            if (animate) {
+                val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
+                toolbarAnimation.applySystemAnimatorScale(this)
+                toolbarAnimation.setAnimationListener(
+                    object : SimpleAnimationListener() {
+                        override fun onAnimationStart(animation: Animation) {
+                            // Fix status bar being translucent the first time it's opened.
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                        }
+                    },
+                )
+                binding.toolbar.startAnimation(toolbarAnimation)
+
+                val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
+                bottomAnimation.applySystemAnimatorScale(this)
+                binding.readerMenuBottom.startAnimation(bottomAnimation)
+            }
+            /*
+
+            if (readerPreferences.showPageNumber().get()) {
+                config?.setPageNumberVisibility(false)
+            }
+
+             */
+        } else {
+            /*
+            if (readerPreferences.fullscreen().get()) {
+                windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+                windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+
+             */
+
+            if (animate) {
+                val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
+                toolbarAnimation.applySystemAnimatorScale(this)
+                toolbarAnimation.setAnimationListener(
+                    object : SimpleAnimationListener() {
+                        override fun onAnimationEnd(animation: Animation) {
+                            binding.readerMenu.isVisible = false
+                        }
+                    },
+                )
+                binding.toolbar.startAnimation(toolbarAnimation)
+
+                val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
+                bottomAnimation.applySystemAnimatorScale(this)
+                binding.readerMenuBottom.startAnimation(bottomAnimation)
+            }
+            /*
+
+            if (readerPreferences.showPageNumber().get()) {
+                config?.setPageNumberVisibility(true)
+            }
+
+             */
+        }
+    }
+
+
+    /**
+     * Called from the viewer to toggle the visibility of the menu. It's implemented on the
+     * viewer because each one implements its own touch and key events.
+     */
+    fun toggleMenu() {
+        setMenuVisibility(!menuVisible)
+    }
+
+    /**
+     * Called from the viewer to show the menu.
+     */
+    fun showMenu() {
+        if (!menuVisible) {
+            setMenuVisibility(true)
+        }
+    }
+
+    /**
+     * Called from the viewer to hide the menu.
+     */
+    fun hideMenu() {
+        if (menuVisible) {
+            setMenuVisibility(false)
+        }
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is marked as active. It updates the values of the
+     * bottom menu and delegates the change to the presenter.
+     */
+    @SuppressLint("SetTextI18n")
+    fun onPageSelected(page: ReaderPage) {
+        val pages = mGalleryProvider?.mPages ?: return
+
+        // Set bottom page number
+        binding.pageNumber.text = "${page.number}/${pages.size}"
+
+        // Set page numbers
+        if (viewer !is R2LPagerViewer) {
+            binding.leftPageText.text = "${page.number}"
+            binding.rightPageText.text = "${pages.size}"
+        } else {
+            binding.rightPageText.text = "${page.number}"
+            binding.leftPageText.text = "${pages.size}"
+        }
+
+        // Set slider progress
+        binding.pageSlider.isEnabled = pages.size > 1
+        binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
+        binding.pageSlider.value = page.index.toFloat()
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
+     * actions to perform is shown.
+     */
+    fun onPageLongTap(page: ReaderPage) {
+    }
+
+    /**
+     * Moves the viewer to the given page [index]. It does nothing if the viewer is null or the
+     * page is not found.
+     */
+    fun moveToPageIndex(index: Int) {
+        val viewer = viewer ?: return
+        val page = mGalleryProvider?.mPages?.getOrNull(index) ?: return
+        viewer.moveToPage(page)
+    }
+
+    /**
+     * Initializes the reader menu. It sets up click listeners and the initial visibility.
+     */
+    @SuppressLint("PrivateResource")
+    private fun initializeMenu() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.toolbar.applyInsetter {
+            type(navigationBars = true, statusBars = true) {
+                margin(top = true, horizontal = true)
+            }
+        }
+        binding.readerMenuBottom.applyInsetter {
+            type(navigationBars = true) {
+                margin(bottom = true, horizontal = true)
+            }
+        }
+
+        // Init listeners on bottom menu
+        binding.pageSlider.addOnSliderTouchListener(
+            object : Slider.OnSliderTouchListener {
+                override fun onStartTrackingTouch(slider: Slider) {
+                    isScrollingThroughPages = true
+                }
+
+                override fun onStopTrackingTouch(slider: Slider) {
+                    isScrollingThroughPages = false
+                }
+            },
+        )
+        binding.pageSlider.addOnChangeListener { slider, value, fromUser ->
+            if (viewer != null && fromUser) {
+                isScrollingThroughPages = true
+                moveToPageIndex(value.toInt())
+                slider.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            }
+        }
+
+        // initBottomShortcuts()
+
+        val toolbarBackground = (binding.toolbar.background as MaterialShapeDrawable).apply {
+            elevation =
+                resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
+            alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
+        }
+        binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
+
+        binding.readerSeekbar.background = toolbarBackground.copy(this@ReaderActivity)?.apply {
+            setCornerSize(999F)
+        }
+
+        val toolbarColor = ColorUtils.setAlphaComponent(
+            toolbarBackground.resolvedTintColor,
+            toolbarBackground.alpha,
+        )
+
+        window.statusBarColor = toolbarColor
+        window.navigationBarColor = toolbarColor
+
+        // Set initial visibility
+        setMenuVisibility(menuVisible)
+    }
+
+    /**
+     * Dispatches a key event. If the viewer doesn't handle it, call the default implementation.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val handled = viewer?.handleKeyEvent(event) ?: false
+        return handled || super.dispatchKeyEvent(event)
+    }
+
+    /**
+     * Dispatches a generic motion event. If the viewer doesn't handle it, call the default
+     * implementation.
+     */
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        val handled = viewer?.handleGenericMotionEvent(event) ?: false
+        return handled || super.dispatchGenericMotionEvent(event)
+    }
+
+    private fun buildContainerTransform(entering: Boolean): MaterialContainerTransform {
+        return MaterialContainerTransform(this, entering).apply {
+            duration = 350 // ms
+            addTarget(android.R.id.content)
+        }
     }
 }

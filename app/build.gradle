@@ -199,6 +199,7 @@ dependencies {
 
     // Tachiyomi Reader
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation 'dev.chrisbanes.insetter:insetter:0.6.1'
     implementation ('com.github.tachiyomiorg:DirectionalViewPager:1.0.0') {
         exclude group: 'androidx.viewpager', module: 'viewpager'
     }
