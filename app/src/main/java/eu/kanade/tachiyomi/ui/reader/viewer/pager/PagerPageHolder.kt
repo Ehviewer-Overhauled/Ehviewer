@@ -65,7 +65,7 @@ class PagerPageHolder(
     init {
         addView(progressIndicator)
         progressJob = scope.launch(Dispatchers.Main) {
-            page.progress.collectLatest {
+            page.progress.collect {
                 progressIndicator.setProgress(it.toInt())
             }
         }

@@ -78,6 +78,7 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
+import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.copy
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
@@ -259,6 +260,7 @@ class ReaderActivity : EhActivity() {
             ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
+        updateViewerInset(readerPreferences.fullscreen().get())
         binding.viewerContainer.addView(viewer?.getView())
         viewer?.setGalleryProvider(mGalleryProvider!!)
 
@@ -272,8 +274,6 @@ class ReaderActivity : EhActivity() {
         mSize = mGalleryProvider!!.size()
         mCurrentIndex = startPage
         initializeMenu()
-        // Draw edge-to-edge
-        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     override fun onDestroy() {
@@ -572,6 +572,18 @@ class ReaderActivity : EhActivity() {
     var viewer: BaseViewer? = null
         private set
 
+    val hasCutout by lazy { hasDisplayCutout() }
+
+    private fun setCutoutShort(enabled: Boolean) {
+        window.attributes.layoutInDisplayCutoutMode = when (enabled) {
+            true -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            false -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+        }
+
+        // Trigger relayout
+        setMenuVisibility(menuVisible)
+    }
+
     private val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(this)) }
 
     private val windowInsetsController by lazy {
@@ -672,6 +684,21 @@ class ReaderActivity : EhActivity() {
     fun hideMenu() {
         if (menuVisible) {
             setMenuVisibility(false)
+        }
+    }
+
+    /**
+     * Updates viewer inset depending on fullscreen reader preferences.
+     */
+    fun updateViewerInset(fullscreen: Boolean) {
+        WindowCompat.setDecorFitsSystemWindows(window, !fullscreen)
+        setCutoutShort(true)
+        viewer?.getView()?.applyInsetter {
+            if (!fullscreen) {
+                type(navigationBars = true, statusBars = true) {
+                    padding()
+                }
+            }
         }
     }
 

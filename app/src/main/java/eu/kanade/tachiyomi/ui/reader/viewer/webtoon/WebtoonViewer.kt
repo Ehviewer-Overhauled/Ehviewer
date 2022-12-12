@@ -158,8 +158,6 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
 
         if (recycler.isGone) {
             logcat { "Recycler first layout" }
-            if (provider.size() <= 0)
-                return
             recycler.isVisible = true
         }
     }

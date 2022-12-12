@@ -81,7 +81,7 @@ class WebtoonPageHolder(
     fun bind(page: ReaderPage) {
         this.page = page
         progressJob = scope.launch(Dispatchers.Main) {
-            page.progress.collectLatest {
+            page.progress.collect {
                 progressIndicator.setProgress(it.toInt())
             }
         }
