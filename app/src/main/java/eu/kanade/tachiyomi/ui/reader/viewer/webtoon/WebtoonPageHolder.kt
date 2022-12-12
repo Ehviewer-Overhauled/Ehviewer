@@ -112,6 +112,7 @@ class WebtoonPageHolder(
         progressJob?.cancel()
         removeErrorLayout()
         frame.recycle()
+        page?.image?.recycle()
         progressIndicator.setProgress(0, animated = false)
     }
 

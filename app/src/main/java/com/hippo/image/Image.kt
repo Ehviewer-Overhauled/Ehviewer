@@ -18,6 +18,7 @@
 package com.hippo.image
 
 import android.graphics.ImageDecoder
+import android.graphics.ImageDecoder.ALLOCATOR_HARDWARE
 import android.graphics.ImageDecoder.DecodeException
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
@@ -32,13 +33,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 class Image private constructor(source: Source?, val release: () -> Unit = {}) {
-    public var mObtainedDrawable: Drawable?
+    var mObtainedDrawable: Drawable?
 
     init {
         mObtainedDrawable = null
         source?.let {
             mObtainedDrawable =
                 ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, src: Source ->
+                    decoder.allocator = ALLOCATOR_HARDWARE
                     decoder.setTargetSampleSize(
                         max(
                             min(

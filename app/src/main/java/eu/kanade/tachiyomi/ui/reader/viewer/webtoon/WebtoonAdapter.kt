@@ -32,16 +32,8 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
      * next/previous chapter to allow seamless transitions.
      */
     fun setChapters(chapter: GalleryProvider) {
-        val newItems = mutableListOf<Any>()
         currentChapter = chapter
-        newItems.addAll(chapter.mPages)
-        updateItems(newItems)
-    }
-
-    private fun updateItems(newItems: List<Any>) {
-        val result = DiffUtil.calculateDiff(Callback(items, newItems))
-        items = newItems
-        result.dispatchUpdatesTo(this)
+        items = chapter.mPages
     }
 
     fun refresh() {
@@ -95,46 +87,6 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         when (holder) {
             is WebtoonPageHolder -> holder.recycle()
-        }
-    }
-
-    /**
-     * Diff util callback used to dispatch delta updates instead of full dataset changes.
-     */
-    private class Callback(
-        private val oldItems: List<Any>,
-        private val newItems: List<Any>,
-    ) : DiffUtil.Callback() {
-
-        /**
-         * Returns true if these two items are the same.
-         */
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldItems[oldItemPosition]
-            val newItem = newItems[newItemPosition]
-
-            return oldItem == newItem
-        }
-
-        /**
-         * Returns true if the contents of the items are the same.
-         */
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return true
-        }
-
-        /**
-         * Returns the size of the old list.
-         */
-        override fun getOldListSize(): Int {
-            return oldItems.size
-        }
-
-        /**
-         * Returns the size of the new list.
-         */
-        override fun getNewListSize(): Int {
-            return newItems.size
         }
     }
 }

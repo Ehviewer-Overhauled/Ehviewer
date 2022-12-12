@@ -23,7 +23,7 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
 abstract class GalleryProvider {
-    val mPages by lazy { (0..size()).map { ReaderPage(it) } }
+    val mPages by lazy { (0 until size()).map { ReaderPage(it) } }
     private var mStarted = false
     abstract val error: String
 
@@ -71,8 +71,10 @@ abstract class GalleryProvider {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
+        val priv = mPages[index].image
         mPages[index].image = image
         mPages[index].status.value = Page.State.READY
+        priv?.recycle()
     }
 
     fun notifyPageFailed(index: Int) {
