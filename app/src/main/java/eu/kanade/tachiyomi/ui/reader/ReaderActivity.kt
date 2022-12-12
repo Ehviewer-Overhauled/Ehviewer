@@ -58,7 +58,9 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
+import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -231,6 +233,9 @@ class ReaderActivity : EhActivity() {
         }
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
+
+        val pager = WebtoonViewer(this)
+        binding.viewerContainer.addView(pager.getView())
 
         // Get start page
         val startPage: Int = if (savedInstanceState == null) {

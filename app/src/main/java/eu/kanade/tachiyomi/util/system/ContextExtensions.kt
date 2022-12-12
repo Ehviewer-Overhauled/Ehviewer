@@ -240,9 +240,11 @@ fun Context.getApplicationIcon(pkgName: String): Drawable? {
  * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=348;drc=e28752c96fc3fb4d3354781469a1af3dbded4898
  */
 fun Context.createReaderThemeContext(): Context {
+    return this
     TODO()
 }
 
 fun logcat(block: () -> String) {
+    return
     TODO()
 }

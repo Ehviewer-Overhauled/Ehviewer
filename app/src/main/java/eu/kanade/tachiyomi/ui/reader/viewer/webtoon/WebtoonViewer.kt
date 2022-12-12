@@ -1,12 +1,10 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
-import android.graphics.PointF
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import androidx.core.app.ActivityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -16,11 +14,9 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.StencilPage
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
-import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import rx.subscriptions.CompositeSubscription
 import kotlin.math.max
 import kotlin.math.min
 
@@ -66,19 +62,8 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      */
     private var currentPage: Any? = null
 
-    /**
-     * Subscriptions to keep while this viewer is used.
-     */
-    val subscriptions = CompositeSubscription()
 
     private val threshold: Int = 10
-    /*
-        Injekt.get<ReaderPreferences>()
-            .readerHideThreshold()
-            .get()
-            .threshold
-
-     */
 
     init {
         recycler.isVisible = false // Don't let the recycler layout yet
@@ -146,7 +131,6 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     override fun destroy() {
         super.destroy()
         scope.cancel()
-        subscriptions.unsubscribe()
     }
 
     /**

@@ -23,9 +23,9 @@ import androidx.annotation.UiThread
 import com.hippo.image.Image
 import com.hippo.yorozuya.ConcurrentPool
 import com.hippo.yorozuya.OSUtils
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 
-abstract class GalleryProvider {
-    private val mNotifyTaskPool = ConcurrentPool<NotifyTask>(5)
+abstract class GalleryProvider : PageLoader() {
     private val mImageCache = ImageCache()
     @Volatile
     private var mListener: Listener? = null

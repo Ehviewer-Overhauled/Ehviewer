@@ -19,10 +19,6 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.util.system.ImageUtil
 import eu.kanade.tachiyomi.util.system.dpToPx
-import rx.Observable
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
@@ -66,22 +62,6 @@ class WebtoonPageHolder(
      */
     private var page: ReaderPage? = null
 
-    /**
-     * Subscription for status changes of the page.
-     */
-    private var statusSubscription: Subscription? = null
-
-    /**
-     * Subscription for progress changes of the page.
-     */
-    private var progressSubscription: Subscription? = null
-
-    /**
-     * Subscription used to read the header of the image. This is needed in order to instantiate
-     * the appropiate image view depending if the image is animated (GIF).
-     */
-    private var readImageHeaderSubscription: Subscription? = null
-
     init {
         refreshLayoutParams()
 
@@ -95,7 +75,6 @@ class WebtoonPageHolder(
      */
     fun bind(page: ReaderPage) {
         this.page = page
-        observeStatus()
         refreshLayoutParams()
     }
 
@@ -115,48 +94,9 @@ class WebtoonPageHolder(
      * Called when the view is recycled and added to the view pool.
      */
     override fun recycle() {
-        unsubscribeStatus()
-        unsubscribeProgress()
-        unsubscribeReadImageHeader()
-
         removeErrorLayout()
         frame.recycle()
         progressIndicator.setProgress(0, animated = false)
-    }
-
-    /**
-     * Observes the status of the page and notify the changes.
-     *
-     * @see processStatus
-     */
-    private fun observeStatus() {
-        unsubscribeStatus()
-
-        val page = page ?: return
-        val loader = page.chapter.pageLoader ?: return
-        statusSubscription = loader.getPage(page)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { processStatus(it) }
-
-        addSubscription(statusSubscription)
-    }
-
-    /**
-     * Observes the progress of the page and updates view.
-     */
-    private fun observeProgress() {
-        unsubscribeProgress()
-
-        val page = page ?: return
-
-        progressSubscription = Observable.interval(100, TimeUnit.MILLISECONDS)
-            .map { page.progress }
-            .distinctUntilChanged()
-            .onBackpressureLatest()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { value -> progressIndicator.setProgress(value) }
-
-        addSubscription(progressSubscription)
     }
 
     /**
@@ -169,42 +109,15 @@ class WebtoonPageHolder(
             Page.State.QUEUE -> setQueued()
             Page.State.LOAD_PAGE -> setLoading()
             Page.State.DOWNLOAD_IMAGE -> {
-                observeProgress()
                 setDownloading()
             }
             Page.State.READY -> {
                 setImage()
-                unsubscribeProgress()
             }
             Page.State.ERROR -> {
                 setError()
-                unsubscribeProgress()
             }
         }
-    }
-
-    /**
-     * Unsubscribes from the status subscription.
-     */
-    private fun unsubscribeStatus() {
-        removeSubscription(statusSubscription)
-        statusSubscription = null
-    }
-
-    /**
-     * Unsubscribes from the progress subscription.
-     */
-    private fun unsubscribeProgress() {
-        removeSubscription(progressSubscription)
-        progressSubscription = null
-    }
-
-    /**
-     * Unsubscribes from the read image header subscription.
-     */
-    private fun unsubscribeReadImageHeader() {
-        removeSubscription(readImageHeaderSubscription)
-        readImageHeaderSubscription = null
     }
 
     /**
@@ -241,35 +154,9 @@ class WebtoonPageHolder(
         progressIndicator.setProgress(0)
         removeErrorLayout()
 
-        unsubscribeReadImageHeader()
         val streamFn = page?.stream ?: return
 
         var openStream: InputStream? = null
-        readImageHeaderSubscription = Observable
-            .fromCallable {
-                val stream = streamFn().buffered(16)
-                openStream = process(stream)
-
-                ImageUtil.isAnimatedAndSupported(stream)
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { isAnimated ->
-                frame.setImage(
-                    openStream!!,
-                    isAnimated,
-                    ReaderPageImageView.Config(
-                        zoomDuration = 100,
-                        minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
-                    ),
-                )
-            }
-            // Keep the Rx stream alive to close the input stream only when unsubscribed
-            .flatMap { Observable.never<Unit>() }
-            .doOnUnsubscribe { openStream?.close() }
-            .subscribe({}, {})
-
-        addSubscription(readImageHeaderSubscription)
     }
 
     private fun process(imageStream: BufferedInputStream): InputStream {

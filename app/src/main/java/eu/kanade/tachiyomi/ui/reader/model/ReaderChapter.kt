@@ -1,11 +1,9 @@
 package eu.kanade.tachiyomi.ui.reader.model
 
-import com.hippo.gallery.GalleryProvider
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
-import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.flow.MutableStateFlow
 
-data class ReaderChapter(val chapter: GalleryProvider) {
+class ReaderChapter {
 
     val stateFlow = MutableStateFlow<State>(State.Wait)
     var state: State
@@ -30,9 +28,6 @@ data class ReaderChapter(val chapter: GalleryProvider) {
     fun unref() {
         references--
         if (references == 0) {
-            if (pageLoader != null) {
-                logcat { "Recycling galleryProvider $chapter" }
-            }
             pageLoader?.recycle()
             pageLoader = null
             state = State.Wait
