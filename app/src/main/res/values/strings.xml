@@ -707,4 +707,6 @@
     <string name="nav_zone_next">Next</string>
     <string name="nav_zone_left">Left</string>
     <string name="nav_zone_right">Right</string>
+    <string name="decode_image_error">The image couldn\'t be loaded</string>
+    <string name="action_retry">Retry</string>
 </resources>

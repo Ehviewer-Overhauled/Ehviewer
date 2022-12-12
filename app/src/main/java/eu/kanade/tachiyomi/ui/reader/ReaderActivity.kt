@@ -17,6 +17,7 @@
 package eu.kanade.tachiyomi.ui.reader
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.assist.AssistContent
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -38,7 +39,9 @@ import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.animation.AnimationUtils
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
@@ -55,6 +58,7 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,6 +77,13 @@ class ReaderActivity : EhActivity() {
     private var mGalleryInfo: GalleryInfo? = null
     private var mPage: Int = 0
     private var mCacheFileName: String? = null
+
+    /**
+     * Whether the menu is currently visible.
+     */
+    var menuVisible = false
+        private set
+
     private var saveImageToLauncher = registerForActivityResult(
         CreateDocument("todo/todo")
     ) { uri ->
@@ -240,6 +251,61 @@ class ReaderActivity : EhActivity() {
             mGalleryProvider = null
         }
     }
+
+    /**
+     * Sets the visibility of the menu according to [visible] and with an optional parameter to
+     * [animate] the views.
+     */
+    fun setMenuVisibility(visible: Boolean, animate: Boolean = true) {
+        menuVisible = visible
+        if (visible) {
+        } else {
+        }
+    }
+
+
+    /**
+     * Called from the viewer to toggle the visibility of the menu. It's implemented on the
+     * viewer because each one implements its own touch and key events.
+     */
+    fun toggleMenu() {
+        setMenuVisibility(!menuVisible)
+    }
+
+    /**
+     * Called from the viewer to show the menu.
+     */
+    fun showMenu() {
+        if (!menuVisible) {
+            setMenuVisibility(true)
+        }
+    }
+
+    /**
+     * Called from the viewer to hide the menu.
+     */
+    fun hideMenu() {
+        if (menuVisible) {
+            setMenuVisibility(false)
+        }
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is marked as active. It updates the values of the
+     * bottom menu and delegates the change to the presenter.
+     */
+    @SuppressLint("SetTextI18n")
+    fun onPageSelected(page: ReaderPage) {
+
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
+     * actions to perform is shown.
+     */
+    fun onPageLongTap(page: ReaderPage) {
+    }
+
 
     private fun shareImage(page: Int) {
         if (null == mGalleryProvider) {

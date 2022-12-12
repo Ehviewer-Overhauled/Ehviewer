@@ -232,3 +232,17 @@ fun Context.getApplicationIcon(pkgName: String): Drawable? {
         null
     }
 }
+
+/**
+ * Creates night mode Context depending on reader theme/background
+ *
+ * Context wrapping method obtained from AppCompatDelegateImpl
+ * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=348;drc=e28752c96fc3fb4d3354781469a1af3dbded4898
+ */
+fun Context.createReaderThemeContext(): Context {
+    TODO()
+}
+
+fun logcat(block: () -> String) {
+    TODO()
+}
