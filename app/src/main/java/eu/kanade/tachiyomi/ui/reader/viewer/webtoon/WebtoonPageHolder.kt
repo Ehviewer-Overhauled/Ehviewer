@@ -16,12 +16,11 @@ import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.util.system.dpToPx
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.BufferedInputStream
-import java.io.InputStream
 
 /**
  * Holder of the webtoon reader for a single page of a chapter.
@@ -62,7 +61,11 @@ class WebtoonPageHolder(
      */
     private var page: ReaderPage? = null
 
-    private var job: Job? = null
+    private var progressJob: Job? = null
+
+    private var statusJob: Job? = null
+
+    private var scope = CoroutineScope(Dispatchers.IO)
 
     init {
         refreshLayoutParams()
@@ -76,11 +79,14 @@ class WebtoonPageHolder(
      */
     fun bind(page: ReaderPage) {
         this.page = page
-        MainScope().launch {
-            page.image.collectLatest {
-                it?.apply {
-                    mObtainedDrawable?.let { setImage(it) }
-                }
+        progressJob = scope.launch(Dispatchers.Main) {
+            page.progress.collectLatest {
+                progressIndicator.setProgress(it.toInt())
+            }
+        }
+        statusJob = scope.launch(Dispatchers.Main) {
+            page.status.collectLatest {
+                processStatus(it)
             }
         }
         refreshLayoutParams()
@@ -102,6 +108,8 @@ class WebtoonPageHolder(
      * Called when the view is recycled and added to the view pool.
      */
     override fun recycle() {
+        statusJob?.cancel()
+        progressJob?.cancel()
         removeErrorLayout()
         frame.recycle()
         progressIndicator.setProgress(0, animated = false)
@@ -121,11 +129,13 @@ class WebtoonPageHolder(
             }
 
             Page.State.READY -> {
-
+                page?.image?.mObtainedDrawable?.let { setImage(it) }
+                progressJob?.cancel()
             }
 
             Page.State.ERROR -> {
                 setError()
+                progressJob?.cancel()
             }
         }
     }
@@ -164,11 +174,6 @@ class WebtoonPageHolder(
         progressIndicator.setProgress(0)
         removeErrorLayout()
         frame.setImage(drawable, ReaderPageImageView.Config(10))
-    }
-
-    private fun process(imageStream: BufferedInputStream): InputStream {
-
-        return imageStream
     }
 
     /**

@@ -9,7 +9,6 @@ open class Page(val index: Int)  {
 
     var status = MutableStateFlow(State.QUEUE)
 
-    @Volatile
     var progress = MutableStateFlow(0f)
 
     enum class State {

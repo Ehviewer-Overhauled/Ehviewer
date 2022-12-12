@@ -45,10 +45,6 @@ abstract class GalleryProvider {
         onRequest(index)
     }
 
-    fun forceRequest(index: Int) {
-        onForceRequest(index)
-    }
-
     protected abstract fun onRequest(index: Int)
 
     protected abstract fun onForceRequest(index: Int)
@@ -75,7 +71,7 @@ abstract class GalleryProvider {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        mPages[index].image.value = image
+        mPages[index].image = image
         mPages[index].status.value = Page.State.READY
     }
 
