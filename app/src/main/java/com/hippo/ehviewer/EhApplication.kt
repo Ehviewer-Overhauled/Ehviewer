@@ -67,6 +67,7 @@ import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import java.io.File
+import java.net.Proxy
 import java.security.KeyStore
 import java.util.Arrays
 import javax.net.ssl.TrustManagerFactory
@@ -318,6 +319,7 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
                 }
 
                 builder.sslSocketFactory(EhSSLSocketFactory(), trustManager)
+                builder.proxy(Proxy.NO_PROXY)
             }
             builder.build()
         }
