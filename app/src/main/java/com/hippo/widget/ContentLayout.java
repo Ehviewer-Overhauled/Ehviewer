@@ -123,19 +123,9 @@ public class ContentLayout extends FrameLayout {
         return mFastScroller;
     }
 
-    public SwipeRefreshLayout getRefreshLayout() {
-        return mRefreshLayout;
-    }
-
     public void setHelper(ContentHelper<?> helper) {
         mContentHelper = helper;
         helper.init(this);
-    }
-
-    public void showFastScroll() {
-        if (!mFastScroller.isAttached()) {
-            mFastScroller.attachToRecyclerView(mRecyclerView);
-        }
     }
 
     public void hideFastScroll() {
@@ -191,9 +181,6 @@ public class ContentLayout extends FrameLayout {
         public static final int TYPE_NEXT_PAGE_KEEP_POS = 4;
         public static final int TYPE_SOMEWHERE = 5;
         public static final int TYPE_REFRESH_PAGE = 6;
-        public static final int REFRESH_TYPE_HEADER = 0;
-        public static final int REFRESH_TYPE_FOOTER = 1;
-        public static final int REFRESH_TYPE_PROGRESS_VIEW = 2;
         private static final String TAG = ContentHelper.class.getSimpleName();
         private static final int CHECK_DUPLICATE_RANGE = 50;
         private static final String KEY_SUPER = "super";
@@ -210,9 +197,7 @@ public class ContentLayout extends FrameLayout {
          */
         private final IntIdGenerator mIdGenerator = new IntIdGenerator();
         private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener = ContentHelper.this::onScrollToPosition;
-        private CircularProgressIndicator mProgressView;
         private TextView mTipView;
-        private ViewGroup mContentView;
         private SwipeRefreshLayout mRefreshLayout;
         private LinearProgressIndicator mBottomProgress;
         private EasyRecyclerView mRecyclerView;
@@ -297,9 +282,9 @@ public class ContentLayout extends FrameLayout {
         private void init(ContentLayout contentLayout) {
             mNextPageScrollSize = LayoutUtils.dp2pix(contentLayout.getContext(), 48);
 
-            mProgressView = contentLayout.mProgressView;
+            CircularProgressIndicator mProgressView = contentLayout.mProgressView;
             mTipView = contentLayout.mTipView;
-            mContentView = contentLayout.mContentView;
+            ViewGroup mContentView = contentLayout.mContentView;
 
             mRefreshLayout = contentLayout.mRefreshLayout;
             mBottomProgress = contentLayout.mBottomProgress;
@@ -330,11 +315,11 @@ public class ContentLayout extends FrameLayout {
 
         protected abstract void notifyDataSetChanged();
 
-        protected abstract void notifyItemRangeRemoved(int positionStart, int itemCount);
+        protected abstract void notifyItemRangeChanged(int positionStart, int itemCount);
 
         protected abstract void notifyItemRangeInserted(int positionStart, int itemCount);
 
-        protected void onScrollToPosition(int postion) {
+        protected void onScrollToPosition(int position) {
         }
 
         @Override
@@ -361,13 +346,6 @@ public class ContentLayout extends FrameLayout {
             return mData;
         }
 
-        /**
-         * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}
-         */
-        public E getDataAt(int location) {
-            return mData.get(location);
-        }
-
         @Nullable
         public E getDataAtEx(int location) {
             if (location >= 0 && location < mData.size()) {
@@ -387,34 +365,6 @@ public class ContentLayout extends FrameLayout {
 
         public int getPages() {
             return mPages;
-        }
-
-        public void addAt(int index, E data) {
-            mData.add(index, data);
-            onAddData(data);
-
-            for (int i = 0, n = mPageDivider.size(); i < n; i++) {
-                int divider = mPageDivider.get(i);
-                if (index < divider) {
-                    mPageDivider.set(i, divider + 1);
-                }
-            }
-
-            notifyItemRangeInserted(index, 1);
-        }
-
-        public void removeAt(int index) {
-            E data = mData.remove(index);
-            onRemoveData(data);
-
-            for (int i = 0, n = mPageDivider.size(); i < n; i++) {
-                int divider = mPageDivider.get(i);
-                if (index < divider) {
-                    mPageDivider.set(i, divider - 1);
-                }
-            }
-
-            notifyItemRangeRemoved(index, 1);
         }
 
         protected abstract boolean isDuplicate(E d1, E d2);
@@ -453,14 +403,13 @@ public class ContentLayout extends FrameLayout {
                 int dataSize;
 
                 switch (mCurrentTaskType) {
-                    case TYPE_REFRESH:
+                    case TYPE_REFRESH -> {
                         mStartPage = 0;
                         mEndPage = 1;
                         mPages = pages;
                         mNextPage = nextPage;
                         mPageDivider.clear();
                         mPageDivider.add(data.size());
-
                         if (data.isEmpty()) {
                             mData.clear();
                             onClearData();
@@ -490,9 +439,8 @@ public class ContentLayout extends FrameLayout {
                                 onScrollToPosition(0);
                             }
                         }
-                        break;
-                    case TYPE_PRE_PAGE:
-                    case TYPE_PRE_PAGE_KEEP_POS:
+                    }
+                    case TYPE_PRE_PAGE, TYPE_PRE_PAGE_KEEP_POS -> {
                         removeDuplicateData(data, 0, CHECK_DUPLICATE_RANGE);
                         dataSize = data.size();
                         for (int i = 0, n = mPageDivider.size(); i < n; i++) {
@@ -527,6 +475,7 @@ public class ContentLayout extends FrameLayout {
                             mData.addAll(0, data);
                             onAddData(data);
                             notifyItemRangeInserted(0, data.size());
+                            notifyItemRangeChanged(data.size(), mData.size() - data.size());
 
                             // Ui change, show content
                             mRefreshLayout.setRefreshing(false);
@@ -546,9 +495,8 @@ public class ContentLayout extends FrameLayout {
                                 }
                             }
                         }
-                        break;
-                    case TYPE_NEXT_PAGE:
-                    case TYPE_NEXT_PAGE_KEEP_POS:
+                    }
+                    case TYPE_NEXT_PAGE, TYPE_NEXT_PAGE_KEEP_POS -> {
                         removeDuplicateData(data, mData.size() - CHECK_DUPLICATE_RANGE, mData.size());
                         dataSize = data.size();
                         int oldDataSize = mData.size();
@@ -556,7 +504,6 @@ public class ContentLayout extends FrameLayout {
                         mEndPage++;
                         mNextPage = nextPage;
                         mPages = Math.max(mEndPage, pages);
-
                         if (data.isEmpty()) {
                             // OK, that's all
                             if (mData.isEmpty()) {
@@ -598,15 +545,14 @@ public class ContentLayout extends FrameLayout {
                                 }
                             }
                         }
-                        break;
-                    case TYPE_SOMEWHERE:
+                    }
+                    case TYPE_SOMEWHERE -> {
                         mStartPage = mCurrentTaskPage;
                         mEndPage = mCurrentTaskPage + 1;
                         mNextPage = nextPage;
                         mPages = pages;
                         mPageDivider.clear();
                         mPageDivider.add(data.size());
-
                         if (data.isEmpty()) {
                             mData.clear();
                             onClearData();
@@ -636,36 +582,30 @@ public class ContentLayout extends FrameLayout {
                                 onScrollToPosition(0);
                             }
                         }
-                        break;
-                    case TYPE_REFRESH_PAGE:
+                    }
+                    case TYPE_REFRESH_PAGE -> {
                         if (mCurrentTaskPage < mStartPage || mCurrentTaskPage >= mEndPage) {
                             Log.e(TAG, "TYPE_REFRESH_PAGE, but mCurrentTaskPage = " + mCurrentTaskPage +
                                     ", mStartPage = " + mStartPage + ", mEndPage = " + mEndPage);
                             break;
                         }
-
                         if (mCurrentTaskPage == mEndPage - 1) {
                             mNextPage = nextPage;
                         }
-
                         mPages = Math.max(mEndPage, pages);
-
                         int oldIndexStart = mCurrentTaskPage == mStartPage ? 0 : mPageDivider.get(mCurrentTaskPage - mStartPage - 1);
                         int oldIndexEnd = mPageDivider.get(mCurrentTaskPage - mStartPage);
                         List<E> toRemove = mData.subList(oldIndexStart, oldIndexEnd);
                         onRemoveData(toRemove);
                         toRemove.clear();
                         removeDuplicateData(data, oldIndexStart - CHECK_DUPLICATE_RANGE, oldIndexStart + CHECK_DUPLICATE_RANGE);
-                        int newIndexStart = oldIndexStart;
-                        int newIndexEnd = newIndexStart + data.size();
+                        int newIndexEnd = oldIndexStart + data.size();
                         mData.addAll(oldIndexStart, data);
                         onAddData(data);
                         notifyDataSetChanged();
-
                         for (int i = mCurrentTaskPage - mStartPage, n = mPageDivider.size(); i < n; i++) {
                             mPageDivider.set(i, mPageDivider.get(i) - oldIndexEnd + newIndexEnd);
                         }
-
                         if (mData.isEmpty()) {
                             // Ui change, show empty string
                             mRefreshLayout.setRefreshing(false);
@@ -684,7 +624,7 @@ public class ContentLayout extends FrameLayout {
                                 onScrollToPosition(newIndexEnd - 1);
                             }
                         }
-                        break;
+                    }
                 }
             }
         }
@@ -739,35 +679,6 @@ public class ContentLayout extends FrameLayout {
             showText(mEmptyString);
         }
 
-        /**
-         * Be carefull
-         */
-        public void doGetData(int type, int page, int refreshType) {
-            switch (refreshType) {
-                default:
-                case REFRESH_TYPE_HEADER:
-                    showContent();
-                    mRefreshLayout.setRefreshing(false);
-                    mBottomProgress.hide();
-                    break;
-                case REFRESH_TYPE_FOOTER:
-                    showContent();
-                    mRefreshLayout.setRefreshing(false);
-                    mBottomProgress.hide();
-                    break;
-                case REFRESH_TYPE_PROGRESS_VIEW:
-                    showProgressBar();
-                    mRefreshLayout.setRefreshing(false);
-                    mBottomProgress.hide();
-                    break;
-            }
-
-            mCurrentTaskId = mIdGenerator.nextId();
-            mCurrentTaskType = type;
-            mCurrentTaskPage = page;
-            getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage);
-        }
-
         protected void doRefresh() {
             beforeRefresh();
             mCurrentTaskId = mIdGenerator.nextId();
@@ -777,7 +688,7 @@ public class ContentLayout extends FrameLayout {
         }
 
         /**
-         * Lisk {@link #refresh()}, but no animation when show progress bar
+         * Like {@link #refresh()}, but no animation when show progress bar
          */
         public void firstRefresh() {
             showProgressBar(false);
@@ -806,10 +717,6 @@ public class ContentLayout extends FrameLayout {
             }
         }
 
-        private int getPageEnd(int page) {
-            return mPageDivider.get(page - mStartPage);
-        }
-
         private int getPageForPosition(int position) {
             if (position < 0) {
                 return -1;
@@ -829,10 +736,6 @@ public class ContentLayout extends FrameLayout {
             return getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(mRecyclerView.getLayoutManager()));
         }
 
-        public int getPageForBottom() {
-            return getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(mRecyclerView.getLayoutManager()));
-        }
-
         public boolean canGoTo() {
             return isContentShowing();
         }
@@ -841,7 +744,7 @@ public class ContentLayout extends FrameLayout {
          * Check range first!
          *
          * @param page the target page
-         * @throws IndexOutOfBoundsException
+         * @throws IndexOutOfBoundsException if page < 0 or page >= mPages
          */
         public void goTo(int page) throws IndexOutOfBoundsException {
             if (page < 0 || page >= mPages) {

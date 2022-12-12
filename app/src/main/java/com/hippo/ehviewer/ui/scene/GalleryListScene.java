@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.Spannable;
@@ -140,8 +139,6 @@ public final class GalleryListScene extends SearchBarScene
     private final static int STATE_SEARCH = 2;
     private final static int STATE_SEARCH_SHOW_LIST = 3;
     private static final long ANIMATE_TIME = 300L;
-    // Double click back exit
-    private final long mPressBackTime = 0;
     /*---------------
      Whole life cycle
      ---------------*/
@@ -149,11 +146,6 @@ public final class GalleryListScene extends SearchBarScene
     private EhClient mClient;
     @Nullable
     private ListUrlBuilder mUrlBuilder;
-    /*---------------
-     View life cycle
-     ---------------*/
-    @Nullable
-    private ContentLayout mContentLayout;
     @Nullable
     private EasyRecyclerView mRecyclerView;
     @Nullable
@@ -247,17 +239,13 @@ public final class GalleryListScene extends SearchBarScene
         } else if (ListUrlBuilder.MODE_WHATS_HOT == urlBuilder.getMode()) {
             return resources.getString(R.string.whats_hot);
         } else if (ListUrlBuilder.MODE_TOPLIST == urlBuilder.getMode()) {
-            switch (urlBuilder.getKeyword()) {
-                case "11":
-                    return resources.getString(R.string.toplist_alltime);
-                case "12":
-                    return resources.getString(R.string.toplist_pastyear);
-                case "13":
-                    return resources.getString(R.string.toplist_pastmonth);
-                case "15":
-                    return resources.getString(R.string.toplist_yesterday);
-            }
-            return null;
+            return switch (urlBuilder.getKeyword()) {
+                case "11" -> resources.getString(R.string.toplist_alltime);
+                case "12" -> resources.getString(R.string.toplist_pastyear);
+                case "13" -> resources.getString(R.string.toplist_pastmonth);
+                case "15" -> resources.getString(R.string.toplist_yesterday);
+                default -> null;
+            };
         } else if (!TextUtils.isEmpty(keyword)) {
             return keyword;
         } else if (MathUtils.hammingWeight(category) == 1) {
@@ -325,6 +313,7 @@ public final class GalleryListScene extends SearchBarScene
         showSearchBar();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -547,7 +536,7 @@ public final class GalleryListScene extends SearchBarScene
         mShowActionFab = true;
 
         View mainLayout = ViewUtils.$$(view, R.id.main_layout);
-        mContentLayout = (ContentLayout) ViewUtils.$$(mainLayout, R.id.content_layout);
+        ContentLayout mContentLayout = (ContentLayout) ViewUtils.$$(mainLayout, R.id.content_layout);
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchLayout = (SearchLayout) ViewUtils.$$(mainLayout, R.id.search_layout);
@@ -651,8 +640,7 @@ public final class GalleryListScene extends SearchBarScene
         mActionFabDrawable = null;
     }
 
-    private void showQuickSearchTipDialog(final QsDrawerAdapter adapter,
-                                          final EasyRecyclerView recyclerView, final TextView tip) {
+    private void showQuickSearchTipDialog() {
         Context context = getContext();
         if (null == context) {
             return;
@@ -756,7 +744,7 @@ public final class GalleryListScene extends SearchBarScene
             if (id == R.id.action_add) {
                 showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip);
             } else if (id == R.id.action_help) {
-                showQuickSearchTipDialog(qsDrawerAdapter, recyclerView, tip);
+                showQuickSearchTipDialog();
             }
             return true;
         });
@@ -778,15 +766,7 @@ public final class GalleryListScene extends SearchBarScene
         }
         if (isSearchViewShown())
             return false;
-        switch (mState) {
-            case STATE_NORMAL:
-                return getStackIndex() == 0;
-            case STATE_SIMPLE_SEARCH:
-            case STATE_SEARCH:
-            case STATE_SEARCH_SHOW_LIST:
-                return false;
-        }
-        return false;
+        return mState == STATE_NORMAL && getStackIndex() == 0;
     }
 
     @Override
@@ -817,7 +797,7 @@ public final class GalleryListScene extends SearchBarScene
         }
     }
 
-    public boolean onItemClick(View view, int position) {
+    public boolean onItemClick(int position) {
         if (null == mHelper || null == mRecyclerView) {
             return false;
         }
@@ -884,7 +864,7 @@ public final class GalleryListScene extends SearchBarScene
             long fromDate = local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli();
             long toDate = MaterialDatePicker.todayInUtcMilliseconds();
 
-            ArrayList listValidators = new ArrayList<>();
+            ArrayList<CalendarConstraints.DateValidator> listValidators = new ArrayList<>();
             listValidators.add(DateValidatorPointForward.from(fromDate));
             listValidators.add(DateValidatorPointBackward.before(toDate));
 
@@ -899,9 +879,7 @@ public final class GalleryListScene extends SearchBarScene
                     .setSelection(toDate)
                     .build();
             datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
-            datePicker.addOnPositiveButtonClickListener(v -> {
-                mHelper.goTo(v);
-            });
+            datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v));
         }
     }
 
@@ -1186,32 +1164,17 @@ public final class GalleryListScene extends SearchBarScene
                     }
                     break;
                 case STATE_SEARCH:
-                    if (state == STATE_NORMAL) {
-                        mViewTransition.showView(0, animation);
-                        selectActionFab(animation);
-                    } else if (state == STATE_SIMPLE_SEARCH) {
-                        mViewTransition.showView(0, animation);
-                    } else if (state == STATE_SEARCH_SHOW_LIST) {
-                    }
-                    break;
                 case STATE_SEARCH_SHOW_LIST:
                     if (state == STATE_NORMAL) {
                         mViewTransition.showView(0, animation);
                         selectActionFab(animation);
                     } else if (state == STATE_SIMPLE_SEARCH) {
                         mViewTransition.showView(0, animation);
-                    } else if (state == STATE_SEARCH) {
                     }
                     break;
             }
         }
         ((StageActivity) requireActivity()).updateBackPressCallBackStatus();
-    }
-
-    public void onClickTitle() {
-        if (mState == STATE_NORMAL) {
-            setState(STATE_SIMPLE_SEARCH);
-        }
     }
 
     @Override
@@ -1249,15 +1212,6 @@ public final class GalleryListScene extends SearchBarScene
         onUpdateUrlBuilder();
         mHelper.refresh();
         setState(STATE_NORMAL);
-    }
-
-    public void onReceiveContent(Uri uri) {
-        if (mSearchLayout == null || uri == null) {
-            return;
-        }
-        mSearchLayout.setSearchMode(SearchLayout.SEARCH_MODE_IMAGE);
-        mSearchLayout.setImageUri(uri);
-        setState(STATE_SEARCH);
     }
 
     @Override
@@ -1308,7 +1262,7 @@ public final class GalleryListScene extends SearchBarScene
                     : R.string.gallery_list_empty_hit);
             mHelper.setEmptyString(emptyString);
 
-            int pages = 0;
+            int pages;
             if (mIsTopList)
                 pages = 200;
             else if (result.nextGid == 0)
@@ -1619,7 +1573,7 @@ public final class GalleryListScene extends SearchBarScene
 
         @Override
         void onItemClick(View view, int position) {
-            GalleryListScene.this.onItemClick(view, position);
+            GalleryListScene.this.onItemClick(position);
         }
 
         @Override
@@ -1692,6 +1646,7 @@ public final class GalleryListScene extends SearchBarScene
             return GalleryListScene.this.getContext();
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         @Override
         protected void notifyDataSetChanged() {
             if (null != mAdapter) {
@@ -1700,9 +1655,9 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         @Override
-        protected void notifyItemRangeRemoved(int positionStart, int itemCount) {
+        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
             if (null != mAdapter) {
-                mAdapter.notifyItemRangeRemoved(positionStart, itemCount);
+                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
             }
         }
 

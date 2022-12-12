@@ -1188,9 +1188,9 @@ public class FavoritesScene extends SearchBarScene implements
         }
 
         @Override
-        protected void notifyItemRangeRemoved(int positionStart, int itemCount) {
+        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
             if (mAdapter != null) {
-                mAdapter.notifyItemRangeRemoved(positionStart, itemCount);
+                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
             }
         }
 
