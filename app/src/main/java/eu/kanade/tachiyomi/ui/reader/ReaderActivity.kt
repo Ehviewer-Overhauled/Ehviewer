@@ -56,6 +56,9 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import eu.kanade.tachiyomi.ui.reader.viewer.pager.L2RPagerViewer
+import eu.kanade.tachiyomi.ui.reader.viewer.pager.VerticalPagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -230,7 +233,7 @@ class ReaderActivity : EhActivity() {
         ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
 
-        val pager = WebtoonViewer(this)
+        val pager = VerticalPagerViewer(this)
         binding.viewerContainer.addView(pager.getView())
         pager.setGalleryProvider(mGalleryProvider!!)
 
@@ -296,7 +299,7 @@ class ReaderActivity : EhActivity() {
      * bottom menu and delegates the change to the presenter.
      */
     @SuppressLint("SetTextI18n")
-    fun onPageSelected(page: Int) {
+    fun onPageSelected(page: ReaderPage) {
 
     }
 
@@ -304,7 +307,7 @@ class ReaderActivity : EhActivity() {
      * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
      * actions to perform is shown.
      */
-    fun onPageLongTap(page: Int) {
+    fun onPageLongTap(page: ReaderPage) {
     }
 
 
