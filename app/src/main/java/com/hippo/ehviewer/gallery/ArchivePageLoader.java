@@ -46,7 +46,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ArchiveGalleryProvider extends GalleryProvider2 {
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
+
+public class ArchivePageLoader extends PageLoader2 {
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
     public static Handler showPasswd;
     public static String passwd;
@@ -61,10 +63,10 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
             new Thread(new DecodeTask())
     };
     private Thread archiveThread;
-    private volatile int size = com.hippo.gallery.GalleryProvider.STATE_WAIT;
+    private volatile int size = PageLoader.STATE_WAIT;
     private String error;
 
-    public ArchiveGalleryProvider(Context context, Uri uri) {
+    public ArchivePageLoader(Context context, Uri uri) {
         UriArchiveAccessor archiveAccessor1;
         try {
             archiveAccessor1 = new UriArchiveAccessor(context, uri);
@@ -77,8 +79,6 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
 
     @Override
     public void start() {
-        super.start();
-
         int id = sIdGenerator.incrementAndGet();
 
         archiveThread = new PriorityThread(
@@ -91,7 +91,6 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
 
     @Override
     public void stop() {
-        super.stop();
         if (archiveThread != null) {
             archiveThread.interrupt();
             archiveThread = null;
@@ -217,7 +216,7 @@ public class ArchiveGalleryProvider extends GalleryProvider2 {
                 size = 0;
             }
             if (size <= 0) {
-                size = com.hippo.gallery.GalleryProvider.STATE_ERROR;
+                size = PageLoader.STATE_ERROR;
                 error = GetText.getString(R.string.error_reading_failed);
                 notifyDataChanged();
                 return;

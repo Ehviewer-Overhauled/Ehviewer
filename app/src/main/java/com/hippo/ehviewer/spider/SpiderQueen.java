@@ -48,8 +48,8 @@ import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import com.hippo.ehviewer.gallery.GalleryProvider2;
-import com.hippo.gallery.GalleryProvider;
+import com.hippo.ehviewer.gallery.PageLoader2;
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
@@ -398,9 +398,9 @@ public final class SpiderQueen implements Runnable {
 
     public int size() {
         if (mQueenThread == null) {
-            return GalleryProvider.STATE_ERROR;
+            return PageLoader.STATE_ERROR;
         } else if (mPageStateArray == null) {
-            return GalleryProvider.STATE_WAIT;
+            return PageLoader.STATE_WAIT;
         } else {
             return mPageStateArray.length;
         }
@@ -1273,8 +1273,8 @@ public final class SpiderQueen implements Runnable {
                         extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mediaType.toString());
                     }
                     // Ensure extension
-                    if (!Utilities.contain(GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS, extension)) {
-                        extension = GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS[0];
+                    if (!Utilities.contain(PageLoader2.SUPPORT_IMAGE_EXTENSIONS, extension)) {
+                        extension = PageLoader2.SUPPORT_IMAGE_EXTENSIONS[0];
                     }
 
                     OutputStreamPipe osPipe = null;

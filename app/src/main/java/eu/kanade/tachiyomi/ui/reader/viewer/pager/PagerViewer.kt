@@ -11,7 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
 import com.hippo.ehviewer.R
-import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
@@ -53,7 +53,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Viewer chapters to set when the pager enters idle mode. Otherwise, if the view was settling
      * or dragging, there'd be a noticeable and annoying jump.
      */
-    private var awaitingIdleViewerChapters: GalleryProvider? = null
+    private var awaitingIdleViewerChapters: PageLoader? = null
 
     /**
      * Whether the view pager is currently in idle mode. It sets the awaiting chapters if setting
@@ -190,7 +190,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Tells this viewer to set the given [provider] as active. If the pager is currently idle,
      * it sets the chapters immediately, otherwise they are saved and set when it becomes idle.
      */
-    override fun setGalleryProvider(provider: GalleryProvider) {
+    override fun setGalleryProvider(provider: PageLoader) {
         if (isIdle) {
             setChaptersInternal(provider)
         } else {
@@ -201,7 +201,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
     /**
      * Sets the active [chapters] on this pager.
      */
-    private fun setChaptersInternal(chapters: GalleryProvider) {
+    private fun setChaptersInternal(chapters: PageLoader) {
         logcat { "setChaptersInternal" }
         adapter.setChapters(chapters)
 

@@ -89,8 +89,8 @@ import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
-import com.hippo.ehviewer.gallery.EhGalleryProvider;
-import com.hippo.ehviewer.gallery.GalleryProvider2;
+import com.hippo.ehviewer.gallery.EhPageLoader;
+import com.hippo.ehviewer.gallery.PageLoader2;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
@@ -452,7 +452,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         super.onResume();
         if (mRead != null) {
             try {
-                GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+                PageLoader2 galleryProvider = new EhPageLoader(requireContext(), mGalleryInfo);
                 galleryProvider.start();
                 int startPage = galleryProvider.getStartPage();
                 if (startPage != 0) {

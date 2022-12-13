@@ -1,43 +1,16 @@
-/*
- * Copyright 2016 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package eu.kanade.tachiyomi.ui.reader.loader
 
-package com.hippo.gallery
-
-import androidx.annotation.UiThread
 import com.hippo.image.Image
-import com.hippo.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
-abstract class GalleryProvider {
+abstract class PageLoader {
     val mPages by lazy { (0 until size()).map { ReaderPage(it) } }
-    private var mStarted = false
     abstract val error: String
 
-    @UiThread
-    open fun start() {
-        OSUtils.checkMainLoop()
-        check(!mStarted) { "Can't start it twice" }
-        mStarted = true
-    }
+    abstract fun start()
 
-    @UiThread
-    open fun stop() {
-        OSUtils.checkMainLoop()
-    }
+    abstract fun stop()
 
     abstract fun size(): Int
 

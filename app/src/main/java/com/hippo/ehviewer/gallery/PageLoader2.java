@@ -19,10 +19,10 @@ package com.hippo.ehviewer.gallery;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.hippo.gallery.GalleryProvider;
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import com.hippo.unifile.UniFile;
 
-public abstract class GalleryProvider2 extends GalleryProvider {
+public abstract class PageLoader2 extends PageLoader {
 
     // With dot
     public static final String[] SUPPORT_IMAGE_EXTENSIONS = {

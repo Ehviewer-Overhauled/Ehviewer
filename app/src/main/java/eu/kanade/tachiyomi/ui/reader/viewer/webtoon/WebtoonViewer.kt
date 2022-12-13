@@ -11,7 +11,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.WebtoonLayoutManager
-import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
@@ -153,7 +153,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     /**
      * Tells this viewer to set the given [provider] as active.
      */
-    override fun setGalleryProvider(provider: GalleryProvider) {
+    override fun setGalleryProvider(provider: PageLoader) {
         adapter.setChapters(provider)
 
         if (recycler.isGone) {

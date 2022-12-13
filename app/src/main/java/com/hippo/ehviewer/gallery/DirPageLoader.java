@@ -43,9 +43,11 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 
-    private static final String TAG = DirGalleryProvider.class.getSimpleName();
+public class DirPageLoader extends PageLoader2 implements Runnable {
+
+    private static final String TAG = DirPageLoader.class.getSimpleName();
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
     private static final FilenameFilter imageFilter =
             (dir, name) -> StringUtils.endsWith(name.toLowerCase(), SUPPORT_IMAGE_EXTENSIONS);
@@ -63,17 +65,15 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
     private final AtomicReference<UniFile[]> mFileList = new AtomicReference<>();
     @Nullable
     private Thread mBgThread;
-    private volatile int mSize = com.hippo.gallery.GalleryProvider.STATE_WAIT;
+    private volatile int mSize = PageLoader.STATE_WAIT;
     private String mError;
 
-    public DirGalleryProvider(@NonNull UniFile dir) {
+    public DirPageLoader(@NonNull UniFile dir) {
         mDir = dir;
     }
 
     @Override
     public void start() {
-        super.start();
-
         mBgThread = new PriorityThread(this, TAG + '-' + sIdGenerator.incrementAndGet(),
                 Process.THREAD_PRIORITY_BACKGROUND);
         mBgThread.start();
@@ -81,8 +81,6 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
 
     @Override
     public void stop() {
-        super.stop();
-
         if (mBgThread != null) {
             mBgThread.interrupt();
             mBgThread = null;
@@ -212,7 +210,7 @@ public class DirGalleryProvider extends GalleryProvider2 implements Runnable {
         UniFile[] files = mDir.listFiles(imageFilter);
 
         if (files == null) {
-            mSize = com.hippo.gallery.GalleryProvider.STATE_ERROR;
+            mSize = PageLoader.STATE_ERROR;
             mError = GetText.getString(R.string.error_not_folder_path);
 
             // Notify to to show error

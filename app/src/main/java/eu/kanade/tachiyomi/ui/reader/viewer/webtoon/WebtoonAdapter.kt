@@ -1,9 +1,8 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.util.system.createReaderThemeContext
@@ -19,7 +18,7 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
     var items: List<Any> = emptyList()
         private set
 
-    var currentChapter: GalleryProvider? = null
+    var currentChapter: PageLoader? = null
 
     /**
      * Context that has been wrapped to use the correct theme values based on the
@@ -31,7 +30,7 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
      * Updates this adapter with the given [chapter]. It handles setting a few pages of the
      * next/previous chapter to allow seamless transitions.
      */
-    fun setChapters(chapter: GalleryProvider) {
+    fun setChapters(chapter: PageLoader) {
         currentChapter = chapter
         items = chapter.mPages
     }

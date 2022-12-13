@@ -3,7 +3,7 @@ package eu.kanade.tachiyomi.ui.reader.viewer
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
 /**
@@ -24,7 +24,7 @@ interface BaseViewer {
     /**
      * Tells this viewer to set the given [provider] as active.
      */
-    fun setGalleryProvider(provider: GalleryProvider)
+    fun setGalleryProvider(provider: PageLoader)
 
     /**
      * Tells this viewer to move to the given [page].

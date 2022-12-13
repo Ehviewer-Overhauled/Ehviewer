@@ -61,10 +61,10 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.ReaderActivityBinding
-import com.hippo.ehviewer.gallery.ArchiveGalleryProvider
-import com.hippo.ehviewer.gallery.DirGalleryProvider
-import com.hippo.ehviewer.gallery.EhGalleryProvider
-import com.hippo.ehviewer.gallery.GalleryProvider2
+import com.hippo.ehviewer.gallery.ArchivePageLoader
+import com.hippo.ehviewer.gallery.DirPageLoader
+import com.hippo.ehviewer.gallery.EhPageLoader
+import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
@@ -142,7 +142,7 @@ class ReaderActivity : EhActivity() {
             }
         }
     }
-    private var mGalleryProvider: GalleryProvider2? = null
+    private var mGalleryProvider: PageLoader2? = null
     private var mSize: Int = 0
     private var mCurrentIndex: Int = 0
     private var mSavingPage = -1
@@ -180,11 +180,14 @@ class ReaderActivity : EhActivity() {
 
         if (ACTION_DIR == mAction) {
             if (mFilename != null) {
-                mGalleryProvider = DirGalleryProvider(UniFile.fromFile(File(mFilename!!))!!)
+                mGalleryProvider = DirPageLoader(
+                    UniFile.fromFile(File(mFilename!!))!!
+                )
             }
         } else if (ACTION_EH == mAction) {
             if (mGalleryInfo != null) {
-                mGalleryProvider = EhGalleryProvider(this, mGalleryInfo)
+                mGalleryProvider =
+                    EhPageLoader(this, mGalleryInfo)
             }
         } else if (Intent.ACTION_VIEW == mAction) {
             if (mUri != null) {
@@ -198,7 +201,8 @@ class ReaderActivity : EhActivity() {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show()
                 }
 
-                mGalleryProvider = ArchiveGalleryProvider(this, mUri)
+                mGalleryProvider =
+                    ArchivePageLoader(this, mUri)
             }
         }
     }
@@ -253,7 +257,7 @@ class ReaderActivity : EhActivity() {
             finish()
             return
         }
-        ArchiveGalleryProvider.showPasswd = ShowPasswdDialogHandler(this)
+        ArchivePageLoader.showPasswd = ShowPasswdDialogHandler(this)
         mGalleryProvider!!.start()
 
         val viewerMode =
@@ -517,8 +521,8 @@ class ReaderActivity : EhActivity() {
         if (passwd.isEmpty())
             builder!!.setError(getString(R.string.passwd_cannot_be_empty))
         else {
-            ArchiveGalleryProvider.passwd = passwd
-            ArchiveGalleryProvider.pv.v()
+            ArchivePageLoader.passwd = passwd
+            ArchivePageLoader.pv.v()
         }
     }
 

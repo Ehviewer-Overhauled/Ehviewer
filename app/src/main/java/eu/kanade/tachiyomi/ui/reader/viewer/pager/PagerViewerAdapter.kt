@@ -2,7 +2,7 @@ package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
 import android.view.View
 import android.view.ViewGroup
-import com.hippo.gallery.GalleryProvider
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.util.system.createReaderThemeContext
 import eu.kanade.tachiyomi.util.system.logcat
@@ -19,7 +19,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
     var items: MutableList<Any> = mutableListOf()
         private set
 
-    var currentChapter: GalleryProvider? = null
+    var currentChapter: PageLoader? = null
 
     /**
      * Context that has been wrapped to use the correct theme values based on the
@@ -32,7 +32,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      * next/previous chapter to allow seamless transitions and inverting the pages if the viewer
      * has R2L direction.
      */
-    fun setChapters(chapters: GalleryProvider) {
+    fun setChapters(chapters: PageLoader) {
         items = chapters.mPages.toMutableList()
         currentChapter = chapters
 

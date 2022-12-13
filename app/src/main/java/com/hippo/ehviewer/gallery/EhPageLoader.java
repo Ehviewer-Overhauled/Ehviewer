@@ -23,37 +23,33 @@ import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.spider.SpiderQueen;
-import com.hippo.gallery.GalleryProvider;
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.SimpleHandler;
 
 import java.util.Locale;
 
-public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.OnSpiderListener {
+public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderListener {
 
     private final Context mContext;
     private final GalleryInfo mGalleryInfo;
     @Nullable
     private SpiderQueen mSpiderQueen;
 
-    public EhGalleryProvider(Context context, GalleryInfo galleryInfo) {
+    public EhPageLoader(Context context, GalleryInfo galleryInfo) {
         mContext = context;
         mGalleryInfo = galleryInfo;
     }
 
     @Override
     public void start() {
-        super.start();
-
         mSpiderQueen = SpiderQueen.obtainSpiderQueen(mContext, mGalleryInfo, SpiderQueen.MODE_READ);
         mSpiderQueen.addOnSpiderListener(this);
     }
 
     @Override
     public void stop() {
-        super.stop();
-
         if (mSpiderQueen != null) {
             mSpiderQueen.removeOnSpiderListener(this);
             // Activity recreate may called, so wait 3000s
@@ -120,7 +116,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
         if (mSpiderQueen != null) {
             return mSpiderQueen.size();
         } else {
-            return GalleryProvider.STATE_ERROR;
+            return PageLoader.STATE_ERROR;
         }
     }
 
