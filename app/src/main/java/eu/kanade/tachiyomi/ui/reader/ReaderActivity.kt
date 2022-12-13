@@ -300,7 +300,7 @@ class ReaderActivity : EhActivity() {
         initializeMenu()
     }
 
-    private fun setGallery() {
+    fun setGallery() {
         mSize = mGalleryProvider!!.size()
         val viewerMode =
             ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
@@ -764,6 +764,7 @@ class ReaderActivity : EhActivity() {
                     val newReadingMode = ReadingModeType.fromPreference(itemId)
 
                     readerPreferences.defaultReadingMode().set(newReadingMode.flagValue)
+                    setGallery()
 
                     /*
                     menuToggleToast?.cancel()
