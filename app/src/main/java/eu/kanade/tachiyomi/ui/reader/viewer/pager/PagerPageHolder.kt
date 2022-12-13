@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -155,7 +156,16 @@ class PagerPageHolder(
     private fun setImage(drawable: Drawable) {
         progressIndicator.setProgress(0)
         errorLayout?.root?.isVisible = false
-        setImage(drawable, Config(10))
+        setImage(drawable,
+            Config(
+                zoomDuration = viewer.config.doubleTapAnimDuration,
+                minimumScaleType = viewer.config.imageScaleType,
+                cropBorders = viewer.config.imageCropBorders,
+                zoomStartPosition = viewer.config.imageZoomType,
+                landscapeZoom = viewer.config.landscapeZoom,
+            ),)
+        if (drawable !is Animatable)
+            pageBackground = background
     }
 
     /**
