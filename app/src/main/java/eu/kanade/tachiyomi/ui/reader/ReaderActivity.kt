@@ -86,6 +86,7 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
+import eu.kanade.tachiyomi.util.preference.toggle
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import eu.kanade.tachiyomi.util.system.isNightMode
@@ -309,6 +310,7 @@ class ReaderActivity : EhActivity() {
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
         updateViewerInset(readerPreferences.fullscreen().get())
         binding.viewerContainer.removeAllViews()
+        setOrientation(readerPreferences.defaultOrientationType().get())
         binding.viewerContainer.addView(viewer?.getView())
         viewer?.setGalleryProvider(mGalleryProvider!!)
         moveToPageIndex(mCurrentIndex)
@@ -766,14 +768,6 @@ class ReaderActivity : EhActivity() {
                     readerPreferences.defaultReadingMode().set(newReadingMode.flagValue)
                     setGallery()
 
-                    /*
-                    menuToggleToast?.cancel()
-                    if (!readerPreferences.showReadingMode().get()) {
-                        menuToggleToast = toast(newReadingMode.stringRes)
-                    }
-
-                     */
-
                     updateCropBordersShortcut()
                 }
             }
@@ -784,24 +778,12 @@ class ReaderActivity : EhActivity() {
             setTooltip(R.string.pref_crop_borders)
 
             setOnClickListener {
-                /*
-                val isPagerType = ReadingModeType.isPagerType(viewModel.getMangaReadingMode())
-                val enabled = if (isPagerType) {
+                val isPagerType = ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
+                if (isPagerType) {
                     readerPreferences.cropBorders().toggle()
                 } else {
                     readerPreferences.cropBordersWebtoon().toggle()
                 }
-
-                menuToggleToast?.cancel()
-                menuToggleToast = toast(
-                    if (enabled) {
-                        R.string.on
-                    } else {
-                        R.string.off
-                    },
-                )
-
-                 */
             }
         }
         updateCropBordersShortcut()
@@ -817,21 +799,15 @@ class ReaderActivity : EhActivity() {
             setTooltip(R.string.rotation_type)
 
             setOnClickListener {
-                /*
                 popupMenu(
                     items = OrientationType.values().map { it.flagValue to it.stringRes },
-                    selectedItemId = viewModel.manga?.orientationType?.toInt()
-                        ?: readerPreferences.defaultOrientationType().get(),
+                    selectedItemId = readerPreferences.defaultOrientationType().get(),
                 ) {
                     val newOrientation = OrientationType.fromPreference(itemId)
 
-                    viewModel.setMangaOrientationType(newOrientation.flagValue)
-
-                    menuToggleToast?.cancel()
-                    menuToggleToast = toast(newOrientation.stringRes)
+                    readerPreferences.defaultOrientationType().set(newOrientation.flagValue)
+                    setGallery()
                 }
-
-                 */
             }
         }
 
@@ -850,6 +826,11 @@ class ReaderActivity : EhActivity() {
                 true
             }
         }
+    }
+
+    private fun updateOrientationShortcut(preference: Int) {
+        val orientation = OrientationType.fromPreference(preference)
+        binding.actionRotation.setImageResource(orientation.iconRes)
     }
 
     private fun updateCropBordersShortcut() {
@@ -961,6 +942,17 @@ class ReaderActivity : EhActivity() {
         if (menuVisible) {
             setMenuVisibility(false)
         }
+    }
+
+    /**
+     * Forces the user preferred [orientation] on the activity.
+     */
+    private fun setOrientation(orientation: Int) {
+        val newOrientation = OrientationType.fromPreference(orientation)
+        if (newOrientation.flag != requestedOrientation) {
+            requestedOrientation = newOrientation.flag
+        }
+        updateOrientationShortcut(readerPreferences.defaultOrientationType().get())
     }
 
     /**

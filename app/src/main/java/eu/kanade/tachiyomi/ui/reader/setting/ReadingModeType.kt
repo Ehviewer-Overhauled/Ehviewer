@@ -38,7 +38,7 @@ enum class ReadingModeType(val prefValue: Int, @StringRes val stringRes: Int, @D
                 VERTICAL -> VerticalPagerViewer(activity)
                 WEBTOON -> WebtoonViewer(activity)
                 CONTINUOUS_VERTICAL -> WebtoonViewer(activity, isContinuous = false)
-                DEFAULT -> throw IllegalStateException("Preference value must be resolved: $preference")
+                DEFAULT -> L2RPagerViewer(activity)
             }
         }
     }
