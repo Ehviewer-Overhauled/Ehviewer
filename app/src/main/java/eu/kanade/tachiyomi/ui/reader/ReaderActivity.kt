@@ -24,6 +24,10 @@ import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +39,7 @@ import android.text.TextUtils
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.View.LAYER_TYPE_HARDWARE
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -57,6 +62,7 @@ import com.google.android.material.transition.MaterialContainerTransform
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -84,7 +90,12 @@ import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.copy
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -93,6 +104,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.ref.WeakReference
+import kotlin.math.abs
 import kotlin.math.max
 
 class ReaderActivity : EhActivity() {
@@ -280,13 +292,14 @@ class ReaderActivity : EhActivity() {
 
         mGalleryProvider!!.start()
 
+        config = ReaderConfig()
         initializeMenu()
-        setCutoutShort(true)
     }
 
     private fun setGallery() {
         mSize = mGalleryProvider!!.size()
-        val viewerMode = ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+        val viewerMode =
+            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
@@ -299,6 +312,7 @@ class ReaderActivity : EhActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        config = null
         viewer?.destroy()
         viewer = null
         if (mGalleryProvider != null) {
@@ -580,6 +594,8 @@ class ReaderActivity : EhActivity() {
         const val KEY_GALLERY_INFO = "gallery_info"
         const val KEY_PAGE = "page"
         const val KEY_CURRENT_INDEX = "current_index"
+
+        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(EhApplication.application)) }
     }
 
     /* Tachiyomi funcs */
@@ -595,17 +611,7 @@ class ReaderActivity : EhActivity() {
 
     val hasCutout by lazy { hasDisplayCutout() }
 
-    private fun setCutoutShort(enabled: Boolean) {
-        window.attributes.layoutInDisplayCutoutMode = when (enabled) {
-            true -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            false -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-        }
-
-        // Trigger relayout
-        setMenuVisibility(menuVisible)
-    }
-
-    private val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(this)) }
+    private var config: ReaderConfig? = null
 
     private val windowInsetsController by lazy {
         WindowInsetsControllerCompat(
@@ -641,18 +647,14 @@ class ReaderActivity : EhActivity() {
                 bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
-            /*
 
             if (readerPreferences.showPageNumber().get()) {
                 config?.setPageNumberVisibility(false)
             }
-
-             */
         } else {
             if (readerPreferences.fullscreen().get()) {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                windowInsetsController.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 
             if (animate) {
@@ -671,98 +673,11 @@ class ReaderActivity : EhActivity() {
                 bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
-            /*
 
             if (readerPreferences.showPageNumber().get()) {
                 config?.setPageNumberVisibility(true)
             }
-
-             */
         }
-    }
-
-
-    /**
-     * Called from the viewer to toggle the visibility of the menu. It's implemented on the
-     * viewer because each one implements its own touch and key events.
-     */
-    fun toggleMenu() {
-        setMenuVisibility(!menuVisible)
-    }
-
-    /**
-     * Called from the viewer to show the menu.
-     */
-    fun showMenu() {
-        if (!menuVisible) {
-            setMenuVisibility(true)
-        }
-    }
-
-    /**
-     * Called from the viewer to hide the menu.
-     */
-    fun hideMenu() {
-        if (menuVisible) {
-            setMenuVisibility(false)
-        }
-    }
-
-    /**
-     * Updates viewer inset depending on fullscreen reader preferences.
-     */
-    fun updateViewerInset(fullscreen: Boolean) {
-        WindowCompat.setDecorFitsSystemWindows(window, !fullscreen)
-        viewer?.getView()?.applyInsetter {
-            if (!fullscreen) {
-                type(navigationBars = true, statusBars = true) {
-                    padding()
-                }
-            }
-        }
-    }
-
-    /**
-     * Called from the viewer whenever a [page] is marked as active. It updates the values of the
-     * bottom menu and delegates the change to the presenter.
-     */
-    @SuppressLint("SetTextI18n")
-    fun onPageSelected(page: ReaderPage) {
-        val pages = mGalleryProvider?.mPages ?: return
-
-        // Set bottom page number
-        binding.pageNumber.text = "${page.number}/${pages.size}"
-
-        // Set page numbers
-        if (viewer !is R2LPagerViewer) {
-            binding.leftPageText.text = "${page.number}"
-            binding.rightPageText.text = "${pages.size}"
-        } else {
-            binding.rightPageText.text = "${page.number}"
-            binding.leftPageText.text = "${pages.size}"
-        }
-
-        // Set slider progress
-        binding.pageSlider.isEnabled = pages.size > 1
-        binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
-        binding.pageSlider.value = page.index.toFloat()
-    }
-
-    /**
-     * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
-     * actions to perform is shown.
-     */
-    fun onPageLongTap(page: ReaderPage) {
-    }
-
-    /**
-     * Moves the viewer to the given page [index]. It does nothing if the viewer is null or the
-     * page is not found.
-     */
-    fun moveToPageIndex(index: Int) {
-        val viewer = viewer ?: return
-        val page = mGalleryProvider?.mPages?.getOrNull(index) ?: return
-        viewer.moveToPage(page)
     }
 
     /**
@@ -853,6 +768,307 @@ class ReaderActivity : EhActivity() {
         return MaterialContainerTransform(this, entering).apply {
             duration = 350 // ms
             addTarget(android.R.id.content)
+        }
+    }
+
+    /**
+     * Moves the viewer to the given page [index]. It does nothing if the viewer is null or the
+     * page is not found.
+     */
+    fun moveToPageIndex(index: Int) {
+        val viewer = viewer ?: return
+        val page = mGalleryProvider?.mPages?.getOrNull(index) ?: return
+        viewer.moveToPage(page)
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is marked as active. It updates the values of the
+     * bottom menu and delegates the change to the presenter.
+     */
+    @SuppressLint("SetTextI18n")
+    fun onPageSelected(page: ReaderPage) {
+        val pages = mGalleryProvider?.mPages ?: return
+
+        // Set bottom page number
+        binding.pageNumber.text = "${page.number}/${pages.size}"
+
+        // Set page numbers
+        if (viewer !is R2LPagerViewer) {
+            binding.leftPageText.text = "${page.number}"
+            binding.rightPageText.text = "${pages.size}"
+        } else {
+            binding.rightPageText.text = "${page.number}"
+            binding.leftPageText.text = "${pages.size}"
+        }
+
+        // Set slider progress
+        binding.pageSlider.isEnabled = pages.size > 1
+        binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
+        binding.pageSlider.value = page.index.toFloat()
+    }
+
+    /**
+     * Called from the viewer whenever a [page] is long clicked. A bottom sheet with a list of
+     * actions to perform is shown.
+     */
+    fun onPageLongTap(page: ReaderPage) {
+    }
+
+    /**
+     * Called from the viewer to toggle the visibility of the menu. It's implemented on the
+     * viewer because each one implements its own touch and key events.
+     */
+    fun toggleMenu() {
+        setMenuVisibility(!menuVisible)
+    }
+
+    /**
+     * Called from the viewer to show the menu.
+     */
+    fun showMenu() {
+        if (!menuVisible) {
+            setMenuVisibility(true)
+        }
+    }
+
+    /**
+     * Called from the viewer to hide the menu.
+     */
+    fun hideMenu() {
+        if (menuVisible) {
+            setMenuVisibility(false)
+        }
+    }
+
+    /**
+     * Updates viewer inset depending on fullscreen reader preferences.
+     */
+    fun updateViewerInset(fullscreen: Boolean) {
+        viewer?.getView()?.applyInsetter {
+            if (!fullscreen) {
+                type(navigationBars = true, statusBars = true) {
+                    padding()
+                }
+            }
+        }
+    }
+
+    /**
+     * Class that handles the user preferences of the reader.
+     */
+    private inner class ReaderConfig {
+
+        private fun getCombinedPaint(grayscale: Boolean, invertedColors: Boolean): Paint {
+            return Paint().apply {
+                colorFilter = ColorMatrixColorFilter(
+                    ColorMatrix().apply {
+                        if (grayscale) {
+                            setSaturation(0f)
+                        }
+                        if (invertedColors) {
+                            postConcat(
+                                ColorMatrix(
+                                    floatArrayOf(
+                                        -1f, 0f, 0f, 0f, 255f,
+                                        0f, -1f, 0f, 0f, 255f,
+                                        0f, 0f, -1f, 0f, 255f,
+                                        0f, 0f, 0f, 1f, 0f,
+                                    ),
+                                ),
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        /**
+         * Initializes the reader subscriptions.
+         */
+        init {
+            readerPreferences.readerTheme().changes()
+                .onEach { theme ->
+                    binding.readerContainer.setBackgroundResource(
+                        when (theme) {
+                            0 -> android.R.color.white
+                            2 -> R.color.reader_background_dark
+                            3 -> automaticBackgroundColor()
+                            else -> android.R.color.black
+                        },
+                    )
+                }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.showPageNumber().changes()
+                .onEach { setPageNumberVisibility(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.trueColor().changes()
+                .onEach { setTrueColor(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.cutoutShort().changes()
+                .onEach { setCutoutShort(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.keepScreenOn().changes()
+                .onEach { setKeepScreenOn(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.customBrightness().changes()
+                .onEach { setCustomBrightness(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.colorFilter().changes()
+                .onEach { setColorFilter(it) }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.colorFilterMode().changes()
+                .onEach { setColorFilter(readerPreferences.colorFilter().get()) }
+                .launchIn(lifecycleScope)
+
+            merge(
+                readerPreferences.grayscale().changes(),
+                readerPreferences.invertedColors().changes()
+            )
+                .onEach {
+                    setLayerPaint(
+                        readerPreferences.grayscale().get(),
+                        readerPreferences.invertedColors().get()
+                    )
+                }
+                .launchIn(lifecycleScope)
+
+            readerPreferences.fullscreen().changes()
+                .onEach {
+                    WindowCompat.setDecorFitsSystemWindows(window, !it)
+                    updateViewerInset(it)
+                }
+                .launchIn(lifecycleScope)
+        }
+
+        /**
+         * Picks background color for [ReaderActivity] based on light/dark theme preference
+         */
+        private fun automaticBackgroundColor(): Int {
+            return if (baseContext.isNightMode()) {
+                R.color.reader_background_dark
+            } else {
+                android.R.color.white
+            }
+        }
+
+        /**
+         * Sets the visibility of the bottom page indicator according to [visible].
+         */
+        fun setPageNumberVisibility(visible: Boolean) {
+            binding.pageNumber.isVisible = visible
+        }
+
+        /**
+         * Sets the 32-bit color mode according to [enabled].
+         */
+        private fun setTrueColor(enabled: Boolean) {
+            // TODO()
+        }
+
+        private fun setCutoutShort(enabled: Boolean) {
+            window.attributes.layoutInDisplayCutoutMode = when (enabled) {
+                true -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                false -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+            }
+
+            // Trigger relayout
+            setMenuVisibility(menuVisible)
+        }
+
+        /**
+         * Sets the keep screen on mode according to [enabled].
+         */
+        private fun setKeepScreenOn(enabled: Boolean) {
+            if (enabled) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+
+        /**
+         * Sets the custom brightness overlay according to [enabled].
+         */
+        @OptIn(FlowPreview::class)
+        private fun setCustomBrightness(enabled: Boolean) {
+            if (enabled) {
+                readerPreferences.customBrightnessValue().changes()
+                    .sample(100)
+                    .onEach { setCustomBrightnessValue(it) }
+                    .launchIn(lifecycleScope)
+            } else {
+                setCustomBrightnessValue(0)
+            }
+        }
+
+        /**
+         * Sets the color filter overlay according to [enabled].
+         */
+        @OptIn(FlowPreview::class)
+        private fun setColorFilter(enabled: Boolean) {
+            if (enabled) {
+                readerPreferences.colorFilterValue().changes()
+                    .sample(100)
+                    .onEach { setColorFilterValue(it) }
+                    .launchIn(lifecycleScope)
+            } else {
+                binding.colorOverlay.isVisible = false
+            }
+        }
+
+        /**
+         * Sets the brightness of the screen. Range is [-75, 100].
+         * From -75 to -1 a semi-transparent black view is overlaid with the minimum brightness.
+         * From 1 to 100 it sets that value as brightness.
+         * 0 sets system brightness and hides the overlay.
+         */
+        private fun setCustomBrightnessValue(value: Int) {
+            // Calculate and set reader brightness.
+            val readerBrightness = when {
+                value > 0 -> {
+                    value / 100f
+                }
+
+                value < 0 -> {
+                    0.01f
+                }
+
+                else -> WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            }
+
+            window.attributes = window.attributes.apply { screenBrightness = readerBrightness }
+
+            // Set black overlay visibility.
+            if (value < 0) {
+                binding.brightnessOverlay.isVisible = true
+                val alpha = (abs(value) * 2.56).toInt()
+                binding.brightnessOverlay.setBackgroundColor(Color.argb(alpha, 0, 0, 0))
+            } else {
+                binding.brightnessOverlay.isVisible = false
+            }
+        }
+
+        /**
+         * Sets the color filter [value].
+         */
+        private fun setColorFilterValue(value: Int) {
+            binding.colorOverlay.isVisible = true
+            binding.colorOverlay.setFilterColor(value, readerPreferences.colorFilterMode().get())
+        }
+
+        private fun setLayerPaint(grayscale: Boolean, invertedColors: Boolean) {
+            val paint = if (grayscale || invertedColors) getCombinedPaint(
+                grayscale,
+                invertedColors
+            ) else null
+            binding.viewerContainer.setLayerType(LAYER_TYPE_HARDWARE, paint)
         }
     }
 }

@@ -28,4 +28,6 @@
     <color name="navigation_menu">#CC95818D</color>
     <color name="navigation_right">#CCA6CFD5</color>
     <color name="navigation_left">#CC7D1128</color>
+
+    <color name="reader_background_dark">#202125</color>
 </resources>
