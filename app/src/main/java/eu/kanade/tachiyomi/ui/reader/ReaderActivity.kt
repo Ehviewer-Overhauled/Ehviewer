@@ -909,6 +909,8 @@ class ReaderActivity : EhActivity() {
         binding.pageSlider.isEnabled = pages.size > 1
         binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
         binding.pageSlider.value = page.index.toFloat()
+
+        mGalleryProvider?.putStartPage(page.index)
     }
 
     /**
