@@ -90,13 +90,6 @@ class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attr
 
         binding.pagerPrefsGroup.zoomStart.bindToPreference(readerPreferences.zoomStart(), 1)
         binding.pagerPrefsGroup.cropBorders.bindToPreference(readerPreferences.cropBorders())
-
-        binding.pagerPrefsGroup.dualPageSplit.bindToPreference(readerPreferences.dualPageSplitPaged())
-        // Makes it so that dual page invert gets hidden away when dual page split is turned off
-        readerPreferences.dualPageSplitPaged()
-            .asHotFlow { binding.pagerPrefsGroup.dualPageInvert.isVisible = it }
-            .launchIn((context as ReaderActivity).lifecycleScope)
-        binding.pagerPrefsGroup.dualPageInvert.bindToPreference(readerPreferences.dualPageInvertPaged())
     }
 
     /**
@@ -114,12 +107,5 @@ class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attr
             .launchIn((context as ReaderActivity).lifecycleScope)
         binding.webtoonPrefsGroup.cropBordersWebtoon.bindToPreference(readerPreferences.cropBordersWebtoon())
         binding.webtoonPrefsGroup.webtoonSidePadding.bindToIntPreference(readerPreferences.webtoonSidePadding(), R.array.webtoon_side_padding_values)
-
-        binding.webtoonPrefsGroup.dualPageSplit.bindToPreference(readerPreferences.dualPageSplitWebtoon())
-        // Makes it so that dual page invert gets hidden away when dual page split is turned off
-        readerPreferences.dualPageSplitWebtoon()
-            .asHotFlow { binding.webtoonPrefsGroup.dualPageInvert.isVisible = it }
-            .launchIn((context as ReaderActivity).lifecycleScope)
-        binding.webtoonPrefsGroup.dualPageInvert.bindToPreference(readerPreferences.dualPageInvertWebtoon())
     }
 }

@@ -46,39 +46,10 @@
         android:text="@string/pref_crop_borders"
         android:textColor="?android:attr/textColorSecondary" />
 
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/dual_page_split"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
-        android:text="@string/pref_dual_page_split"
-        android:textColor="?android:attr/textColorSecondary" />
-
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/dual_page_invert"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
-        android:text="@string/pref_dual_page_invert"
-        android:textColor="?android:attr/textColorSecondary"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/long_strip_split"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="@string/pref_long_strip_split"
-        android:textColor="?android:attr/textColorSecondary" />
-
     <androidx.constraintlayout.widget.Group
         android:id="@+id/tapping_prefs_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="webtoon_nav,tapping_inverted,dual_page_split,dual_page_invert" />
+        app:constraint_referenced_ids="webtoon_nav,tapping_inverted" />
 
 </LinearLayout>

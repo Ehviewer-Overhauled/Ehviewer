@@ -46,7 +46,6 @@ class ReaderGeneralSettings @JvmOverloads constructor(context: Context, attrs: A
 
         binding.keepscreen.bindToPreference(readerPreferences.keepScreenOn())
         binding.longTap.bindToPreference(readerPreferences.readWithLongTap())
-        binding.alwaysShowChapterTransition.bindToPreference(readerPreferences.alwaysShowChapterTransition())
         binding.pageTransitions.bindToPreference(readerPreferences.pageTransitions())
     }
 }

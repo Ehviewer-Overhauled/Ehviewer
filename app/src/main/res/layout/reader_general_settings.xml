@@ -65,15 +65,6 @@
             android:textColor="?android:attr/textColorSecondary" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/always_show_chapter_transition"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="16dp"
-            android:text="@string/pref_always_show_chapter_transition"
-            android:textColor="?android:attr/textColorSecondary" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/page_transitions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
