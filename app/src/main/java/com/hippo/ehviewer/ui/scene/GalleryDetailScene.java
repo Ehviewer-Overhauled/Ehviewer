@@ -89,11 +89,11 @@ import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
-import com.hippo.ehviewer.gallery.EhGalleryProvider;
-import com.hippo.ehviewer.gallery.GalleryProvider2;
+import com.hippo.ehviewer.gallery.EhPageLoader;
+import com.hippo.ehviewer.gallery.PageLoader2;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.GalleryActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
@@ -452,7 +452,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         super.onResume();
         if (mRead != null) {
             try {
-                GalleryProvider2 galleryProvider = new EhGalleryProvider(requireContext(), mGalleryInfo);
+                PageLoader2 galleryProvider = new EhPageLoader(requireContext(), mGalleryInfo);
                 galleryProvider.start();
                 int startPage = galleryProvider.getStartPage();
                 if (startPage != 0) {
@@ -866,10 +866,10 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (mPage != 0) {
             Snackbar.make(requireActivity().findViewById(R.id.snackbar), getString(R.string.read_from, mPage), Snackbar.LENGTH_LONG)
                     .setAction(R.string.read, v -> {
-                        Intent intent = new Intent(requireContext(), GalleryActivity.class);
-                        intent.setAction(GalleryActivity.ACTION_EH);
-                        intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, mGalleryDetail);
-                        intent.putExtra(GalleryActivity.KEY_PAGE, mPage);
+                        Intent intent = new Intent(requireContext(), ReaderActivity.class);
+                        intent.setAction(ReaderActivity.ACTION_EH);
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryDetail);
+                        intent.putExtra(ReaderActivity.KEY_PAGE, mPage);
                         startActivity(intent);
                     })
                     .show();
@@ -1164,9 +1164,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 galleryInfo = mGalleryDetail;
             }
             if (galleryInfo != null) {
-                Intent intent = new Intent(activity, GalleryActivity.class);
-                intent.setAction(GalleryActivity.ACTION_EH);
-                intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, galleryInfo);
+                Intent intent = new Intent(activity, ReaderActivity.class);
+                intent.setAction(ReaderActivity.ACTION_EH);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
                 startActivity(intent);
             }
         } else if (mNewerVersion == v) {
@@ -1298,10 +1298,10 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             o = v.getTag(R.id.index);
             if (null != galleryInfo && o instanceof Integer) {
                 int index = (Integer) o;
-                Intent intent = new Intent(context, GalleryActivity.class);
-                intent.setAction(GalleryActivity.ACTION_EH);
-                intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, galleryInfo);
-                intent.putExtra(GalleryActivity.KEY_PAGE, index);
+                Intent intent = new Intent(context, ReaderActivity.class);
+                intent.setAction(ReaderActivity.ACTION_EH);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
+                intent.putExtra(ReaderActivity.KEY_PAGE, index);
                 startActivity(intent);
             }
         }

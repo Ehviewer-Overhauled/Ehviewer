@@ -30,4 +30,6 @@
     <item name="add_filter" type="id" />
     <item name="copy_trans" type="id" />
 
+    <item name="reader_pager" type="id"/>
+
 </resources>

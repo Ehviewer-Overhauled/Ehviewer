@@ -49,7 +49,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryPreview;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ehviewer.ui.GalleryActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
@@ -227,10 +227,10 @@ public class GalleryPreviewsScene extends ToolbarScene {
         if (null != context && null != mHelper && null != mGalleryInfo) {
             GalleryPreview p = mHelper.getDataAtEx(position);
             if (p != null) {
-                Intent intent = new Intent(context, GalleryActivity.class);
-                intent.setAction(GalleryActivity.ACTION_EH);
-                intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, mGalleryInfo);
-                intent.putExtra(GalleryActivity.KEY_PAGE, p.getPosition());
+                Intent intent = new Intent(context, ReaderActivity.class);
+                intent.setAction(ReaderActivity.ACTION_EH);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryInfo);
+                intent.putExtra(ReaderActivity.KEY_PAGE, p.getPosition());
                 startActivity(intent);
             }
         }

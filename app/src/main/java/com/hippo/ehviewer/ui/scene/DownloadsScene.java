@@ -70,7 +70,7 @@ import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.download.DownloadService;
 import com.hippo.ehviewer.spider.SpiderDen;
-import com.hippo.ehviewer.ui.GalleryActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.scene.Announcer;
 import com.hippo.unifile.UniFile;
@@ -596,9 +596,9 @@ public class DownloadsScene extends ToolbarScene
                 return false;
             }
 
-            Intent intent = new Intent(activity, GalleryActivity.class);
-            intent.setAction(GalleryActivity.ACTION_EH);
-            intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, list.get(position));
+            Intent intent = new Intent(activity, ReaderActivity.class);
+            intent.setAction(ReaderActivity.ACTION_EH);
+            intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, list.get(position));
             startActivity(intent);
             return true;
         }

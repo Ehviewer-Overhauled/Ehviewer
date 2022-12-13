@@ -30,7 +30,6 @@ import com.hippo.ehviewer.client.EhConfig;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
-import com.hippo.glgallery.GalleryView;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.NumberUtils;
@@ -131,11 +130,8 @@ public class Settings {
     private static final String KEY_SCREEN_ROTATION = "screen_rotation";
     private static final int DEFAULT_SCREEN_ROTATION = 0;
     private static final String KEY_READING_DIRECTION = "reading_direction";
-    private static final int DEFAULT_READING_DIRECTION = GalleryView.LAYOUT_RIGHT_TO_LEFT;
     private static final String KEY_PAGE_SCALING = "page_scaling";
-    private static final int DEFAULT_PAGE_SCALING = GalleryView.SCALE_FIT;
     private static final String KEY_START_POSITION = "start_position";
-    private static final int DEFAULT_START_POSITION = GalleryView.START_POSITION_TOP_RIGHT;
     private static final String KEY_KEEP_SCREEN_ON = "keep_screen_on";
     private static final boolean DEFAULT_KEEP_SCREEN_ON = false;
     private static final String KEY_SHOW_CLOCK = "gallery_show_clock";
@@ -236,7 +232,7 @@ public class Settings {
     public static boolean LIST_THUMB_SIZE_INITED = false;
     private static int LIST_THUMB_SIZE = 40;
     private static Context sContext;
-    private static SharedPreferences sSettingsPre;
+    public static SharedPreferences sSettingsPre;
     private static EhConfig sEhConfig;
 
     public static void initialize(Context context) {
@@ -507,27 +503,12 @@ public class Settings {
         putIntToStr(KEY_SCREEN_ROTATION, value);
     }
 
-    @GalleryView.LayoutMode
-    public static int getReadingDirection() {
-        return GalleryView.sanitizeLayoutMode(getIntFromStr(KEY_READING_DIRECTION, DEFAULT_READING_DIRECTION));
-    }
-
     public static void putReadingDirection(int value) {
         putIntToStr(KEY_READING_DIRECTION, value);
     }
 
-    @GalleryView.ScaleMode
-    public static int getPageScaling() {
-        return GalleryView.sanitizeScaleMode(getIntFromStr(KEY_PAGE_SCALING, DEFAULT_PAGE_SCALING));
-    }
-
     public static void putPageScaling(int value) {
         putIntToStr(KEY_PAGE_SCALING, value);
-    }
-
-    @GalleryView.StartPosition
-    public static int getStartPosition() {
-        return GalleryView.sanitizeStartPosition(getIntFromStr(KEY_START_POSITION, DEFAULT_START_POSITION));
     }
 
     public static void putStartPosition(int value) {

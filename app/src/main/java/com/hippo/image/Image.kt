@@ -17,19 +17,14 @@
  */
 package com.hippo.image
 
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.ImageDecoder
-import android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+import android.graphics.ImageDecoder.ALLOCATOR_HARDWARE
 import android.graphics.ImageDecoder.DecodeException
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
-import android.graphics.PixelFormat
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.core.graphics.drawable.toDrawable
 import com.hippo.ehviewer.EhApplication
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -37,23 +32,15 @@ import java.nio.channels.FileChannel
 import kotlin.math.max
 import kotlin.math.min
 
-class Image private constructor(
-    source: Source?, drawable: Drawable? = null,
-    val release: () -> Unit? = {}
-) {
-    private var mObtainedDrawable: Drawable?
-    private var mBitmap: Bitmap? = null
-    private var mCanvas: Canvas? = null
+class Image private constructor(source: Source?, val release: () -> Unit = {}) {
+    var mObtainedDrawable: Drawable?
 
     init {
         mObtainedDrawable = null
         source?.let {
             mObtainedDrawable =
                 ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, src: Source ->
-                    decoder.allocator = ALLOCATOR_SOFTWARE
-                    // Sadly we must use software memory since we need copy it to tile buffer, fuck glgallery
-                    // Idk it will cause how much performance regression
-
+                    decoder.allocator = ALLOCATOR_HARDWARE
                     decoder.setTargetSampleSize(
                         max(
                             min(
@@ -64,16 +51,10 @@ class Image private constructor(
                     )
                 } // Should we lazy decode it?
         }
-        if (mObtainedDrawable == null) {
-            mObtainedDrawable = drawable!!
-        }
     }
 
-    val animated = mObtainedDrawable is AnimatedImageDrawable
     val width = mObtainedDrawable!!.intrinsicWidth
     val height = mObtainedDrawable!!.intrinsicHeight
-    val isRecycled = mObtainedDrawable == null
-
     var started = false
 
     @Synchronized
@@ -86,39 +67,7 @@ class Image private constructor(
         }
         mObtainedDrawable?.callback = null
         mObtainedDrawable = null
-        mCanvas = null
-        mBitmap?.recycle()
-        mBitmap = null
         release()
-    }
-
-    private fun prepareBitmap() {
-        if (mBitmap != null) return
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        mCanvas = Canvas(mBitmap!!)
-    }
-
-    private fun updateBitmap() {
-        prepareBitmap()
-        mObtainedDrawable!!.draw(mCanvas!!)
-    }
-
-    fun texImage(init: Boolean, offsetX: Int, offsetY: Int, width: Int, height: Int) {
-        val bitmap: Bitmap? = if (animated) {
-            updateBitmap()
-            mBitmap
-        } else {
-            (mObtainedDrawable as BitmapDrawable?)?.bitmap
-        }
-        bitmap ?: return
-        nativeTexImage(
-            bitmap,
-            init,
-            offsetX,
-            offsetY,
-            width,
-            height
-        )
     }
 
     fun start() {
@@ -126,18 +75,6 @@ class Image private constructor(
             (mObtainedDrawable as AnimatedImageDrawable?)?.start()
         }
     }
-
-    val delay: Int
-        get() {
-            if (animated)
-                return 10
-            return 0
-        }
-
-    val isOpaque: Boolean
-        get() {
-            return mObtainedDrawable?.opacity == PixelFormat.OPAQUE
-        }
 
     companion object {
         var screenWidth: Int = 0
@@ -169,20 +106,5 @@ class Image private constructor(
                 release()
             }
         }
-
-        @JvmStatic
-        fun create(bitmap: Bitmap): Image {
-            return Image(null, bitmap.toDrawable(Resources.getSystem()))
-        }
-
-        @JvmStatic
-        private external fun nativeTexImage(
-            bitmap: Bitmap,
-            init: Boolean,
-            offsetX: Int,
-            offsetY: Int,
-            width: Int,
-            height: Int
-        )
     }
 }

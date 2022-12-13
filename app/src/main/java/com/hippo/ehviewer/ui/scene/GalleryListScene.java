@@ -87,7 +87,7 @@ import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.GalleryActivity;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
@@ -977,9 +977,9 @@ public final class GalleryListScene extends SearchBarScene
                 .setAdapter(new SelectItemWithIconAdapter(context, items, icons), (dialog, which) -> {
                     switch (which) {
                         case 0: // Read
-                            Intent intent = new Intent(activity, GalleryActivity.class);
-                            intent.setAction(GalleryActivity.ACTION_EH);
-                            intent.putExtra(GalleryActivity.KEY_GALLERY_INFO, gi);
+                            Intent intent = new Intent(activity, ReaderActivity.class);
+                            intent.setAction(ReaderActivity.ACTION_EH);
+                            intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi);
                             startActivity(intent);
                             break;
                         case 1: // Download

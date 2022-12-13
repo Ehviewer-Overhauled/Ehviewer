@@ -14,6 +14,8 @@
 -keep,allowoptimization class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BaseFragment { }
 -keep,allowoptimization class com.hippo.ehviewer.ui.fragment.* extends com.hippo.ehviewer.ui.fragment.BasePreferenceFragment { }
 
+-keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
+
 -renamesourcefileattribute
 -repackageclasses
 -allowaccessmodification

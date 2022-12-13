@@ -123,4 +123,7 @@
     <dimen name="gallery_page_text_size">56sp</dimen>
     <dimen name="gallery_error_text_size">24sp</dimen>
 
+    <dimen name="bottom_sheet_width">0dp</dimen>
+    <dimen name="screen_edge_margin">16dp</dimen>
+
 </resources>

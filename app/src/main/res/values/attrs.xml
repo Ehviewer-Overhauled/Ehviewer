@@ -135,4 +135,10 @@
         <attr name="draggable" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="MaterialSpinnerView">
+        <attr name="title" format="reference|string"/>
+        <attr name="android:entries"/>
+        <attr name="summary" format="reference|string" />
+    </declare-styleable>
+
 </resources>

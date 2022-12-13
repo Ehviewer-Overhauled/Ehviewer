@@ -94,6 +94,8 @@ android {
     buildFeatures {
         buildConfig true
         compose true
+        dataBinding true
+        viewBinding true
     }
 
     composeOptions {
@@ -194,6 +196,13 @@ dependencies {
     implementation 'io.coil-kt:coil:2.2.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jsoup:jsoup:1.15.3'
+
+    // Tachiyomi Reader
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation 'dev.chrisbanes.insetter:insetter:0.6.1'
+    implementation ('com.github.tachiyomiorg:DirectionalViewPager:1.0.0') {
+        exclude group: 'androidx.viewpager', module: 'viewpager'
+    }
 }
 
 configurations.all {
