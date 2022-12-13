@@ -136,7 +136,7 @@ public final class MainActivity extends StageActivity
     @NonNull
     @Override
     protected Announcer getLaunchAnnouncer() {
-        if (EhUtils.needSignedIn(this)) {
+        if (EhUtils.needSignedIn()) {
             return new Announcer(SignInScene.class);
         } else if (Settings.getSelectSite()) {
             return new Announcer(SelectSiteScene.class);
@@ -150,7 +150,7 @@ public final class MainActivity extends StageActivity
     // Sometimes scene can't show directly
     private Announcer processAnnouncer(Announcer announcer) {
         if (0 == getSceneCount()) {
-            if (EhUtils.needSignedIn(this)) {
+            if (EhUtils.needSignedIn()) {
                 Bundle newArgs = new Bundle();
                 newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.getClazz().getName());
                 newArgs.putBundle(SignInScene.KEY_TARGET_ARGS, announcer.getArgs());

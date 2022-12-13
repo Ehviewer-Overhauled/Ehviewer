@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer.client;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
 
@@ -49,10 +48,10 @@ public class EhUtils {
 
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff
     public static final Pattern PATTERN_TITLE_PREFIX = Pattern.compile(
-            "^(?:(?:\\([^\\)]*\\))|(?:\\[[^\\]]*\\])|(?:\\{[^\\}]*\\})|(?:~[^~]*~)|\\s+)*");
+            "^(?:\\([^)]*\\)|\\[[^]]*]|\\{[^}]*\\}|~[^~]*~|\\s+)*");
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff and something like ch. 1-23
     public static final Pattern PATTERN_TITLE_SUFFIX = Pattern.compile(
-            "(?:\\s+ch.[\\s\\d-]+)?(?:(?:\\([^\\)]*\\))|(?:\\[[^\\]]*\\])|(?:\\{[^\\}]*\\})|(?:~[^~]*~)|\\s+)*$",
+            "(?:\\s+ch.[\\s\\d-]+)?(?:\\([^)]*\\)|\\[[^]]*]|\\{[^}]*\\}|~[^~]*~|\\s+)*$",
             Pattern.CASE_INSENSITIVE);
 
     private static final int[] CATEGORY_VALUES = {
@@ -106,40 +105,29 @@ public class EhUtils {
     }
 
     public static int getCategoryColor(int category) {
-        switch (category) {
-            case EhConfig.DOUJINSHI:
-                return BG_COLOR_DOUJINSHI;
-            case EhConfig.MANGA:
-                return BG_COLOR_MANGA;
-            case EhConfig.ARTIST_CG:
-                return BG_COLOR_ARTIST_CG;
-            case EhConfig.GAME_CG:
-                return BG_COLOR_GAME_CG;
-            case EhConfig.WESTERN:
-                return BG_COLOR_WESTERN;
-            case EhConfig.NON_H:
-                return BG_COLOR_NON_H;
-            case EhConfig.IMAGE_SET:
-                return BG_COLOR_IMAGE_SET;
-            case EhConfig.COSPLAY:
-                return BG_COLOR_COSPLAY;
-            case EhConfig.ASIAN_PORN:
-                return BG_COLOR_ASIAN_PORN;
-            case EhConfig.MISC:
-                return BG_COLOR_MISC;
-            default:
-                return BG_COLOR_UNKNOWN;
-        }
+        return switch (category) {
+            case EhConfig.DOUJINSHI -> BG_COLOR_DOUJINSHI;
+            case EhConfig.MANGA -> BG_COLOR_MANGA;
+            case EhConfig.ARTIST_CG -> BG_COLOR_ARTIST_CG;
+            case EhConfig.GAME_CG -> BG_COLOR_GAME_CG;
+            case EhConfig.WESTERN -> BG_COLOR_WESTERN;
+            case EhConfig.NON_H -> BG_COLOR_NON_H;
+            case EhConfig.IMAGE_SET -> BG_COLOR_IMAGE_SET;
+            case EhConfig.COSPLAY -> BG_COLOR_COSPLAY;
+            case EhConfig.ASIAN_PORN -> BG_COLOR_ASIAN_PORN;
+            case EhConfig.MISC -> BG_COLOR_MISC;
+            default -> BG_COLOR_UNKNOWN;
+        };
     }
 
-    public static void signOut(Context context) {
+    public static void signOut() {
         EhApplication.getEhCookieStore().signOut();
         Settings.putAvatar(null);
         Settings.putDisplayName(null);
         Settings.putNeedSignIn(true);
     }
 
-    public static boolean needSignedIn(Context context) {
+    public static boolean needSignedIn() {
         return Settings.getNeedSignIn() && !EhApplication.getEhCookieStore().hasSignedIn();
     }
 
