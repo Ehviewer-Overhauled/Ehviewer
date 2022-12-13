@@ -22,7 +22,6 @@
 
     <!-- Text size -->
     <dimen name="text_super_large">24sp</dimen>
-    <dimen name="text_little_large">20sp</dimen>
     <dimen name="text_little_small">16sp</dimen>
     <dimen name="text_small">14sp</dimen>
     <dimen name="text_super_small">12sp</dimen>
@@ -46,7 +45,6 @@
     <dimen name="gallery_grid_margin_v">4dp</dimen>
 
     <!-- 8dp - 4dp, 4dp for card padding -->
-    <dimen name="gallery_search_bar_margin_h">6dp</dimen>
     <!-- 12dp - 4dp, 4dp for card padding -->
     <dimen name="gallery_search_bar_margin_v">10dp</dimen>
 
@@ -64,12 +62,6 @@
     <dimen name="search_layout_margin_v">4dp</dimen>
 
     <!-- DrawerArrowDrawable -->
-    <dimen name="dad_drawable_size">24dp</dimen>
-    <dimen name="dad_bar_size">18dp</dimen>
-    <dimen name="dad_top_bottom_bar_arrow_size">11.31dp</dimen>
-    <dimen name="dad_thickness">2dp</dimen>
-    <dimen name="dad_gap_between_bars">3dp</dimen>
-    <dimen name="dad_middle_bar_arrow_size">16dp</dimen>
 
     <!-- AddDeleteDrawable -->
     <dimen name="add_size">20dp</dimen>
@@ -105,23 +97,11 @@
     <dimen name="gallery_detail_thumb_width">128dp</dimen>
     <dimen name="gallery_detail_thumb_height">192dp</dimen>
 
-    <dimen name="gallery_widget_margin_h">12dp</dimen>
-    <dimen name="gallery_widget_margin_v">12dp</dimen>
-
-    <dimen name="gallery_guide_divider_width">3dp</dimen>
-
     <!-- Lock pattern view -->
 
     <!-- Custom preference -->
 
     <!-- Gallery -->
-    <dimen name="gallery_pager_interval">48dp</dimen>
-    <dimen name="gallery_scroll_interval">28dp</dimen>
-    <dimen name="gallery_page_min_height">256dp</dimen>
-    <dimen name="gallery_page_info_interval">24dp</dimen>
-    <dimen name="gallery_progress_size">56dp</dimen>
-    <dimen name="gallery_page_text_size">56sp</dimen>
-    <dimen name="gallery_error_text_size">24sp</dimen>
 
     <dimen name="bottom_sheet_width">0dp</dimen>
     <dimen name="screen_edge_margin">16dp</dimen>

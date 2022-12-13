@@ -40,8 +40,6 @@
     <string name="text_is_empty">ข้อความห้ามเว้นว่างไว้</string>
     <string name="waring">คำเตือน</string>
     <string name="wrong_cookie_warning">ดูเหมือนว่าคุกกี้ที่คุณกรอกมานั้นมันผิด คุณลองตรวจสอบใหม่ดูอีกรอบ</string>
-    <string name="i_will_check_it">ฉันจะตรวจสอบเอง</string>
-    <string name="i_dont_think_so">ฉันว่าไม่ดีกว่า</string>
     <string name="found_cookies">พบคุกกี้แล้ว!</string>
 
     <string name="invalid_download_location">ดูเหมือนที่อยู่ในการดาวน์โหลดนั้นไม่พร้อมใช้งาน โปรดตั้งค่าในเมนูการตั้งค่า</string>
@@ -59,7 +57,6 @@
     <string name="error_cannot_parse_the_url">ไม่สามารถวิเคราะห์ URL </string>
     <string name="error_not_folder_path">ไม่พบโฟลเดอร์ปลายทาง</string>
     <string name="error_decoding_failed">การถอดรหัสล้มเหลว</string>
-    <string name="error_empty">ว่างเปล่า</string>
     <string name="error_reading_failed">การอ่านล้มเหลว</string>
     <string name="error_out_of_range">ไม่อยู่ในขอบเขต</string>
     <string name="error_write_failed">การเขียนล้มเหลว</string>
@@ -310,12 +307,6 @@
     <string name="invalid_ip">ไอพีไม่ถูกต้อง</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">หน้า %d</string>
-    <string name="page_menu_refresh">รีเฟรช</string>
-    <string name="page_menu_share">แชร์</string>
-    <string name="page_menu_save">บันทึก</string>
-    <string name="page_menu_save_to">บันทึกลงที่…</string>
-    <string name="gallery_menu_title">เมนู</string>
     <string name="share_image">แชร์รูปภาพ</string>
     <string name="image_saved">ภาพถูกบันทึกไปที่ %s</string>
 
@@ -477,11 +468,6 @@
     <string name="error_something_wrong_happened">มีสิ่งผิดปกติบางอย่างเกิดขึ้น</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">เปลี่ยนหน้า</string>
-    <string name="guide_gallery_right">เปลี่ยนหน้า</string>
-    <string name="guide_gallery_menu">เมนู</string>
-    <string name="guide_gallery_progress">ความคืบหน้า</string>
-    <string name="guide_gallery_long_click">แตะค้างไว้เพื่อเปิดหน้าเมนู</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">จากอนาคต</string>

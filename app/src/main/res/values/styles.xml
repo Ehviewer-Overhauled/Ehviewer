@@ -53,8 +53,6 @@
         <item name="indicatorColor">?attr/dividerColor</item>
     </style>
 
-    <style name="Guide.Title" parent="TextAppearance.Material3.TitleMedium" />
-
     <style name="Snackbar" parent="Widget.Material3.Snackbar">
         <item name="materialThemeOverlay">@style/SnackbarTheme</item>
         <item name="actionTextColorAlpha">1</item>

@@ -40,8 +40,6 @@
     <string name="text_is_empty">텍스트가 비어 있습니다.</string>
     <string name="waring">경고</string>
     <string name="wrong_cookie_warning">입력한 쿠키가 잘못된 것 같습니다. 확인해 보는 게 좋겠어요.</string>
-    <string name="i_will_check_it">확인해 볼게요</string>
-    <string name="i_dont_think_so">아닌데요</string>
     <string name="found_cookies">쿠키를 찾았어요!</string>
 
     <string name="invalid_download_location">다운로드 위치가 잘못되었습니다. 설정을 확인하세요.</string>
@@ -59,7 +57,6 @@
     <string name="error_cannot_parse_the_url">URL을 분석할 수 없음</string>
     <string name="error_not_folder_path">폴더 경로가 아님</string>
     <string name="error_decoding_failed">디코딩 실패</string>
-    <string name="error_empty">비어 있음</string>
     <string name="error_reading_failed">읽기 실패</string>
     <string name="error_out_of_range">범위 초과</string>
     <string name="error_write_failed">쓰기 실패</string>
@@ -295,10 +292,6 @@
     <string name="invalid_ip">잘못된 IP</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">페이지 %d</string>
-    <string name="page_menu_save">저장</string>
-    <string name="page_menu_save_to">다른 이름으로 저장</string>
-    <string name="gallery_menu_title">메뉴</string>
     <string name="share_image">이미지 공유</string>
     <string name="image_saved">이미지를 %s 경로에 저장함</string>
 
@@ -460,11 +453,6 @@
     <string name="error_something_wrong_happened">뭔가 잘못되었습니다.</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">페이지 넘기기</string>
-    <string name="guide_gallery_right">페이지 넘기기</string>
-    <string name="guide_gallery_menu">메뉴</string>
-    <string name="guide_gallery_progress">독서 진행도</string>
-    <string name="guide_gallery_long_click">페이지 메뉴를 열려면 길게 누르세요.</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">미래에</string>

@@ -39,8 +39,6 @@
     <string name="text_is_empty">テキストを入力してください</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">入力したCookieは正しくないようです。確認してください。</string>
-    <string name="i_will_check_it">はい</string>
-    <string name="i_dont_think_so">再試行</string>
     <string name="found_cookies">Cookieが見つかりました</string>
 
     <string name="invalid_download_location">ダウンロードパスは現在利用できません。ダウンロードパスを設定してください。</string>
@@ -55,7 +53,6 @@
     <string name="error_cannot_parse_the_url">リンクを解析できません。</string>
     <string name="error_not_folder_path">フォルダが見つかりません。</string>
     <string name="error_decoding_failed">デコードに失敗しました。</string>
-    <string name="error_empty">空</string>
     <string name="error_reading_failed">読み込めませんでした。</string>
     <string name="error_out_of_range">範囲外です。</string>
     <string name="error_write_failed">書き込めませんでした</string>
@@ -313,11 +310,6 @@
     <string name="apply_tip">右上隅のチェックマークをタップして設定を保存します。</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">ページ%d</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">保存</string>
-    <string name="gallery_menu_title">メニュー</string>
     <string name="share_image">画像を共有</string>
     <string name="image_saved">画像は%sに保存されました</string>
 
@@ -468,10 +460,6 @@
     <string name="error_something_wrong_happened">エラーが発生しました</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">ページをめくる</string>
-    <string name="guide_gallery_right">ページをめくる</string>
-    <string name="guide_gallery_menu">メニュー</string>
-    <string name="guide_gallery_progress">プログレスバー</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">未来から</string>
@@ -515,7 +503,6 @@
     <string name="settings_advanced_clear_download_path_cache_summary">ギャラリー ダウンロード パスは無効なようで、もう一度ダウンロードする必要があると表示されている場合は、ダウンロードパスのキャッシュをクリアしてみてください。</string>
     <string name="clipboard_gallery_url_snack_message">クリップボードにはギャラリーURLが検出されました。</string>
     <string name="clipboard_gallery_url_snack_action">移動</string>
-    <string name="page_menu_save_to">名前を付けて保存</string>
     <string name="settings_advanced_app_language_title">アプリ言語（Language）</string>
     <string name="settings_advanced_proxy">プロキシ</string>
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s：%3$d</string>
@@ -531,7 +518,6 @@
     <string name="invalid_host">無効なホストです</string>
     <string name="invalid_ip">無効なIPです</string>
     <string name="settings_advanced_built_in_hosts_title">既定hosts.txt</string>
-    <string name="guide_gallery_long_click">メニューを呼び出すには、長押ししてください</string>
     <string name="app_language_system">システム言語（既定）</string>
     <string name="download_service">ダウンロードサービス</string>
     <string name="settings_advanced_built_in_hosts_summary">ホストをアプリ既定のIPにマッピング\nカスタムhosts.txtに上書きされます。</string>

@@ -41,8 +41,6 @@
     <string name="text_is_empty">Entrez le texte.</string>
     <string name="waring">Attention</string>
     <string name="wrong_cookie_warning">Les cookies entrés n\'ont pas l\'air corrects. Vérifiez-les.</string>
-    <string name="i_will_check_it">Je les vérifie tout le suite.</string>
-    <string name="i_dont_think_so">Ils sont corrects !</string>
     <string name="found_cookies">Cookies trouvés</string>
 
     <string name="invalid_download_location">La location de téléchargement actuelle n\'est pas disponible. Choissez-en une à nouveau dans les Paramétres.</string>
@@ -57,7 +55,6 @@
     <string name="error_cannot_parse_the_url">Impossible de parser le lien URL</string>
     <string name="error_not_folder_path">Chemin de dossier invalide</string>
     <string name="error_decoding_failed">Échec de décodage</string>
-    <string name="error_empty">Vide</string>
     <string name="error_reading_failed">Échec de lecture</string>
     <string name="error_out_of_range">Hors de portée</string>
     <string name="error_write_failed">Échec d\'écriture</string>
@@ -316,11 +313,6 @@
     <string name="apply_tip">Appuyez sur la coche pour sauvegarder les changements</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">Page %d</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">Enregistrer</string>
-    <string name="gallery_menu_title">Menu</string>
     <string name="share_image">Partager l\'image</string>
     <string name="image_saved">Image sauvegardée à %s</string>
 
@@ -472,11 +464,6 @@
     <string name="error_something_wrong_happened">Une erreur s\'est produite</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">Tourner la page</string>
-    <string name="guide_gallery_right">Tourner la page</string>
-    <string name="guide_gallery_menu">Menu</string>
-    <string name="guide_gallery_progress">Progrès</string>
-    <string name="guide_gallery_long_click">Maintenez pour ouvrir le menu de page</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">Du futur</string>
@@ -530,7 +517,6 @@
     <string name="edit_host_delete">Supprimer</string>
     <string name="invalid_host">Hôte invalide</string>
     <string name="invalid_ip">IP invalide</string>
-    <string name="page_menu_save_to">Enregistrer sous…</string>
     <string name="settings_advanced_app_language_title">Langue de l\'app (Language)</string>
     <string name="settings_advanced_built_in_hosts_title">hosts.txt integré</string>
     <string name="settings_advanced_proxy">Serveur proxy</string>

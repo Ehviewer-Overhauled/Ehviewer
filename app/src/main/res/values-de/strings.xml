@@ -35,8 +35,6 @@
     <string name="text_is_empty">Der Text wird nicht eingegeben</string>
     <string name="waring">Achtung</string>
     <string name="wrong_cookie_warning">Die eingegebenen Cookies sehen korrekt nicht aus. Überprüfe sie.</string>
-    <string name="i_will_check_it">In Ordnung!</string>
-    <string name="i_dont_think_so">Sie sind absolut korrekt!</string>
     <string name="found_cookies">Cookies werden gefunden</string>
     <string name="invalid_download_location">Der Downloadpfad ist nicht verfügbar. Geh zu die Einstellungen und stelle einen neue Pfad fest.</string>
     <string name="error_bad_status_code">Inkorrekter Statuscode: %d</string>
@@ -49,7 +47,6 @@
     <string name="error_cannot_parse_the_url">Die URL konnte analysiert nicht werden</string>
     <string name="error_not_folder_path">Der Ordnerpfad ist ungültig</string>
     <string name="error_decoding_failed">Dekodierung fehlgeschlagen</string>
-    <string name="error_empty">Leer</string>
     <string name="error_reading_failed">Lesefehler</string>
     <string name="error_out_of_range">Außer Reichweite</string>
     <string name="error_write_failed">Schreibfehler</string>
@@ -261,12 +258,6 @@
     <string name="edit_host_delete">Entfernen</string>
     <string name="invalid_host">Ungültiger Host</string>
     <string name="invalid_ip">Ungültige IP</string>
-    <string name="page_menu_title">Seite %d</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">Speichern</string>
-    <string name="page_menu_save_to">Speichern unter …</string>
-    <string name="gallery_menu_title">Menü</string>
     <string name="share_image">Das Bild teilen</string>
     <string name="image_saved">Das Bild wurde zu %s gespeichert</string>
     <string name="settings_eh">EH</string>
@@ -374,11 +365,6 @@
     <string name="collections">Kollektionen</string>
     <string name="need_sign_in">Du musst dich zuerst anmelden</string>
     <string name="error_something_wrong_happened">Ein Fehler ist aufgetreten</string>
-    <string name="guide_gallery_left">Seiten umblättern</string>
-    <string name="guide_gallery_right">Seiten umblättern</string>
-    <string name="guide_gallery_menu">Menü</string>
-    <string name="guide_gallery_progress">Fortschitt</string>
-    <string name="guide_gallery_long_click">Drücken und halten, um Seitemenü zu öffnen</string>
     <string name="from_the_future">Von der Zukunft</string>
     <string name="just_now">Gerade</string>
     <string name="yesterday">Gestern</string>

@@ -41,8 +41,6 @@
     <string name="text_is_empty">文字是空的</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">看來您輸入的 Cookie 是錯誤的，最好再檢查一下。</string>
-    <string name="i_will_check_it">好的</string>
-    <string name="i_dont_think_so">我覺得沒打錯</string>
     <string name="found_cookies">找到 Cookie了!</string>
 
     <string name="invalid_download_location">看來下載路徑似乎沒辦法使用。請至設定重新設定下載路徑。</string>
@@ -60,7 +58,6 @@
     <string name="error_cannot_parse_the_url">無法解析連結</string>
     <string name="error_not_folder_path">非資料夾路徑</string>
     <string name="error_decoding_failed">解碼失敗</string>
-    <string name="error_empty">空</string>
     <string name="error_reading_failed">讀取失敗</string>
     <string name="error_out_of_range">超出範圍</string>
     <string name="error_write_failed">寫入失敗</string>
@@ -345,12 +342,6 @@
     <string name="invalid_ip">無效的 IP</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">第 %d 頁</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">儲存</string>
-    <string name="page_menu_save_to">儲存到…</string>
-    <string name="gallery_menu_title">選單</string>
     <string name="share_image">分享圖片</string>
     <string name="image_saved">已將圖片儲存至 %s</string>
 
@@ -528,11 +519,6 @@
     <string name="error_something_wrong_happened">被玩壞了</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">翻頁</string>
-    <string name="guide_gallery_right">翻頁</string>
-    <string name="guide_gallery_menu">選單</string>
-    <string name="guide_gallery_progress">進度條</string>
-    <string name="guide_gallery_long_click">長按以開啟頁面選單</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">來自未來</string>
@@ -599,7 +585,6 @@
     <string name="follow_app">跟隨應用</string>
     <string name="action_add_tag">增加標籤</string>
     <string name="action_add_tag_tip">增加新標籤，用逗號「，」分割</string>
-    <string name="error_no_webview">WebView 不可用</string>
     <string name="comment_user_uploader">%s （上傳者）</string>
     <string name="settings_eh_metered_network_warning">流量計費網路警告</string>
     <string name="metered_network_warning">正在使用流量計費網路</string>

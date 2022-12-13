@@ -41,8 +41,6 @@
     <string name="text_is_empty">El texto está vacío</string>
     <string name="waring">Advertencia</string>
     <string name="wrong_cookie_warning">Parece que las cookies que ingresaste son incorrectas. Debe revisarlos.</string>
-    <string name="i_will_check_it">Comprobar ahora</string>
-    <string name="i_dont_think_so">No lo creo</string>
     <string name="found_cookies">¡Cookies encontradas!</string>
 
     <string name="invalid_download_location">Parece que la ubicación de descarga no está disponible. Establece la ubicación en Configuración.</string>
@@ -57,7 +55,6 @@
     <string name="error_cannot_parse_the_url">No se puede analizar el URL</string>
     <string name="error_not_folder_path">Sin ruta del directorio</string>
     <string name="error_decoding_failed">Decodificación fallida</string>
-    <string name="error_empty">Vacío</string>
     <string name="error_reading_failed">Lectura Fallida</string>
     <string name="error_out_of_range">Fuera de rango</string>
     <string name="error_write_failed">Falla en la escritura</string>
@@ -278,11 +275,6 @@
     <!-- Set Security -->
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">Página %d</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">Guardar</string>
-    <string name="gallery_menu_title">Menú</string>
     <string name="share_image">Compartir imagen</string>
     <string name="image_saved">Imagen guardada en  %s</string>
 
@@ -429,11 +421,6 @@
     <!-- Progress Scene -->
 
     <!-- Guide -->
-    <string name="guide_gallery_left">Cambiar de página</string>
-    <string name="guide_gallery_right">Cambiar de página</string>
-    <string name="guide_gallery_menu">Menú</string>
-    <string name="guide_gallery_progress">Progreso</string>
-    <string name="guide_gallery_long_click">Pulso largo para abrir el menú de página</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">Desde el futuro</string>
@@ -501,7 +488,6 @@
 
     <string name="settings_privacy_secure">Impedir capturas de pantalla</string>
     <string name="settings_privacy_secure_summary">Si habilitas esta opción no podrás hacer captura de pantalla y el sistema no mostrará una previsualización en el multitareas.\n\nDeberás reiniciar la aplicación para activar esta función.</string>
-    <string name="page_menu_save_to">Guardar en…</string>
     <string name="u_config">Ajustes EHentai</string>
     <string name="apply">Aplicar</string>
     <string name="apply_tip">Toca la marca de verificación para guardar los cambios</string>

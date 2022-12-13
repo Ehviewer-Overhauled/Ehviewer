@@ -41,8 +41,6 @@
     <string name="text_is_empty">文本为空</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">看起来您输入的 Cookie 是错误的，最好检查一下。</string>
-    <string name="i_will_check_it">好的</string>
-    <string name="i_dont_think_so">我没输错</string>
     <string name="found_cookies">找到旧版 Cookie</string>
 
     <string name="invalid_download_location">似乎下载路径不可用。请到重新设置下载路径。</string>
@@ -60,7 +58,6 @@
     <string name="error_cannot_parse_the_url">无法解析链接</string>
     <string name="error_not_folder_path">非文件夹路径</string>
     <string name="error_decoding_failed">解码失败</string>
-    <string name="error_empty">空</string>
     <string name="error_reading_failed">读取失败</string>
     <string name="error_out_of_range">越界</string>
     <string name="error_write_failed">写入失败</string>
@@ -345,12 +342,6 @@
     <string name="invalid_ip">无效的 IP</string>
 
     <!-- Gallery Activity -->
-    <string name="page_menu_title">第 %d 页</string>
-    <string name="page_menu_refresh">@string/refresh</string>
-    <string name="page_menu_share">@string/share</string>
-    <string name="page_menu_save">保存</string>
-    <string name="page_menu_save_to">保存到…</string>
-    <string name="gallery_menu_title">菜单</string>
     <string name="share_image">分享图片</string>
     <string name="image_saved">图片已保存至 %s</string>
 
@@ -533,11 +524,6 @@
     <string name="error_something_wrong_happened">被玩坏了</string>
 
     <!-- Guide -->
-    <string name="guide_gallery_left">翻页</string>
-    <string name="guide_gallery_right">翻页</string>
-    <string name="guide_gallery_menu">菜单</string>
-    <string name="guide_gallery_progress">进度条</string>
-    <string name="guide_gallery_long_click">长按打开页面菜单</string>
 
     <!-- Readable Time -->
     <string name="from_the_future">来自未来</string>
@@ -604,7 +590,6 @@
     <string name="follow_app">跟随应用</string>
     <string name="action_add_tag">添加标签</string>
     <string name="action_add_tag_tip">添加新标签，用逗号「，」分割</string>
-    <string name="error_no_webview">WebView 不可用</string>
     <string name="comment_user_uploader">%s （上传者）</string>
     <string name="settings_eh_metered_network_warning">流量计费网络警告</string>
     <string name="metered_network_warning">正在使用流量计费网络</string>
