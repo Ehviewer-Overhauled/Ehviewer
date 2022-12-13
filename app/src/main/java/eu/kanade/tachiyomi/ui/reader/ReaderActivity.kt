@@ -733,7 +733,7 @@ class ReaderActivity : EhActivity() {
         val toolbarBackground = (binding.toolbar.background as MaterialShapeDrawable).apply {
             elevation =
                 resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
-            alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
+            alpha = 0
         }
         binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
 
