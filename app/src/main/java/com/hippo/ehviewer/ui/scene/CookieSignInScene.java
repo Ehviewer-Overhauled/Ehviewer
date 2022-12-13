@@ -201,27 +201,6 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         EhApplication.getEhClient().execute(request);
     }
 
-    private class CookieSignInListener implements EhClient.Callback<Object> {
-        @Override
-        public void onSuccess(Object result) {
-            setResult(RESULT_OK, null);
-            finish();
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            EhApplication.getEhCookieStore().signOut();
-            new BaseDialogBuilder(requireContext()).setTitle(R.string.sign_in_failed)
-                    .setMessage(ExceptionUtils.getReadableString(e) + "\n\n" + getString(R.string.wrong_cookie_warning))
-                    .setPositiveButton(R.string.get_it, null).show();
-        }
-
-        @Override
-        public void onCancel() {
-            EhApplication.getEhCookieStore().signOut();
-        }
-    }
-
     private void storeCookie(String id, String hash, String igneous) {
         Context context = getContext();
         if (null == context) {
@@ -300,6 +279,27 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
             ExceptionUtils.throwIfFatal(e);
             e.printStackTrace();
             showTip(R.string.from_clipboard_error, LENGTH_SHORT);
+        }
+    }
+
+    private class CookieSignInListener implements EhClient.Callback<Object> {
+        @Override
+        public void onSuccess(Object result) {
+            setResult(RESULT_OK, null);
+            finish();
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            EhApplication.getEhCookieStore().signOut();
+            new BaseDialogBuilder(requireContext()).setTitle(R.string.sign_in_failed)
+                    .setMessage(ExceptionUtils.getReadableString(e) + "\n\n" + getString(R.string.wrong_cookie_warning))
+                    .setPositiveButton(R.string.get_it, null).show();
+        }
+
+        @Override
+        public void onCancel() {
+            EhApplication.getEhCookieStore().signOut();
         }
     }
 }

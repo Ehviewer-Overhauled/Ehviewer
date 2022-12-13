@@ -29,10 +29,11 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
+
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 
 public final class UrlOpener {
 

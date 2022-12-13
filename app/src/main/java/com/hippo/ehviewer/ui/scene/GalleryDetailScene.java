@@ -93,7 +93,6 @@ import com.hippo.ehviewer.gallery.EhPageLoader;
 import com.hippo.ehviewer.gallery.PageLoader2;
 import com.hippo.ehviewer.spider.SpiderDen;
 import com.hippo.ehviewer.ui.CommonOperations;
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
@@ -124,6 +123,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import coil.Coil;
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
 

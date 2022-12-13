@@ -87,7 +87,6 @@ import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.ui.CommonOperations;
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
@@ -117,6 +116,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import rikka.core.res.ResourcesKt;
 
 @SuppressLint("RtlHardcoded")

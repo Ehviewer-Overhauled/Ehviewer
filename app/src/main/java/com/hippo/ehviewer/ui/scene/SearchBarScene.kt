@@ -220,7 +220,8 @@ abstract class SearchBarScene : ToolbarScene() {
 
     }
 
-    inner class TagSuggestion constructor(private var mHint: String, private var mKeyword: String) : Suggestion() {
+    inner class TagSuggestion constructor(private var mHint: String, private var mKeyword: String) :
+        Suggestion() {
 
         override fun getText(textView: TextView): CharSequence {
             return if (textView.id == android.R.id.text1) {

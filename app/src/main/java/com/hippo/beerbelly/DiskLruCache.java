@@ -290,21 +290,7 @@ public final class DiskLruCache implements Closeable {
         } finally {
             Util.closeQuietly(reader);
         }
-    }    private final Callable<Void> cleanupCallable = new Callable<>() {
-        public Void call() throws Exception {
-            synchronized (DiskLruCache.this) {
-                if (journalWriter == null) {
-                    return null; // Closed.
-                }
-                trimToSize();
-                if (journalRebuildRequired()) {
-                    rebuildJournal();
-                    redundantOpCount = 0;
-                }
-            }
-            return null;
-        }
-    };
+    }
 
     private void readJournalLine(String line) throws IOException {
         int firstSpace = line.indexOf(' ');
@@ -343,7 +329,21 @@ public final class DiskLruCache implements Closeable {
         } else {
             throw new IOException("unexpected journal line: " + line);
         }
-    }
+    }    private final Callable<Void> cleanupCallable = new Callable<>() {
+        public Void call() throws Exception {
+            synchronized (DiskLruCache.this) {
+                if (journalWriter == null) {
+                    return null; // Closed.
+                }
+                trimToSize();
+                if (journalRebuildRequired()) {
+                    rebuildJournal();
+                    redundantOpCount = 0;
+                }
+            }
+            return null;
+        }
+    };
 
     /**
      * Computes the initial size and collects garbage as a part of opening the

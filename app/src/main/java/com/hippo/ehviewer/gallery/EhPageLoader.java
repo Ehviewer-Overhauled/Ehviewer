@@ -23,12 +23,13 @@ import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.spider.SpiderQueen;
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.SimpleHandler;
 
 import java.util.Locale;
+
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 
 public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderListener {
 

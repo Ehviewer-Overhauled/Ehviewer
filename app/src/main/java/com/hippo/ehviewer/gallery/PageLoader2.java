@@ -19,8 +19,9 @@ package com.hippo.ehviewer.gallery;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import com.hippo.unifile.UniFile;
+
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 
 public abstract class PageLoader2 extends PageLoader {
 

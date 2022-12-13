@@ -20,12 +20,11 @@ public class HistoryInfo extends GalleryInfo {
             return new HistoryInfo[size];
         }
     };
-
+    @ColumnInfo(name = "TIME")
+    public long time;
     // Use MODE for favoriteSlot
     @ColumnInfo(name = "MODE")
     private int mode;
-    @ColumnInfo(name = "TIME")
-    public long time;
 
     protected HistoryInfo(Parcel in) {
         super(in);

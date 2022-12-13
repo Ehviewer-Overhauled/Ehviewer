@@ -230,9 +230,9 @@ public class Settings {
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static final String KEY_ARCHIVE_PASSWDS = "archive_passwds";
     public static boolean LIST_THUMB_SIZE_INITED = false;
+    public static SharedPreferences sSettingsPre;
     private static int LIST_THUMB_SIZE = 40;
     private static Context sContext;
-    public static SharedPreferences sSettingsPre;
     private static EhConfig sEhConfig;
 
     public static void initialize(Context context) {

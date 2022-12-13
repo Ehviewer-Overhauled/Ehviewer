@@ -70,7 +70,6 @@ import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.download.DownloadService;
 import com.hippo.ehviewer.spider.SpiderDen;
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.scene.Announcer;
 import com.hippo.unifile.UniFile;
@@ -89,6 +88,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import rikka.core.res.ResourcesKt;
 
 @SuppressLint("RtlHardcoded")

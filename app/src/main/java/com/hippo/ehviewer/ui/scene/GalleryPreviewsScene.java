@@ -49,7 +49,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryPreview;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.EhException;
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
@@ -61,6 +60,8 @@ import com.hippo.yorozuya.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 
 public class GalleryPreviewsScene extends ToolbarScene {
 
