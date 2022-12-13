@@ -72,6 +72,7 @@ import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
@@ -83,6 +84,7 @@ import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.copy
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -258,15 +260,6 @@ class ReaderActivity : EhActivity() {
             return
         }
         ArchivePageLoader.showPasswd = ShowPasswdDialogHandler(this)
-        mGalleryProvider!!.start()
-
-        val viewerMode =
-            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
-        binding.actionReadingMode.setImageResource(viewerMode.iconRes)
-        viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
-        updateViewerInset(readerPreferences.fullscreen().get())
-        binding.viewerContainer.addView(viewer?.getView())
-        viewer?.setGalleryProvider(mGalleryProvider!!)
 
         // Get start page
         val startPage: Int = if (savedInstanceState == null) {
@@ -274,10 +267,34 @@ class ReaderActivity : EhActivity() {
         } else {
             mCurrentIndex
         }
-
-        mSize = mGalleryProvider!!.size()
         mCurrentIndex = startPage
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            mGalleryProvider!!.state.collect {
+                if (it == PageLoader.STATE_READY) {
+                    setGallery()
+                    cancel()
+                }
+            }
+        }
+
+        mGalleryProvider!!.start()
+
         initializeMenu()
+        setCutoutShort(true)
+    }
+
+    private fun setGallery() {
+        mSize = mGalleryProvider!!.size()
+        val viewerMode = ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+        binding.actionReadingMode.setImageResource(viewerMode.iconRes)
+        viewer?.destroy()
+        viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
+        updateViewerInset(readerPreferences.fullscreen().get())
+        binding.viewerContainer.removeAllViews()
+        binding.viewerContainer.addView(viewer?.getView())
+        viewer?.setGalleryProvider(mGalleryProvider!!)
+        moveToPageIndex(mCurrentIndex)
     }
 
     override fun onDestroy() {
@@ -696,7 +713,6 @@ class ReaderActivity : EhActivity() {
      */
     fun updateViewerInset(fullscreen: Boolean) {
         WindowCompat.setDecorFitsSystemWindows(window, !fullscreen)
-        setCutoutShort(true)
         viewer?.getView()?.applyInsetter {
             if (!fullscreen) {
                 type(navigationBars = true, statusBars = true) {

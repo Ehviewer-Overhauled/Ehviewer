@@ -46,6 +46,8 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     public void start() {
         mSpiderQueen = SpiderQueen.obtainSpiderQueen(mContext, mGalleryInfo, SpiderQueen.MODE_READ);
         mSpiderQueen.addOnSpiderListener(this);
+        if (mSpiderQueen.size() > 0)
+            notifyDataChanged();
     }
 
     @Override

@@ -3,9 +3,16 @@ package eu.kanade.tachiyomi.ui.reader.loader
 import com.hippo.image.Image
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class PageLoader {
-    val mPages by lazy { (0 until size()).map { ReaderPage(it) } }
+    val mPages by lazy {
+        check(size() > 0)
+        (0 until size()).map { ReaderPage(it) }
+    }
+
+    var state = MutableStateFlow(STATE_WAIT)
+
     abstract val error: String
 
     abstract fun start()
@@ -28,7 +35,12 @@ abstract class PageLoader {
 
     protected abstract fun onCancelRequest(index: Int)
 
-    fun notifyDataChanged() {}
+    fun notifyDataChanged() {
+        if (size() == STATE_ERROR)
+            state.value = STATE_ERROR
+        else
+            state.compareAndSet(STATE_WAIT, STATE_READY)
+    }
 
     fun notifyDataChanged(index: Int) {
         onRequest(index)
@@ -57,5 +69,6 @@ abstract class PageLoader {
     companion object {
         const val STATE_WAIT = -1
         const val STATE_ERROR = -2
+        const val STATE_READY = -3
     }
 }
