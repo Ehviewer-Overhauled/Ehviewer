@@ -86,7 +86,7 @@ class AccountPreference @JvmOverloads constructor(
             }
         }
         builder.setPositiveButton(R.string.settings_eh_sign_out) { _: DialogInterface?, _: Int ->
-            EhUtils.signOut(context)
+            EhUtils.signOut()
             mActivity.showTip(R.string.settings_eh_sign_out_tip, BaseScene.LENGTH_SHORT)
         }
     }

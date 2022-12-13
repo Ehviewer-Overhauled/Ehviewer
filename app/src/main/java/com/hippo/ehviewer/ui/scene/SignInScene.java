@@ -207,7 +207,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         if (REQUEST_CODE_WEBVIEW == requestCode) {
             if (RESULT_OK == resultCode) {
                 getProfile();
-                getUConfig();
             }
         } else {
             super.onSceneResult(requestCode, resultCode, data);
@@ -281,9 +280,9 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         showProgress(true);
 
         // Clean up for sign in
-        EhUtils.signOut(context);
+        EhUtils.signOut();
 
-        EhCallback<SignInScene, String> callback = new SignInListener(context,
+        EhCallback<?, ?> callback = new SignInListener(context,
                 activity.getStageId(), getTag());
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
@@ -305,28 +304,16 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         hideSoftInput();
         showProgress(true);
 
-        EhCallback<SignInScene, ProfileParser.Result> callback = new GetProfileListener(context,
+        EhCallback<?, ?> callback = new GetProfileListener(context,
                 activity.getStageId(), getTag());
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
                 .setCallback(callback);
         EhApplication.getEhClient().execute(request);
-    }
 
-    private void getUConfig() {
-        Context context = getContext();
-        MainActivity activity = getMainActivity();
-        if (null == context || null == activity) {
-            return;
-        }
-
-        hideSoftInput();
-        showProgress(true);
-
-        EhRequest request = new EhRequest()
-                .setMethod(EhClient.METHOD_GET_UCONFIG);
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(new EhRequest()
+                .setMethod(EhClient.METHOD_GET_UCONFIG));
     }
 
     private void redirectTo() {
@@ -359,7 +346,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
         if (EhApplication.getEhCookieStore().hasSignedIn()) {
             getProfile();
-            getUConfig();
         } else {
             mSigningIn = false;
             hideProgress();

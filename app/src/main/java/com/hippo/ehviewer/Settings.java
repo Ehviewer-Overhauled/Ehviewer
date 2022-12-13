@@ -31,13 +31,9 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.unifile.UniFile;
-import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.FileUtils;
-import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.NumberUtils;
 
-import java.io.File;
 import java.util.Locale;
 import java.util.Set;
 
@@ -51,10 +47,7 @@ public class Settings {
 
     public static final String KEY_ACCOUNT = "account";
     public static final String KEY_BLACK_DARK_THEME = "black_dark_theme";
-    public static final int THEME_LIGHT = 1;
     public static final int THEME_SYSTEM = -1;
-    public static final int THEME_BLACK = 2;
-    public static final String KEY_APPLY_NAV_BAR_THEME_COLOR = "apply_nav_bar_theme_color";
     public static final String KEY_GALLERY_SITE = "gallery_site";
     public static final String KEY_LIST_MODE = "list_mode";
     public static final String KEY_DETAIL_SIZE = "detail_size";
@@ -83,15 +76,12 @@ public class Settings {
     public static final String KEY_IMAGE_RESOLUTION = "image_size";
     public static final String DEFAULT_IMAGE_RESOLUTION = EhConfig.IMAGE_SIZE_AUTO;
     public static final int INVALID_DEFAULT_FAV_SLOT = -2;
-    public static final String KEY_ENABLE_ANALYTICS = "enable_analytics";
     /********************
      ****** Advanced
      ********************/
     public static final String KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body";
     public static final String KEY_SECURITY = "require_unlock";
     public static final String KEY_SECURITY_DELAY = "require_unlock_delay";
-    public static final String DEFAULT_SECURITY = "";
-    public static final String KEY_ENABLE_FINGERPRINT = "enable_fingerprint";
     public static final String KEY_READ_CACHE_SIZE = "read_cache_size";
     public static final int DEFAULT_READ_CACHE_SIZE = 320;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
@@ -105,25 +95,17 @@ public class Settings {
     private static final String KEY_PREVIEW_NUM = "preview_num";
     private static final int DEFAULT_PREVIEW_NUM = 60;
     private static final String TAG = Settings.class.getSimpleName();
-    private static final String KEY_VERSION_CODE = "version_code";
-    private static final int DEFAULT_VERSION_CODE = 0;
     private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String DEFAULT_DISPLAY_NAME = null;
     private static final int DEFAULT_LIST_THUMB_SIZE = 40;
     private static final String KEY_AVATAR = "avatar";
-    private static final String DEFAULT_AVATAR = null;
-    private static final String KEY_SHOW_WARNING = "show_warning";
-    private static final boolean DEFAULT_SHOW_WARNING = true;
     private static final String KEY_REMOVE_IMAGE_FILES = "include_pic";
     private static final boolean DEFAULT_REMOVE_IMAGE_FILES = true;
     private static final String KEY_NEED_SIGN_IN = "need_sign_in";
     private static final boolean DEFAULT_NEED_SIGN_IN = true;
     private static final String KEY_SELECT_SITE = "select_site";
     private static final boolean DEFAULT_SELECT_SITE = true;
-    private static final String KEY_QUICK_SEARCH_TIP = "quick_search_tip";
-    private static final boolean DEFAULT_QUICK_SEARCH_TIP = true;
     private static final int DEFAULT_THEME = THEME_SYSTEM;
-    private static final boolean DEFAULT_APPLY_NAV_BAR_THEME_COLOR = true;
     private static final int DEFAULT_GALLERY_SITE = 1;
     private static final String KEY_LAUNCH_PAGE = "launch_page";
     private static final int DEFAULT_LAUNCH_PAGE = 0;
@@ -142,10 +124,6 @@ public class Settings {
     private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
     private static final String KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip";
     private static final boolean DEFAULT_APP_LINK_VERIFY_TIP = false;
-    private static final String KEY_NIGHT_MODE = "night_mode";
-    private static final String DEFAULT_NIGHT_MODE = "-1";
-    private static final String KEY_E_INK_MODE = "e_ink_mode_2";
-    private static final boolean DEFAULT_E_INK_MODE = false;
     /********************
      ****** Read
      ********************/
@@ -230,21 +208,6 @@ public class Settings {
     // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
     private static final String KEY_DEFAULT_FAV_SLOT = "default_favorite_2";
     private static final int DEFAULT_DEFAULT_FAV_SLOT = INVALID_DEFAULT_FAV_SLOT;
-    /********************
-     ****** Analytics
-     ********************/
-    private static final String KEY_ASK_ANALYTICS = "ask_analytics";
-    private static final boolean DEFAULT_ASK_ANALYTICS = true;
-    private static final boolean DEFAULT_ENABLE_ANALYTICS = false;
-    private static final String KEY_USER_ID = "user_id";
-    private static final String FILENAME_USER_ID = ".user_id";
-    private static final int LENGTH_USER_ID = 32;
-    /********************
-     ****** Update
-     ********************/
-    private static final String KEY_BETA_UPDATE_CHANNEL = "beta_update_channel";
-    private static final String KEY_SKIP_UPDATE_VERSION = "skip_update_version";
-    private static final int DEFAULT_SKIP_UPDATE_VERSION = 0;
     private static final boolean DEFAULT_SAVE_PARSE_ERROR_BODY = true;
     private static final String KEY_SAVE_CRASH_LOG = "save_crash_log";
     private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
@@ -257,17 +220,6 @@ public class Settings {
     private static final String DEFAULT_PROXY_IP = null;
     private static final String KEY_PROXY_PORT = "proxy_port";
     private static final int DEFAULT_PROXY_PORT = -1;
-    /********************
-     ****** Guide
-     ********************/
-    private static final String KEY_GUIDE_QUICK_SEARCH = "guide_quick_search";
-    private static final boolean DEFAULT_GUIDE_QUICK_SEARCH = true;
-    private static final String KEY_GUIDE_COLLECTIONS = "guide_collections";
-    private static final boolean DEFAULT_GUIDE_COLLECTIONS = true;
-    private static final String KEY_GUIDE_DOWNLOAD_THUMB = "guide_download_thumb";
-    private static final boolean DEFAULT_GUIDE_DOWNLOAD_THUMB = true;
-    private static final String KEY_GUIDE_DOWNLOAD_LABELS = "guide_download_labels";
-    private static final boolean DEFAULT_GUIDE_DOWNLOAD_LABELS = true;
     private static final String KEY_GUIDE_GALLERY = "guide_gallery";
     private static final boolean DEFAULT_GUIDE_GALLERY = true;
     private static final String KEY_CLIPBOARD_TEXT_HASH_CODE = "clipboard_text_hash_code";
@@ -287,10 +239,10 @@ public class Settings {
         sContext = context.getApplicationContext();
         sSettingsPre = PreferenceManager.getDefaultSharedPreferences(sContext);
         sEhConfig = loadEhConfig();
-        fixDefaultValue(context);
+        fixDefaultValue();
     }
 
-    private static void fixDefaultValue(Context context) {
+    private static void fixDefaultValue() {
         if ("CN".equals(Locale.getDefault().getCountry())) {
             // Enable domain fronting if the country is CN
             if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
@@ -308,7 +260,6 @@ public class Settings {
     }
 
     public static Locale getLocale() {
-        Locale locale = null;
         String language = Settings.getAppLanguage();
         if (language != null && !language.equals("system")) {
             return Locale.forLanguageTag(language);
@@ -351,32 +302,6 @@ public class Settings {
 
     public static void putInt(String key, int value) {
         sSettingsPre.edit().putInt(key, value).apply();
-    }
-
-    public static long getLong(String key, long defValue) {
-        try {
-            return sSettingsPre.getLong(key, defValue);
-        } catch (ClassCastException e) {
-            Log.d(TAG, "Get ClassCastException when get " + key + " value", e);
-            return defValue;
-        }
-    }
-
-    public static void putLong(String key, long value) {
-        sSettingsPre.edit().putLong(key, value).apply();
-    }
-
-    public static float getFloat(String key, float defValue) {
-        try {
-            return sSettingsPre.getFloat(key, defValue);
-        } catch (ClassCastException e) {
-            Log.d(TAG, "Get ClassCastException when get " + key + " value", e);
-            return defValue;
-        }
-    }
-
-    public static void putFloat(String key, float value) {
-        sSettingsPre.edit().putFloat(key, value).apply();
     }
 
     public static String getString(String key, String defValue) {
@@ -429,20 +354,8 @@ public class Settings {
         putString(KEY_DISPLAY_NAME, value);
     }
 
-    public static String getAvatar() {
-        return getString(KEY_AVATAR, DEFAULT_AVATAR);
-    }
-
     public static void putAvatar(String value) {
         putString(KEY_AVATAR, value);
-    }
-
-    public static boolean getShowWarning() {
-        return getBoolean(KEY_SHOW_WARNING, DEFAULT_SHOW_WARNING);
-    }
-
-    public static void putShowWarning(boolean value) {
-        putBoolean(KEY_SHOW_WARNING, value);
     }
 
     public static boolean getRemoveImageFiles() {
@@ -477,14 +390,6 @@ public class Settings {
         return getIntFromStr(KEY_THEME, DEFAULT_THEME);
     }
 
-    public static void putTheme(int theme) {
-        putIntToStr(KEY_THEME, theme);
-    }
-
-    public static boolean getApplyNavBarThemeColor() {
-        return getBoolean(KEY_APPLY_NAV_BAR_THEME_COLOR, DEFAULT_APPLY_NAV_BAR_THEME_COLOR);
-    }
-
     public static int getGallerySite() {
         return getIntFromStr(KEY_GALLERY_SITE, DEFAULT_GALLERY_SITE);
     }
@@ -495,17 +400,13 @@ public class Settings {
 
     public static String getLaunchPageGalleryListSceneAction() {
         int value = getIntFromStr(KEY_LAUNCH_PAGE, DEFAULT_LAUNCH_PAGE);
-        switch (value) {
-            default:
-            case 0:
-                return GalleryListScene.ACTION_HOMEPAGE;
-            case 1:
-                return GalleryListScene.ACTION_SUBSCRIPTION;
-            case 2:
-                return GalleryListScene.ACTION_WHATS_HOT;
-            case 3:
-                return GalleryListScene.ACTION_TOP_LIST;
-        }
+        return switch (value) {
+            case 0 -> GalleryListScene.ACTION_HOMEPAGE;
+            case 1 -> GalleryListScene.ACTION_SUBSCRIPTION;
+            case 2 -> GalleryListScene.ACTION_WHATS_HOT;
+            case 3 -> GalleryListScene.ACTION_TOP_LIST;
+            default -> throw new IllegalStateException("Unexpected value: " + value);
+        };
     }
 
     public static int getListMode() {
@@ -518,13 +419,11 @@ public class Settings {
 
     @DimenRes
     public static int getDetailSizeResId() {
-        switch (getDetailSize()) {
-            default:
-            case 0:
-                return R.dimen.gallery_list_column_width_long;
-            case 1:
-                return R.dimen.gallery_list_column_width_short;
-        }
+        return switch (getDetailSize()) {
+            case 0 -> R.dimen.gallery_list_column_width_long;
+            case 1 -> R.dimen.gallery_list_column_width_short;
+            default -> throw new IllegalStateException("Unexpected value: " + getDetailSize());
+        };
     }
 
     public static int getThumbSize() {
@@ -576,30 +475,12 @@ public class Settings {
         return getInt(KEY_DEFAULT_CATEGORIES, DEFAULT_DEFAULT_CATEGORIES);
     }
 
-    public static void putDefaultCategories(int value) {
-        sEhConfig.defaultCategories = value;
-        sEhConfig.setDirty();
-        putInt(KEY_DEFAULT_CATEGORIES, value);
-    }
-
     public static int getExcludedTagNamespaces() {
         return getInt(KEY_EXCLUDED_TAG_NAMESPACES, DEFAULT_EXCLUDED_TAG_NAMESPACES);
     }
 
-    public static void putExcludedTagNamespaces(int value) {
-        sEhConfig.excludedNamespaces = value;
-        sEhConfig.setDirty();
-        putInt(KEY_EXCLUDED_TAG_NAMESPACES, value);
-    }
-
     public static String getExcludedLanguages() {
         return getString(KEY_EXCLUDED_LANGUAGES, DEFAULT_EXCLUDED_LANGUAGES);
-    }
-
-    public static void putExcludedLanguages(String value) {
-        sEhConfig.excludedLanguages = value;
-        sEhConfig.setDirty();
-        putString(KEY_EXCLUDED_LANGUAGES, value);
     }
 
     public static boolean getMeteredNetworkWarning() {
@@ -726,25 +607,16 @@ public class Settings {
         return getBoolean(KEY_SEC_SECURITY, VALUE_SEC_SECURITY);
     }
 
-    public static void putEnabledSecurity(boolean value) {
-        putBoolean(KEY_READING_FULLSCREEN, value);
-    }
-
     @Nullable
     public static UniFile getDownloadLocation() {
-        UniFile dir = null;
-        try {
-            Uri.Builder builder = new Uri.Builder();
-            builder.scheme(getString(KEY_DOWNLOAD_SAVE_SCHEME, null));
-            builder.encodedAuthority(getString(KEY_DOWNLOAD_SAVE_AUTHORITY, null));
-            builder.encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null));
-            builder.encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null));
-            builder.encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null));
-            dir = UniFile.fromUri(sContext, builder.build());
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            // Ignore
-        }
+        UniFile dir;
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(getString(KEY_DOWNLOAD_SAVE_SCHEME, null));
+        builder.encodedAuthority(getString(KEY_DOWNLOAD_SAVE_AUTHORITY, null));
+        builder.encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null));
+        builder.encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null));
+        builder.encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null));
+        dir = UniFile.fromUri(sContext, builder.build());
         return dir != null ? dir : UniFile.fromFile(AppConfig.getDefaultDownloadDir());
     }
 
@@ -795,24 +667,12 @@ public class Settings {
         return getIntFromStr(KEY_MULTI_THREAD_DOWNLOAD, DEFAULT_MULTI_THREAD_DOWNLOAD);
     }
 
-    public static void putMultiThreadDownload(int value) {
-        putIntToStr(KEY_MULTI_THREAD_DOWNLOAD, value);
-    }
-
     public static int getDownloadDelay() {
         return getIntFromStr(KEY_DOWNLOAD_DELAY, DEFAULT_DOWNLOAD_DELAY);
     }
 
-    public static void putDownloadDelay(int value) {
-        putIntToStr(KEY_DOWNLOAD_DELAY, value);
-    }
-
     public static int getPreloadImage() {
         return getIntFromStr(KEY_PRELOAD_IMAGE, DEFAULT_PRELOAD_IMAGE);
-    }
-
-    public static void putPreloadImage(int value) {
-        putIntToStr(KEY_PRELOAD_IMAGE, value);
     }
 
     public static String getImageResolution() {
@@ -827,10 +687,6 @@ public class Settings {
 
     public static boolean getDownloadOriginImage() {
         return getBoolean(KEY_DOWNLOAD_ORIGIN_IMAGE, DEFAULT_DOWNLOAD_ORIGIN_IMAGE);
-    }
-
-    public static void putDownloadOriginImage(boolean value) {
-        putBoolean(KEY_DOWNLOAD_ORIGIN_IMAGE, value);
     }
 
     public static String[] getFavCat() {
@@ -927,98 +783,8 @@ public class Settings {
         putInt(KEY_DEFAULT_FAV_SLOT, value);
     }
 
-    public static boolean getAskAnalytics() {
-        return getBoolean(KEY_ASK_ANALYTICS, DEFAULT_ASK_ANALYTICS);
-    }
-
-    public static void putAskAnalytics(boolean value) {
-        putBoolean(KEY_ASK_ANALYTICS, value);
-    }
-
-    public static boolean getEnableAnalytics() {
-        return getBoolean(KEY_ENABLE_ANALYTICS, DEFAULT_ENABLE_ANALYTICS);
-    }
-
-    public static void putEnableAnalytics(boolean value) {
-        putBoolean(KEY_ENABLE_ANALYTICS, value);
-    }
-
-    public static String getUserID() {
-        boolean writeXml = false;
-        boolean writeFile = false;
-        String userID = getString(KEY_USER_ID, null);
-        File file = AppConfig.getFileInExternalAppDir(FILENAME_USER_ID);
-        if (!isValidUserID(userID)) {
-            writeXml = true;
-            // Get use ID from out sd card file
-            userID = FileUtils.read(file);
-            if (!isValidUserID(userID)) {
-                writeFile = true;
-                userID = generateUserID();
-            }
-        } else {
-            writeFile = true;
-        }
-
-        if (writeXml) {
-            putString(KEY_USER_ID, userID);
-        }
-        if (writeFile) {
-            FileUtils.write(file, userID);
-        }
-
-        return userID;
-    }
-
-    @NonNull
-    private static String generateUserID() {
-        int length = LENGTH_USER_ID;
-        StringBuilder sb = new StringBuilder(length);
-
-        for (int i = 0; i < length; i++) {
-            if (MathUtils.random(0, ('9' - '0' + 1) + ('z' - 'a' + 1)) <= '9' - '0') {
-                sb.append((char) MathUtils.random('0', '9' + 1));
-            } else {
-                sb.append((char) MathUtils.random('a', 'z' + 1));
-            }
-        }
-
-        return sb.toString();
-    }
-
-    private static boolean isValidUserID(@Nullable String userID) {
-        if (null == userID || LENGTH_USER_ID != userID.length()) {
-            return false;
-        }
-
-        for (int i = 0; i < LENGTH_USER_ID; i++) {
-            char ch = userID.charAt(i);
-            if (!(ch >= '0' && ch <= '9') && !(ch >= 'a' && ch <= 'z')) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static void putBetaUpdateChannel(boolean value) {
-        putBoolean(KEY_BETA_UPDATE_CHANNEL, value);
-    }
-
-    public static int getSkipUpdateVersion() {
-        return getInt(KEY_SKIP_UPDATE_VERSION, DEFAULT_SKIP_UPDATE_VERSION);
-    }
-
-    public static void putSkipUpdateVersion(int value) {
-        putInt(KEY_SKIP_UPDATE_VERSION, value);
-    }
-
     public static boolean getSaveParseErrorBody() {
         return getBoolean(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY);
-    }
-
-    public static void putSaveParseErrorBody(boolean value) {
-        putBoolean(KEY_SAVE_PARSE_ERROR_BODY, value);
     }
 
     public static boolean getSaveCrashLog() {
@@ -1035,10 +801,6 @@ public class Settings {
 
     public static int getSecurityDelay() {
         return getInt(KEY_SECURITY_DELAY, 0);
-    }
-
-    public static boolean getEnableFingerprint() {
-        return getBoolean(KEY_ENABLE_FINGERPRINT, true);
     }
 
     public static int getReadCacheSize() {
@@ -1065,10 +827,6 @@ public class Settings {
         return getString(KEY_APP_LANGUAGE, DEFAULT_APP_LANGUAGE);
     }
 
-    public static void putAppLanguage(String value) {
-        putString(KEY_APP_LANGUAGE, value);
-    }
-
     public static int getProxyType() {
         return getInt(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE);
     }
@@ -1091,38 +849,6 @@ public class Settings {
 
     public static void putProxyPort(int value) {
         putInt(KEY_PROXY_PORT, value);
-    }
-
-    public static boolean getGuideQuickSearch() {
-        return getBoolean(KEY_GUIDE_QUICK_SEARCH, DEFAULT_GUIDE_QUICK_SEARCH);
-    }
-
-    public static void putGuideQuickSearch(boolean value) {
-        putBoolean(KEY_GUIDE_QUICK_SEARCH, value);
-    }
-
-    public static boolean getGuideCollections() {
-        return getBoolean(KEY_GUIDE_COLLECTIONS, DEFAULT_GUIDE_COLLECTIONS);
-    }
-
-    public static void putGuideCollections(boolean value) {
-        putBoolean(KEY_GUIDE_COLLECTIONS, value);
-    }
-
-    public static boolean getGuideDownloadThumb() {
-        return getBoolean(KEY_GUIDE_DOWNLOAD_THUMB, DEFAULT_GUIDE_DOWNLOAD_THUMB);
-    }
-
-    public static void putGuideDownloadThumb(boolean value) {
-        putBoolean(KEY_GUIDE_DOWNLOAD_THUMB, value);
-    }
-
-    public static boolean getGuideDownloadLabels() {
-        return getBoolean(KEY_GUIDE_DOWNLOAD_LABELS, DEFAULT_GUIDE_DOWNLOAD_LABELS);
-    }
-
-    public static void puttGuideDownloadLabels(boolean value) {
-        putBoolean(KEY_GUIDE_DOWNLOAD_LABELS, value);
     }
 
     public static boolean getGuideGallery() {
