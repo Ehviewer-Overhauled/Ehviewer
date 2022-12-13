@@ -1,5 +1,7 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerConfig
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation
@@ -9,6 +11,9 @@ import eu.kanade.tachiyomi.ui.reader.viewer.navigation.KindlishNavigation
 import eu.kanade.tachiyomi.ui.reader.viewer.navigation.LNavigation
 import eu.kanade.tachiyomi.ui.reader.viewer.navigation.RightAndLeftNavigation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Configuration used by pager viewers.
@@ -16,7 +21,11 @@ import kotlinx.coroutines.CoroutineScope
 class PagerConfig(
     private val viewer: PagerViewer,
     scope: CoroutineScope,
-) : ViewerConfig(scope) {
+    readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences,
+) : ViewerConfig(readerPreferences, scope) {
+
+    var theme = readerPreferences.readerTheme().get()
+        private set
 
     var automaticBackground = false
         private set
@@ -37,6 +46,54 @@ class PagerConfig(
 
     var landscapeZoom = false
         private set
+
+    init {
+        readerPreferences.readerTheme()
+            .register(
+                {
+                    theme = it
+                    automaticBackground = it == 3
+                },
+                { imagePropertyChangedListener?.invoke() },
+            )
+
+        readerPreferences.imageScaleType()
+            .register({ imageScaleType = it }, { imagePropertyChangedListener?.invoke() })
+
+        readerPreferences.zoomStart()
+            .register({ zoomTypeFromPreference(it) }, { imagePropertyChangedListener?.invoke() })
+
+        readerPreferences.cropBorders()
+            .register({ imageCropBorders = it }, { imagePropertyChangedListener?.invoke() })
+
+        readerPreferences.navigateToPan()
+            .register({ navigateToPan = it })
+
+        readerPreferences.landscapeZoom()
+            .register({ landscapeZoom = it }, { imagePropertyChangedListener?.invoke() })
+
+        readerPreferences.navigationModePager()
+            .register({ navigationMode = it }, { updateNavigation(navigationMode) })
+
+        readerPreferences.pagerNavInverted()
+            .register({ tappingInverted = it }, { navigator.invertMode = it })
+        readerPreferences.pagerNavInverted().changes()
+            .drop(1)
+            .onEach { navigationModeChangedListener?.invoke() }
+            .launchIn(scope)
+
+        readerPreferences.dualPageSplitPaged()
+            .register(
+                { dualPageSplit = it },
+                {
+                    imagePropertyChangedListener?.invoke()
+                    dualPageSplitChangedListener?.invoke(it)
+                },
+            )
+
+        readerPreferences.dualPageInvertPaged()
+            .register({ dualPageInvert = it }, { imagePropertyChangedListener?.invoke() })
+    }
 
     private fun zoomTypeFromPreference(value: Int) {
         imageZoomType = when (value) {

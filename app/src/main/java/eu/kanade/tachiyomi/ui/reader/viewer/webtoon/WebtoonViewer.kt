@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
+import android.annotation.SuppressLint
 import android.graphics.PointF
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -261,12 +262,9 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      * Notifies adapter of changes around the current page to trigger a relayout in the recycler.
      * Used when an image configuration is changed.
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun refreshAdapter() {
-        val position = layoutManager.findLastEndVisibleItemPosition()
         adapter.refresh()
-        adapter.notifyItemRangeChanged(
-            max(0, position - 3),
-            min(position + 3, adapter.itemCount - 1),
-        )
+        adapter.notifyDataSetChanged()
     }
 }
