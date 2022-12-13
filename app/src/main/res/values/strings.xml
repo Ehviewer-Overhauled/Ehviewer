@@ -682,7 +682,7 @@
     <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
     <string name="account_name">Account</string>
 
-    <!-- Tachiyomi Reader-->
+    <!-- Tachiyomi Reader Start-->
     <string name="action_settings">Settings</string>
     <string name="pref_rotation_type">Default rotation type</string>
     <string name="pref_crop_borders">Crop borders</string>
@@ -768,4 +768,5 @@
     <string name="action_share">Share</string>
     <string name="action_save">Save</string>
     <string name="pref_category_for_this_series">For this series</string>
+    <!-- Tachiyomi Reader End-->
 </resources>
