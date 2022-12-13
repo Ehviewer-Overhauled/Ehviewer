@@ -327,7 +327,7 @@ class ReaderActivity : EhActivity() {
         }
     }
 
-    private fun shareImage(page: Int) {
+    fun shareImage(page: Int) {
         if (null == mGalleryProvider) {
             return
         }
@@ -499,7 +499,7 @@ class ReaderActivity : EhActivity() {
         ).show()
     }
 
-    private fun saveImageTo(page: Int) {
+    fun saveImageTo(page: Int) {
         if (null == mGalleryProvider) {
             return
         }
@@ -916,6 +916,7 @@ class ReaderActivity : EhActivity() {
      * actions to perform is shown.
      */
     fun onPageLongTap(page: ReaderPage) {
+        ReaderPageSheet(this, page).show()
     }
 
     /**

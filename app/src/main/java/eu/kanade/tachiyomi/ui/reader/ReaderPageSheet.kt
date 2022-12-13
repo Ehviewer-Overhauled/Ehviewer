@@ -29,7 +29,7 @@ class ReaderPageSheet(
      * Shares the image of this page with external apps.
      */
     private fun share() {
-        TODO()
+        activity.shareImage(page.index)
         dismiss()
     }
 
@@ -37,7 +37,7 @@ class ReaderPageSheet(
      * Saves the image of this page on external storage.
      */
     private fun save() {
-        TODO()
+        activity.saveImageTo(page.index)
         dismiss()
     }
 }
