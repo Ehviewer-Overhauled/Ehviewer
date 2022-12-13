@@ -80,7 +80,9 @@ import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
@@ -88,6 +90,8 @@ import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.copy
+import eu.kanade.tachiyomi.util.view.popupMenu
+import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -722,7 +726,7 @@ class ReaderActivity : EhActivity() {
             }
         }
 
-        // initBottomShortcuts()
+        initBottomShortcuts()
 
         val toolbarBackground = (binding.toolbar.background as MaterialShapeDrawable).apply {
             elevation =
@@ -746,6 +750,124 @@ class ReaderActivity : EhActivity() {
         // Set initial visibility
         setMenuVisibility(menuVisible)
     }
+
+    private fun initBottomShortcuts() {
+        // Reading mode
+        with(binding.actionReadingMode) {
+            setTooltip(R.string.viewer)
+
+            setOnClickListener {
+                popupMenu(
+                    items = ReadingModeType.values().map { it.flagValue to it.stringRes },
+                    selectedItemId = readerPreferences.defaultReadingMode().get(),
+                ) {
+                    val newReadingMode = ReadingModeType.fromPreference(itemId)
+
+                    readerPreferences.defaultReadingMode().set(newReadingMode.flagValue)
+
+                    /*
+                    menuToggleToast?.cancel()
+                    if (!readerPreferences.showReadingMode().get()) {
+                        menuToggleToast = toast(newReadingMode.stringRes)
+                    }
+
+                     */
+
+                    updateCropBordersShortcut()
+                }
+            }
+        }
+
+        // Crop borders
+        with(binding.actionCropBorders) {
+            setTooltip(R.string.pref_crop_borders)
+
+            setOnClickListener {
+                /*
+                val isPagerType = ReadingModeType.isPagerType(viewModel.getMangaReadingMode())
+                val enabled = if (isPagerType) {
+                    readerPreferences.cropBorders().toggle()
+                } else {
+                    readerPreferences.cropBordersWebtoon().toggle()
+                }
+
+                menuToggleToast?.cancel()
+                menuToggleToast = toast(
+                    if (enabled) {
+                        R.string.on
+                    } else {
+                        R.string.off
+                    },
+                )
+
+                 */
+            }
+        }
+        updateCropBordersShortcut()
+        listOf(readerPreferences.cropBorders(), readerPreferences.cropBordersWebtoon())
+            .forEach { pref ->
+                pref.changes()
+                    .onEach { updateCropBordersShortcut() }
+                    .launchIn(lifecycleScope)
+            }
+
+        // Rotation
+        with(binding.actionRotation) {
+            setTooltip(R.string.rotation_type)
+
+            setOnClickListener {
+                /*
+                popupMenu(
+                    items = OrientationType.values().map { it.flagValue to it.stringRes },
+                    selectedItemId = viewModel.manga?.orientationType?.toInt()
+                        ?: readerPreferences.defaultOrientationType().get(),
+                ) {
+                    val newOrientation = OrientationType.fromPreference(itemId)
+
+                    viewModel.setMangaOrientationType(newOrientation.flagValue)
+
+                    menuToggleToast?.cancel()
+                    menuToggleToast = toast(newOrientation.stringRes)
+                }
+
+                 */
+            }
+        }
+
+        // Settings sheet
+        with(binding.actionSettings) {
+            setTooltip(R.string.action_settings)
+            val readerSettingSheetDialog = ReaderSettingsSheet(this@ReaderActivity)
+            setOnClickListener {
+                if (!readerSettingSheetDialog.isShowing()) {
+                    readerSettingSheetDialog.show()
+                }
+            }
+
+            setOnLongClickListener {
+                ReaderSettingsSheet(this@ReaderActivity, showColorFilterSettings = true).show()
+                true
+            }
+        }
+    }
+
+    private fun updateCropBordersShortcut() {
+        val isPagerType = ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
+        val enabled = if (isPagerType) {
+            readerPreferences.cropBorders().get()
+        } else {
+            readerPreferences.cropBordersWebtoon().get()
+        }
+
+        binding.actionCropBorders.setImageResource(
+            if (enabled) {
+                R.drawable.ic_crop_24dp
+            } else {
+                R.drawable.ic_crop_off_24dp
+            },
+        )
+    }
+
 
     /**
      * Dispatches a key event. If the viewer doesn't handle it, call the default implementation.

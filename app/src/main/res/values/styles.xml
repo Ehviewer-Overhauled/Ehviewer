@@ -63,4 +63,9 @@
     <style name="SnackbarButton" parent="Widget.Material3.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
     </style>
+
+    <!-- Tachiyomi -->
+    <style name="TextAppearance.Tachiyomi.SectionHeader" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
 </resources>
