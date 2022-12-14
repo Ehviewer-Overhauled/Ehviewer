@@ -637,18 +637,6 @@ class ReaderActivity : EhActivity() {
             binding.readerMenu.isVisible = true
 
             if (animate) {
-                val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
-                toolbarAnimation.applySystemAnimatorScale(this)
-                toolbarAnimation.setAnimationListener(
-                    object : SimpleAnimationListener() {
-                        override fun onAnimationStart(animation: Animation) {
-                            // Fix status bar being translucent the first time it's opened.
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                        }
-                    },
-                )
-                binding.toolbar.startAnimation(toolbarAnimation)
-
                 val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
                 bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
@@ -664,19 +652,15 @@ class ReaderActivity : EhActivity() {
             }
 
             if (animate) {
-                val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
-                toolbarAnimation.applySystemAnimatorScale(this)
-                toolbarAnimation.setAnimationListener(
+                val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
+                bottomAnimation.applySystemAnimatorScale(this)
+                bottomAnimation.setAnimationListener(
                     object : SimpleAnimationListener() {
                         override fun onAnimationEnd(animation: Animation) {
                             binding.readerMenu.isVisible = false
                         }
                     },
                 )
-                binding.toolbar.startAnimation(toolbarAnimation)
-
-                val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
-                bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
 
@@ -691,17 +675,6 @@ class ReaderActivity : EhActivity() {
      */
     @SuppressLint("PrivateResource")
     private fun initializeMenu() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        binding.toolbar.applyInsetter {
-            type(navigationBars = true, statusBars = true) {
-                margin(top = true, horizontal = true)
-            }
-        }
         binding.readerMenuBottom.applyInsetter {
             type(navigationBars = true) {
                 margin(bottom = true, horizontal = true)
@@ -730,10 +703,9 @@ class ReaderActivity : EhActivity() {
 
         initBottomShortcuts()
 
-        val toolbarBackground = (binding.toolbar.background as MaterialShapeDrawable).apply {
-            elevation =
-                resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
-            alpha = 0
+        val toolbarBackground = MaterialShapeDrawable.createWithElevationOverlay(this).apply {
+            elevation = resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
+            alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
         }
         binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
 
