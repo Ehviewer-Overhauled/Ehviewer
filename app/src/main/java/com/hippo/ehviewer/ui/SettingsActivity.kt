@@ -41,8 +41,6 @@ class SettingsActivity : EhActivity() {
         mFab = findViewById(R.id.fab)
         mAppbarLayout = findViewById(R.id.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
-            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()

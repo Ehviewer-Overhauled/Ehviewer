@@ -30,6 +30,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -69,6 +70,8 @@ abstract class EhActivity : AppCompatActivity() {
                 WindowInsetsHelper.LISTENER
             )
         super.onCreate(savedInstanceState)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES) <= 0
         window.decorView.post {
             val rootWindowInsets = window.decorView.rootWindowInsets
             if (rootWindowInsets != null && rootWindowInsets.systemWindowInsetBottom >= Resources.getSystem().displayMetrics.density * 40) {

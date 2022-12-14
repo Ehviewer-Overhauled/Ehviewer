@@ -200,11 +200,6 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         hideSoftInput();
-
-        insetsController = getInsetsController();
-        if (insetsController != null) {
-            insetsController.setAppearanceLightStatusBars((requireActivity().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_YES) <= 0);
-        }
     }
 
     @Nullable
