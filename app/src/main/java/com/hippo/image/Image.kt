@@ -17,6 +17,7 @@
  */
 package com.hippo.image
 
+import android.graphics.ColorSpace
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ALLOCATOR_HARDWARE
 import android.graphics.ImageDecoder.DecodeException
@@ -41,6 +42,7 @@ class Image private constructor(source: Source?, val release: () -> Unit = {}) {
             mObtainedDrawable =
                 ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, src: Source ->
                     decoder.allocator = ALLOCATOR_HARDWARE
+                    decoder.setTargetColorSpace(colorSpace)
                     decoder.setTargetSampleSize(
                         max(
                             min(
@@ -77,14 +79,10 @@ class Image private constructor(source: Source?, val release: () -> Unit = {}) {
     }
 
     companion object {
-        var screenWidth: Int = 0
-        var screenHeight: Int = 0
-
-        init {
-            val context = EhApplication.application
-            screenWidth = context.resources.displayMetrics.widthPixels
-            screenHeight = context.resources.displayMetrics.heightPixels
-        }
+        val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
+        val screenHeight = EhApplication.application.resources.displayMetrics.heightPixels
+        val isWideColorGamut = EhApplication.application.resources.configuration.isScreenWideColorGamut
+        val colorSpace = ColorSpace.get(if (isWideColorGamut) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB)
 
         @Throws(DecodeException::class)
         @JvmStatic
