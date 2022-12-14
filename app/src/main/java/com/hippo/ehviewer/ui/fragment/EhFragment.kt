@@ -47,7 +47,7 @@ class EhFragment : BasePreferenceFragment() {
         thumbSize!!.onPreferenceChangeListener = this
         showTagTranslations!!.onPreferenceChangeListener = this
         blackDarkTheme!!.onPreferenceChangeListener = this
-        if (!EhTagDatabase.isPossible(requireActivity())) {
+        if (!EhTagDatabase.isTranslatable(requireActivity())) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
         }
