@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.ui.reader.setting
 
 import android.animation.ValueAnimator
+import android.os.Build
 import android.os.Bundle
 import com.google.android.material.tabs.TabLayout
 import com.hippo.ehviewer.R
@@ -32,7 +33,11 @@ class ReaderSettingsSheet(
         ValueAnimator.ofFloat(sheetBackgroundDim, 0f).also { valueAnimator ->
             valueAnimator.duration = 250
             valueAnimator.addUpdateListener {
-                window?.setDimAmount(it.animatedValue as Float)
+                window?.run {
+                    setDimAmount(it.animatedValue as Float)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                        attributes.blurBehindRadius = (it.animatedValue as Float * 50).toInt()
+                }
             }
         }
     }
