@@ -927,7 +927,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             mNoTags.setVisibility(View.GONE);
         }
 
-        EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance(context) : null;
+        EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance() : null;
         int colorTag = ResourcesKt.resolveColor(getTheme(), R.attr.tagBackgroundColor);
         int colorName = ResourcesKt.resolveColor(getTheme(), R.attr.tagGroupBackgroundColor);
         for (GalleryTagGroup tg : tagGroups) {

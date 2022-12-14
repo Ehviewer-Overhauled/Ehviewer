@@ -283,7 +283,7 @@ abstract class SearchBarScene : ToolbarScene() {
             providerSuggestions(text)?.let { suggestions.addAll(it) }
         }
         mSearchDatabase.getSuggestions(text, 128).forEach { suggestions.add(KeywordSuggestion(it)) }
-        val ehTagDatabase = EhTagDatabase.getInstance(context)
+        val ehTagDatabase = EhTagDatabase.getInstance()
         if (!TextUtils.isEmpty(text) && ehTagDatabase != null && !text.endsWith(" ")) {
             val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (s.isNotEmpty()) {
