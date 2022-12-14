@@ -318,8 +318,6 @@
     <string name="settings_eh_identity_cookies_copy">คัดลอก</string>
     <string name="settings_u_config">การตั้งค่า EHentai</string>
     <string name="settings_u_config_summary">การตั้งค่าบนเว็บไซต์ EHentai</string>
-    <string name="settings_eh_theme_light">สว่าง</string>
-    <string name="settings_eh_theme_dark">มืด</string>
     <string name="settings_eh_gallery_site">เว็บไซต์หลักของแกลเลอรี่</string>
     <string name="settings_eh_list_mode">มุมองแบบรายการ</string>
     <string name="settings_eh_list_mode_detail">แสดงรายละเอียด</string>
@@ -339,36 +337,7 @@
     <string name="settings_eh_tag_translations_source">Placeholder</string>
     <string name="settings_eh_tag_translations_source_url">https://placeholder</string>
 
-    <string name="settings_read">การอ่าน</string>
-    <string name="settings_read_screen_rotation">ทิศทางของหน้าจอ</string>
-    <string name="settings_read_screen_rotation_default">ค่าเริ่มต้น</string>
-    <string name="settings_read_screen_rotation_portrait">แนวตั้ง</string>
-    <string name="settings_read_screen_rotation_landscape">แนวนอน</string>
-    <string name="settings_read_reading_direction">ทิศทางการเปิดหน้าอ่าน</string>
-    <string name="settings_read_reading_direction_left_to_right">ซ้าย -> ขวา</string>
-    <string name="settings_read_reading_direction_right_to_Left">ขวา -> ซ้าย</string>
-    <string name="settings_read_reading_direction_top_to_bottom">บน -> ล่าง</string>
-    <string name="settings_read_page_scaling">ขนาดของหน้า</string>
-    <string name="settings_read_page_scaling_actual_size">เท่าขนาด</string>
-    <string name="settings_read_page_scaling_fit_to_width">พอดีกับขนาดแนวกว้าง</string>
-    <string name="settings_read_page_scaling_fit_to_height">พอดีกับขนาดแนวสูง</string>
-    <string name="settings_read_page_scaling_fit_to_screen">พอดีกับขนาดหน้าจอ</string>
-    <string name="settings_read_page_scaling_fixed_scale">ขนาดตายตัว</string>
-    <string name="settings_read_start_position">ตำแหน่งเริ่มต้น</string>
-    <string name="settings_read_start_position_top_left">บนซ้าย</string>
-    <string name="settings_read_start_position_top_right">บนขวา</string>
-    <string name="settings_read_start_position_bottom_left">ล่างซ้าย</string>
-    <string name="settings_read_start_position_bottom_right">ล่างขวา</string>
-    <string name="settings_read_start_position_center">ตรงกลาง</string>
-    <string name="settings_read_keep_screen_on">เปิดหน้าจอค้างไว้</string>
-    <string name="settings_read_show_clock">แสดงเวลา</string>
-    <string name="settings_read_show_progress">แสดงความคืบหน้า</string>
-    <string name="settings_read_show_battery">แสดงแบตเตอรี่</string>
-    <string name="settings_read_show_page_interval">แสดงความห่างของหน้าเมื่อเปลี่ยน</string>
     <string name="settings_read_volume_page">ใช้ปุ่มปรับเสียงเพื่อเปลี่ยนหน้า</string>
-    <string name="settings_read_reading_fullscreen">อ่านเต็มจอ</string>
-    <string name="settings_read_custom_screen_lightness">ปรับความสว่างของหน้าจอ</string>
-    <string name="settings_read_screen_lightness">แสงหน้าจอ</string>
 
     <string name="settings_download">การดาวน์โหลด</string>
     <string name="settings_download_download_location">ตำแหน่งแหล่งดาวน์โหลด</string>

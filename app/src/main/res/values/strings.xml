@@ -401,8 +401,6 @@
     <string name="settings_u_config_summary">Settings on EHentai website</string>
     <string name="settings_my_tags">My tags</string>
     <string name="settings_my_tags_summary">My tags on EHentai website</string>
-    <string name="settings_eh_theme_light">Light</string>
-    <string name="settings_eh_theme_dark">Dark</string>
     <string name="settings_eh_gallery_site">Gallery site</string>
     <string name="settings_eh_launch_page">Launch page</string>
     <string name="settings_eh_list_mode">List mode</string>
@@ -430,37 +428,7 @@
     <string name="settings_eh_filter">Block gallery</string>
     <string name="settings_eh_filter_summary">Block gallery by title, uploader and tags</string>
 
-    <string name="settings_read">Read</string>
-    <string name="settings_read_screen_rotation">Screen orientation</string>
-    <string name="settings_read_screen_rotation_default">Default</string>
-    <string name="settings_read_screen_rotation_portrait">Portrait</string>
-    <string name="settings_read_screen_rotation_landscape">Landscape</string>
-    <string name="settings_read_screen_rotation_sensor">Auto rotate</string>
-    <string name="settings_read_reading_direction">Reading direction</string>
-    <string name="settings_read_reading_direction_left_to_right">Left to right</string>
-    <string name="settings_read_reading_direction_right_to_Left">Right to left</string>
-    <string name="settings_read_reading_direction_top_to_bottom">Top to bottom</string>
-    <string name="settings_read_page_scaling">Page scaling</string>
-    <string name="settings_read_page_scaling_actual_size">Actual size</string>
-    <string name="settings_read_page_scaling_fit_to_width">Fit to width</string>
-    <string name="settings_read_page_scaling_fit_to_height">Fit to height</string>
-    <string name="settings_read_page_scaling_fit_to_screen">Fit to screen</string>
-    <string name="settings_read_page_scaling_fixed_scale">Fixed scale</string>
-    <string name="settings_read_start_position">Start position</string>
-    <string name="settings_read_start_position_top_left">Top left</string>
-    <string name="settings_read_start_position_top_right">Top right</string>
-    <string name="settings_read_start_position_bottom_left">Bottom left</string>
-    <string name="settings_read_start_position_bottom_right">Bottom right</string>
-    <string name="settings_read_start_position_center">Center</string>
-    <string name="settings_read_keep_screen_on">Keep screen on</string>
-    <string name="settings_read_show_clock">Show clock</string>
-    <string name="settings_read_show_progress">Show progress</string>
-    <string name="settings_read_show_battery">Show battery</string>
-    <string name="settings_read_show_page_interval">Show page interval</string>
     <string name="settings_read_volume_page">Use volume key to turn pages</string>
-    <string name="settings_read_reading_fullscreen">Fullscreen</string>
-    <string name="settings_read_custom_screen_lightness">Custom screen lightness</string>
-    <string name="settings_read_screen_lightness">Screen lightness</string>
     <string name="settings_read_reverse_volume">Reverse volume key</string>
 
     <string name="settings_download">Download</string>
@@ -649,8 +617,6 @@
     <string name="from_clipboard">From clipboard</string>
     <string name="from_clipboard_error">No cookies found in clipboard.</string>
     <string name="delete_search_history">Delete \"%s\" from search history?</string>
-    <string name="read_theme">Color theme</string>
-    <string name="follow_app">Follow app</string>
     <string name="action_add_tag">Add tag</string>
     <string name="action_add_tag_tip">Enter new tags, separated with comma</string>
     <string name="comment_user_uploader">%s (Uploader)</string>

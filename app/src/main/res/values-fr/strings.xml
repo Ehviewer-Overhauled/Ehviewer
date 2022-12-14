@@ -339,36 +339,7 @@
     <string name="settings_eh_filter">Bloqueur des galeries</string>
     <string name="settings_eh_filter_summary">Filtrer les galerie par les titres, les uploaders ou les tags</string>
 
-    <string name="settings_read">Lecture</string>
-    <string name="settings_read_screen_rotation">Rotation d\'écran</string>
-    <string name="settings_read_screen_rotation_default">Par défaut</string>
-    <string name="settings_read_screen_rotation_portrait">Portrait</string>
-    <string name="settings_read_screen_rotation_landscape">Landscape</string>
-    <string name="settings_read_reading_direction">Direction de lecture</string>
-    <string name="settings_read_reading_direction_left_to_right">De gauche à droit</string>
-    <string name="settings_read_reading_direction_right_to_Left">De droit à gauche</string>
-    <string name="settings_read_reading_direction_top_to_bottom">De haut à fond</string>
-    <string name="settings_read_page_scaling">Écaillage de page</string>
-    <string name="settings_read_page_scaling_actual_size">Taille actuelle</string>
-    <string name="settings_read_page_scaling_fit_to_width">S\'adapter à la largueur</string>
-    <string name="settings_read_page_scaling_fit_to_height">S\'adapter à la hauteur</string>
-    <string name="settings_read_page_scaling_fit_to_screen">S\'adapter à l\'écran</string>
-    <string name="settings_read_page_scaling_fixed_scale">Taille fixée</string>
-    <string name="settings_read_start_position">Position de début</string>
-    <string name="settings_read_start_position_top_left">En haut à gauche</string>
-    <string name="settings_read_start_position_top_right">En haut à droit</string>
-    <string name="settings_read_start_position_bottom_left">En bas à gauche</string>
-    <string name="settings_read_start_position_bottom_right">En bas à droit</string>
-    <string name="settings_read_start_position_center">Centre</string>
-    <string name="settings_read_keep_screen_on">Maintenir l\'écran allumé</string>
-    <string name="settings_read_show_clock">Montrer l\'heure</string>
-    <string name="settings_read_show_progress">Montrer le progrès</string>
-    <string name="settings_read_show_battery">Montrer le niveau de batterie</string>
-    <string name="settings_read_show_page_interval">Montrer l\'intervalle des pages</string>
     <string name="settings_read_volume_page">Tourner la page avec les Volumes</string>
-    <string name="settings_read_reading_fullscreen">Plein d\'écran</string>
-    <string name="settings_read_custom_screen_lightness">Personaliser la luminosité d\'écran</string>
-    <string name="settings_read_screen_lightness">Luminosité d\'écran</string>
 
     <!-- My Tags Activity -->
     <string name="my_tags">Tags suivis</string>
@@ -526,8 +497,6 @@
     <string name="settings_advanced_custom_hosts_title">hosts.txt personalisé</string>
     <string name="settings_advanced_custom_hosts_summary">Mapper l\'hôte à l\'adresse IP\nIls pouvent redéfinir l\'hosts.txt de l\'app</string>
     <string name="app_language_system">Langue du système (défaut)</string>
-    <string name="settings_eh_theme_light">Blanc</string>
-    <string name="settings_eh_theme_dark">Gris</string>
     <string name="settings_eh_identity_cookies_signed">Tout le monde peut utiliser les cookies de ce compte pour s\'y connecter.&lt;br&gt;&lt;b&gt;GARDEZ-LES BIEN !&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">Vous ne vous êtes pas connecté.</string>
     <string name="settings_eh_identity_cookies_copy">Copier</string>

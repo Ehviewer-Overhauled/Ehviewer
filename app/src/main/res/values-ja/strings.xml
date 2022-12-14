@@ -337,36 +337,7 @@
     <string name="settings_eh_filter">ギャラリーをブロック</string>
     <string name="settings_eh_filter_summary">タイトル、アップローダ、もしくはタグで望ましくないギャラリーを除外</string>
 
-    <string name="settings_read">閲覧</string>
-    <string name="settings_read_screen_rotation">画面の向き</string>
-    <string name="settings_read_screen_rotation_default">システムデフォルト</string>
-    <string name="settings_read_screen_rotation_portrait">縦画面</string>
-    <string name="settings_read_screen_rotation_landscape">横画面</string>
-    <string name="settings_read_reading_direction">閲覧方向</string>
-    <string name="settings_read_reading_direction_left_to_right">左から右へ</string>
-    <string name="settings_read_reading_direction_right_to_Left">右から左へ</string>
-    <string name="settings_read_reading_direction_top_to_bottom">上から下へ</string>
-    <string name="settings_read_page_scaling">ページのズーム</string>
-    <string name="settings_read_page_scaling_actual_size">元のサイズ</string>
-    <string name="settings_read_page_scaling_fit_to_width">幅に合わせる</string>
-    <string name="settings_read_page_scaling_fit_to_height">長さに合わせる</string>
-    <string name="settings_read_page_scaling_fit_to_screen">画面に合わせる</string>
-    <string name="settings_read_page_scaling_fixed_scale">固定したスケール</string>
-    <string name="settings_read_start_position">ページを開く位置</string>
-    <string name="settings_read_start_position_top_left">左上隅</string>
-    <string name="settings_read_start_position_top_right">右上隅</string>
-    <string name="settings_read_start_position_bottom_left">左下隅</string>
-    <string name="settings_read_start_position_bottom_right">右下隅</string>
-    <string name="settings_read_start_position_center">中心</string>
-    <string name="settings_read_keep_screen_on">画面を常にオン</string>
-    <string name="settings_read_show_clock">時計を表示</string>
-    <string name="settings_read_show_progress">進捗を表示</string>
-    <string name="settings_read_show_battery">バッテリー残量を表示</string>
-    <string name="settings_read_show_page_interval">ページ間の余白を表示</string>
     <string name="settings_read_volume_page">ボリュームキーでページをめくる</string>
-    <string name="settings_read_reading_fullscreen">フルスクリーン</string>
-    <string name="settings_read_custom_screen_lightness">画面の明るさを設定</string>
-    <string name="settings_read_screen_lightness">画面の明るさ</string>
 
 
     <!-- My Tags Activity -->
@@ -524,8 +495,6 @@
     <string name="settings_advanced_custom_hosts_title">カスタムhosts.txt</string>
     <string name="settings_advanced_custom_hosts_summary">ホスト名をIPにマッピング\n既定のhosts.txtを上書きできます。</string>
 
-    <string name="settings_eh_theme_light">ライト</string>
-    <string name="settings_eh_theme_dark">ダーク</string>
     <string name="settings_eh_identity_cookies_signed">下記の情報を持つ誰でもこのアカウントにログインできますので&lt;br&gt;&lt;b&gt;絶対に他人に渡さないように！&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">まだログインしていません</string>
     <string name="settings_eh_identity_cookies_copy">コピー</string>

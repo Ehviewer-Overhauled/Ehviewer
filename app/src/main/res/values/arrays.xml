@@ -155,64 +155,6 @@
         <item>2400</item>
     </string-array>
 
-    <string-array name="screen_rotation_entries">
-        <item>@string/settings_read_screen_rotation_default</item>
-        <item>@string/settings_read_screen_rotation_portrait</item>
-        <item>@string/settings_read_screen_rotation_landscape</item>
-        <item>@string/settings_read_screen_rotation_sensor</item>
-    </string-array>
-
-    <string-array name="screen_rotation_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="reading_direction_entries">
-        <item>@string/settings_read_reading_direction_left_to_right</item>
-        <item>@string/settings_read_reading_direction_right_to_Left</item>
-        <item>@string/settings_read_reading_direction_top_to_bottom</item>
-    </string-array>
-
-    <string-array name="reading_direction_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
-    <string-array name="page_scaling_entries">
-        <item>@string/settings_read_page_scaling_actual_size</item>
-        <item>@string/settings_read_page_scaling_fit_to_width</item>
-        <item>@string/settings_read_page_scaling_fit_to_height</item>
-        <item>@string/settings_read_page_scaling_fit_to_screen</item>
-        <item>@string/settings_read_page_scaling_fixed_scale</item>
-    </string-array>
-
-    <string-array name="page_scaling_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
-    <string-array name="start_position_entries">
-        <item>@string/settings_read_start_position_top_left</item>
-        <item>@string/settings_read_start_position_top_right</item>
-        <item>@string/settings_read_start_position_bottom_left</item>
-        <item>@string/settings_read_start_position_bottom_right</item>
-        <item>@string/settings_read_start_position_center</item>
-    </string-array>
-
-    <string-array name="start_position_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
     <string-array name="read_cache_size_entries" translatable="false">
         <item>40 MB</item>
         <item>80 MB</item>
@@ -296,18 +238,6 @@
         <item>@string/download_state_downloading</item>
         <item>@string/download_state_finish</item>
         <item>@string/download_state_failed</item>
-    </string-array>
-
-    <string-array name="read_theme_entries">
-        <item>@string/follow_app</item>
-        <item>@string/settings_eh_theme_dark</item>
-        <item>@string/settings_eh_theme_light</item>
-    </string-array>
-
-    <string-array name="read_theme_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
     </string-array>
 
     <declare-styleable name="SubsamplingScaleImageView">

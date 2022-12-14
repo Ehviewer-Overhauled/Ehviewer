@@ -356,8 +356,6 @@
     <string name="settings_u_config_summary">EHentai 网站上的设置</string>
     <string name="settings_my_tags">我的标签</string>
     <string name="settings_my_tags_summary">EHentai 网站上的我的标签</string>
-    <string name="settings_eh_theme_light">亮色</string>
-    <string name="settings_eh_theme_dark">暗色</string>
     <string name="settings_eh_gallery_site">画廊站点</string>
     <string name="settings_eh_launch_page">启动页</string>
     <string name="settings_eh_list_mode">列表模式</string>
@@ -385,37 +383,7 @@
     <string name="settings_eh_filter">屏蔽画廊</string>
     <string name="settings_eh_filter_summary">根据标题、上传者、标签屏蔽画廊</string>
 
-    <string name="settings_read">阅读</string>
-    <string name="settings_read_screen_rotation">屏幕方向</string>
-    <string name="settings_read_screen_rotation_default">系统默认</string>
-    <string name="settings_read_screen_rotation_portrait">竖屏</string>
-    <string name="settings_read_screen_rotation_landscape">横屏</string>
-    <string name="settings_read_screen_rotation_sensor">自动旋转</string>
-    <string name="settings_read_reading_direction">阅读方向</string>
-    <string name="settings_read_reading_direction_left_to_right">从左至右</string>
-    <string name="settings_read_reading_direction_right_to_Left">从右至左</string>
-    <string name="settings_read_reading_direction_top_to_bottom">从上至下</string>
-    <string name="settings_read_page_scaling">页面缩放</string>
-    <string name="settings_read_page_scaling_actual_size">原始尺寸</string>
-    <string name="settings_read_page_scaling_fit_to_width">匹配宽度</string>
-    <string name="settings_read_page_scaling_fit_to_height">匹配长度</string>
-    <string name="settings_read_page_scaling_fit_to_screen">匹配屏幕</string>
-    <string name="settings_read_page_scaling_fixed_scale">固定缩放</string>
-    <string name="settings_read_start_position">开页位置</string>
-    <string name="settings_read_start_position_top_left">左上角</string>
-    <string name="settings_read_start_position_top_right">右上角</string>
-    <string name="settings_read_start_position_bottom_left">左下角</string>
-    <string name="settings_read_start_position_bottom_right">右下角</string>
-    <string name="settings_read_start_position_center">中心</string>
-    <string name="settings_read_keep_screen_on">屏幕常亮</string>
-    <string name="settings_read_show_clock">显示时钟</string>
-    <string name="settings_read_show_progress">显示进度</string>
-    <string name="settings_read_show_battery">显示电量</string>
-    <string name="settings_read_show_page_interval">显示页面间隔</string>
     <string name="settings_read_volume_page">使用音量键翻页</string>
-    <string name="settings_read_reading_fullscreen">全屏</string>
-    <string name="settings_read_custom_screen_lightness">自定义屏幕亮度</string>
-    <string name="settings_read_screen_lightness">屏幕亮度</string>
     <string name="settings_read_reverse_volume">翻转音量键</string>
 
     <string name="settings_download">下载</string>
@@ -586,8 +554,6 @@
     <string name="delete_search_history">从搜索记录中删除“%s”？</string>
     <string name="settings_advanced_domain_fronting_title">域名前置</string>
     <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁</string>
-    <string name="read_theme">色彩主题</string>
-    <string name="follow_app">跟随应用</string>
     <string name="action_add_tag">添加标签</string>
     <string name="action_add_tag_tip">添加新标签，用逗号「，」分割</string>
     <string name="comment_user_uploader">%s （上传者）</string>

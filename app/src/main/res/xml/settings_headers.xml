@@ -22,11 +22,6 @@
         android:title="@string/settings_eh" />
 
     <Preference
-        android:icon="@drawable/v_book_open_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.ReadFragment"
-        android:title="@string/settings_read" />
-
-    <Preference
         android:icon="@drawable/v_download_primary_x24"
         android:key="com.hippo.ehviewer.ui.fragment.DownloadFragment"
         android:title="@string/settings_download" />

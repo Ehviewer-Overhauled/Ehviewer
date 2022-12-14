@@ -303,8 +303,6 @@
     <string name="settings_u_config">E-Hentai 설정</string>
     <string name="settings_u_config_summary">E-Hentai 사이트의 설정 페이지를 엽니다.</string>
     <string name="settings_eh_sign_out_tip">로그아웃했습니다. 다시 로그인하려면 앱을 재시작하세요.</string>
-    <string name="settings_eh_theme_light">밝은 테마</string>
-    <string name="settings_eh_theme_dark">어두운 테마</string>
     <string name="settings_eh_gallery_site">갤러리 사이트</string>
     <string name="settings_eh_list_mode">목록 모드</string>
     <string name="settings_eh_list_mode_detail">자세히</string>
@@ -324,36 +322,7 @@
     <string name="settings_eh_tag_translations_source">Placeholder</string>
     <string name="settings_eh_tag_translations_source_url">https://placeholder</string>
 
-    <string name="settings_read">읽기</string>
-    <string name="settings_read_screen_rotation">화면 회전</string>
-    <string name="settings_read_screen_rotation_default">기본값</string>
-    <string name="settings_read_screen_rotation_portrait">세로 모드</string>
-    <string name="settings_read_screen_rotation_landscape">가로 모드</string>
-    <string name="settings_read_reading_direction">읽기 방향</string>
-    <string name="settings_read_reading_direction_left_to_right">왼쪽에서 오른쪽으로</string>
-    <string name="settings_read_reading_direction_right_to_Left">오른쪽에서 왼쪽으로</string>
-    <string name="settings_read_reading_direction_top_to_bottom">위에서 아래로</string>
-    <string name="settings_read_page_scaling">페이지 표시</string>
-    <string name="settings_read_page_scaling_actual_size">실제 크기</string>
-    <string name="settings_read_page_scaling_fit_to_width">너비에 맞춤</string>
-    <string name="settings_read_page_scaling_fit_to_height">높이에 맞춤</string>
-    <string name="settings_read_page_scaling_fit_to_screen">화면에 맞춤</string>
-    <string name="settings_read_page_scaling_fixed_scale">비율 고정</string>
-    <string name="settings_read_start_position">시작 위치</string>
-    <string name="settings_read_start_position_top_left">왼쪽 상단</string>
-    <string name="settings_read_start_position_top_right">오른쪽 상단</string>
-    <string name="settings_read_start_position_bottom_left">왼쪽 하단</string>
-    <string name="settings_read_start_position_bottom_right">오른쪽 하단</string>
-    <string name="settings_read_start_position_center">중앙</string>
-    <string name="settings_read_keep_screen_on">화면 켜짐 유지</string>
-    <string name="settings_read_show_clock">시계 표시</string>
-    <string name="settings_read_show_progress">독서 진행도 표시</string>
-    <string name="settings_read_show_battery">배터리 표시</string>
-    <string name="settings_read_show_page_interval">페이지 간격 표시</string>
     <string name="settings_read_volume_page">볼륨 키로 페이지 넘기기</string>
-    <string name="settings_read_reading_fullscreen">전체 화면</string>
-    <string name="settings_read_custom_screen_lightness">화면 밝기 사용자 지정</string>
-    <string name="settings_read_screen_lightness">화면 밝기</string>
 
     <string name="settings_download">다운로드</string>
     <string name="settings_download_download_location">다운로드 위치</string>

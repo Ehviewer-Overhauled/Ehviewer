@@ -304,36 +304,7 @@
     <string name="settings_eh_filter">Filtrado de galerías</string>
     <string name="settings_eh_filter_summary">Filtrado de galerías por título, uploader y etiquetas. Para más detalles presiona el ícono (i) en la parte superior del menú</string>
 
-    <string name="settings_read">Lectura</string>
-    <string name="settings_read_screen_rotation">Orientación de la pantalla</string>
-    <string name="settings_read_screen_rotation_default">Defecto</string>
-    <string name="settings_read_screen_rotation_portrait">Retrato</string>
-    <string name="settings_read_screen_rotation_landscape">Paisaje</string>
-    <string name="settings_read_reading_direction">Dirección de lectura</string>
-    <string name="settings_read_reading_direction_left_to_right">Izquierda a derecha</string>
-    <string name="settings_read_reading_direction_right_to_Left">Derecha a izquierda</string>
-    <string name="settings_read_reading_direction_top_to_bottom">Arriba hacia abajo</string>
-    <string name="settings_read_page_scaling">Escala de página</string>
-    <string name="settings_read_page_scaling_actual_size">Tamaño original</string>
-    <string name="settings_read_page_scaling_fit_to_width">Ajustar a anchura</string>
-    <string name="settings_read_page_scaling_fit_to_height">Ajustar a altura</string>
-    <string name="settings_read_page_scaling_fit_to_screen">Ajustar a pantalla</string>
-    <string name="settings_read_page_scaling_fixed_scale">Escala fija</string>
-    <string name="settings_read_start_position">Posición de inicio</string>
-    <string name="settings_read_start_position_top_left">Arriba a la izquierda</string>
-    <string name="settings_read_start_position_top_right">Abajo a la derecha</string>
-    <string name="settings_read_start_position_bottom_left">Abajo a la izquierda</string>
-    <string name="settings_read_start_position_bottom_right">Abajo a la derecha</string>
-    <string name="settings_read_start_position_center">Centro</string>
-    <string name="settings_read_keep_screen_on">Pantalla siempre encendida</string>
-    <string name="settings_read_show_page_interval">Mostrar intervalo de página</string>
-    <string name="settings_read_show_clock">Mostrar hora</string>
-    <string name="settings_read_show_progress">Mostrar progreso de lectura</string>
-    <string name="settings_read_show_battery">Mostrar porcentaje de la batería</string>
     <string name="settings_read_volume_page">Pasar páginas con botón del volumen</string>
-    <string name="settings_read_reading_fullscreen">Pantalla completa</string>
-    <string name="settings_read_custom_screen_lightness">Personalizar brillo de la pantalla</string>
-    <string name="settings_read_screen_lightness">Brillo de la pantalla</string>
 
     <string name="settings_download">Descargas</string>
     <string name="settings_download_download_location">Ruta de descargas</string>
@@ -501,7 +472,5 @@
     <string name="edit_host_delete">Borrar</string>
     <string name="invalid_host">Anfitrión inválida</string>
     <string name="invalid_ip">IP inválida</string>
-    <string name="settings_eh_theme_light">Claro</string>
-    <string name="settings_eh_theme_dark">Oscuro</string>
 
 </resources>
