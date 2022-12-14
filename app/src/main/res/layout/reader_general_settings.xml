@@ -73,6 +73,24 @@
             android:text="@string/pref_page_transitions"
             android:textColor="?android:attr/textColorSecondary" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/volume_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/settings_read_volume_page"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/reserve_volume_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/settings_read_reverse_volume"
+            android:textColor="?android:attr/textColorSecondary" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

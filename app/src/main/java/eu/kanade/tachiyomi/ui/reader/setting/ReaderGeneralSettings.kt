@@ -47,5 +47,10 @@ class ReaderGeneralSettings @JvmOverloads constructor(context: Context, attrs: A
         binding.keepscreen.bindToPreference(readerPreferences.keepScreenOn())
         binding.longTap.bindToPreference(readerPreferences.readWithLongTap())
         binding.pageTransitions.bindToPreference(readerPreferences.pageTransitions())
+        binding.volumePage.bindToPreference(readerPreferences.readWithVolumeKeys())
+        binding.reserveVolumePage.bindToPreference(readerPreferences.readWithVolumeKeysInverted())
+        readerPreferences.readWithVolumeKeys().asHotFlow {
+            binding.reserveVolumePage.isVisible = it
+        }.launchIn((context as ReaderActivity).lifecycleScope)
     }
 }
