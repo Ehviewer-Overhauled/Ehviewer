@@ -278,6 +278,8 @@ class ReaderActivity : EhActivity() {
         }
         ArchivePageLoader.showPasswd = ShowPasswdDialogHandler(this)
 
+        mGalleryProvider!!.start()
+
         // Get start page
         val startPage: Int = if (savedInstanceState == null) {
             if (mPage >= 0) mPage else mGalleryProvider!!.startPage
@@ -294,8 +296,6 @@ class ReaderActivity : EhActivity() {
                 }
             }
         }
-
-        mGalleryProvider!!.start()
 
         config = ReaderConfig()
         initializeMenu()
