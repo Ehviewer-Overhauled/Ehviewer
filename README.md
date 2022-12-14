@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">
-  <img src="art/launcher_icon-web.svg" width="200">
+  <img src="https://github.com/Ehviewer-Overhauled/ART/blob/master/launcher_icon-web.svg" width="200">
   <br>EhViewer<br>
 </h1>
 
@@ -66,12 +66,12 @@ with Material Design 3 and Dynamic Color Support
 
 # Download
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="art/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="art/get-it-on-fdroid.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="https://github.com/Ehviewer-Overhauled/ART/blob/master/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="https://github.com/Ehviewer-Overhauled/ART/blob/master/get-it-on-fdroid.svg" width="200px"/></a>
 
 # Screenshot
 
-![screenshot-01](art/screenshot-01.png)
-![screenshot-02](art/screenshot-02.png)
+![screenshot-01](https://github.com/Ehviewer-Overhauled/ART/blob/master/screenshot-01.png)
+![screenshot-02](https://github.com/Ehviewer-Overhauled/ART/blob/master/screenshot-02.png)
 
 # Thanks
 
