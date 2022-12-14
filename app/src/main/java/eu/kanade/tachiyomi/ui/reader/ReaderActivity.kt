@@ -161,7 +161,7 @@ class ReaderActivity : EhActivity() {
             }
         }
     }
-    private var mGalleryProvider: PageLoader2? = null
+    var mGalleryProvider: PageLoader2? = null
     private var mSize: Int = 0
     private var mCurrentIndex: Int = 0
     private var mSavingPage = -1

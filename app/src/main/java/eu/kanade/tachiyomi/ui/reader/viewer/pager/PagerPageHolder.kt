@@ -203,7 +203,7 @@ class PagerPageHolder(
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), this, true)
             errorLayout?.actionRetry?.viewer = viewer
             errorLayout?.actionRetry?.setOnClickListener {
-                TODO()
+                viewer.activity.mGalleryProvider?.request(page.index)
             }
         }
         errorLayout?.root?.isVisible = true
