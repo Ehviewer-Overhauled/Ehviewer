@@ -586,7 +586,6 @@
     <string name="account_name">账户</string>
 
     <!-- Tachiyomi Reader Start-->
-    <string name="manga">书架中的作品</string>
     <string name="action_settings">设置</string>
     <string name="action_retry">重试</string>
     <string name="action_share">分享</string>

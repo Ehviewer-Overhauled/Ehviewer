@@ -518,7 +518,6 @@
     <string name="favorite_name">收藏畫廊</string>
 
     <!-- Tachiyomi Reader Start-->
-    <string name="manga">藏書</string>
     <string name="action_settings">設定</string>
     <string name="action_retry">重試</string>
     <string name="action_share">分享</string>

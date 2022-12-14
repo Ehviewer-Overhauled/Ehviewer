@@ -580,7 +580,6 @@
     <string name="account_name">帳號</string>
 
     <!-- Tachiyomi Reader Start-->
-    <string name="manga">藏書</string>
     <string name="action_settings">設定</string>
     <string name="action_retry">重試</string>
     <string name="action_share">分享</string>
