@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
+import com.hippo.util.HashCodeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,30 +86,11 @@ public class SimpleDiskCache {
         try {
             final MessageDigest digest = MessageDigest.getInstance("MD5");
             digest.update(key.getBytes());
-            cacheKey = bytesToHexString(digest.digest());
+            cacheKey = HashCodeUtils.bytesToHexString(digest.digest());
         } catch (final NoSuchAlgorithmException e) {
             cacheKey = String.valueOf(key.hashCode());
         }
         return cacheKey;
-    }
-
-    /**
-     * http://stackoverflow.com/questions/332079
-     *
-     * @param bytes The bytes to convert.
-     * @return A {@link String} converted from the bytes of a hashable key used
-     * to store a filename on the disk, to hex digits.
-     */
-    private static String bytesToHexString(final byte[] bytes) {
-        final StringBuilder builder = new StringBuilder();
-        for (final byte b : bytes) {
-            final String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) {
-                builder.append('0');
-            }
-            builder.append(hex);
-        }
-        return builder.toString();
     }
 
     public synchronized boolean isValid() {

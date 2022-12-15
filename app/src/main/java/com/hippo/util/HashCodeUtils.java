@@ -39,4 +39,23 @@ public class HashCodeUtils {
         }
         return hash;
     }
+
+    /**
+     * http://stackoverflow.com/questions/332079
+     *
+     * @param bytes The bytes to convert.
+     * @return A {@link String} converted from the bytes of a hashable key used
+     * to store a filename on the disk, to hex digits.
+     */
+    public static String bytesToHexString(final byte[] bytes) {
+        final StringBuilder builder = new StringBuilder();
+        for (final byte b : bytes) {
+            final String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) {
+                builder.append('0');
+            }
+            builder.append(hex);
+        }
+        return builder.toString();
+    }
 }
