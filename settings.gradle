@@ -12,14 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url "https://jcenter.bintray.com" }
         maven { url "https://jitpack.io" }
-        maven {
-            name = "MaterialSnapshots"
-            url = uri("https://maven.pkg.github.com/material-components/material-components-android")
-            credentials {
-                username = "nullArrayList"
-                password = "ghp_" + "TTLrOZAWR" + "MlbqMF" + "zwJNdaNON" + "EDDRM22DCHSL" // This github account has nothing and this token only have "read packages" permission. So guys, don't try to do bad things
-            }
-        }
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
