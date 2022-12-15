@@ -24,7 +24,6 @@ import androidx.core.util.Pair;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.HashCodeUtils;
 import com.hippo.util.IoThreadPoolExecutor;
@@ -63,7 +62,6 @@ public class EhTagDatabase {
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
     private static volatile EhTagDatabase instance;
-    private static boolean translate;
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -104,16 +102,11 @@ public class EhTagDatabase {
         } else {
             tagList = null;
         }
-        translate = Settings.getShowTagTranslations();
     }
 
     @Nullable
     public static EhTagDatabase getInstance() {
         return instance;
-    }
-
-    public static void setTranslate(boolean value) {
-        translate = value;
     }
 
     @Nullable
@@ -298,7 +291,7 @@ public class EhTagDatabase {
         return null;
     }
 
-    public ArrayList<Pair<String, String>> suggest(String keyword) {
+    public ArrayList<Pair<String, String>> suggest(String keyword, boolean translate) {
         ArrayList<Pair<String, String>> searchHints = new ArrayList<>();
         for (int i = 0; i < tagList.size(); i++) {
             var tmp = tagList.get(i);
