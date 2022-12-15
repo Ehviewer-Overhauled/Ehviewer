@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.client;
 
 import android.content.Context;
-import android.util.Base64;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
@@ -27,9 +26,13 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.util.ExceptionUtils;
+import com.hippo.util.HashCodeUtils;
 import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,6 +63,7 @@ public class EhTagDatabase {
     // TODO more lock for different language
     private static final Lock lock = new ReentrantLock();
     private static volatile EhTagDatabase instance;
+    private static boolean translate;
 
     static {
         NAMESPACE_TO_PREFIX.put("artist", "a:");
@@ -76,33 +80,40 @@ public class EhTagDatabase {
     }
 
     private final String name;
-    private final byte[] tags;
+    private final JSONObject tags;
+    private final ArrayList<Pair<String, String>> tagList;
 
     public EhTagDatabase(String name, BufferedSource source) throws IOException {
         this.name = name;
-        String[] tmp;
-        StringBuilder buffer = new StringBuilder();
-        source.readInt();
-        for (String i : source.readUtf8().split("\n")) {
-            tmp = i.split("\r", 2);
-            buffer.append(tmp[0]);
-            buffer.append("\r");
-            try {
-                buffer.append(new String(Base64.decode(tmp[1], Base64.DEFAULT), StandardCharsets.UTF_8));
-            } catch (Exception e) {
-                buffer.append(tmp[1]);
-            }
-            buffer.append("\n");
+        JSONObject tmpTags = null;
+        try {
+            tmpTags = new JSONObject(source.readString(StandardCharsets.UTF_8));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        byte[] b = buffer.toString().getBytes(StandardCharsets.UTF_8);
-        int totalBytes = b.length;
-        tags = new byte[totalBytes];
-        System.arraycopy(b, 0, tags, 0, totalBytes);
+        tags = tmpTags;
+        if (tags != null) {
+            tagList = new ArrayList<>();
+            tags.keys().forEachRemaining(k -> {
+                try {
+                    tagList.add(new Pair<>(k, tags.getString(k)));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
+            tagList = null;
+        }
+        translate = Settings.getShowTagTranslations();
     }
 
     @Nullable
     public static EhTagDatabase getInstance() {
         return instance;
+    }
+
+    public static void setTranslate(boolean value) {
+        translate = value;
     }
 
     @Nullable
@@ -124,18 +135,16 @@ public class EhTagDatabase {
     }
 
     @Nullable
-    private static byte[] getFileContent(File file, int length) {
+    private static String getFileContent(File file) {
         try (BufferedSource source = Okio.buffer(Okio.source(file))) {
-            byte[] content = new byte[length];
-            source.readFully(content);
-            return content;
+            return source.readString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             return null;
         }
     }
 
     @Nullable
-    private static byte[] getFileSha1(File file) {
+    private static String getFileSha1(File file) {
         try (InputStream is = new FileInputStream(file)) {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
             int n;
@@ -143,45 +152,24 @@ public class EhTagDatabase {
             while ((n = is.read(buffer)) != -1) {
                 digest.update(buffer, 0, n);
             }
-            return digest.digest();
+            return HashCodeUtils.bytesToHexString(digest.digest());
         } catch (IOException | NoSuchAlgorithmException e) {
             return null;
         }
     }
 
-    private static boolean equals(byte[] b1, byte[] b2) {
-        if (b1 == null && b2 == null) {
-            return true;
-        }
-        if (b1 == null || b2 == null) {
-            return false;
-        }
-
-        if (b1.length != b2.length) {
-            return false;
-        }
-
-        for (int i = 0; i < b1.length; i++) {
-            if (b1[i] != b2[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private static boolean checkData(File sha1File, File dataFile) {
-        byte[] s1 = getFileContent(sha1File, 20);
+        var s1 = getFileContent(sha1File);
         if (s1 == null) {
             return false;
         }
 
-        byte[] s2 = getFileSha1(dataFile);
+        var s2 = getFileSha1(dataFile);
         if (s2 == null) {
             return false;
         }
 
-        return equals(s1, s2);
+        return s1.equals(s2);
     }
 
     private static boolean save(OkHttpClient client, String url, File file) {
@@ -302,108 +290,20 @@ public class EhTagDatabase {
     }
 
     public String getTranslation(String tag) {
-        return search(tags, tag.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Nullable
-    private String search(byte[] tags, byte[] tag) {
-        int low = 0;
-        int high = tags.length;
-        while (low < high) {
-            int start = (low + high) / 2;
-            // Look for the starting '\n'
-            while (start > -1 && tags[start] != '\n') {
-                start--;
-            }
-            start++;
-
-            // Look for the middle '\r'.
-            int middle = 1;
-            while (tags[start + middle] != '\r') {
-                middle++;
-            }
-
-            // Look for the ending '\n'
-            int end = middle + 1;
-            while (tags[start + end] != '\n') {
-                end++;
-            }
-
-            int compare;
-            int tagIndex = 0;
-            int curIndex = start;
-
-            for (; ; ) {
-                int tagByte = tag[tagIndex] & 0xff;
-                int curByte = tags[curIndex] & 0xff;
-                compare = tagByte - curByte;
-                if (compare != 0) {
-                    break;
-                }
-
-                tagIndex++;
-                curIndex++;
-                if (tagIndex == tag.length && curIndex == start + middle) {
-                    break;
-                }
-                if (tagIndex == tag.length) {
-                    compare = -1;
-                    break;
-                }
-                if (curIndex == start + middle) {
-                    compare = 1;
-                    break;
-                }
-            }
-
-            if (compare < 0) {
-                high = start - 1;
-            } else if (compare > 0) {
-                low = start + end + 1;
-            } else {
-                return new String(tags, start + middle + 1, end - middle - 1, StandardCharsets.UTF_8);
-            }
+        try {
+            return tags.getString(tag);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     public ArrayList<Pair<String, String>> suggest(String keyword) {
-        return searchTag(tags, keyword);
-    }
-
-    private ArrayList<Pair<String, String>> searchTag(byte[] tags, String keyword) {
         ArrayList<Pair<String, String>> searchHints = new ArrayList<>();
-        int begin = 0;
-        while (begin < tags.length - 1) {
-            int start = begin;
-            // Look for the starting '\n'
-            while (tags[start] != '\n') {
-                start++;
-            }
-
-            // Look for the middle '\r'.
-            int middle = 1;
-            while (tags[start + middle] != '\r') {
-                middle++;
-            }
-
-            // Look for the ending '\n'
-            int end = middle + 1;
-            while (tags[start + end] != '\n') {
-                end++;
-            }
-
-            begin = start + end;
-
-            String hint = null;
-            if (Settings.getShowTagTranslations()) {
-                byte[] hintBytes = new byte[end - middle - 1];
-                System.arraycopy(tags, start + middle + 1, hintBytes, 0, end - middle - 1);
-                hint = new String(hintBytes, StandardCharsets.UTF_8);
-            }
-            byte[] tagBytes = new byte[middle];
-            System.arraycopy(tags, start + 1, tagBytes, 0, middle);
-            String tag = new String(tagBytes, StandardCharsets.UTF_8);
+        for (int i = 0; i < tagList.size(); i++) {
+            var tmp = tagList.get(i);
+            String tag = tmp.first;
+            String hint = translate ? tmp.second : null;
             int index = tag.indexOf(':');
             boolean keywordMatches;
             if (index == -1 || index >= tag.length() - 1 || keyword.length() > 2) {
@@ -421,7 +321,6 @@ public class EhTagDatabase {
             if (searchHints.size() > 20) {
                 break;
             }
-
         }
         return searchHints;
     }
