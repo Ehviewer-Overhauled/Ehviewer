@@ -18,6 +18,7 @@ import com.google.android.material.search.SearchView
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.widget.SearchDatabase
 import com.hippo.scene.StageActivity
@@ -288,7 +289,8 @@ abstract class SearchBarScene : ToolbarScene() {
             val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (s.isNotEmpty()) {
                 val keyword = s[s.size - 1]
-                val searchHints = ehTagDatabase.suggest(keyword)
+                val translate = Settings.getShowTagTranslations() && EhTagDatabase.isTranslatable(context)
+                val searchHints = ehTagDatabase.suggest(keyword, translate)
 
                 for (searchHint in searchHints) {
                     suggestions.add(TagSuggestion(searchHint.first, searchHint.second))
