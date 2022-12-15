@@ -46,19 +46,19 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="320"
         android:key="read_cache_size"
-        android:summary="%s"
         android:title="@string/settings_advanced_read_cache_size"
         app:entries="@array/read_cache_size_entries"
         app:entryValues="@array/read_cache_size_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="system"
         android:key="app_language"
-        android:summary="%s"
         android:title="@string/settings_advanced_app_language_title"
         app:entries="@array/app_language_entries"
         app:entryValues="@array/app_language_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.ProxyPreference

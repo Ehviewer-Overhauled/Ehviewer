@@ -19,6 +19,7 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
@@ -36,6 +37,7 @@ class EhFragment : BasePreferenceFragment() {
         val listThumbSize = findPreference<Preference>(Settings.KEY_LIST_THUMB_SIZE)
         val detailSize = findPreference<Preference>(Settings.KEY_DETAIL_SIZE)
         val thumbSize = findPreference<Preference>(Settings.KEY_THUMB_SIZE)
+        val thumbResolution = findPreference<Preference>(Settings.KEY_THUMB_RESOLUTION)
         val showTagTranslations = findPreference<Preference>(Settings.KEY_SHOW_TAG_TRANSLATIONS)
         val tagTranslationsSource = findPreference<Preference>("tag_translations_source")
         Settings.getDisplayName()?.let { account?.summary = it }
@@ -47,6 +49,9 @@ class EhFragment : BasePreferenceFragment() {
         thumbSize!!.onPreferenceChangeListener = this
         showTagTranslations!!.onPreferenceChangeListener = this
         blackDarkTheme!!.onPreferenceChangeListener = this
+        thumbResolution!!.setSummaryProvider {
+            getString(R.string.settings_eh_thumb_resolution_summary, (it as ListPreference).entry)
+        }
         if (!EhTagDatabase.isTranslatable(requireActivity())) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
