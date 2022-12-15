@@ -26,10 +26,10 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="1"
         android:key="gallery_site"
-        android:summary="%s"
         android:title="@string/settings_eh_gallery_site"
         app:entries="@array/gallery_site_entries"
         app:entryValues="@array/gallery_site_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.SignInRequiredPreference
@@ -49,8 +49,8 @@
         android:entries="@array/night_mode_entries"
         android:entryValues="@array/night_mode_values"
         android:key="theme"
-        android:summary="%s"
         android:title="@string/dark_theme"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <rikka.material.preference.MaterialSwitchPreference
@@ -61,19 +61,19 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="launch_page"
-        android:summary="%s"
         android:title="@string/settings_eh_launch_page"
         app:entries="@array/launch_page_entries"
         app:entryValues="@array/launch_page_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="list_mode"
-        android:summary="%s"
         android:title="@string/settings_eh_list_mode"
         app:entries="@array/list_mode_entries"
         app:entryValues="@array/list_mode_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <SeekBarPreference
@@ -88,10 +88,10 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="detail_size"
-        android:summary="%s"
         android:title="@string/settings_eh_detail_size"
         app:entries="@array/detail_size_entries"
         app:entryValues="@array/detail_size_entry_values"
+        app:useSimpleSummaryProvider="true"
         app:iconSpaceReserved="false" />
 
     <SeekBarPreference
@@ -107,7 +107,6 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="0"
         android:key="thumb_resolution"
-        android:summary="@string/settings_eh_thumb_resolution_summary"
         android:title="@string/settings_eh_thumb_resolution"
         app:entries="@array/thumb_resolution_entries"
         app:entryValues="@array/thumb_resolution_entry_values"
