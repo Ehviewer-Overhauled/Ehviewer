@@ -61,6 +61,10 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
         }
     }
 
+    override fun destroyView(container: ViewGroup, position: Int, view: View) {
+        currentChapter?.cancelRequest(position)
+    }
+
     /**
      * Returns the current position of the given [view] on the adapter.
      */
