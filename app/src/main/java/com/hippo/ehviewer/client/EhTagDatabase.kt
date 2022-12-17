@@ -58,11 +58,12 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
         tags = tmpTags
         if (tags != null) {
             tagList = ArrayList()
-            tags.keys().forEachRemaining { k: String ->
-                try {
-                    tagList!!.add(Pair(k, tags.getString(k)))
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+            tags.keys().forEachRemaining { prefix: String ->
+                val values = tags.optJSONObject(prefix)
+                values?.let {
+                    it.keys().forEachRemaining { tag: String ->
+                        tagList!!.add(Pair("$prefix:$tag", values.optString(tag)))
+                    }
                 }
             }
         } else {
@@ -70,17 +71,16 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
         }
     }
 
-    fun getTranslation(tag: String?): String? {
-        try {
-            return tag?.let { tags!!.getString(it) }
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        return null
+    fun getTranslation(prefix: String?, tag: String?): String? {
+        return tags!!.optJSONObject(prefix)?.optString(tag)
     }
 
     /* Construct a cold flow for tag database suggestions */
-    fun suggestFlow(keyword: String, translate: Boolean, exactly: Boolean = false): Flow<Pair<String?, String>> = flow {
+    fun suggestFlow(
+        keyword: String,
+        translate: Boolean,
+        exactly: Boolean = false
+    ): Flow<Pair<String?, String>> = flow {
         tagList?.forEach {
             val tag = it.first
             val hint = if (translate) it.second else null
@@ -120,17 +120,17 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
             private set
 
         init {
-            NAMESPACE_TO_PREFIX["artist"] = "a:"
-            NAMESPACE_TO_PREFIX["cosplayer"] = "cos:"
-            NAMESPACE_TO_PREFIX["character"] = "c:"
-            NAMESPACE_TO_PREFIX["female"] = "f:"
-            NAMESPACE_TO_PREFIX["group"] = "g:"
-            NAMESPACE_TO_PREFIX["language"] = "l:"
-            NAMESPACE_TO_PREFIX["male"] = "m:"
-            NAMESPACE_TO_PREFIX["mixed"] = "x:"
-            NAMESPACE_TO_PREFIX["other"] = "o:"
-            NAMESPACE_TO_PREFIX["parody"] = "p:"
-            NAMESPACE_TO_PREFIX["reclass"] = "r:"
+            NAMESPACE_TO_PREFIX["artist"] = "a"
+            NAMESPACE_TO_PREFIX["cosplayer"] = "cos"
+            NAMESPACE_TO_PREFIX["character"] = "c"
+            NAMESPACE_TO_PREFIX["female"] = "f"
+            NAMESPACE_TO_PREFIX["group"] = "g"
+            NAMESPACE_TO_PREFIX["language"] = "l"
+            NAMESPACE_TO_PREFIX["male"] = "m"
+            NAMESPACE_TO_PREFIX["mixed"] = "x"
+            NAMESPACE_TO_PREFIX["other"] = "o"
+            NAMESPACE_TO_PREFIX["parody"] = "p"
+            NAMESPACE_TO_PREFIX["reclass"] = "r"
         }
 
         @JvmStatic

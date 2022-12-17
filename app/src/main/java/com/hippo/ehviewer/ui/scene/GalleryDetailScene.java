@@ -937,7 +937,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
             String readableTagName = null;
             if (ehTags != null) {
-                readableTagName = ehTags.getTranslation("n:" + tg.groupName);
+                readableTagName = ehTags.getTranslation("n", tg.groupName);
             }
 
             TextView tgName = (TextView) inflater.inflate(R.layout.item_gallery_tag, ll, false);
@@ -946,9 +946,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             tgName.setBackgroundTintList(ColorStateList.valueOf(colorName));
 
             String prefix = EhTagDatabase.namespaceToPrefix(tg.groupName);
-            if (prefix == null) {
-                prefix = "";
-            }
 
             AutoWrapLayout awl = new AutoWrapLayout(context);
             ll.addView(awl, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -959,7 +956,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
                 String readableTag = null;
                 if (ehTags != null) {
-                    readableTag = ehTags.getTranslation(prefix + tagStr);
+                    readableTag = ehTags.getTranslation(prefix, tagStr);
                 }
 
                 tag.setText(readableTag != null ? readableTag : tagStr);
