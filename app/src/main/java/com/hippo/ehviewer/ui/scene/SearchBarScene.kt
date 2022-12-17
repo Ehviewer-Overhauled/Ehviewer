@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchBar
@@ -22,6 +23,11 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.widget.SearchDatabase
 import com.hippo.scene.StageActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 abstract class SearchBarScene : ToolbarScene() {
@@ -221,10 +227,13 @@ abstract class SearchBarScene : ToolbarScene() {
 
     }
 
-    inner class TagSuggestion constructor(private var mHint: String, private var mKeyword: String) :
+    inner class TagSuggestion constructor(
+        private var mHint: String?,
+        private var mKeyword: String
+    ) :
         Suggestion() {
 
-        override fun getText(textView: TextView): CharSequence {
+        override fun getText(textView: TextView): CharSequence? {
             return if (textView.id == android.R.id.text1) {
                 mKeyword
             } else {
@@ -278,30 +287,42 @@ abstract class SearchBarScene : ToolbarScene() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSuggestions(scrollToTop: Boolean = true) {
-        val suggestions = arrayListOf<Suggestion>()
-        val text = mSearchView?.editText?.text?.toString() ?: return
-        mSuggestionProvider?.run {
-            providerSuggestions(text)?.let { suggestions.addAll(it) }
-        }
-        mSearchDatabase.getSuggestions(text, 128).forEach { suggestions.add(KeywordSuggestion(it)) }
-        val ehTagDatabase = EhTagDatabase.getInstance()
-        if (!TextUtils.isEmpty(text) && ehTagDatabase != null && !text.endsWith(" ")) {
-            val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            if (s.isNotEmpty()) {
-                val keyword = s[s.size - 1]
-                val translate = Settings.getShowTagTranslations() && EhTagDatabase.isTranslatable(context)
-                val searchHints = ehTagDatabase.suggest(keyword, translate)
-
-                for (searchHint in searchHints) {
-                    suggestions.add(TagSuggestion(searchHint.first, searchHint.second))
+        viewLifecycleOwner.lifecycleScope.launch {
+            val suggestions = mutableListOf<Suggestion>()
+            withContext(Dispatchers.Default) {
+                mergedSuggestionFlow().collect {
+                    suggestions.add(it)
                 }
-
+            }
+            withContext(Dispatchers.Main) {
+                mSuggestionList = suggestions
+                mSuggestionAdapter?.notifyDataSetChanged()
             }
         }
-        mSuggestionList = suggestions
-        mSuggestionAdapter?.notifyDataSetChanged()
         if (scrollToTop) {
             mRecyclerView?.scrollToPosition(0)
+        }
+    }
+
+    private fun mergedSuggestionFlow(): Flow<Suggestion> = flow {
+        mSearchView?.editText?.text?.toString()?.let { text ->
+            mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
+            mSearchDatabase.getSuggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
+            EhTagDatabase.instance?.run {
+                if (!TextUtils.isEmpty(text) && !text.endsWith(" ")) {
+                    val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    if (s.isNotEmpty()) {
+                        val keyword = s[s.size - 1]
+                        val translate =
+                            Settings.getShowTagTranslations() && EhTagDatabase.isTranslatable(
+                                requireContext()
+                            )
+                        suggestFlow(keyword, translate).collect {
+                            emit(TagSuggestion(it.first, it.second))
+                        }
+                    }
+                }
+            }
         }
     }
 
