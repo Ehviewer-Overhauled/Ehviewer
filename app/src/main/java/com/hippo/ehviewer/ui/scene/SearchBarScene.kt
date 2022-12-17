@@ -287,12 +287,10 @@ abstract class SearchBarScene : ToolbarScene() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSuggestions(scrollToTop: Boolean = true) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
             val suggestions = mutableListOf<Suggestion>()
-            withContext(Dispatchers.Default) {
-                mergedSuggestionFlow().collect {
-                    suggestions.add(it)
-                }
+            mergedSuggestionFlow().collect {
+                suggestions.add(it)
             }
             withContext(Dispatchers.Main) {
                 mSuggestionList = suggestions
