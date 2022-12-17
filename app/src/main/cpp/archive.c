@@ -43,6 +43,11 @@ typedef struct {
     struct archive_entry *entry;
 } archive_ctx;
 
+typedef struct {
+    const char *filename;
+    int index;
+} entry;
+
 pthread_mutex_t ctx_lock;
 static archive_ctx **ctx_pool;
 #define CTX_POOL_SIZE 20
@@ -51,6 +56,8 @@ static bool need_encrypt = false;
 static char *passwd = NULL;
 static void *archiveAddr = NULL;
 static size_t archiveSize = 0;
+static entry *entries = NULL;
+static size_t entryCount = 0;
 
 #define POPULATE_THRESHOLD (512 * 1024 * 1024) // 512 MiB
 
@@ -75,6 +82,30 @@ static inline int filename_is_playable_file(const char *name) {
         if (strcmp(dotptr, supportExt[i]) == 0)
             return true;
     return false;
+}
+
+static inline int compare_entries(const void *a, const void *b) {
+    const char *fa = ((entry *) a)->filename;
+    const char *fb = ((entry *) b)->filename;
+    int a_len = (int) strlen(fa);
+    int b_len = (int) strlen(fb);
+    return a_len == b_len ? strcmp(fa, fb) : a_len - b_len;
+}
+
+static long archive_map_entries_index(archive_ctx *ctx) {
+    long count = 0;
+    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
+        const char *name = archive_entry_pathname(ctx->entry);
+        if (filename_is_playable_file(name)) {
+            entries[count].filename = strdup(name);
+            entries[count].index = count;
+            count++;
+        }
+    }
+    if (!count)
+        LOGE("%s", archive_error_string(ctx->arc));
+    qsort(entries, entryCount, sizeof(entry), compare_entries);
+    return count;
 }
 
 static long archive_list_all_entries(archive_ctx *ctx) {
@@ -221,10 +252,9 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     if (r) {
         if (r == -ENOMEM)
             LOGE("%s", "Mem alloc failed");
-        r = 0;
         LOGE("%s%s", "Archive open failed:", archive_error_string(ctx->arc));
     } else {
-        r = archive_list_all_entries(ctx);
+        entryCount = archive_list_all_entries(ctx);
         LOGI("%s%ld%s", "Found ", r, " image entries in archive");
 
         // We must read through the file|vm then we can know whether it is encrypted
@@ -252,6 +282,19 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     }
 
     archive_release_ctx(ctx);
+
+    r = archive_alloc_ctx(&ctx);
+    if (r) {
+        if (r == -ENOMEM)
+            LOGE("%s", "Mem alloc failed");
+        r = 0;
+        LOGE("%s%s", "Archive open failed:", archive_error_string(ctx->arc));
+    } else {
+        entries = calloc(entryCount, sizeof(entry));
+        r = archive_map_entries_index(ctx);
+    }
+
+    archive_release_ctx(ctx);
     return r;
 }
 
@@ -259,6 +302,7 @@ JNIEXPORT jobject JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
+    index = entries[index].index;
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -295,6 +339,10 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
     passwd = NULL;
     need_encrypt = false;
     munmap(archiveAddr, archiveSize);
+    for (int i = 0; i < entryCount; ++i) {
+        free((void *) entries[i].filename);
+    }
+    free(entries);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -338,6 +386,7 @@ JNIEXPORT jstring JNICALL
 Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
+    index = entries[index].index;
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -352,6 +401,7 @@ JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint index, jint fd) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
+    index = entries[index].index;
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
@@ -363,6 +413,7 @@ Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint in
 
 JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, jobject buffer) {
+    EH_UNUSED(thiz);
     void *addr = (*env)->GetDirectBufferAddress(env, buffer);
     free(addr);
 }
