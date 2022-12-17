@@ -80,11 +80,18 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
     }
 
     /* Construct a cold flow for tag database suggestions */
-    fun suggestFlow(keyword: String, translate: Boolean): Flow<Pair<String?, String>> = flow {
+    fun suggestFlow(keyword: String, translate: Boolean, exactly: Boolean = false): Flow<Pair<String?, String>> = flow {
         tagList?.forEach {
             val tag = it.first
             val hint = if (translate) it.second else null
             val index = tag.indexOf(':')
+            if (tag.substring(index + 1).trim() == keyword) {
+                if (exactly)
+                    emit(Pair(hint, tag))
+                return@forEach
+            }
+            if (exactly)
+                return@forEach
             val keywordMatches: Boolean =
                 if (index == -1 || index >= tag.length - 1 || keyword.length > 2) {
                     containsIgnoreSpace(tag, keyword)

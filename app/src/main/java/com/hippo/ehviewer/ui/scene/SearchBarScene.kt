@@ -315,6 +315,10 @@ abstract class SearchBarScene : ToolbarScene() {
                             Settings.getShowTagTranslations() && EhTagDatabase.isTranslatable(
                                 requireContext()
                             )
+
+                        suggestFlow(keyword, translate, true).collect {
+                            emit(TagSuggestion(it.first, it.second))
+                        }
                         suggestFlow(keyword, translate).collect {
                             emit(TagSuggestion(it.first, it.second))
                         }
