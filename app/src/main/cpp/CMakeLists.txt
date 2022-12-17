@@ -47,4 +47,4 @@ add_subdirectory(libarchive)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED archive.c fdutils.c)
 target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} archive_static log jnigraphics GLESv2 -Wl,--gc-sections)
+target_link_libraries(${PROJECT_NAME} archive_static log -Wl,--gc-sections)
