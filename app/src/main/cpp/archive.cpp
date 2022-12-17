@@ -17,14 +17,17 @@
  * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 #include <pthread.h>
 #include <sys/mman.h>
 #include <syscall.h>
+
+#include <algorithm>
+#include <cassert>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <vector>
 
 #include <jni.h>
 #include <android/log.h>
@@ -37,20 +40,26 @@
 #include "ehviewer.h"
 
 typedef struct {
-    int using;
+    int _using;
     int next_index;
     struct archive *arc;
     struct archive_entry *entry;
 } archive_ctx;
+
+struct entry {
+    std::string filename;
+    int index;
+};
 
 pthread_mutex_t ctx_lock;
 static archive_ctx **ctx_pool;
 #define CTX_POOL_SIZE 20
 
 static bool need_encrypt = false;
-static char *passwd = NULL;
-static void *archiveAddr = NULL;
+static char *passwd = nullptr;
+static void *archiveAddr = nullptr;
 static size_t archiveSize = 0;
+static std::vector<entry> entries;
 
 #define POPULATE_THRESHOLD (512 * 1024 * 1024) // 512 MiB
 
@@ -79,11 +88,20 @@ static inline int filename_is_playable_file(const char *name) {
 
 static long archive_list_all_entries(archive_ctx *ctx) {
     long count = 0;
-    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK)
-        if (filename_is_playable_file(archive_entry_pathname(ctx->entry)))
+    while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
+        auto name = archive_entry_pathname(ctx->entry);
+        if (filename_is_playable_file(name)) {
+            entries.push_back({strdup(name), (int) count});
             count++;
+        }
+    }
     if (!count)
         LOGE("%s", archive_error_string(ctx->arc));
+    std::sort(entries.begin(), entries.end(), [](const entry &a, const entry &b) {
+        auto &fa = a.filename;
+        auto &fb = b.filename;
+        return fa.length() < fb.length() || fa < fb;
+    });
     return count;
 }
 
@@ -98,11 +116,11 @@ static void archive_release_ctx(archive_ctx *ctx) {
 static int archive_alloc_ctx(archive_ctx **ctxptr) {
     archive_ctx *ctx;
     int err;
-    ctx = calloc(1, sizeof(archive_ctx));
+    ctx = (archive_ctx *) calloc(1, sizeof(archive_ctx));
     if (!ctx)
         return -ENOMEM;
     ctx->arc = archive_read_new();
-    ctx->using = 1;
+    ctx->_using = 1;
     if (!ctx->arc) {
         free(ctx);
         return -ENOMEM;
@@ -140,12 +158,12 @@ static int archive_skip_to_index(archive_ctx *ctx, int index) {
 
 static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
     int ret;
-    archive_ctx *ctx = NULL;
+    archive_ctx *ctx = nullptr;
     pthread_mutex_lock(&ctx_lock);
     for (int i = 0; i < CTX_POOL_SIZE; i++) {
         if (!ctx_pool[i])
             continue;
-        if (ctx_pool[i]->using)
+        if (ctx_pool[i]->_using)
             continue;
         if (ctx_pool[i]->next_index > idx)
             continue;
@@ -155,11 +173,11 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
             break;
     }
     if (ctx)
-        ctx->using = 1;
+        ctx->_using = 1;
     pthread_mutex_unlock(&ctx_lock);
 
     if (!ctx) {
-        archive_ctx *victimCtx = NULL;
+        archive_ctx *victimCtx = nullptr;
         int victimIdx = 0;
         int replace = 1;
         ret = archive_alloc_ctx(&ctx);
@@ -172,7 +190,7 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
                 replace = 0;
                 break;
             }
-            if (ctx_pool[i]->using)
+            if (ctx_pool[i]->_using)
                 continue;
             if (!victimCtx || ctx_pool[i]->next_index > victimCtx->next_index) {
                 victimCtx = ctx_pool[i];
@@ -196,23 +214,23 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
     return 0;
 }
 
-JNIEXPORT jint JNICALL
+extern "C" JNIEXPORT jint JNICALL
 Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd, jlong size) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
-    archive_ctx *ctx = NULL;
+    archive_ctx *ctx = nullptr;
     int mmap_flags = MAP_PRIVATE;
     if (size <= POPULATE_THRESHOLD)
         mmap_flags |= MAP_POPULATE;
-    archiveAddr = mmap64(0, size, PROT_READ, mmap_flags, fd, 0);
+    archiveAddr = mmap64(nullptr, size, PROT_READ, mmap_flags, fd, 0);
     if (archiveAddr == MAP_FAILED) {
         LOGE("%s%s", "mmap64 failed with error ", strerror(errno));
         return 0;
     }
     archiveSize = size;
     madvise_log_if_error(archiveAddr, archiveSize, MADV_WILLNEED);
-    pthread_mutex_init(&ctx_lock, 0);
-    ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
+    pthread_mutex_init(&ctx_lock, nullptr);
+    ctx_pool = (archive_ctx **) calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
     if (!ctx_pool) {
         LOGE("Allocate archive ctx pool failed:ENOMEM");
         return 0;
@@ -255,35 +273,36 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     return r;
 }
 
-JNIEXPORT jobject JNICALL
+extern "C" JNIEXPORT jobject JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
-    archive_ctx *ctx = NULL;
+    index = entries.at(index).index;
+    archive_ctx *ctx = nullptr;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (ret)
-        return 0;
+        return nullptr;
     long long size = archive_entry_size(ctx->entry);
     void *buffer = malloc(size);
     if (!buffer) {
-        ctx->using = 0;
+        ctx->_using = 0;
         LOGE("Allocate buffer for decompression failed:ENOMEM");
-        return 0;
+        return nullptr;
     }
     ret = archive_read_data(ctx->arc, buffer, size);
-    ctx->using = 0;
+    ctx->_using = 0;
     if (ret == size)
-        return (*env)->NewDirectByteBuffer(env, buffer, size);
+        return env->NewDirectByteBuffer(buffer, size);
     if (ret != size)
         LOGE("%s", "No enough data read, WTF?");
     if (ret < 0)
         LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
     free(buffer);
-    return 0;
+    return nullptr;
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
@@ -292,31 +311,32 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
     free(passwd);
     free(ctx_pool);
     pthread_mutex_destroy(&ctx_lock);
-    passwd = NULL;
+    passwd = nullptr;
     need_encrypt = false;
     munmap(archiveAddr, archiveSize);
+    entries.clear();
 }
 
-JNIEXPORT jboolean JNICALL
+extern "C" JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *env, jobject thiz) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     return need_encrypt;
 }
 
-JNIEXPORT jboolean JNICALL
+extern "C" JNIEXPORT jboolean JNICALL
 Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jstring str) {
     EH_UNUSED(thiz);
     struct archive_entry *entry;
     archive_ctx *ctx;
     jboolean ret = true;
-    int len = (*env)->GetStringUTFLength(env, str);
-    passwd = realloc(passwd, len * sizeof(char));
+    int len = env->GetStringUTFLength(str);
+    passwd = (char *) realloc(passwd, len * sizeof(char));
     if (!passwd) {
         LOGE("Allocate passwd buffer failed");
         return false;
     }
-    strcpy(passwd, (*env)->GetStringUTFChars(env, str, NULL));
+    strcpy(passwd, env->GetStringUTFChars(str, nullptr));
     archive_alloc_ctx(&ctx);
     void *tmpBuf = alloca(4096);
     while (archive_read_next_header(ctx->arc, &entry) == ARCHIVE_OK) {
@@ -334,35 +354,38 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jst
     return ret;
 }
 
-JNIEXPORT jstring JNICALL
+extern "C" JNIEXPORT jstring JNICALL
 Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
-    archive_ctx *ctx = NULL;
+    index = entries.at(index).index;
+    archive_ctx *ctx = nullptr;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (ret)
-        return NULL;
-    jstring str = (*env)->NewStringUTF(env, archive_entry_pathname(ctx->entry));
-    ctx->using = 0;
+        return nullptr;
+    jstring str = env->NewStringUTF(archive_entry_pathname(ctx->entry));
+    ctx->_using = 0;
     return str;
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint index, jint fd) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
-    archive_ctx *ctx = NULL;
+    index = entries.at(index).index;
+    archive_ctx *ctx = nullptr;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (!ret) {
         archive_read_data_into_fd(ctx->arc, fd);
-        ctx->using = 0;
+        ctx->_using = 0;
     }
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, jobject buffer) {
-    void *addr = (*env)->GetDirectBufferAddress(env, buffer);
+    EH_UNUSED(thiz);
+    void *addr = env->GetDirectBufferAddress(buffer);
     free(addr);
 }
