@@ -191,9 +191,15 @@ object EhTagDatabase {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    @Synchronized
     @JvmStatic
     fun update() {
+        GlobalScope.launch(Dispatchers.IO) {
+            updateInternal()
+        }
+    }
+
+    @Synchronized
+    private fun updateInternal() {
         val urls = getMetadata(EhApplication.application)
         urls?.let {
             val sha1Name = urls[0]
@@ -201,65 +207,63 @@ object EhTagDatabase {
             val dataName = urls[2]
             val dataUrl = urls[3]
 
-            GlobalScope.launch(Dispatchers.IO) {
-                try {
-                    val dir = AppConfig.getFilesDir("tag-translations")
-                    checkNotNull(dir)
+            try {
+                val dir = AppConfig.getFilesDir("tag-translations")
+                checkNotNull(dir)
 
-                    // Check current sha1 and current data
-                    val sha1File = File(dir, sha1Name)
-                    val dataFile = File(dir, dataName)
-                    if (!checkData(sha1File, dataFile)) {
+                // Check current sha1 and current data
+                val sha1File = File(dir, sha1Name)
+                val dataFile = File(dir, dataName)
+                if (!checkData(sha1File, dataFile)) {
+                    FileUtils.delete(sha1File)
+                    FileUtils.delete(dataFile)
+                }
+
+                // Read current EhTagDatabase
+                if (!isInitialized() && dataFile.exists()) {
+                    try {
+                        dataFile.source().buffer().use { updateData(it) }
+                    } catch (e: IOException) {
                         FileUtils.delete(sha1File)
                         FileUtils.delete(dataFile)
                     }
-
-                    // Read current EhTagDatabase
-                    if (!isInitialized() && dataFile.exists()) {
-                        try {
-                            dataFile.source().buffer().use { updateData(it) }
-                        } catch (e: IOException) {
-                            FileUtils.delete(sha1File)
-                            FileUtils.delete(dataFile)
-                        }
-                    }
-                    val client = okHttpClient
-
-                    // Save new sha1
-                    val tempSha1File = File(dir, "$sha1Name.tmp")
-                    check(save(client, sha1Url, tempSha1File))
-
-                    // Check new sha1 and current data
-                    if (checkData(tempSha1File, dataFile)) {
-                        // The data is the same
-                        FileUtils.delete(tempSha1File)
-                        return@launch
-                    }
-
-                    // Save new data
-                    val tempDataFile = File(dir, "$dataName.tmp")
-                    check(save(client, dataUrl, tempDataFile))
-
-                    // Check new sha1 and new data
-                    if (!checkData(tempSha1File, tempDataFile)) {
-                        FileUtils.delete(tempSha1File)
-                        FileUtils.delete(tempDataFile)
-                        return@launch
-                    }
-
-                    // Replace current sha1 and current data with new sha1 and new data
-                    FileUtils.delete(sha1File)
-                    FileUtils.delete(dataFile)
-                    tempSha1File.renameTo(sha1File)
-                    tempDataFile.renameTo(dataFile)
-
-                    // Read new EhTagDatabase
-                    try {
-                        dataFile.source().buffer().use { updateData(it) }
-                    } catch (_: IOException) {
-                    }
-                } finally {
                 }
+                val client = okHttpClient
+
+                // Save new sha1
+                val tempSha1File = File(dir, "$sha1Name.tmp")
+                check(save(client, sha1Url, tempSha1File))
+
+                // Check new sha1 and current data
+                if (checkData(tempSha1File, dataFile)) {
+                    // The data is the same
+                    FileUtils.delete(tempSha1File)
+                    return
+                }
+
+                // Save new data
+                val tempDataFile = File(dir, "$dataName.tmp")
+                check(save(client, dataUrl, tempDataFile))
+
+                // Check new sha1 and new data
+                if (!checkData(tempSha1File, tempDataFile)) {
+                    FileUtils.delete(tempSha1File)
+                    FileUtils.delete(tempDataFile)
+                    return
+                }
+
+                // Replace current sha1 and current data with new sha1 and new data
+                FileUtils.delete(sha1File)
+                FileUtils.delete(dataFile)
+                tempSha1File.renameTo(sha1File)
+                tempDataFile.renameTo(dataFile)
+
+                // Read new EhTagDatabase
+                try {
+                    dataFile.source().buffer().use { updateData(it) }
+                } catch (_: IOException) {
+                }
+            } finally {
             }
         }
     }
