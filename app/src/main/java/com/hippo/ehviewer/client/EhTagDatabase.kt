@@ -72,7 +72,7 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
     }
 
     fun getTranslation(prefix: String?, tag: String?): String? {
-        return tags!!.optJSONObject(prefix)?.optString(tag)
+        return tags!!.optJSONObject(prefix)?.optString(tag)?.trim()?.takeIf { it.isNotEmpty() }
     }
 
     /* Construct a cold flow for tag database suggestions */
