@@ -527,7 +527,7 @@ public final class SpiderQueen implements Runnable {
                 synchronized (mDecodeRequestQueue) {
                     if (!contain(mDecodeIndexArray, index) && !mDecodeRequestQueue.contains(index)) {
                         mDecodeRequestQueue.add(index);
-                        mDecodeRequestQueue.notify();
+                        mDecodeRequestQueue.notifyAll();
                     }
                 }
                 result = null;
