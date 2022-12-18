@@ -263,7 +263,8 @@ object EhTagDatabase {
                     dataFile.source().buffer().use { updateData(it) }
                 } catch (_: IOException) {
                 }
-            } finally {
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
     }
