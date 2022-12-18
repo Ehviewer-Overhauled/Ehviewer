@@ -52,7 +52,7 @@ class EhFragment : BasePreferenceFragment() {
         thumbResolution!!.setSummaryProvider {
             getString(R.string.settings_eh_thumb_resolution_summary, (it as ListPreference).entry)
         }
-        if (!EhTagDatabase.isTranslatable(requireActivity())) {
+        if (!EhTagDatabase.isTranslatable()) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
         }
@@ -80,7 +80,7 @@ class EhFragment : BasePreferenceFragment() {
             requireActivity().setResult(Activity.RESULT_OK)
         } else if (Settings.KEY_SHOW_TAG_TRANSLATIONS == key) {
             if (java.lang.Boolean.TRUE == newValue) {
-                EhTagDatabase.update(requireActivity())
+                EhTagDatabase.update()
             }
         } else if (Settings.KEY_BLACK_DARK_THEME == key) {
             if (requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES > 0) {

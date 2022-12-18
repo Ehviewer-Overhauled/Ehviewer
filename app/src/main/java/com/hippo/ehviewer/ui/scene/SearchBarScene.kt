@@ -306,16 +306,12 @@ abstract class SearchBarScene : ToolbarScene() {
         mSearchView?.editText?.text?.toString()?.let { text ->
             mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
             mSearchDatabase.getSuggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
-            EhTagDatabase.instance?.run {
+            EhTagDatabase.takeIf { it.isInitialized() }?.run {
                 if (!TextUtils.isEmpty(text) && !text.endsWith(" ")) {
                     val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     if (s.isNotEmpty()) {
                         val keyword = s[s.size - 1]
-                        val translate =
-                            Settings.getShowTagTranslations() && EhTagDatabase.isTranslatable(
-                                requireContext()
-                            )
-
+                        val translate = Settings.getShowTagTranslations() && isTranslatable()
                         suggestFlow(keyword, translate, true).collect {
                             emit(TagSuggestion(it.first, it.second))
                         }

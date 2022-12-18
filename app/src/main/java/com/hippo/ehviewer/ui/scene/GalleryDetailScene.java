@@ -927,7 +927,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             mNoTags.setVisibility(View.GONE);
         }
 
-        EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.getInstance() : null;
+        EhTagDatabase ehTags = Settings.getShowTagTranslations() ? EhTagDatabase.INSTANCE : null;
         int colorTag = ResourcesKt.resolveColor(getTheme(), R.attr.tagBackgroundColor);
         int colorName = ResourcesKt.resolveColor(getTheme(), R.attr.tagGroupBackgroundColor);
         for (GalleryTagGroup tg : tagGroups) {
@@ -936,7 +936,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             mTags.addView(ll);
 
             String readableTagName = null;
-            if (ehTags != null) {
+            if (ehTags != null && ehTags.isInitialized()) {
                 readableTagName = ehTags.getTranslation("n", tg.groupName);
             }
 

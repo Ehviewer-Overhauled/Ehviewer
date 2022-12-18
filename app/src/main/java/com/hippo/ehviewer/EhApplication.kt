@@ -43,6 +43,7 @@ import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhSSLSocketFactory
+import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhX509TrustManager
 import com.hippo.ehviewer.client.data.GalleryDetail
@@ -114,6 +115,7 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         EhDB.initialize(this)
         EhEngine.initialize()
         BitmapUtils.initialize(this)
+        EhTagDatabase.update()
 
         // Locales can be managed by system automatically above Snow Cone v2
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)

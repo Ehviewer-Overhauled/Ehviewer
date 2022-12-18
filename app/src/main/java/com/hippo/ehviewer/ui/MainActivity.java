@@ -309,8 +309,6 @@ public final class MainActivity extends StageActivity
         } else {
             onRestore(savedInstanceState);
         }
-
-        EhTagDatabase.update(this);
     }
 
 

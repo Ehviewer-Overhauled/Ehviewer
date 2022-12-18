@@ -16,17 +16,20 @@
 package com.hippo.ehviewer.client
 
 import android.content.Context
-import androidx.core.util.Pair
 import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import com.hippo.ehviewer.R
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.HashCodeUtils
-import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
@@ -41,38 +44,36 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
 
-class EhTagDatabase(private val name: String, source: BufferedSource) {
-    private val tags: JSONObject?
-    private var tagList: ArrayList<Pair<String, String>>? = null
+object EhTagDatabase {
+    private lateinit var tags: JSONObject
+    private lateinit var tagList: ArrayList<Pair<String, String>>
 
-    init {
-        var tmpTags: JSONObject? = null
+    fun isInitialized(): Boolean {
+        return this::tags.isInitialized && this::tagList.isInitialized
+    }
+
+    private fun updateData(source: BufferedSource) {
         try {
-            tmpTags = JSONObject(source.readString(StandardCharsets.UTF_8))
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        tags = tmpTags
-        if (tags != null) {
-            tagList = ArrayList()
-            tags.keys().forEachRemaining { prefix: String ->
-                val values = tags.optJSONObject(prefix)
+            val tmpTags = JSONObject(source.readString(StandardCharsets.UTF_8))
+            val tmpTagList = arrayListOf<Pair<String, String>>()
+            tmpTags.keys().forEachRemaining { prefix: String ->
+                val values = tmpTags.optJSONObject(prefix)
                 values?.let {
                     it.keys().forEachRemaining { tag: String ->
-                        tagList!!.add(Pair("$prefix:$tag", values.optString(tag)))
+                        tmpTagList.add(Pair("$prefix:$tag", values.optString(tag)))
                     }
                 }
             }
-        } else {
-            tagList = null
+            tags = tmpTags
+            tagList = tmpTagList
+        } catch (e: JSONException) {
+            e.printStackTrace()
         }
     }
 
     fun getTranslation(prefix: String?, tag: String?): String? {
-        return tags!!.optJSONObject(prefix)?.optString(tag)?.trim()?.takeIf { it.isNotEmpty() }
+        return tags.optJSONObject(prefix)?.optString(tag)?.trim()?.takeIf { it.isNotEmpty() }
     }
 
     /* Construct a cold flow for tag database suggestions */
@@ -81,7 +82,7 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
         translate: Boolean,
         exactly: Boolean = false
     ): Flow<Pair<String?, String>> = flow {
-        tagList?.forEach {
+        tagList.forEach {
             val tag = it.first
             val hint = if (translate) it.second else null
             val index = tag.indexOf(':')
@@ -108,126 +109,102 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
         return text != null && text.replace(" ", "").contains(key.replace(" ", ""))
     }
 
-    companion object {
-        private val NAMESPACE_TO_PREFIX: MutableMap<String, String> = HashMap()
+    private val NAMESPACE_TO_PREFIX = HashMap<String, String>().also {
+        it["artist"] = "a"
+        it["cosplayer"] = "cos"
+        it["character"] = "c"
+        it["female"] = "f"
+        it["group"] = "g"
+        it["language"] = "l"
+        it["male"] = "m"
+        it["mixed"] = "x"
+        it["other"] = "o"
+        it["parody"] = "p"
+        it["reclass"] = "r"
+    }
 
-        // TODO more lock for different language
-        private val lock: Lock = ReentrantLock()
+    @JvmStatic
+    fun namespaceToPrefix(namespace: String): String? {
+        return NAMESPACE_TO_PREFIX[namespace]
+    }
 
-        @JvmStatic
-        @Volatile
-        var instance: EhTagDatabase? = null
-            private set
+    private fun getMetadata(context: Context): Array<String>? {
+        return context.resources.getStringArray(R.array.tag_translation_metadata)
+            .takeIf { it.size == 4 }
+    }
 
-        init {
-            NAMESPACE_TO_PREFIX["artist"] = "a"
-            NAMESPACE_TO_PREFIX["cosplayer"] = "cos"
-            NAMESPACE_TO_PREFIX["character"] = "c"
-            NAMESPACE_TO_PREFIX["female"] = "f"
-            NAMESPACE_TO_PREFIX["group"] = "g"
-            NAMESPACE_TO_PREFIX["language"] = "l"
-            NAMESPACE_TO_PREFIX["male"] = "m"
-            NAMESPACE_TO_PREFIX["mixed"] = "x"
-            NAMESPACE_TO_PREFIX["other"] = "o"
-            NAMESPACE_TO_PREFIX["parody"] = "p"
-            NAMESPACE_TO_PREFIX["reclass"] = "r"
+    fun isTranslatable(): Boolean {
+        return EhApplication.application.resources.getBoolean(R.bool.tag_translatable)
+    }
+
+    private fun getFileContent(file: File): String? {
+        try {
+            file.source().buffer().use { return it.readString(StandardCharsets.UTF_8) }
+        } catch (e: IOException) {
+            return null
         }
+    }
 
-        @JvmStatic
-        fun namespaceToPrefix(namespace: String): String? {
-            return NAMESPACE_TO_PREFIX[namespace]
-        }
-
-        private fun getMetadata(context: Context): Array<String>? {
-            val metadata = context.resources.getStringArray(R.array.tag_translation_metadata)
-            return if (metadata.size == 4) {
-                metadata
-            } else {
-                null
-            }
-        }
-
-        fun isTranslatable(context: Context): Boolean {
-            return context.resources.getBoolean(R.bool.tag_translatable)
-        }
-
-        private fun getFileContent(file: File): String? {
-            try {
-                file.source().buffer()
-                    .use { source -> return source.readString(StandardCharsets.UTF_8) }
-            } catch (e: IOException) {
-                return null
-            }
-        }
-
-        private fun getFileSha1(file: File): String? {
-            try {
-                FileInputStream(file).use { `is` ->
-                    val digest = MessageDigest.getInstance("SHA-1")
-                    var n: Int
-                    val buffer = ByteArray(4 * 1024)
-                    while (`is`.read(buffer).also { n = it } != -1) {
-                        digest.update(buffer, 0, n)
-                    }
-                    return HashCodeUtils.bytesToHexString(digest.digest())
+    private fun getFileSha1(file: File): String? {
+        try {
+            FileInputStream(file).use { stream ->
+                val digest = MessageDigest.getInstance("SHA-1")
+                var n: Int
+                val buffer = ByteArray(4 * 1024)
+                while (stream.read(buffer).also { n = it } != -1) {
+                    digest.update(buffer, 0, n)
                 }
-            } catch (e: IOException) {
-                return null
-            } catch (e: NoSuchAlgorithmException) {
-                return null
+                return HashCodeUtils.bytesToHexString(digest.digest())
             }
+        } catch (e: IOException) {
+            return null
+        } catch (e: NoSuchAlgorithmException) {
+            return null
         }
+    }
 
-        private fun checkData(sha1File: File, dataFile: File): Boolean {
-            val s1 = getFileContent(sha1File) ?: return false
-            val s2 = getFileSha1(dataFile) ?: return false
-            return s1 == s2
-        }
+    private fun checkData(sha1File: File, dataFile: File): Boolean {
+        val s1 = getFileContent(sha1File) ?: return false
+        val s2 = getFileSha1(dataFile) ?: return false
+        return s1 == s2
+    }
 
-        private fun save(client: OkHttpClient, url: String, file: File): Boolean {
-            val request: Request = Request.Builder().url(url).build()
-            val call = client.newCall(request)
-            try {
-                call.execute().use { response ->
-                    if (!response.isSuccessful) {
-                        return false
-                    }
-                    val body = response.body
-                    body.byteStream()
-                        .use { `is` -> FileOutputStream(file).use { os -> IOUtils.copy(`is`, os) } }
-                    return true
+    private fun save(client: OkHttpClient, url: String, file: File): Boolean {
+        val request: Request = Request.Builder().url(url).build()
+        val call = client.newCall(request)
+        try {
+            call.execute().use { response ->
+                if (!response.isSuccessful) {
+                    return false
                 }
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                ExceptionUtils.throwIfFatal(t)
-                return false
+                val body = response.body
+                body.byteStream()
+                    .use { ins -> FileOutputStream(file).use { os -> IOUtils.copy(ins, os) } }
+                return true
             }
+        } catch (t: Throwable) {
+            FileUtils.delete(file)
+            t.printStackTrace()
+            ExceptionUtils.throwIfFatal(t)
+            return false
         }
+    }
 
-        @JvmStatic
-        fun update(context: Context) {
-            val urls = getMetadata(context)
-            if (urls == null || urls.size != 4) {
-                // Clear tags if it's not possible
-                instance = null
-                return
-            }
+    @OptIn(DelicateCoroutinesApi::class)
+    @Synchronized
+    @JvmStatic
+    fun update() {
+        val urls = getMetadata(EhApplication.application)
+        urls?.let {
             val sha1Name = urls[0]
             val sha1Url = urls[1]
             val dataName = urls[2]
             val dataUrl = urls[3]
 
-            // Clear tags if name if different
-            val tmp = instance
-            if (tmp != null && tmp.name != dataName) {
-                instance = null
-            }
-            IoThreadPoolExecutor.getInstance().execute {
-                if (!lock.tryLock()) {
-                    return@execute
-                }
+            GlobalScope.launch(Dispatchers.IO) {
                 try {
-                    val dir = AppConfig.getFilesDir("tag-translations") ?: return@execute
+                    val dir = AppConfig.getFilesDir("tag-translations")
+                    checkNotNull(dir)
 
                     // Check current sha1 and current data
                     val sha1File = File(dir, sha1Name)
@@ -238,10 +215,9 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
                     }
 
                     // Read current EhTagDatabase
-                    if (instance == null && dataFile.exists()) {
+                    if (!isInitialized() && dataFile.exists()) {
                         try {
-                            dataFile.source().buffer()
-                                .use { source -> instance = EhTagDatabase(dataName, source) }
+                            dataFile.source().buffer().use { updateData(it) }
                         } catch (e: IOException) {
                             FileUtils.delete(sha1File)
                             FileUtils.delete(dataFile)
@@ -251,30 +227,24 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
 
                     // Save new sha1
                     val tempSha1File = File(dir, "$sha1Name.tmp")
-                    if (!save(client, sha1Url, tempSha1File)) {
-                        FileUtils.delete(tempSha1File)
-                        return@execute
-                    }
+                    check(save(client, sha1Url, tempSha1File))
 
                     // Check new sha1 and current data
                     if (checkData(tempSha1File, dataFile)) {
                         // The data is the same
                         FileUtils.delete(tempSha1File)
-                        return@execute
+                        return@launch
                     }
 
                     // Save new data
                     val tempDataFile = File(dir, "$dataName.tmp")
-                    if (!save(client, dataUrl, tempDataFile)) {
-                        FileUtils.delete(tempDataFile)
-                        return@execute
-                    }
+                    check(save(client, dataUrl, tempDataFile))
 
                     // Check new sha1 and new data
                     if (!checkData(tempSha1File, tempDataFile)) {
                         FileUtils.delete(tempSha1File)
                         FileUtils.delete(tempDataFile)
-                        return@execute
+                        return@launch
                     }
 
                     // Replace current sha1 and current data with new sha1 and new data
@@ -285,13 +255,10 @@ class EhTagDatabase(private val name: String, source: BufferedSource) {
 
                     // Read new EhTagDatabase
                     try {
-                        dataFile.source().buffer()
-                            .use { source -> instance = EhTagDatabase(dataName, source) }
-                    } catch (e: IOException) {
-                        // Ignore
+                        dataFile.source().buffer().use { updateData(it) }
+                    } catch (_: IOException) {
                     }
                 } finally {
-                    lock.unlock()
                 }
             }
         }
