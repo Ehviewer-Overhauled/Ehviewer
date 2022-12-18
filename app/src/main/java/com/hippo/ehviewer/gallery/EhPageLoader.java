@@ -126,7 +126,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     @Override
     protected void onRequest(int index) {
         if (mSpiderQueen != null) {
-            Object object = mSpiderQueen.request(index);
+            Object object = mSpiderQueen.request(index, true);
             if (object instanceof Float) {
                 notifyPagePercent(index, (Float) object);
             } else if (object instanceof String) {
@@ -186,7 +186,9 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
 
     @Override
     public void onPageSuccess(int index, int finished, int downloaded, int total) {
-        notifyDataChanged(index);
+        if (mSpiderQueen != null) {
+            mSpiderQueen.request(index, false);
+        }
     }
 
     @Override
