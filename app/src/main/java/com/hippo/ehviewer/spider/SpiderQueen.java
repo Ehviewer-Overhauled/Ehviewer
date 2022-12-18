@@ -418,8 +418,8 @@ public final class SpiderQueen implements Runnable {
         return request(index, true, true, false);
     }
 
-    public Object request(int index) {
-        return request(index, true, false, true);
+    public Object request(int index, boolean addNeighbor) {
+        return request(index, true, false, addNeighbor);
     }
 
     private int getPageState(int index) {

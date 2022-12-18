@@ -42,10 +42,6 @@ abstract class PageLoader {
             state.compareAndSet(STATE_WAIT, STATE_READY)
     }
 
-    fun notifyDataChanged(index: Int) {
-        onRequest(index)
-    }
-
     fun notifyPageWait(index: Int) {
         mPages[index].status.value = Page.State.QUEUE
     }
