@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.hippo.ehviewer.client.EhConfig;
+import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
@@ -460,7 +461,7 @@ public class Settings {
     }
 
     public static boolean getShowTagTranslations() {
-        return getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS);
+        return getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS) && EhTagDatabase.INSTANCE.isTranslatable();
     }
 
     public static void putShowTagTranslations(boolean value) {
