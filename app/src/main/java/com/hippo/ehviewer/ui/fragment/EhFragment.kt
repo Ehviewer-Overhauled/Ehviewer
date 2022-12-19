@@ -52,7 +52,7 @@ class EhFragment : BasePreferenceFragment() {
         thumbResolution!!.setSummaryProvider {
             getString(R.string.settings_eh_thumb_resolution_summary, (it as ListPreference).entry)
         }
-        if (!EhTagDatabase.isTranslatable()) {
+        if (!EhTagDatabase.isTranslatable(requireActivity())) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
         }

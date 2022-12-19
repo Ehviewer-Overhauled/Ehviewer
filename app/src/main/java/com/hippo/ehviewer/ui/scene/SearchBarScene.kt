@@ -311,7 +311,7 @@ abstract class SearchBarScene : ToolbarScene() {
                     val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     if (s.isNotEmpty()) {
                         val keyword = s[s.size - 1]
-                        val translate = Settings.getShowTagTranslations() && isTranslatable()
+                        val translate = Settings.getShowTagTranslations() && isTranslatable(requireContext())
                         suggestFlow(keyword, translate, true).collect {
                             emit(TagSuggestion(it.first, it.second))
                         }
