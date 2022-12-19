@@ -56,3 +56,10 @@ jobs:
         with:
           name: x86-${{ github.sha }}
           path: app/build/outputs/apk/release/app-x86-release.apk
+
+      - name: Update mapping
+        uses: actions/upload-artifact@v3
+        with:
+          name: mapping-${{ github.sha }}
+          path: app/build/outputs/mapping/release/mapping.txt
+          retention-days: 5

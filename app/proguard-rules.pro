@@ -16,8 +16,8 @@
 
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 
--renamesourcefileattribute
+-keepattributes LineNumberTable,SourceFile
+-renamesourcefileattribute SourceFile
 -repackageclasses
 -allowaccessmodification
--mergeinterfacesaggressively
 -overloadaggressively
