@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ComponentCallbacks2
-import android.os.Build
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.View
@@ -28,7 +27,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.core.content.getSystemService
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -116,9 +114,6 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         BitmapUtils.initialize(this)
         EhTagDatabase.update()
 
-        // Locales can be managed by system automatically above Snow Cone v2
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Settings.getLocale()))
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
 
         GlobalScope.launch {

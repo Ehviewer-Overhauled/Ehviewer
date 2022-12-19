@@ -372,7 +372,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         String key = preference.getKey();
         if (KEY_APP_LANGUAGE.equals(key) && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             if ("system".equals(newValue)) {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.wrap(Resources.getSystem().getConfiguration().getLocales()));
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
             } else {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) newValue));
             }
