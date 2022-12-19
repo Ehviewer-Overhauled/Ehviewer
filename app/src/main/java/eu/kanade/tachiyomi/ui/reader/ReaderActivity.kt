@@ -281,12 +281,9 @@ class ReaderActivity : EhActivity() {
         mGalleryProvider!!.start()
 
         // Get start page
-        val startPage: Int = if (savedInstanceState == null) {
-            if (mPage >= 0) mPage else mGalleryProvider!!.startPage
-        } else {
-            mCurrentIndex
+        if (savedInstanceState == null) {
+            mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         }
-        mCurrentIndex = startPage
 
         lifecycleScope.launch(Dispatchers.Main) {
             mGalleryProvider!!.state.collect {
@@ -788,7 +785,7 @@ class ReaderActivity : EhActivity() {
             setTooltip(R.string.action_settings)
             val readerSettingSheetDialog = ReaderSettingsSheet(this@ReaderActivity)
             setOnClickListener {
-                if (!readerSettingSheetDialog.isShowing()) {
+                if (!readerSettingSheetDialog.isShowing) {
                     readerSettingSheetDialog.show()
                 }
             }
@@ -882,7 +879,8 @@ class ReaderActivity : EhActivity() {
         binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
         binding.pageSlider.value = page.index.toFloat()
 
-        mGalleryProvider?.putStartPage(page.index)
+        mCurrentIndex = page.index
+        mGalleryProvider?.putStartPage(mCurrentIndex)
     }
 
     /**
