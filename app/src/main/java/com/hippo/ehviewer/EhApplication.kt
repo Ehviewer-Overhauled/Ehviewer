@@ -105,7 +105,7 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         super<SceneApplication>.onCreate()
         Native.initialize()
         GetText.initialize(this)
-        Settings.initialize(this)
+        Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
         SpiderDen.initialize(this)
