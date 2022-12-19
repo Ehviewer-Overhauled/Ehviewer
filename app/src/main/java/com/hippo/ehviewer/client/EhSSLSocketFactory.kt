@@ -23,7 +23,7 @@ import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
-class EhSSLSocketFactory : SSLSocketFactory() {
+object EhSSLSocketFactory : SSLSocketFactory() {
     private val sslSocketFactory = getDefault() as SSLSocketFactory
     override fun getDefaultCipherSuites(): Array<String> {
         return sslSocketFactory.defaultCipherSuites

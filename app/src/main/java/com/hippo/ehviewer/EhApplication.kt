@@ -78,7 +78,6 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
     private val mIdGenerator = IntIdGenerator()
     private val mGlobalStuffMap = HashMap<Int, Any>()
     private val mActivityList = ArrayList<Activity>()
-    private var initialized = false
     val topActivity: EhActivity?
         get() = if (mActivityList.isNotEmpty()) {
             mActivityList[mActivityList.size - 1] as EhActivity
@@ -149,7 +148,6 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
             theDawnOfNewDay()
         }
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
-        initialized = true
     }
 
     private suspend fun theDawnOfNewDay() {
@@ -298,7 +296,7 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
             val builder = OkHttpClient.Builder()
                 .cookieJar(ehCookieStore)
                 .cache(Cache(File(application.cacheDir, "http_cache"), 50L * 1024L * 1024L))
-                .dns(EhDns())
+                .dns(EhDns)
                 .proxySelector(ehProxySelector)
 
             if (Settings.getDF()) {
@@ -317,10 +315,10 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
                     trustManager = trustManagers[0] as X509TrustManager
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    trustManager = EhX509TrustManager()
+                    trustManager = EhX509TrustManager
                 }
 
-                builder.sslSocketFactory(EhSSLSocketFactory(), trustManager)
+                builder.sslSocketFactory(EhSSLSocketFactory, trustManager)
                 builder.proxy(Proxy.NO_PROXY)
             }
             builder.build()

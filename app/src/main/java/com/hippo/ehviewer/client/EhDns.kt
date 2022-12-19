@@ -22,7 +22,7 @@ import okhttp3.Dns
 import java.net.InetAddress
 import java.net.UnknownHostException
 
-class EhDns : Dns {
+object EhDns : Dns {
     private val hosts = EhApplication.hosts
     private val builtInHosts: MutableMap<String, List<InetAddress>> = mutableMapOf()
 
