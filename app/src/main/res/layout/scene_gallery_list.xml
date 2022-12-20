@@ -40,7 +40,7 @@
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingRight="@dimen/corner_fab_margin"
+        android:paddingEnd="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
         app:fitsSystemWindowsInsets="top|bottom">
 
@@ -61,6 +61,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_refresh_dark_x24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            style="@style/Widget.Material3.FloatingActionButton.Small.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/v_last_page_x24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
