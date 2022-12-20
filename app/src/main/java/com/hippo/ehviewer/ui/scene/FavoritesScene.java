@@ -136,15 +136,13 @@ public class FavoritesScene extends SearchBarScene implements
         @Override
         public void run() {
             if (mFabLayout != null) {
-                mFabLayout.setSecondaryFabVisibilityAt(0, true);
+                updateJumpFab(); // index: 0, 2
                 mFabLayout.setSecondaryFabVisibilityAt(1, true);
-                mFabLayout.setSecondaryFabVisibilityAt(2, true);
                 mFabLayout.setSecondaryFabVisibilityAt(3, false);
                 mFabLayout.setSecondaryFabVisibilityAt(4, false);
                 mFabLayout.setSecondaryFabVisibilityAt(5, false);
                 mFabLayout.setSecondaryFabVisibilityAt(6, false);
             }
-            updateJumpFab();
         }
     };
     private int mFavLocalCount = 0;
@@ -346,7 +344,8 @@ public class FavoritesScene extends SearchBarScene implements
     // Hide jump fab on local fav cat
     private void updateJumpFab() {
         if (mFabLayout != null && mUrlBuilder != null) {
-            mFabLayout.setSecondaryFabVisibilityAt(1, mUrlBuilder.getFavCat() != FavListUrlBuilder.FAV_CAT_LOCAL);
+            mFabLayout.setSecondaryFabVisibilityAt(0, mUrlBuilder.getFavCat() != FavListUrlBuilder.FAV_CAT_LOCAL);
+            mFabLayout.setSecondaryFabVisibilityAt(2, mUrlBuilder.getFavCat() != FavListUrlBuilder.FAV_CAT_LOCAL);
         }
     }
 
