@@ -254,7 +254,7 @@ class WebtoonPageHolder(
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), frame, true)
             errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
             errorLayout?.actionRetry?.setOnClickListener {
-                viewer.activity.mGalleryProvider?.retryPage(page!!.index)
+                viewer.activity.mGalleryProvider?.retryPage(page!!)
             }
         }
         return errorLayout!!

@@ -54,7 +54,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      * Creates a new view for the item at the given [position].
      */
     override fun createView(container: ViewGroup, position: Int): View {
-        currentChapter?.request(position)
+        currentChapter?.request(items[position] as ReaderPage)
         return when (val item = items[position]) {
             is ReaderPage -> PagerPageHolder(readerThemedContext, viewer, item)
             else -> throw NotImplementedError("Holder for ${item.javaClass} not implemented")

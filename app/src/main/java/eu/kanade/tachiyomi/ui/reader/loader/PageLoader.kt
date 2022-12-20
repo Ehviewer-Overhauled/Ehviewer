@@ -30,7 +30,8 @@ abstract class PageLoader {
 
     abstract fun size(): Int
 
-    fun request(index: Int) {
+    fun request(page: ReaderPage) {
+        val index = mPages.indexOf(page)
         val image = mImageCache[index]
         if (image != null)
             notifyPageSucceed(index, image)
@@ -38,8 +39,8 @@ abstract class PageLoader {
             onRequest(index)
     }
 
-    fun retryPage(index: Int) {
-        onForceRequest(index)
+    fun retryPage(page: ReaderPage) {
+        onForceRequest(mPages.indexOf(page))
     }
 
     protected abstract fun onRequest(index: Int)
