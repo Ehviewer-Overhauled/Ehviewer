@@ -1,6 +1,7 @@
 package eu.kanade.tachiyomi.source.model
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 open class Page(val index: Int)  {
 
@@ -9,7 +10,14 @@ open class Page(val index: Int)  {
 
     var status = MutableStateFlow(State.QUEUE)
 
-    var progress = MutableStateFlow(0f)
+    private val _progressFlow = MutableStateFlow(0)
+
+    val progressFlow = _progressFlow.asStateFlow()
+    var progress: Int
+        get() = _progressFlow.value
+        set(value) {
+            _progressFlow.value = value
+        }
 
     enum class State {
         QUEUE,

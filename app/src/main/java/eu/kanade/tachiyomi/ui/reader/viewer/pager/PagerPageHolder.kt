@@ -39,19 +39,18 @@ class PagerPageHolder(
     /**
      * Loading progress bar to indicate the current progress.
      */
-    private val progressIndicator: ReaderProgressIndicator =
-        ReaderProgressIndicator(readerThemedContext).apply {
-            updateLayoutParams<LayoutParams> {
-                gravity = Gravity.CENTER
-            }
+    private val progressIndicator: ReaderProgressIndicator = ReaderProgressIndicator(readerThemedContext).apply {
+        updateLayoutParams<LayoutParams> {
+            gravity = Gravity.CENTER
         }
+    }
 
     /**
      * Error layout to show when the image fails to load.
      */
     private var errorLayout: ReaderErrorBinding? = null
 
-    private var scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     /**
      * Subscription for status changes of the page.
@@ -59,17 +58,12 @@ class PagerPageHolder(
     private var statusJob: Job? = null
 
     /**
-     * Subscription for progress changes of the page.
+     * Job for progress changes of the page.
      */
     private var progressJob: Job? = null
 
     init {
         addView(progressIndicator)
-        progressJob = scope.launch(Dispatchers.Main) {
-            page.progress.collect {
-                progressIndicator.setProgress(it.toInt())
-            }
-        }
         statusJob = scope.launch(Dispatchers.Main) {
             page.status.collectLatest {
                 processStatus(it)
@@ -83,8 +77,15 @@ class PagerPageHolder(
     @SuppressLint("ClickableViewAccessibility")
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        unsubscribeProgress()
+        cancelProgressJob()
         unsubscribeStatus()
+    }
+
+    private fun launchProgressJob() {
+        progressJob?.cancel()
+        progressJob = scope.launch(Dispatchers.Main) {
+            page.progressFlow.collectLatest { value -> progressIndicator.setProgress(value) }
+        }
     }
 
     /**
@@ -97,17 +98,16 @@ class PagerPageHolder(
             Page.State.QUEUE -> setQueued()
             Page.State.LOAD_PAGE -> setLoading()
             Page.State.DOWNLOAD_IMAGE -> {
+                launchProgressJob()
                 setDownloading()
             }
-
             Page.State.READY -> {
                 page.image?.mObtainedDrawable?.let { setImage(it) }
-                unsubscribeProgress()
+                cancelProgressJob()
             }
-
             Page.State.ERROR -> {
                 setError()
-                unsubscribeProgress()
+                cancelProgressJob()
             }
         }
     }
@@ -117,13 +117,12 @@ class PagerPageHolder(
      */
     private fun unsubscribeStatus() {
         statusJob?.cancel()
+        statusJob = null
     }
 
-    /**
-     * Unsubscribes from the progress subscription.
-     */
-    private fun unsubscribeProgress() {
+    private fun cancelProgressJob() {
         progressJob?.cancel()
+        progressJob = null
     }
 
     /**

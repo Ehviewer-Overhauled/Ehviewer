@@ -63,14 +63,21 @@ class WebtoonPageHolder(
      */
     private var page: ReaderPage? = null
 
-    private var progressJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.IO)
 
+    /**
+     * Subscription for status changes of the page.
+     */
     private var statusJob: Job? = null
 
-    private var scope = CoroutineScope(Dispatchers.IO)
+    /**
+     * Job for progress changes of the page.
+     */
+    private var progressJob: Job? = null
 
     init {
         refreshLayoutParams()
+
         frame.onImageLoaded = { onImageDecoded() }
         frame.onImageLoadError = { onImageDecodeError() }
         frame.onScaleChanged = { viewer.activity.hideMenu() }
@@ -81,11 +88,6 @@ class WebtoonPageHolder(
      */
     fun bind(page: ReaderPage) {
         this.page = page
-        progressJob = scope.launch(Dispatchers.Main) {
-            page.progress.collect {
-                progressIndicator.setProgress(it.toInt())
-            }
-        }
         statusJob = scope.launch(Dispatchers.Main) {
             page.status.collectLatest {
                 processStatus(it)
@@ -111,11 +113,25 @@ class WebtoonPageHolder(
      */
     override fun recycle() {
         statusJob?.cancel()
-        progressJob?.cancel()
+        cancelProgressJob()
+
         removeErrorLayout()
         frame.recycle()
         page?.image?.recycle()
         progressIndicator.setProgress(0, animated = false)
+    }
+
+    /**
+     * Observes the progress of the page and updates view.
+     */
+    private fun launchProgressJob() {
+        cancelProgressJob()
+
+        val page = page ?: return
+
+        progressJob = scope.launch(Dispatchers.Main) {
+            page.progressFlow.collectLatest { value -> progressIndicator.setProgress(value) }
+        }
     }
 
     /**
@@ -128,19 +144,26 @@ class WebtoonPageHolder(
             Page.State.QUEUE -> setQueued()
             Page.State.LOAD_PAGE -> setLoading()
             Page.State.DOWNLOAD_IMAGE -> {
+                launchProgressJob()
                 setDownloading()
             }
-
             Page.State.READY -> {
                 page?.image?.mObtainedDrawable?.let { setImage(it) }
-                progressJob?.cancel()
+                cancelProgressJob()
             }
-
             Page.State.ERROR -> {
                 setError()
-                progressJob?.cancel()
+                cancelProgressJob()
             }
         }
+    }
+
+    /**
+     * Unsubscribes from the progress subscription.
+     */
+    private fun cancelProgressJob() {
+        progressJob?.cancel()
+        progressJob = null
     }
 
     /**

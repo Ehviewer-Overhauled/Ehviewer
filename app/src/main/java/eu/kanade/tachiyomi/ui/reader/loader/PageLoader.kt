@@ -48,7 +48,7 @@ abstract class PageLoader {
 
     fun notifyPagePercent(index: Int, percent: Float) {
         mPages[index].status.compareAndSet(Page.State.QUEUE, Page.State.DOWNLOAD_IMAGE)
-        mPages[index].progress.value = percent
+        mPages[index].progress = (percent * 100).toInt()
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
