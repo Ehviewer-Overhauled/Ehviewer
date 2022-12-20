@@ -91,6 +91,7 @@ public class ArchivePageLoader extends PageLoader2 {
 
     @Override
     public void stop() {
+        super.stop();
         if (archiveThread != null) {
             archiveThread.interrupt();
             archiveThread = null;

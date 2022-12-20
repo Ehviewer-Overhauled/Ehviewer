@@ -81,6 +81,7 @@ public class DirPageLoader extends PageLoader2 implements Runnable {
 
     @Override
     public void stop() {
+        super.stop();
         if (mBgThread != null) {
             mBgThread.interrupt();
             mBgThread = null;

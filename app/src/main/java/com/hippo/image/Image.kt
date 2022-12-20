@@ -78,6 +78,9 @@ class Image private constructor(source: Source?, val release: () -> Unit = {}) {
         }
     }
 
+    val isRecycled: Boolean
+        get() = (mObtainedDrawable as? BitmapDrawable)?.bitmap?.isRecycled ?: (mObtainedDrawable as? AnimatedImageDrawable)?.isRunning?.not() ?: true
+
     companion object {
         val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
         val screenHeight = EhApplication.application.resources.displayMetrics.heightPixels

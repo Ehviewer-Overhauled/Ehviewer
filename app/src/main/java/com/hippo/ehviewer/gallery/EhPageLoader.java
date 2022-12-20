@@ -53,6 +53,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
 
     @Override
     public void stop() {
+        super.stop();
         if (mSpiderQueen != null) {
             mSpiderQueen.removeOnSpiderListener(this);
             // Activity recreate may called, so wait 3000s

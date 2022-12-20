@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.loader
 
+import androidx.annotation.CallSuper
 import com.hippo.image.Image
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -17,12 +18,22 @@ abstract class PageLoader {
 
     abstract fun start()
 
-    abstract fun stop()
+    @CallSuper
+    open fun stop() {
+        mPages.forEach { it.image?.recycle() }
+    }
 
     abstract fun size(): Int
 
     fun request(index: Int) {
-        onRequest(index)
+        if (mPages[index].image?.isRecycled == false)
+            notifyPageSucceed(index, mPages[index].image!!)
+        else
+            onRequest(index)
+    }
+
+    fun retryPage(index: Int) {
+        onForceRequest(index)
     }
 
     protected abstract fun onRequest(index: Int)
@@ -52,7 +63,7 @@ abstract class PageLoader {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        val priv = mPages[index].image
+        val priv = if (image != mPages[index].image) mPages[index].image else null
         mPages[index].image = image
         mPages[index].status.value = Page.State.READY
         priv?.recycle()
