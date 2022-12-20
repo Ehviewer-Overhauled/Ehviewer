@@ -582,17 +582,16 @@ public class FavoritesScene extends SearchBarScene implements
 
         if (!mRecyclerView.isInCustomChoice()) {
             switch (position) {
-                case 0: // Open right
-                    openDrawer(Gravity.RIGHT);
-                    break;
-                case 1: // Go to
-                    if (mHelper.canGoTo()) {
-                        showGoToDialog();
-                    }
-                    break;
-                case 2: // Refresh
-                    mHelper.refresh();
-                    break;
+                // Open right
+                case 0 -> openDrawer(Gravity.RIGHT);
+                // Go to
+                case 1 -> {
+                    if (mHelper.canGoTo()) showGoToDialog();
+                }
+                // Refresh
+                case 2 -> mHelper.refresh();
+                // Last page
+                case 3 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
             }
             view.setExpanded(false);
             return;
@@ -1141,7 +1140,10 @@ public class FavoritesScene extends SearchBarScene implements
                 SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
             } else {
                 String prev = null, next = null;
-                if (jumpTo != null) {
+                if (page == Integer.MAX_VALUE - 1) {
+                    prev = "1-0";
+                    jumpTo = null;
+                } else if (jumpTo != null) {
                     next = Integer.toString(minGid);
                     operation = 0;
                 } else if (page != 0 && mHelper != null) {

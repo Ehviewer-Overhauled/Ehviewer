@@ -150,7 +150,7 @@ public final class GalleryListScene extends SearchBarScene
     private EasyRecyclerView mRecyclerView;
     @Nullable
     private SearchLayout mSearchLayout;
-    ActivityResultLauncher<PickVisualMediaRequest> selectImageLauncher = registerForActivityResult(
+    final ActivityResultLauncher<PickVisualMediaRequest> selectImageLauncher = registerForActivityResult(
             new ActivityResultContracts.PickVisualMedia(),
             result -> mSearchLayout.setImageUri(result));
     @Nullable
@@ -474,23 +474,27 @@ public final class GalleryListScene extends SearchBarScene
         String keyword = builder.getKeyword();
         int category = builder.getCategory();
 
-        boolean isTopList = builder.getMode() == ListUrlBuilder.MODE_TOPLIST;
+        var mode = builder.getMode();
+        boolean isPopular = mode == ListUrlBuilder.MODE_WHATS_HOT;
+        boolean isTopList = mode == ListUrlBuilder.MODE_TOPLIST;
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList;
             recreateDrawerView();
             mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_x24);
         }
 
-        mFabLayout.setSecondaryFabVisibilityAt(1, ListUrlBuilder.MODE_WHATS_HOT != builder.getMode());
+        // Update fab visibility
+        mFabLayout.setSecondaryFabVisibilityAt(1, !isPopular);
+        mFabLayout.setSecondaryFabVisibilityAt(3, !isTopList && !isPopular);
 
         // Update normal search mode
-        mSearchLayout.setNormalSearchMode(builder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION
+        mSearchLayout.setNormalSearchMode(mode == ListUrlBuilder.MODE_SUBSCRIPTION
                 ? R.id.search_subscription_search
                 : R.id.search_normal_search);
 
         // Update search edit text
         if (!TextUtils.isEmpty(keyword) && !mIsTopList) {
-            if (builder.getMode() == ListUrlBuilder.MODE_TAG) {
+            if (mode == ListUrlBuilder.MODE_TAG) {
                 keyword = wrapTagKeyword(keyword);
             }
             setSearchBarText(keyword);
@@ -505,19 +509,16 @@ public final class GalleryListScene extends SearchBarScene
 
         // Update nav checked item
         int checkedItemId;
-        if (ListUrlBuilder.MODE_NORMAL == builder.getMode() &&
-                EhUtils.NONE == category &&
-                TextUtils.isEmpty(keyword)) {
-            checkedItemId = R.id.nav_homepage;
-        } else if (ListUrlBuilder.MODE_SUBSCRIPTION == builder.getMode()) {
-            checkedItemId = R.id.nav_subscription;
-        } else if (ListUrlBuilder.MODE_WHATS_HOT == builder.getMode()) {
-            checkedItemId = R.id.nav_whats_hot;
-        } else if (ListUrlBuilder.MODE_TOPLIST == builder.getMode()) {
-            checkedItemId = R.id.nav_toplist;
-        } else {
-            checkedItemId = 0;
-        }
+        checkedItemId = switch (mode) {
+            case ListUrlBuilder.MODE_NORMAL ->
+                    EhUtils.NONE == category && TextUtils.isEmpty(keyword) ? R.id.nav_homepage : 0;
+            case ListUrlBuilder.MODE_SUBSCRIPTION -> R.id.nav_subscription;
+            case ListUrlBuilder.MODE_WHATS_HOT -> R.id.nav_whats_hot;
+            case ListUrlBuilder.MODE_TOPLIST -> R.id.nav_toplist;
+            case ListUrlBuilder.MODE_TAG, ListUrlBuilder.MODE_UPLOADER, ListUrlBuilder.MODE_IMAGE_SEARCH ->
+                    0;
+            default -> throw new IllegalStateException("Unexpected value: " + mode);
+        };
         setNavCheckedItem(checkedItemId);
         mNavCheckedId = checkedItemId;
     }
@@ -797,14 +798,14 @@ public final class GalleryListScene extends SearchBarScene
         }
     }
 
-    public boolean onItemClick(int position) {
+    public void onItemClick(int position) {
         if (null == mHelper || null == mRecyclerView) {
-            return false;
+            return;
         }
 
         GalleryInfo gi = mHelper.getDataAtEx(position);
         if (gi == null) {
-            return true;
+            return;
         }
 
         Bundle args = new Bundle();
@@ -812,7 +813,6 @@ public final class GalleryListScene extends SearchBarScene
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
         startScene(announcer);
-        return true;
     }
 
     @Override
@@ -890,17 +890,16 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         switch (position) {
-            case 0: // Open right
-                openDrawer(Gravity.RIGHT);
-                break;
-            case 1: // Go to
-                if (mHelper.canGoTo()) {
-                    showGoToDialog();
-                }
-                break;
-            case 2: // Refresh
-                mHelper.refresh();
-                break;
+            // Open right
+            case 0 -> openDrawer(Gravity.RIGHT);
+            // Go to
+            case 1 -> {
+                if (mHelper.canGoTo()) showGoToDialog();
+            }
+            // Refresh
+            case 2 -> mHelper.refresh();
+            // Last page
+            case 3 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
         }
 
         view.setExpanded(false);
@@ -1607,6 +1606,9 @@ public final class GalleryListScene extends SearchBarScene
                 } else {
                     nextGid = page;
                 }
+            } else if (page == Integer.MAX_VALUE - 1) {
+                prevGid = 1;
+                jumpTo = null;
             } else if (jumpTo != null) {
                 nextGid = minGid;
             } else if (page != 0) {
