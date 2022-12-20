@@ -133,8 +133,8 @@ object EhTagDatabase {
             .takeIf { it.size == 4 }
     }
 
-    fun isTranslatable(): Boolean {
-        return EhApplication.application.resources.getBoolean(R.bool.tag_translatable)
+    fun isTranslatable(context: Context): Boolean {
+        return context.resources.getBoolean(R.bool.tag_translatable)
     }
 
     private fun getFileContent(file: File): String? {

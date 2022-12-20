@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
@@ -27,7 +26,6 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.hippo.ehviewer.client.EhConfig;
-import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
@@ -87,7 +85,6 @@ public class Settings {
     public static final int DEFAULT_READ_CACHE_SIZE = 320;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
-    public static final String KEY_APP_LANGUAGE = "app_language";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
     private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
     private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
@@ -125,34 +122,6 @@ public class Settings {
     private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
     private static final String KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip";
     private static final boolean DEFAULT_APP_LINK_VERIFY_TIP = false;
-    /********************
-     ****** Read
-     ********************/
-    private static final String KEY_SCREEN_ROTATION = "screen_rotation";
-    private static final int DEFAULT_SCREEN_ROTATION = 0;
-    private static final String KEY_READING_DIRECTION = "reading_direction";
-    private static final String KEY_PAGE_SCALING = "page_scaling";
-    private static final String KEY_START_POSITION = "start_position";
-    private static final String KEY_KEEP_SCREEN_ON = "keep_screen_on";
-    private static final boolean DEFAULT_KEEP_SCREEN_ON = false;
-    private static final String KEY_SHOW_CLOCK = "gallery_show_clock";
-    private static final boolean DEFAULT_SHOW_CLOCK = true;
-    private static final String KEY_SHOW_PROGRESS = "gallery_show_progress";
-    private static final boolean DEFAULT_SHOW_PROGRESS = true;
-    private static final String KEY_SHOW_BATTERY = "gallery_show_battery";
-    private static final boolean DEFAULT_SHOW_BATTERY = true;
-    private static final String KEY_SHOW_PAGE_INTERVAL = "gallery_show_page_interval";
-    private static final boolean DEFAULT_SHOW_PAGE_INTERVAL = true;
-    private static final String KEY_VOLUME_PAGE = "volume_page";
-    private static final boolean DEFAULT_VOLUME_PAGE = false;
-    private static final String KEY_REVERSE_VOLUME_PAGE = "reserve_volume_page";
-    private static final boolean DEFAULT_REVERSE_VOLUME_PAGE = false;
-    private static final String KEY_READING_FULLSCREEN = "reading_fullscreen";
-    private static final boolean VALUE_READING_FULLSCREEN = true;
-    private static final String KEY_CUSTOM_SCREEN_LIGHTNESS = "custom_screen_lightness";
-    private static final boolean DEFAULT_CUSTOM_SCREEN_LIGHTNESS = false;
-    private static final String KEY_SCREEN_LIGHTNESS = "screen_lightness";
-    private static final int DEFAULT_SCREEN_LIGHTNESS = 50;
     private static final boolean DEFAULT_MEDIA_SCAN = false;
     private static final String KEY_RECENT_DOWNLOAD_LABEL = "recent_download_label";
     private static final String DEFAULT_RECENT_DOWNLOAD_LABEL = null;
@@ -166,8 +135,6 @@ public class Settings {
     private static final int DEFAULT_PRELOAD_IMAGE = 5;
     private static final String KEY_DOWNLOAD_ORIGIN_IMAGE = "download_origin_image";
     private static final boolean DEFAULT_DOWNLOAD_ORIGIN_IMAGE = false;
-    private static final String KEY_READ_THEME = "read_theme";
-    private static final int DEFAULT_READ_THEME = 1;
     /********************
      ****** Favorites
      ********************/
@@ -214,15 +181,12 @@ public class Settings {
     private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
     private static final boolean DEFAULT_FRONTING = false;
-    private static final String DEFAULT_APP_LANGUAGE = "system";
     private static final String KEY_PROXY_TYPE = "proxy_type";
     private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM;
     private static final String KEY_PROXY_IP = "proxy_ip";
     private static final String DEFAULT_PROXY_IP = null;
     private static final String KEY_PROXY_PORT = "proxy_port";
     private static final int DEFAULT_PROXY_PORT = -1;
-    private static final String KEY_GUIDE_GALLERY = "guide_gallery";
-    private static final boolean DEFAULT_GUIDE_GALLERY = true;
     private static final String KEY_CLIPBOARD_TEXT_HASH_CODE = "clipboard_text_hash_code";
     private static final int DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0;
     private static final String KEY_DOWNLOAD_DELAY = "download_delay";
@@ -233,12 +197,10 @@ public class Settings {
     public static boolean LIST_THUMB_SIZE_INITED = false;
     public static SharedPreferences sSettingsPre;
     private static int LIST_THUMB_SIZE = 40;
-    private static Context sContext;
     private static EhConfig sEhConfig;
 
-    public static void initialize(Context context) {
-        sContext = context.getApplicationContext();
-        sSettingsPre = PreferenceManager.getDefaultSharedPreferences(sContext);
+    public static void initialize() {
+        sSettingsPre = PreferenceManager.getDefaultSharedPreferences(EhApplication.getApplication());
         sEhConfig = loadEhConfig();
         fixDefaultValue();
     }
@@ -257,15 +219,6 @@ public class Settings {
                 putShowTagTranslations(true);
 
             }
-        }
-    }
-
-    public static Locale getLocale() {
-        String language = Settings.getAppLanguage();
-        if (language != null && !language.equals("system")) {
-            return Locale.forLanguageTag(language);
-        } else {
-            return Locale.getDefault();
         }
     }
 
@@ -432,7 +385,7 @@ public class Settings {
     }
 
     public static int dip2px(int dpValue) {
-        final float scale = sContext.getResources().getDisplayMetrics().density;
+        final float scale = EhApplication.getApplication().getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
@@ -461,7 +414,7 @@ public class Settings {
     }
 
     public static boolean getShowTagTranslations() {
-        return getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS) && EhTagDatabase.INSTANCE.isTranslatable();
+        return getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS);
     }
 
     public static void putShowTagTranslations(boolean value) {
@@ -496,114 +449,6 @@ public class Settings {
         putBoolean(KEY_APP_LINK_VERIFY_TIP, value);
     }
 
-    public static int getScreenRotation() {
-        return getIntFromStr(KEY_SCREEN_ROTATION, DEFAULT_SCREEN_ROTATION);
-    }
-
-    public static void putScreenRotation(int value) {
-        putIntToStr(KEY_SCREEN_ROTATION, value);
-    }
-
-    public static void putReadingDirection(int value) {
-        putIntToStr(KEY_READING_DIRECTION, value);
-    }
-
-    public static void putPageScaling(int value) {
-        putIntToStr(KEY_PAGE_SCALING, value);
-    }
-
-    public static void putStartPosition(int value) {
-        putIntToStr(KEY_START_POSITION, value);
-    }
-
-    public static boolean getKeepScreenOn() {
-        return getBoolean(KEY_KEEP_SCREEN_ON, DEFAULT_KEEP_SCREEN_ON);
-    }
-
-    public static void putKeepScreenOn(boolean value) {
-        putBoolean(KEY_KEEP_SCREEN_ON, value);
-    }
-
-    public static boolean getShowClock() {
-        return getBoolean(KEY_SHOW_CLOCK, DEFAULT_SHOW_CLOCK);
-    }
-
-    public static void putShowClock(boolean value) {
-        putBoolean(KEY_SHOW_CLOCK, value);
-    }
-
-    public static boolean getShowProgress() {
-        return getBoolean(KEY_SHOW_PROGRESS, DEFAULT_SHOW_PROGRESS);
-    }
-
-    public static void putShowProgress(boolean value) {
-        putBoolean(KEY_SHOW_PROGRESS, value);
-    }
-
-    public static boolean getShowBattery() {
-        return getBoolean(KEY_SHOW_BATTERY, DEFAULT_SHOW_BATTERY);
-    }
-
-    public static void putShowBattery(boolean value) {
-        putBoolean(KEY_SHOW_BATTERY, value);
-    }
-
-    public static boolean getShowPageInterval() {
-        return getBoolean(KEY_SHOW_PAGE_INTERVAL, DEFAULT_SHOW_PAGE_INTERVAL);
-    }
-
-    public static void putShowPageInterval(boolean value) {
-        putBoolean(KEY_SHOW_PAGE_INTERVAL, value);
-    }
-
-    public static boolean getVolumePage() {
-        return getBoolean(KEY_VOLUME_PAGE, DEFAULT_VOLUME_PAGE);
-    }
-
-    public static void putVolumePage(boolean value) {
-        putBoolean(KEY_VOLUME_PAGE, value);
-    }
-
-    public static boolean getReverseVolumePage() {
-        return getBoolean(KEY_REVERSE_VOLUME_PAGE, DEFAULT_REVERSE_VOLUME_PAGE);
-    }
-
-    public static void putReverseVolumePage(boolean value) {
-        putBoolean(KEY_REVERSE_VOLUME_PAGE, value);
-    }
-
-    public static boolean getReadingFullscreen() {
-        return getBoolean(KEY_READING_FULLSCREEN, VALUE_READING_FULLSCREEN);
-    }
-
-    public static void putReadingFullscreen(boolean value) {
-        putBoolean(KEY_READING_FULLSCREEN, value);
-    }
-
-    public static boolean getCustomScreenLightness() {
-        return getBoolean(KEY_CUSTOM_SCREEN_LIGHTNESS, DEFAULT_CUSTOM_SCREEN_LIGHTNESS);
-    }
-
-    public static void putCustomScreenLightness(boolean value) {
-        putBoolean(KEY_CUSTOM_SCREEN_LIGHTNESS, value);
-    }
-
-    public static int getScreenLightness() {
-        return getInt(KEY_SCREEN_LIGHTNESS, DEFAULT_SCREEN_LIGHTNESS);
-    }
-
-    public static void putScreenLightness(int value) {
-        putInt(KEY_SCREEN_LIGHTNESS, value);
-    }
-
-    public static int getReadTheme() {
-        return getIntFromStr(KEY_READ_THEME, DEFAULT_READ_THEME);
-    }
-
-    public static void putReadTheme(int value) {
-        putIntToStr(KEY_READ_THEME, value);
-    }
-
     public static boolean getEnabledSecurity() {
         return getBoolean(KEY_SEC_SECURITY, VALUE_SEC_SECURITY);
     }
@@ -617,7 +462,7 @@ public class Settings {
         builder.encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null));
         builder.encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null));
         builder.encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null));
-        dir = UniFile.fromUri(sContext, builder.build());
+        dir = UniFile.fromUri(EhApplication.getApplication(), builder.build());
         return dir != null ? dir : UniFile.fromFile(AppConfig.getDefaultDownloadDir());
     }
 
@@ -824,10 +669,6 @@ public class Settings {
         putBoolean(KEY_DOMAIN_FRONTING, value);
     }
 
-    public static String getAppLanguage() {
-        return getString(KEY_APP_LANGUAGE, DEFAULT_APP_LANGUAGE);
-    }
-
     public static int getProxyType() {
         return getInt(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE);
     }
@@ -850,14 +691,6 @@ public class Settings {
 
     public static void putProxyPort(int value) {
         putInt(KEY_PROXY_PORT, value);
-    }
-
-    public static boolean getGuideGallery() {
-        return getBoolean(KEY_GUIDE_GALLERY, DEFAULT_GUIDE_GALLERY);
-    }
-
-    public static void putGuideGallery(boolean value) {
-        putBoolean(KEY_GUIDE_GALLERY, value);
     }
 
     public static int getClipboardTextHashCode() {
