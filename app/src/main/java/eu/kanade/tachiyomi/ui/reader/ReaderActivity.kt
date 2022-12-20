@@ -305,6 +305,7 @@ class ReaderActivity : EhActivity() {
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
+        binding.pageSlider.isRTL = viewer is R2LPagerViewer
         updateViewerInset(readerPreferences.fullscreen().get())
         binding.viewerContainer.removeAllViews()
         setOrientation(readerPreferences.defaultOrientationType().get())
