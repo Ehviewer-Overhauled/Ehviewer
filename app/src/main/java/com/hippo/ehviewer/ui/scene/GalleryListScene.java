@@ -480,12 +480,11 @@ public final class GalleryListScene extends SearchBarScene
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList;
             recreateDrawerView();
-            mFabLayout.getSecondaryFabAt(0).setImageResource(isTopList ? R.drawable.ic_baseline_format_list_numbered_24 : R.drawable.v_magnify_x24);
         }
 
         // Update fab visibility
-        mFabLayout.setSecondaryFabVisibilityAt(1, !isPopular);
-        mFabLayout.setSecondaryFabVisibilityAt(3, !isTopList && !isPopular);
+        mFabLayout.setSecondaryFabVisibilityAt(0, !isPopular);
+        mFabLayout.setSecondaryFabVisibilityAt(2, !isTopList && !isPopular);
 
         // Update normal search mode
         mSearchLayout.setNormalSearchMode(mode == ListUrlBuilder.MODE_SUBSCRIPTION
@@ -890,16 +889,14 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         switch (position) {
-            // Open right
-            case 0 -> openDrawer(Gravity.RIGHT);
             // Go to
-            case 1 -> {
+            case 0 -> {
                 if (mHelper.canGoTo()) showGoToDialog();
             }
             // Refresh
-            case 2 -> mHelper.refresh();
+            case 1 -> mHelper.refresh();
             // Last page
-            case 3 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
+            case 2 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
         }
 
         view.setExpanded(false);

@@ -582,16 +582,14 @@ public class FavoritesScene extends SearchBarScene implements
 
         if (!mRecyclerView.isInCustomChoice()) {
             switch (position) {
-                // Open right
-                case 0 -> openDrawer(Gravity.RIGHT);
                 // Go to
-                case 1 -> {
+                case 0 -> {
                     if (mHelper.canGoTo()) showGoToDialog();
                 }
                 // Refresh
-                case 2 -> mHelper.refresh();
+                case 1 -> mHelper.refresh();
                 // Last page
-                case 3 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
+                case 2 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
             }
             view.setExpanded(false);
             return;
