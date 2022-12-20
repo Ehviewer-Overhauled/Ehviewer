@@ -49,6 +49,7 @@ jobs:
             app/build/outputs/apk/release/EhViewer-x86_64.apk
             app/build/outputs/apk/release/EhViewer-x86.apk
             app/build/outputs/apk/release/EhViewer-armeabi-v7a.apk
+            app/build/outputs/mapping/release/mapping.txt
 
       - name: Collect Apks
         run: |
