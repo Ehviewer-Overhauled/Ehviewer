@@ -1,12 +1,17 @@
 package eu.kanade.tachiyomi.ui.reader.loader
 
 import androidx.annotation.CallSuper
+import androidx.collection.LruCache
 import com.hippo.image.Image
+import com.hippo.yorozuya.MathUtils
+import com.hippo.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class PageLoader {
+
+    private val mImageCache = ImageCache()
     val mPages by lazy {
         check(size() > 0)
         (0 until size()).map { ReaderPage(it) }
@@ -20,14 +25,15 @@ abstract class PageLoader {
 
     @CallSuper
     open fun stop() {
-        mPages.forEach { it.image?.recycle() }
+        mImageCache.evictAll()
     }
 
     abstract fun size(): Int
 
     fun request(index: Int) {
-        if (mPages[index].image?.isRecycled == false)
-            notifyPageSucceed(index, mPages[index].image!!)
+        val image = mImageCache[index]
+        if (image != null)
+            notifyPageSucceed(index, image)
         else
             onRequest(index)
     }
@@ -63,14 +69,33 @@ abstract class PageLoader {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        val priv = if (image != mPages[index].image) mPages[index].image else null
+        if (mImageCache[index] != image)
+            mImageCache.add(index, image)
         mPages[index].image = image
         mPages[index].status.value = Page.State.READY
-        priv?.recycle()
     }
 
     fun notifyPageFailed(index: Int) {
         mPages[index].status.value = Page.State.ERROR
+    }
+
+    private class ImageCache : LruCache<Int, Image>(MathUtils.clamp(OSUtils.getTotalMemory() / 16, MIN_CACHE_SIZE, MAX_CACHE_SIZE).toInt()) {
+        fun add(key: Int, value: Image) {
+            put(key, value)
+        }
+
+        override fun sizeOf(key: Int, value: Image): Int {
+            return value.height * value.width * 4
+        }
+
+        override fun entryRemoved(evicted: Boolean, key: Int, oldValue: Image, newValue: Image?) {
+            oldValue.recycle()
+        }
+
+        companion object {
+            private const val MAX_CACHE_SIZE = (512 * 1024 * 1024).toLong()
+            private const val MIN_CACHE_SIZE = (128 * 1024 * 1024).toLong()
+        }
     }
 
     companion object {
