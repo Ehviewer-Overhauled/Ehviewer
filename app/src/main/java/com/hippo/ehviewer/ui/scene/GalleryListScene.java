@@ -467,7 +467,7 @@ public final class GalleryListScene extends SearchBarScene
     private void onUpdateUrlBuilder() {
         ListUrlBuilder builder = mUrlBuilder;
         Resources resources = getResourcesOrNull();
-        if (resources == null || builder == null || mSearchLayout == null) {
+        if (resources == null || builder == null || mSearchLayout == null || mFabLayout == null) {
             return;
         }
 
@@ -541,6 +541,7 @@ public final class GalleryListScene extends SearchBarScene
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mSearchLayout = (SearchLayout) ViewUtils.$$(mainLayout, R.id.search_layout);
         mFabLayout = (FabLayout) ViewUtils.$$(mainLayout, R.id.fab_layout);
+        AssertUtils.assertNotNull(container);
         mSearchFab = ViewUtils.$$(container, R.id.search_fab);
         ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
@@ -823,7 +824,7 @@ public final class GalleryListScene extends SearchBarScene
 
     private void showGoToDialog() {
         Context context = getContext();
-        if (null == context || null == mHelper) {
+        if (null == context || null == mHelper || null == mUrlBuilder) {
             return;
         }
 
@@ -1252,7 +1253,7 @@ public final class GalleryListScene extends SearchBarScene
 
 
     private void onGetGalleryListSuccess(GalleryListParser.Result result, int taskId) {
-        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
+        if (mHelper != null && mHelper.isCurrentTask(taskId) && mUrlBuilder != null) {
             String emptyString = getString(mUrlBuilder.getMode() == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags
                     ? R.string.gallery_list_empty_hit_subscription
                     : R.string.gallery_list_empty_hit);
@@ -1591,7 +1592,7 @@ public final class GalleryListScene extends SearchBarScene
         protected void getPageData(int taskId, int type, int page) {
             pgCounter = page;
             MainActivity activity = getMainActivity();
-            if (null == activity || null == mClient || null == mUrlBuilder) {
+            if (null == activity || null == mClient || null == mHelper || null == mUrlBuilder) {
                 return;
             }
 
