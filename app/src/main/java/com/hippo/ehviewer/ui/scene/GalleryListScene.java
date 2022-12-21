@@ -828,9 +828,9 @@ public final class GalleryListScene extends SearchBarScene
             return;
         }
 
-        if (ListUrlBuilder.MODE_TOPLIST == mUrlBuilder.getMode()) {
+        if (mIsTopList) {
             final int page = mHelper.getPageForTop() + 1;
-            final int pages = 200;
+            final int pages = mHelper.getPages();
             String hint = getString(R.string.go_to_hint, page, pages);
             final EditTextDialogBuilder builder = new EditTextDialogBuilder(context, null, hint);
             builder.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -856,7 +856,7 @@ public final class GalleryListScene extends SearchBarScene
                     return;
                 }
                 builder.setError(null);
-                mHelper.goToPage(goTo);
+                mHelper.goTo(goTo);
                 dialog.dismiss();
             });
         } else {
@@ -897,7 +897,7 @@ public final class GalleryListScene extends SearchBarScene
             // Refresh
             case 1 -> mHelper.refresh();
             // Last page
-            case 2 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
+            case 2 -> mHelper.goTo("1", false);
         }
 
         view.setExpanded(false);
@@ -1258,16 +1258,11 @@ public final class GalleryListScene extends SearchBarScene
                     ? R.string.gallery_list_empty_hit_subscription
                     : R.string.gallery_list_empty_hit);
             mHelper.setEmptyString(emptyString);
-
-            int pages;
-            if (mIsTopList)
-                pages = 200;
-            else if (result.nextGid == 0)
-                pages = mHelper.pgCounter + 1;
-            else
-                pages = result.founds;
-
-            mHelper.onGetPageData(taskId, pages, mHelper.pgCounter + 1, result.galleryInfoList);
+            if (mIsTopList) {
+                mHelper.onGetPageData(taskId, result.pages, result.nextPage, null, null, result.galleryInfoList);
+            } else {
+                mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList);
+            }
         }
     }
 
@@ -1439,7 +1434,8 @@ public final class GalleryListScene extends SearchBarScene
                     }
 
                     mUrlBuilder.set(mQuickSearchList.get(position));
-                    mUrlBuilder.setNextGid(0);
+                    mUrlBuilder.setIndex(null, true);
+                    mUrlBuilder.setJumpTo(null);
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);
@@ -1456,7 +1452,8 @@ public final class GalleryListScene extends SearchBarScene
                     }
 
                     mUrlBuilder.setKeyword(String.valueOf(keywords[position]));
-                    mUrlBuilder.setNextGid(0);
+                    mUrlBuilder.setIndex(null, true);
+                    mUrlBuilder.setJumpTo(null);
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);
@@ -1586,41 +1583,20 @@ public final class GalleryListScene extends SearchBarScene
     }
 
     private class GalleryListHelper extends GalleryInfoContentHelper {
-        public int pgCounter = 0;
 
         @Override
-        protected void getPageData(int taskId, int type, int page) {
-            pgCounter = page;
+        protected void getPageData(int taskId, int type, int page, String index, boolean isNext) {
             MainActivity activity = getMainActivity();
             if (null == activity || null == mClient || null == mHelper || null == mUrlBuilder) {
                 return;
             }
 
-            int prevGid = 0, nextGid = 0;
             if (mIsTopList) {
-                if (jumpTo != null) {
-                    pgCounter = Integer.parseInt(jumpTo);
-                    nextGid = pgCounter;
-                } else {
-                    nextGid = page;
-                }
-            } else if (page == Integer.MAX_VALUE - 1) {
-                prevGid = 1;
-                jumpTo = null;
-            } else if (jumpTo != null) {
-                nextGid = minGid;
-            } else if (page != 0) {
-                if (page >= mHelper.getPageForTop())
-                    nextGid = minGid;
-                else
-                    prevGid = maxGid;
+                mUrlBuilder.setJumpTo(String.valueOf(page));
+            } else {
+                mUrlBuilder.setIndex(index, isNext);
+                mUrlBuilder.setJumpTo(jumpTo);
             }
-            mUrlBuilder.setPrevGid(prevGid);
-            mUrlBuilder.setNextGid(nextGid);
-
-            mUrlBuilder.setJumpTo(jumpTo);
-            jumpTo = null;
-
             if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.getMode()) {
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_IMAGE_SEARCH);

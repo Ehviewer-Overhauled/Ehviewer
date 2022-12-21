@@ -588,7 +588,7 @@ public class FavoritesScene extends SearchBarScene implements
                 // Refresh
                 case 1 -> mHelper.refresh();
                 // Last page
-                case 2 -> mHelper.goToPage(Integer.MAX_VALUE - 1);
+                case 2 -> mHelper.goTo("1-0", false);
             }
             view.setExpanded(false);
             return;
@@ -734,28 +734,7 @@ public class FavoritesScene extends SearchBarScene implements
             }
 
             updateSearchBar();
-
-            int pages;
-            if (result.nextPage == null)
-                pages = mHelper.pgCounter + 1;
-            else
-                pages = Integer.MAX_VALUE;
-
-            String prev = result.prevPage, next = result.nextPage;
-            switch (mHelper.operation) {
-                case -1:
-                    if (prev != null) mHelper.upperPage = prev;
-                    break;
-                case 1:
-                    if (next != null) mHelper.lowerPage = next;
-                    break;
-                default:
-                    mHelper.upperPage = prev;
-                    mHelper.lowerPage = next;
-                    break;
-            }
-
-            mHelper.onGetPageData(taskId, pages, mHelper.pgCounter + 1, result.galleryInfoList);
+            mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList);
 
             if (mDrawerAdapter != null) {
                 mDrawerAdapter.notifyDataSetChanged();
@@ -780,9 +759,9 @@ public class FavoritesScene extends SearchBarScene implements
             }
 
             if (list.size() == 0) {
-                mHelper.onGetPageData(taskId, 0, 0, Collections.EMPTY_LIST);
+                mHelper.onGetPageData(taskId, 0, 0, null, null, Collections.EMPTY_LIST);
             } else {
-                mHelper.onGetPageData(taskId, 1, 0, list);
+                mHelper.onGetPageData(taskId, 1, 0, null, null, list);
             }
 
             if (TextUtils.isEmpty(keyword)) {
@@ -1073,18 +1052,13 @@ public class FavoritesScene extends SearchBarScene implements
     }
 
     private class FavoritesHelper extends GalleryInfoContentHelper {
-        public String upperPage = null;
-        public String lowerPage = null;
-        public int operation = 0;
-        public int pgCounter = 0;
 
         @Override
-        protected void getPageData(final int taskId, int type, int page) {
+        protected void getPageData(final int taskId, int type, int page, String index, boolean isNext) {
             MainActivity activity = getMainActivity();
             if (null == activity || null == mUrlBuilder || null == mClient) {
                 return;
             }
-            pgCounter = page;
 
             if (mEnableModify) {
                 mEnableModify = false;
@@ -1123,7 +1097,7 @@ public class FavoritesScene extends SearchBarScene implements
                         url = mUrlBuilder.build();
                     }
 
-                    mUrlBuilder.setNext(lowerPage);
+                    mUrlBuilder.setIndex(index, true);
                     EhRequest request = new EhRequest();
                     request.setMethod(EhClient.METHOD_MODIFY_FAVORITES);
                     request.setCallback(new GetFavoritesListener(getContext(),
@@ -1136,28 +1110,8 @@ public class FavoritesScene extends SearchBarScene implements
                 final String keyword = mUrlBuilder.getKeyword();
                 SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
             } else {
-                String prev = null, next = null;
-                if (page == Integer.MAX_VALUE - 1) {
-                    prev = "1-0";
-                    jumpTo = null;
-                } else if (jumpTo != null) {
-                    next = Integer.toString(minGid);
-                    operation = 0;
-                } else if (page != 0 && mHelper != null) {
-                    if (page >= mHelper.getPageForTop()) {
-                        next = lowerPage;
-                        operation = 1;
-                    } else {
-                        prev = upperPage;
-                        operation = -1;
-                    }
-                }
-                mUrlBuilder.setPrev(prev);
-                mUrlBuilder.setNext(next);
-
+                mUrlBuilder.setIndex(index, isNext);
                 mUrlBuilder.setJumpTo(jumpTo);
-                jumpTo = null;
-
                 String url = mUrlBuilder.build();
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_GET_FAVORITES);
@@ -1225,26 +1179,17 @@ public class FavoritesScene extends SearchBarScene implements
         @Override
         protected void beforeRefresh() {
             super.beforeRefresh();
-            upperPage = null;
-            lowerPage = null;
-            operation = 0;
         }
 
         @NonNull
         @Override
         protected Parcelable saveInstanceState(@NonNull Parcelable superState) {
-            Bundle bundle = (Bundle) super.saveInstanceState(superState);
-            bundle.putString(KEY_UPPER_PAGE, upperPage);
-            bundle.putString(KEY_LOWER_PAGE, lowerPage);
-            return bundle;
+            return (Bundle) super.saveInstanceState(superState);
         }
 
         @NonNull
         @Override
         protected Parcelable restoreInstanceState(@NonNull Parcelable state) {
-            Bundle bundle = (Bundle) state;
-            upperPage = bundle.getString(KEY_UPPER_PAGE);
-            lowerPage = bundle.getString(KEY_LOWER_PAGE);
             return super.restoreInstanceState(state);
         }
     }

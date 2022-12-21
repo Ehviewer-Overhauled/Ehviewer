@@ -27,16 +27,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.math.max
-import kotlin.math.min
 
 abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
-    @JvmField
-    var maxGid = -1
-
-    @JvmField
-    var minGid = -1
-
     @JvmField
     var jumpTo: String? = null
     private val listener: FavouriteStatusRouter.Listener
@@ -65,10 +57,6 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
     override fun onAddData(data: List<GalleryInfo?>) {
         for (info in data) {
             info?.let {
-                if (maxGid == -1) maxGid = info.gid.toInt()
-                if (minGid == -1) minGid = info.gid.toInt()
-                maxGid = max(maxGid.toLong(), info.gid).toInt()
-                minGid = min(minGid.toLong(), info.gid).toInt()
                 map[info.gid] = info
             }
         }
@@ -86,14 +74,6 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
 
     override fun onClearData() {
         map.clear()
-        maxGid = -1
-        minGid = -1
-    }
-
-    override fun beforeRefresh() {
-        super.beforeRefresh()
-        maxGid = -1
-        minGid = -1
     }
 
     override fun saveInstanceState(superState: Parcelable): Parcelable {
@@ -103,8 +83,6 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val router = EhApplication.favouriteStatusRouter
         val id = router.saveDataMap(map)
         bundle.putInt(KEY_DATA_MAP, id)
-        bundle.putInt(KEY_MIN_GID, minGid)
-        bundle.putInt(KEY_MAX_GID, maxGid)
         return bundle
     }
 
@@ -118,8 +96,6 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
                 this.map = map
             }
         }
-        minGid = bundle.getInt(KEY_MIN_GID)
-        maxGid = bundle.getInt(KEY_MAX_GID)
         return super.restoreInstanceState(state)
     }
 
@@ -127,19 +103,11 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val formatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
         jumpTo = formatter.format(Instant.ofEpochMilli(time))
-        doGoToPage(Int.MAX_VALUE / 2)
-    }
-
-    fun goToPage(page: Int) {
-        jumpTo = page.toString()
-        doGoToPage(page)
+        doRefresh()
+        jumpTo = null
     }
 
     companion object {
         private const val KEY_DATA_MAP = "data_map"
-        private const val KEY_MAX_GID = "max_gid"
-        private const val KEY_MIN_GID = "min_gid"
-        const val KEY_UPPER_PAGE = "upper_page"
-        const val KEY_LOWER_PAGE = "lower_page"
     }
 }

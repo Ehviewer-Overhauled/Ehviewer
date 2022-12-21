@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui.fragment;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -333,14 +332,14 @@ public class AdvancedFragment extends BasePreferenceFragment {
                         Log.d("LocalFavorites", "now backup page " + status);
                         EhDB.putLocalFavorites(result.galleryInfoList);
 
-                        if (result.nextPage != null) {
+                        if (result.next != null) {
                             try {
                                 Thread.sleep(Settings.getDownloadDelay());
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                             favIndex++;
-                            favListUrlBuilder.setNext(result.nextPage);
+                            favListUrlBuilder.setIndex(result.next, true);
                             request.setArgs(favListUrlBuilder.build());
                             mClient.execute(request);
                         } else {

@@ -50,8 +50,8 @@ public class GalleryListParser {
     private static final Pattern PATTERN_THUMB_SIZE = Pattern.compile("height:(\\d+)px;width:(\\d+)px");
     private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("background-color:rgba\\((\\d+),(\\d+),(\\d+),");
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
-    private static final Pattern PATTERN_PREV_PAGE = Pattern.compile("prev=(\\d+)");
-    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+)");
+    private static final Pattern PATTERN_PREV_PAGE = Pattern.compile("prev=(\\d+(-\\d+)?)");
+    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+(-\\d+)?)");
 
     private static final String[][] FAVORITE_SLOT_RGB = new String[][]{
             new String[]{"0", "0", "0"},
@@ -256,11 +256,7 @@ public class GalleryListParser {
                 if (div != null) {
                     gi.disowned = div.attr("style").contains("opacity:0.5");
                     Element a = div.children().first();
-                    if (a != null) {
-                        gi.uploader = a.text().trim();
-                    } else {
-                        gi.uploader = div.text().trim();
-                    }
+                    gi.uploader = a == null ? div.text().trim() : a.text().trim();
                 }
             }
             if (children.size() > pagesIndex) {
@@ -299,23 +295,39 @@ public class GalleryListParser {
             Matcher matcherPrev = PATTERN_PREV_PAGE.matcher(prev.attr("href"));
             Matcher matcherNext = PATTERN_NEXT_PAGE.matcher(next.attr("href"));
             if (matcherPrev.find())
-                result.prevGid = NumberUtils.parseIntSafely(matcherPrev.group(1), 0);
+                result.prev = matcherPrev.group(1);
             if (matcherNext.find())
-                result.nextGid = NumberUtils.parseIntSafely(matcherNext.group(1), 0);
-            result.founds = Integer.MAX_VALUE;
+                result.next = matcherNext.group(1);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             result.noWatchedTags = body.contains("<p>You do not have any watched tags");
             if (body.contains("No hits found</p>")) {
-                result.founds = 0;
                 //noinspection unchecked
                 result.galleryInfoList = Collections.EMPTY_LIST;
                 return result;
-            } else if (d.getElementsByClass("ptt").isEmpty()) {
-                result.founds = 1;
-            } else {
-                result.founds = Integer.MAX_VALUE;
             }
+        }
+
+        try { // For toplists
+            Element ptt = d.getElementsByClass("ptt").first();
+            if (ptt != null) {
+                Elements es = ptt.child(0).child(0).children();
+                result.pages = Integer.parseInt(es.get(es.size() - 2).text().trim());
+
+                Element e = es.get(es.size() - 1);
+                if (e != null) {
+                    e = e.children().first();
+                    if (e != null) {
+                        String href = e.attr("href");
+                        Matcher matcher = PATTERN_NEXT_PAGE.matcher(href);
+                        if (matcher.find()) {
+                            result.nextPage = NumberUtils.parseIntSafely(matcher.group(1), 0);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
 
         try {
@@ -350,9 +362,10 @@ public class GalleryListParser {
     }
 
     public static class Result {
-        public int founds;
-        public int prevGid;
-        public int nextGid;
+        public int pages;
+        public int nextPage;
+        public String prev;
+        public String next;
         public boolean noWatchedTags;
         public List<GalleryInfo> galleryInfoList;
     }
