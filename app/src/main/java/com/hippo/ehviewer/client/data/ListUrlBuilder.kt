@@ -36,8 +36,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
     @get:Mode
     @Mode
     var mode = MODE_NORMAL
-    private var mPrevGid = 0
-    private var mNextGid = 0
+    private var mPrev: String? = null
+    private var mNext: String? = null
     private var mJumpTo: String? = null
     var category = EhUtils.NONE
     private var mKeyword: String? = null
@@ -54,8 +54,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
     constructor()
     protected constructor(parcel: Parcel) {
         mode = parcel.readInt()
-        mPrevGid = parcel.readInt()
-        mNextGid = parcel.readInt()
+        mPrev = parcel.readString()
+        mNext = parcel.readString()
         mJumpTo = parcel.readString()
         this.category = parcel.readInt()
         mKeyword = parcel.readString()
@@ -72,8 +72,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
 
     fun reset() {
         mode = MODE_NORMAL
-        mPrevGid = 0
-        mNextGid = 0
+        mPrev = null
+        mNext = null
         mJumpTo = null
         this.category = EhUtils.NONE
         mKeyword = null
@@ -96,12 +96,14 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         }
     }
 
-    fun setPrevGid(prevGid: Int) {
-        mPrevGid = prevGid
-    }
-
-    fun setNextGid(nextGid: Int) {
-        mNextGid = nextGid
+    fun setIndex(index: String?, isNext: Boolean = true) {
+        if (isNext) {
+            mNext = index
+            mPrev = null
+        } else {
+            mPrev = index
+            mNext = null
+        }
     }
 
     fun setJumpTo(jumpTo: String?) {
@@ -121,8 +123,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
      */
     fun set(lub: ListUrlBuilder) {
         mode = lub.mode
-        mPrevGid = lub.mPrevGid
-        mNextGid = lub.mNextGid
+        mPrev = lub.mPrev
+        mNext = lub.mNext
         mJumpTo = lub.mJumpTo
         this.category = lub.category
         mKeyword = lub.mKeyword
@@ -196,7 +198,7 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         if (TextUtils.isEmpty(query)) {
             return
         }
-        val querys = StringUtils.split(query, '&')
+        val queries = StringUtils.split(query, '&')
         var category = 0
         var keyword: String? = null
         var enableAdvanceSearch = false
@@ -206,7 +208,7 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         var enablePage = false
         var pageFrom = -1
         var pageTo = -1
-        for (str in querys) {
+        for (str in queries) {
             val index = str.indexOf('=')
             if (index < 0) {
                 continue
@@ -348,19 +350,19 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                         }
                     }
                 }
-                if (mSHash != null) {
-                    ub.addQuery("f_shash", mSHash!!)
+                mSHash?.let {
+                    ub.addQuery("f_shash", it)
                 }
                 mJumpTo?.let {
-                    ub.addQuery("seek", mJumpTo!!)
-                    mPrevGid = 0
-                    mNextGid = 0
+                    ub.addQuery("seek", it)
+                    mPrev = null
+                    mNext = null
                 }
-                if (mPrevGid != 0) {
-                    ub.addQuery("prev", mPrevGid)
+                mPrev?.let {
+                    ub.addQuery("prev", it)
                 }
-                if (mNextGid != 0) {
-                    ub.addQuery("next", mNextGid)
+                mNext?.let {
+                    ub.addQuery("next", it)
                 }
                 // Advance search
                 if (advanceSearch != -1) {
@@ -393,14 +395,14 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 } catch (e: UnsupportedEncodingException) {
                     // Empty
                 }
-                if (mPrevGid != 0) {
-                    sb.append("?prev=").append(mPrevGid)
+                mPrev?.let {
+                    sb.append("?prev=").append(it)
                 }
-                if (mNextGid != 0) {
-                    sb.append("?next=").append(mNextGid)
+                mNext?.let {
+                    sb.append("?next=").append(it)
                 }
-                if (mJumpTo != null) {
-                    sb.append("&seek=").append(mJumpTo)
+                mJumpTo?.let {
+                    sb.append("&seek=").append(it)
                 }
                 sb.toString()
             }
@@ -413,14 +415,14 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 } catch (e: UnsupportedEncodingException) {
                     // Empty
                 }
-                if (mPrevGid != 0) {
-                    sb.append("?prev=").append(mPrevGid)
+                mPrev?.let {
+                    sb.append("?prev=").append(it)
                 }
-                if (mNextGid != 0) {
-                    sb.append("?next=").append(mNextGid)
+                mNext?.let {
+                    sb.append("?next=").append(it)
                 }
-                if (mJumpTo != null) {
-                    sb.append("&seek=").append(mJumpTo)
+                mJumpTo?.let {
+                    sb.append("&seek=").append(it)
                 }
                 sb.toString()
             }
@@ -433,61 +435,15 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 try {
                     sb.append(URLEncoder.encode(mKeyword, "UTF-8"))
                 } catch (e: UnsupportedEncodingException) {
-                    // Empty
+                    e.printStackTrace()
                 }
-                if (mNextGid != 0) {
-                    sb.append("&p=").append(mNextGid)
+                mJumpTo?.let {
+                    sb.append("&p=").append(it)
                 }
                 sb.toString()
             }
 
-            else -> {
-                val url: String = if (mode == MODE_NORMAL) {
-                    EhUrl.getHost()
-                } else {
-                    EhUrl.getWatchedUrl()
-                }
-                val ub = UrlBuilder(url)
-                if (this.category != EhUtils.NONE) {
-                    ub.addQuery("f_cats", category.inv() and EhConfig.ALL_CATEGORY)
-                }
-                if (mKeyword != null) {
-                    val keyword = mKeyword!!.trim { it <= ' ' }
-                    if (keyword.isNotEmpty()) {
-                        try {
-                            ub.addQuery("f_search", URLEncoder.encode(mKeyword, "UTF-8"))
-                        } catch (_: UnsupportedEncodingException) {
-                        }
-                    }
-                }
-                if (mSHash != null) {
-                    ub.addQuery("f_shash", mSHash!!)
-                }
-                if (mPrevGid != 0) {
-                    ub.addQuery("prev", mPrevGid)
-                }
-                if (mNextGid != 0) {
-                    ub.addQuery("next", mNextGid)
-                }
-                if (advanceSearch != -1) {
-                    ub.addQuery("advsearch", "1")
-                    if (advanceSearch and AdvanceSearchTable.SH != 0) ub.addQuery("f_sh", "on")
-                    if (advanceSearch and AdvanceSearchTable.STO != 0) ub.addQuery("f_sto", "on")
-                    if (advanceSearch and AdvanceSearchTable.SFL != 0) ub.addQuery("f_sfl", "on")
-                    if (advanceSearch and AdvanceSearchTable.SFU != 0) ub.addQuery("f_sfu", "on")
-                    if (advanceSearch and AdvanceSearchTable.SFT != 0) ub.addQuery("f_sft", "on")
-                    if (minRating != -1) {
-                        ub.addQuery("f_sr", "on")
-                        ub.addQuery("f_srdd", minRating)
-                    }
-                    if (pageFrom != -1 || pageTo != -1) {
-                        ub.addQuery("f_sp", "on")
-                        ub.addQuery("f_spf", if (pageFrom != -1) pageFrom.toString() else "")
-                        ub.addQuery("f_spt", if (pageTo != -1) pageTo.toString() else "")
-                    }
-                }
-                ub.build()
-            }
+            else -> throw java.lang.IllegalStateException("Unexpected value: $mode")
         }
     }
 
@@ -497,8 +453,8 @@ open class ListUrlBuilder : Cloneable, Parcelable {
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(mode)
-        dest.writeInt(mPrevGid)
-        dest.writeInt(mNextGid)
+        dest.writeString(mPrev)
+        dest.writeString(mNext)
         dest.writeString(mJumpTo)
         dest.writeInt(this.category)
         dest.writeString(mKeyword)

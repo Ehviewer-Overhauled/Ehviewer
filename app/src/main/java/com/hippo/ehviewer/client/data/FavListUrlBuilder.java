@@ -32,7 +32,7 @@ public class FavListUrlBuilder implements Parcelable {
 
     public static final int FAV_CAT_ALL = -1;
     public static final int FAV_CAT_LOCAL = -2;
-    public static final Parcelable.Creator<FavListUrlBuilder> CREATOR = new Parcelable.Creator<FavListUrlBuilder>() {
+    public static final Parcelable.Creator<FavListUrlBuilder> CREATOR = new Parcelable.Creator<>() {
 
         @Override
         public FavListUrlBuilder createFromParcel(Parcel source) {
@@ -66,12 +66,14 @@ public class FavListUrlBuilder implements Parcelable {
         return favCat >= 0 && favCat <= 9;
     }
 
-    public void setPrev(String prev) {
-        mPrev = prev;
-    }
-
-    public void setNext(String next) {
-        mNext = next;
+    public void setIndex(String index, boolean isNext) {
+        if (isNext) {
+            mNext = index;
+            mPrev = null;
+        } else {
+            mPrev = index;
+            mNext = null;
+        }
     }
 
     public void setJumpTo(String jumpTo) {
@@ -115,12 +117,6 @@ public class FavListUrlBuilder implements Parcelable {
                     e.printStackTrace();
                 }
             }
-            // Name
-            ub.addQuery("sn", "on");
-            // Tags
-            ub.addQuery("st", "on");
-            // Note
-            ub.addQuery("sf", "on");
         }
         if (mPrev != null && !mPrev.isEmpty()) {
             ub.addQuery("prev", mPrev);

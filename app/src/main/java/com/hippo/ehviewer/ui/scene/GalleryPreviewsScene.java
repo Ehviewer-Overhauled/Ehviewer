@@ -247,7 +247,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
                 list.add(previewSet.getGalleryPreview(mGalleryInfo.gid, i));
             }
 
-            mHelper.onGetPageData(taskId, result.second, 0, list);
+            mHelper.onGetPageData(taskId, result.second, 0, null, null, list);
         }
     }
 
@@ -343,7 +343,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
     private class GalleryPreviewHelper extends ContentLayout.ContentHelper<GalleryPreview> {
 
         @Override
-        protected void getPageData(final int taskId, int type, int page) {
+        protected void getPageData(final int taskId, int type, int page, String index, boolean isNext) {
             MainActivity activity = getMainActivity();
             if (null == activity || null == mClient || null == mGalleryInfo) {
                 onGetException(taskId, new EhException(getString(R.string.error_cannot_find_gallery)));
