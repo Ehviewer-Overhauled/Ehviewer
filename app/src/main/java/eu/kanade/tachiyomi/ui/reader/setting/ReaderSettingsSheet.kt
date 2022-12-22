@@ -91,7 +91,7 @@ class ReaderSettingsSheet(
     )
 
     override fun show() {
-        initSettings()
+        readingModeSettings.init()
         super.show()
     }
 }

@@ -7,8 +7,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import com.hippo.ehviewer.R
-import eu.kanade.tachiyomi.data.preference.PreferenceValues
 import com.hippo.ehviewer.databinding.ReaderReadingModeSettingsBinding
+import eu.kanade.tachiyomi.data.preference.PreferenceValues
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.PagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
@@ -19,12 +19,16 @@ import kotlinx.coroutines.flow.launchIn
 /**
  * Sheet to show reader and viewer preferences.
  */
-class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+class ReaderReadingModeSettings @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) :
     NestedScrollView(context, attrs) {
 
     private val readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences
 
-    private val binding = ReaderReadingModeSettingsBinding.inflate(LayoutInflater.from(context), this, false)
+    private val binding =
+        ReaderReadingModeSettingsBinding.inflate(LayoutInflater.from(context), this, false)
 
     init {
         addView(binding.root)
@@ -53,14 +57,18 @@ class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attr
                 initPagerPreferences()
             }
         }
-        binding.viewer.setSelection(ReaderActivity.readerPreferences.defaultReadingMode().get().let { ReadingModeType.fromPreference(it).prefValue })
+        binding.viewer.setSelection(
+            ReaderActivity.readerPreferences.defaultReadingMode().get()
+                .let { ReadingModeType.fromPreference(it).prefValue })
 
         binding.rotationMode.onItemSelectedListener = { position ->
             val rotationType = OrientationType.fromSpinner(position)
             readerPreferences.defaultOrientationType().set(rotationType.flagValue)
             (context as ReaderActivity).setGallery()
         }
-        binding.rotationMode.setSelection(ReaderActivity.readerPreferences.defaultOrientationType().get().let { OrientationType.fromPreference(it).prefValue })
+        binding.rotationMode.setSelection(
+            ReaderActivity.readerPreferences.defaultOrientationType().get()
+                .let { OrientationType.fromPreference(it).prefValue })
     }
 
     /**
@@ -70,7 +78,10 @@ class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attr
         binding.webtoonPrefsGroup.root.isVisible = false
         binding.pagerPrefsGroup.root.isVisible = true
 
-        binding.pagerPrefsGroup.tappingInverted.bindToPreference(readerPreferences.pagerNavInverted(), PreferenceValues.TappingInvertMode::class.java)
+        binding.pagerPrefsGroup.tappingInverted.bindToPreference(
+            readerPreferences.pagerNavInverted(),
+            PreferenceValues.TappingInvertMode::class.java
+        )
         binding.pagerPrefsGroup.navigatePan.bindToPreference(readerPreferences.navigateToPan())
 
         binding.pagerPrefsGroup.pagerNav.bindToPreference(readerPreferences.navigationModePager())
@@ -99,13 +110,28 @@ class ReaderReadingModeSettings @JvmOverloads constructor(context: Context, attr
         binding.pagerPrefsGroup.root.isVisible = false
         binding.webtoonPrefsGroup.root.isVisible = true
 
-        binding.webtoonPrefsGroup.tappingInverted.bindToPreference(readerPreferences.webtoonNavInverted(), PreferenceValues.TappingInvertMode::class.java)
+        binding.webtoonPrefsGroup.tappingInverted.bindToPreference(
+            readerPreferences.webtoonNavInverted(),
+            PreferenceValues.TappingInvertMode::class.java
+        )
 
         binding.webtoonPrefsGroup.webtoonNav.bindToPreference(readerPreferences.navigationModeWebtoon())
         readerPreferences.navigationModeWebtoon()
             .asHotFlow { binding.webtoonPrefsGroup.tappingInverted.isVisible = it != 5 }
             .launchIn((context as ReaderActivity).lifecycleScope)
         binding.webtoonPrefsGroup.cropBordersWebtoon.bindToPreference(readerPreferences.cropBordersWebtoon())
-        binding.webtoonPrefsGroup.webtoonSidePadding.bindToIntPreference(readerPreferences.webtoonSidePadding(), R.array.webtoon_side_padding_values)
+        binding.webtoonPrefsGroup.webtoonSidePadding.bindToIntPreference(
+            readerPreferences.webtoonSidePadding(),
+            R.array.webtoon_side_padding_values
+        )
+    }
+
+    fun init() {
+        initGeneralPreferences()
+
+        when ((context as ReaderActivity).viewer) {
+            is PagerViewer -> initPagerPreferences()
+            is WebtoonViewer -> initWebtoonPreferences()
+        }
     }
 }
