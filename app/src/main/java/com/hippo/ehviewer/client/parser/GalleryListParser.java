@@ -50,8 +50,9 @@ public class GalleryListParser {
     private static final Pattern PATTERN_THUMB_SIZE = Pattern.compile("height:(\\d+)px;width:(\\d+)px");
     private static final Pattern PATTERN_FAVORITE_SLOT = Pattern.compile("background-color:rgba\\((\\d+),(\\d+),(\\d+),");
     private static final Pattern PATTERN_PAGES = Pattern.compile("(\\d+) page");
-    private static final Pattern PATTERN_PREV_PAGE = Pattern.compile("prev=(\\d+(-\\d+)?)");
-    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("next=(\\d+(-\\d+)?)");
+    private static final Pattern PATTERN_NEXT_PAGE = Pattern.compile("p=(\\d+)");
+    private static final Pattern PATTERN_PREV = Pattern.compile("prev=(\\d+(-\\d+)?)");
+    private static final Pattern PATTERN_NEXT = Pattern.compile("next=(\\d+(-\\d+)?)");
 
     private static final String[][] FAVORITE_SLOT_RGB = new String[][]{
             new String[]{"0", "0", "0"},
@@ -292,8 +293,8 @@ public class GalleryListParser {
             Element next = d.getElementById("unext");
             assert prev != null;
             assert next != null;
-            Matcher matcherPrev = PATTERN_PREV_PAGE.matcher(prev.attr("href"));
-            Matcher matcherNext = PATTERN_NEXT_PAGE.matcher(next.attr("href"));
+            Matcher matcherPrev = PATTERN_PREV.matcher(prev.attr("href"));
+            Matcher matcherNext = PATTERN_NEXT.matcher(next.attr("href"));
             if (matcherPrev.find())
                 result.prev = matcherPrev.group(1);
             if (matcherNext.find())

@@ -50,20 +50,12 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         EhApplication.favouriteStatusRouter.removeListener(listener)
     }
 
-    override fun onAddData(data: GalleryInfo?) {
-        data?.let { map[data.gid] = data }
-    }
-
     override fun onAddData(data: List<GalleryInfo?>) {
         for (info in data) {
             info?.let {
                 map[info.gid] = info
             }
         }
-    }
-
-    override fun onRemoveData(data: GalleryInfo?) {
-        data?.let { map.remove(data.gid) }
     }
 
     override fun onRemoveData(data: List<GalleryInfo?>) {
@@ -103,7 +95,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         val formatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd", Locale.US).withZone(ZoneOffset.UTC)
         jumpTo = formatter.format(Instant.ofEpochMilli(time))
-        doRefresh()
+        goTo(null, true)
         jumpTo = null
     }
 
