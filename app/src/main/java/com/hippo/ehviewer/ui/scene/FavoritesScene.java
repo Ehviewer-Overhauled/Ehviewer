@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
@@ -1169,28 +1168,6 @@ public class FavoritesScene extends SearchBarScene implements
             if (0 == position) {
                 showSearchBar();
             }
-        }
-
-        @Override
-        protected void onClearData() {
-            super.onClearData();
-        }
-
-        @Override
-        protected void beforeRefresh() {
-            super.beforeRefresh();
-        }
-
-        @NonNull
-        @Override
-        protected Parcelable saveInstanceState(@NonNull Parcelable superState) {
-            return (Bundle) super.saveInstanceState(superState);
-        }
-
-        @NonNull
-        @Override
-        protected Parcelable restoreInstanceState(@NonNull Parcelable state) {
-            return super.restoreInstanceState(state);
         }
     }
 }
