@@ -53,6 +53,8 @@ class Image private constructor(source: Source?, val release: () -> Unit = {}) {
                     )
                 } // Should we lazy decode it?
         }
+        if (mObtainedDrawable is BitmapDrawable)
+            release()
     }
 
     val width = mObtainedDrawable!!.intrinsicWidth
@@ -68,8 +70,9 @@ class Image private constructor(source: Source?, val release: () -> Unit = {}) {
             (mObtainedDrawable as BitmapDrawable?)?.bitmap?.recycle()
         }
         mObtainedDrawable?.callback = null
+        if (mObtainedDrawable is AnimatedImageDrawable)
+            release()
         mObtainedDrawable = null
-        release()
     }
 
     fun start() {
