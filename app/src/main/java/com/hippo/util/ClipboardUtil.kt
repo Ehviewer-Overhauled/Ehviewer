@@ -34,6 +34,10 @@ fun Context.getClipboardManager(): ClipboardManager {
     return getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 }
 
+infix fun Context.tellClipboard(text: String?) {
+    addTextToClipboard(text, false)
+}
+
 fun Context.addTextToClipboard(text: String?, isSensitive: Boolean) {
     getClipboardManager().apply {
         setPrimaryClip(ClipData.newPlainText(null, text).apply {
