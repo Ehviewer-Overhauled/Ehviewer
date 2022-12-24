@@ -1631,13 +1631,6 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         @Override
-        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
-            if (null != mAdapter) {
-                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
-            }
-        }
-
-        @Override
         protected void notifyItemRangeInserted(int positionStart, int itemCount) {
             if (null != mAdapter) {
                 mAdapter.notifyItemRangeInserted(positionStart, itemCount);
