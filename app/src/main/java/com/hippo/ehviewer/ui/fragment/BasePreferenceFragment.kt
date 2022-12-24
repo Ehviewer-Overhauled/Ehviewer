@@ -15,76 +15,70 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.os.Bundle
+import androidx.annotation.StringRes
+import androidx.fragment.app.FragmentTransaction
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.SettingsActivity
 
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.SettingsActivity;
-
-
-public class BasePreferenceFragment extends PreferenceFragmentCompat
-        implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
-    @Override
-    public void onStart() {
-        super.onStart();
-        setTitle(getFragmentTitle());
+open class BasePreferenceFragment : PreferenceFragmentCompat(),
+    Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+    override fun onStart() {
+        super.onStart()
+        setTitle(fragmentTitle)
     }
 
-    @StringRes
-    public int getFragmentTitle() {
-        return -1;
+    @get:StringRes
+    open val fragmentTitle: Int
+        get() = -1
+
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        return false
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        return false;
+    override fun onPreferenceClick(preference: Preference): Boolean {
+        return false
     }
 
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        return false;
-    }
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {}
 
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-
-    }
-
-    @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
-        String key = preference.getKey();
-        try {
-            Fragment classObj = (Fragment) Class.forName(key).newInstance();
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .replace(R.id.fragment, classObj)
-                    .addToBackStack(null)
-                    .commitAllowingStateLoss();
-        } catch (ClassNotFoundException | IllegalAccessException |
-                 java.lang.InstantiationException ignored) {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        val fragment = when (preference.key) {
+            "eh" -> EhFragment()
+            "download" -> DownloadFragment()
+            "privacy" -> PrivacyFragment()
+            "advance" -> AdvancedFragment()
+            "about" -> AboutFragment()
+            "filter" -> FilterFragment()
+            "mytags" -> MyTagsFragment()
+            "uconfig" -> UConfigFragment()
+            "hosts" -> HostsFragment()
+            else -> null
         }
-        return true;
+        fragment?.let {
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .replace(R.id.fragment, it)
+                .addToBackStack(null)
+                .commitAllowingStateLoss()
+        }
+        return true
     }
 
-    private void setTitle(@StringRes int string) {
-        requireActivity().setTitle(string);
+    private fun setTitle(@StringRes string: Int) {
+        requireActivity().setTitle(string)
     }
 
-    public void showTip(@StringRes int id, int length) {
-        ((SettingsActivity) requireActivity()).showTip(getString(id), length);
+    fun showTip(@StringRes id: Int, length: Int) {
+        (requireActivity() as SettingsActivity).showTip(getString(id), length)
     }
 
-    public void showTip(CharSequence message, int length) {
-        ((SettingsActivity) requireActivity()).showTip(message, length);
+    fun showTip(message: CharSequence?, length: Int) {
+        (requireActivity() as SettingsActivity).showTip(message, length)
     }
 }

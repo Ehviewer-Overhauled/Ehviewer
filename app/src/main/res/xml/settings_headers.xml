@@ -18,26 +18,26 @@
 
     <Preference
         android:icon="@drawable/v_sad_panda_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.EhFragment"
+        android:key="eh"
         android:title="@string/settings_eh" />
 
     <Preference
         android:icon="@drawable/v_download_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.DownloadFragment"
+        android:key="download"
         android:title="@string/settings_download" />
 
     <Preference
         android:icon="@drawable/v_sec_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.PrivacyFragment"
+        android:key="privacy"
         android:title="@string/settings_privacy" />
 
     <Preference
         android:icon="@drawable/v_adb_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.AdvancedFragment"
+        android:key="advance"
         android:title="@string/settings_advanced" />
 
     <Preference
         android:icon="@drawable/v_info_primary_x24"
-        android:key="com.hippo.ehviewer.ui.fragment.AboutFragment"
+        android:key="about"
         android:title="@string/settings_about" />
 </PreferenceScreen>

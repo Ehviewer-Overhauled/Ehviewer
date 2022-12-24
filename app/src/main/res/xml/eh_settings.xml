@@ -33,13 +33,13 @@
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.SignInRequiredPreference
-        android:key="com.hippo.ehviewer.ui.fragment.UConfigFragment"
+        android:key="uconfig"
         android:summary="@string/settings_u_config_summary"
         android:title="@string/settings_u_config"
         app:iconSpaceReserved="false" />
 
     <com.hippo.ehviewer.preference.SignInRequiredPreference
-        android:key="com.hippo.ehviewer.ui.fragment.MyTagsFragment"
+        android:key="mytags"
         android:summary="@string/settings_my_tags_summary"
         android:title="@string/settings_my_tags"
         app:iconSpaceReserved="false" />
@@ -158,7 +158,7 @@
         app:singleLineTitle="false" />
 
     <Preference
-        android:key="com.hippo.ehviewer.ui.fragment.FilterFragment"
+        android:key="filter"
         android:summary="@string/settings_eh_filter_summary"
         android:title="@string/settings_eh_filter"
         app:iconSpaceReserved="false" />

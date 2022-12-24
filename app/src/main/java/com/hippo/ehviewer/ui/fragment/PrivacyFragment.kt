@@ -19,6 +19,7 @@
 package com.hippo.ehviewer.ui.fragment
 
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreferenceCompat
 import com.hippo.ehviewer.R
@@ -59,9 +60,9 @@ class PrivacyFragment : BasePreferenceFragment() {
         }
     }
 
-    override fun getFragmentTitle(): Int {
-        return R.string.settings_privacy
-    }
+    @get:StringRes
+    override val fragmentTitle: Int
+        get() = R.string.settings_privacy
 
     private fun setUnlockDelaySummary(value: Int) {
         unlockDelay.summary = if (value == 0) {

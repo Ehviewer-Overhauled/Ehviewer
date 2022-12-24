@@ -18,6 +18,7 @@ package com.hippo.ehviewer.ui.fragment
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -91,7 +92,7 @@ class EhFragment : BasePreferenceFragment() {
         return true
     }
 
-    override fun getFragmentTitle(): Int {
-        return R.string.settings_eh
-    }
+    @get:StringRes
+    override val fragmentTitle: Int
+        get() = R.string.settings_eh
 }
