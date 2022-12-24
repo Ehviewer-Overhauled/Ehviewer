@@ -295,6 +295,7 @@ public class ContentLayout extends FrameLayout {
             mRecyclerView = contentLayout.mRecyclerView;
 
             Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.big_sad_pandroid);
+            assert drawable != null;
             drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             mTipView.setCompoundDrawables(null, drawable, null, null);
 
@@ -320,8 +321,6 @@ public class ContentLayout extends FrameLayout {
         protected abstract Context getContext();
 
         protected abstract void notifyDataSetChanged();
-
-        protected abstract void notifyItemRangeChanged(int positionStart, int itemCount);
 
         protected abstract void notifyItemRangeInserted(int positionStart, int itemCount);
 
@@ -478,7 +477,6 @@ public class ContentLayout extends FrameLayout {
                             mData.addAll(0, data);
                             onAddData(data);
                             notifyItemRangeInserted(0, data.size());
-                            notifyItemRangeChanged(data.size(), mData.size() - data.size());
 
                             // Ui change, show content
                             mRefreshLayout.setRefreshing(false);

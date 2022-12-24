@@ -106,8 +106,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
         RecyclerView recyclerView = mRecyclerView;
         switch (type) {
-            default:
-            case GalleryAdapter.TYPE_LIST: {
+            case GalleryAdapter.TYPE_LIST -> {
                 int columnWidth = mResources.getDimensionPixelOffset(Settings.getDetailSizeResId());
                 mLayoutManager.setColumnSize(columnWidth);
                 mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
@@ -123,9 +122,8 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 recyclerView.addItemDecoration(mListDecoration);
                 adjustPaddings();
                 notifyDataSetChanged();
-                break;
             }
-            case GalleryAdapter.TYPE_GRID: {
+            case GalleryAdapter.TYPE_GRID -> {
                 int columnWidth = Settings.getThumbSize();
                 mLayoutManager.setColumnSize(columnWidth);
                 mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_SUITABLE_SIZE);
@@ -141,7 +139,6 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 recyclerView.addItemDecoration(mGirdDecoration);
                 adjustPaddings();
                 notifyDataSetChanged();
-                break;
             }
         }
     }
@@ -149,16 +146,11 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     @NonNull
     @Override
     public GalleryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layoutId;
-        switch (viewType) {
-            default:
-            case TYPE_LIST:
-                layoutId = R.layout.item_gallery_list;
-                break;
-            case TYPE_GRID:
-                layoutId = R.layout.item_gallery_grid;
-                break;
-        }
+        int layoutId = switch (viewType) {
+            case TYPE_LIST -> R.layout.item_gallery_list;
+            case TYPE_GRID -> R.layout.item_gallery_grid;
+            default -> throw new IllegalStateException("Unexpected value: " + viewType);
+        };
 
         GalleryHolder holder = new GalleryHolder(mInflater.inflate(layoutId, parent, false));
 
@@ -168,6 +160,9 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
             lp.height = mListThumbHeight;
             holder.thumb.setLayoutParams(lp);
         }
+
+        holder.card.setOnClickListener(v -> onItemClick(holder.itemView, holder.getBindingAdapterPosition()));
+        holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, holder.getBindingAdapterPosition()));
 
         return holder;
     }
@@ -193,8 +188,7 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         }
 
         switch (mType) {
-            default:
-            case TYPE_LIST: {
+            case TYPE_LIST -> {
                 holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
                 holder.title.setText(EhUtils.getSuitableTitle(gi));
                 holder.uploader.setText(gi.uploader);
@@ -223,9 +217,8 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 }
                 holder.favourited.setVisibility((mShowFavourited && gi.favoriteSlot >= -1 && gi.favoriteSlot <= 10) ? View.VISIBLE : View.GONE);
                 holder.downloaded.setVisibility(mDownloadManager.containDownloadInfo(gi.gid) ? View.VISIBLE : View.GONE);
-                break;
             }
-            case TYPE_GRID: {
+            case TYPE_GRID -> {
                 ((TileThumb) holder.thumb).setThumbSize(gi.thumbWidth, gi.thumbHeight);
                 holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
                 View category = holder.category;
@@ -238,15 +231,11 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                     ((TriangleDrawable) drawable).setColor(color);
                 }
                 holder.simpleLanguage.setText(gi.simpleLanguage);
-                break;
             }
         }
 
         // Update transition name
         ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gi.gid));
-
-        holder.card.setOnClickListener(v -> onItemClick(holder.itemView, position));
-        holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, position));
     }
 
     @IntDef({TYPE_LIST, TYPE_GRID})

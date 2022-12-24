@@ -373,13 +373,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
         }
 
         @Override
-        protected void notifyItemRangeChanged(int positionStart, int itemCount) {
-            if (mAdapter != null) {
-                mAdapter.notifyItemRangeChanged(positionStart, itemCount);
-            }
-        }
-
-        @Override
         protected void notifyItemRangeInserted(int positionStart, int itemCount) {
             if (mAdapter != null) {
                 mAdapter.notifyItemRangeInserted(positionStart, itemCount);
