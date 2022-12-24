@@ -181,7 +181,7 @@ dependencies {
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.google.android.material:material:1.8.0-beta01'
 
-    implementation 'com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.10'
+    implementation 'com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11'
     implementation 'com.squareup.okhttp3:okhttp'
 
     implementation 'dev.rikka.rikkax.core:core-ktx:1.4.1'
