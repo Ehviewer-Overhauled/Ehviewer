@@ -15,6 +15,7 @@
 
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
+
 -repackageclasses
 -allowaccessmodification
 -overloadaggressively
