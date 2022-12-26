@@ -104,8 +104,6 @@ public class ContentLayout extends FrameLayout {
         mBottomProgress = mContentView.findViewById(R.id.bottom_progress);
         mFastScroller = mContentView.findViewById(R.id.fast_scroller);
         mRecyclerView = mRefreshLayout.findViewById(R.id.recycler_view);
-
-        mRefreshLayout.setColorSchemeColors(ResourcesKt.resolveColor(context.getTheme(), androidx.appcompat.R.attr.colorPrimary));
         mFastScroller.attachToRecyclerView(mRecyclerView);
         HandlerDrawable drawable = new HandlerDrawable();
         drawable.setColor(ResourcesKt.resolveColor(context.getTheme(), androidx.appcompat.R.attr.colorPrimary));

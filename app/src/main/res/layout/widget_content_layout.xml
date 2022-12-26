@@ -39,7 +39,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -51,7 +51,7 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false" />
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.ThemedSwipeRefreshLayout>
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/bottom_progress"
