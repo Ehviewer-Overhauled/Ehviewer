@@ -73,8 +73,10 @@ class MaterialSpinnerView @JvmOverloads constructor(context: Context, attrs: Att
             }
         }
         selectedPosition = selection
-        popup?.menu?.getItem(selectedPosition)?.let {
-            it.icon = checkmarkIcon
+        if (selectedPosition < (popup?.menu?.size ?: 0)) {
+            popup?.menu?.getItem(selectedPosition)?.let {
+                it.icon = checkmarkIcon
+            }
         }
         binding.details.text = entries.getOrNull(selection).orEmpty()
     }
