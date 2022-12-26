@@ -16,8 +16,6 @@
 
 package com.hippo.ehviewer.gallery;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -33,19 +31,17 @@ import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 
 public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderListener {
 
-    private final Context mContext;
     private final GalleryInfo mGalleryInfo;
     @Nullable
     private SpiderQueen mSpiderQueen;
 
-    public EhPageLoader(Context context, GalleryInfo galleryInfo) {
-        mContext = context;
+    public EhPageLoader(GalleryInfo galleryInfo) {
         mGalleryInfo = galleryInfo;
     }
 
     @Override
     public void start() {
-        mSpiderQueen = SpiderQueen.obtainSpiderQueen(mContext, mGalleryInfo, SpiderQueen.MODE_READ);
+        mSpiderQueen = SpiderQueen.obtainSpiderQueen(mGalleryInfo, SpiderQueen.MODE_READ);
         mSpiderQueen.addOnSpiderListener(this);
         if (mSpiderQueen.size() > 0)
             notifyDataChanged();

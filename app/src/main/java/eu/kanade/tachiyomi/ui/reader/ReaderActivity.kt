@@ -206,7 +206,7 @@ class ReaderActivity : EhActivity() {
         } else if (ACTION_EH == mAction) {
             if (mGalleryInfo != null) {
                 mGalleryProvider =
-                    EhPageLoader(this, mGalleryInfo)
+                    EhPageLoader(mGalleryInfo)
             }
         } else if (Intent.ACTION_VIEW == mAction) {
             if (mUri != null) {
@@ -849,7 +849,7 @@ class ReaderActivity : EhActivity() {
      * Moves the viewer to the given page [index]. It does nothing if the viewer is null or the
      * page is not found.
      */
-    fun moveToPageIndex(index: Int) {
+    private fun moveToPageIndex(index: Int) {
         val viewer = viewer ?: return
         val page = mGalleryProvider?.mPages?.getOrNull(index) ?: return
         viewer.moveToPage(page)

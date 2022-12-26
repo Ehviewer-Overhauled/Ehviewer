@@ -413,7 +413,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         super.onResume();
         if (mRead != null) {
             try {
-                PageLoader2 galleryProvider = new EhPageLoader(requireContext(), mGalleryInfo);
+                PageLoader2 galleryProvider = new EhPageLoader(mGalleryInfo);
                 galleryProvider.start();
                 int startPage = galleryProvider.getStartPage();
                 if (startPage != 0) {
