@@ -140,14 +140,11 @@ public final class SpiderDen {
     }
 
     public boolean isReady() {
-        switch (mMode) {
-            case SpiderQueen.MODE_READ:
-                return sCache != null;
-            case SpiderQueen.MODE_DOWNLOAD:
-                return mDownloadDir != null && mDownloadDir.isDirectory();
-            default:
-                return false;
-        }
+        return switch (mMode) {
+            case SpiderQueen.MODE_READ -> sCache != null;
+            case SpiderQueen.MODE_DOWNLOAD -> mDownloadDir != null && mDownloadDir.isDirectory();
+            default -> false;
+        };
     }
 
     @Nullable
