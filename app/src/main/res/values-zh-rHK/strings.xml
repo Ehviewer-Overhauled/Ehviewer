@@ -522,6 +522,7 @@
     <string name="action_retry">重試</string>
     <string name="action_share">分享</string>
     <string name="action_save">儲存</string>
+    <string name="action_save_to">儲存到&#8230;</string>
     <string name="pref_category_general">一般</string>
     <string name="pref_fullscreen">全螢幕</string>
     <string name="pref_show_page_number">顯示頁碼</string>

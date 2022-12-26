@@ -21,6 +21,7 @@ class ReaderPageSheet(
 
         binding.share.setOnClickListener { share() }
         binding.save.setOnClickListener { save() }
+        binding.saveTo.setOnClickListener { saveTo() }
 
         return binding.root
     }
@@ -37,6 +38,14 @@ class ReaderPageSheet(
      * Saves the image of this page on external storage.
      */
     private fun save() {
+        activity.saveImage(page.index)
+        dismiss()
+    }
+
+    /**
+     * Saves the image of this page to a custom location on external storage.
+     */
+    private fun saveTo() {
         activity.saveImageTo(page.index)
         dismiss()
     }

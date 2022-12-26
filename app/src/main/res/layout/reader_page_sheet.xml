@@ -35,4 +35,19 @@
         app:drawableStartCompat="@drawable/ic_save_24dp"
         app:drawableTint="?attr/colorOnBackground" />
 
+    <TextView
+        android:id="@+id/save_to"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:drawablePadding="32dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingHorizontal="16dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:text="@string/action_save_to"
+        android:textColor="?attr/colorOnBackground"
+        app:drawableStartCompat="@drawable/ic_save_24dp"
+        app:drawableTint="?attr/colorOnBackground" />
+
 </LinearLayout>
