@@ -422,7 +422,7 @@ class ReaderActivity : EhActivity() {
         }
     }
 
-    private fun saveImage(page: Int) {
+    fun saveImage(page: Int) {
         if (null == mGalleryProvider) {
             return
         }
