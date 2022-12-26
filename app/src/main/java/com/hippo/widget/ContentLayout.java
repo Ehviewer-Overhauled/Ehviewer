@@ -790,6 +790,8 @@ public class ContentLayout extends FrameLayout {
         }
 
         protected Parcelable saveInstanceState(Parcelable superState) {
+            cancelCurrentTask();
+
             Bundle bundle = new Bundle();
             bundle.putParcelable(KEY_SUPER, superState);
             int shownView = mViewTransition.getShownViewIndex();
