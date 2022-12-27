@@ -657,7 +657,7 @@ public final class GalleryListScene extends SearchBarScene
                                           final EasyRecyclerView recyclerView, final TextView tip) {
         Context context = getContext();
         final ListUrlBuilder urlBuilder = mUrlBuilder;
-        if (null == context || null == urlBuilder) {
+        if (null == context || null == urlBuilder || null == mHelper) {
             return;
         }
 
@@ -667,11 +667,17 @@ public final class GalleryListScene extends SearchBarScene
             return;
         }
 
+        var gi = mHelper.getFirstVisibleItem();
+        var next = gi != null ? "@" + (gi.gid + 1) : null;
+
         // Check duplicate
         for (QuickSearch q : mQuickSearchList) {
             if (urlBuilder.equalsQuickSearch(q)) {
-                showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG);
-                return;
+                var i = q.name.lastIndexOf("@");
+                if (i != -1 && q.name.substring(i).equals(next)) {
+                    showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG);
+                    return;
+                }
             }
         }
 
@@ -687,6 +693,10 @@ public final class GalleryListScene extends SearchBarScene
             if (TextUtils.isEmpty(text)) {
                 builder.setError(getString(R.string.name_is_empty));
                 return;
+            }
+
+            if (next != null) {
+                text += next;
             }
 
             // Check name duplicate
@@ -1439,11 +1449,11 @@ public final class GalleryListScene extends SearchBarScene
                         return;
                     }
 
-                    mUrlBuilder.set(mQuickSearchList.get(position));
-                    mUrlBuilder.setIndex(null, true);
-                    mUrlBuilder.setJumpTo(null);
+                    var q = mQuickSearchList.get(position);
+                    mUrlBuilder.set(q);
                     onUpdateUrlBuilder();
-                    mHelper.refresh();
+                    var i = q.name.lastIndexOf("@");
+                    mHelper.goTo(i != -1 ? q.name.substring(i + 1) : null, true);
                     setState(STATE_NORMAL);
                     closeDrawer(Gravity.RIGHT);
                 });
@@ -1458,8 +1468,6 @@ public final class GalleryListScene extends SearchBarScene
                     }
 
                     mUrlBuilder.setKeyword(String.valueOf(keywords[position]));
-                    mUrlBuilder.setIndex(null, true);
-                    mUrlBuilder.setJumpTo(null);
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);

@@ -358,6 +358,11 @@ public class ContentLayout extends FrameLayout {
             }
         }
 
+        @Nullable
+        public E getFirstVisibleItem() {
+            return getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(mRecyclerView.getLayoutManager()));
+        }
+
         public int size() {
             return mData.size();
         }
