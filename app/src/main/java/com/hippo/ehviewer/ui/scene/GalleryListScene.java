@@ -484,7 +484,7 @@ public final class GalleryListScene extends SearchBarScene
 
         // Update fab visibility
         mFabLayout.setSecondaryFabVisibilityAt(0, !isPopular);
-        mFabLayout.setSecondaryFabVisibilityAt(2, !isTopList && !isPopular);
+        mFabLayout.setSecondaryFabVisibilityAt(2, !isPopular);
 
         // Update normal search mode
         mSearchLayout.setNormalSearchMode(mode == ListUrlBuilder.MODE_SUBSCRIPTION
@@ -897,7 +897,13 @@ public final class GalleryListScene extends SearchBarScene
             // Refresh
             case 1 -> mHelper.refresh();
             // Last page
-            case 2 -> mHelper.goTo("1", false);
+            case 2 -> {
+                if (mIsTopList) {
+                    mHelper.goTo(mHelper.getPages() - 1);
+                } else {
+                    mHelper.goTo("1", false);
+                }
+            }
         }
 
         view.setExpanded(false);

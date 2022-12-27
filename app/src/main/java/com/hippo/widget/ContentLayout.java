@@ -266,7 +266,7 @@ public class ContentLayout extends FrameLayout {
                         mCurrentTaskType = TYPE_NEXT_PAGE_KEEP_POS;
                         mCurrentTaskPage = mEndPage;
                         getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, mNext, true);
-                    } else if (mEndPage == mPages) {
+                    } else if (mStartPage > 0 && mEndPage == mPages) {
                         // Refresh last page
                         mCurrentTaskId = mIdGenerator.nextId();
                         mCurrentTaskType = TYPE_REFRESH_PAGE;
