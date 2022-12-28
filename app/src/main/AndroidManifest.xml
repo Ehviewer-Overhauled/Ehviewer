@@ -101,7 +101,6 @@
 
         <activity
             android:name="eu.kanade.tachiyomi.ui.reader.ReaderActivity"
-            android:colorMode="wideColorGamut"
             android:configChanges="screenSize"
             android:exported="true"
             android:launchMode="singleTask">

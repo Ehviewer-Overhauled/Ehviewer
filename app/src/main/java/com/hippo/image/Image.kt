@@ -69,10 +69,8 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
     companion object {
         val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
         val screenHeight = EhApplication.application.resources.displayMetrics.heightPixels
-        private val isWideColorGamut =
-            EhApplication.application.resources.configuration.isScreenWideColorGamut
-        val colorSpace =
-            ColorSpace.get(if (isWideColorGamut) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB)
+        val isWideColorGamut = EhApplication.application.resources.configuration.isScreenWideColorGamut
+        var colorSpace = ColorSpace.get(if (isWideColorGamut && EhApplication.readerPreferences.wideColorGamut().get()) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB)
 
         @Throws(DecodeException::class)
         @JvmStatic

@@ -735,5 +735,6 @@
     <string name="action_save">Save</string>
     <string name="action_save_to">Save to&#8230;</string>
     <string name="pref_category_for_this_series">For this series</string>
+    <string name="wide_color_gamut">Use Display P3 color space</string>
     <!-- Tachiyomi Reader End-->
 </resources>

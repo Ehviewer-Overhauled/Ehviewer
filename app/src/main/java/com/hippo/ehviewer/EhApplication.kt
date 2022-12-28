@@ -56,6 +56,8 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
+import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -344,5 +346,8 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
 
         @JvmStatic
         val favouriteStatusRouter by lazy { FavouriteStatusRouter() }
+
+        @JvmStatic
+        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }
     }
 }

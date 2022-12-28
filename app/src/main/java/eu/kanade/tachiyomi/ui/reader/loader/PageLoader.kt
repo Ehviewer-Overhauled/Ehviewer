@@ -28,6 +28,10 @@ abstract class PageLoader {
         mImageCache.evictAll()
     }
 
+    fun restart() {
+        mImageCache.evictAll()
+    }
+
     abstract fun size(): Int
 
     fun request(page: ReaderPage) {

@@ -1,6 +1,8 @@
 package eu.kanade.tachiyomi.ui.reader.setting
 
 import android.content.Context
+import android.content.pm.ActivityInfo
+import android.graphics.ColorSpace
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.annotation.ColorInt
@@ -12,7 +14,9 @@ import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import eu.kanade.tachiyomi.core.preference.getAndSet
 import com.hippo.ehviewer.databinding.ReaderColorFilterSettingsBinding
+import com.hippo.image.Image
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.util.preference.asHotFlow
 import eu.kanade.tachiyomi.util.preference.bindToPreference
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -31,9 +35,26 @@ class ReaderColorFilterSettings @JvmOverloads constructor(context: Context, attr
     init {
         addView(binding.root)
 
+        binding.wideColorGamut.isEnabled = Image.isWideColorGamut
+        if (!Image.isWideColorGamut)
+            readerPreferences.wideColorGamut().set(false)
+        binding.wideColorGamut.bindToPreference(readerPreferences.wideColorGamut())
+
+        readerPreferences.wideColorGamut().asHotFlow {
+            Image.colorSpace = ColorSpace.get(if (Image.isWideColorGamut && it) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB)
+            val colorMode = if (Image.isWideColorGamut && it) ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT else ActivityInfo.COLOR_MODE_DEFAULT
+            (context as ReaderActivity).run {
+                if (window.colorMode != colorMode) {
+                    window.colorMode = colorMode
+                    mGalleryProvider?.restart()
+                    setGallery()
+                }
+            }
+        }.launchIn((context as ReaderActivity).lifecycleScope)
+
         readerPreferences.colorFilter().changes()
             .onEach { setColorFilter(it) }
-            .launchIn((context as ReaderActivity).lifecycleScope)
+            .launchIn(context.lifecycleScope)
 
         readerPreferences.colorFilterMode().changes()
             .onEach { setColorFilter(readerPreferences.colorFilter().get()) }

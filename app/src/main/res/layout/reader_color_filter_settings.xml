@@ -9,6 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/wide_color_gamut"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/wide_color_gamut"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Brightness -->
 
         <com.google.android.material.materialswitch.MaterialSwitch
@@ -18,7 +28,7 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="16dp"
             android:text="@string/pref_custom_brightness"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/wide_color_gamut" />
 
         <!-- Brightness value -->
 
@@ -41,9 +51,9 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:padding="8dp"
+            android:stepSize="1.0"
             android:valueFrom="-75.0"
             android:valueTo="100.0"
-            android:stepSize="1.0"
             app:layout_constraintEnd_toStartOf="@id/txt_brightness_seekbar_value"
             app:layout_constraintStart_toEndOf="@id/txt_brightness_seekbar_icon"
             app:layout_constraintTop_toBottomOf="@id/custom_brightness" />
@@ -91,9 +101,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:padding="8dp"
             android:stepSize="1.0"
             android:valueTo="255.0"
-            android:padding="8dp"
             app:layout_constraintEnd_toStartOf="@id/txt_color_filter_red_value"
             app:layout_constraintStart_toEndOf="@id/color_filter_symbols_barrier"
             app:layout_constraintTop_toBottomOf="@id/switch_color_filter" />
@@ -129,9 +139,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:padding="8dp"
             android:stepSize="1.0"
             android:valueTo="255.0"
-            android:padding="8dp"
             app:layout_constraintEnd_toStartOf="@id/txt_color_filter_green_value"
             app:layout_constraintStart_toEndOf="@id/color_filter_symbols_barrier"
             app:layout_constraintTop_toBottomOf="@id/slider_color_filter_red" />
@@ -167,9 +177,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:padding="8dp"
             android:stepSize="1.0"
             android:valueTo="255.0"
-            android:padding="8dp"
             app:layout_constraintEnd_toStartOf="@id/txt_color_filter_blue_value"
             app:layout_constraintStart_toEndOf="@id/color_filter_symbols_barrier"
             app:layout_constraintTop_toBottomOf="@id/slider_color_filter_green" />
@@ -205,9 +215,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:padding="8dp"
             android:stepSize="1.0"
             android:valueTo="255.0"
-            android:padding="8dp"
             app:layout_constraintEnd_toStartOf="@id/txt_color_filter_alpha_value"
             app:layout_constraintStart_toEndOf="@id/color_filter_symbols_barrier"
             app:layout_constraintTop_toBottomOf="@id/slider_color_filter_blue" />

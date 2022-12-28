@@ -23,6 +23,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.ColorMatrix
@@ -72,16 +73,15 @@ import com.hippo.ehviewer.gallery.DirPageLoader
 import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
+import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
-import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
-import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
@@ -260,6 +260,7 @@ class ReaderActivity : EhActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.colorMode = if (Image.isWideColorGamut && readerPreferences.wideColorGamut().get()) ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT else ActivityInfo.COLOR_MODE_DEFAULT
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -599,7 +600,7 @@ class ReaderActivity : EhActivity() {
         const val KEY_PAGE = "page"
         const val KEY_CURRENT_INDEX = "current_index"
 
-        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(EhApplication.application)) }
+        val readerPreferences = EhApplication.readerPreferences
     }
 
     /* Tachiyomi funcs */
@@ -646,7 +647,8 @@ class ReaderActivity : EhActivity() {
         } else {
             if (readerPreferences.fullscreen().get()) {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                windowInsetsController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 
             if (animate) {
@@ -702,7 +704,8 @@ class ReaderActivity : EhActivity() {
         initBottomShortcuts()
 
         val toolbarBackground = MaterialShapeDrawable.createWithElevationOverlay(this).apply {
-            elevation = resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
+            elevation =
+                resources.getDimension(com.google.android.material.R.dimen.m3_sys_elevation_level2)
             alpha = if (isNightMode()) 230 else 242 // 90% dark 95% light
         }
         binding.toolbarBottom.background = toolbarBackground.copy(this@ReaderActivity)
@@ -748,7 +751,8 @@ class ReaderActivity : EhActivity() {
             setTooltip(R.string.pref_crop_borders)
 
             setOnClickListener {
-                val isPagerType = ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
+                val isPagerType =
+                    ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
                 if (isPagerType) {
                     readerPreferences.cropBorders().toggle()
                 } else {

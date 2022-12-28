@@ -106,5 +106,7 @@ class ReaderPreferences(private val preferenceStore: PreferenceStore) {
 
     fun showNavigationOverlayOnStart() = preferenceStore.getBoolean("reader_navigation_overlay_on_start", false)
 
+    fun wideColorGamut() = preferenceStore.getBoolean("wide_color_gamut", false)
+
     // endregion
 }

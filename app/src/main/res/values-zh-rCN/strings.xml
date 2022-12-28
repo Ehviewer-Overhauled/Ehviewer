@@ -672,5 +672,6 @@
     <string name="pref_navigate_pan">图片放大时先平移再翻页</string>
     <string name="rotation_reverse_portrait">反向竖屏</string>
     <string name="disabled_nav">关闭</string>
+    <string name="wide_color_gamut">使用Display P3色彩空间</string>
     <!-- Tachiyomi Reader End-->
 </resources>
