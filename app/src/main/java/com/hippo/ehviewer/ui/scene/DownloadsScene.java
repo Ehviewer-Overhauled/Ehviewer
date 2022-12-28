@@ -875,11 +875,13 @@ public class DownloadsScene extends ToolbarScene
     private static class DownloadLabelHolder extends RecyclerView.ViewHolder {
 
         private final TextView label;
+        private final ImageView edit;
         private final ImageView option;
 
         private DownloadLabelHolder(View itemView) {
             super(itemView);
             label = (TextView) ViewUtils.$$(itemView, R.id.tv_key);
+            edit = (ImageView) ViewUtils.$$(itemView, R.id.iv_edit);
             option = (ImageView) ViewUtils.$$(itemView, R.id.iv_option);
         }
     }
@@ -937,8 +939,8 @@ public class DownloadsScene extends ToolbarScene
                     }
                 });
                 if (position > 0) {
-                    holder.option.setVisibility(View.VISIBLE);
-                    holder.option.setOnClickListener(v -> {
+                    holder.edit.setVisibility(View.VISIBLE);
+                    holder.edit.setOnClickListener(v -> {
                         if (context != null) {
                             EditTextDialogBuilder builder = new EditTextDialogBuilder(
                                     context, label, getString(R.string.download_labels));
