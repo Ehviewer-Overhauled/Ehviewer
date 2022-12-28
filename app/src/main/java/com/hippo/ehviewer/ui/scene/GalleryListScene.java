@@ -685,6 +685,10 @@ public final class GalleryListScene extends SearchBarScene
                 getSuitableTitleForUrlBuilder(context.getResources(), urlBuilder, false), getString(R.string.quick_search));
         builder.setTitle(R.string.add_quick_search_dialog_title);
         builder.setPositiveButton(android.R.string.ok, null);
+        // TODO: It's ugly
+        final boolean[] checked = {Settings.getQSSaveProgress()};
+        final String[] hint = {getString(R.string.save_progress)};
+        builder.setMultiChoiceItems(hint, checked, (dialog, which, isChecked) -> checked[which] = isChecked);
         final AlertDialog dialog = builder.show();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
             String text = builder.getText().trim();
@@ -695,8 +699,11 @@ public final class GalleryListScene extends SearchBarScene
                 return;
             }
 
-            if (next != null) {
+            if (checked[0] && next != null) {
                 text += next;
+                Settings.putQSSaveProgress(true);
+            } else {
+                Settings.putQSSaveProgress(false);
             }
 
             // Check name duplicate

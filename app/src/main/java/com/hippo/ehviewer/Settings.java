@@ -194,6 +194,8 @@ public class Settings {
     private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static final String KEY_ARCHIVE_PASSWDS = "archive_passwds";
+    private static final String KEY_QS_SAVE_PROGRESS = "qs_save_progress";
+    private static final boolean DEFAULT_QS_SAVE_PROGRESS = true;
     public static boolean LIST_THUMB_SIZE_INITED = false;
     public static SharedPreferences sSettingsPre;
     private static int LIST_THUMB_SIZE = 40;
@@ -627,6 +629,14 @@ public class Settings {
 
     public static void putDefaultFavSlot(int value) {
         putInt(KEY_DEFAULT_FAV_SLOT, value);
+    }
+
+    public static boolean getQSSaveProgress() {
+        return getBoolean(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS);
+    }
+
+    public static void putQSSaveProgress(boolean value) {
+        putBoolean(KEY_QS_SAVE_PROGRESS, value);
     }
 
     public static boolean getSaveParseErrorBody() {
