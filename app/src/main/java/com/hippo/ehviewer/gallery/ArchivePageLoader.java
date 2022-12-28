@@ -335,12 +335,9 @@ public class ArchivePageLoader extends PageLoader2 {
                 Image image = null;
                 if (buffer != null) {
                     try {
-                        image = Image.decode(buffer, () -> {
-                            archiveAccessor.releaseByteBuffer(buffer);
-                            return null;
-                        });
+                        image = Image.decode(buffer.asReadOnlyBuffer());
                     } catch (ImageDecoder.DecodeException e) {
-                        archiveAccessor.releaseByteBuffer(buffer);
+                        UriArchiveAccessor.releaseByteBuffer(buffer);
                         e.printStackTrace();
                     }
                 }
