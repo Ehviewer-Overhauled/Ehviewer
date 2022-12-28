@@ -50,12 +50,13 @@ public final class SpiderDen {
     @Nullable
     private static SimpleDiskCache sCache;
     @Nullable
-    private UniFile mDownloadDir;
+    private final UniFile mDownloadDir;
     private final long mGid;
     private volatile int mMode = SpiderQueen.MODE_READ;
 
     public SpiderDen(GalleryInfo galleryInfo) {
         mGid = galleryInfo.gid;
+        mDownloadDir = getGalleryDownloadDir(galleryInfo);
     }
 
     public static void initialize(Context context) {
@@ -150,10 +151,6 @@ public final class SpiderDen {
     @Nullable
     public UniFile getDownloadDir() {
         return mDownloadDir != null && mDownloadDir.isDirectory() ? mDownloadDir : null;
-    }
-
-    public void setDownloadDir(UniFile dir) {
-        mDownloadDir = dir;
     }
 
     private boolean containInCache(int index) {
