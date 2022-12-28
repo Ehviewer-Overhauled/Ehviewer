@@ -69,7 +69,6 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.ReaderActivityBinding
 import com.hippo.ehviewer.gallery.ArchivePageLoader
-import com.hippo.ehviewer.gallery.DirPageLoader
 import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
@@ -197,13 +196,7 @@ class ReaderActivity : EhActivity() {
             return
         }
 
-        if (ACTION_DIR == mAction) {
-            if (mFilename != null) {
-                mGalleryProvider = DirPageLoader(
-                    UniFile.fromFile(File(mFilename!!))!!
-                )
-            }
-        } else if (ACTION_EH == mAction) {
+        if (ACTION_EH == mAction) {
             if (mGalleryInfo != null) {
                 mGalleryProvider =
                     EhPageLoader(mGalleryInfo)
@@ -591,7 +584,6 @@ class ReaderActivity : EhActivity() {
     }
 
     companion object {
-        const val ACTION_DIR = "dir"
         const val ACTION_EH = "eh"
         const val KEY_ACTION = "action"
         const val KEY_FILENAME = "filename"
