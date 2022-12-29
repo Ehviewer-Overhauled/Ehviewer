@@ -227,8 +227,8 @@ public class ContentLayout extends FrameLayout {
          */
         private int mPages;
         private int mNextPage;
-        private String mPrev;
-        private String mNext;
+        protected String mPrev;
+        protected String mNext;
         private int mCurrentTaskId;
         private int mCurrentTaskType;
         private int mCurrentTaskPage;

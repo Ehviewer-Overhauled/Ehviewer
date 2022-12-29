@@ -568,7 +568,7 @@ public class FavoritesScene extends SearchBarScene implements
                 .setSelection(toDate)
                 .build();
         datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
-        datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v));
+        datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v, true));
     }
 
     @Override
