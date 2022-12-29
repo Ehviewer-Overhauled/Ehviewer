@@ -896,7 +896,7 @@ public final class GalleryListScene extends SearchBarScene
                     .setSelection(toDate)
                     .build();
             datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
-            datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v));
+            datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v, true));
         }
     }
 

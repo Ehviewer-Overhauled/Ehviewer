@@ -355,8 +355,6 @@ open class ListUrlBuilder : Cloneable, Parcelable {
                 }
                 mJumpTo?.let {
                     ub.addQuery("seek", it)
-                    mPrev = null
-                    mNext = null
                 }
                 mPrev?.let {
                     ub.addQuery("prev", it)
