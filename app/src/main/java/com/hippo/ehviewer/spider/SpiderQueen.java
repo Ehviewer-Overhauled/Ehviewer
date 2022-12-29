@@ -844,10 +844,9 @@ public final class SpiderQueen implements Runnable {
         if (editor == null) return;
         try (OutputStream os = new FileOutputStream(editor.getData().toFile())) {
             spiderInfo.write(os);
-        } catch (IOException e) {
-            // Ignore
-        } finally {
             editor.commit();
+        } catch (IOException e) {
+            editor.abort();
         }
     }
 
