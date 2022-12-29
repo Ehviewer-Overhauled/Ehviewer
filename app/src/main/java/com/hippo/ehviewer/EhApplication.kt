@@ -32,9 +32,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.disk.DiskCache
 import com.hippo.Native
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.beerbelly.SimpleDiskCache
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
@@ -332,10 +332,8 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
 
         @JvmStatic
         val spiderInfoCache by lazy {
-            SimpleDiskCache(
-                File(application.cacheDir, "spider_info"),
-                20 * 1024 * 1024
-            )
+            DiskCache.Builder().directory(File(application.cacheDir, "spider_info"))
+                .maxSizeBytes(20 * 1024 * 1024).build()
         }
 
         @JvmStatic

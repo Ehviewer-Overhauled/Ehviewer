@@ -30,7 +30,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 
-import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
@@ -65,6 +64,7 @@ import com.hippo.yorozuya.thread.PriorityThreadFactory;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,6 +82,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import coil.disk.DiskCache;
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -112,7 +113,7 @@ public final class SpiderQueen implements Runnable {
     @NonNull
     private final OkHttpClient mHttpClient;
     @NonNull
-    private final SimpleDiskCache mSpiderInfoCache;
+    private final DiskCache mSpiderInfoCache;
     @NonNull
     private final GalleryInfo mGalleryInfo;
     @NonNull
@@ -689,21 +690,16 @@ public final class SpiderQueen implements Runnable {
         }
 
         // Read from cache
-        InputStreamPipe pipe = mSpiderInfoCache.getInputStreamPipe(Long.toString(mGalleryInfo.gid));
-        if (null != pipe) {
-            try {
-                pipe.obtain();
-                spiderInfo = SpiderInfo.read(pipe.open());
-                if (spiderInfo != null && spiderInfo.gid == mGalleryInfo.gid &&
-                        spiderInfo.token.equals(mGalleryInfo.token)) {
-                    return spiderInfo;
-                }
-            } catch (IOException e) {
-                // Ignore
-            } finally {
-                pipe.close();
-                pipe.release();
+        var entry = mSpiderInfoCache.get(Long.toString(mGalleryInfo.gid));
+        if (entry == null) return null;
+        try (entry; InputStream is = new FileInputStream(entry.getData().toFile())) {
+            spiderInfo = SpiderInfo.read(is);
+            if (spiderInfo != null && spiderInfo.gid == mGalleryInfo.gid &&
+                    spiderInfo.token.equals(mGalleryInfo.token)) {
+                return spiderInfo;
             }
+        } catch (IOException e) {
+            // Ignore
         }
 
         return null;
@@ -843,16 +839,15 @@ public final class SpiderQueen implements Runnable {
             }
         }
 
-        // Read from cache
-        OutputStreamPipe pipe = mSpiderInfoCache.getOutputStreamPipe(Long.toString(mGalleryInfo.gid));
-        try {
-            pipe.obtain();
-            spiderInfo.write(pipe.open());
+        // Write to cache
+        var editor = mSpiderInfoCache.edit(Long.toString(mGalleryInfo.gid));
+        if (editor == null) return;
+        try (OutputStream os = new FileOutputStream(editor.getData().toFile())) {
+            spiderInfo.write(os);
         } catch (IOException e) {
             // Ignore
         } finally {
-            pipe.close();
-            pipe.release();
+            editor.commit();
         }
     }
 
