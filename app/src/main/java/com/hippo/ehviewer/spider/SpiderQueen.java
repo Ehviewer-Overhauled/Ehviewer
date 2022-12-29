@@ -1238,9 +1238,7 @@ public final class SpiderQueen implements Runnable {
                     }
 
                     // disable Call Timeout for image-downloading requests
-                    Call call = mHttpClient.newBuilder()
-                            .callTimeout(0, TimeUnit.SECONDS).build()
-                            .newCall(new EhRequestBuilder(targetImageUrl, referer).build());
+                    Call call = mHttpClient.newCall(new EhRequestBuilder(targetImageUrl, referer).build());
                     Response response = call.execute();
                     ResponseBody responseBody = response.body();
 
