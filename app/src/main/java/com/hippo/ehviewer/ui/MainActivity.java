@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -638,9 +637,7 @@ public final class MainActivity extends StageActivity
         }
 
         @Override
-        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
-        }
+        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {}
 
         @Override
         public void onDrawerOpened(@NonNull View drawerView) {
@@ -648,14 +645,17 @@ public final class MainActivity extends StageActivity
         }
 
         @Override
-        public void onDrawerClosed(@NonNull View drawerView) {
-            if (!mLayout.isDrawerVisible(GravityCompat.START) && !mLayout.isDrawerVisible(GravityCompat.END))
-                setEnabled(false);
-        }
+        public void onDrawerClosed(@NonNull View drawerView) {}
 
         @Override
         public void onDrawerStateChanged(int newState) {
-
+            switch (newState) {
+                case DrawerLayout.STATE_DRAGGING, DrawerLayout.STATE_SETTLING -> setEnabled(true);
+                case DrawerLayout.STATE_IDLE -> {
+                    if (!mLayout.isDrawerVisible(GravityCompat.START) && !mLayout.isDrawerVisible(GravityCompat.END))
+                        setEnabled(false);
+                }
+            }
         }
     }
 }
