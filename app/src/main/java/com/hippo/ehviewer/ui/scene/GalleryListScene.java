@@ -48,6 +48,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -933,12 +934,12 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         if (expanded) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
             mActionFabDrawable.setDelete(ANIMATE_TIME);
         } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.LEFT);
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
             mActionFabDrawable.setAdd(ANIMATE_TIME);
         }
     }
@@ -1237,23 +1238,23 @@ public final class GalleryListScene extends SearchBarScene
     @Override
     public void onStartDragHandler() {
         // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
     }
 
     @Override
     public void onEndDragHandler() {
         // Restore right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
         showSearchBar();
     }
 
     public void onStateChange(int newState) {
         if (newState == STATE_NORMAL || newState == STATE_SIMPLE_SEARCH) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.LEFT);
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
         } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
         }
     }
 
@@ -1462,7 +1463,7 @@ public final class GalleryListScene extends SearchBarScene
                     var i = q.name.lastIndexOf("@");
                     mHelper.goTo(i != -1 ? q.name.substring(i + 1) : null, true);
                     setState(STATE_NORMAL);
-                    closeDrawer(Gravity.RIGHT);
+                    closeDrawer(GravityCompat.END);
                 });
             } else {
                 int[] keywords = {11, 12, 13, 15};
@@ -1478,7 +1479,7 @@ public final class GalleryListScene extends SearchBarScene
                     onUpdateUrlBuilder();
                     mHelper.refresh();
                     setState(STATE_NORMAL);
-                    closeDrawer(Gravity.RIGHT);
+                    closeDrawer(GravityCompat.END);
                 });
             }
         }

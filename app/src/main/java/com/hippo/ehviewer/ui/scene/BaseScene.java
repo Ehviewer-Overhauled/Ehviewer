@@ -33,6 +33,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -76,6 +77,14 @@ public abstract class BaseScene extends SceneFragment {
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).setDrawerLockMode(lockMode, edgeGravity);
         }
+    }
+
+    public Integer getDrawerLockMode(int edgeGravity) {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof MainActivity) {
+            return ((MainActivity) activity).getDrawerLockMode(edgeGravity);
+        }
+        return null;
     }
 
     public void openDrawer(int drawerGravity) {
@@ -190,9 +199,9 @@ public abstract class BaseScene extends SceneFragment {
 
         // Update left drawer locked state
         if (needShowLeftDrawer()) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.LEFT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
         } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
         }
 
         // Update nav checked item

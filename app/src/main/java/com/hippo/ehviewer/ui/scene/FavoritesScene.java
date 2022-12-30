@@ -33,6 +33,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -435,21 +436,21 @@ public class FavoritesScene extends SearchBarScene implements
     @Override
     public void onStartDragHandler() {
         // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
     }
 
     @Override
     public void onEndDragHandler() {
         // Restore right drawer
         if (null != mRecyclerView && !mRecyclerView.isInCustomChoice()) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
         }
 
         showSearchBar();
     }
 
     public boolean onItemClick(int position) {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.END)) {
             // Skip if in search mode
             if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
                 return true;
@@ -475,7 +476,7 @@ public class FavoritesScene extends SearchBarScene implements
             updateJumpFab();
             mHelper.refresh();
 
-            closeDrawer(Gravity.RIGHT);
+            closeDrawer(GravityCompat.END);
 
         } else {
             if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
@@ -673,8 +674,8 @@ public class FavoritesScene extends SearchBarScene implements
             mHelper.setRefreshLayoutEnable(false);
         }
         // Lock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
     }
 
     @Override
@@ -688,8 +689,8 @@ public class FavoritesScene extends SearchBarScene implements
             mHelper.setRefreshLayoutEnable(true);
         }
         // Unlock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.LEFT);
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
     }
 
     @Override

@@ -10,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.CallSuper
+import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -77,14 +79,35 @@ abstract class SearchBarScene : ToolbarScene() {
         return view.apply { addView(contentView, 0) }
     }
 
+    private var privLockModeStart: Int? = null
+    private var privLockModeEnd: Int? = null
+
     @CallSuper
     open fun onSearchViewExpanded() {
+        privLockModeStart = getDrawerLockMode(GravityCompat.START)
+        privLockModeEnd = getDrawerLockMode(GravityCompat.END)
+        privLockModeStart?.let {
+            setDrawerLockMode(
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
+                GravityCompat.START
+            )
+        }
+        privLockModeEnd?.let {
+            setDrawerLockMode(
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
+                GravityCompat.END
+            )
+        }
         (requireActivity() as StageActivity).updateBackPressCallBackStatus()
         updateSuggestions()
     }
 
     @CallSuper
     open fun onSearchViewHidden() {
+        privLockModeStart?.let { setDrawerLockMode(it, GravityCompat.START) }
+        privLockModeStart = null
+        privLockModeEnd?.let { setDrawerLockMode(it, GravityCompat.END) }
+        privLockModeEnd = null
         (requireActivity() as StageActivity).updateBackPressCallBackStatus()
     }
 
@@ -311,7 +334,8 @@ abstract class SearchBarScene : ToolbarScene() {
                     val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     if (s.isNotEmpty()) {
                         val keyword = s[s.size - 1]
-                        val translate = Settings.getShowTagTranslations() && isTranslatable(requireContext())
+                        val translate =
+                            Settings.getShowTagTranslations() && isTranslatable(requireContext())
                         suggestFlow(keyword, translate, true).collect {
                             emit(TagSuggestion(it.first, it.second))
                         }

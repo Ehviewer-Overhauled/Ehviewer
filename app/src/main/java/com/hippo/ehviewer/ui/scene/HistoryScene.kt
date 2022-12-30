@@ -25,6 +25,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -190,7 +191,7 @@ class HistoryScene : ToolbarScene() {
 
     @SuppressLint("RtlHardcoded")
     override fun onNavigationClick() {
-        toggleDrawer(Gravity.LEFT)
+        toggleDrawer(GravityCompat.START)
     }
 
     override fun getMenuResId(): Int {

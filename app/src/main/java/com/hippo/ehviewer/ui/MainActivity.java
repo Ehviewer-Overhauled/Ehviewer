@@ -485,9 +485,9 @@ public final class MainActivity extends StageActivity
                     baseScene.getLayoutInflater(), mRightDrawer, null);
             if (drawerView != null) {
                 mRightDrawer.addView(drawerView);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
             } else {
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
             }
         }
     }
@@ -517,6 +517,13 @@ public final class MainActivity extends StageActivity
         if (mDrawerLayout != null) {
             mDrawerLayout.setDrawerLockMode(lockMode, edgeGravity);
         }
+    }
+
+    public Integer getDrawerLockMode(int edgeGravity) {
+        if (mDrawerLayout != null) {
+            return mDrawerLayout.getDrawerLockMode(edgeGravity);
+        }
+        return null;
     }
 
     public void openDrawer(int drawerGravity) {
