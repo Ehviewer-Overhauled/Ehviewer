@@ -426,8 +426,6 @@ public class FavoritesScene extends SearchBarScene implements
             mFabLayout.toggle();
         } else if (mSearchMode) {
             exitSearchMode();
-        } else if (isSearchViewShown()) {
-            hideSearchView();
         } else {
             finish();
         }

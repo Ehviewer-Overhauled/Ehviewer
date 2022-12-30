@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchBar
 import com.google.android.material.search.SearchView
+import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
@@ -75,8 +77,15 @@ abstract class SearchBarScene : ToolbarScene() {
             else if (newState == SearchView.TransitionState.HIDING)
                 onSearchViewHidden()
         }
+        mSearchView?.addTransitionListener(mSearchViewOnBackPressedCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
         return view.apply { addView(contentView, 0) }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mSearchViewOnBackPressedCallback.remove()
     }
 
     private var privLockModeStart: Int? = null
@@ -150,14 +159,6 @@ abstract class SearchBarScene : ToolbarScene() {
 
     fun setAllowEmptySearch(allowEmptySearch: Boolean) {
         mAllowEmptySearch = allowEmptySearch
-    }
-
-    fun isSearchViewShown(): Boolean {
-        return mSearchView?.isShowing ?: false
-    }
-
-    fun hideSearchView() {
-        mSearchView?.hide()
     }
 
     private fun wrapTagKeyword(keyword: String): String {
@@ -355,4 +356,22 @@ abstract class SearchBarScene : ToolbarScene() {
     fun showSearchBar() {
         mAppBarLayout?.setExpanded(true)
     }
+
+    private val mSearchViewOnBackPressedCallback =
+        object : OnBackPressedCallback(false), TransitionListener {
+            override fun handleOnBackPressed() {
+                mSearchView?.hide()
+            }
+
+            override fun onStateChanged(
+                searchView: SearchView,
+                previousState: SearchView.TransitionState,
+                newState: SearchView.TransitionState
+            ) {
+                if (newState == SearchView.TransitionState.SHOWING)
+                    isEnabled = true
+                else if (newState == SearchView.TransitionState.HIDING)
+                    isEnabled = false
+            }
+        }
 }

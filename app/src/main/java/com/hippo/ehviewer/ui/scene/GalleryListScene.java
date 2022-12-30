@@ -783,17 +783,11 @@ public final class GalleryListScene extends SearchBarScene
         if (null != mFabLayout && mFabLayout.isExpanded()) {
             return false;
         }
-        if (isSearchViewShown())
-            return false;
         return mState == STATE_NORMAL && getStackIndex() == 0;
     }
 
     @Override
     public void onBackPressed() {
-        if (isSearchViewShown()) {
-            hideSearchView();
-            return;
-        }
         if (null != mFabLayout && mFabLayout.isExpanded()) {
             mFabLayout.setExpanded(false);
             return;
