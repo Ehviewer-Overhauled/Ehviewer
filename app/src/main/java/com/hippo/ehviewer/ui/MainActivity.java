@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
@@ -40,6 +41,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
@@ -49,7 +51,6 @@ import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
@@ -287,6 +288,9 @@ public final class MainActivity extends StageActivity
         mDrawerLayout = (DrawerLayout) ViewUtils.$$(this, R.id.draw_view);
         mNavView = (NavigationView) ViewUtils.$$(this, R.id.nav_view);
         mRightDrawer = (DrawerView) ViewUtils.$$(this, R.id.right_drawer);
+        var callback = new DrawerOnBackPressedCallback(false, mDrawerLayout);
+        mDrawerLayout.addDrawerListener(callback);
+        getOnBackPressedDispatcher().addCallback(callback);
 
         if (mNavView != null) {
             mNavView.setNavigationItemSelectedListener(this);
@@ -566,17 +570,6 @@ public final class MainActivity extends StageActivity
         }
     }
 
-    @SuppressLint("RtlHardcoded")
-    @Override
-    public void onBackPressed() {
-        if (mDrawerLayout != null && (mDrawerLayout.isDrawerOpen(Gravity.LEFT) ||
-                mDrawerLayout.isDrawerOpen(Gravity.RIGHT))) {
-            mDrawerLayout.closeDrawers();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Don't select twice
@@ -622,5 +615,40 @@ public final class MainActivity extends StageActivity
         }
 
         return true;
+    }
+
+    static class DrawerOnBackPressedCallback extends OnBackPressedCallback implements DrawerLayout.DrawerListener {
+        private final DrawerLayout mLayout;
+
+        public DrawerOnBackPressedCallback(boolean enabled, DrawerLayout drawerLayout) {
+            super(enabled);
+            mLayout = drawerLayout;
+        }
+
+        @Override
+        public void handleOnBackPressed() {
+            mLayout.closeDrawers();
+        }
+
+        @Override
+        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+        }
+
+        @Override
+        public void onDrawerOpened(@NonNull View drawerView) {
+            setEnabled(true);
+        }
+
+        @Override
+        public void onDrawerClosed(@NonNull View drawerView) {
+            if (!mLayout.isDrawerVisible(GravityCompat.START) && !mLayout.isDrawerVisible(GravityCompat.END))
+                setEnabled(false);
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+
+        }
     }
 }
