@@ -55,6 +55,7 @@ abstract class EhActivity : AppCompatActivity() {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
         super.onCreate(savedInstanceState)
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isNightMode()
         (application as EhApplication).registerActivity(this)
     }
 

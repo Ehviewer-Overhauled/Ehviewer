@@ -20,17 +20,21 @@
         <item name="dividerColor">@color/divider</item>
         <item name="tagGroupBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="tagBackgroundColor">?attr/colorTertiaryContainer</item>
-
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
 
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Window No Action Bar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">true</item>
+
+        <!-- Transparent Status Bar -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- Transparent Navigation Bar -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
 
         <!-- Apply blur on Android 12 above -->
         <item name="materialCalendarTheme">@style/MaterialCalendarTheme</item>
