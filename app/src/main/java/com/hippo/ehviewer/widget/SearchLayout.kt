@@ -207,8 +207,15 @@ class SearchLayout @JvmOverloads constructor(
                 if (mEnableAdvance) {
                     urlBuilder.advanceSearch = mTableAdvanceSearch.advanceSearch
                     urlBuilder.minRating = mTableAdvanceSearch.minRating
-                    urlBuilder.pageFrom = mTableAdvanceSearch.pageFrom
-                    urlBuilder.pageTo = mTableAdvanceSearch.pageTo
+                    val pageFrom = mTableAdvanceSearch.pageFrom
+                    val pageTo = mTableAdvanceSearch.pageTo
+                    if (pageTo != -1 && pageTo < 10) {
+                        throw EhException(context.getString(R.string.search_sp_err1))
+                    } else if (pageFrom != -1 && pageTo != -1 && pageTo - pageFrom < 20) {
+                        throw EhException(context.getString(R.string.search_sp_err2))
+                    }
+                    urlBuilder.pageFrom = pageFrom
+                    urlBuilder.pageTo = pageTo
                 }
             }
 
