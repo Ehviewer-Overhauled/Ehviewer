@@ -23,6 +23,8 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
+
+        <!-- Non-overhead workaround for ROMs enable it by default, MIUI etc. -->
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
 
         <!-- Window No Action Bar -->
