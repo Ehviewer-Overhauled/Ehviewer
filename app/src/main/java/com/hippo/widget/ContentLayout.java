@@ -251,9 +251,8 @@ public class ContentLayout extends FrameLayout {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (!mRefreshLayout.isRefreshing() && !recyclerView.canScrollVertically(1)) {
-                    // Get next page
-                    mBottomProgress.show();
                     if (mNext != null || mEndPage < mPages) {
+                        mBottomProgress.show();
                         // Get next page
                         // Fill pages before NextPage with empty list
                         while (mNextPage > mEndPage && mEndPage < mPages) {
@@ -267,14 +266,12 @@ public class ContentLayout extends FrameLayout {
                         mCurrentTaskPage = mEndPage;
                         getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, mNext, true);
                     } else if (mStartPage > 0 && mEndPage == mPages) {
+                        mBottomProgress.show();
                         // Refresh last page
                         mCurrentTaskId = mIdGenerator.nextId();
                         mCurrentTaskType = TYPE_REFRESH_PAGE;
                         mCurrentTaskPage = mEndPage - 1;
                         getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true);
-                    } else {
-                        Log.e(TAG, "Try to footer refresh, but mEndPage = " + mEndPage + ", mPages = " + mPages);
-                        mBottomProgress.hide();
                     }
                 }
             }
