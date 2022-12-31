@@ -51,7 +51,6 @@
     <string name="error_unknown">不明なエラー</string>
     <string name="error_cant_find_activity">アクティビティが見つかりません。</string>
     <string name="error_cannot_parse_the_url">リンクを解析できません。</string>
-    <string name="error_not_folder_path">フォルダが見つかりません。</string>
     <string name="error_decoding_failed">デコードに失敗しました。</string>
     <string name="error_reading_failed">読み込めませんでした。</string>
     <string name="error_out_of_range">範囲外です。</string>

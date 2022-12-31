@@ -53,7 +53,6 @@
     <string name="error_unknown">Raro</string>
     <string name="error_cant_find_activity">No se encuentra la aplicación</string>
     <string name="error_cannot_parse_the_url">No se puede analizar el URL</string>
-    <string name="error_not_folder_path">Sin ruta del directorio</string>
     <string name="error_decoding_failed">Decodificación fallida</string>
     <string name="error_reading_failed">Lectura Fallida</string>
     <string name="error_out_of_range">Fuera de rango</string>

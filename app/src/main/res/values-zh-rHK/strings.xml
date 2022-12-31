@@ -56,7 +56,6 @@
     <string name="error_unknown">奇怪的錯誤</string>
     <string name="error_cant_find_activity">找不到相應的應用</string>
     <string name="error_cannot_parse_the_url">無法解析鏈接</string>
-    <string name="error_not_folder_path">非文件夾路徑</string>
     <string name="error_decoding_failed">解碼失敗</string>
     <string name="error_reading_failed">讀取失敗</string>
     <string name="error_out_of_range">越界</string>
@@ -567,7 +566,6 @@
     <string name="download_all">全部</string>
     <string name="custom_filter">濾鏡</string>
     <string name="gray_background">灰色</string>
-    <string name="pref_category_for_this_series">適用於這套叢書</string>
     <string name="webtoon_side_padding_25">25%</string>
     <string name="webtoon_side_padding_20">20%</string>
     <string name="webtoon_side_padding_15">15%</string>

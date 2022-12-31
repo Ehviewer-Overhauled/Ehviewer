@@ -45,7 +45,6 @@
     <string name="error_unknown">Unbekannter Fehler</string>
     <string name="error_cant_find_activity">Die Application wurde nicht gefunden</string>
     <string name="error_cannot_parse_the_url">Die URL konnte analysiert nicht werden</string>
-    <string name="error_not_folder_path">Der Ordnerpfad ist ungültig</string>
     <string name="error_decoding_failed">Dekodierung fehlgeschlagen</string>
     <string name="error_reading_failed">Lesefehler</string>
     <string name="error_out_of_range">Außer Reichweite</string>

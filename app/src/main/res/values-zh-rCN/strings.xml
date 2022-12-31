@@ -56,7 +56,6 @@
     <string name="error_unknown">奇怪的错误</string>
     <string name="error_cant_find_activity">找不到相应的应用</string>
     <string name="error_cannot_parse_the_url">无法解析链接</string>
-    <string name="error_not_folder_path">非文件夹路径</string>
     <string name="error_decoding_failed">解码失败</string>
     <string name="error_reading_failed">读取失败</string>
     <string name="error_out_of_range">越界</string>
@@ -644,7 +643,6 @@
     <string name="pref_webtoon_side_padding">侧边填充</string>
     <string name="vertical_plus_viewer">从上到下（连续）</string>
     <string name="gray_background">灰色</string>
-    <string name="pref_category_for_this_series">本作品</string>
     <string name="viewer">阅读模式</string>
     <string name="tapping_inverted_both">水平 + 垂直</string>
     <string name="tapping_inverted_vertical">垂直</string>

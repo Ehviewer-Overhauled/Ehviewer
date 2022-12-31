@@ -55,7 +55,6 @@
     <string name="error_unknown">이상함</string>
     <string name="error_cant_find_activity">앱을 찾을 수 없음</string>
     <string name="error_cannot_parse_the_url">URL을 분석할 수 없음</string>
-    <string name="error_not_folder_path">폴더 경로가 아님</string>
     <string name="error_decoding_failed">디코딩 실패</string>
     <string name="error_reading_failed">읽기 실패</string>
     <string name="error_out_of_range">범위 초과</string>

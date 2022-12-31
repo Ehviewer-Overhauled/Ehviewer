@@ -53,7 +53,6 @@
     <string name="error_unknown">Erreur inconnue</string>
     <string name="error_cant_find_activity">Impossible de trouver l\'application</string>
     <string name="error_cannot_parse_the_url">Impossible de parser le lien URL</string>
-    <string name="error_not_folder_path">Chemin de dossier invalide</string>
     <string name="error_decoding_failed">Échec de décodage</string>
     <string name="error_reading_failed">Échec de lecture</string>
     <string name="error_out_of_range">Hors de portée</string>
