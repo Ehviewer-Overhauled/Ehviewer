@@ -30,9 +30,11 @@
         <item name="windowNoTitle">true</item>
 
         <!-- Transparent Status Bar -->
+        <item name="android:windowLightStatusBar">?isLightTheme</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
 
         <!-- Transparent Navigation Bar -->
+        <item name="android:windowLightNavigationBar">?isLightTheme</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
 

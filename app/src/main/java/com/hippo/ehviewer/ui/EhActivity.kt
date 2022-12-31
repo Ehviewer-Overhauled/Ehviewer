@@ -26,7 +26,6 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -54,8 +53,6 @@ abstract class EhActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
         super.onCreate(savedInstanceState)
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isNightMode()
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isNightMode()
         (application as EhApplication).registerActivity(this)
     }
 
