@@ -1311,7 +1311,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         menu.add(resources.getString(android.R.string.copy));
         menuId.add(R.id.copy);
-        if (!tag.equals(tv.getText().toString())) {
+        if (!tag2.equals(tv.getText().toString())) {
             menu.add(resources.getString(R.string.copy_trans));
             menuId.add(R.id.copy_trans);
         }
