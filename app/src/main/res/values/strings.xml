@@ -284,6 +284,8 @@
     <string name="comment_successfully">Comment post successfully</string>
     <string name="comment_failed">Failed to post the comment</string>
     <string name="copy_comment_text">Copy comment text</string>
+    <string name="block_commenter">Block the commenter</string>
+    <string name="filter_the_commenter">Block the commenter \"%s\"?</string>
     <string name="edit_comment">Edit comment</string>
     <string name="edit_comment_successfully">The comment has been edited</string>
     <string name="edit_comment_failed">Failed to edit the comment</string>
@@ -355,17 +357,19 @@
     <string name="clear_all_history">Clear all history?</string>
 
     <!-- Filter -->
-    <string name="filter">Block gallery</string>
+    <string name="filter">Blockers</string>
     <string name="filter_title">Title</string>
     <string name="filter_uploader">Uploader</string>
     <string name="filter_tag">Tag</string>
     <string name="filter_tag_namespace">Tag namespace</string>
+    <string name="filter_commenter">Commenter</string>
+    <string name="filter_comment">Comment Regex</string>
     <string name="delete_filter">Delete blocker \"%s\"?</string>
     <string name="tip">Tip</string>
     <string name="add_filter">Add blocker</string>
     <string name="show_definition">Show definition</string>
     <string name="filter_text">Blocker text</string>
-    <string name="filter_tip">This blocking system filters the result of EHentai website blocking system.\n\nTitle Blocker: exclude the gallery whose title contains the word.\n\nUploader Blocker: exclude the gallery which was uploaded by the uploader.\n\nTag Blocker: exclude the gallery which contain the tag, it takes more time to get gallery list.\n\nTag Namespace Blocker: exclude the gallery which contain the tag namespace, it takes more time to get gallery list.</string>
+    <string name="filter_tip">This blocking system filters the result of EHentai website blocking system.\n\nTitle Blocker: exclude the gallery whose title contains the word.\n\nUploader Blocker: exclude the gallery which was uploaded by the uploader.\n\nTag Blocker: exclude the gallery which contain the tag, it takes more time to get gallery list.\n\nTag Namespace Blocker: exclude the gallery which contain the tag namespace, it takes more time to get gallery list.\n\nCommenter Blocker: exclude the comments posted by the commenter.\n\nComment Blocker: exclude the comments matching the regex.</string>
 
     <!-- Set Security -->
 
@@ -427,8 +431,8 @@
     <string name="settings_eh_tag_translations_source_url">https://placeholder</string>
     <string name="settings_eh_preview_num">The maximum number of previews on the gallery details page</string>
     <string name="settings_eh_preview_num_summary">For historical reasons, large value could cause lag</string>
-    <string name="settings_eh_filter">Block gallery</string>
-    <string name="settings_eh_filter_summary">Block gallery by title, uploader and tags</string>
+    <string name="settings_eh_filter">Blockers</string>
+    <string name="settings_eh_filter_summary">Block gallery or comment by title, uploader, tags and commenter</string>
 
     <string name="settings_read_volume_page">Use volume key to turn pages</string>
     <string name="settings_read_reverse_volume">Reverse volume key</string>

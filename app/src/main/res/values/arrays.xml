@@ -178,6 +178,8 @@
         <item>@string/filter_uploader</item>
         <item>@string/filter_tag</item>
         <item>@string/filter_tag_namespace</item>
+        <item>@string/filter_commenter</item>
+        <item>@string/filter_comment</item>
     </string-array>
 
     <string-array name="app_language_entries">
