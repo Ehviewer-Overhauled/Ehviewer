@@ -274,7 +274,7 @@ abstract class SearchBarScene : ToolbarScene() {
                     temp = text.substring(0, text.lastIndexOf(" ")) + " " + temp
                 }
                 it.setText(temp)
-                it.setSelection(text.length)
+                it.setSelection(temp.length)
             }
         }
     }
