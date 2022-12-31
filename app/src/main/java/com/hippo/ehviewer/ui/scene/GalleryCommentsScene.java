@@ -62,6 +62,7 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.UrlOpener;
 import com.hippo.ehviewer.WindowInsetsAnimationHelper;
 import com.hippo.ehviewer.client.EhClient;
+import com.hippo.ehviewer.client.EhFilter;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.data.GalleryComment;
@@ -69,6 +70,7 @@ import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
+import com.hippo.ehviewer.dao.Filter;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
@@ -265,6 +267,45 @@ public final class GalleryCommentsScene extends ToolbarScene
         onBackPressed();
     }
 
+    private void showFilterCommenterDialog(String commenter, int position) {
+        Context context = getContext();
+        if (context == null || commenter == null) {
+            return;
+        }
+
+        new BaseDialogBuilder(context)
+                .setMessage(getString(R.string.filter_the_commenter, commenter))
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    Filter filter = new Filter();
+                    filter.mode = EhFilter.MODE_COMMENTER;
+                    filter.text = commenter;
+                    EhFilter.getInstance().addFilter(filter);
+                    hideComment(position);
+                    showTip(R.string.filter_added, LENGTH_SHORT);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void hideComment(int position) {
+        if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
+            return;
+        }
+
+        GalleryComment[] oldCommentsList = mGalleryDetail.comments.comments;
+        GalleryComment[] newCommentsList = new GalleryComment[oldCommentsList.length - 1];
+        for (int i = 0, j = 0; i < oldCommentsList.length; i++) {
+            if (i != position) {
+                newCommentsList[j] = oldCommentsList[i];
+                j++;
+            }
+        }
+
+        mGalleryDetail.comments.comments = newCommentsList;
+        mAdapter.notifyDataSetChanged();
+        updateView(true);
+    }
+
     private void voteComment(long id, int vote) {
         Context context = getContext();
         MainActivity activity = getMainActivity();
@@ -339,6 +380,10 @@ public final class GalleryCommentsScene extends ToolbarScene
 
         menu.add(resources.getString(R.string.copy_comment_text));
         menuId.add(R.id.copy);
+        if (!comment.uploader && !comment.editable) {
+            menu.add(resources.getString(R.string.block_commenter));
+            menuId.add(R.id.block_commenter);
+        }
         if (comment.editable) {
             menu.add(resources.getString(R.string.edit_comment));
             menuId.add(R.id.edit_comment);
@@ -364,6 +409,8 @@ public final class GalleryCommentsScene extends ToolbarScene
                     int id = menuId.get(which);
                     if (id == R.id.copy) {
                         ClipboardUtilKt.addTextToClipboard(requireActivity(), comment.comment, false);
+                    } else if (id == R.id.block_commenter) {
+                        showFilterCommenterDialog(comment.user, position);
                     } else if (id == R.id.vote_up) {
                         voteComment(comment.id, 1);
                     } else if (id == R.id.vote_down) {

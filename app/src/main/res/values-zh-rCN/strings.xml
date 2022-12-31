@@ -238,6 +238,8 @@
     <string name="comment_successfully">评论成功</string>
     <string name="comment_failed">评论失败</string>
     <string name="copy_comment_text">复制评论文字</string>
+    <string name="block_commenter">屏蔽评论者</string>
+    <string name="filter_the_commenter">屏蔽评论者“%s”？</string>
     <string name="edit_comment">修改评论</string>
     <string name="edit_comment_successfully">评论已被修改</string>
     <string name="edit_comment_failed">修改评论失败</string>
@@ -309,17 +311,19 @@
     <string name="clear_all_history">清除所有阅读历史？</string>
 
     <!-- Filter -->
-    <string name="filter">屏蔽画廊</string>
+    <string name="filter">屏蔽列表</string>
     <string name="filter_title">标题</string>
     <string name="filter_uploader">上传者</string>
     <string name="filter_tag">标签</string>
     <string name="filter_tag_namespace">标签组</string>
+    <string name="filter_commenter">评论者</string>
+    <string name="filter_comment">评论</string>
     <string name="delete_filter">删除屏蔽项“%s”？</string>
     <string name="tip">提示</string>
     <string name="add_filter">添加屏蔽项</string>
     <string name="show_definition">查看定义</string>
     <string name="filter_text">屏蔽项文本</string>
-    <string name="filter_tip">该屏蔽系统会在 EHentai 网站屏蔽系统的基础上继续屏蔽画廊。\n\n标题屏蔽项：排除标题含有该关键字的画廊。\n\n上传者屏蔽项：排除该上传者上传的画廊。\n\n标签屏蔽项：排除包含该标签的画廊，这会使获取画廊列表花费更多时间。\n\n标签组屏蔽项：排除包含该标签组的画廊，这会使获取画廊列表花费更多时间。</string>
+    <string name="filter_tip">该屏蔽系统会在 EHentai 网站屏蔽系统的基础上继续屏蔽画廊。\n\n标题屏蔽项：排除标题含有该关键字的画廊。\n\n上传者屏蔽项：排除该上传者上传的画廊。\n\n标签屏蔽项：排除包含该标签的画廊，这会使获取画廊列表花费更多时间。\n\n标签组屏蔽项：排除包含该标签组的画廊，这会使获取画廊列表花费更多时间。\n\n评论者屏蔽项：排除该评论者发布的评论。\n\n评论屏蔽项：排除匹配该正则表达式的评论。</string>
 
     <!-- Set Security -->
 
@@ -382,8 +386,8 @@
     <string name="settings_eh_tag_translations_source_url">https://github.com/EhTagTranslation/Editor/wiki</string>
     <string name="settings_eh_preview_num">画廊详情页预览图最大数量</string>
     <string name="settings_eh_preview_num_summary">由于历史因素，此值过大会导致卡顿</string>
-    <string name="settings_eh_filter">屏蔽画廊</string>
-    <string name="settings_eh_filter_summary">根据标题、上传者、标签屏蔽画廊</string>
+    <string name="settings_eh_filter">屏蔽列表</string>
+    <string name="settings_eh_filter_summary">根据标题、上传者、标签、评论者屏蔽画廊或评论</string>
 
     <string name="settings_read_volume_page">使用音量键翻页</string>
     <string name="settings_read_reverse_volume">翻转音量键</string>

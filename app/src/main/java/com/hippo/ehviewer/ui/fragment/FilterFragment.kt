@@ -264,10 +264,14 @@ class FilterFragment : BaseFragment() {
         private val mUploaderFilterList: List<Filter> = mEhFilter.uploaderFilterList
         private val mTagFilterList: List<Filter> = mEhFilter.tagFilterList
         private val mTagNamespaceFilterList: List<Filter> = mEhFilter.tagNamespaceFilterList
+        private val mCommenterFilterList: List<Filter> = mEhFilter.commenterFilterList
+        private val mCommentFilterList: List<Filter> = mEhFilter.commentFilterList
         private var mTitleHeader: Filter? = null
         private var mUploaderHeader: Filter? = null
         private var mTagHeader: Filter? = null
         private var mTagNamespaceHeader: Filter? = null
+        private var mCommenterHeader: Filter? = null
+        private var mCommentHeader: Filter? = null
         fun size(): Int {
             var count = 0
             var size = mTitleFilterList.size
@@ -277,6 +281,10 @@ class FilterFragment : BaseFragment() {
             size = mTagFilterList.size
             count += if (0 == size) 0 else size + 1
             size = mTagNamespaceFilterList.size
+            count += if (0 == size) 0 else size + 1
+            size = mCommenterFilterList.size;
+            count += if (0 == size) 0 else size + 1
+            size = mCommentFilterList.size;
             count += if (0 == size) 0 else size + 1
             return count
         }
@@ -317,6 +325,24 @@ class FilterFragment : BaseFragment() {
                 }
                 return mTagNamespaceHeader!!
             }
+        private val commenterHeader: Filter
+            get() {
+                if (null == mCommenterHeader) {
+                    mCommenterHeader = Filter()
+                    mCommenterHeader!!.mode = MODE_HEADER
+                    mCommenterHeader!!.text = getString(R.string.filter_commenter)
+                }
+                return mCommenterHeader!!
+            }
+        private val commentHeader: Filter
+            get() {
+                if (null == mCommentHeader) {
+                    mCommentHeader = Filter()
+                    mCommentHeader!!.mode = MODE_HEADER
+                    mCommentHeader!!.text = getString(R.string.filter_comment)
+                }
+                return mCommentHeader!!
+            }
 
         operator fun get(index: Int): Filter {
             var index1 = index
@@ -356,6 +382,26 @@ class FilterFragment : BaseFragment() {
                     return tagNamespaceHeader
                 } else if (index1 <= size) {
                     return mTagNamespaceFilterList[index1 - 1]
+                } else {
+                    size + 1
+                }
+            }
+            size = mCommenterFilterList.size
+            if (0 != size) {
+                index1 -= if (index1 == 0) {
+                    return commenterHeader
+                } else if (index1 <= size) {
+                    return mCommenterFilterList[index1 - 1]
+                } else {
+                    size + 1
+                }
+            }
+            size = mCommentFilterList.size
+            if (0 != size) {
+                if (index1 == 0) {
+                    return commentHeader
+                } else if (index1 <= size) {
+                    return mCommentFilterList[index1 - 1]
                 }
             }
             throw IndexOutOfBoundsException()
