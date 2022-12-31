@@ -149,7 +149,7 @@ abstract class SearchBarScene : ToolbarScene() {
     }
 
     fun onApplySearch() {
-        val query = mSearchView?.text.toString().trim()
+        val query = (mToolbar as SearchBar).text.toString().trim()
         if (!mAllowEmptySearch && query.isEmpty()) {
             return
         }
