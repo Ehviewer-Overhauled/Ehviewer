@@ -85,6 +85,8 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.preference.toggle
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
@@ -93,15 +95,12 @@ import eu.kanade.tachiyomi.util.view.copy
 import eu.kanade.tachiyomi.util.view.popupMenu
 import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -134,29 +133,27 @@ class ReaderActivity : EhActivity() {
                 AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
             val cachefile = File(filepath)
             val resolver = contentResolver
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    var `is`: InputStream? = null
-                    var os: OutputStream? = null
-                    try {
-                        `is` = FileInputStream(cachefile)
-                        os = resolver.openOutputStream(uri)
-                        IOUtils.copy(`is`, os)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    } finally {
-                        IOUtils.closeQuietly(`is`)
-                        IOUtils.closeQuietly(os)
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@ReaderActivity,
-                                getString(R.string.image_saved, uri.path),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+            lifecycleScope.launchIO {
+                var `is`: InputStream? = null
+                var os: OutputStream? = null
+                try {
+                    `is` = FileInputStream(cachefile)
+                    os = resolver.openOutputStream(uri)
+                    IOUtils.copy(`is`, os)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                } finally {
+                    IOUtils.closeQuietly(`is`)
+                    IOUtils.closeQuietly(os)
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@ReaderActivity,
+                            getString(R.string.image_saved, uri.path),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    cachefile.delete()
                 }
+                cachefile.delete()
             }
         }
     }
@@ -253,7 +250,9 @@ class ReaderActivity : EhActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.colorMode = if (Image.isWideColorGamut && readerPreferences.wideColorGamut().get()) ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT else ActivityInfo.COLOR_MODE_DEFAULT
+        window.colorMode = if (Image.isWideColorGamut && readerPreferences.wideColorGamut()
+                .get()
+        ) ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT else ActivityInfo.COLOR_MODE_DEFAULT
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -279,7 +278,7 @@ class ReaderActivity : EhActivity() {
             mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         }
 
-        lifecycleScope.launch(Dispatchers.Main) {
+        lifecycleScope.launchUI {
             mGalleryProvider!!.state.collect {
                 if (it == PageLoader.STATE_READY) {
                     setGallery()

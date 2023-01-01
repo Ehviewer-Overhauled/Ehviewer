@@ -27,11 +27,10 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.widget.SearchDatabase
 import com.hippo.scene.StageActivity
-import kotlinx.coroutines.Dispatchers
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 abstract class SearchBarScene : ToolbarScene() {
@@ -311,12 +310,12 @@ abstract class SearchBarScene : ToolbarScene() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSuggestions(scrollToTop: Boolean = true) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+        viewLifecycleOwner.lifecycleScope.launch {
             val suggestions = mutableListOf<Suggestion>()
             mergedSuggestionFlow().collect {
                 suggestions.add(it)
             }
-            withContext(Dispatchers.Main) {
+            withUIContext {
                 mSuggestionList = suggestions
                 mSuggestionAdapter?.notifyDataSetChanged()
             }
