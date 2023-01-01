@@ -399,9 +399,9 @@ class FabLayout @JvmOverloads constructor(
         return state
     }
 
-    public override fun onRestoreInstanceState(state: Parcelable) {
+    override fun onRestoreInstanceState(state: Parcelable) {
         if (state is Bundle) {
-            super.onRestoreInstanceState(state.getBundle(STATE_KEY_SUPER))
+            super.onRestoreInstanceState(state.getParcelable(STATE_KEY_SUPER))
             setAutoCancel(state.getBoolean(STATE_KEY_AUTO_CANCEL))
             setExpanded(state.getBoolean(STATE_KEY_EXPANDED), false)
         }
