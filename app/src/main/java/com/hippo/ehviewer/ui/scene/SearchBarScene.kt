@@ -359,6 +359,7 @@ abstract class SearchBarScene : ToolbarScene() {
     private val mSearchViewOnBackPressedCallback =
         object : OnBackPressedCallback(false), TransitionListener {
             override fun handleOnBackPressed() {
+                mSearchView?.let { (mToolbar as SearchBar).text = it.text }
                 mSearchView?.hide()
             }
 
