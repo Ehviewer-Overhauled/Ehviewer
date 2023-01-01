@@ -33,7 +33,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.CancelledException;
 import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ehviewer.client.exception.NoHAtHClientException;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.ehviewer.client.parser.ArchiveParser;
 import com.hippo.ehviewer.client.parser.EventPaneParser;
@@ -65,8 +64,6 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
@@ -87,8 +84,6 @@ public class EhEngine {
     private static final String SAD_PANDA_LENGTH = "9615";
     private static final String KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg";
     private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
-
-    private static final Pattern PATTERN_NEED_HATH_CLIENT = Pattern.compile("(You must have a H@H client assigned to your account to use this feature\\.)");
 
     public static EhFilter sEhFilter;
 
@@ -714,8 +709,8 @@ public class EhEngine {
         return result;
     }
 
-    public static Void downloadArchive(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                       long gid, String token, String or, String res) throws Throwable {
+    public static String downloadArchive(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
+                                         long gid, String token, String or, String res, boolean isHAtH) throws Throwable {
         if (or == null || or.length() == 0) {
             throw new EhException("Invalid form param or: " + or);
         }
@@ -723,7 +718,16 @@ public class EhEngine {
             throw new EhException("Invalid res: " + res);
         }
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add("hathdl_xres", res);
+        if (isHAtH) {
+            builder.add("hathdl_xres", res);
+        } else {
+            builder.add("dltype", res);
+            if (res.equals("org")) {
+                builder.add("dlcheck", "Download Original Archive");
+            } else {
+                builder.add("dlcheck", "Download Resample Archive");
+            }
+        }
         String url = EhUrl.getDownloadArchive(gid, token, or);
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         String origin = EhUrl.getOrigin();
@@ -752,11 +756,27 @@ public class EhEngine {
             throw e;
         }
 
-        Matcher m = PATTERN_NEED_HATH_CLIENT.matcher(body);
-        if (m.find()) {
-            throw new NoHAtHClientException("No H@H client");
+        var result = ArchiveParser.parseArchiveUrl(body);
+        if (!isHAtH) {
+            if (result == null) {
+                Thread.sleep(1000);
+                try (var response = call.clone().execute()) {
+                    code = response.code();
+                    headers = response.headers();
+                    body = response.body().string();
+                    throwException(call, code, headers, body, null);
+                } catch (Throwable e) {
+                    ExceptionUtils.throwIfFatal(e);
+                    throwException(call, code, headers, body, e);
+                    throw e;
+                }
+                result = ArchiveParser.parseArchiveUrl(body);
+                if (result == null) {
+                    throw new EhException("Archive unavailable");
+                }
+            }
+            return result;
         }
-
         return null;
     }
 

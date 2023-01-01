@@ -1177,7 +1177,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
             ArchiveListDialogHelper helper = new ArchiveListDialogHelper();
             Dialog dialog = new BaseDialogBuilder(context)
-                    .setTitle(R.string.dialog_archive_title)
+                    .setTitle(R.string.settings_download)
                     .setView(R.layout.dialog_archive_list)
                     .setOnDismissListener(helper)
                     .show();
@@ -1713,14 +1713,34 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
     }
 
-    private static class DownloadArchiveListener extends EhCallback<GalleryDetailScene, Void> {
+    private static class DownloadArchiveListener extends EhCallback<GalleryDetailScene, String> {
 
-        public DownloadArchiveListener(Context context, int stageId, String sceneTag) {
+        private final GalleryInfo mGalleryInfo;
+
+        public DownloadArchiveListener(Context context, int stageId, String sceneTag, GalleryInfo galleryInfo) {
             super(context, stageId, sceneTag);
+            mGalleryInfo = galleryInfo;
         }
 
         @Override
-        public void onSuccess(Void result) {
+        public void onSuccess(String result) {
+            if (result != null) {
+                // TODO: Don't use buggy system download service
+                DownloadManager.Request r = new DownloadManager.Request(Uri.parse(result));
+                var name = mGalleryInfo.gid + "-" + EhUtils.getSuitableTitle(mGalleryInfo) + ".zip";
+                r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                        FileUtils.sanitizeFilename(name));
+                r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                DownloadManager dm = (DownloadManager) getApplication().getSystemService(Context.DOWNLOAD_SERVICE);
+                if (dm != null) {
+                    try {
+                        dm.enqueue(r);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        ExceptionUtils.throwIfFatal(e);
+                    }
+                }
+            }
             showTip(R.string.download_archive_started, LENGTH_SHORT);
         }
 
@@ -1790,7 +1810,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 mListView.setVisibility(View.GONE);
                 mErrorText.setText(R.string.no_archives);
             } else {
-                var nameArray = data.stream().map(ArchiveParser.Archive::format).toArray(String[]::new);
+                var nameArray = data.stream().map(archive -> archive.format(getResources()::getString)).toArray(String[]::new);
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
@@ -1804,10 +1824,11 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             MainActivity activity = getMainActivity();
             if (null != context && null != activity && null != mArchiveList && position < mArchiveList.size()) {
                 String res = mArchiveList.get(position).res();
+                boolean isHAtH = mArchiveList.get(position).isHAtH();
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
-                request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res);
-                request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag()));
+                request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res, isHAtH);
+                request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag(), mGalleryDetail));
                 EhApplication.getEhClient().execute(request);
             }
 

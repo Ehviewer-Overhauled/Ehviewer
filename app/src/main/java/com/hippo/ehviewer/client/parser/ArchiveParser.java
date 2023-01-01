@@ -18,34 +18,75 @@ package com.hippo.ehviewer.client.parser;
 
 import androidx.annotation.NonNull;
 
+import com.hippo.ehviewer.R;
+import com.hippo.ehviewer.client.exception.NoHAtHClientException;
+
+import org.jsoup.Jsoup;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArchiveParser {
 
-    private static final Pattern PATTERN_FORM = Pattern.compile("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">");
-    private static final Pattern PATTERN_ARCHIVE = Pattern.compile("<p><a href=\"[^\"]*\" onclick=\"return do_hathdl\\('([0-9]+|org)'\\)\">([^<]+)</a></p>\\s*<p>([\\w. ]+)</p>\\s*<p>([\\w. ]+)</p>");
+    private static final Pattern PATTERN_ARCHIVE_URL = Pattern.compile("<strong>(.*)</strong>.*<a href=\"([^\"]*)\">Click Here To Start Downloading</a>");
+    private static final Pattern PATTERN_HATH_FORM = Pattern.compile("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">");
+    private static final Pattern PATTERN_HATH_ARCHIVE = Pattern.compile("<p><a href=\"[^\"]*\" onclick=\"return do_hathdl\\('([0-9]+|org)'\\)\">([^<]+)</a></p>\\s*<p>([\\w. ]+)</p>\\s*<p>([\\w. ]+)</p>");
+    private static final Pattern PATTERN_NEED_HATH_CLIENT = Pattern.compile("You must have a H@H client assigned to your account to use this feature\\.");
 
     public static Result parse(String body) {
-        Matcher m = PATTERN_FORM.matcher(body);
+        Matcher m = PATTERN_HATH_FORM.matcher(body);
         if (!m.find()) {
             return new Result(null, null);
         }
         String paramOr = m.group(1);
+
         var archiveList = new ArrayList<Archive>();
-        m = PATTERN_ARCHIVE.matcher(body);
+        var d = Jsoup.parse(body);
+        var es = d.select("#db>div>div");
+        for (var e : es) {
+            try {
+                var res = e.selectFirst("form>input").attr("value");
+                var name = e.selectFirst("form>div>input").attr("value");
+                var size = e.selectFirst("p>strong").text();
+                var cost = e.selectFirst("div>strong").text();
+                var item = new Archive(res, name, size, cost, false);
+                archiveList.add(item);
+            } catch (NullPointerException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        m = PATTERN_HATH_ARCHIVE.matcher(body);
         while (m.find()) {
             String res = ParserUtils.trim(m.group(1));
             String name = ParserUtils.trim(m.group(2));
             String size = ParserUtils.trim(m.group(3));
             String cost = ParserUtils.trim(m.group(4));
-            var item = new Archive(res, name, size, cost);
+            var item = new Archive(res, name, size, cost, true);
             archiveList.add(item);
         }
+
         return new Result(paramOr, archiveList);
+    }
+
+    public static String parseArchiveUrl(String body) throws NoHAtHClientException {
+        Matcher m = PATTERN_NEED_HATH_CLIENT.matcher(body);
+        if (m.find()) {
+            throw new NoHAtHClientException("No H@H client");
+        }
+
+        var d = Jsoup.parse(body);
+        var a = d.selectFirst("#continue>a[href]");
+        if (a != null) {
+            return a.attr("href") + "?start=1";
+        }
+
+        // TODO: Check more errors
+        return null;
     }
 
     public static final class Archive {
@@ -53,16 +94,25 @@ public class ArchiveParser {
         private final String name;
         private final String size;
         private final String cost;
+        private final boolean isHAtH;
 
-        public Archive(String res, String name, String size, String cost) {
+        public Archive(String res, String name, String size, String cost, boolean isHAtH) {
             this.res = res;
             this.name = name;
             this.size = size;
             this.cost = cost;
+            this.isHAtH = isHAtH;
         }
 
-        public String format() {
-            return String.format("%s [%s, %s]", name, size, cost);
+        public String format(IntFunction<String> getString) {
+            if (isHAtH) {
+                var costStr = cost.equals("Free") ? getString.apply(R.string.archive_free) : cost;
+                return String.format("[H@H] %s [%s] [%s]", name, size, costStr);
+            } else {
+                var nameStr = getString.apply(res.equals("org") ? R.string.archive_original : R.string.archive_resample);
+                var costStr = cost.equals("Free!") ? getString.apply(R.string.archive_free) : cost;
+                return String.format("%s [%s] [%s]", nameStr, size, costStr);
+            }
         }
 
         public String res() {
@@ -81,6 +131,10 @@ public class ArchiveParser {
             return cost;
         }
 
+        public boolean isHAtH() {
+            return isHAtH;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == this) return true;
@@ -89,12 +143,13 @@ public class ArchiveParser {
             return Objects.equals(this.res, that.res) &&
                     Objects.equals(this.name, that.name) &&
                     Objects.equals(this.size, that.size) &&
-                    Objects.equals(this.cost, that.cost);
+                    Objects.equals(this.cost, that.cost) &&
+                    this.isHAtH == that.isHAtH;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(res, name, size, cost);
+            return Objects.hash(res, name, size, cost, isHAtH);
         }
 
         @NonNull
@@ -104,7 +159,8 @@ public class ArchiveParser {
                     "res=" + res + ", " +
                     "name=" + name + ", " +
                     "size=" + size + ", " +
-                    "cost=" + cost + ']';
+                    "cost=" + cost + ", " +
+                    "isHAtH=" + isHAtH + ']';
         }
 
     }
