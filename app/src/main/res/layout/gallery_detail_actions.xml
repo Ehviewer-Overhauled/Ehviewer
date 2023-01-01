@@ -49,7 +49,7 @@
 
             <Button
                 android:id="@+id/heart"
-                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/favorited"
