@@ -473,7 +473,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
     @Override
     public void onNavigationClick() {
-        onBackPressed();
+        requireActivity().getOnBackPressedDispatcher().onBackPressed();
         super.onNavigationClick();
     }
 
@@ -1410,11 +1410,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
         }
         return false;
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
     @Override

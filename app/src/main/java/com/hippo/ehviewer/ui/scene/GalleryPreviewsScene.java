@@ -220,7 +220,7 @@ public class GalleryPreviewsScene extends ToolbarScene {
 
     @Override
     public void onNavigationClick() {
-        onBackPressed();
+        requireActivity().getOnBackPressedDispatcher().onBackPressed();
     }
 
     public boolean onItemClick(int position) {
