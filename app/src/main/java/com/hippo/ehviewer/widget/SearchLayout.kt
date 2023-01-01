@@ -102,8 +102,15 @@ class SearchLayout @JvmOverloads constructor(
             mChip.idt = mPair.first
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
             mChip.setOnLongClickListener {
-                mCategoryGroup.clearCheck()
-                mChip.isChecked = true
+                if (mChip.isChecked) {
+                    for (i in 1 until mCategoryGroup.childCount + 1) {
+                        mCategoryGroup.check(i)
+                    }
+                    mChip.isChecked = false
+                } else {
+                    mCategoryGroup.clearCheck()
+                    mChip.isChecked = true
+                }
                 true
             }
             mCategoryGroup.addView(mChip)
