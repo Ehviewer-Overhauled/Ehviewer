@@ -97,6 +97,7 @@ import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -282,7 +283,7 @@ class ReaderActivity : EhActivity() {
             mGalleryProvider!!.state.collect {
                 if (it == PageLoader.STATE_READY) {
                     setGallery()
-                    cancel()
+                    currentCoroutineContext().cancel()
                 }
             }
         }
