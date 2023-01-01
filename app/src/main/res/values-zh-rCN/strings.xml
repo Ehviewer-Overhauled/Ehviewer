@@ -531,6 +531,9 @@
     <string name="download_archive_started">开始下载压缩包</string>
     <string name="download_archive_failure">无法下载压缩包</string>
     <string name="archive">压缩包</string>
+    <string name="archive_free">免费</string>
+    <string name="archive_original">原始档案</string>
+    <string name="archive_resample">重采样档案</string>
     <string name="download_archive_failure_no_hath">下载压缩包需要 H@H 客户端</string>
     <string name="settings_privacy">隐私</string>
     <string name="settings_privacy_secure">不允许屏幕抓取</string>
