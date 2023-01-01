@@ -24,7 +24,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +94,6 @@ public class FavoritesScene extends SearchBarScene implements
     private static final long ANIMATE_TIME = 300L;
 
     private static final String KEY_URL_BUILDER = "url_builder";
-    private static final String KEY_SEARCH_MODE = "search_mode";
     private static final String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
     private static final String KEY_FAV_COUNT_ARRAY = "fav_count_array";
     // For modify action
@@ -148,7 +146,6 @@ public class FavoritesScene extends SearchBarScene implements
     private int mFavLocalCount = 0;
     private int mFavCountSum = 0;
     private boolean mHasFirstRefresh;
-    private boolean mSearchMode;
     // Avoid unnecessary search bar update
     private String mOldFavCat;
     // Avoid unnecessary search bar update
@@ -187,7 +184,6 @@ public class FavoritesScene extends SearchBarScene implements
     private void onInit() {
         mUrlBuilder = new FavListUrlBuilder();
         mUrlBuilder.setFavCat(Settings.getRecentFavCat());
-        mSearchMode = false;
     }
 
     private void onRestore(Bundle savedInstanceState) {
@@ -195,7 +191,6 @@ public class FavoritesScene extends SearchBarScene implements
         if (mUrlBuilder == null) {
             mUrlBuilder = new FavListUrlBuilder();
         }
-        mSearchMode = savedInstanceState.getBoolean(KEY_SEARCH_MODE);
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH);
         mFavCountArray = savedInstanceState.getIntArray(KEY_FAV_COUNT_ARRAY);
     }
@@ -212,7 +207,6 @@ public class FavoritesScene extends SearchBarScene implements
         }
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
         outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder);
-        outState.putBoolean(KEY_SEARCH_MODE, mSearchMode);
         outState.putIntArray(KEY_FAV_COUNT_ARRAY, mFavCountArray);
     }
 
@@ -243,6 +237,7 @@ public class FavoritesScene extends SearchBarScene implements
         mRecyclerView = mContentLayout.getRecyclerView();
         FastScroller fastScroller = mContentLayout.getFastScroller();
         mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
+        mFabLayout.addOnExpandListener(new FabLayoutListener());
         ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
         AssertUtils.assertNotNull(container);
         container.addView(mFabLayout);
@@ -282,14 +277,8 @@ public class FavoritesScene extends SearchBarScene implements
         mFabLayout.setAutoCancel(true);
         mFabLayout.setHidePrimaryFab(false);
         mFabLayout.setOnClickFabListener(this);
-        mFabLayout.setOnExpandListener(this);
+        mFabLayout.addOnExpandListener(this);
         addAboveSnackView(mFabLayout);
-
-        // Restore search mode
-        if (mSearchMode) {
-            mSearchMode = false;
-            enterSearchMode();
-        }
 
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
@@ -419,19 +408,6 @@ public class FavoritesScene extends SearchBarScene implements
     }
 
     @Override
-    public void onBackPressed() {
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            mRecyclerView.outOfCustomChoiceMode();
-        } else if (mFabLayout != null && mFabLayout.isExpanded()) {
-            mFabLayout.toggle();
-        } else if (mSearchMode) {
-            exitSearchMode();
-        } else {
-            finish();
-        }
-    }
-
-    @Override
     public void onStartDragHandler() {
         // Lock right drawer
         setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
@@ -466,8 +442,6 @@ public class FavoritesScene extends SearchBarScene implements
                 return true;
             }
 
-            exitSearchMode();
-
             mUrlBuilder.setKeyword(null);
             mUrlBuilder.setFavCat(newFavCat);
             updateSearchBar();
@@ -496,7 +470,7 @@ public class FavoritesScene extends SearchBarScene implements
 
     public boolean onItemLongClick(int position) {
         // Can not into
-        if (mRecyclerView != null && !mSearchMode) {
+        if (mRecyclerView != null) {
             if (!mRecyclerView.isInCustomChoice()) {
                 mRecyclerView.intoCustomChoiceMode();
             }
@@ -514,8 +488,6 @@ public class FavoritesScene extends SearchBarScene implements
         if (mUrlBuilder == null || mHelper == null) {
             return;
         }
-
-        exitSearchMode();
 
         mUrlBuilder.setKeyword(query);
         updateSearchBar();
@@ -697,22 +669,6 @@ public class FavoritesScene extends SearchBarScene implements
         if (view.getCheckedItemCount() == 0) {
             view.outOfCustomChoiceMode();
         }
-    }
-
-    private void enterSearchMode() {
-        if (mSearchMode) {
-            return;
-        }
-        mSearchMode = true;
-        showSearchBar();
-    }
-
-    private void exitSearchMode() {
-        if (!mSearchMode) {
-            return;
-        }
-        mSearchMode = false;
-        showSearchBar();
     }
 
     private void onGetFavoritesSuccess(FavoritesParser.Result result, int taskId) {
@@ -1046,6 +1002,14 @@ public class FavoritesScene extends SearchBarScene implements
         @Override
         public GalleryInfo getDataAt(int position) {
             return null != mHelper ? mHelper.getDataAtEx(position) : null;
+        }
+    }
+
+    private class FabLayoutListener implements FabLayout.OnExpandListener {
+        @Override
+        public void onExpand(boolean expanded) {
+            if (!expanded && mRecyclerView != null && mRecyclerView.isInCustomChoice())
+                mRecyclerView.outOfCustomChoiceMode();
         }
     }
 

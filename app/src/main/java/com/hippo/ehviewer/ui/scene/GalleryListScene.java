@@ -29,7 +29,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -586,7 +585,7 @@ public final class GalleryListScene extends SearchBarScene
         mFabLayout.setExpanded(false);
         mFabLayout.setHidePrimaryFab(false);
         mFabLayout.setOnClickFabListener(this);
-        mFabLayout.setOnExpandListener(this);
+        mFabLayout.addOnExpandListener(this);
         addAboveSnackView(mFabLayout);
 
         int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
@@ -780,19 +779,11 @@ public final class GalleryListScene extends SearchBarScene
     }
 
     public boolean isBackpressCanPreviewLauncherStatus() {
-        if (null != mFabLayout && mFabLayout.isExpanded()) {
-            return false;
-        }
         return mState == STATE_NORMAL && getStackIndex() == 0;
     }
 
     @Override
     public void onBackPressed() {
-        if (null != mFabLayout && mFabLayout.isExpanded()) {
-            mFabLayout.setExpanded(false);
-            return;
-        }
-
         switch (mState) {
             case STATE_NORMAL:
                 if (getStackIndex() == 0)

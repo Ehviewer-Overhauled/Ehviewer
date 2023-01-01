@@ -23,9 +23,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Interpolator
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.ehviewer.R
-import com.hippo.scene.StageActivity
 import com.hippo.yorozuya.AnimationUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 
@@ -40,8 +41,30 @@ class FabLayout @JvmOverloads constructor(
     private var mAutoCancel = true
     private var mHidePrimaryFab = false
     private var mMainFabCenterY = -1f
-    private var mOnExpandListener: OnExpandListener? = null
+    private var mOnExpandListeners = arrayListOf<OnExpandListener>()
     private var mOnClickFabListener: OnClickFabListener? = null
+
+    private val mOnBackPressedCallback = object : OnBackPressedCallback(false), OnExpandListener {
+        override fun handleOnBackPressed() {
+            isExpanded = false
+        }
+
+        override fun onExpand(expanded: Boolean) {
+            isEnabled = expanded
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        (context as ComponentActivity).onBackPressedDispatcher.addCallback(mOnBackPressedCallback)
+        mOnExpandListeners.add(mOnBackPressedCallback)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        mOnBackPressedCallback.remove()
+        mOnExpandListeners.remove(mOnBackPressedCallback)
+    }
 
     init {
         isSoundEffectsEnabled = false
@@ -166,8 +189,8 @@ class FabLayout @JvmOverloads constructor(
         }
     }
 
-    fun setOnExpandListener(listener: OnExpandListener?) {
-        mOnExpandListener = listener
+    fun addOnExpandListener(listener: OnExpandListener) {
+        mOnExpandListeners.add(listener)
     }
 
     fun setOnClickFabListener(listener: OnClickFabListener?) {
@@ -261,9 +284,8 @@ class FabLayout @JvmOverloads constructor(
                     }
                 }
             }
-            mOnExpandListener?.onExpand(expanded)
+            mOnExpandListeners.forEach { it.onExpand(expanded) }
         }
-        (context as StageActivity).updateBackPressCallBackStatus()
     }
 
     private fun setPrimaryFabAnimation(child: View, expanded: Boolean, delay: Boolean) {

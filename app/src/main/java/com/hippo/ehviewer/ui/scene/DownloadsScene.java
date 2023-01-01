@@ -367,6 +367,7 @@ public class DownloadsScene extends ToolbarScene
         mFastScroller.setHandlerDrawable(handlerDrawable);
         mFastScroller.setOnDragHandlerListener(this);
 
+        mFabLayout.addOnExpandListener(new FabLayoutListener());
         mFabLayout.setExpanded(false, false);
         mFabLayout.setHidePrimaryFab(true);
         mFabLayout.setAutoCancel(false);
@@ -553,15 +554,6 @@ public class DownloadsScene extends ToolbarScene
         recyclerView.setAdapter(mLabelAdapter);
 
         return view;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            mRecyclerView.outOfCustomChoiceMode();
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -1187,6 +1179,14 @@ public class DownloadsScene extends ToolbarScene
         @Override
         public int getItemCount() {
             return mList == null ? 0 : mList.size();
+        }
+    }
+
+    private class FabLayoutListener implements FabLayout.OnExpandListener {
+        @Override
+        public void onExpand(boolean expanded) {
+            if (!expanded && mRecyclerView != null && mRecyclerView.isInCustomChoice())
+                mRecyclerView.outOfCustomChoiceMode();
         }
     }
 
