@@ -639,8 +639,7 @@ class ReaderActivity : EhActivity() {
         } else {
             if (readerPreferences.fullscreen().get()) {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                windowInsetsController.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH
             }
 
             if (animate) {
