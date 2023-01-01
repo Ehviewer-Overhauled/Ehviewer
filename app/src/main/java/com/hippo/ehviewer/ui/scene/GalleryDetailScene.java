@@ -84,6 +84,7 @@ import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
+import com.hippo.ehviewer.client.parser.ArchiveParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
@@ -257,7 +258,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 }
             });
     private String mArchiveFormParamOr;
-    private Pair<String, String>[] mArchiveList;
+    private List<ArchiveParser.Archive> mArchiveList;
     @State
     private int mState = STATE_INIT;
     private boolean mModifyingFavorites;
@@ -1754,7 +1755,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     }
 
     private class ArchiveListDialogHelper implements AdapterView.OnItemClickListener,
-            DialogInterface.OnDismissListener, EhClient.Callback<Pair<String, Pair<String, String>[]>> {
+            DialogInterface.OnDismissListener, EhClient.Callback<ArchiveParser.Result> {
 
         @Nullable
         private CircularProgressIndicator mProgressView;
@@ -1789,21 +1790,18 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
         }
 
-        private void bind(Pair<String, String>[] data) {
+        private void bind(List<ArchiveParser.Archive> data) {
             if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
                 return;
             }
 
-            if (0 == data.length) {
+            if (null == data || 0 == data.size()) {
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.VISIBLE);
                 mListView.setVisibility(View.GONE);
                 mErrorText.setText(R.string.no_archives);
             } else {
-                String[] nameArray = new String[data.length];
-                for (int i = 0, n = data.length; i < n; i++) {
-                    nameArray[i] = data[i].second;
-                }
+                var nameArray = data.stream().map(ArchiveParser.Archive::format).toArray(String[]::new);
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
@@ -1815,8 +1813,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Context context = getContext();
             MainActivity activity = getMainActivity();
-            if (null != context && null != activity && null != mArchiveList && position < mArchiveList.length) {
-                String res = mArchiveList[position].first;
+            if (null != context && null != activity && null != mArchiveList && position < mArchiveList.size()) {
+                String res = mArchiveList.get(position).res();
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
                 request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res);
@@ -1843,12 +1841,12 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         @Override
-        public void onSuccess(Pair<String, Pair<String, String>[]> result) {
+        public void onSuccess(ArchiveParser.Result result) {
             if (mRequest != null) {
                 mRequest = null;
-                mArchiveFormParamOr = result.first;
-                mArchiveList = result.second;
-                bind(result.second);
+                mArchiveFormParamOr = result.paramOr();
+                mArchiveList = result.archiveList();
+                bind(result.archiveList());
             }
         }
 
