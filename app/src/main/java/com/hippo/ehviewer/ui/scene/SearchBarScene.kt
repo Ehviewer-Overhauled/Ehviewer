@@ -111,6 +111,7 @@ abstract class SearchBarScene : ToolbarScene() {
 
     @CallSuper
     open fun onSearchViewHidden() {
+        mSearchView?.let { (mToolbar as SearchBar).text = it.text }
         privLockModeStart?.let { setDrawerLockMode(it, GravityCompat.START) }
         privLockModeStart = null
         privLockModeEnd?.let { setDrawerLockMode(it, GravityCompat.END) }
@@ -357,7 +358,6 @@ abstract class SearchBarScene : ToolbarScene() {
     private val mSearchViewOnBackPressedCallback =
         object : OnBackPressedCallback(false), TransitionListener {
             override fun handleOnBackPressed() {
-                mSearchView?.let { (mToolbar as SearchBar).text = it.text }
                 mSearchView?.hide()
             }
 
