@@ -460,6 +460,19 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+    public void preloadPages(@NonNull List<Integer> pages) {
+        if (mQueenThread == null) {
+            return;
+        }
+
+        synchronized (mRequestPageQueue) {
+            pages.removeAll(mRequestPageQueue);
+            pages.removeAll(mRequestPageQueue2);
+            pages.removeAll(mDecodeRequestQueue);
+            mRequestPageQueue2.addAll(pages);
+        }
+    }
+
     /**
      * @return String for error<br>
      * Float for download percent<br>

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -185,6 +186,11 @@ public class ArchivePageLoader extends PageLoader2 {
         UniFile dst = dir.subFile(null != extension ? filename + "." + extension : filename);
         save(index, dst);
         return dst;
+    }
+
+    @Override
+    protected void preloadPages(@NonNull List<Integer> pages) {
+
     }
 
     private class ArchiveHostTask implements Runnable {

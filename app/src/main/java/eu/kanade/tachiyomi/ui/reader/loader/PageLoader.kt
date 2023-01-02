@@ -17,6 +17,8 @@ abstract class PageLoader {
         (0 until size()).map { ReaderPage(it) }
     }
 
+    private val mPreloads = MathUtils.clamp(com.hippo.ehviewer.Settings.getPreloadImage(), 0, 100)
+
     var state = MutableStateFlow(STATE_WAIT)
 
     abstract val error: String
@@ -41,11 +43,18 @@ abstract class PageLoader {
             notifyPageSucceed(index, image)
         else
             onRequest(index)
+
+        // val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).toMutableList().removeAll(mImageCache.snapshot().keys)
+        // Should we refresh our LruCache ?
+        val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).mapNotNull { it.takeIf { mImageCache[it] == null } }
+        preloadPages(pagesAbsent)
     }
 
     fun retryPage(page: ReaderPage) {
         onForceRequest(mPages.indexOf(page))
     }
+
+    protected abstract fun preloadPages(pages: List<Int>)
 
     protected abstract fun onRequest(index: Int)
 

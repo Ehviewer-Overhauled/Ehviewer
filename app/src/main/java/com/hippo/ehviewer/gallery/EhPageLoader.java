@@ -25,6 +25,7 @@ import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.SimpleHandler;
 
+import java.util.List;
 import java.util.Locale;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
@@ -205,6 +206,13 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     @Override
     public void onGetImageFailure(int index, String error) {
         notifyPageFailed(index);
+    }
+
+    @Override
+    protected void preloadPages(@NonNull List<Integer> pages) {
+        if (mSpiderQueen != null) {
+            mSpiderQueen.preloadPages(pages);
+        }
     }
 
     private static class ReleaseTask implements Runnable {
