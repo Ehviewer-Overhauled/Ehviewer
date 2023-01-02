@@ -268,7 +268,7 @@ public final class GalleryCommentsScene extends ToolbarScene
 
     @Override
     public void onNavigationClick() {
-        onBackPressed();
+        requireActivity().getOnBackPressedDispatcher().onBackPressed();
     }
 
     private void showFilterCommenterDialog(String commenter, int position) {

@@ -61,7 +61,6 @@ public class SceneFragment extends Fragment {
         FragmentActivity activity = getActivity();
         if (activity instanceof StageActivity) {
             ((StageActivity) activity).startScene(announcer, horizontal);
-            ((StageActivity) activity).updateBackPressCallBackStatus();
         }
     }
 
@@ -96,10 +95,6 @@ public class SceneFragment extends Fragment {
         } else {
             return -1;
         }
-    }
-
-    public void onBackPressed() {
-        finish();
     }
 
     public void onProvideAssistContent(AssistContent outContent) {

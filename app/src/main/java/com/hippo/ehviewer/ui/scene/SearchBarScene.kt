@@ -106,7 +106,6 @@ abstract class SearchBarScene : ToolbarScene() {
                 GravityCompat.END
             )
         }
-        (requireActivity() as StageActivity).updateBackPressCallBackStatus()
         updateSuggestions()
     }
 
@@ -116,7 +115,6 @@ abstract class SearchBarScene : ToolbarScene() {
         privLockModeStart = null
         privLockModeEnd?.let { setDrawerLockMode(it, GravityCompat.END) }
         privLockModeEnd = null
-        (requireActivity() as StageActivity).updateBackPressCallBackStatus()
     }
 
     fun setSearchBarHint(hint: String?) {

@@ -31,7 +31,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.EhActivity;
-import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 
@@ -58,7 +57,7 @@ public abstract class StageActivity extends EhActivity {
     private final SceneViewComparator mSceneViewComparator = new SceneViewComparator();
     private int mStageId = IntIdGenerator.INVALID_ID;
 
-    private OnBackPressedCallback callback;
+    private OnBackPressedCallback callback = new BackPressCallBack();
 
     public static void registerLaunchMode(Class<?> clazz, @SceneFragment.LaunchMode int launchMode) {
         if (launchMode != SceneFragment.LAUNCH_MODE_STANDARD &&
@@ -141,8 +140,6 @@ public abstract class StageActivity extends EhActivity {
     @Override
     protected final void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        callback = new BackPressCallBack(false);
         getOnBackPressedDispatcher().addCallback(callback);
         if (savedInstanceState != null) {
             mStageId = savedInstanceState.getInt(KEY_STAGE_ID, IntIdGenerator.INVALID_ID);
@@ -252,10 +249,14 @@ public abstract class StageActivity extends EhActivity {
 
     public void startScene(Announcer announcer) {
         startScene(announcer, false);
-        updateBackPressCallBackStatus();
     }
 
     public void startScene(Announcer announcer, boolean horizontal) {
+        startSceneInternal(announcer, horizontal);
+        updateBackPressCallBackStatus();
+    }
+
+    public void startSceneInternal(Announcer announcer, boolean horizontal) {
         Class<?> clazz = announcer.clazz;
         Bundle args = announcer.args;
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -565,23 +566,8 @@ public abstract class StageActivity extends EhActivity {
         updateBackPressCallBackStatus();
     }
 
-    private boolean shouldEnableBackPressCallBack() {
-        if (mSceneTagList.size() > 1)
-            return true;
-        if (mSceneTagList.size() == 0)
-            return false;
-        String tag = mSceneTagList.get(0);
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment instanceof GalleryListScene)
-            return !((GalleryListScene) fragment).isBackpressCanPreviewLauncherStatus();
-        return false;
-    }
-
     public void updateBackPressCallBackStatus() {
-        var isEnabled = callback.isEnabled();
-        var shouldEnable = shouldEnableBackPressCallBack();
-        if (isEnabled != shouldEnable)
-            callback.setEnabled(shouldEnable);
+        callback.setEnabled(mSceneTagList.size() > 1);
     }
 
     @Override
@@ -627,8 +613,8 @@ public abstract class StageActivity extends EhActivity {
     }
 
     class BackPressCallBack extends OnBackPressedCallback {
-        public BackPressCallBack(boolean enabled) {
-            super(enabled);
+        public BackPressCallBack() {
+            super(false);
         }
 
         @Override
@@ -647,7 +633,7 @@ public abstract class StageActivity extends EhActivity {
             }
 
             scene = (SceneFragment) fragment;
-            scene.onBackPressed();
+            finishScene(scene);
         }
     }
 

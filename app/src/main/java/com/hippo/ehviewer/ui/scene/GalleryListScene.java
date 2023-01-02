@@ -783,10 +783,6 @@ public final class GalleryListScene extends SearchBarScene
         return view;
     }
 
-    public boolean isBackpressCanPreviewLauncherStatus() {
-        return mState == STATE_NORMAL && getStackIndex() == 0;
-    }
-
     public void onItemClick(int position) {
         if (null == mHelper || null == mRecyclerView) {
             return;
@@ -1166,7 +1162,6 @@ public final class GalleryListScene extends SearchBarScene
                     break;
             }
         }
-        ((StageActivity) requireActivity()).updateBackPressCallBackStatus();
     }
 
     @Override
