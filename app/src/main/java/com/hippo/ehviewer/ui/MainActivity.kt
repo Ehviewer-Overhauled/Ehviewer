@@ -603,25 +603,12 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
 
     private val mDrawerOnBackPressedCallback =
         object : OnBackPressedCallback(false), DrawerListener {
-            override fun handleOnBackPressed() {
-                mDrawerLayout?.closeDrawers()
-            }
-
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-            override fun onDrawerOpened(drawerView: View) {
-                isEnabled = true
-            }
-
+            val slideThreshold = 0.05
+            override fun handleOnBackPressed() { mDrawerLayout?.closeDrawers() }
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) { isEnabled = slideOffset > slideThreshold }
+            override fun onDrawerOpened(drawerView: View) {}
             override fun onDrawerClosed(drawerView: View) {}
-            override fun onDrawerStateChanged(newState: Int) {
-                when (newState) {
-                    DrawerLayout.STATE_DRAGGING, DrawerLayout.STATE_SETTLING -> isEnabled = true
-                    DrawerLayout.STATE_IDLE -> {
-                        // Note that it's impossible to have two drawers open at the same time
-                        if ((mDrawerLayout?.isDrawerVisible(GravityCompat.START) == true) == (mDrawerLayout?.isDrawerVisible(GravityCompat.END) == true)) isEnabled = false
-                    }
-                }
-            }
+            override fun onDrawerStateChanged(newState: Int) {}
         }
 
     companion object {
