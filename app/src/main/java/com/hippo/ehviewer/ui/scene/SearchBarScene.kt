@@ -70,8 +70,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                 onSearchViewHidden()
         }
         binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
-        requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
         return binding.root.apply { addView(contentView, 0) }
     }
 
