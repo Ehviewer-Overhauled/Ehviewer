@@ -9,14 +9,20 @@ import androidx.annotation.DrawableRes
 import com.hippo.ehviewer.databinding.SceneCollapsingToolbarBinding
 
 abstract class CollapsingToolbarScene : BaseScene(), ToolBarScene {
-    private lateinit var binding: SceneCollapsingToolbarBinding
+    private var _binding: SceneCollapsingToolbarBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = SceneCollapsingToolbarBinding.inflate(inflater, container, false)
+        _binding = SceneCollapsingToolbarBinding.inflate(inflater, container, false)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
         return binding.root.apply { addView(contentView, 0) }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

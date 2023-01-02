@@ -26,15 +26,21 @@ import androidx.core.view.size
 import com.hippo.ehviewer.databinding.SceneToolbarBinding
 
 abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
-    private lateinit var binding: SceneToolbarBinding
+    private var _binding: SceneToolbarBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = SceneToolbarBinding.inflate(inflater, container, false)
+        _binding = SceneToolbarBinding.inflate(inflater, container, false)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
         return binding.root.apply { addView(contentView, 0) }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

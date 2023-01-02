@@ -61,7 +61,8 @@ import rikka.core.res.resolveColor
 
 @SuppressLint("NotifyDataSetChanged")
 class HistoryScene : BaseToolbarScene() {
-    lateinit var binding: SceneHistoryBinding
+    private var _binding: SceneHistoryBinding? = null
+    private val binding get() = _binding!!
     private val mAdapter: HistoryAdapter by lazy {
         HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
             override fun areItemsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
@@ -126,7 +127,7 @@ class HistoryScene : BaseToolbarScene() {
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = SceneHistoryBinding.inflate(inflater, container, false)
+        _binding = SceneHistoryBinding.inflate(inflater, container, false)
         setLiftOnScrollTargetView(binding.recyclerView)
         val mViewTransition = ViewTransition(binding.content, binding.tip)
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_history)
@@ -176,6 +177,7 @@ class HistoryScene : BaseToolbarScene() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.recyclerView.stopScroll()
+        _binding = null
     }
 
     override fun onNavigationClick() {

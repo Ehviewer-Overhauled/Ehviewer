@@ -33,7 +33,8 @@ import kotlinx.coroutines.launch
 
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
-    private lateinit var binding: SceneSearchbarBinding
+    private var _binding: SceneSearchbarBinding? = null
+    private val binding get() = _binding!!
     private var mSuggestionList: List<Suggestion>? = null
     private var mSuggestionAdapter: SuggestionAdapter? = null
     private var mSuggestionProvider: SuggestionProvider? = null
@@ -45,7 +46,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = SceneSearchbarBinding.inflate(inflater, container, false)
+        _binding = SceneSearchbarBinding.inflate(inflater, container, false)
         binding.appbar.statusBarForeground =
             MaterialShapeDrawable.createWithElevationOverlay(context)
         binding.searchview.editText.addTextChangedListener {
@@ -89,6 +90,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     override fun onDestroyView() {
         super.onDestroyView()
         mSearchViewOnBackPressedCallback.remove()
+        _binding = null
     }
 
     private var privLockModeStart: Int? = null
