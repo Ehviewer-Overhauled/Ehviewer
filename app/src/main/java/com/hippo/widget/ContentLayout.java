@@ -792,7 +792,7 @@ public class ContentLayout extends FrameLayout {
         }
 
         protected Parcelable saveInstanceState(Parcelable superState) {
-            cancelCurrentTask();
+            if (!mData.isEmpty()) cancelCurrentTask();
 
             Bundle bundle = new Bundle();
             bundle.putParcelable(KEY_SUPER, superState);
