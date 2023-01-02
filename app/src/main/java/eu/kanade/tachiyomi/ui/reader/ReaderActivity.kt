@@ -377,7 +377,7 @@ class ReaderActivity : EhActivity() {
 
     }
 
-    private fun copyImage(page: Int) {
+    fun copyImage(page: Int) {
         if (null == mGalleryProvider) {
             return
         }

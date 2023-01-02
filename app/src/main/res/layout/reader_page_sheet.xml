@@ -21,6 +21,21 @@
         app:drawableTint="?attr/colorOnBackground" />
 
     <TextView
+        android:id="@+id/copy"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:drawablePadding="32dp"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingHorizontal="16dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:text="@string/action_copy"
+        android:textColor="?attr/colorOnBackground"
+        app:drawableStartCompat="@drawable/ic_file_copy_24"
+        app:drawableTint="?attr/colorOnBackground" />
+
+    <TextView
         android:id="@+id/save"
         android:layout_width="match_parent"
         android:layout_height="56dp"
