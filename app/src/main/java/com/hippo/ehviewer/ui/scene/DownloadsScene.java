@@ -371,7 +371,6 @@ public class DownloadsScene extends BaseToolbarScene
         mFabLayout.setOnClickFabListener(this);
         addAboveSnackView(mFabLayout);
 
-        updateTitle();
         updateView();
 
         return view;
@@ -485,6 +484,7 @@ public class DownloadsScene extends BaseToolbarScene
                 mViewTransition.showView(0);
             }
         }
+        updateTitle();
     }
 
     @Override
