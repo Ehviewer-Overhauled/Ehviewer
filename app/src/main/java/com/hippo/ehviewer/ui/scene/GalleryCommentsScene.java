@@ -44,6 +44,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -133,10 +134,12 @@ public final class GalleryCommentsScene extends ToolbarScene
     private boolean mShowAllComments = false;
     private boolean mRefreshingComments = false;
 
+    private final EditPanelOnBackPressedCallback mCallback = new EditPanelOnBackPressedCallback();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        requireActivity().getOnBackPressedDispatcher().addCallback(mCallback);
         if (savedInstanceState == null) {
             onInit();
         } else {
@@ -234,6 +237,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mCallback.remove();
 
         if (null != mRecyclerView) {
             mRecyclerView.stopScroll();
@@ -526,6 +530,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void showEditPanel(boolean animation) {
+        mCallback.setEnabled(true);
         if (animation) {
             showEditPanelWithAnimation();
         } else {
@@ -585,6 +590,7 @@ public final class GalleryCommentsScene extends ToolbarScene
     }
 
     private void hideEditPanel(boolean animation) {
+        mCallback.setEnabled(false);
         hideSoftInput();
         if (animation) {
             hideEditPanelWithAnimation();
@@ -641,18 +647,6 @@ public final class GalleryCommentsScene extends ToolbarScene
                 hideSoftInput();
                 hideEditPanel(true);
             }
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mInAnimation) {
-            return;
-        }
-        if (null != mEditPanel && mEditPanel.getVisibility() == View.VISIBLE) {
-            hideEditPanel(true);
-        } else {
-            finish();
         }
     }
 
@@ -1003,6 +997,19 @@ public final class GalleryCommentsScene extends ToolbarScene
                 return mRefreshingComments ? TYPE_PROGRESS : TYPE_MORE;
             } else {
                 return TYPE_COMMENT;
+            }
+        }
+    }
+
+    class EditPanelOnBackPressedCallback extends OnBackPressedCallback {
+        public EditPanelOnBackPressedCallback() {
+            super(false);
+        }
+
+        @Override
+        public void handleOnBackPressed() {
+            if (!mInAnimation && null != mEditPanel && mEditPanel.getVisibility() == View.VISIBLE) {
+                hideEditPanel(true);
             }
         }
     }
