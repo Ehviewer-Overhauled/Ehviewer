@@ -906,7 +906,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 String tagStr = tg.getTagAt(j);
 
                 String readableTag = null;
-                if (ehTags != null) {
+                if (ehTags != null && ehTags.isInitialized()) {
                     readableTag = ehTags.getTranslation(prefix, tagStr);
                 }
 
