@@ -86,7 +86,9 @@ abstract class ToolbarScene : BaseScene() {
         return false
     }
 
-    open fun onNavigationClick() {}
+    open fun onNavigationClick() {
+        requireActivity().onBackPressedDispatcher.onBackPressed()
+    }
 
     fun setNavigationIcon(@DrawableRes resId: Int) {
         mToolbar?.setNavigationIcon(resId)

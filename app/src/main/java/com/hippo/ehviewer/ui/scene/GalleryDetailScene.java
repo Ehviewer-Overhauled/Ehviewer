@@ -472,12 +472,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     }
 
     @Override
-    public void onNavigationClick() {
-        requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        super.onNavigationClick();
-    }
-
-    @Override
     public boolean onMenuItemClick(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_open_in_other_app) {

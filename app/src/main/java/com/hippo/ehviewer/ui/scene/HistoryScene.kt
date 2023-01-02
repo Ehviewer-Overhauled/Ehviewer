@@ -189,7 +189,6 @@ class HistoryScene : ToolbarScene() {
         mRecyclerView = null
     }
 
-    @SuppressLint("RtlHardcoded")
     override fun onNavigationClick() {
         toggleDrawer(GravityCompat.START)
     }

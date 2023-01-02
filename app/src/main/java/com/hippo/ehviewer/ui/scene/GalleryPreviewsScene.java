@@ -218,11 +218,6 @@ public class GalleryPreviewsScene extends ToolbarScene {
         return false;
     }
 
-    @Override
-    public void onNavigationClick() {
-        requireActivity().getOnBackPressedDispatcher().onBackPressed();
-    }
-
     public boolean onItemClick(int position) {
         Context context = getContext();
         if (null != context && null != mHelper && null != mGalleryInfo) {

@@ -266,11 +266,6 @@ public final class GalleryCommentsScene extends ToolbarScene
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
     }
 
-    @Override
-    public void onNavigationClick() {
-        requireActivity().getOnBackPressedDispatcher().onBackPressed();
-    }
-
     private void showFilterCommenterDialog(String commenter, int position) {
         Context context = getContext();
         if (context == null || commenter == null) {
