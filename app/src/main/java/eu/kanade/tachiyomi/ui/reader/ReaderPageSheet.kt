@@ -20,6 +20,7 @@ class ReaderPageSheet(
         binding = ReaderPageSheetBinding.inflate(activity.layoutInflater, null, false)
 
         binding.share.setOnClickListener { share() }
+        binding.copy.setOnClickListener { copy() }
         binding.save.setOnClickListener { save() }
         binding.saveTo.setOnClickListener { saveTo() }
 
@@ -31,6 +32,14 @@ class ReaderPageSheet(
      */
     private fun share() {
         activity.shareImage(page.index)
+        dismiss()
+    }
+
+    /**
+     * Copy the image of this page with external apps.
+     */
+    private fun copy() {
+        activity.copyImage(page.index)
         dismiss()
     }
 

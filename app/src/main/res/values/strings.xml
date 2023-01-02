@@ -738,6 +738,7 @@
     <string name="pref_category_general">General</string>
     <string name="custom_filter">Custom filter</string>
     <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
     <string name="action_save">Save</string>
     <string name="action_save_to">Save to&#8230;</string>
     <string name="wide_color_gamut">Use Display P3 color space</string>

@@ -595,6 +595,7 @@
     <string name="action_settings">设置</string>
     <string name="action_retry">重试</string>
     <string name="action_share">分享</string>
+    <string name="action_copy">复制</string>
     <string name="action_save">保存</string>
     <string name="action_save_to">保存到&#8230;</string>
     <string name="pref_category_general">通用</string>
