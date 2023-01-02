@@ -319,6 +319,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSuggestions(scrollToTop: Boolean = true) {
+        _binding ?: return
         viewLifecycleOwner.lifecycleScope.launch {
             val suggestions = mutableListOf<Suggestion>()
             mergedSuggestionFlow().collect {
@@ -362,6 +363,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     fun showSearchBar() {
+        _binding ?: return
         binding.appbar.setExpanded(true)
     }
 

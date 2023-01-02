@@ -84,6 +84,7 @@ abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
     }
 
     fun setTitle(title: CharSequence?) {
+        _binding ?: return
         binding.toolbar.title = title
     }
 
