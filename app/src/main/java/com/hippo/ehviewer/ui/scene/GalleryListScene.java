@@ -38,6 +38,7 @@ import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -213,6 +214,8 @@ public final class GalleryListScene extends SearchBarScene
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
     private boolean mIsTopList = false;
+
+    private final SearchStateOnBackPressedCallback mCallback = new SearchStateOnBackPressedCallback();
 
     @Nullable
     private static String getSuitableTitleForUrlBuilder(
@@ -527,6 +530,7 @@ public final class GalleryListScene extends SearchBarScene
     public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                                         @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.scene_gallery_list, container, false);
+        requireActivity().getOnBackPressedDispatcher().addCallback(mCallback);
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
@@ -618,6 +622,7 @@ public final class GalleryListScene extends SearchBarScene
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mCallback.remove();
 
         if (null != mHelper) {
             mHelper.destroy();
@@ -780,25 +785,6 @@ public final class GalleryListScene extends SearchBarScene
 
     public boolean isBackpressCanPreviewLauncherStatus() {
         return mState == STATE_NORMAL && getStackIndex() == 0;
-    }
-
-    @Override
-    public void onBackPressed() {
-        switch (mState) {
-            case STATE_NORMAL:
-                if (getStackIndex() == 0)
-                    requireActivity().moveTaskToBack(false);
-                else
-                    finish();
-                break;
-            case STATE_SIMPLE_SEARCH:
-            case STATE_SEARCH:
-                setState(STATE_NORMAL);
-                break;
-            case STATE_SEARCH_SHOW_LIST:
-                setState(STATE_SEARCH);
-                break;
-        }
     }
 
     public void onItemClick(int position) {
@@ -1234,6 +1220,7 @@ public final class GalleryListScene extends SearchBarScene
     }
 
     public void onStateChange(int newState) {
+        mCallback.setEnabled(newState != STATE_NORMAL);
         if (newState == STATE_NORMAL || newState == STATE_SIMPLE_SEARCH) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
@@ -1704,6 +1691,21 @@ public final class GalleryListScene extends SearchBarScene
             EhDB.deleteQuickSearch(quickSearch);
             mQuickSearchList.remove(position);
             mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    class SearchStateOnBackPressedCallback extends OnBackPressedCallback {
+        public SearchStateOnBackPressedCallback() {
+            super(false);
+        }
+
+        @Override
+        public void handleOnBackPressed() {
+            switch (mState) {
+                case STATE_NORMAL -> throw new IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL");
+                case STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL);
+                case STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH);
+            }
         }
     }
 }
