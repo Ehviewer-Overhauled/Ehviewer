@@ -318,9 +318,6 @@ public final class SpiderQueen implements Runnable {
             mode = MODE_READ;
         }
 
-        if (mSpiderDen.getDownloadDir() == null) {
-            mSpiderDen.setDownloadDir(SpiderDen.getGalleryDownloadDir(mGalleryInfo, mode == MODE_DOWNLOAD));
-        }
         mSpiderDen.setMode(mode);
 
         // Update download page
@@ -367,6 +364,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         updateMode();
+        writeSpiderInfoToLocal();
     }
 
     private void clearMode(@Mode int mode) {
@@ -839,6 +837,13 @@ public final class SpiderQueen implements Runnable {
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             return null;
+        }
+    }
+
+    private void writeSpiderInfoToLocal() {
+        var spiderInfo = mSpiderInfo.get();
+        if (spiderInfo != null) {
+            writeSpiderInfoToLocal(spiderInfo);
         }
     }
 
