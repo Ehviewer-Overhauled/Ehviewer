@@ -588,11 +588,11 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
                     galleryInfo.uploader = downloadInfo.uploader;
                     galleryInfo.rating = downloadInfo.rating;
 
-                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo, false);
+                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.gid);
                     if (downloadDir == null) {
                         continue;
                     }
-                    UniFile file = downloadDir.findFile(".ehviewer");
+                    UniFile file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME);
                     if (file == null) {
                         continue;
                     }

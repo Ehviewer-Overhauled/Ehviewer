@@ -2074,7 +2074,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             boolean checked = mBuilder.isChecked();
             Settings.putRemoveImageFiles(checked);
             if (checked) {
-                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo, false);
+                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid);
                 EhDB.removeDownloadDirname(mGalleryInfo.gid);
                 deleteFileAsync(file);
             }
