@@ -94,7 +94,6 @@ import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
 import com.hippo.ehviewer.widget.SearchLayout;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.SceneFragment;
-import com.hippo.scene.StageActivity;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.BringOutTransition;
 import com.hippo.view.ViewTransition;
@@ -495,7 +494,7 @@ public final class GalleryListScene extends SearchBarScene
                 : R.id.search_normal_search);
 
         // Update search edit text
-        if (!TextUtils.isEmpty(keyword) && !mIsTopList) {
+        if (!mIsTopList) {
             if (mode == ListUrlBuilder.MODE_TAG) {
                 keyword = wrapTagKeyword(keyword);
             }
