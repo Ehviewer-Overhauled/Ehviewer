@@ -50,13 +50,12 @@ public final class SpiderDen {
     @Nullable
     private static SimpleDiskCache sCache;
     @Nullable
-    private final UniFile mDownloadDir;
+    private UniFile mDownloadDir;
     private final long mGid;
     private volatile int mMode = SpiderQueen.MODE_READ;
 
     public SpiderDen(GalleryInfo galleryInfo) {
         mGid = galleryInfo.gid;
-        mDownloadDir = getGalleryDownloadDir(galleryInfo);
     }
 
     public static void initialize(Context context) {
@@ -64,7 +63,7 @@ public final class SpiderDen {
                 MathUtils.clamp(Settings.getReadCacheSize(), 40, 1280) * 1024 * 1024);
     }
 
-    public static UniFile getGalleryDownloadDir(GalleryInfo galleryInfo) {
+    public static UniFile getGalleryDownloadDir(GalleryInfo galleryInfo, boolean create) {
         UniFile dir = Settings.getDownloadLocation();
         if (dir != null) {
             // Read from DB
@@ -75,35 +74,13 @@ public final class SpiderDen {
                 EhDB.putDownloadDirname(galleryInfo.gid, dirname);
             }
 
-            // Find it
-            if (null == dirname) {
-                UniFile[] files = dir.listFiles(new StartWithFilenameFilter(galleryInfo.gid + "-"));
-                if (null != files) {
-                    // Get max-length-name dir
-                    int maxLength = -1;
-                    for (UniFile file : files) {
-                        if (file.isDirectory()) {
-                            String name = file.getName();
-                            int length = name.length();
-                            if (length > maxLength) {
-                                maxLength = length;
-                                dirname = name;
-                            }
-                        }
-                    }
-                    if (null != dirname) {
-                        EhDB.putDownloadDirname(galleryInfo.gid, dirname);
-                    }
-                }
-            }
-
             // Create it
-            if (null == dirname) {
+            if (null == dirname && create) {
                 dirname = FileUtils.sanitizeFilename(galleryInfo.gid + "-" + EhUtils.getSuitableTitle(galleryInfo));
                 EhDB.putDownloadDirname(galleryInfo.gid, dirname);
             }
 
-            return dir.subFile(dirname);
+            return null != dirname ? dir.subFile(dirname) : null;
         } else {
             return null;
         }
@@ -151,6 +128,10 @@ public final class SpiderDen {
     @Nullable
     public UniFile getDownloadDir() {
         return mDownloadDir != null && mDownloadDir.isDirectory() ? mDownloadDir : null;
+    }
+
+    public void setDownloadDir(UniFile dir) {
+        mDownloadDir = dir;
     }
 
     private boolean containInCache(int index) {

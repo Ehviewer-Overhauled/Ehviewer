@@ -588,7 +588,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
                     galleryInfo.uploader = downloadInfo.uploader;
                     galleryInfo.rating = downloadInfo.rating;
 
-                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo);
+                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo, false);
                     if (downloadDir == null) {
                         continue;
                     }

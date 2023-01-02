@@ -318,6 +318,9 @@ public final class SpiderQueen implements Runnable {
             mode = MODE_READ;
         }
 
+        if (mSpiderDen.getDownloadDir() == null) {
+            mSpiderDen.setDownloadDir(SpiderDen.getGalleryDownloadDir(mGalleryInfo, mode == MODE_DOWNLOAD));
+        }
         mSpiderDen.setMode(mode);
 
         // Update download page
