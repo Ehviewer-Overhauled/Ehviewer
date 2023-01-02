@@ -63,7 +63,7 @@ import java.util.Locale;
 
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 
-public class GalleryPreviewsScene extends ToolbarScene {
+public class GalleryPreviewsScene extends BaseToolbarScene {
 
     public static final String KEY_GALLERY_INFO = "gallery_info";
     private final static String KEY_HAS_FIRST_REFRESH = "has_first_refresh";

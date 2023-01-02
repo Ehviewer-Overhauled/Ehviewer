@@ -22,41 +22,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.size
-import com.google.android.material.appbar.AppBarLayout
-import com.hippo.ehviewer.R
+import com.hippo.ehviewer.databinding.SceneToolbarBinding
 
-abstract class ToolbarScene : BaseScene() {
-    protected var mToolbar: Toolbar? = null
-    protected var mAppBarLayout: AppBarLayout? = null
-    private var mTempTitle: CharSequence? = null
-
-    abstract fun onCreateViewWithToolbar(
-        inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
-    ): View
+abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
+    private lateinit var binding: SceneToolbarBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.scene_toolbar, container, false) as ViewGroup
-        mToolbar = view.findViewById(R.id.toolbar)
-        mAppBarLayout = view.findViewById(R.id.appbar)
-        val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
-        return view.apply { addView(contentView, 0) }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mToolbar = null
+    ): View {
+        binding = SceneToolbarBinding.inflate(inflater, container, false)
+        val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
+        return binding.root.apply { addView(contentView, 0) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mToolbar?.apply {
-            mTempTitle?.let { title = it }
+        binding.toolbar.apply {
             val menuResId = getMenuResId()
             if (menuResId != 0) {
                 inflateMenu(menuResId)
@@ -66,32 +49,28 @@ abstract class ToolbarScene : BaseScene() {
         }
     }
 
-    fun hideMenu() {
-        mToolbar?.menu?.clear()
-    }
-
     fun showMenu(menuResId: Int) {
-        if (mToolbar?.menu?.size != 0) return
-        mToolbar?.apply {
+        if (binding.toolbar.menu?.size != 0) return
+        binding.toolbar.apply {
             inflateMenu(menuResId)
             setOnMenuItemClickListener { item: MenuItem -> onMenuItemClick(item) }
         }
     }
 
-    open fun getMenuResId(): Int {
+    override fun getMenuResId(): Int {
         return 0
     }
 
-    open fun onMenuItemClick(item: MenuItem): Boolean {
+    override fun onMenuItemClick(item: MenuItem): Boolean {
         return false
     }
 
-    open fun onNavigationClick() {
+    override fun onNavigationClick() {
         requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     fun setNavigationIcon(@DrawableRes resId: Int) {
-        mToolbar?.setNavigationIcon(resId)
+        binding.toolbar.setNavigationIcon(resId)
     }
 
     fun setTitle(@StringRes resId: Int) {
@@ -99,11 +78,10 @@ abstract class ToolbarScene : BaseScene() {
     }
 
     fun setTitle(title: CharSequence?) {
-        mToolbar?.title = title
-        mTempTitle = title
+        binding.toolbar.title = title
     }
 
-    fun setLiftOnScrollTargetView(view: View?) {
-        mAppBarLayout?.setLiftOnScrollTargetView(view)
+    override fun setLiftOnScrollTargetView(view: View?) {
+        binding.appbar.setLiftOnScrollTargetView(view)
     }
 }

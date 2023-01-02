@@ -95,7 +95,7 @@ import java.util.List;
 
 import rikka.core.res.ResourcesKt;
 
-public final class GalleryCommentsScene extends ToolbarScene
+public final class GalleryCommentsScene extends BaseToolbarScene
         implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String TAG = GalleryCommentsScene.class.getSimpleName();

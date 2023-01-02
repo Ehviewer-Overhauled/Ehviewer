@@ -1,11 +1,11 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -17,7 +17,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.search.SearchBar
 import com.google.android.material.search.SearchView
 import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -25,17 +24,16 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.widget.SearchDatabase
-import com.hippo.scene.StageActivity
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 
-abstract class SearchBarScene : ToolbarScene() {
-    private var mSearchView: SearchView? = null
-    private var mRecyclerView: RecyclerView? = null
+abstract class SearchBarScene : BaseScene(), ToolBarScene {
+    private lateinit var binding: SceneSearchbarBinding
     private var mSuggestionList: List<Suggestion>? = null
     private var mSuggestionAdapter: SuggestionAdapter? = null
     private var mSuggestionProvider: SuggestionProvider? = null
@@ -46,40 +44,46 @@ abstract class SearchBarScene : ToolbarScene() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view =
-            inflater.inflate(R.layout.scene_searchbar, container, false) as ViewGroup
-        mToolbar = view.findViewById(R.id.toolbar)
-        mAppBarLayout = view.findViewById(R.id.appbar)
-        mAppBarLayout?.statusBarForeground =
+    ): View {
+        binding = SceneSearchbarBinding.inflate(inflater, container, false)
+        binding.appbar.statusBarForeground =
             MaterialShapeDrawable.createWithElevationOverlay(context)
-
-        mSearchView = view.findViewById(R.id.searchview)
-        mRecyclerView = view.findViewById(R.id.search_bar_list)
-        mSearchView?.editText?.addTextChangedListener {
+        binding.searchview.editText.addTextChangedListener {
             updateSuggestions()
         }
-        mSearchView?.editText?.setOnEditorActionListener { _, _, _ ->
-            (mToolbar as SearchBar).text = mSearchView!!.text
-            mSearchView?.hide()
+        binding.searchview.editText.setOnEditorActionListener { _, _, _ ->
+            binding.toolbar.text = binding.searchview.text
+            binding.searchview.hide()
             onApplySearch()
             true
         }
         mSuggestionList = ArrayList()
         mSuggestionAdapter = SuggestionAdapter(LayoutInflater.from(context))
-        mRecyclerView?.adapter = mSuggestionAdapter
+        binding.searchBarList.adapter = mSuggestionAdapter
         val layoutManager = LinearLayoutManager(context)
-        mRecyclerView?.layoutManager = layoutManager
-        mSearchView?.addTransitionListener { _, _, newState ->
+        binding.searchBarList.layoutManager = layoutManager
+        binding.searchview.addTransitionListener { _, _, newState ->
             if (newState == SearchView.TransitionState.SHOWING)
                 onSearchViewExpanded()
             else if (newState == SearchView.TransitionState.HIDING)
                 onSearchViewHidden()
         }
-        mSearchView?.addTransitionListener(mSearchViewOnBackPressedCallback)
+        binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
         requireActivity().onBackPressedDispatcher.addCallback(mSearchViewOnBackPressedCallback)
-        val contentView = onCreateViewWithToolbar(inflater, view, savedInstanceState)
-        return view.apply { addView(contentView, 0) }
+        val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
+        return binding.root.apply { addView(contentView, 0) }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.apply {
+            val menuResId = getMenuResId()
+            if (menuResId != 0) {
+                inflateMenu(menuResId)
+                setOnMenuItemClickListener { item: MenuItem -> onMenuItemClick(item) }
+            }
+            setNavigationOnClickListener { onNavigationClick() }
+        }
     }
 
     override fun onDestroyView() {
@@ -118,27 +122,31 @@ abstract class SearchBarScene : ToolbarScene() {
     }
 
     fun setSearchBarHint(hint: String?) {
-        (mToolbar as? SearchBar)?.hint = hint
+        binding.toolbar.hint = hint
     }
 
     fun setSearchBarText(text: String?) {
-        (mToolbar as? SearchBar)?.text = text
+        binding.toolbar.text = text
     }
 
     fun setEditTextHint(hint: String?) {
-        mSearchView?.editText?.hint = hint
-    }
-
-    fun setEditTextText(text: String?) {
-        mSearchView?.setText(text)
-    }
-
-    fun setNavigationDrawable(drawable: Drawable?) {
-        (mToolbar as? SearchBar)?.navigationIcon = drawable
+        binding.searchview.editText.hint = hint
     }
 
     override fun onNavigationClick() {
         toggleDrawer(Gravity.START)
+    }
+
+    override fun getMenuResId(): Int {
+        return 0
+    }
+
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        return false
+    }
+
+    override fun setLiftOnScrollTargetView(view: View?) {
+        binding.appbar.setLiftOnScrollTargetView(view)
     }
 
     fun setOnApplySearch(lambda: (String) -> Unit) {
@@ -146,7 +154,7 @@ abstract class SearchBarScene : ToolbarScene() {
     }
 
     fun onApplySearch() {
-        val query = (mToolbar as SearchBar).text.toString().trim()
+        val query = binding.toolbar.text.toString().trim()
         if (!mAllowEmptySearch && query.isEmpty()) {
             return
         }
@@ -263,8 +271,8 @@ abstract class SearchBarScene : ToolbarScene() {
         }
 
         override fun onClick() {
-            val edittext = mSearchView?.editText
-            edittext?.let {
+            val edittext = binding.searchview.editText
+            edittext.let {
                 val text = it.text.toString()
                 var temp = wrapTagKeyword(mKeyword) + " "
                 if (text.contains(" ")) {
@@ -287,7 +295,7 @@ abstract class SearchBarScene : ToolbarScene() {
         }
 
         override fun onClick() {
-            mSearchView?.editText?.run {
+            binding.searchview.editText.run {
                 setText(mKeyword)
                 setSelection(length())
             }
@@ -319,12 +327,12 @@ abstract class SearchBarScene : ToolbarScene() {
             }
         }
         if (scrollToTop) {
-            mRecyclerView?.scrollToPosition(0)
+            binding.searchBarList.scrollToPosition(0)
         }
     }
 
     private fun mergedSuggestionFlow(): Flow<Suggestion> = flow {
-        mSearchView?.editText?.text?.toString()?.let { text ->
+        binding.searchview.editText.text?.toString()?.let { text ->
             mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
             mSearchDatabase.getSuggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
             EhTagDatabase.takeIf { it.isInitialized() }?.run {
@@ -351,14 +359,14 @@ abstract class SearchBarScene : ToolbarScene() {
     }
 
     fun showSearchBar() {
-        mAppBarLayout?.setExpanded(true)
+        binding.appbar.setExpanded(true)
     }
 
     private val mSearchViewOnBackPressedCallback =
         object : OnBackPressedCallback(false), TransitionListener {
             override fun handleOnBackPressed() {
-                mSearchView?.let { (mToolbar as SearchBar).text = it.text }
-                mSearchView?.hide()
+                binding.searchview.let { binding.toolbar.text = it.text }
+                binding.searchview.hide()
             }
 
             override fun onStateChanged(

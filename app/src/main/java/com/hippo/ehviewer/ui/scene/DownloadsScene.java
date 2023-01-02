@@ -28,7 +28,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,7 +92,7 @@ import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 import rikka.core.res.ResourcesKt;
 
 @SuppressLint("RtlHardcoded")
-public class DownloadsScene extends ToolbarScene
+public class DownloadsScene extends BaseToolbarScene
         implements DownloadManager.DownloadInfoListener,
         FabLayout.OnClickFabListener, FastScroller.OnDragHandlerListener {
 
@@ -276,8 +275,6 @@ public class DownloadsScene extends ToolbarScene
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
-
-        updateTitle();
         Settings.putRecentDownloadLabel(mLabel);
     }
 
@@ -374,6 +371,7 @@ public class DownloadsScene extends ToolbarScene
         mFabLayout.setOnClickFabListener(this);
         addAboveSnackView(mFabLayout);
 
+        updateTitle();
         updateView();
 
         return view;

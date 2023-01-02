@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
 
 @SuppressLint("NotifyDataSetChanged")
-class HistoryScene : ToolbarScene() {
+class HistoryScene : BaseToolbarScene() {
     lateinit var binding: SceneHistoryBinding
     private val mAdapter: HistoryAdapter by lazy {
         HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
