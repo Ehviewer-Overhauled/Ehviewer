@@ -53,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/favorited"
+                app:backgroundTint="?colorAccent"
                 app:icon="@drawable/v_heart_primary_x48" />
 
             <Button
