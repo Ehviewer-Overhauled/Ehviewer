@@ -13,60 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
-
-// TODO Add url field?
-public class GalleryTagGroup implements Parcelable {
-
-    public static final Parcelable.Creator<GalleryTagGroup> CREATOR = new Parcelable.Creator<GalleryTagGroup>() {
-        @Override
-        public GalleryTagGroup createFromParcel(Parcel source) {
-            return new GalleryTagGroup(source);
-        }
-
-        @Override
-        public GalleryTagGroup[] newArray(int size) {
-            return new GalleryTagGroup[size];
-        }
-    };
-    private final ArrayList<String> mTagList;
-    public String groupName;
-
-    public GalleryTagGroup() {
-        mTagList = new ArrayList<>();
+@Parcelize
+class GalleryTagGroup(
+    private val mTagList: ArrayList<String> = arrayListOf(),
+    @JvmField
+    var groupName: String? = null
+) : Parcelable {
+    fun addTag(tag: String) {
+        mTagList.add(tag)
     }
 
-    protected GalleryTagGroup(Parcel in) {
-        this.groupName = in.readString();
-        this.mTagList = in.createStringArrayList();
+    fun size(): Int {
+        return mTagList.size
     }
 
-    public void addTag(String tag) {
-        mTagList.add(tag);
-    }
-
-    public int size() {
-        return mTagList.size();
-    }
-
-    public String getTagAt(int position) {
-        return mTagList.get(position);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.groupName);
-        dest.writeStringList(this.mTagList);
+    fun getTagAt(position: Int): String {
+        return mTagList[position]
     }
 }

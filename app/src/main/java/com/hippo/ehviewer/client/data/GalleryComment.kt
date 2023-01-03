@@ -13,78 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class GalleryComment implements Parcelable {
-
-    public static final Creator<GalleryComment> CREATOR = new Creator<GalleryComment>() {
-        @Override
-        public GalleryComment createFromParcel(Parcel source) {
-            return new GalleryComment(source);
-        }
-
-        @Override
-        public GalleryComment[] newArray(int size) {
-            return new GalleryComment[size];
-        }
-    };
+@Parcelize
+class GalleryComment(
     // 0 for uploader comment. can't vote
-    public long id;
-    public int score;
-    public boolean editable;
-    public boolean voteUpAble;
-    public boolean voteUpEd;
-    public boolean voteDownAble;
-    public boolean voteDownEd;
-    public boolean uploader;
-    public String voteState;
-    public long time;
-    public String user;
-    public String comment;
-    public long lastEdited;
-
-    public GalleryComment() {
-    }
-
-    protected GalleryComment(Parcel in) {
-        this.id = in.readLong();
-        this.score = in.readInt();
-        this.editable = in.readByte() != 0;
-        this.voteUpAble = in.readByte() != 0;
-        this.voteUpEd = in.readByte() != 0;
-        this.voteDownAble = in.readByte() != 0;
-        this.voteDownEd = in.readByte() != 0;
-        this.uploader = in.readByte() != 0;
-        this.voteState = in.readString();
-        this.time = in.readLong();
-        this.user = in.readString();
-        this.comment = in.readString();
-        this.lastEdited = in.readLong();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.id);
-        dest.writeInt(this.score);
-        dest.writeByte(editable ? (byte) 1 : (byte) 0);
-        dest.writeByte(voteUpAble ? (byte) 1 : (byte) 0);
-        dest.writeByte(voteUpEd ? (byte) 1 : (byte) 0);
-        dest.writeByte(voteDownAble ? (byte) 1 : (byte) 0);
-        dest.writeByte(voteDownEd ? (byte) 1 : (byte) 0);
-        dest.writeByte(uploader ? (byte) 1 : (byte) 0);
-        dest.writeString(this.voteState);
-        dest.writeLong(this.time);
-        dest.writeString(this.user);
-        dest.writeString(this.comment);
-        dest.writeLong(this.lastEdited);
-    }
-}
+    @JvmField
+    var id: Long = 0,
+    @JvmField
+    var score: Int = 0,
+    @JvmField
+    var editable: Boolean = false,
+    @JvmField
+    var voteUpAble: Boolean = false,
+    @JvmField
+    var voteUpEd: Boolean = false,
+    @JvmField
+    var voteDownAble: Boolean = false,
+    @JvmField
+    var voteDownEd: Boolean = false,
+    @JvmField
+    var uploader: Boolean = false,
+    @JvmField
+    var voteState: String? = null,
+    @JvmField
+    var time: Long = 0,
+    @JvmField
+    var user: String? = null,
+    @JvmField
+    var comment: String? = null,
+    @JvmField
+    var lastEdited: Long = 0
+) : Parcelable

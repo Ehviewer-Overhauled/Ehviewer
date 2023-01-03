@@ -13,53 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.Arrays;
-
-public class GalleryCommentList implements Parcelable {
-
-    public static final Creator<GalleryCommentList> CREATOR = new Creator<GalleryCommentList>() {
-        @Override
-        public GalleryCommentList createFromParcel(Parcel in) {
-            return new GalleryCommentList(in);
-        }
-
-        @Override
-        public GalleryCommentList[] newArray(int size) {
-            return new GalleryCommentList[size];
-        }
-    };
-    public GalleryComment[] comments;
-    public boolean hasMore;
-
-    public GalleryCommentList(GalleryComment[] comments, boolean hasMore) {
-        this.comments = comments;
-        this.hasMore = hasMore;
-    }
-
-    protected GalleryCommentList(Parcel in) {
-        Parcelable[] array = in.readParcelableArray(getClass().getClassLoader());
-        if (array != null) {
-            comments = Arrays.copyOf(array, array.length, GalleryComment[].class);
-        } else {
-            comments = null;
-        }
-        hasMore = in.readByte() != 0;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelableArray(comments, flags);
-        dest.writeByte(hasMore ? (byte) 1 : (byte) 0);
-    }
-}
+@Parcelize
+class GalleryCommentList(
+    @JvmField
+    var comments: Array<GalleryComment>?,
+    @JvmField
+    var hasMore: Boolean
+) : Parcelable
