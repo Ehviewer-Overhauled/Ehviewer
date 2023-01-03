@@ -197,4 +197,7 @@ configurations.all {
     exclude group: 'dev.rikka.rikkax.appcompat', module: 'appcompat'
     exclude group: 'dev.rikka.rikkax.material', module: 'material'
     exclude group: 'androidx.compose.material'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-android-extensions-runtime'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
 }
