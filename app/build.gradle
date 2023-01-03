@@ -103,7 +103,6 @@ android {
 
 dependencies {
     def activity_version = "1.6.1"
-    implementation "androidx.activity:activity:$activity_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
 
     implementation "androidx.annotation:annotation:1.5.0"
@@ -134,14 +133,12 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
 
     def core_version = "1.9.0"
-    implementation "androidx.core:core:$core_version"
     implementation "androidx.core:core-ktx:$core_version"
 
     implementation "androidx.customview:customview:1.2.0-alpha02"
     implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
 
     def fragment_version = "1.6.0-alpha04"
-    implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
     def lifecycle_version = "2.6.0-alpha03"
@@ -155,14 +152,12 @@ dependencies {
     implementation "androidx.loader:loader:1.1.0"
 
     def nav_version = "2.5.3"
-    implementation "androidx.navigation:navigation-fragment:$nav_version"
-    implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    implementation "androidx.paging:paging-runtime:3.2.0-alpha03"
+    implementation "androidx.paging:paging-runtime-ktx:3.2.0-alpha03"
 
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.0-rc01'
 
     def room_version = "2.5.0-rc01"
