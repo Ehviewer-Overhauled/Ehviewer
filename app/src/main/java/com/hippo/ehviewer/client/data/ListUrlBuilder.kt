@@ -15,9 +15,7 @@
  */
 package com.hippo.ehviewer.client.data
 
-import android.os.Parcel
 import android.os.Parcelable
-import android.os.Parcelable.Creator
 import android.text.TextUtils
 import androidx.annotation.IntDef
 import com.hippo.ehviewer.client.EhConfig
@@ -28,47 +26,29 @@ import com.hippo.ehviewer.widget.AdvanceSearchTable
 import com.hippo.network.UrlBuilder
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.StringUtils
+import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-open class ListUrlBuilder : Cloneable, Parcelable {
-    @get:Mode
-    @Mode
-    var mode = MODE_NORMAL
-    private var mPrev: String? = null
-    private var mNext: String? = null
-    private var mJumpTo: String? = null
-    var category = EhUtils.NONE
-    private var mKeyword: String? = null
-    private var mSHash: String? = null
-    var advanceSearch = -1
-    var minRating = -1
-    var pageFrom = -1
-    var pageTo = -1
-    var imagePath: String? = null
-    var isUseSimilarityScan = false
-    var isOnlySearchCovers = false
-    var isShowExpunged = false
-
-    constructor()
-    protected constructor(parcel: Parcel) {
-        mode = parcel.readInt()
-        mPrev = parcel.readString()
-        mNext = parcel.readString()
-        mJumpTo = parcel.readString()
-        this.category = parcel.readInt()
-        mKeyword = parcel.readString()
-        advanceSearch = parcel.readInt()
-        minRating = parcel.readInt()
-        pageFrom = parcel.readInt()
-        pageTo = parcel.readInt()
-        imagePath = parcel.readString()
-        isUseSimilarityScan = parcel.readByte().toInt() != 0
-        isOnlySearchCovers = parcel.readByte().toInt() != 0
-        isShowExpunged = parcel.readByte().toInt() != 0
-        mSHash = parcel.readString()
-    }
+@Parcelize
+open class ListUrlBuilder(
+    @get:Mode @Mode var mode: Int = MODE_NORMAL,
+    private var mPrev: String? = null,
+    private var mNext: String? = null,
+    private var mJumpTo: String? = null,
+    var category: Int = EhUtils.NONE,
+    private var mKeyword: String? = null,
+    private var mSHash: String? = null,
+    var advanceSearch: Int = -1,
+    var minRating: Int = -1,
+    var pageFrom: Int = -1,
+    var pageTo: Int = -1,
+    var imagePath: String? = null,
+    var isUseSimilarityScan: Boolean = false,
+    var isOnlySearchCovers: Boolean = false,
+    var isShowExpunged: Boolean = false,
+) : Cloneable, Parcelable {
 
     fun reset() {
         mode = MODE_NORMAL
@@ -86,14 +66,6 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         isOnlySearchCovers = false
         isShowExpunged = false
         mSHash = null
-    }
-
-    public override fun clone(): ListUrlBuilder {
-        return try {
-            super.clone() as ListUrlBuilder
-        } catch (e: CloneNotSupportedException) {
-            throw IllegalStateException(e)
-        }
     }
 
     fun setIndex(index: String?, isNext: Boolean = true) {
@@ -449,24 +421,6 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(mode)
-        dest.writeString(mPrev)
-        dest.writeString(mNext)
-        dest.writeString(mJumpTo)
-        dest.writeInt(this.category)
-        dest.writeString(mKeyword)
-        dest.writeInt(advanceSearch)
-        dest.writeInt(minRating)
-        dest.writeInt(pageFrom)
-        dest.writeInt(pageTo)
-        dest.writeString(imagePath)
-        dest.writeByte(if (isUseSimilarityScan) 1.toByte() else 0.toByte())
-        dest.writeByte(if (isOnlySearchCovers) 1.toByte() else 0.toByte())
-        dest.writeByte(if (isShowExpunged) 1.toByte() else 0.toByte())
-        dest.writeString(mSHash)
-    }
-
     @IntDef(
         MODE_NORMAL,
         MODE_UPLOADER,
@@ -486,16 +440,5 @@ open class ListUrlBuilder : Cloneable, Parcelable {
         const val MODE_IMAGE_SEARCH = 0x4
         const val MODE_SUBSCRIPTION = 0x5
         const val MODE_TOPLIST = 0x6
-
-        @JvmField
-        val CREATOR: Creator<ListUrlBuilder> = object : Creator<ListUrlBuilder> {
-            override fun createFromParcel(source: Parcel): ListUrlBuilder {
-                return ListUrlBuilder(source)
-            }
-
-            override fun newArray(size: Int): Array<ListUrlBuilder?> {
-                return arrayOfNulls(size)
-            }
-        }
     }
 }
