@@ -24,12 +24,12 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.widget.AdvanceSearchTable
 import com.hippo.network.UrlBuilder
+import com.hippo.util.encodeUTF8
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.StringUtils
 import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-import java.net.URLEncoder
 
 @Parcelize
 open class ListUrlBuilder(
@@ -312,14 +312,10 @@ open class ListUrlBuilder(
                     ub.addQuery("f_cats", category.inv() and EhConfig.ALL_CATEGORY)
                 }
                 // Search key
-                if (mKeyword != null) {
-                    val keyword = mKeyword!!.trim { it <= ' ' }
+                mKeyword?.run {
+                    val keyword = trim { it <= ' ' }
                     if (keyword.isNotEmpty()) {
-                        try {
-                            ub.addQuery("f_search", URLEncoder.encode(mKeyword, "UTF-8"))
-                        } catch (e: UnsupportedEncodingException) {
-                            // Empty
-                        }
+                        ub.addQuery("f_search", encodeUTF8(this))
                     }
                 }
                 mSHash?.let {
@@ -359,11 +355,9 @@ open class ListUrlBuilder(
 
             MODE_UPLOADER -> {
                 val sb = StringBuilder(EhUrl.getHost())
-                sb.append("uploader/")
-                try {
-                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"))
-                } catch (e: UnsupportedEncodingException) {
-                    // Empty
+                mKeyword?.let {
+                    sb.append("uploader/")
+                    sb.append(encodeUTF8(it))
                 }
                 mPrev?.let {
                     sb.append("?prev=").append(it)
@@ -379,11 +373,9 @@ open class ListUrlBuilder(
 
             MODE_TAG -> {
                 val sb = StringBuilder(EhUrl.getHost())
-                sb.append("tag/")
-                try {
-                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"))
-                } catch (e: UnsupportedEncodingException) {
-                    // Empty
+                mKeyword?.let {
+                    sb.append("tag/")
+                    sb.append(encodeUTF8(it))
                 }
                 mPrev?.let {
                     sb.append("?prev=").append(it)
@@ -402,10 +394,8 @@ open class ListUrlBuilder(
             MODE_TOPLIST -> {
                 val sb = StringBuilder(EhUrl.HOST_E)
                 sb.append("toplist.php?tl=")
-                try {
-                    sb.append(URLEncoder.encode(mKeyword, "UTF-8"))
-                } catch (e: UnsupportedEncodingException) {
-                    e.printStackTrace()
+                mKeyword.orEmpty().let {
+                    sb.append(encodeUTF8(it))
                 }
                 mJumpTo?.let {
                     sb.append("&p=").append(it)
@@ -415,10 +405,6 @@ open class ListUrlBuilder(
 
             else -> throw java.lang.IllegalStateException("Unexpected value: $mode")
         }
-    }
-
-    override fun describeContents(): Int {
-        return 0
     }
 
     @IntDef(
