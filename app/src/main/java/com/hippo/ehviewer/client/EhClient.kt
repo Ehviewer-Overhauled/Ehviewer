@@ -40,91 +40,91 @@ class EhClient {
                         METHOD_SIGN_IN -> EhEngine.signIn(
                             task,
                             mOkHttpClient,
-                            params[0] as String,
-                            params[1] as String
+                            params[0] as String?,
+                            params[1] as String?
                         )
 
                         METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
                             task,
                             mOkHttpClient,
-                            params[0] as String
+                            params[0] as String?
                         )
 
                         METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
                             task,
                             mOkHttpClient,
-                            params[0] as String
+                            params[0] as String?
                         )
 
                         METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
                             task,
                             mOkHttpClient,
-                            params[0] as String
+                            params[0] as String?
                         )
 
                         METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
+                            params[1] as String?,
                             (params[2] as Long),
-                            params[3] as String,
+                            params[3] as String?,
                             (params[4] as Float)
                         )
 
                         METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
                             task,
                             mOkHttpClient,
-                            params[0] as String,
-                            params[1] as String,
-                            params[2] as String
+                            params[0] as String?,
+                            params[1] as String?,
+                            params[2] as String?
                         )
 
                         METHOD_GET_GALLERY_TOKEN -> EhEngine.getGalleryToken(
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
+                            params[1] as String?,
                             (params[2] as Int)
                         )
 
                         METHOD_GET_FAVORITES -> EhEngine.getFavorites(
                             task,
                             mOkHttpClient,
-                            params[0] as String
+                            params[0] as String?
                         )
 
                         METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
+                            params[1] as String?,
                             (params[2] as Int),
-                            params[3] as String
+                            params[3] as String?
                         )
 
                         METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
                             task,
                             mOkHttpClient,
-                            params[0] as LongArray,
-                            params[1] as Array<String?>,
+                            params[0] as LongArray?,
+                            params[1] as Array<String?>?,
                             (params[2] as Int)
                         )
 
                         METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
                             task,
                             mOkHttpClient,
-                            params[0] as String,
-                            params[1] as LongArray,
+                            params[0] as String?,
+                            params[1] as LongArray?,
                             (params[2] as Int)
                         )
 
                         METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
                             task,
                             mOkHttpClient,
-                            params[0] as String,
+                            params[0] as String?,
                             (params[1] as Long),
-                            params[2] as String
+                            params[2] as String?
                         )
 
                         METHOD_GET_PROFILE -> EhEngine.getProfile(task, mOkHttpClient)
@@ -132,9 +132,9 @@ class EhClient {
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
+                            params[1] as String?,
                             (params[2] as Long),
-                            params[3] as String,
+                            params[3] as String?,
                             (params[4] as Long),
                             (params[5] as Int)
                         )
@@ -142,7 +142,7 @@ class EhClient {
                         METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
                             task,
                             mOkHttpClient,
-                            params[0] as File,
+                            params[0] as File?,
                             (params[1] as Boolean),
                             (params[2] as Boolean),
                             (params[3] as Boolean)
@@ -151,18 +151,18 @@ class EhClient {
                         METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
                             task,
                             mOkHttpClient,
-                            params[0] as String,
+                            params[0] as String?,
                             (params[1] as Long),
-                            params[2] as String
+                            params[2] as String?
                         )
 
                         METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
-                            params[2] as String,
-                            params[3] as String,
+                            params[1] as String?,
+                            params[2] as String?,
+                            params[3] as String?,
                             (params[4] as Boolean)
                         )
 
@@ -170,10 +170,10 @@ class EhClient {
                             task,
                             mOkHttpClient,
                             (params[0] as Long),
-                            params[1] as String,
+                            params[1] as String?,
                             (params[2] as Long),
-                            params[3] as String,
-                            params[4] as String,
+                            params[3] as String?,
+                            params[4] as String?,
                             (params[5] as Int)
                         )
 
