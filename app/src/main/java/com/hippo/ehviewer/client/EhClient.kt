@@ -23,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import java.io.File
@@ -41,14 +43,14 @@ class EhClient {
                         METHOD_SIGN_IN -> EhEngine.signIn(
                             task,
                             mOkHttpClient,
-                            params[0] as String?,
-                            params[1] as String?
+                            params[0] as String,
+                            params[1] as String
                         )
 
                         METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
                             task,
                             mOkHttpClient,
-                            params[0] as String?
+                            params[0] as String
                         )
 
                         METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
@@ -77,7 +79,7 @@ class EhClient {
                             task,
                             mOkHttpClient,
                             params[0] as String?,
-                            params[1] as String?,
+                            params[1] as String,
                             params[2] as String?
                         )
 
@@ -92,7 +94,7 @@ class EhClient {
                         METHOD_GET_FAVORITES -> EhEngine.getFavorites(
                             task,
                             mOkHttpClient,
-                            params[0] as String?
+                            params[0] as String
                         )
 
                         METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
@@ -107,16 +109,16 @@ class EhClient {
                         METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
                             task,
                             mOkHttpClient,
-                            params[0] as LongArray?,
-                            params[1] as Array<String?>?,
+                            params[0] as LongArray,
+                            params[1] as Array<String?>,
                             (params[2] as Int)
                         )
 
                         METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
                             task,
                             mOkHttpClient,
-                            params[0] as String?,
-                            params[1] as LongArray?,
+                            params[0] as String,
+                            params[1] as LongArray,
                             (params[2] as Int)
                         )
 
@@ -143,7 +145,7 @@ class EhClient {
                         METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
                             task,
                             mOkHttpClient,
-                            params[0] as File?,
+                            params[0] as File,
                             (params[1] as Boolean),
                             (params[2] as Boolean),
                             (params[3] as Boolean)
@@ -213,7 +215,12 @@ class EhClient {
         private val mStop
             get() = !(job?.isActive ?: false)
 
-        fun setCall(call: Call?) {
+        suspend fun setCall(call: Call?) {
+            if (mStop || !currentCoroutineContext().isActive) call?.cancel()
+            else mCall.lazySet(call)
+        }
+
+        fun setCallNoSuspend(call: Call?) {
             if (mStop) call?.cancel()
             else mCall.lazySet(call)
         }

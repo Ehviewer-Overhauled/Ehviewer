@@ -110,7 +110,6 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         AppConfig.initialize(this)
         SpiderDen.initialize(this)
         EhDB.initialize(this)
-        EhEngine.initialize()
         BitmapUtils.initialize(this)
         EhTagDatabase.update()
 

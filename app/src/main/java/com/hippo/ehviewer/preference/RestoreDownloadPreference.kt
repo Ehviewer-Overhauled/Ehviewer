@@ -13,209 +13,170 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import android.app.Activity
+import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable.Creator
+import android.util.AttributeSet
+import androidx.preference.Preference
+import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.spider.SpiderInfo
+import com.hippo.ehviewer.spider.SpiderQueen
+import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.unifile.UniFile
+import com.hippo.util.ExceptionUtils
+import com.hippo.yorozuya.IOUtils
+import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
+import java.io.IOException
+import java.io.InputStream
+import java.util.Collections
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Parcel;
-import android.util.AttributeSet;
-
-import androidx.annotation.NonNull;
-import androidx.preference.Preference;
-
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhEngine;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.ehviewer.spider.SpiderInfo;
-import com.hippo.ehviewer.spider.SpiderQueen;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-import com.hippo.unifile.UniFile;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import okhttp3.OkHttpClient;
-
-public class RestoreDownloadPreference extends TaskPreference {
-
-    public RestoreDownloadPreference(Context context) {
-        super(context);
+class RestoreDownloadPreference constructor(
+    context: Context, attrs: AttributeSet?
+) : TaskPreference(context, attrs) {
+    override fun onCreateTask(): Task {
+        return RestoreTask(context)
     }
 
-    public RestoreDownloadPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public RestoreDownloadPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @NonNull
-    @Override
-    protected Task onCreateTask() {
-        return new RestoreTask(getContext());
-    }
-
-    private static class RestoreTask extends Task {
-
-        private final DownloadManager mManager;
-        private final OkHttpClient mHttpClient;
-
-        public RestoreTask(@NonNull Context context) {
-            super(context);
-            mManager = EhApplication.getDownloadManager();
-            mHttpClient = EhApplication.getOkHttpClient();
-        }
-
-        private RestoreItem getRestoreItem(UniFile file) {
-            if (null == file || !file.isDirectory()) {
-                return null;
+    private class RestoreTask(context: Context) : Task(context) {
+        private val mManager: DownloadManager = downloadManager
+        private val mHttpClient: OkHttpClient = okHttpClient
+        private fun getRestoreItem(file: UniFile?): RestoreItem? {
+            if (null == file || !file.isDirectory) {
+                return null
             }
-            UniFile siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME);
-            if (null == siFile) {
-                return null;
-            }
-
-            InputStream is = null;
-            try {
-                is = siFile.openInputStream();
-                SpiderInfo spiderInfo = SpiderInfo.read(is);
-                if (spiderInfo == null) {
-                    return null;
-                }
-                long gid = spiderInfo.gid;
+            val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
+            var `is`: InputStream? = null
+            return try {
+                `is` = siFile.openInputStream()
+                val spiderInfo = SpiderInfo.read(`is`) ?: return null
+                val gid = spiderInfo.gid
                 if (mManager.containDownloadInfo(gid)) {
-                    return null;
+                    return null
                 }
-                String token = spiderInfo.token;
-                RestoreItem restoreItem = new RestoreItem();
-                restoreItem.gid = gid;
-                restoreItem.token = token;
-                restoreItem.dirname = file.getName();
-                return restoreItem;
-            } catch (IOException e) {
-                return null;
+                val token = spiderInfo.token
+                val restoreItem = RestoreItem()
+                restoreItem.gid = gid
+                restoreItem.token = token
+                restoreItem.dirname = file.name
+                restoreItem
+            } catch (e: IOException) {
+                null
             } finally {
-                IOUtils.closeQuietly(is);
+                IOUtils.closeQuietly(`is`)
             }
         }
 
-        @Override
-        protected Object doInBackground(Void... params) {
-            UniFile dir = Settings.getDownloadLocation();
-            if (null == dir) {
-                return null;
-            }
-
-            List<RestoreItem> restoreItemList = new ArrayList<>();
-
-            UniFile[] files = dir.listFiles();
-            if (files == null) {
-                return null;
-            }
-
-            for (UniFile file : files) {
-                RestoreItem restoreItem = getRestoreItem(file);
+        override fun doInBackground(vararg params: Void): Any? {
+            val dir = Settings.getDownloadLocation() ?: return null
+            val restoreItemList: MutableList<RestoreItem> = ArrayList()
+            val files = dir.listFiles() ?: return null
+            for (file in files) {
+                val restoreItem = getRestoreItem(file)
                 if (null != restoreItem) {
-                    restoreItemList.add(restoreItem);
+                    restoreItemList.add(restoreItem)
                 }
             }
-
-            if (0 == restoreItemList.size()) {
-                return Collections.EMPTY_LIST;
-            }
-
-            try {
-                return EhEngine.fillGalleryListByApi(null, mHttpClient, new ArrayList<>(restoreItemList), EhUrl.getReferer());
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                e.printStackTrace();
-                return null;
+            return if (0 == restoreItemList.size) {
+                Collections.EMPTY_LIST
+            } else try {
+                runBlocking {
+                    fillGalleryListByApi(
+                        null,
+                        mHttpClient,
+                        ArrayList(restoreItemList),
+                        EhUrl.getReferer()
+                    )
+                }
+            } catch (e: Throwable) {
+                ExceptionUtils.throwIfFatal(e)
+                e.printStackTrace()
+                null
             }
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
-        protected void onPostExecute(Object o) {
-            if (!(o instanceof List)) {
-                mActivity.showTip(R.string.settings_download_restore_failed, BaseScene.LENGTH_SHORT);
+        override fun onPostExecute(o: Any) {
+            if (o !is List<*>) {
+                mActivity.showTip(R.string.settings_download_restore_failed, BaseScene.LENGTH_SHORT)
             } else {
-                List<RestoreItem> list = (List<RestoreItem>) o;
+                val list = o as List<RestoreItem>
                 if (list.isEmpty()) {
-                    mActivity.showTip(R.string.settings_download_restore_not_found, BaseScene.LENGTH_SHORT);
+                    mActivity.showTip(
+                        R.string.settings_download_restore_not_found,
+                        BaseScene.LENGTH_SHORT
+                    )
                 } else {
-                    int count = 0;
-                    for (int i = 0, n = list.size(); i < n; i++) {
-                        RestoreItem item = list.get(i);
+                    var count = 0
+                    var i = 0
+                    val n = list.size
+                    while (i < n) {
+                        val item = list[i]
                         // Avoid failed gallery info
                         if (null != item.title) {
                             // Put to download
-                            mManager.addDownload(item, null);
+                            mManager.addDownload(item, null)
                             // Put download dir to DB
-                            EhDB.putDownloadDirname(item.gid, item.dirname);
-                            count++;
+                            EhDB.putDownloadDirname(item.gid, item.dirname)
+                            count++
                         }
+                        i++
                     }
                     showTip(
-                            mActivity.getString(R.string.settings_download_restore_successfully, count),
-                            BaseScene.LENGTH_SHORT);
-
-                    Preference preference = getPreference();
+                        mActivity.getString(R.string.settings_download_restore_successfully, count),
+                        BaseScene.LENGTH_SHORT
+                    )
+                    val preference: Preference? = preference
                     if (null != preference) {
-                        Context context = preference.getContext();
-                        if (context instanceof Activity) {
-                            ((Activity) context).setResult(Activity.RESULT_OK);
+                        val context = preference.context
+                        if (context is Activity) {
+                            context.setResult(Activity.RESULT_OK)
                         }
                     }
                 }
             }
-            super.onPostExecute(o);
+            super.onPostExecute(o)
         }
     }
 
-    private static class RestoreItem extends GalleryInfo {
+    private class RestoreItem : GalleryInfo {
+        var dirname: String? = null
 
-        public static final Creator<RestoreItem> CREATOR = new Creator<RestoreItem>() {
-            @Override
-            public RestoreItem createFromParcel(Parcel source) {
-                return new RestoreItem(source);
+        constructor()
+        constructor(`in`: Parcel) : super(`in`) {
+            dirname = `in`.readString()
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            super.writeToParcel(dest, flags)
+            dest.writeString(dirname)
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR: Creator<RestoreItem> = object : Creator<RestoreItem> {
+                override fun createFromParcel(source: Parcel): RestoreItem {
+                    return RestoreItem(source)
+                }
+
+                override fun newArray(size: Int): Array<RestoreItem?> {
+                    return arrayOfNulls(size)
+                }
             }
-
-            @Override
-            public RestoreItem[] newArray(int size) {
-                return new RestoreItem[size];
-            }
-        };
-        public String dirname;
-
-        public RestoreItem() {
-        }
-
-        protected RestoreItem(Parcel in) {
-            super(in);
-            this.dirname = in.readString();
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeString(this.dirname);
         }
     }
 }

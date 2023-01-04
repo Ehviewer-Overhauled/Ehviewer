@@ -18,6 +18,8 @@ package com.hippo.ehviewer.client;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.dao.Filter;
@@ -69,7 +71,7 @@ public final class EhFilter {
         }
     }
 
-    public static EhFilter getInstance() {
+    public static @NonNull EhFilter getInstance() {
         if (sInstance == null) {
             sInstance = new EhFilter();
         }

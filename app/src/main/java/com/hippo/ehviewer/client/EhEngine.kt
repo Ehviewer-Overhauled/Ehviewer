@@ -13,1090 +13,1159 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import android.text.TextUtils
+import android.util.Log
+import android.util.Pair
+import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.EhApplication.Companion.application
+import com.hippo.ehviewer.GetText
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.data.GalleryCommentList
+import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.PreviewSet
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.client.parser.ArchiveParser
+import com.hippo.ehviewer.client.parser.EventPaneParser
+import com.hippo.ehviewer.client.parser.FavoritesParser
+import com.hippo.ehviewer.client.parser.ForumsParser
+import com.hippo.ehviewer.client.parser.GalleryApiParser
+import com.hippo.ehviewer.client.parser.GalleryDetailParser
+import com.hippo.ehviewer.client.parser.GalleryListParser
+import com.hippo.ehviewer.client.parser.GalleryNotAvailableParser
+import com.hippo.ehviewer.client.parser.GalleryPageApiParser
+import com.hippo.ehviewer.client.parser.GalleryPageParser
+import com.hippo.ehviewer.client.parser.GalleryTokenApiParser
+import com.hippo.ehviewer.client.parser.ProfileParser
+import com.hippo.ehviewer.client.parser.RateGalleryParser
+import com.hippo.ehviewer.client.parser.SignInParser
+import com.hippo.ehviewer.client.parser.TorrentParser
+import com.hippo.ehviewer.client.parser.VoteCommentParser
+import com.hippo.ehviewer.client.parser.VoteTagParser
+import com.hippo.network.StatusCodeException
+import com.hippo.util.ExceptionUtils
+import com.hippo.yorozuya.AssertUtils
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import okhttp3.Call
+import okhttp3.FormBody
+import okhttp3.Headers
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
+import org.jsoup.Jsoup
+import java.io.File
+import kotlin.math.ceil
 
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Pair;
+object EhEngine {
+    private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
+    private val TAG = EhEngine::class.java.simpleName
+    private const val MAX_REQUEST_SIZE = 25
+    private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
+    private const val SAD_PANDA_TYPE = "image/gif"
+    private const val SAD_PANDA_LENGTH = "9615"
+    private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
+    private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
+    private var sEhFilter = EhFilter.getInstance()
 
-import androidx.annotation.Nullable;
-
-import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.data.GalleryCommentList;
-import com.hippo.ehviewer.client.data.GalleryDetail;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.data.PreviewSet;
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.ehviewer.client.parser.ArchiveParser;
-import com.hippo.ehviewer.client.parser.EventPaneParser;
-import com.hippo.ehviewer.client.parser.FavoritesParser;
-import com.hippo.ehviewer.client.parser.ForumsParser;
-import com.hippo.ehviewer.client.parser.GalleryApiParser;
-import com.hippo.ehviewer.client.parser.GalleryDetailParser;
-import com.hippo.ehviewer.client.parser.GalleryListParser;
-import com.hippo.ehviewer.client.parser.GalleryNotAvailableParser;
-import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
-import com.hippo.ehviewer.client.parser.GalleryPageParser;
-import com.hippo.ehviewer.client.parser.GalleryTokenApiParser;
-import com.hippo.ehviewer.client.parser.ProfileParser;
-import com.hippo.ehviewer.client.parser.RateGalleryParser;
-import com.hippo.ehviewer.client.parser.SignInParser;
-import com.hippo.ehviewer.client.parser.TorrentParser;
-import com.hippo.ehviewer.client.parser.VoteCommentParser;
-import com.hippo.ehviewer.client.parser.VoteTagParser;
-import com.hippo.network.StatusCodeException;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.AssertUtils;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-
-import okhttp3.Call;
-import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-public class EhEngine {
-
-    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-    private static final String TAG = EhEngine.class.getSimpleName();
-    private static final String SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\"";
-    private static final String SAD_PANDA_TYPE = "image/gif";
-    private static final String SAD_PANDA_LENGTH = "9615";
-    private static final String KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg";
-    private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
-
-    public static EhFilter sEhFilter;
-
-    public static void initialize() {
-        sEhFilter = EhFilter.getInstance();
-    }
-
-    private static void doThrowException(Call call, int code, @Nullable Headers headers,
-                                         @Nullable String body, Throwable e) throws Throwable {
+    @Throws(Throwable::class)
+    private fun doThrowException(
+        call: Call, code: Int, headers: Headers?,
+        body: String?, e: Throwable?
+    ) {
         if (call.isCanceled()) {
-            throw new CancellationException("Call cancelled!");
+            throw CancellationException("Call cancelled!")
         }
 
         // Check sad panda
-        if (headers != null && SAD_PANDA_DISPOSITION.equals(headers.get("Content-Disposition")) &&
-                SAD_PANDA_TYPE.equals(headers.get("Content-Type")) &&
-                SAD_PANDA_LENGTH.equals(headers.get("Content-Length"))) {
-            throw new EhException("Sad Panda");
+        if (headers != null && SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
+            throw EhException("Sad Panda")
         }
 
         // Check sad panda(without panda)
-        if (headers != null && "text/html; charset=UTF-8".equals(headers.get("Content-Type")) &&
-                "0".equals(headers.get("Content-Length"))) {
-            throw new EhException("Sad Panda\n(without panda)");
+        if (headers != null && "text/html; charset=UTF-8" == headers["Content-Type"] && "0" == headers["Content-Length"]) {
+            throw EhException("Sad Panda\n(without panda)")
         }
 
         // Check kokomade
         if (body != null && body.contains(KOKOMADE_URL)) {
-            throw new EhException("今回はここまで\n\n" + GetText.getString(R.string.kokomade_tip));
+            throw EhException(
+                """
+    今回はここまで
+    
+    ${GetText.getString(R.string.kokomade_tip)}
+    """.trimIndent()
+            )
         }
-
         if (body != null && body.contains("Gallery Not Available - ")) {
-            String error = GalleryNotAvailableParser.parse(body);
+            val error = GalleryNotAvailableParser.parse(body)
             if (!TextUtils.isEmpty(error)) {
-                throw new EhException(error);
+                throw EhException(error)
             }
         }
-
-        if (e instanceof ParseException) {
+        if (e is ParseException) {
             if (body != null && !body.contains("<")) {
-                throw new EhException(body);
+                throw EhException(body)
             } else if (TextUtils.isEmpty(body)) {
-                throw new EhException(GetText.getString(R.string.error_empty_html));
+                throw EhException(GetText.getString(R.string.error_empty_html))
             } else {
                 if (Settings.getSaveParseErrorBody()) {
-                    AppConfig.saveParseErrorBody((ParseException) e);
+                    AppConfig.saveParseErrorBody(e as ParseException?)
                 }
-                throw new EhException(GetText.getString(R.string.error_parse_error));
+                throw EhException(GetText.getString(R.string.error_parse_error))
             }
         }
-
         if (code >= 400) {
-            throw new StatusCodeException(code);
+            throw StatusCodeException(code)
         }
-
         if (e != null) {
-            throw e;
+            throw e
         }
     }
 
-    private static void throwException(Call call, int code, @Nullable Headers headers,
-                                       @Nullable String body, Throwable e) throws Throwable {
+    @Throws(Throwable::class)
+    private fun throwException(
+        call: Call, code: Int, headers: Headers?,
+        body: String?, e: Throwable?
+    ) {
         try {
-            doThrowException(call, code, headers, body, e);
-        } catch (Throwable error) {
-            error.printStackTrace();
-            throw error;
+            doThrowException(call, code, headers, body, e)
+        } catch (error: Throwable) {
+            error.printStackTrace()
+            throw error
         }
     }
 
-    public static String signIn(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                String username, String password) throws Throwable {
-        String referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00";
-        FormBody.Builder builder = new FormBody.Builder()
-                .add("referer", referer)
-                .add("b", "")
-                .add("bt", "")
-                .add("UserName", username)
-                .add("PassWord", password)
-                .add("CookieDate", "1");
-        String url = EhUrl.API_SIGN_IN;
-        String origin = "https://forums.e-hentai.org";
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun signIn(
+        task: EhClient.Task, okHttpClient: OkHttpClient,
+        username: String, password: String
+    ): String {
+        val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
+        val builder = FormBody.Builder()
+            .add("referer", referer)
+            .add("b", "")
+            .add("bt", "")
+            .add("UserName", username)
+            .add("PassWord", password)
+            .add("CookieDate", "1")
+        val url = EhUrl.API_SIGN_IN
+        val origin = "https://forums.e-hentai.org"
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return SignInParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return SignInParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    private static void fillGalleryList(@Nullable EhClient.Task task, OkHttpClient okHttpClient, List<GalleryInfo> list, String url, boolean filter) throws Throwable {
+    @Throws(Throwable::class)
+    private suspend fun fillGalleryList(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient,
+        list: MutableList<GalleryInfo>,
+        url: String,
+        filter: Boolean
+    ) {
         // Filter title and uploader
         if (filter) {
-            for (int i = 0, n = list.size(); i < n; i++) {
-                GalleryInfo info = list.get(i);
+            var i = 0
+            var n = list.size
+            while (i < n) {
+                val info = list[i]
                 if (!sEhFilter.filterTitle(info) || !sEhFilter.filterUploader(info)) {
-                    list.remove(i);
-                    i--;
-                    n--;
+                    list.removeAt(i)
+                    i--
+                    n--
                 }
+                i++
             }
         }
-
-        boolean hasTags = false;
-        boolean hasPages = false;
-        boolean hasRated = false;
-        for (GalleryInfo gi : list) {
+        var hasTags = false
+        var hasPages = false
+        var hasRated = false
+        for (gi in list) {
             if (gi.simpleTags != null) {
-                hasTags = true;
+                hasTags = true
             }
             if (gi.pages != 0) {
-                hasPages = true;
+                hasPages = true
             }
             if (gi.rated) {
-                hasRated = true;
+                hasRated = true
             }
         }
-
-        boolean needApi = (filter && sEhFilter.needTags() && !hasTags) ||
-                (Settings.getShowGalleryPages() && !hasPages) ||
-                hasRated;
+        val needApi =
+            filter && sEhFilter.needTags() && !hasTags || Settings.getShowGalleryPages() && !hasPages ||
+                    hasRated
         if (needApi) {
-            fillGalleryListByApi(task, okHttpClient, list, url);
+            fillGalleryListByApi(task, okHttpClient, list, url)
         }
 
         // Filter tag
         if (filter) {
-            for (int i = 0, n = list.size(); i < n; i++) {
-                GalleryInfo info = list.get(i);
+            var i = 0
+            var n = list.size
+            while (i < n) {
+                val info = list[i]
                 // Thumbnail mode need filter uploader again
-                if (!sEhFilter.filterUploader(info) || !sEhFilter.filterTag(info) || !sEhFilter.filterTagNamespace(info)) {
-                    list.remove(i);
-                    i--;
-                    n--;
+                if (!sEhFilter.filterUploader(info) || !sEhFilter.filterTag(info) || !sEhFilter.filterTagNamespace(
+                        info
+                    )
+                ) {
+                    list.removeAt(i)
+                    i--
+                    n--
                 }
+                i++
             }
         }
     }
 
-    public static GalleryListParser.Result getGalleryList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                          String url) throws Throwable {
-        String referer = EhUrl.getReferer();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getGalleryList(
+        task: EhClient.Task, okHttpClient: OkHttpClient,
+        url: String
+    ): GalleryListParser.Result {
+        val referer = EhUrl.getReferer()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
+        task.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: GalleryListParser.Result
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = GalleryListParser.parse(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
-
-        String body = null;
-        Headers headers = null;
-        GalleryListParser.Result result;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = GalleryListParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true);
-
-        return result;
+        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true)
+        return result
     }
 
     // At least, GalleryInfo contain valid gid and token
-    public static List<GalleryInfo> fillGalleryListByApi(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                         List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
-        // We can only request 25 items one time at most
-        final int MAX_REQUEST_SIZE = 25;
-        List<GalleryInfo> requestItems = new ArrayList<>(MAX_REQUEST_SIZE);
-        for (int i = 0, size = galleryInfoList.size(); i < size; i++) {
-            requestItems.add(galleryInfoList.get(i));
-            if (requestItems.size() == MAX_REQUEST_SIZE || i == size - 1) {
-                doFillGalleryListByApi(task, okHttpClient, requestItems, referer);
-                requestItems.clear();
+    @JvmStatic
+    @Throws(Throwable::class)
+    suspend fun fillGalleryListByApi(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        galleryInfoList: List<GalleryInfo>, referer: String
+    ): List<GalleryInfo> {
+        val requestItems: MutableList<GalleryInfo> = ArrayList(MAX_REQUEST_SIZE)
+        var i = 0
+        val size = galleryInfoList.size
+        while (i < size) {
+            requestItems.add(galleryInfoList[i])
+            if (requestItems.size == MAX_REQUEST_SIZE || i == size - 1) {
+                doFillGalleryListByApi(task, okHttpClient, requestItems, referer)
+                requestItems.clear()
             }
+            i++
         }
-        return galleryInfoList;
+        return galleryInfoList
     }
 
-    private static void doFillGalleryListByApi(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                               List<GalleryInfo> galleryInfoList, String referer) throws Throwable {
-        JSONObject json = new JSONObject();
-        json.put("method", "gdata");
-        JSONArray ja = new JSONArray();
-        for (int i = 0, size = galleryInfoList.size(); i < size; i++) {
-            GalleryInfo gi = galleryInfoList.get(i);
-            JSONArray g = new JSONArray();
-            g.put(gi.gid);
-            g.put(gi.token);
-            ja.put(g);
+    @Throws(Throwable::class)
+    suspend fun doFillGalleryListByApi(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        galleryInfoList: List<GalleryInfo>, referer: String
+    ) {
+        val json = JSONObject()
+        json.put("method", "gdata")
+        val ja = JSONArray()
+        var i = 0
+        val size = galleryInfoList.size
+        while (i < size) {
+            val gi = galleryInfoList[i]
+            val g = JSONArray()
+            g.put(gi.gid)
+            g.put(gi.token)
+            ja.put(g)
+            i++
         }
-        json.put("gidlist", ja);
-        json.put("namespace", 1);
-        String url = EhUrl.getApiUrl();
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(RequestBody.create(json.toString(), MEDIA_TYPE_JSON))
-                .build();
-        Call call = okHttpClient.newCall(request);
+        json.put("gidlist", ja)
+        json.put("namespace", 1)
+        val url = EhUrl.getApiUrl()
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(json.toString().toRequestBody(MEDIA_TYPE_JSON))
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            GalleryApiParser.parse(body, galleryInfoList);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-    }
-
-    public static GalleryDetail getGalleryDetail(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                 String url) throws Throwable {
-        String referer = EhUrl.getReferer();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            String html = EventPaneParser.parse(body);
-            if (html != null) {
-                EhApplication.getApplication().showEventPane(html);
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                GalleryApiParser.parse(body, galleryInfoList)
             }
-            return GalleryDetailParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-
-    public static Pair<PreviewSet, Integer> getPreviewSet(
-            @Nullable EhClient.Task task, OkHttpClient okHttpClient, String url) throws Throwable {
-        String referer = EhUrl.getReferer();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getGalleryDetail(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        url: String?
+    ): GalleryDetail {
+        val referer = EhUrl.getReferer()
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return Pair.create(GalleryDetailParser.parsePreviewSet(body),
-                    GalleryDetailParser.parsePreviewPages(body));
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                val html = EventPaneParser.parse(body)
+                if (html != null) {
+                    application.showEventPane(html)
+                }
+                return GalleryDetailParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static RateGalleryParser.Result rateGallery(@Nullable EhClient.Task task,
-                                                       OkHttpClient okHttpClient, long apiUid, String apiKey, long gid,
-                                                       String token, float rating) throws Throwable {
-        final JSONObject json = new JSONObject();
-        json.put("method", "rategallery");
-        json.put("apiuid", apiUid);
-        json.put("apikey", apiKey);
-        json.put("gid", gid);
-        json.put("token", token);
-        json.put("rating", (int) Math.ceil(rating * 2));
-        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
-        String url = EhUrl.getApiUrl();
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getPreviewSet(
+        task: EhClient.Task?, okHttpClient: OkHttpClient, url: String?
+    ): Pair<PreviewSet, Int> {
+        val referer = EhUrl.getReferer()
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return RateGalleryParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return Pair.create(
+                    GalleryDetailParser.parsePreviewSet(body),
+                    GalleryDetailParser.parsePreviewPages(body)
+                )
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static GalleryCommentList commentGallery(@Nullable EhClient.Task task,
-                                                    OkHttpClient okHttpClient, String url, String comment, String id) throws Throwable {
-        FormBody.Builder builder = new FormBody.Builder();
+    @Throws(Throwable::class)
+    suspend fun rateGallery(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient, apiUid: Long, apiKey: String?, gid: Long,
+        token: String?, rating: Float
+    ): RateGalleryParser.Result {
+        val json = JSONObject()
+        json.put("method", "rategallery")
+        json.put("apiuid", apiUid)
+        json.put("apikey", apiKey)
+        json.put("gid", gid)
+        json.put("token", token)
+        json.put("rating", ceil((rating * 2).toDouble()).toInt())
+        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
+        val url = EhUrl.getApiUrl()
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return RateGalleryParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
+        }
+    }
+
+    @Throws(Throwable::class)
+    suspend fun commentGallery(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient, url: String?, comment: String, id: String?
+    ): GalleryCommentList {
+        val builder = FormBody.Builder()
         if (id == null) {
-            builder.add("commenttext_new", comment);
+            builder.add("commenttext_new", comment)
         } else {
-            builder.add("commenttext_edit", comment);
-            builder.add("edit_comment", id);
+            builder.add("commenttext_edit", comment)
+            builder.add("edit_comment", id)
         }
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, url, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, url, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            Document document = Jsoup.parse(body);
-
-            Elements elements = document.select("#chd + p");
-            if (elements.size() > 0) {
-                throw new EhException(elements.get(0).text());
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                val document = Jsoup.parse(body!!)
+                val elements = document.select("#chd + p")
+                if (elements.size > 0) {
+                    throw EhException(elements[0].text())
+                }
+                return GalleryDetailParser.parseComments(document)
             }
-
-            return GalleryDetailParser.parseComments(document);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static String getGalleryToken(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                         long gid, String gtoken, int page) throws Throwable {
-        JSONObject json = new JSONObject()
-                .put("method", "gtoken")
-                .put("pagelist", new JSONArray().put(
-                        new JSONArray().put(gid).put(gtoken).put(page + 1)));
-        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
-        String url = EhUrl.getApiUrl();
-        String referer = EhUrl.getReferer();
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getGalleryToken(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        gid: Long, gtoken: String?, page: Int
+    ): String {
+        val json = JSONObject()
+            .put("method", "gtoken")
+            .put(
+                "pagelist", JSONArray().put(
+                    JSONArray().put(gid).put(gtoken).put(page + 1)
+                )
+            )
+        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
+        val url = EhUrl.getApiUrl()
+        val referer = EhUrl.getReferer()
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return GalleryTokenApiParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return GalleryTokenApiParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static FavoritesParser.Result getFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                      String url) throws Throwable {
-        String referer = EhUrl.getReferer();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getFavorites(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        url: String
+    ): FavoritesParser.Result {
+        val referer = EhUrl.getReferer()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: FavoritesParser.Result
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = FavoritesParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
-
-        String body = null;
-        Headers headers = null;
-        FavoritesParser.Result result;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = FavoritesParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false);
-
-        return result;
+        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false)
+        return result
     }
 
     /**
      * @param dstCat -1 for delete, 0 - 9 for cloud favorite, others throw Exception
      * @param note   max 250 characters
      */
-    public static Void addFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                    long gid, String token, int dstCat, String note) throws Throwable {
-        String catStr;
-        if (dstCat == -1) {
-            catStr = "favdel";
-        } else if (dstCat >= 0 && dstCat <= 9) {
-            catStr = String.valueOf(dstCat);
-        } else {
-            throw new EhException("Invalid dstCat: " + dstCat);
-        }
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add("favcat", catStr);
-        builder.add("favnote", note != null ? note : "");
-        // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
-        builder.add("submit", "Apply Changes");
-        builder.add("update", "1");
-        String url = EhUrl.getAddFavorites(gid, token);
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, url, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            throwException(call, code, headers, body, null);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        return null;
-    }
-
-    public static Void addFavoritesRange(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                         long[] gidArray, String[] tokenArray, int dstCat) throws Throwable {
-        AssertUtils.assertEquals(gidArray.length, tokenArray.length);
-        for (int i = 0, n = gidArray.length; i < n; i++) {
-            addFavorites(task, okHttpClient, gidArray[i], tokenArray[i], dstCat, null);
-        }
-        return null;
-    }
-
-    public static FavoritesParser.Result modifyFavorites(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                         String url, long[] gidArray, int dstCat) throws Throwable {
-        String catStr;
-        if (dstCat == -1) {
-            catStr = "delete";
-        } else if (dstCat >= 0 && dstCat <= 9) {
-            catStr = "fav" + dstCat;
-        } else {
-            throw new EhException("Invalid dstCat: " + dstCat);
-        }
-        FormBody.Builder builder = new FormBody.Builder();
-        builder.add("ddact", catStr);
-        for (long gid : gidArray) {
-            builder.add("modifygids[]", Long.toString(gid));
-        }
-        builder.add("apply", "Apply");
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, url, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        FavoritesParser.Result result;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = FavoritesParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false);
-
-        return result;
-    }
-
-    public static List<TorrentParser.Result> getTorrentList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                            String url, long gid, String token) throws Throwable {
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        List<TorrentParser.Result> result;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = TorrentParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        return result;
-    }
-
-    public static ArchiveParser.Result getArchiveList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                      String url, long gid, String token) throws Throwable {
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        ArchiveParser.Result result;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = ArchiveParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        return result;
-    }
-
-    public static String downloadArchive(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                         long gid, String token, String or, String res, boolean isHAtH) throws Throwable {
-        if (or == null || or.length() == 0) {
-            throw new EhException("Invalid form param or: " + or);
-        }
-        if (res == null || res.length() == 0) {
-            throw new EhException("Invalid res: " + res);
-        }
-        FormBody.Builder builder = new FormBody.Builder();
-        if (isHAtH) {
-            builder.add("hathdl_xres", res);
-        } else {
-            builder.add("dltype", res);
-            if (res.equals("org")) {
-                builder.add("dlcheck", "Download Original Archive");
-            } else {
-                builder.add("dlcheck", "Download Resample Archive");
+    @Throws(Throwable::class)
+    suspend fun addFavorites(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        gid: Long, token: String?, dstCat: Int, note: String?
+    ): Void? {
+        val catStr: String = when (dstCat) {
+            -1 -> {
+                "favdel"
+            }
+            in 0..9 -> {
+                dstCat.toString()
+            }
+            else -> {
+                throw EhException("Invalid dstCat: $dstCat")
             }
         }
-        String url = EhUrl.getDownloadArchive(gid, token, or);
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
+        val builder = FormBody.Builder()
+        builder.add("favcat", catStr)
+        builder.add("favnote", note ?: "")
+        // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
+        builder.add("submit", "Apply Changes")
+        builder.add("update", "1")
+        val url = EhUrl.getAddFavorites(gid, token)
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, url, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                throwException(call, code, headers, body, null)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
+        return null
+    }
 
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            throwException(call, code, headers, body, null);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+    @Throws(Throwable::class)
+    suspend fun addFavoritesRange(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        gidArray: LongArray, tokenArray: Array<String?>, dstCat: Int
+    ): Void? {
+        AssertUtils.assertEquals(gidArray.size, tokenArray.size)
+        var i = 0
+        val n = gidArray.size
+        while (i < n) {
+            addFavorites(task, okHttpClient, gidArray[i], tokenArray[i], dstCat, null)
+            i++
         }
+        return null
+    }
 
-        var result = ArchiveParser.parseArchiveUrl(body);
+    @Throws(Throwable::class)
+    suspend fun modifyFavorites(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        url: String, gidArray: LongArray, dstCat: Int
+    ): FavoritesParser.Result {
+        val catStr: String = when (dstCat) {
+            -1 -> {
+                "delete"
+            }
+            in 0..9 -> {
+                "fav$dstCat"
+            }
+            else -> {
+                throw EhException("Invalid dstCat: $dstCat")
+            }
+        }
+        val builder = FormBody.Builder()
+        builder.add("ddact", catStr)
+        for (gid in gidArray) {
+            builder.add("modifygids[]", gid.toString())
+        }
+        builder.add("apply", "Apply")
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, url, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: FavoritesParser.Result
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = FavoritesParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
+        }
+        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false)
+        return result
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getTorrentList(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        url: String?, gid: Long, token: String?
+    ): List<TorrentParser.Result> {
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: List<TorrentParser.Result>
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = TorrentParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
+        }
+        return result
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getArchiveList(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        url: String?, gid: Long, token: String?
+    ): ArchiveParser.Result {
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: ArchiveParser.Result
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = ArchiveParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
+        }
+        return result
+    }
+
+    @Throws(Throwable::class)
+    suspend fun downloadArchive(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        gid: Long, token: String?, or: String?, res: String?, isHAtH: Boolean
+    ): String? {
+        if (or.isNullOrEmpty()) {
+            throw EhException("Invalid form param or: $or")
+        }
+        if (res.isNullOrEmpty()) {
+            throw EhException("Invalid res: $res")
+        }
+        val builder = FormBody.Builder()
+        if (isHAtH) {
+            builder.add("hathdl_xres", res)
+        } else {
+            builder.add("dltype", res)
+            if (res == "org") {
+                builder.add("dlcheck", "Download Original Archive")
+            } else {
+                builder.add("dlcheck", "Download Resample Archive")
+            }
+        }
+        val url = EhUrl.getDownloadArchive(gid, token, or)
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                throwException(call, code, headers, body, null)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
+        }
+        var result = ArchiveParser.parseArchiveUrl(body)
         if (!isHAtH) {
             if (result == null) {
-                Thread.sleep(1000);
-                try (var response = call.clone().execute()) {
-                    code = response.code();
-                    headers = response.headers();
-                    body = response.body().string();
-                    throwException(call, code, headers, body, null);
-                } catch (Throwable e) {
-                    ExceptionUtils.throwIfFatal(e);
-                    throwException(call, code, headers, body, e);
-                    throw e;
+                delay(1000)
+                try {
+                    call.clone().execute().use { response ->
+                        code = response.code
+                        headers = response.headers
+                        body = response.body.string()
+                        throwException(call, code, headers, body, null)
+                    }
+                } catch (e: Throwable) {
+                    ExceptionUtils.throwIfFatal(e)
+                    throwException(call, code, headers, body, e)
+                    throw e
                 }
-                result = ArchiveParser.parseArchiveUrl(body);
+                result = ArchiveParser.parseArchiveUrl(body)
                 if (result == null) {
-                    throw new EhException("Archive unavailable");
+                    throw EhException("Archive unavailable")
                 }
             }
-            return result;
+            return result
         }
-        return null;
+        return null
     }
 
-    private static ProfileParser.Result getProfileInternal(@Nullable EhClient.Task task,
-                                                           OkHttpClient okHttpClient, String url, String referer) throws Throwable {
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    private suspend fun getProfileInternal(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient, url: String, referer: String
+    ): ProfileParser.Result {
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return ProfileParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-    }
-
-    public static ProfileParser.Result getProfile(@Nullable EhClient.Task task,
-                                                  OkHttpClient okHttpClient) throws Throwable {
-        String url = EhUrl.URL_FORUMS;
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, null).build();
-        Call call = okHttpClient.newCall(request);
-
-        // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return getProfileInternal(task, okHttpClient, ForumsParser.parse(body), url);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return ProfileParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static Void getUConfig(@Nullable EhClient.Task task,
-                                  OkHttpClient okHttpClient) throws Throwable {
-        String url = EhUrl.getUConfigUrl();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, null).build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun getProfile(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient
+    ): ProfileParser.Result {
+        val url = EhUrl.URL_FORUMS
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, null).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return getProfileInternal(task, okHttpClient, ForumsParser.parse(body), url)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
+    }
 
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            request = response.request();
-            throwException(call, code, headers, body, null);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+    @Throws(Throwable::class)
+    suspend fun getUConfig(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient
+    ): Void? {
+        val url = EhUrl.getUConfigUrl()
+        Log.d(TAG, url)
+        var request = EhRequestBuilder(url, null).build()
+        var call = okHttpClient.newCall(request)
+
+        // Put call
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                request = response.request
+                throwException(call, code, headers, body, null)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
 
         // TODO Use a better way to handle 302
-        if (!request.url().toString().equals(url)) {
-            Log.d(TAG, "Redirected! Retry " + url);
-            request = new EhRequestBuilder(url, null).build();
-            call = okHttpClient.newCall(request);
-            if (null != task) task.setCall(call);
-
-            try (Response response = call.execute()) {
-                code = response.code();
-                headers = response.headers();
-                body = response.body().string();
-                throwException(call, code, headers, body, null);
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                throwException(call, code, headers, body, e);
-                throw e;
+        if (request.url.toString() != url) {
+            Log.d(TAG, "Redirected! Retry $url")
+            request = EhRequestBuilder(url, null).build()
+            call = okHttpClient.newCall(request)
+            task?.setCall(call)
+            try {
+                call.execute().use { response ->
+                    code = response.code
+                    headers = response.headers
+                    body = response.body.string()
+                    throwException(call, code, headers, body, null)
+                }
+            } catch (e: Throwable) {
+                ExceptionUtils.throwIfFatal(e)
+                throwException(call, code, headers, body, e)
+                throw e
             }
         }
-
-        return null;
+        return null
     }
 
-    public static VoteCommentParser.Result voteComment(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                       long apiUid, String apiKey, long gid, String token, long commentId, int commentVote) throws Throwable {
-        final JSONObject json = new JSONObject();
-        json.put("method", "votecomment");
-        json.put("apiuid", apiUid);
-        json.put("apikey", apiKey);
-        json.put("gid", gid);
-        json.put("token", token);
-        json.put("comment_id", commentId);
-        json.put("comment_vote", commentVote);
-        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
-        String url = EhUrl.getApiUrl();
-        String referer = EhUrl.getReferer();
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun voteComment(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        apiUid: Long, apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
+    ): VoteCommentParser.Result {
+        val json = JSONObject()
+        json.put("method", "votecomment")
+        json.put("apiuid", apiUid)
+        json.put("apikey", apiKey)
+        json.put("gid", gid)
+        json.put("token", token)
+        json.put("comment_id", commentId)
+        json.put("comment_vote", commentVote)
+        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
+        val url = EhUrl.getApiUrl()
+        val referer = EhUrl.getReferer()
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return VoteCommentParser.parse(body, commentVote);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return VoteCommentParser.parse(body, commentVote)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static VoteTagParser.Result voteTag(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                               long apiUid, String apiKey, long gid, String token, String tags, int vote) throws Throwable {
-        final JSONObject json = new JSONObject();
-        json.put("method", "taggallery");
-        json.put("apiuid", apiUid);
-        json.put("apikey", apiKey);
-        json.put("gid", gid);
-        json.put("token", token);
-        json.put("tags", tags);
-        json.put("vote", vote);
-        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
-        String url = EhUrl.getApiUrl();
-        String referer = EhUrl.getReferer();
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
+    @Throws(Throwable::class)
+    suspend fun voteTag(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        apiUid: Long, apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
+    ): VoteTagParser.Result {
+        val json = JSONObject()
+        json.put("method", "taggallery")
+        json.put("apiuid", apiUid)
+        json.put("apikey", apiKey)
+        json.put("gid", gid)
+        json.put("token", token)
+        json.put("tags", tags)
+        json.put("vote", vote)
+        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
+        val url = EhUrl.getApiUrl()
+        val referer = EhUrl.getReferer()
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return VoteTagParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return VoteTagParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
     /**
      * @param image Must be jpeg
      */
-    public static GalleryListParser.Result imageSearch(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                       File image, boolean uss, boolean osc, boolean se) throws Throwable {
-        MultipartBody.Builder builder = new MultipartBody.Builder();
-        builder.setType(MultipartBody.FORM);
+    @Throws(Throwable::class)
+    suspend fun imageSearch(
+        task: EhClient.Task?, okHttpClient: OkHttpClient,
+        image: File, uss: Boolean, osc: Boolean, se: Boolean
+    ): GalleryListParser.Result {
+        val builder = MultipartBody.Builder()
+        builder.setType(MultipartBody.FORM)
         builder.addPart(
-                Headers.of("Content-Disposition", "form-data; name=\"sfile\"; filename=\"a.jpg\""),
-                RequestBody.create(image, MEDIA_TYPE_JPEG)
-        );
+            Headers.headersOf(
+                "Content-Disposition",
+                "form-data; name=\"sfile\"; filename=\"a.jpg\""
+            ),
+            image.asRequestBody(MEDIA_TYPE_JPEG)
+        )
         if (uss) {
             builder.addPart(
-                    Headers.of("Content-Disposition", "form-data; name=\"fs_similar\""),
-                    RequestBody.create("on", null)
-            );
+                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_similar\""),
+                "on".toRequestBody()
+            )
         }
         if (osc) {
             builder.addPart(
-                    Headers.of("Content-Disposition", "form-data; name=\"fs_covers\""),
-                    RequestBody.create("on", null)
-            );
+                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_covers\""),
+                "on".toRequestBody()
+            )
         }
         if (se) {
             builder.addPart(
-                    Headers.of("Content-Disposition", "form-data; name=\"fs_exp\""),
-                    RequestBody.create("on", null)
-            );
+                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_exp\""),
+                "on".toRequestBody()
+            )
         }
         builder.addPart(
-                Headers.of("Content-Disposition", "form-data; name=\"f_sfile\""),
-                RequestBody.create("File Search", null)
-        );
-        String url = EhUrl.getImageSearchUrl();
-        String referer = EhUrl.getReferer();
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(builder.build())
-                .build();
-        Call call = okHttpClient.newCall(request);
+            Headers.headersOf("Content-Disposition", "form-data; name=\"f_sfile\""),
+            "File Search".toRequestBody()
+        )
+        val url = EhUrl.getImageSearchUrl()
+        val referer = EhUrl.getReferer()
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
+        task?.setCall(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var result: GalleryListParser.Result
+        var code = -1
+        try {
+            call.execute().use { response ->
+                Log.d(TAG, "" + response.request.url)
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                result = GalleryListParser.parse(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
-
-        String body = null;
-        Headers headers = null;
-        GalleryListParser.Result result;
-        int code = -1;
-        try (Response response = call.execute()) {
-
-            Log.d(TAG, "" + response.request().url());
-
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            result = GalleryListParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
-        }
-
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true);
-
-        return result;
+        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true)
+        return result
     }
 
-    public static GalleryPageParser.Result getGalleryPage(@Nullable EhClient.Task task,
-                                                          OkHttpClient okHttpClient, String url, long gid, String token) throws Throwable {
-        String referer = EhUrl.getGalleryDetailUrl(gid, token);
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer).build();
-        Call call = okHttpClient.newCall(request);
+    @JvmStatic
+    @Throws(Throwable::class)
+    fun getGalleryPage(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient, url: String?, gid: Long, token: String?
+    ): GalleryPageParser.Result {
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        Log.d(TAG, url!!)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return GalleryPageParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCallNoSuspend(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return GalleryPageParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 
-    public static GalleryPageApiParser.Result getGalleryPageApi(@Nullable EhClient.Task task,
-                                                                OkHttpClient okHttpClient, long gid, int index, String pToken, String showKey, String previousPToken) throws Throwable {
-        final JSONObject json = new JSONObject();
-        json.put("method", "showpage");
-        json.put("gid", gid);
-        json.put("page", index + 1);
-        json.put("imgkey", pToken);
-        json.put("showkey", showKey);
-        final RequestBody requestBody = RequestBody.create(json.toString(), MEDIA_TYPE_JSON);
-        String url = EhUrl.getApiUrl();
-        String referer = null;
+    @JvmStatic
+    @Throws(Throwable::class)
+    fun getGalleryPageApi(
+        task: EhClient.Task?,
+        okHttpClient: OkHttpClient,
+        gid: Long,
+        index: Int,
+        pToken: String?,
+        showKey: String?,
+        previousPToken: String?
+    ): GalleryPageApiParser.Result {
+        val json = JSONObject()
+        json.put("method", "showpage")
+        json.put("gid", gid)
+        json.put("page", index + 1)
+        json.put("imgkey", pToken)
+        json.put("showkey", showKey)
+        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
+        val url = EhUrl.getApiUrl()
+        var referer: String? = null
         if (index > 0 && previousPToken != null) {
-            referer = EhUrl.getPageUrl(gid, index - 1, previousPToken);
+            referer = EhUrl.getPageUrl(gid, index - 1, previousPToken)
         }
-        String origin = EhUrl.getOrigin();
-        Log.d(TAG, url);
-        Request request = new EhRequestBuilder(url, referer, origin)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
+        val origin = EhUrl.getOrigin()
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer, origin)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
 
         // Put call
-        if (null != task) {
-            task.setCall(call);
-        }
-
-        String body = null;
-        Headers headers = null;
-        int code = -1;
-        try (Response response = call.execute()) {
-            code = response.code();
-            headers = response.headers();
-            body = response.body().string();
-            return GalleryPageApiParser.parse(body);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throwException(call, code, headers, body, e);
-            throw e;
+        task?.setCallNoSuspend(call)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.execute().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return GalleryPageApiParser.parse(body)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            throwException(call, code, headers, body, e)
+            throw e
         }
     }
 }
