@@ -18,6 +18,7 @@ package com.hippo.ehviewer.client
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import com.hippo.ehviewer.client.exception.CancelledException
 import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +36,8 @@ class EhClient {
                 val method = request.method
                 val params = request.args
                 val callback = request.callback
-                val result = try {
-                    when (method) {
+                try {
+                    val result: Any? = when (method) {
                         METHOD_SIGN_IN -> EhEngine.signIn(
                             task,
                             mOkHttpClient,
@@ -180,26 +181,14 @@ class EhClient {
                         METHOD_GET_UCONFIG -> EhEngine.getUConfig(task, mOkHttpClient)
                         else -> throw IllegalStateException("Can't detect method $method")
                     }
-                } catch (e: Throwable) {
-                    e
+                    withUIContext { callback.onSuccess(result) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    if (e !is CancelledException)
+                        withUIContext { callback.onFailure(e) }
                 }
-                scope.launchUI {
-                    callback?.let {
-                        if (result !is CancelledException) {
-                            if (result is Exception) {
-                                callback.onFailure(result)
-                            } else {
-                                callback.onSuccess(result)
-                            }
-                        } else {
-                            // onCancel is called in stop
-                        }
-                    }
-                }
-
-                // Clear
+                request.task = null
                 request.callback = null
-                task.mCall.lazySet(null)
             }
             task.job = job
             task.mCallback = request.callback
@@ -217,7 +206,7 @@ class EhClient {
     }
 
     class Task {
-        internal val mCall = AtomicReference<Call?>()
+        private val mCall = AtomicReference<Call?>()
         internal var mCallback: Callback<*>? = null
         internal var job: Job? = null
         private val mStop
@@ -239,15 +228,8 @@ class EhClient {
                 job?.cancel()
                 mCall.get()?.cancel()
                 mCallback?.let {
-                    scope.launchUI {
-                        it.onCancel()
-                    }
+                    scope.launchUI { it.onCancel() }
                 }
-
-                // Clear
-                job = null
-                mCallback = null
-                mCall.lazySet(null)
             }
         }
     }
