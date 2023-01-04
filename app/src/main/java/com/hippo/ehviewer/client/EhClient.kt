@@ -16,9 +16,9 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
-import com.hippo.ehviewer.client.exception.CancelledException
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -183,9 +183,10 @@ class EhClient {
                     }
                     withUIContext { callback?.onSuccess(result) }
                 } catch (e: Exception) {
+                    if (e is CancellationException)
+                        throw e // Don't catch coroutine CancellationException
                     e.printStackTrace()
-                    if (e !is CancelledException)
-                        withUIContext { callback?.onFailure(e) }
+                    withUIContext { callback?.onFailure(e) }
                 }
                 request.task = null
                 request.callback = null
@@ -212,15 +213,9 @@ class EhClient {
         private val mStop
             get() = !(job?.isActive ?: false)
 
-        // Called in Job thread
-        @Throws(CancelledException::class)
         fun setCall(call: Call?) {
-            if (mStop) {
-                // Stopped Job thread
-                throw CancelledException()
-            } else {
-                mCall.lazySet(call)
-            }
+            if (mStop) call?.cancel()
+            else mCall.lazySet(call)
         }
 
         fun stop() {

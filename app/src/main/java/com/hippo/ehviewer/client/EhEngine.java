@@ -31,7 +31,6 @@ import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.PreviewSet;
-import com.hippo.ehviewer.client.exception.CancelledException;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.ehviewer.client.parser.ArchiveParser;
@@ -64,6 +63,7 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
@@ -94,7 +94,7 @@ public class EhEngine {
     private static void doThrowException(Call call, int code, @Nullable Headers headers,
                                          @Nullable String body, Throwable e) throws Throwable {
         if (call.isCanceled()) {
-            throw new CancelledException();
+            throw new CancellationException("Call cancelled!");
         }
 
         // Check sad panda
