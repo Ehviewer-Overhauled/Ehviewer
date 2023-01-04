@@ -86,6 +86,7 @@ import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.NoHAtHClientException;
 import com.hippo.ehviewer.client.parser.ArchiveParser;
 import com.hippo.ehviewer.client.parser.RateGalleryParser;
+import com.hippo.ehviewer.client.parser.TorrentParser;
 import com.hippo.ehviewer.client.parser.VoteTagParser;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.Filter;
@@ -243,7 +244,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     @Nullable
     private GalleryDetail mGalleryDetail;
     private int mRequestId = IntIdGenerator.INVALID_ID;
-    private Pair<String, String>[] mTorrentList;
+    private List<TorrentParser.Result> mTorrentList;
     ActivityResultLauncher<String> requestStoragePermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             result -> {
@@ -1879,7 +1880,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     }
 
     private class TorrentListDialogHelper implements AdapterView.OnItemClickListener,
-            DialogInterface.OnDismissListener, EhClient.Callback<Pair<String, String>[]> {
+            DialogInterface.OnDismissListener, EhClient.Callback<List<TorrentParser.Result>> {
 
         @Nullable
         private CircularProgressIndicator mProgressView;
@@ -1914,21 +1915,18 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
         }
 
-        private void bind(Pair<String, String>[] data) {
+        private void bind(List<TorrentParser.Result> data) {
             if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
                 return;
             }
 
-            if (0 == data.length) {
+            if (null == data || 0 == data.size()) {
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.VISIBLE);
                 mListView.setVisibility(View.GONE);
                 mErrorText.setText(R.string.no_torrents);
             } else {
-                String[] nameArray = new String[data.length];
-                for (int i = 0, n = data.length; i < n; i++) {
-                    nameArray[i] = data[i].second;
-                }
+                var nameArray = data.stream().map(torrent -> torrent.format(getResources()::getString)).toArray(String[]::new);
                 mProgressView.setVisibility(View.GONE);
                 mErrorText.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
@@ -1939,9 +1937,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Context context = getContext();
-            if (null != context && null != mTorrentList && position < mTorrentList.length) {
-                String url = mTorrentList[position].first;
-                String name = mTorrentList[position].second;
+            if (null != context && null != mTorrentList && position < mTorrentList.size()) {
+                String url = mTorrentList.get(position).url();
+                String name = mTorrentList.get(position).name();
                 // TODO: Don't use buggy system download service
                 DownloadManager.Request r = new DownloadManager.Request(Uri.parse(url.replace("exhentai.org", "ehtracker.org")));
                 r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
@@ -1979,7 +1977,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         @Override
-        public void onSuccess(Pair<String, String>[] result) {
+        public void onSuccess(List<TorrentParser.Result> result) {
             if (mRequest != null) {
                 mRequest = null;
                 mTorrentList = result;

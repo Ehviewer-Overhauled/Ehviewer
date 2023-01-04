@@ -649,8 +649,8 @@ public class EhEngine {
         return result;
     }
 
-    public static Pair<String, String>[] getTorrentList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
-                                                        String url, long gid, String token) throws Throwable {
+    public static List<TorrentParser.Result> getTorrentList(@Nullable EhClient.Task task, OkHttpClient okHttpClient,
+                                                            String url, long gid, String token) throws Throwable {
         String referer = EhUrl.getGalleryDetailUrl(gid, token);
         Log.d(TAG, url);
         Request request = new EhRequestBuilder(url, referer).build();
@@ -663,7 +663,7 @@ public class EhEngine {
 
         String body = null;
         Headers headers = null;
-        Pair<String, String>[] result;
+        List<TorrentParser.Result> result;
         int code = -1;
         try (Response response = call.execute()) {
             code = response.code();
