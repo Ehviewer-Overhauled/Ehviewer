@@ -197,6 +197,8 @@ public class ContentLayout extends FrameLayout {
          */
         private final IntIdGenerator mIdGenerator = new IntIdGenerator();
         private final LayoutManagerUtils.OnScrollToPositionListener mOnScrollToPositionListener = ContentHelper.this::onScrollToPosition;
+        protected String mPrev;
+        protected String mNext;
         private TextView mTipView;
         private SwipeRefreshLayout mRefreshLayout;
         private LinearProgressIndicator mBottomProgress;
@@ -227,8 +229,6 @@ public class ContentLayout extends FrameLayout {
          */
         private int mPages;
         private int mNextPage;
-        protected String mPrev;
-        protected String mNext;
         private int mCurrentTaskId;
         private int mCurrentTaskType;
         private int mCurrentTaskPage;

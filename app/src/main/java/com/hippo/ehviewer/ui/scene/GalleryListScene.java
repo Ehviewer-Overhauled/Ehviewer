@@ -52,7 +52,6 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -140,6 +139,7 @@ public final class GalleryListScene extends SearchBarScene
     private final static int STATE_SEARCH = 2;
     private final static int STATE_SEARCH_SHOW_LIST = 3;
     private static final long ANIMATE_TIME = 300L;
+    private final SearchStateOnBackPressedCallback mCallback = new SearchStateOnBackPressedCallback();
     /*---------------
      Whole life cycle
      ---------------*/
@@ -214,8 +214,6 @@ public final class GalleryListScene extends SearchBarScene
     private FavouriteStatusRouter mFavouriteStatusRouter;
     private FavouriteStatusRouter.Listener mFavouriteStatusRouterListener;
     private boolean mIsTopList = false;
-
-    private final SearchStateOnBackPressedCallback mCallback = new SearchStateOnBackPressedCallback();
 
     @Nullable
     private static String getSuitableTitleForUrlBuilder(
@@ -1697,7 +1695,8 @@ public final class GalleryListScene extends SearchBarScene
         @Override
         public void handleOnBackPressed() {
             switch (mState) {
-                case STATE_NORMAL -> throw new IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL");
+                case STATE_NORMAL ->
+                        throw new IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL");
                 case STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL);
                 case STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH);
             }

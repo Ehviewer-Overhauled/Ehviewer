@@ -57,7 +57,6 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
-import androidx.lifecycle.LifecycleKt;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
@@ -1764,6 +1763,40 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
     }
 
+    private static class DeleteDialogHelper implements DialogInterface.OnClickListener {
+        private final com.hippo.ehviewer.download.DownloadManager mDownloadManager;
+        private final GalleryInfo mGalleryInfo;
+        private final CheckBoxDialogBuilder mBuilder;
+
+        public DeleteDialogHelper(com.hippo.ehviewer.download.DownloadManager downloadManager,
+                                  GalleryInfo galleryInfo, CheckBoxDialogBuilder builder) {
+            mDownloadManager = downloadManager;
+            mGalleryInfo = galleryInfo;
+            mBuilder = builder;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which != DialogInterface.BUTTON_POSITIVE) {
+                return;
+            }
+
+            // Delete
+            if (null != mDownloadManager) {
+                mDownloadManager.deleteDownload(mGalleryInfo.gid);
+            }
+
+            // Delete image files
+            boolean checked = mBuilder.isChecked();
+            Settings.putRemoveImageFiles(checked);
+            if (checked) {
+                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid);
+                EhDB.removeDownloadDirname(mGalleryInfo.gid);
+                deleteFileAsync(file);
+            }
+        }
+    }
+
     private class ArchiveListDialogHelper implements AdapterView.OnItemClickListener,
             DialogInterface.OnDismissListener, EhClient.Callback<ArchiveParser.Result> {
 
@@ -2042,40 +2075,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
             request.enqueue(GalleryDetailScene.this);
-        }
-    }
-
-    private static class DeleteDialogHelper implements DialogInterface.OnClickListener {
-        private final com.hippo.ehviewer.download.DownloadManager mDownloadManager;
-        private final GalleryInfo mGalleryInfo;
-        private final CheckBoxDialogBuilder mBuilder;
-
-        public DeleteDialogHelper(com.hippo.ehviewer.download.DownloadManager downloadManager,
-                                  GalleryInfo galleryInfo, CheckBoxDialogBuilder builder) {
-            mDownloadManager = downloadManager;
-            mGalleryInfo = galleryInfo;
-            mBuilder = builder;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which != DialogInterface.BUTTON_POSITIVE) {
-                return;
-            }
-
-            // Delete
-            if (null != mDownloadManager) {
-                mDownloadManager.deleteDownload(mGalleryInfo.gid);
-            }
-
-            // Delete image files
-            boolean checked = mBuilder.isChecked();
-            Settings.putRemoveImageFiles(checked);
-            if (checked) {
-                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid);
-                EhDB.removeDownloadDirname(mGalleryInfo.gid);
-                deleteFileAsync(file);
-            }
         }
     }
 }

@@ -27,7 +27,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleKt;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhClient;

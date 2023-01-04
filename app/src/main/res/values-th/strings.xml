@@ -463,7 +463,6 @@
     <plurals name="year">
         <item quantity="other">ปี</item>
     </plurals>
-    <string name="dialog_archive_title">H@H Downloader</string>
     <string name="no_archives">ยังไม่มีไฟล์บีบอัด</string>
     <string name="download_archive_started">เริ่มการดาวน์โหลดบีบอัด</string>
     <string name="download_archive_failure">การดาวน์โหลดไฟล์บีบอัดล้มเหลว</string>

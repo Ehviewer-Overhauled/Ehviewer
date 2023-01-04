@@ -526,7 +526,6 @@
     <plurals name="year">
         <item quantity="other">年</item>
     </plurals>
-    <string name="dialog_archive_title">通过 H@H 下载</string>
     <string name="no_archives">没有压缩包</string>
     <string name="download_archive_started">开始下载压缩包</string>
     <string name="download_archive_failure">无法下载压缩包</string>

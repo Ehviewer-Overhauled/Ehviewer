@@ -604,8 +604,14 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
     private val mDrawerOnBackPressedCallback =
         object : OnBackPressedCallback(false), DrawerListener {
             val slideThreshold = 0.05
-            override fun handleOnBackPressed() { mDrawerLayout?.closeDrawers() }
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) { isEnabled = slideOffset > slideThreshold }
+            override fun handleOnBackPressed() {
+                mDrawerLayout?.closeDrawers()
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                isEnabled = slideOffset > slideThreshold
+            }
+
             override fun onDrawerOpened(drawerView: View) {}
             override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerStateChanged(newState: Int) {}
@@ -616,7 +622,10 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
 
         init {
             registerLaunchMode(SignInScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(WebViewSignInScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
+            registerLaunchMode(
+                WebViewSignInScene::class.java,
+                SceneFragment.LAUNCH_MODE_SINGLE_TASK
+            )
             registerLaunchMode(CookieSignInScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
             registerLaunchMode(SelectSiteScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
             registerLaunchMode(GalleryListScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TOP)

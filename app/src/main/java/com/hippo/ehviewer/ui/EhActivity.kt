@@ -51,7 +51,8 @@ abstract class EhActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        layoutInflater.factory2 = LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
+        layoutInflater.factory2 =
+            LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
         super.onCreate(savedInstanceState)
         (application as EhApplication).registerActivity(this)
     }
@@ -78,7 +79,11 @@ abstract class EhActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun checkAndRequestNotificationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) return
         if (Settings.getNotificationRequired()) return
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }

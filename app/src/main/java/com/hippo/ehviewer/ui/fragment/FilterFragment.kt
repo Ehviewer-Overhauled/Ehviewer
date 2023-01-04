@@ -282,9 +282,9 @@ class FilterFragment : BaseFragment() {
             count += if (0 == size) 0 else size + 1
             size = mTagNamespaceFilterList.size
             count += if (0 == size) 0 else size + 1
-            size = mCommenterFilterList.size;
+            size = mCommenterFilterList.size
             count += if (0 == size) 0 else size + 1
-            size = mCommentFilterList.size;
+            size = mCommentFilterList.size
             count += if (0 == size) 0 else size + 1
             return count
         }

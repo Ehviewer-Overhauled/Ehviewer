@@ -15,12 +15,10 @@
  */
 package com.hippo.ehviewer.ui
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton

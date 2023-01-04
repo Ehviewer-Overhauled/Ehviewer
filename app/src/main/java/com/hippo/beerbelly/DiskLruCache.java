@@ -329,21 +329,7 @@ public final class DiskLruCache implements Closeable {
         } else {
             throw new IOException("unexpected journal line: " + line);
         }
-    }    private final Callable<Void> cleanupCallable = new Callable<>() {
-        public Void call() throws Exception {
-            synchronized (DiskLruCache.this) {
-                if (journalWriter == null) {
-                    return null; // Closed.
-                }
-                trimToSize();
-                if (journalRebuildRequired()) {
-                    rebuildJournal();
-                    redundantOpCount = 0;
-                }
-            }
-            return null;
-        }
-    };
+    }
 
     /**
      * Computes the initial size and collects garbage as a part of opening the
@@ -366,7 +352,21 @@ public final class DiskLruCache implements Closeable {
                 i.remove();
             }
         }
-    }
+    }    private final Callable<Void> cleanupCallable = new Callable<>() {
+        public Void call() throws Exception {
+            synchronized (DiskLruCache.this) {
+                if (journalWriter == null) {
+                    return null; // Closed.
+                }
+                trimToSize();
+                if (journalRebuildRequired()) {
+                    rebuildJournal();
+                    redundantOpCount = 0;
+                }
+            }
+            return null;
+        }
+    };
 
     /**
      * Creates a new journal that omits redundant information. This replaces the

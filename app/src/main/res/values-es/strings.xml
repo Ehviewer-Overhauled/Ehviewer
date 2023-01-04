@@ -440,7 +440,6 @@
     <string name="download_state_none">Descarga en pausa</string>
     <string name="error_password_cannot_empty">La contraseña no puede estar vacía</string>
     <string name="error_something_wrong_happened">Ocurrió algo malo</string>
-    <string name="dialog_archive_title">H@H Downloader</string>
     <string name="settings_privacy">Privacidad</string>
     <string name="filter">Bloqueo de galerías</string>
     <string name="filter_title">Título</string>

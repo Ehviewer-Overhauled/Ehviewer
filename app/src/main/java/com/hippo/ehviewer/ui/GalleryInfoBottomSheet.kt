@@ -29,7 +29,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.util.addTextToClipboard
 import com.hippo.util.tellClipboard
 
 class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment() {

@@ -30,7 +30,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleKt;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.app.BaseDialogBuilder;

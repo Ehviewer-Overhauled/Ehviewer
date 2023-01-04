@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleKt;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.app.BaseDialogBuilder;
@@ -49,8 +48,6 @@ import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
-
-import kotlinx.coroutines.GlobalScope;
 
 public final class SignInScene extends SolidScene implements EditText.OnEditorActionListener,
         View.OnClickListener {

@@ -448,7 +448,6 @@
     <plurals name="year">
         <item quantity="other">년</item>
     </plurals>
-    <string name="dialog_archive_title">H@H 다운로더</string>
     <string name="no_archives">아카이브 없음</string>
     <string name="download_archive_started">아카이브 다운로드가 시작되었습니다.</string>
     <string name="download_archive_failure">아카이브 다운로드에 실패했습니다.</string>

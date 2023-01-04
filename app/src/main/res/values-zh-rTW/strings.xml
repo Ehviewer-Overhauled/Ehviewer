@@ -514,7 +514,6 @@
     <plurals name="year">
         <item quantity="other">年</item>
     </plurals>
-    <string name="dialog_archive_title">透過 H@H 下載</string>
     <string name="no_archives">沒有壓縮檔</string>
     <string name="download_archive_started">開始下載壓縮檔</string>
     <string name="download_archive_failure">下載失敗</string>

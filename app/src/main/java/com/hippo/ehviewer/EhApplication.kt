@@ -35,10 +35,8 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import com.hippo.Native
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
-import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase

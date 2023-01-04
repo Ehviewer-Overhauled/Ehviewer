@@ -50,7 +50,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -109,6 +108,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
     private static final int TYPE_COMMENT = 0;
     private static final int TYPE_MORE = 1;
     private static final int TYPE_PROGRESS = 2;
+    private final EditPanelOnBackPressedCallback mCallback = new EditPanelOnBackPressedCallback();
     private GalleryDetail mGalleryDetail;
     @Nullable
     private EasyRecyclerView mRecyclerView;
@@ -133,8 +133,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
     private boolean mInAnimation = false;
     private boolean mShowAllComments = false;
     private boolean mRefreshingComments = false;
-
-    private final EditPanelOnBackPressedCallback mCallback = new EditPanelOnBackPressedCallback();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

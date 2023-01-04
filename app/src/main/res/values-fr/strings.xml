@@ -468,7 +468,6 @@
         <item quantity="one">%d an</item>
         <item quantity="other">ans</item>
     </plurals>
-    <string name="dialog_archive_title">H@H Downloader</string>
     <string name="no_archives">Aucun fiche archives</string>
     <string name="download_archive_started">Téléchargement du fiche archives a commencé</string>
     <string name="download_archive_failure">Téléchargement du fiche archives a échoué</string>

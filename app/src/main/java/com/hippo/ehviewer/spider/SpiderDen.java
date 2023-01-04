@@ -33,7 +33,6 @@ import com.hippo.io.UniFileInputStreamPipe;
 import com.hippo.io.UniFileOutputStreamPipe;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
-import com.hippo.unifile.FilenameFilter;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
@@ -49,10 +48,10 @@ public final class SpiderDen {
 
     @Nullable
     private static SimpleDiskCache sCache;
-    @Nullable
-    private UniFile mDownloadDir;
     private final GalleryInfo mGalleryInfo;
     private final long mGid;
+    @Nullable
+    private UniFile mDownloadDir;
     private volatile int mMode = SpiderQueen.MODE_READ;
 
     public SpiderDen(GalleryInfo galleryInfo) {

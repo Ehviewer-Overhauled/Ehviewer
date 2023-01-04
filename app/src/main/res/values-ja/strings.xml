@@ -458,7 +458,6 @@
     <plurals name="year">
         <item quantity="other">年</item>
     </plurals>
-    <string name="dialog_archive_title">H@Hからダウンロード</string>
     <string name="no_archives">圧縮パッケージなし</string>
     <string name="download_archive_started">圧縮パッケージのダウンロードを開始しました</string>
     <string name="download_archive_failure">圧縮パッケージをダウンロードできませんでした</string>

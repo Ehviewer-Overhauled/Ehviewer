@@ -55,9 +55,8 @@ public abstract class StageActivity extends EhActivity {
     private final ArrayList<String> mDelaySceneTagList = new ArrayList<>();
     private final AtomicInteger mIdGenerator = new AtomicInteger();
     private final SceneViewComparator mSceneViewComparator = new SceneViewComparator();
+    private final OnBackPressedCallback callback = new BackPressCallBack();
     private int mStageId = IntIdGenerator.INVALID_ID;
-
-    private OnBackPressedCallback callback = new BackPressCallBack();
 
     public static void registerLaunchMode(Class<?> clazz, @SceneFragment.LaunchMode int launchMode) {
         if (launchMode != SceneFragment.LAUNCH_MODE_STANDARD &&
