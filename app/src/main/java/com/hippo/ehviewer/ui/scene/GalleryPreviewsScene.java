@@ -39,7 +39,6 @@ import com.google.android.material.slider.Slider;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhClient;
@@ -352,7 +351,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             request.setCallback(new GetPreviewSetListener(getContext(),
                     activity.getStageId(), getTag(), taskId));
             request.setArgs(url);
-            mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+            request.enqueue(GalleryPreviewsScene.this);
         }
 
         @Override

@@ -59,7 +59,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hippo.app.BaseDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.UrlOpener;
 import com.hippo.ehviewer.WindowInsetsAnimationHelper;
@@ -318,7 +317,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, id, vote)
                 .setCallback(new VoteCommentListener(context,
                         activity.getStageId(), getTag()));
-        EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        request.enqueue(this);
     }
 
     @SuppressLint("InflateParams")
@@ -454,7 +453,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
                         .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
-                EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                request.enqueue(this);
             }
         }
 
@@ -639,7 +638,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setArgs(url, comment, mCommentId != 0 ? Long.toString(mCommentId) : null)
                         .setCallback(new CommentGalleryListener(context,
                                 activity.getStageId(), getTag(), mCommentId));
-                EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                request.enqueue(this);
                 hideSoftInput();
                 hideEditPanel(true);
             }
@@ -745,7 +744,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
                         .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
-                EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                request.enqueue(this);
             }
         }
     }

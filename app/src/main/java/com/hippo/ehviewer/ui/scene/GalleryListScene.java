@@ -1594,7 +1594,7 @@ public final class GalleryListScene extends SearchBarScene
                 request.setArgs(new File(StringUtils.avoidNull(mUrlBuilder.getImagePath())),
                         mUrlBuilder.isUseSimilarityScan(),
                         mUrlBuilder.isOnlySearchCovers(), mUrlBuilder.isShowExpunged());
-                mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                request.enqueue(GalleryListScene.this);
             } else {
                 String url = mUrlBuilder.build();
                 EhRequest request = new EhRequest();
@@ -1602,7 +1602,7 @@ public final class GalleryListScene extends SearchBarScene
                 request.setCallback(new GetGalleryListListener(getContext(),
                         activity.getStageId(), getTag(), taskId));
                 request.setArgs(url);
-                mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                request.enqueue(GalleryListScene.this);
             }
         }
 

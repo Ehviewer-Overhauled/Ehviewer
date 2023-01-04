@@ -15,7 +15,14 @@
  */
 package com.hippo.ehviewer.client
 
+import android.app.Activity
 import androidx.annotation.MainThread
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 
 class EhRequest {
@@ -43,6 +50,24 @@ class EhRequest {
     fun setCallback(callback: EhClient.Callback<*>?): EhRequest {
         this.callback = callback as EhClient.Callback<Any?>?
         return this
+    }
+
+    fun enqueue(scope: CoroutineScope) {
+        EhClient.enqueue(this, scope)
+    }
+
+    @DelicateCoroutinesApi
+    fun enqueue() {
+        EhClient.enqueue(this, GlobalScope)
+    }
+
+    fun enqueue(fragment: Fragment) {
+        enqueue(fragment.lifecycleScope)
+    }
+
+    fun enqueue(activity: Activity) {
+        check(activity is FragmentActivity)
+        enqueue(activity.lifecycleScope)
     }
 
     @MainThread

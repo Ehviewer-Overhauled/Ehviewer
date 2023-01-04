@@ -23,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import java.io.File
 
 object EhClient {
-    fun execute(request: EhRequest, scope: CoroutineScope) {
+    internal fun enqueue(request: EhRequest, scope: CoroutineScope) {
         check(!request.isActive) // Abort if attempt to execute an active request
         request.job = scope.launchIO {
             val method = request.method

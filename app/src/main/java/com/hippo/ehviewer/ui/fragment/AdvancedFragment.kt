@@ -347,10 +347,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                             request.setArgs(favListUrlBuilder.build())
                             viewLifecycleOwner.lifecycleScope.launch {
                                 delay(100)
-                                mClient.execute(
-                                    request,
-                                    viewLifecycleOwner.lifecycle.coroutineScope
-                                )
+                                request.enqueue(this@AdvancedFragment)
                             }
                         } else {
                             showTip(
@@ -376,7 +373,7 @@ class AdvancedFragment : BasePreferenceFragment() {
             }
         })
         request.setArgs(favListUrlBuilder.build())
-        mClient.execute(request, viewLifecycleOwner.lifecycle.coroutineScope)
+        mClient.enqueue(request, viewLifecycleOwner.lifecycle.coroutineScope)
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {

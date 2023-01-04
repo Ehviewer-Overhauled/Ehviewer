@@ -60,7 +60,7 @@ public final class CommonOperations {
             request.setMethod(EhClient.METHOD_ADD_FAVORITES);
             request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "");
             request.setCallback(listener);
-            client.execute(request, LifecycleKt.getCoroutineScope(((FragmentActivity)activity).getLifecycle()));
+            request.enqueue(activity);
         } else {
             listener.onFailure(new Exception()); // TODO Add text
         }
@@ -107,7 +107,7 @@ public final class CommonOperations {
         request.setMethod(EhClient.METHOD_ADD_FAVORITES);
         request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "");
         request.setCallback(new DelegateFavoriteCallback(listener, galleryInfo, null, -2));
-        client.execute(request, LifecycleKt.getCoroutineScope(((FragmentActivity)activity).getLifecycle()));
+        request.enqueue(activity);
     }
 
     public static void startDownload(final MainActivity activity, final GalleryInfo galleryInfo, boolean forceDefault) {

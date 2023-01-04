@@ -199,7 +199,7 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
                 .setCallback(new CookieSignInListener());
-        EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        request.enqueue(this);
     }
 
     private void storeCookie(String id, String hash, String igneous) {
