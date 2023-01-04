@@ -35,7 +35,7 @@ class EhClient {
             val job = scope.launch(Dispatchers.IO, CoroutineStart.LAZY) {
                 val method = request.method
                 val params = request.args
-                val callback = request.callback
+                val callback: Callback<Any?>? = request.callback
                 try {
                     val result: Any? = when (method) {
                         METHOD_SIGN_IN -> EhEngine.signIn(
@@ -181,11 +181,11 @@ class EhClient {
                         METHOD_GET_UCONFIG -> EhEngine.getUConfig(task, mOkHttpClient)
                         else -> throw IllegalStateException("Can't detect method $method")
                     }
-                    withUIContext { callback.onSuccess(result) }
+                    withUIContext { callback?.onSuccess(result) }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     if (e !is CancelledException)
-                        withUIContext { callback.onFailure(e) }
+                        withUIContext { callback?.onFailure(e) }
                 }
                 request.task = null
                 request.callback = null
