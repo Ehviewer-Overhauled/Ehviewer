@@ -100,7 +100,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
                     .setArgs(mGid, mPToken, mPage)
                     .setCallback(new GetGalleryTokenListener(context,
                             activity.getStageId(), getTag()));
-            EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+            EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             return true;
         }
         return false;

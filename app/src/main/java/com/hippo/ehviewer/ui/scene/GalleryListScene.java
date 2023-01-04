@@ -323,7 +323,7 @@ public final class GalleryListScene extends SearchBarScene
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient();
+        mClient = EhClient.INSTANCE;
         mDownloadManager = EhApplication.getDownloadManager();
         mFavouriteStatusRouter = EhApplication.getFavouriteStatusRouter();
 

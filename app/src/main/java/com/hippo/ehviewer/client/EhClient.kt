@@ -16,167 +16,154 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
+import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.io.File
 
-class EhClient {
+object EhClient {
     fun execute(request: EhRequest, scope: CoroutineScope) {
-        if (!request.isCancelled) {
-            val task = Task()
-            val job = scope.launch(Dispatchers.IO, CoroutineStart.LAZY) {
-                val method = request.method
-                val params = request.args
-                val callback: Callback<Any?>? = request.callback
-                try {
-                    val result: Any? = when (method) {
-                        METHOD_SIGN_IN -> EhEngine.signIn(
-                            mOkHttpClient,
-                            params[0] as String,
-                            params[1] as String
-                        )
+        check(!request.isActive) // Abort if attempt to execute an active request
+        request.job = scope.launchIO {
+            val method = request.method
+            val params = request.args
+            val callback: Callback<Any?>? = request.callback
+            try {
+                val result: Any? = when (method) {
+                    METHOD_SIGN_IN -> EhEngine.signIn(
+                        mOkHttpClient,
+                        params!![0] as String,
+                        params[1] as String
+                    )
 
-                        METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
-                            mOkHttpClient,
-                            params[0] as String
-                        )
+                    METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
+                        mOkHttpClient,
+                        params!![0] as String
+                    )
 
-                        METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
-                            mOkHttpClient,
-                            params[0] as String?
-                        )
+                    METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
+                        mOkHttpClient,
+                        params!![0] as String?
+                    )
 
-                        METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
-                            mOkHttpClient,
-                            params[0] as String?
-                        )
+                    METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
+                        mOkHttpClient,
+                        params!![0] as String?
+                    )
 
-                        METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            (params[2] as Long),
-                            params[3] as String?,
-                            (params[4] as Float)
-                        )
+                    METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as Long,
+                        params[3] as String?,
+                        params[4] as Float
+                    )
 
-                        METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
-                            mOkHttpClient,
-                            params[0] as String?,
-                            params[1] as String,
-                            params[2] as String?
-                        )
+                    METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
+                        mOkHttpClient,
+                        params!![0] as String?,
+                        params[1] as String,
+                        params[2] as String?
+                    )
 
-                        METHOD_GET_GALLERY_TOKEN -> EhEngine.getGalleryToken(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            (params[2] as Int)
-                        )
+                    METHOD_GET_GALLERY_TOKEN -> EhEngine.getGalleryToken(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as Int
+                    )
 
-                        METHOD_GET_FAVORITES -> EhEngine.getFavorites(
-                            mOkHttpClient,
-                            params[0] as String
-                        )
+                    METHOD_GET_FAVORITES -> EhEngine.getFavorites(
+                        mOkHttpClient,
+                        params!![0] as String
+                    )
 
-                        METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            (params[2] as Int),
-                            params[3] as String?
-                        )
+                    METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as Int,
+                        params[3] as String?
+                    )
 
-                        METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
-                            mOkHttpClient,
-                            params[0] as LongArray,
-                            params[1] as Array<String?>,
-                            (params[2] as Int)
-                        )
+                    METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
+                        mOkHttpClient,
+                        params!![0] as LongArray,
+                        params[1] as Array<String?>,
+                        params[2] as Int
+                    )
 
-                        METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
-                            mOkHttpClient,
-                            params[0] as String,
-                            params[1] as LongArray,
-                            (params[2] as Int)
-                        )
+                    METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
+                        mOkHttpClient,
+                        params!![0] as String,
+                        params[1] as LongArray,
+                        params[2] as Int
+                    )
 
-                        METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
-                            mOkHttpClient,
-                            params[0] as String?,
-                            (params[1] as Long),
-                            params[2] as String?
-                        )
+                    METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
+                        mOkHttpClient,
+                        params!![0] as String?,
+                        params[1] as Long,
+                        params[2] as String?
+                    )
 
-                        METHOD_GET_PROFILE -> EhEngine.getProfile(mOkHttpClient)
-                        METHOD_VOTE_COMMENT -> EhEngine.voteComment(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            (params[2] as Long),
-                            params[3] as String?,
-                            (params[4] as Long),
-                            (params[5] as Int)
-                        )
+                    METHOD_GET_PROFILE -> EhEngine.getProfile(mOkHttpClient)
+                    METHOD_VOTE_COMMENT -> EhEngine.voteComment(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as Long,
+                        params[3] as String?,
+                        params[4] as Long,
+                        params[5] as Int
+                    )
 
-                        METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
-                            mOkHttpClient,
-                            params[0] as File,
-                            (params[1] as Boolean),
-                            (params[2] as Boolean),
-                            (params[3] as Boolean)
-                        )
+                    METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
+                        mOkHttpClient,
+                        params!![0] as File,
+                        params[1] as Boolean,
+                        params[2] as Boolean,
+                        params[3] as Boolean
+                    )
 
-                        METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
-                            mOkHttpClient,
-                            params[0] as String?,
-                            (params[1] as Long),
-                            params[2] as String?
-                        )
+                    METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
+                        mOkHttpClient,
+                        params!![0] as String?,
+                        params[1] as Long,
+                        params[2] as String?
+                    )
 
-                        METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            params[2] as String?,
-                            params[3] as String?,
-                            (params[4] as Boolean)
-                        )
+                    METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as String?,
+                        params[3] as String?,
+                        params[4] as Boolean
+                    )
 
-                        METHOD_VOTE_TAG -> EhEngine.voteTag(
-                            mOkHttpClient,
-                            (params[0] as Long),
-                            params[1] as String?,
-                            (params[2] as Long),
-                            params[3] as String?,
-                            params[4] as String?,
-                            (params[5] as Int)
-                        )
+                    METHOD_VOTE_TAG -> EhEngine.voteTag(
+                        mOkHttpClient,
+                        params!![0] as Long,
+                        params[1] as String?,
+                        params[2] as Long,
+                        params[3] as String?,
+                        params[4] as String?,
+                        params[5] as Int
+                    )
 
-                        METHOD_GET_UCONFIG -> EhEngine.getUConfig(mOkHttpClient)
-                        else -> throw IllegalStateException("Can't detect method $method")
-                    }
-                    withUIContext { callback?.onSuccess(result) }
-                } catch (e: Exception) {
-                    if (e is CancellationException)
-                        throw e // Don't catch coroutine CancellationException
-                    e.printStackTrace()
-                    withUIContext { callback?.onFailure(e) }
+                    METHOD_GET_UCONFIG -> EhEngine.getUConfig(mOkHttpClient)
+                    else -> throw IllegalStateException("Can't detect method $method")
                 }
-                request.task = null
-                request.callback = null
+                withUIContext { callback?.onSuccess(result) }
+            } catch (e: Exception) {
+                if (e is CancellationException)
+                    throw e // Don't catch coroutine CancellationException
+                e.printStackTrace()
+                withUIContext { callback?.onFailure(e) }
             }
-            task.job = job
-            task.mCallback = request.callback
-            request.task = task
-            job.start()
-        } else {
-            request.callback?.onCancel()
         }
     }
 
@@ -186,40 +173,24 @@ class EhClient {
         fun onCancel()
     }
 
-    class Task {
-        internal var mCallback: Callback<*>? = null
-        internal var job: Job? = null
-        private val mStop
-            get() = !(job?.isActive ?: false)
-
-        fun stop() {
-            if (!mStop) {
-                job?.cancel()
-                mCallback?.onCancel()
-            }
-        }
-    }
-
-    companion object {
-        const val METHOD_SIGN_IN = 0
-        const val METHOD_GET_GALLERY_LIST = 1
-        const val METHOD_GET_GALLERY_DETAIL = 3
-        const val METHOD_GET_PREVIEW_SET = 4
-        const val METHOD_GET_RATE_GALLERY = 5
-        const val METHOD_GET_COMMENT_GALLERY = 6
-        const val METHOD_GET_GALLERY_TOKEN = 7
-        const val METHOD_GET_FAVORITES = 8
-        const val METHOD_ADD_FAVORITES = 9
-        const val METHOD_ADD_FAVORITES_RANGE = 10
-        const val METHOD_MODIFY_FAVORITES = 11
-        const val METHOD_GET_TORRENT_LIST = 12
-        const val METHOD_GET_PROFILE = 14
-        const val METHOD_VOTE_COMMENT = 15
-        const val METHOD_IMAGE_SEARCH = 16
-        const val METHOD_ARCHIVE_LIST = 17
-        const val METHOD_DOWNLOAD_ARCHIVE = 18
-        const val METHOD_VOTE_TAG = 19
-        const val METHOD_GET_UCONFIG = 20
-        private val mOkHttpClient = okHttpClient
-    }
+    const val METHOD_SIGN_IN = 0
+    const val METHOD_GET_GALLERY_LIST = 1
+    const val METHOD_GET_GALLERY_DETAIL = 3
+    const val METHOD_GET_PREVIEW_SET = 4
+    const val METHOD_GET_RATE_GALLERY = 5
+    const val METHOD_GET_COMMENT_GALLERY = 6
+    const val METHOD_GET_GALLERY_TOKEN = 7
+    const val METHOD_GET_FAVORITES = 8
+    const val METHOD_ADD_FAVORITES = 9
+    const val METHOD_ADD_FAVORITES_RANGE = 10
+    const val METHOD_MODIFY_FAVORITES = 11
+    const val METHOD_GET_TORRENT_LIST = 12
+    const val METHOD_GET_PROFILE = 14
+    const val METHOD_VOTE_COMMENT = 15
+    const val METHOD_IMAGE_SEARCH = 16
+    const val METHOD_ARCHIVE_LIST = 17
+    const val METHOD_DOWNLOAD_ARCHIVE = 18
+    const val METHOD_VOTE_TAG = 19
+    const val METHOD_GET_UCONFIG = 20
+    private val mOkHttpClient = okHttpClient
 }

@@ -50,6 +50,8 @@ import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
 
+import kotlinx.coroutines.GlobalScope;
+
 public final class SignInScene extends SolidScene implements EditText.OnEditorActionListener,
         View.OnClickListener {
 
@@ -290,7 +292,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
                 .setMethod(EhClient.METHOD_SIGN_IN)
                 .setArgs(username, password)
                 .setCallback(callback);
-        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        EhClient.INSTANCE.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
 
         mSigningIn = true;
     }
@@ -311,9 +313,9 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
                 .setCallback(callback);
-        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        EhClient.INSTANCE.execute(request, GlobalScope.INSTANCE);
 
-        EhApplication.getEhClient().execute(new EhRequest().setMethod(EhClient.METHOD_GET_UCONFIG), LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        EhClient.INSTANCE.execute(new EhRequest().setMethod(EhClient.METHOD_GET_UCONFIG), GlobalScope.INSTANCE);
     }
 
     private void redirectTo() {

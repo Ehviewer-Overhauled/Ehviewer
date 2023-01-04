@@ -92,7 +92,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient();
+        mClient = EhClient.INSTANCE;
         if (savedInstanceState == null) {
             onInit();
         } else {

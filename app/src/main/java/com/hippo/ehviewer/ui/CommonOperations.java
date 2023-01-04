@@ -55,7 +55,7 @@ public final class CommonOperations {
             EhDB.putLocalFavorites(galleryInfo);
             listener.onSuccess(null);
         } else if (slot >= 0 && slot <= 9) {
-            EhClient client = EhApplication.getEhClient();
+            EhClient client = EhClient.INSTANCE;
             EhRequest request = new EhRequest();
             request.setMethod(EhClient.METHOD_ADD_FAVORITES);
             request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "");
@@ -102,7 +102,7 @@ public final class CommonOperations {
     public static void removeFromFavorites(Activity activity, GalleryInfo galleryInfo,
                                            final EhClient.Callback<Void> listener) {
         EhDB.removeLocalFavorites(galleryInfo.gid);
-        EhClient client = EhApplication.getEhClient();
+        EhClient client = EhClient.INSTANCE;
         EhRequest request = new EhRequest();
         request.setMethod(EhClient.METHOD_ADD_FAVORITES);
         request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "");

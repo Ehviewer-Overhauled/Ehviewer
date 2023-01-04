@@ -13,377 +13,395 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
+import androidx.preference.Preference
+import com.hippo.app.BaseDialogBuilder
+import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.BuildConfig
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.GetText
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import com.hippo.ehviewer.client.parser.FavoritesParser
+import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.util.ExceptionUtils
+import com.hippo.util.IoThreadPoolExecutor
+import com.hippo.util.LogCat
+import com.hippo.util.ReadableTime
+import com.hippo.yorozuya.IOUtils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import kotlin.math.ceil
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.os.LocaleListCompat;
-import androidx.lifecycle.LifecycleKt;
-import androidx.preference.Preference;
-
-import com.hippo.app.BaseDialogBuilder;
-import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.BuildConfig;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.client.data.FavListUrlBuilder;
-import com.hippo.ehviewer.client.parser.FavoritesParser;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.util.IoThreadPoolExecutor;
-import com.hippo.util.LogCat;
-import com.hippo.util.ReadableTime;
-import com.hippo.yorozuya.IOUtils;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-public class AdvancedFragment extends BasePreferenceFragment {
-
-    private static final String KEY_DUMP_LOGCAT = "dump_logcat";
-    private static final String KEY_APP_LANGUAGE = "app_language";
-    private static final String KEY_IMPORT_DATA = "import_data";
-    private static final String KEY_EXPORT_DATA = "export_data";
-    private static final String KEY_OPEN_BY_DEFAULT = "open_by_default";
-    private static final String KEY_BACKUP_FAVORITE = "backup_favorite";
-    ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument("application/vnd.sqlite3"),
-            uri -> {
-                if (uri != null) {
-                    try {
-                        // grantUriPermission might throw RemoteException on MIUI
-                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e) {
-                        ExceptionUtils.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-                    try {
-                        AlertDialog alertDialog = new BaseDialogBuilder(requireActivity())
-                                .setCancelable(false)
-                                .setView(R.layout.preference_dialog_task)
-                                .show();
-                        IoThreadPoolExecutor.getInstance().execute(() -> {
-                            boolean success = EhDB.exportDB(requireActivity(), uri);
-                            Activity activity = getActivity();
-                            if (activity != null) {
-                                activity.runOnUiThread(() -> {
-                                    if (alertDialog.isShowing()) {
-                                        alertDialog.dismiss();
-                                    }
-                                    showTip(
-                                            (success)
-                                                    ? GetText.getString(R.string.settings_advanced_export_data_to, uri.toString())
-                                                    : GetText.getString(R.string.settings_advanced_export_data_failed),
-                                            BaseScene.LENGTH_SHORT);
-                                });
-                            }
-                        });
-                    } catch (Exception e) {
-                        showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT);
-                    }
-                }
-            });
-    ActivityResultLauncher<String> dumpLogcatLauncher = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument("application/zip"),
-            uri -> {
-                if (uri != null) {
-                    try {
-                        // grantUriPermission might throw RemoteException on MIUI
-                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    } catch (Exception e) {
-                        ExceptionUtils.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-                    try {
-                        File zipFile = new File(AppConfig.getExternalTempDir(), "logs.zip");
-                        if (zipFile.exists()) {
-                            //noinspection ResultOfMethodCallIgnored
-                            zipFile.delete();
-                        }
-
-                        ArrayList<File> files = new ArrayList<>();
-                        files.addAll(Arrays.asList(AppConfig.getExternalParseErrorDir().listFiles()));
-                        files.addAll(Arrays.asList(AppConfig.getExternalCrashDir().listFiles()));
-
-                        boolean finished = false;
-
-                        BufferedInputStream origin = null;
-                        ZipOutputStream out = null;
-                        try {
-                            FileOutputStream dest = new FileOutputStream(zipFile);
-                            out = new ZipOutputStream(new BufferedOutputStream(dest));
-                            byte[] bytes = new byte[1024 * 64];
-
-                            for (File file : files) {
-                                if (!file.isFile()) {
-                                    continue;
-                                }
-                                try {
-                                    FileInputStream fi = new FileInputStream(file);
-                                    origin = new BufferedInputStream(fi, bytes.length);
-
-                                    ZipEntry entry = new ZipEntry(file.getName());
-                                    out.putNextEntry(entry);
-                                    int count;
-                                    while ((count = origin.read(bytes, 0, bytes.length)) != -1) {
-                                        out.write(bytes, 0, count);
-                                    }
-                                    origin.close();
-                                    origin = null;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            ZipEntry entry = new ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
-                            out.putNextEntry(entry);
-                            LogCat.save(out);
-                            out.closeEntry();
-                            out.close();
-                            IOUtils.copy(new FileInputStream(zipFile), requireActivity().getContentResolver().openOutputStream(uri));
-                            finished = true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        } finally {
-                            if (origin != null) {
-                                origin.close();
-                            }
-                            if (out != null) {
-                                out.close();
-                            }
-                        }
-                        if (!finished) {
-                            finished = LogCat.save(requireActivity().getContentResolver().openOutputStream(uri));
+class AdvancedFragment : BasePreferenceFragment() {
+    private var exportLauncher = registerForActivityResult<String, Uri>(
+        ActivityResultContracts.CreateDocument("application/vnd.sqlite3")
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                // grantUriPermission might throw RemoteException on MIUI
+                requireActivity().grantUriPermission(
+                    BuildConfig.APPLICATION_ID,
+                    uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                ExceptionUtils.throwIfFatal(e)
+                e.printStackTrace()
+            }
+            try {
+                val alertDialog = BaseDialogBuilder(requireActivity())
+                    .setCancelable(false)
+                    .setView(R.layout.preference_dialog_task)
+                    .show()
+                IoThreadPoolExecutor.getInstance().execute {
+                    val success = EhDB.exportDB(requireActivity(), uri)
+                    val activity: Activity? = activity
+                    activity?.runOnUiThread {
+                        if (alertDialog.isShowing) {
+                            alertDialog.dismiss()
                         }
                         showTip(
-                                finished ? getString(R.string.settings_advanced_dump_logcat_to, uri.toString()) :
-                                        getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
-                    } catch (Exception e) {
-                        showTip(getString(R.string.settings_advanced_dump_logcat_failed), BaseScene.LENGTH_SHORT);
+                            if (success) GetText.getString(
+                                R.string.settings_advanced_export_data_to,
+                                uri.toString()
+                            ) else GetText.getString(R.string.settings_advanced_export_data_failed),
+                            BaseScene.LENGTH_SHORT
+                        )
                     }
                 }
-            });
-    ActivityResultLauncher<String[]> importDataLauncher = registerForActivityResult(
-            new ActivityResultContracts.OpenDocument(),
-            uri -> {
-                if (uri != null) {
-                    try {
-                        // grantUriPermission might throw RemoteException on MIUI
-                        requireActivity().grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (Exception e) {
-                        ExceptionUtils.throwIfFatal(e);
-                        e.printStackTrace();
-                    }
-                    try {
-                        AlertDialog alertDialog = new BaseDialogBuilder(requireActivity())
-                                .setCancelable(false)
-                                .setView(R.layout.preference_dialog_task)
-                                .show();
-                        IoThreadPoolExecutor.getInstance().execute(() -> {
-                            final String error = EhDB.importDB(requireActivity(), uri);
-                            Activity activity = getActivity();
-                            if (activity != null) {
-                                activity.runOnUiThread(() -> {
-                                    if (alertDialog.isShowing()) {
-                                        alertDialog.dismiss();
-                                    }
-                                    if (null == error) {
-                                        showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT);
-                                    } else {
-                                        showTip(error, BaseScene.LENGTH_SHORT);
-                                    }
-                                });
+            } catch (e: Exception) {
+                showTip(R.string.settings_advanced_export_data_failed, BaseScene.LENGTH_SHORT)
+            }
+        }
+    }
+    private var dumpLogcatLauncher = registerForActivityResult<String, Uri>(
+        ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                // grantUriPermission might throw RemoteException on MIUI
+                requireActivity().grantUriPermission(
+                    BuildConfig.APPLICATION_ID,
+                    uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                ExceptionUtils.throwIfFatal(e)
+                e.printStackTrace()
+            }
+            try {
+                val zipFile = File(AppConfig.getExternalTempDir(), "logs.zip")
+                if (zipFile.exists()) {
+                    zipFile.delete()
+                }
+                val files = ArrayList<File>()
+                AppConfig.getExternalParseErrorDir()?.listFiles()?.let { files.addAll(it) }
+                AppConfig.getExternalCrashDir()?.listFiles()?.let { files.addAll(it) }
+                var finished = false
+                var origin: BufferedInputStream? = null
+                var out: ZipOutputStream? = null
+                try {
+                    val dest = FileOutputStream(zipFile)
+                    out = ZipOutputStream(BufferedOutputStream(dest))
+                    val bytes = ByteArray(1024 * 64)
+                    for (file in files) {
+                        if (!file.isFile) {
+                            continue
+                        }
+                        try {
+                            val fi = FileInputStream(file)
+                            origin = BufferedInputStream(fi, bytes.size)
+                            val entry = ZipEntry(file.name)
+                            out.putNextEntry(entry)
+                            var count: Int
+                            while (origin.read(bytes, 0, bytes.size).also { count = it } != -1) {
+                                out.write(bytes, 0, count)
                             }
-
-                        });
-                    } catch (Exception e) {
-                        showTip(e.getLocalizedMessage(), BaseScene.LENGTH_SHORT);
+                            origin.close()
+                            origin = null
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    val entry =
+                        ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt")
+                    out.putNextEntry(entry)
+                    LogCat.save(out)
+                    out.closeEntry()
+                    out.close()
+                    IOUtils.copy(
+                        FileInputStream(zipFile),
+                        requireActivity().contentResolver.openOutputStream(uri)
+                    )
+                    finished = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    origin?.close()
+                    out?.close()
+                }
+                if (!finished) {
+                    finished = LogCat.save(requireActivity().contentResolver.openOutputStream(uri))
+                }
+                showTip(
+                    if (finished) getString(
+                        R.string.settings_advanced_dump_logcat_to,
+                        uri.toString()
+                    ) else getString(R.string.settings_advanced_dump_logcat_failed),
+                    BaseScene.LENGTH_SHORT
+                )
+            } catch (e: Exception) {
+                showTip(
+                    getString(R.string.settings_advanced_dump_logcat_failed),
+                    BaseScene.LENGTH_SHORT
+                )
+            }
+        }
+    }
+    private var importDataLauncher = registerForActivityResult<Array<String>, Uri>(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                // grantUriPermission might throw RemoteException on MIUI
+                requireActivity().grantUriPermission(
+                    BuildConfig.APPLICATION_ID,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                ExceptionUtils.throwIfFatal(e)
+                e.printStackTrace()
+            }
+            try {
+                val alertDialog = BaseDialogBuilder(requireActivity())
+                    .setCancelable(false)
+                    .setView(R.layout.preference_dialog_task)
+                    .show()
+                IoThreadPoolExecutor.getInstance().execute {
+                    val error = EhDB.importDB(requireActivity(), uri)
+                    val activity: Activity? = activity
+                    activity?.runOnUiThread {
+                        if (alertDialog.isShowing) {
+                            alertDialog.dismiss()
+                        }
+                        if (null == error) {
+                            showTip(
+                                getString(R.string.settings_advanced_import_data_successfully),
+                                BaseScene.LENGTH_SHORT
+                            )
+                        } else {
+                            showTip(error, BaseScene.LENGTH_SHORT)
+                        }
                     }
                 }
-            });
-    private int favTotal;
-    private int favIndex;
-
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.advanced_settings);
-
-        Preference dumpLogcat = findPreference(KEY_DUMP_LOGCAT);
-        Preference appLanguage = findPreference(KEY_APP_LANGUAGE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            appLanguage.setVisible(false);
-        Preference importData = findPreference(KEY_IMPORT_DATA);
-        Preference exportData = findPreference(KEY_EXPORT_DATA);
-        Preference backupFavorite = findPreference(KEY_BACKUP_FAVORITE);
-        Preference openByDefault = findPreference(KEY_OPEN_BY_DEFAULT);
-
+            } catch (e: Exception) {
+                showTip(e.localizedMessage, BaseScene.LENGTH_SHORT)
+            }
+        }
+    }
+    private var favTotal = 0
+    private var favIndex = 0
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.advanced_settings)
+        val dumpLogcat = findPreference<Preference>(KEY_DUMP_LOGCAT)
+        val appLanguage = findPreference<Preference>(KEY_APP_LANGUAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) appLanguage!!.isVisible = false
+        val importData = findPreference<Preference>(KEY_IMPORT_DATA)
+        val exportData = findPreference<Preference>(KEY_EXPORT_DATA)
+        val backupFavorite = findPreference<Preference>(KEY_BACKUP_FAVORITE)
+        val openByDefault = findPreference<Preference>(KEY_OPEN_BY_DEFAULT)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            openByDefault.setVisible(false);
+            openByDefault!!.isVisible = false
         } else {
-            openByDefault.setOnPreferenceClickListener(this);
+            openByDefault!!.onPreferenceClickListener = this
         }
-
-        dumpLogcat.setOnPreferenceClickListener(this);
-        importData.setOnPreferenceClickListener(this);
-        exportData.setOnPreferenceClickListener(this);
-        backupFavorite.setOnPreferenceClickListener(this);
-
-        appLanguage.setOnPreferenceChangeListener(this);
+        dumpLogcat!!.onPreferenceClickListener = this
+        importData!!.onPreferenceClickListener = this
+        exportData!!.onPreferenceClickListener = this
+        backupFavorite!!.onPreferenceClickListener = this
+        appLanguage!!.onPreferenceChangeListener = this
     }
 
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        String key = preference.getKey();
-        if (KEY_DUMP_LOGCAT.equals(key)) {
+    override fun onPreferenceClick(preference: Preference): Boolean {
+        val key = preference.key
+        if (KEY_DUMP_LOGCAT == key) {
             try {
-                dumpLogcatLauncher.launch("log-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".zip");
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                dumpLogcatLauncher.launch("log-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".zip")
+            } catch (e: Throwable) {
+                ExceptionUtils.throwIfFatal(e)
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT)
             }
-            return true;
-        } else if (KEY_IMPORT_DATA.equals(key)) {
+            return true
+        } else if (KEY_IMPORT_DATA == key) {
             try {
-                importDataLauncher.launch(new String[]{"*/*"});
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                importDataLauncher.launch(arrayOf("*/*"))
+            } catch (e: Throwable) {
+                ExceptionUtils.throwIfFatal(e)
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT)
             }
-            return true;
-        } else if (KEY_EXPORT_DATA.equals(key)) {
+            return true
+        } else if (KEY_EXPORT_DATA == key) {
             try {
-                exportLauncher.launch(ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db");
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+                exportLauncher.launch(ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db")
+            } catch (e: Throwable) {
+                ExceptionUtils.throwIfFatal(e)
+                showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT)
             }
-            return true;
-        } else if (KEY_BACKUP_FAVORITE.equals(key)) {
+            return true
+        } else if (KEY_BACKUP_FAVORITE == key) {
             try {
-                backupFavorite();
-            } catch (Exception e) {
-                ExceptionUtils.throwIfFatal(e);
-                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT);
+                backupFavorite()
+            } catch (e: Exception) {
+                ExceptionUtils.throwIfFatal(e)
+                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT)
             }
-            return true;
-        } else if (KEY_OPEN_BY_DEFAULT.equals(key)) {
+            return true
+        } else if (KEY_OPEN_BY_DEFAULT == key) {
             try {
-                @SuppressLint("InlinedApi") Intent intent = new Intent(android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                        Uri.parse("package:" + requireContext().getPackageName()));
-                startActivity(intent);
-            } catch (Throwable t) {
-                Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:" + requireContext().getPackageName()));
-                startActivity(intent);
+                @SuppressLint("InlinedApi") val intent = Intent(
+                    Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                    Uri.parse("package:" + requireContext().packageName)
+                )
+                startActivity(intent)
+            } catch (t: Throwable) {
+                val intent = Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + requireContext().packageName)
+                )
+                startActivity(intent)
             }
-            return true;
+            return true
         }
-        return false;
+        return false
     }
 
-    private void backupFavorite() {
-        EhClient mClient = EhApplication.getEhClient();
-        FavListUrlBuilder favListUrlBuilder = new FavListUrlBuilder();
-        favTotal = 0;
-        favIndex = 1;
-
-        EhRequest request = new EhRequest();
-        request.setMethod(EhClient.METHOD_GET_FAVORITES);
-        request.setCallback(new EhClient.Callback<FavoritesParser.Result>() {
-            @Override
-            public void onSuccess(FavoritesParser.Result result) {
+    private fun backupFavorite() {
+        val mClient = EhClient
+        val favListUrlBuilder = FavListUrlBuilder()
+        favTotal = 0
+        favIndex = 1
+        val request = EhRequest()
+        request.setMethod(EhClient.METHOD_GET_FAVORITES)
+        request.setCallback(object : EhClient.Callback<FavoritesParser.Result> {
+            override fun onSuccess(result: FavoritesParser.Result) {
                 try {
                     if (result.galleryInfoList.isEmpty()) {
-                        showTip(R.string.settings_advanced_backup_favorite_nothing, BaseScene.LENGTH_SHORT);
+                        showTip(
+                            R.string.settings_advanced_backup_favorite_nothing,
+                            BaseScene.LENGTH_SHORT
+                        )
                     } else {
                         if (favTotal == 0 && result.countArray != null) {
-                            int totalFav = 0;
-                            for (int i = 0; i < 10; i++) {
-                                totalFav = totalFav + result.countArray[i];
+                            var totalFav = 0
+                            for (i in 0..9) {
+                                totalFav += result.countArray[i]
                             }
-                            favTotal = (int) Math.ceil((double) totalFav / result.galleryInfoList.size());
+                            favTotal =
+                                ceil(totalFav.toDouble() / result.galleryInfoList.size).toInt()
                         }
-
-                        String status = "(" + favIndex + "/" + favTotal + ")";
-                        showTip(GetText.getString(R.string.settings_advanced_backup_favorite_start, status), BaseScene.LENGTH_SHORT);
-                        Log.d("LocalFavorites", "now backup page " + status);
-                        EhDB.putLocalFavorites(result.galleryInfoList);
-
+                        val status = "($favIndex/$favTotal)"
+                        showTip(
+                            GetText.getString(
+                                R.string.settings_advanced_backup_favorite_start,
+                                status
+                            ), BaseScene.LENGTH_SHORT
+                        )
+                        Log.d("LocalFavorites", "now backup page $status")
+                        EhDB.putLocalFavorites(result.galleryInfoList)
                         if (result.next != null) {
                             try {
-                                Thread.sleep(Settings.getDownloadDelay());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                runBlocking {
+                                    delay(com.hippo.ehviewer.Settings.getDownloadDelay().toLong())
+                                }
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
                             }
-                            favIndex++;
-                            favListUrlBuilder.setIndex(result.next, true);
-                            request.setArgs(favListUrlBuilder.build());
-                            mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+                            favIndex++
+                            favListUrlBuilder.setIndex(result.next, true)
+                            request.setArgs(favListUrlBuilder.build())
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                delay(100)
+                                mClient.execute(
+                                    request,
+                                    viewLifecycleOwner.lifecycle.coroutineScope
+                                )
+                            }
                         } else {
-                            showTip(R.string.settings_advanced_backup_favorite_success, BaseScene.LENGTH_SHORT);
+                            showTip(
+                                R.string.settings_advanced_backup_favorite_success,
+                                BaseScene.LENGTH_SHORT
+                            )
                         }
                     }
-                } catch (Exception e) {
-                    showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT);
+                } catch (e: Exception) {
+                    showTip(
+                        R.string.settings_advanced_backup_favorite_failed,
+                        BaseScene.LENGTH_SHORT
+                    )
                 }
             }
 
-            @Override
-            public void onFailure(Exception e) {
-                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT);
+            override fun onFailure(e: Exception) {
+                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT)
             }
 
-            @Override
-            public void onCancel() {
-                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT);
+            override fun onCancel() {
+                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT)
             }
-        });
-
-        request.setArgs(favListUrlBuilder.build());
-        mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
+        })
+        request.setArgs(favListUrlBuilder.build())
+        mClient.execute(request, viewLifecycleOwner.lifecycle.coroutineScope)
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String key = preference.getKey();
-        if (KEY_APP_LANGUAGE.equals(key) && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            if ("system".equals(newValue)) {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        val key = preference.key
+        if (KEY_APP_LANGUAGE == key && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if ("system" == newValue) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
             } else {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) newValue));
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(newValue as String))
             }
-            requireActivity().recreate();
-            return true;
+            requireActivity().recreate()
+            return true
         }
-        return false;
+        return false
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings_advanced;
+    override val fragmentTitle: Int
+        get() = R.string.settings_advanced
+
+    companion object {
+        private const val KEY_DUMP_LOGCAT = "dump_logcat"
+        private const val KEY_APP_LANGUAGE = "app_language"
+        private const val KEY_IMPORT_DATA = "import_data"
+        private const val KEY_EXPORT_DATA = "export_data"
+        private const val KEY_OPEN_BY_DEFAULT = "open_by_default"
+        private const val KEY_BACKUP_FAVORITE = "backup_favorite"
     }
 }

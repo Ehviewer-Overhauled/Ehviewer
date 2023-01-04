@@ -276,9 +276,6 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         val ehCookieStore by lazy { EhCookieStore(application) }
 
         @JvmStatic
-        val ehClient by lazy { EhClient() }
-
-        @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
         @JvmStatic

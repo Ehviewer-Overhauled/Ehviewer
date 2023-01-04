@@ -169,7 +169,7 @@ public class FavoritesScene extends SearchBarScene implements
 
         Context context = getContext();
         AssertUtils.assertNotNull(context);
-        mClient = EhApplication.getEhClient();
+        mClient = EhClient.INSTANCE;
         mFavCatArray = Settings.getFavCat();
         mFavCountArray = Settings.getFavCount();
         mFavLocalCount = Settings.getFavLocalCount();

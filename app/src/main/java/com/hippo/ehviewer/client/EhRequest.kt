@@ -13,67 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import androidx.annotation.MainThread
+import kotlinx.coroutines.Job
 
-import com.hippo.ehviewer.Settings;
+class EhRequest {
+    internal var job: Job? = null
+    val isActive
+        get() = job?.isActive ?: false
+    var method = 0
+        private set
+    var args: Array<out Any>? = null
+        private set
+    var callback: EhClient.Callback<Any?>? = null
+        private set
 
-public class EhRequest {
-
-    EhClient.Task task;
-    private int mMethod;
-    private Object[] mArgs;
-    private EhClient.Callback mCallback;
-    private EhConfig mEhConfig;
-    private boolean mCancel = false;
-
-    public int getMethod() {
-        return mMethod;
+    fun setMethod(method: Int): EhRequest {
+        this.method = method
+        return this
     }
 
-    public EhRequest setMethod(int method) {
-        mMethod = method;
-        return this;
+    fun setArgs(vararg args: Any): EhRequest {
+        this.args = args
+        return this
     }
 
-    public Object[] getArgs() {
-        return mArgs;
+    @Suppress("UNCHECKED_CAST")
+    fun setCallback(callback: EhClient.Callback<*>?): EhRequest {
+        this.callback = callback as EhClient.Callback<Any?>?
+        return this
     }
 
-    public EhRequest setArgs(Object... args) {
-        mArgs = args;
-        return this;
-    }
-
-    public EhClient.Callback getCallback() {
-        return mCallback;
-    }
-
-    public EhRequest setCallback(EhClient.Callback callback) {
-        mCallback = callback;
-        return this;
-    }
-
-    public EhConfig getEhConfig() {
-        return mEhConfig != null ? mEhConfig : Settings.getEhConfig();
-    }
-
-    public EhRequest setEhConfig(EhConfig ehConfig) {
-        mEhConfig = ehConfig;
-        return this;
-    }
-
-    public void cancel() {
-        if (!mCancel) {
-            mCancel = true;
-            if (task != null) {
-                task.stop();
-                task = null;
-            }
+    @MainThread
+    fun cancel() {
+        if (isActive) {
+            job?.cancel()
+            callback?.onCancel()
         }
-    }
-
-    public boolean isCancelled() {
-        return mCancel;
     }
 }
