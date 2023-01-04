@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleKt;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.app.BaseDialogBuilder;
@@ -289,7 +290,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
                 .setMethod(EhClient.METHOD_SIGN_IN)
                 .setArgs(username, password)
                 .setCallback(callback);
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
 
         mSigningIn = true;
     }
@@ -310,10 +311,9 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
                 .setCallback(callback);
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
 
-        EhApplication.getEhClient().execute(new EhRequest()
-                .setMethod(EhClient.METHOD_GET_UCONFIG));
+        EhApplication.getEhClient().execute(new EhRequest().setMethod(EhClient.METHOD_GET_UCONFIG), LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
     }
 
     private void redirectTo() {

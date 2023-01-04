@@ -36,6 +36,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -1044,7 +1045,7 @@ public class FavoritesScene extends SearchBarScene implements
                             activity.getStageId(), getTag(),
                             taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
                     request.setArgs(gidArray, tokenArray, mModifyFavCat);
-                    mClient.execute(request);
+                    mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                 } else {
                     for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
                         gidArray[i] = mModifyGiList.get(i).gid;
@@ -1066,7 +1067,7 @@ public class FavoritesScene extends SearchBarScene implements
                             activity.getStageId(), getTag(),
                             taskId, local, mUrlBuilder.getKeyword()));
                     request.setArgs(url, gidArray, mModifyFavCat);
-                    mClient.execute(request);
+                    mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                 }
             } else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 final String keyword = mUrlBuilder.getKeyword();
@@ -1081,7 +1082,7 @@ public class FavoritesScene extends SearchBarScene implements
                         activity.getStageId(), getTag(),
                         taskId, false, mUrlBuilder.getKeyword()));
                 request.setArgs(url);
-                mClient.execute(request);
+                mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             }
         }
 

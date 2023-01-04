@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
+import androidx.lifecycle.LifecycleKt;
 import androidx.preference.Preference;
 
 import com.hippo.app.BaseDialogBuilder;
@@ -341,7 +342,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
                             favIndex++;
                             favListUrlBuilder.setIndex(result.next, true);
                             request.setArgs(favListUrlBuilder.build());
-                            mClient.execute(request);
+                            mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                         } else {
                             showTip(R.string.settings_advanced_backup_favorite_success, BaseScene.LENGTH_SHORT);
                         }
@@ -363,7 +364,7 @@ public class AdvancedFragment extends BasePreferenceFragment {
         });
 
         request.setArgs(favListUrlBuilder.build());
-        mClient.execute(request);
+        mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
     }
 
     @Override

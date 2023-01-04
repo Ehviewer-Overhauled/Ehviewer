@@ -52,6 +52,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1593,7 +1594,7 @@ public final class GalleryListScene extends SearchBarScene
                 request.setArgs(new File(StringUtils.avoidNull(mUrlBuilder.getImagePath())),
                         mUrlBuilder.isUseSimilarityScan(),
                         mUrlBuilder.isOnlySearchCovers(), mUrlBuilder.isShowExpunged());
-                mClient.execute(request);
+                mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             } else {
                 String url = mUrlBuilder.build();
                 EhRequest request = new EhRequest();
@@ -1601,7 +1602,7 @@ public final class GalleryListScene extends SearchBarScene
                 request.setCallback(new GetGalleryListListener(getContext(),
                         activity.getStageId(), getTag(), taskId));
                 request.setArgs(url);
-                mClient.execute(request);
+                mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             }
         }
 

@@ -58,6 +58,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.LifecycleKt;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
@@ -728,7 +729,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                 .setArgs(url)
                 .setCallback(callback);
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
 
         return true;
     }
@@ -1357,7 +1358,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, tag, vote)
                 .setCallback(new VoteTagListener(context,
                         activity.getStageId(), getTag()));
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
     }
 
     @Override
@@ -1793,7 +1794,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     mRequest = new EhRequest().setMethod(EhClient.METHOD_ARCHIVE_LIST)
                             .setArgs(url, mGid, mToken)
                             .setCallback(this);
-                    EhApplication.getEhClient().execute(mRequest);
+                    EhApplication.getEhClient().execute(mRequest, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                 } else {
                     bind(mArchiveList);
                 }
@@ -1830,7 +1831,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
                 request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res, isHAtH);
                 request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag(), mGalleryDetail));
-                EhApplication.getEhClient().execute(request);
+                EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             }
 
             if (mDialog != null) {
@@ -1908,7 +1909,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     mRequest = new EhRequest().setMethod(EhClient.METHOD_GET_TORRENT_LIST)
                             .setArgs(url, mGid, mToken)
                             .setCallback(this);
-                    EhApplication.getEhClient().execute(mRequest);
+                    EhApplication.getEhClient().execute(mRequest, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                 } else {
                     bind(mTorrentList);
                 }
@@ -2041,7 +2042,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                             mGalleryDetail.gid, mGalleryDetail.token, mRatingBar.getRating())
                     .setCallback(new RateGalleryListener(context,
                             activity.getStageId(), getTag(), mGalleryDetail.gid));
-            EhApplication.getEhClient().execute(request);
+            EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
         }
     }
 

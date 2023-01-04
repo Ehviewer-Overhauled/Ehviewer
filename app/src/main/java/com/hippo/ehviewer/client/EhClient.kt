@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class EhClient {
-    fun execute(request: EhRequest) {
+    fun execute(request: EhRequest, scope: CoroutineScope) {
         if (!request.isCancelled) {
             val task = Task()
             val job = scope.launch(Dispatchers.IO, CoroutineStart.LAZY) {
@@ -196,15 +195,12 @@ class EhClient {
         fun stop() {
             if (!mStop) {
                 job?.cancel()
-                mCallback?.let {
-                    scope.launchUI { it.onCancel() }
-                }
+                mCallback?.onCancel()
             }
         }
     }
 
     companion object {
-        val scope = CoroutineScope(Dispatchers.IO)
         const val METHOD_SIGN_IN = 0
         const val METHOD_GET_GALLERY_LIST = 1
         const val METHOD_GET_GALLERY_DETAIL = 3

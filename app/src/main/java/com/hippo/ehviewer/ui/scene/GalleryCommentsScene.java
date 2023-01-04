@@ -50,6 +50,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -317,7 +318,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, id, vote)
                 .setCallback(new VoteCommentListener(context,
                         activity.getStageId(), getTag()));
-        EhApplication.getEhClient().execute(request);
+        EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
     }
 
     @SuppressLint("InflateParams")
@@ -453,7 +454,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
                         .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
-                EhApplication.getEhClient().execute(request);
+                EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             }
         }
 
@@ -638,7 +639,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setArgs(url, comment, mCommentId != 0 ? Long.toString(mCommentId) : null)
                         .setCallback(new CommentGalleryListener(context,
                                 activity.getStageId(), getTag(), mCommentId));
-                EhApplication.getEhClient().execute(request);
+                EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
                 hideSoftInput();
                 hideEditPanel(true);
             }
@@ -744,7 +745,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
                         .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
-                EhApplication.getEhClient().execute(request);
+                EhApplication.getEhClient().execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
             }
         }
     }

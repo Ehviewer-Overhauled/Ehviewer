@@ -32,6 +32,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.LifecycleKt;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.slider.Slider;
@@ -351,7 +352,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             request.setCallback(new GetPreviewSetListener(getContext(),
                     activity.getStageId(), getTag(), taskId));
             request.setArgs(url);
-            mClient.execute(request);
+            mClient.execute(request, LifecycleKt.getCoroutineScope(getViewLifecycleOwner().getLifecycle()));
         }
 
         @Override

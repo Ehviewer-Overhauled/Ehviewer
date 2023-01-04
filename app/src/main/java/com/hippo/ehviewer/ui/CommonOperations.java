@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleKt;
 
 import com.hippo.app.ListCheckBoxDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
@@ -58,7 +60,7 @@ public final class CommonOperations {
             request.setMethod(EhClient.METHOD_ADD_FAVORITES);
             request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "");
             request.setCallback(listener);
-            client.execute(request);
+            client.execute(request, LifecycleKt.getCoroutineScope(((FragmentActivity)activity).getLifecycle()));
         } else {
             listener.onFailure(new Exception()); // TODO Add text
         }
@@ -105,7 +107,7 @@ public final class CommonOperations {
         request.setMethod(EhClient.METHOD_ADD_FAVORITES);
         request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "");
         request.setCallback(new DelegateFavoriteCallback(listener, galleryInfo, null, -2));
-        client.execute(request);
+        client.execute(request, LifecycleKt.getCoroutineScope(((FragmentActivity)activity).getLifecycle()));
     }
 
     public static void startDownload(final MainActivity activity, final GalleryInfo galleryInfo, boolean forceDefault) {
