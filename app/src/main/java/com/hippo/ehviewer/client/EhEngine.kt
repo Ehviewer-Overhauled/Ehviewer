@@ -49,9 +49,7 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.network.StatusCodeException
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.AssertUtils
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import okhttp3.Call
 import okhttp3.FormBody
 import okhttp3.Headers
 import okhttp3.MediaType
@@ -61,6 +59,7 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.executeAsync
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -78,15 +77,7 @@ object EhEngine {
     private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
     private var sEhFilter = EhFilter.getInstance()
 
-    @Throws(Throwable::class)
-    private fun doThrowException(
-        call: Call, code: Int, headers: Headers?,
-        body: String?, e: Throwable?
-    ) {
-        if (call.isCanceled()) {
-            throw CancellationException("Call cancelled!")
-        }
-
+    private fun transformException(code: Int, headers: Headers?, body: String?, e: Throwable?) {
         // Check sad panda
         if (headers != null && SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
             throw EhException("Sad Panda")
@@ -99,13 +90,7 @@ object EhEngine {
 
         // Check kokomade
         if (body != null && body.contains(KOKOMADE_URL)) {
-            throw EhException(
-                """
-    今回はここまで
-    
-    ${GetText.getString(R.string.kokomade_tip)}
-    """.trimIndent()
-            )
+            throw EhException("今回はここまで ${GetText.getString(R.string.kokomade_tip)}".trimIndent())
         }
         if (body != null && body.contains("Gallery Not Available - ")) {
             val error = GalleryNotAvailableParser.parse(body)
@@ -128,29 +113,10 @@ object EhEngine {
         if (code >= 400) {
             throw StatusCodeException(code)
         }
-        if (e != null) {
-            throw e
-        }
     }
 
     @Throws(Throwable::class)
-    private fun throwException(
-        call: Call, code: Int, headers: Headers?,
-        body: String?, e: Throwable?
-    ) {
-        try {
-            doThrowException(call, code, headers, body, e)
-        } catch (error: Throwable) {
-            error.printStackTrace()
-            throw error
-        }
-    }
-
-    @Throws(Throwable::class)
-    suspend fun signIn(
-        task: EhClient.Task, okHttpClient: OkHttpClient,
-        username: String, password: String
-    ): String {
+    suspend fun signIn(okHttpClient: OkHttpClient, username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val builder = FormBody.Builder()
             .add("referer", referer)
@@ -166,14 +132,11 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -181,14 +144,13 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     private suspend fun fillGalleryList(
-        task: EhClient.Task?,
         okHttpClient: OkHttpClient,
         list: MutableList<GalleryInfo>,
         url: String,
@@ -226,7 +188,7 @@ object EhEngine {
             filter && sEhFilter.needTags() && !hasTags || Settings.getShowGalleryPages() && !hasPages ||
                     hasRated
         if (needApi) {
-            fillGalleryListByApi(task, okHttpClient, list, url)
+            fillGalleryListByApi(okHttpClient, list, url)
         }
 
         // Filter tag
@@ -250,23 +212,18 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getGalleryList(
-        task: EhClient.Task, okHttpClient: OkHttpClient,
-        url: String
-    ): GalleryListParser.Result {
+    suspend fun getGalleryList(okHttpClient: OkHttpClient, url: String): GalleryListParser.Result {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: GalleryListParser.Result
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -274,10 +231,10 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true)
+        fillGalleryList(okHttpClient, result.galleryInfoList, url, true)
         return result
     }
 
@@ -285,8 +242,9 @@ object EhEngine {
     @JvmStatic
     @Throws(Throwable::class)
     suspend fun fillGalleryListByApi(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        galleryInfoList: List<GalleryInfo>, referer: String
+        okHttpClient: OkHttpClient,
+        galleryInfoList: List<GalleryInfo>,
+        referer: String
     ): List<GalleryInfo> {
         val requestItems: MutableList<GalleryInfo> = ArrayList(MAX_REQUEST_SIZE)
         var i = 0
@@ -294,7 +252,7 @@ object EhEngine {
         while (i < size) {
             requestItems.add(galleryInfoList[i])
             if (requestItems.size == MAX_REQUEST_SIZE || i == size - 1) {
-                doFillGalleryListByApi(task, okHttpClient, requestItems, referer)
+                doFillGalleryListByApi(okHttpClient, requestItems, referer)
                 requestItems.clear()
             }
             i++
@@ -304,8 +262,9 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun doFillGalleryListByApi(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        galleryInfoList: List<GalleryInfo>, referer: String
+        okHttpClient: OkHttpClient,
+        galleryInfoList: List<GalleryInfo>,
+        referer: String
     ) {
         val json = JSONObject()
         json.put("method", "gdata")
@@ -330,13 +289,11 @@ object EhEngine {
             .build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -344,28 +301,23 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
-    suspend fun getGalleryDetail(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        url: String?
-    ): GalleryDetail {
+    suspend fun getGalleryDetail(okHttpClient: OkHttpClient, url: String?): GalleryDetail {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -377,27 +329,23 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
-    suspend fun getPreviewSet(
-        task: EhClient.Task?, okHttpClient: OkHttpClient, url: String?
-    ): Pair<PreviewSet, Int> {
+    suspend fun getPreviewSet(okHttpClient: OkHttpClient, url: String?): Pair<PreviewSet, Int> {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -408,16 +356,16 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun rateGallery(
-        task: EhClient.Task?,
-        okHttpClient: OkHttpClient, apiUid: Long, apiKey: String?, gid: Long,
-        token: String?, rating: Float
+        okHttpClient: OkHttpClient,
+        apiUid: Long, apiKey: String?, gid: Long, token: String?,
+        rating: Float
     ): RateGalleryParser.Result {
         val json = JSONObject()
         json.put("method", "rategallery")
@@ -436,13 +384,11 @@ object EhEngine {
             .build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -450,15 +396,15 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun commentGallery(
-        task: EhClient.Task?,
-        okHttpClient: OkHttpClient, url: String?, comment: String, id: String?
+        okHttpClient: OkHttpClient,
+        url: String?, comment: String, id: String?
     ): GalleryCommentList {
         val builder = FormBody.Builder()
         if (id == null) {
@@ -474,13 +420,11 @@ object EhEngine {
             .build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -493,15 +437,15 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun getGalleryToken(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        gid: Long, gtoken: String?, page: Int
+        okHttpClient: OkHttpClient, gid: Long,
+        gtoken: String?, page: Int
     ): String {
         val json = JSONObject()
             .put("method", "gtoken")
@@ -519,14 +463,11 @@ object EhEngine {
             .post(requestBody)
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -534,29 +475,26 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun getFavorites(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        url: String
+        okHttpClient: OkHttpClient, url: String
     ): FavoritesParser.Result {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: FavoritesParser.Result
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -564,10 +502,10 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false)
+        fillGalleryList(okHttpClient, result.galleryInfoList, url, false)
         return result
     }
 
@@ -577,16 +515,18 @@ object EhEngine {
      */
     @Throws(Throwable::class)
     suspend fun addFavorites(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        gid: Long, token: String?, dstCat: Int, note: String?
+        okHttpClient: OkHttpClient, gid: Long,
+        token: String?, dstCat: Int, note: String?
     ): Void? {
         val catStr: String = when (dstCat) {
             -1 -> {
                 "favdel"
             }
+
             in 0..9 -> {
                 dstCat.toString()
             }
+
             else -> {
                 throw EhException("Invalid dstCat: $dstCat")
             }
@@ -604,22 +544,19 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                throwException(call, code, headers, body, null)
+                transformException(code, headers, body, null)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
         return null
@@ -627,14 +564,14 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun addFavoritesRange(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        gidArray: LongArray, tokenArray: Array<String?>, dstCat: Int
+        okHttpClient: OkHttpClient, gidArray: LongArray,
+        tokenArray: Array<String?>, dstCat: Int
     ): Void? {
         AssertUtils.assertEquals(gidArray.size, tokenArray.size)
         var i = 0
         val n = gidArray.size
         while (i < n) {
-            addFavorites(task, okHttpClient, gidArray[i], tokenArray[i], dstCat, null)
+            addFavorites(okHttpClient, gidArray[i], tokenArray[i], dstCat, null)
             i++
         }
         return null
@@ -642,16 +579,18 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun modifyFavorites(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        url: String, gidArray: LongArray, dstCat: Int
+        okHttpClient: OkHttpClient, url: String,
+        gidArray: LongArray, dstCat: Int
     ): FavoritesParser.Result {
         val catStr: String = when (dstCat) {
             -1 -> {
                 "delete"
             }
+
             in 0..9 -> {
                 "fav$dstCat"
             }
+
             else -> {
                 throw EhException("Invalid dstCat: $dstCat")
             }
@@ -668,15 +607,12 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: FavoritesParser.Result
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -684,31 +620,28 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, false)
+        fillGalleryList(okHttpClient, result.galleryInfoList, url, false)
         return result
     }
 
     @Throws(Throwable::class)
     suspend fun getTorrentList(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        url: String?, gid: Long, token: String?
+        okHttpClient: OkHttpClient, url: String?,
+        gid: Long, token: String?
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: List<TorrentParser.Result>
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -716,7 +649,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
         return result
@@ -724,22 +657,19 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getArchiveList(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        url: String?, gid: Long, token: String?
+        okHttpClient: OkHttpClient, url: String?,
+        gid: Long, token: String?
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: ArchiveParser.Result
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -747,7 +677,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
         return result
@@ -755,8 +685,8 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun downloadArchive(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        gid: Long, token: String?, or: String?, res: String?, isHAtH: Boolean
+        okHttpClient: OkHttpClient, gid: Long,
+        token: String?, or: String?, res: String?, isHAtH: Boolean
     ): String? {
         if (or.isNullOrEmpty()) {
             throw EhException("Invalid form param or: $or")
@@ -783,22 +713,19 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                throwException(call, code, headers, body, null)
+                transformException(code, headers, body, null)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
         var result = ArchiveParser.parseArchiveUrl(body)
@@ -806,15 +733,15 @@ object EhEngine {
             if (result == null) {
                 delay(1000)
                 try {
-                    call.clone().execute().use { response ->
+                    call.clone().executeAsync().use { response ->
                         code = response.code
                         headers = response.headers
                         body = response.body.string()
-                        throwException(call, code, headers, body, null)
+                        transformException(code, headers, body, null)
                     }
                 } catch (e: Throwable) {
                     ExceptionUtils.throwIfFatal(e)
-                    throwException(call, code, headers, body, e)
+                    transformException(code, headers, body, e)
                     throw e
                 }
                 result = ArchiveParser.parseArchiveUrl(body)
@@ -829,20 +756,17 @@ object EhEngine {
 
     @Throws(Throwable::class)
     private suspend fun getProfileInternal(
-        task: EhClient.Task?,
-        okHttpClient: OkHttpClient, url: String, referer: String
+        okHttpClient: OkHttpClient,
+        url: String, referer: String
     ): ProfileParser.Result {
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -850,66 +774,58 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun getProfile(
-        task: EhClient.Task?,
         okHttpClient: OkHttpClient
     ): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, null).build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                return getProfileInternal(task, okHttpClient, ForumsParser.parse(body), url)
+                return getProfileInternal(okHttpClient, ForumsParser.parse(body), url)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun getUConfig(
-        task: EhClient.Task?,
         okHttpClient: OkHttpClient
     ): Void? {
         val url = EhUrl.getUConfigUrl()
         Log.d(TAG, url)
         var request = EhRequestBuilder(url, null).build()
         var call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
                 request = response.request
-                throwException(call, code, headers, body, null)
+                transformException(code, headers, body, null)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
 
@@ -918,17 +834,16 @@ object EhEngine {
             Log.d(TAG, "Redirected! Retry $url")
             request = EhRequestBuilder(url, null).build()
             call = okHttpClient.newCall(request)
-            task?.setCall(call)
             try {
-                call.execute().use { response ->
+                call.executeAsync().use { response ->
                     code = response.code
                     headers = response.headers
                     body = response.body.string()
-                    throwException(call, code, headers, body, null)
+                    transformException(code, headers, body, null)
                 }
             } catch (e: Throwable) {
                 ExceptionUtils.throwIfFatal(e)
-                throwException(call, code, headers, body, e)
+                transformException(code, headers, body, e)
                 throw e
             }
         }
@@ -937,8 +852,8 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun voteComment(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        apiUid: Long, apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
+        okHttpClient: OkHttpClient, apiUid: Long,
+        apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
     ): VoteCommentParser.Result {
         val json = JSONObject()
         json.put("method", "votecomment")
@@ -957,14 +872,11 @@ object EhEngine {
             .post(requestBody)
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -972,15 +884,15 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
 
     @Throws(Throwable::class)
     suspend fun voteTag(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        apiUid: Long, apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
+        okHttpClient: OkHttpClient, apiUid: Long,
+        apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
     ): VoteTagParser.Result {
         val json = JSONObject()
         json.put("method", "taggallery")
@@ -999,14 +911,11 @@ object EhEngine {
             .post(requestBody)
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -1014,7 +923,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
@@ -1024,8 +933,8 @@ object EhEngine {
      */
     @Throws(Throwable::class)
     suspend fun imageSearch(
-        task: EhClient.Task?, okHttpClient: OkHttpClient,
-        image: File, uss: Boolean, osc: Boolean, se: Boolean
+        okHttpClient: OkHttpClient, image: File,
+        uss: Boolean, osc: Boolean, se: Boolean
     ): GalleryListParser.Result {
         val builder = MultipartBody.Builder()
         builder.setType(MultipartBody.FORM)
@@ -1066,15 +975,12 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-
-        // Put call
-        task?.setCall(call)
         var body: String? = null
         var headers: Headers? = null
         var result: GalleryListParser.Result
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 Log.d(TAG, "" + response.request.url)
                 code = response.code
                 headers = response.headers
@@ -1083,26 +989,26 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(task, okHttpClient, result.galleryInfoList, url, true)
+        fillGalleryList(okHttpClient, result.galleryInfoList, url, true)
         return result
     }
 
     @JvmStatic
     @Throws(Throwable::class)
     fun getGalleryPage(
-        task: EhClient.Task?,
-        okHttpClient: OkHttpClient, url: String?, gid: Long, token: String?
+        okHttpClient: OkHttpClient,
+        url: String?,
+        gid: Long,
+        token: String?
     ): GalleryPageParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCallNoSuspend(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
@@ -1115,7 +1021,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }
@@ -1123,7 +1029,6 @@ object EhEngine {
     @JvmStatic
     @Throws(Throwable::class)
     fun getGalleryPageApi(
-        task: EhClient.Task?,
         okHttpClient: OkHttpClient,
         gid: Long,
         index: Int,
@@ -1150,8 +1055,6 @@ object EhEngine {
             .build()
         val call = okHttpClient.newCall(request)
 
-        // Put call
-        task?.setCallNoSuspend(call)
         var body: String? = null
         var headers: Headers? = null
         var code = -1
@@ -1164,7 +1067,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            throwException(call, code, headers, body, e)
+            transformException(code, headers, body, e)
             throw e
         }
     }

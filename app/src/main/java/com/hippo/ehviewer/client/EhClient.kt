@@ -23,12 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import okhttp3.Call
 import java.io.File
-import java.util.concurrent.atomic.AtomicReference
 
 class EhClient {
     fun execute(request: EhRequest) {
@@ -41,32 +37,27 @@ class EhClient {
                 try {
                     val result: Any? = when (method) {
                         METHOD_SIGN_IN -> EhEngine.signIn(
-                            task,
                             mOkHttpClient,
                             params[0] as String,
                             params[1] as String
                         )
 
                         METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
-                            task,
                             mOkHttpClient,
                             params[0] as String
                         )
 
                         METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
-                            task,
                             mOkHttpClient,
                             params[0] as String?
                         )
 
                         METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
-                            task,
                             mOkHttpClient,
                             params[0] as String?
                         )
 
                         METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -76,7 +67,6 @@ class EhClient {
                         )
 
                         METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
-                            task,
                             mOkHttpClient,
                             params[0] as String?,
                             params[1] as String,
@@ -84,7 +74,6 @@ class EhClient {
                         )
 
                         METHOD_GET_GALLERY_TOKEN -> EhEngine.getGalleryToken(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -92,13 +81,11 @@ class EhClient {
                         )
 
                         METHOD_GET_FAVORITES -> EhEngine.getFavorites(
-                            task,
                             mOkHttpClient,
                             params[0] as String
                         )
 
                         METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -107,7 +94,6 @@ class EhClient {
                         )
 
                         METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
-                            task,
                             mOkHttpClient,
                             params[0] as LongArray,
                             params[1] as Array<String?>,
@@ -115,7 +101,6 @@ class EhClient {
                         )
 
                         METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
-                            task,
                             mOkHttpClient,
                             params[0] as String,
                             params[1] as LongArray,
@@ -123,16 +108,14 @@ class EhClient {
                         )
 
                         METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
-                            task,
                             mOkHttpClient,
                             params[0] as String?,
                             (params[1] as Long),
                             params[2] as String?
                         )
 
-                        METHOD_GET_PROFILE -> EhEngine.getProfile(task, mOkHttpClient)
+                        METHOD_GET_PROFILE -> EhEngine.getProfile(mOkHttpClient)
                         METHOD_VOTE_COMMENT -> EhEngine.voteComment(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -143,7 +126,6 @@ class EhClient {
                         )
 
                         METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
-                            task,
                             mOkHttpClient,
                             params[0] as File,
                             (params[1] as Boolean),
@@ -152,7 +134,6 @@ class EhClient {
                         )
 
                         METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
-                            task,
                             mOkHttpClient,
                             params[0] as String?,
                             (params[1] as Long),
@@ -160,7 +141,6 @@ class EhClient {
                         )
 
                         METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -170,7 +150,6 @@ class EhClient {
                         )
 
                         METHOD_VOTE_TAG -> EhEngine.voteTag(
-                            task,
                             mOkHttpClient,
                             (params[0] as Long),
                             params[1] as String?,
@@ -180,7 +159,7 @@ class EhClient {
                             (params[5] as Int)
                         )
 
-                        METHOD_GET_UCONFIG -> EhEngine.getUConfig(task, mOkHttpClient)
+                        METHOD_GET_UCONFIG -> EhEngine.getUConfig(mOkHttpClient)
                         else -> throw IllegalStateException("Can't detect method $method")
                     }
                     withUIContext { callback?.onSuccess(result) }
@@ -209,26 +188,14 @@ class EhClient {
     }
 
     class Task {
-        private val mCall = AtomicReference<Call?>()
         internal var mCallback: Callback<*>? = null
         internal var job: Job? = null
         private val mStop
             get() = !(job?.isActive ?: false)
 
-        suspend fun setCall(call: Call?) {
-            if (mStop || !currentCoroutineContext().isActive) call?.cancel()
-            else mCall.lazySet(call)
-        }
-
-        fun setCallNoSuspend(call: Call?) {
-            if (mStop) call?.cancel()
-            else mCall.lazySet(call)
-        }
-
         fun stop() {
             if (!mStop) {
                 job?.cancel()
-                mCall.get()?.cancel()
                 mCallback?.let {
                     scope.launchUI { it.onCancel() }
                 }

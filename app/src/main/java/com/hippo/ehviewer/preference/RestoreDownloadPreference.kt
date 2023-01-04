@@ -93,7 +93,6 @@ class RestoreDownloadPreference constructor(
             } else try {
                 runBlocking {
                     fillGalleryListByApi(
-                        null,
                         mHttpClient,
                         ArrayList(restoreItemList),
                         EhUrl.getReferer()
