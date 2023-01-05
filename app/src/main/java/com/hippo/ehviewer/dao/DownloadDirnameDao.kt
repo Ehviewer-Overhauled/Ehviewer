@@ -1,29 +1,27 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
-public interface DownloadDirnameDao extends BasicDao<DownloadDirname> {
+interface DownloadDirnameDao : BasicDao<DownloadDirname> {
     @Query("SELECT * FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
-    DownloadDirname load(long gid);
+    fun load(gid: Long): DownloadDirname?
 
     @Update
-    void update(DownloadDirname downloadDirname);
+    fun update(downloadDirname: DownloadDirname)
 
     @Insert
-    long insert(DownloadDirname downloadDirname);
+    override fun insert(t: DownloadDirname): Long
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME WHERE GID = :gid")
-    void deleteByKey(long gid);
+    fun deleteByKey(gid: Long)
 
     @Query("DELETE FROM DOWNLOAD_DIRNAME")
-    void deleteAll();
+    fun deleteAll()
 
     @Query("SELECT * FROM DOWNLOAD_DIRNAME")
-    List<DownloadDirname> list();
+    override fun list(): List<DownloadDirname>
 }

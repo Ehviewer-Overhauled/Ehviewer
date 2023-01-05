@@ -1,27 +1,25 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
-public interface FilterDao extends BasicDao<Filter> {
+interface FilterDao : BasicDao<Filter> {
     @Query("SELECT * FROM FILTER")
-    List<Filter> list();
+    override fun list(): List<Filter>
 
     @Update
-    void update(Filter filter);
+    fun update(filter: Filter)
 
     @Insert
-    long insert(Filter filter);
+    override fun insert(t: Filter): Long
 
     @Delete
-    void delete(Filter filter);
+    fun delete(filter: Filter)
 
     @Query("SELECT * FROM FILTER WHERE TEXT = :text AND MODE = :mode")
-    Filter load(String text, int mode);
+    fun load(text: String, mode: Int): Filter?
 }

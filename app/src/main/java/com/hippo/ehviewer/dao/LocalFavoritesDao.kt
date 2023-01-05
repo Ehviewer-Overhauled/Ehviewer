@@ -1,29 +1,27 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
 
 @Dao
-public interface LocalFavoritesDao extends BasicDao<LocalFavoriteInfo> {
+interface LocalFavoritesDao : BasicDao<LocalFavoriteInfo> {
     @Query("SELECT * FROM LOCAL_FAVORITES ORDER BY TIME DESC")
-    List<LocalFavoriteInfo> list();
+    override fun list(): List<LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE TITLE LIKE :title ORDER BY TIME DESC")
-    List<LocalFavoriteInfo> list(String title);
+    fun list(title: String): List<LocalFavoriteInfo>
 
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid")
-    LocalFavoriteInfo load(long gid);
+    fun load(gid: Long): LocalFavoriteInfo?
 
     @Insert
-    long insert(LocalFavoriteInfo localFavoriteInfo);
+    override fun insert(t: LocalFavoriteInfo): Long
 
     @Delete
-    void delete(LocalFavoriteInfo localFavoriteInfo);
+    fun delete(localFavoriteInfo: LocalFavoriteInfo)
 
     @Query("DELETE FROM LOCAL_FAVORITES WHERE GID = :gid")
-    void deleteByKey(long gid);
+    fun deleteByKey(gid: Long)
 }

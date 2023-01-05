@@ -1,40 +1,18 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "DOWNLOAD_LABELS")
-public class DownloadLabel {
+class DownloadLabel {
     @PrimaryKey
     @ColumnInfo(name = "_id")
-    private Long id;
+    var id: Long? = null
+
     @ColumnInfo(name = "LABEL")
-    private String label;
+    var label: String? = null
+
     @ColumnInfo(name = "TIME")
-    private long time;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
+    var time: Long = 0
 }

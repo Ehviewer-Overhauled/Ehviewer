@@ -1,30 +1,28 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
-public interface QuickSearchDao extends BasicDao<QuickSearch> {
+interface QuickSearchDao : BasicDao<QuickSearch> {
     @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC")
-    List<QuickSearch> list();
+    override fun list(): List<QuickSearch>
 
     @Query("SELECT * FROM QUICK_SEARCH ORDER BY TIME ASC LIMIT :limit OFFSET :offset")
-    List<QuickSearch> list(int offset, int limit);
+    fun list(offset: Int, limit: Int): List<QuickSearch>
 
     @Update
-    void update(List<QuickSearch> downloadLabels);
+    fun update(downloadLabels: List<QuickSearch>)
 
     @Update
-    void update(QuickSearch quickSearch);
+    fun update(quickSearch: QuickSearch)
 
     @Insert
-    long insert(QuickSearch quickSearch);
+    override fun insert(t: QuickSearch): Long
 
     @Delete
-    void delete(QuickSearch quickSearch);
+    fun delete(quickSearch: QuickSearch?)
 }

@@ -1,40 +1,38 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.paging.PagingSource;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.paging.PagingSource
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
-public interface HistoryDao extends BasicDao<HistoryInfo> {
+interface HistoryDao : BasicDao<HistoryInfo> {
     @Query("SELECT * FROM HISTORY WHERE GID = :gid")
-    HistoryInfo load(long gid);
+    fun load(gid: Long): HistoryInfo?
 
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
-    List<HistoryInfo> list();
+    override fun list(): List<HistoryInfo>
 
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC LIMIT :limit OFFSET :offset")
-    List<HistoryInfo> list(int offset, int limit);
+    fun list(offset: Int, limit: Int): List<HistoryInfo>
 
     @Query("SELECT * FROM HISTORY ORDER BY TIME DESC")
-    PagingSource<Integer, HistoryInfo> listLazy();
+    fun listLazy(): PagingSource<Int, HistoryInfo>
 
     @Update
-    void update(HistoryInfo historyInfo);
+    fun update(historyInfo: HistoryInfo)
 
     @Insert
-    long insert(HistoryInfo historyInfo);
+    override fun insert(t: HistoryInfo): Long
 
     @Delete
-    void delete(HistoryInfo historyInfos);
+    fun delete(historyInfo: HistoryInfo)
 
     @Delete
-    void delete(List<HistoryInfo> historyInfos);
+    fun delete(historyInfo: List<HistoryInfo>)
 
     @Query("DELETE FROM HISTORY")
-    void deleteAll();
+    fun deleteAll()
 }

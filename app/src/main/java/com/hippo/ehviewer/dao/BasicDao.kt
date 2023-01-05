@@ -1,9 +1,6 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import java.util.List;
-
-public interface BasicDao<T> {
-    List<T> list();
-
-    long insert(T t);
+interface BasicDao<T> {
+    fun list(): List<T>
+    fun insert(t: T): Long
 }
