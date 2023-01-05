@@ -5,14 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "DOWNLOAD_LABELS")
-class DownloadLabel {
+data class DownloadLabel(
     @PrimaryKey
     @ColumnInfo(name = "_id")
-    var id: Long? = null
+    var id: Long? = null,
 
     @ColumnInfo(name = "LABEL")
-    var label: String? = null
+    var label: String? = null,
 
     @ColumnInfo(name = "TIME")
     var time: Long = 0
-}
+)

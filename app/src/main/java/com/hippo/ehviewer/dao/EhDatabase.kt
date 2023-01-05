@@ -9,12 +9,12 @@ import androidx.room.RoomDatabase
     exportSchema = false
 )
 abstract class EhDatabase : RoomDatabase() {
-    abstract fun bookmarksBao(): BookmarksDao?
-    abstract fun downloadDirnameDao(): DownloadDirnameDao?
-    abstract fun downloadLabelDao(): DownloadLabelDao?
-    abstract fun downloadsDao(): DownloadsDao?
-    abstract fun filterDao(): FilterDao?
-    abstract fun historyDao(): HistoryDao?
-    abstract fun localFavoritesDao(): LocalFavoritesDao?
-    abstract fun quickSearchDao(): QuickSearchDao?
+    abstract fun bookmarksBao(): BookmarksDao
+    abstract fun downloadDirnameDao(): DownloadDirnameDao
+    abstract fun downloadLabelDao(): DownloadLabelDao
+    abstract fun downloadsDao(): DownloadsDao
+    abstract fun filterDao(): FilterDao
+    abstract fun historyDao(): HistoryDao
+    abstract fun localFavoritesDao(): LocalFavoritesDao
+    abstract fun quickSearchDao(): QuickSearchDao
 }
