@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import android.os.Parcelable
+import com.hippo.widget.LoadImageView
 
-import android.os.Parcelable;
-
-import com.hippo.widget.LoadImageView;
-
-public abstract class PreviewSet implements Parcelable {
-
-    public abstract int size();
-
-    public abstract int getPosition(int index);
-
-    public abstract String getPageUrlAt(int index);
-
-    public abstract GalleryPreview getGalleryPreview(long gid, int index);
-
-    public abstract void load(LoadImageView view, long gid, int index);
+abstract class PreviewSet : Parcelable {
+    abstract fun size(): Int
+    abstract fun getPosition(index: Int): Int
+    abstract fun getPageUrlAt(index: Int): String
+    abstract fun getGalleryPreview(gid: Long, index: Int): GalleryPreview
+    abstract fun load(view: LoadImageView, gid: Long, index: Int)
 }

@@ -69,13 +69,8 @@ open class ListUrlBuilder(
     }
 
     fun setIndex(index: String?, isNext: Boolean = true) {
-        if (isNext) {
-            mNext = index
-            mPrev = null
-        } else {
-            mPrev = index
-            mNext = null
-        }
+        mNext = index?.takeIf { isNext }
+        mPrev = index?.takeUnless { isNext }
     }
 
     fun setJumpTo(jumpTo: String?) {
@@ -403,7 +398,7 @@ open class ListUrlBuilder(
                 sb.toString()
             }
 
-            else -> throw java.lang.IllegalStateException("Unexpected value: $mode")
+            else -> throw IllegalStateException("Unexpected value: $mode")
         }
     }
 
