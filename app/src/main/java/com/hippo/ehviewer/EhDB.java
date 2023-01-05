@@ -281,9 +281,9 @@ public class EhDB {
 
     public static synchronized void insertQuickSearch(QuickSearch quickSearch) {
         QuickSearchDao dao = db.quickSearchDao();
-        quickSearch.id = null;
-        quickSearch.time = System.currentTimeMillis();
-        quickSearch.id = dao.insert(quickSearch);
+        quickSearch.setId(null);
+        quickSearch.setTime(System.currentTimeMillis());
+        quickSearch.setId(dao.insert(quickSearch));
     }
 
     public static synchronized void importQuickSearch(List<QuickSearch> quickSearchList) {
@@ -386,7 +386,7 @@ public class EhDB {
     }
 
     public static synchronized void triggerFilter(Filter filter) {
-        filter.setEnable(!filter.enable);
+        filter.enable = !filter.enable;
         db.filterDao().update(filter);
     }
 
@@ -521,9 +521,9 @@ public class EhDB {
                 List<QuickSearch> currentQuickSearchList = db.quickSearchDao().list();
                 List<QuickSearch> importList = new ArrayList<>();
                 for (QuickSearch quickSearch : quickSearchList) {
-                    String name = quickSearch.name;
+                    String name = quickSearch.getName();
                     for (QuickSearch q : currentQuickSearchList) {
-                        if (ObjectUtils.equal(q.name, name)) {
+                        if (ObjectUtils.equal(q.getName(), name)) {
                             // The same name
                             name = null;
                             break;

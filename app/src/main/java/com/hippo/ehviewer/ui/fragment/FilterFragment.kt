@@ -233,7 +233,7 @@ class FilterFragment : BaseFragment() {
                 holder.text?.text = filter.text
             } else {
                 holder.checkbox?.text = filter.text
-                holder.checkbox?.isChecked = filter.enable
+                holder.checkbox?.isChecked = filter.enable!!
                 holder.itemView.setOnClickListener {
                     mFilterList.trigger(filter)
 
@@ -252,7 +252,7 @@ class FilterFragment : BaseFragment() {
             return run {
                 val filter = mFilterList[position]
                 if (filter.id != null) {
-                    (filter.text.hashCode() shr filter.mode) + filter.id
+                    (filter.text.hashCode() shr filter.mode) + filter.id!!
                 } else (filter.text.hashCode() shr filter.mode).toLong()
             }
         }

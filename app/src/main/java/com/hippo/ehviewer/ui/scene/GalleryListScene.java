@@ -676,9 +676,9 @@ public final class GalleryListScene extends SearchBarScene
         // Check duplicate
         for (QuickSearch q : mQuickSearchList) {
             if (urlBuilder.equalsQuickSearch(q)) {
-                var i = q.name.lastIndexOf("@");
-                if (i != -1 && q.name.substring(i).equals(next)) {
-                    showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG);
+                var i = q.getName().lastIndexOf("@");
+                if (i != -1 && q.getName().substring(i).equals(next)) {
+                    showTip(getString(R.string.duplicate_quick_search, q.getName()), LENGTH_LONG);
                     return;
                 }
             }
@@ -711,7 +711,7 @@ public final class GalleryListScene extends SearchBarScene
 
             // Check name duplicate
             for (QuickSearch q : mQuickSearchList) {
-                if (text.equals(q.name)) {
+                if (text.equals(q.getName())) {
                     builder.setError(getString(R.string.duplicate_name));
                     return;
                 }
@@ -720,7 +720,7 @@ public final class GalleryListScene extends SearchBarScene
             builder.setError(null);
             dialog.dismiss();
             QuickSearch quickSearch = urlBuilder.toQuickSearch();
-            quickSearch.name = text;
+            quickSearch.setName(text);
             EhDB.insertQuickSearch(quickSearch);
             mQuickSearchList.add(quickSearch);
             adapter.notifyItemInserted(mQuickSearchList.size() - 1);
@@ -1425,8 +1425,8 @@ public final class GalleryListScene extends SearchBarScene
                     var q = mQuickSearchList.get(position);
                     mUrlBuilder.set(q);
                     onUpdateUrlBuilder();
-                    var i = q.name.lastIndexOf("@");
-                    mHelper.goTo(i != -1 ? q.name.substring(i + 1) : null, true);
+                    var i = q.getName().lastIndexOf("@");
+                    mHelper.goTo(i != -1 ? q.getName().substring(i + 1) : null, true);
                     setState(STATE_NORMAL);
                     closeDrawer(GravityCompat.END);
                 });

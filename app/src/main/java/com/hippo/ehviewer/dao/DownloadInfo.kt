@@ -1,217 +1,68 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-
-import com.hippo.ehviewer.client.data.GalleryInfo;
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import com.hippo.ehviewer.client.data.GalleryInfo
 
 @Entity(tableName = "DOWNLOADS")
-public class DownloadInfo extends GalleryInfo {
-    public static final int STATE_INVALID = -1;
-    public static final int STATE_NONE = 0;
-    public static final int STATE_WAIT = 1;
-    public static final int STATE_DOWNLOAD = 2;
-    public static final int STATE_FINISH = 3;
-    public static final int STATE_FAILED = 4;
+class DownloadInfo() : GalleryInfo() {
+    @JvmField
     @ColumnInfo(name = "STATE")
-    public int state;
+    var state = 0
+
+    @JvmField
     @ColumnInfo(name = "LEGACY")
-    public int legacy;
+    var legacy = 0
+
+    @JvmField
     @ColumnInfo(name = "TIME")
-    public long time;
+    var time: Long = 0
+
+    @JvmField
     @ColumnInfo(name = "LABEL")
-    public String label;
+    var label: String? = null
+
+    @JvmField
     @Ignore
-    public long speed;
+    var speed: Long = 0
+
+    @JvmField
     @Ignore
-    public long remaining;
+    var remaining: Long = 0
+
+    @JvmField
     @Ignore
-    public int finished;
+    var finished = 0
+
+    @JvmField
     @Ignore
-    public int downloaded;
+    var downloaded = 0
+
+    @JvmField
     @Ignore
-    public int total;
+    var total = 0
 
-    DownloadInfo() {
+    constructor(galleryInfo: GalleryInfo) : this() {
+        gid = galleryInfo.gid
+        token = galleryInfo.token
+        title = galleryInfo.title
+        titleJpn = galleryInfo.titleJpn
+        thumb = galleryInfo.thumb
+        this.category = galleryInfo.category
+        posted = galleryInfo.posted
+        uploader = galleryInfo.uploader
+        rating = galleryInfo.rating
+        simpleTags = galleryInfo.simpleTags
+        simpleLanguage = galleryInfo.simpleLanguage
     }
 
-    public DownloadInfo(GalleryInfo galleryInfo) {
-        this.gid = galleryInfo.gid;
-        this.token = galleryInfo.token;
-        this.title = galleryInfo.title;
-        this.titleJpn = galleryInfo.titleJpn;
-        this.thumb = galleryInfo.thumb;
-        this.category = galleryInfo.category;
-        this.posted = galleryInfo.posted;
-        this.uploader = galleryInfo.uploader;
-        this.rating = galleryInfo.rating;
-        this.simpleTags = galleryInfo.simpleTags;
-        this.simpleLanguage = galleryInfo.simpleLanguage;
-    }
-
-    public DownloadInfo(int state, int legacy, long time, String label, long speed, long remaining,
-                        int finished, int downloaded, int total) {
-        this.state = state;
-        this.legacy = legacy;
-        this.time = time;
-        this.label = label;
-        this.speed = speed;
-        this.remaining = remaining;
-        this.finished = finished;
-        this.downloaded = downloaded;
-        this.total = total;
-    }
-
-    public long getGid() {
-        return gid;
-    }
-
-    public void setGid(long gid) {
-        this.gid = gid;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getTitleJpn() {
-        return titleJpn;
-    }
-
-    public void setTitleJpn(String titleJpn) {
-        this.titleJpn = titleJpn;
-    }
-
-    public String getThumb() {
-        return thumb;
-    }
-
-    public void setThumb(String thumb) {
-        this.thumb = thumb;
-    }
-
-    public int getCategory() {
-        return category;
-    }
-
-    public void setCategory(int category) {
-        this.category = category;
-    }
-
-    public String getPosted() {
-        return posted;
-    }
-
-    public void setPosted(String posted) {
-        this.posted = posted;
-    }
-
-    public String getUploader() {
-        return uploader;
-    }
-
-    public void setUploader(String uploader) {
-        this.uploader = uploader;
-    }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
-
-    public String getSimpleLanguage() {
-        return simpleLanguage;
-    }
-
-    public void setSimpleLanguage(String simpleLanguage) {
-        this.simpleLanguage = simpleLanguage;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public int getLegacy() {
-        return legacy;
-    }
-
-    public void setLegacy(int legacy) {
-        this.legacy = legacy;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public long getSpeed() {
-        return this.speed;
-    }
-
-    public void setSpeed(long speed) {
-        this.speed = speed;
-    }
-
-    public long getRemaining() {
-        return this.remaining;
-    }
-
-    public void setRemaining(long remaining) {
-        this.remaining = remaining;
-    }
-
-    public int getFinished() {
-        return this.finished;
-    }
-
-    public void setFinished(int finished) {
-        this.finished = finished;
-    }
-
-    public int getDownloaded() {
-        return this.downloaded;
-    }
-
-    public void setDownloaded(int downloaded) {
-        this.downloaded = downloaded;
-    }
-
-    public int getTotal() {
-        return this.total;
-    }
-
-    public void setTotal(int total) {
-        this.total = total;
+    companion object {
+        const val STATE_INVALID = -1
+        const val STATE_NONE = 0
+        const val STATE_WAIT = 1
+        const val STATE_DOWNLOAD = 2
+        const val STATE_FINISH = 3
+        const val STATE_FAILED = 4
     }
 }
