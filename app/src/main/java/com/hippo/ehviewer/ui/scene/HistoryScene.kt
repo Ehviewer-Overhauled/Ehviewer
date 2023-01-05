@@ -119,7 +119,6 @@ class HistoryScene : BaseToolbarScene() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewLifecycleOwner.lifecycleScope
         mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
         mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
     }
