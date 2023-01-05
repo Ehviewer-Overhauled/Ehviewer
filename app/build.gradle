@@ -162,7 +162,7 @@ dependencies {
 
     def room_version = "2.5.0-rc01"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
     implementation 'androidx.startup:startup-runtime:1.2.0-alpha01'

@@ -1,23 +1,20 @@
-package com.hippo.ehviewer.dao;
+package com.hippo.ehviewer.dao
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
+import androidx.room.Database
+import androidx.room.RoomDatabase
 
-@Database(entities = {BookmarkInfo.class, DownloadInfo.class, DownloadLabel.class, DownloadDirname.class, Filter.class, HistoryInfo.class, LocalFavoriteInfo.class, QuickSearch.class}, version = 4, exportSchema = false)
-public abstract class EhDatabase extends RoomDatabase {
-    public abstract BookmarksDao bookmarksBao();
-
-    public abstract DownloadDirnameDao downloadDirnameDao();
-
-    public abstract DownloadLabelDao downloadLabelDao();
-
-    public abstract DownloadsDao downloadsDao();
-
-    public abstract FilterDao filterDao();
-
-    public abstract HistoryDao historyDao();
-
-    public abstract LocalFavoritesDao localFavoritesDao();
-
-    public abstract QuickSearchDao quickSearchDao();
+@Database(
+    entities = [BookmarkInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
+    version = 4,
+    exportSchema = false
+)
+abstract class EhDatabase : RoomDatabase() {
+    abstract fun bookmarksBao(): BookmarksDao?
+    abstract fun downloadDirnameDao(): DownloadDirnameDao?
+    abstract fun downloadLabelDao(): DownloadLabelDao?
+    abstract fun downloadsDao(): DownloadsDao?
+    abstract fun filterDao(): FilterDao?
+    abstract fun historyDao(): HistoryDao?
+    abstract fun localFavoritesDao(): LocalFavoritesDao?
+    abstract fun quickSearchDao(): QuickSearchDao?
 }
