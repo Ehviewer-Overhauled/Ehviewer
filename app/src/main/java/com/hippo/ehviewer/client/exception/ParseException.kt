@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.exception
 
-package com.hippo.ehviewer.client.exception;
+class ParseException : EhException {
+    val body: String
 
-public class ParseException extends EhException {
-
-    private final String mBody;
-
-    public ParseException(String detailMessage, String body) {
-        super(detailMessage);
-        mBody = body;
+    constructor(detailMessage: String?, body: String) : super(detailMessage) {
+        this.body = body
     }
 
-    public ParseException(String detailMessage, String body, Throwable cause) {
-        super(detailMessage, cause);
-        mBody = body;
-    }
-
-    public String getBody() {
-        return mBody;
+    constructor(detailMessage: String?, body: String, cause: Throwable?) : super(
+        detailMessage,
+        cause
+    ) {
+        this.body = body
     }
 }

@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.exception
 
-package com.hippo.ehviewer.client.exception;
-
-public class Image509Exception extends EhException {
-
-    public Image509Exception() {
-        super("509");
-    }
-}
+class Image509Exception : EhException("509")

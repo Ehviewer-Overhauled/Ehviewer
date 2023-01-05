@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.exception
 
-package com.hippo.ehviewer.client.exception;
-
-public class EhException extends Exception {
-
-    public EhException(String detailMessage) {
-        super(detailMessage);
-    }
-
-    public EhException(String detailMessage, Throwable cause) {
-        super(detailMessage, cause);
-    }
+open class EhException : Exception {
+    constructor(detailMessage: String?) : super(detailMessage)
+    constructor(detailMessage: String?, cause: Throwable?) : super(detailMessage, cause)
 }

@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.hippo.ehviewer.client.exception;
+package com.hippo.ehviewer.client.exception
 
 /**
  * It is an exception for get offensive tip for g.e-hentai.org
  */
-public class OffensiveException extends EhException {
-
-    public OffensiveException() {
-        super("OFFENSIVE");
-    }
-}
+class OffensiveException : EhException("OFFENSIVE")

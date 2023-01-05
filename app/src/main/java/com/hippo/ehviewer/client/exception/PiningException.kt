@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.exception
 
-package com.hippo.ehviewer.client.exception;
-
-public class PiningException extends EhException {
-
-    public PiningException() {
-        super("pining for the fjords");
-    }
-}
+class PiningException : EhException("pining for the fjords")
