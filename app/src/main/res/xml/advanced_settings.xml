@@ -37,12 +37,6 @@
         android:title="@string/settings_advanced_dump_logcat"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.preference.ClearDownloadPathCachePreference
-        android:key="clear_download_path_cache"
-        android:summary="@string/settings_advanced_clear_download_path_cache_summary"
-        android:title="@string/settings_advanced_clear_download_path_cache"
-        app:iconSpaceReserved="false" />
-
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="320"
         android:key="read_cache_size"

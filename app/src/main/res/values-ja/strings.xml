@@ -376,8 +376,6 @@
     <string name="settings_advanced_dump_logcat_summary">ログを外部ストレージに保存</string>
     <string name="settings_advanced_dump_logcat_failed">ログをエクスポートできませんでした</string>
     <string name="settings_advanced_dump_logcat_to">ログを%sにエクスポートしました</string>
-    <string name="settings_advanced_clear_download_path_cache">ｷﾞｬﾗﾘｰのﾀﾞｳﾝﾛｰﾄﾞﾊﾟｽをｸﾘｱ</string>
-    <string name="settings_advanced_clear_download_path_cache_message">ギャラリーのダウンロード パス キャッシュをクリアしますか？</string>
     <string name="settings_advanced_read_cache_size">閲覧キャッシュのサイズ</string>
     <string name="settings_advanced_export_data">データをエクスポート</string>
     <string name="settings_advanced_export_data_summary">ダウンロードリストやクイック検索などのデータを外部ストレージにエクスポートします</string>
@@ -469,7 +467,6 @@
     <string name="default_download_label_name">デフォルト</string>
     <string name="settings_download_media_scan_summary_off">ほとんどのギャラリーアプリはダウンロードパスの内容を表示しません</string>
     <string name="settings_download_download_origin_image_summary">有効にすると、ダウンロード制限にもっとはやく達する恐れがあります</string>
-    <string name="settings_advanced_clear_download_path_cache_summary">ギャラリー ダウンロード パスは無効なようで、もう一度ダウンロードする必要があると表示されている場合は、ダウンロードパスのキャッシュをクリアしてみてください。</string>
     <string name="clipboard_gallery_url_snack_message">クリップボードにはギャラリーURLが検出されました。</string>
     <string name="clipboard_gallery_url_snack_action">移動</string>
     <string name="settings_advanced_app_language_title">アプリ言語（Language）</string>
