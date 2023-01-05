@@ -17,8 +17,6 @@ package com.hippo.ehviewer.preference
 
 import android.app.Activity
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable.Creator
 import android.util.AttributeSet
 import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication.Companion.downloadManager
@@ -123,7 +121,10 @@ class RestoreDownloadPreference constructor(
                         if (restoreDirCount == 0)
                             mActivity.getString(R.string.settings_download_restore_not_found)
                         else
-                            mActivity.getString(R.string.settings_download_restore_successfully, restoreDirCount),
+                            mActivity.getString(
+                                R.string.settings_download_restore_successfully,
+                                restoreDirCount
+                            ),
                         BaseScene.LENGTH_SHORT
                     )
                 } else {
@@ -143,7 +144,10 @@ class RestoreDownloadPreference constructor(
                         i++
                     }
                     showTip(
-                        mActivity.getString(R.string.settings_download_restore_successfully, count + restoreDirCount),
+                        mActivity.getString(
+                            R.string.settings_download_restore_successfully,
+                            count + restoreDirCount
+                        ),
                         BaseScene.LENGTH_SHORT
                     )
                     val preference: Preference? = preference
@@ -159,34 +163,7 @@ class RestoreDownloadPreference constructor(
         }
     }
 
-    private class RestoreItem : GalleryInfo {
+    private class RestoreItem : GalleryInfo() {
         var dirname: String? = null
-
-        constructor()
-        constructor(`in`: Parcel) : super(`in`) {
-            dirname = `in`.readString()
-        }
-
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        override fun writeToParcel(dest: Parcel, flags: Int) {
-            super.writeToParcel(dest, flags)
-            dest.writeString(dirname)
-        }
-
-        companion object {
-            @JvmField
-            val CREATOR: Creator<RestoreItem> = object : Creator<RestoreItem> {
-                override fun createFromParcel(source: Parcel): RestoreItem {
-                    return RestoreItem(source)
-                }
-
-                override fun newArray(size: Int): Array<RestoreItem?> {
-                    return arrayOfNulls(size)
-                }
-            }
-        }
     }
 }

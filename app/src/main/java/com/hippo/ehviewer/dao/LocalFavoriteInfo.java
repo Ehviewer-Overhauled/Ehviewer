@@ -1,7 +1,5 @@
 package com.hippo.ehviewer.dao;
 
-import android.os.Parcel;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
@@ -9,25 +7,8 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "LOCAL_FAVORITES")
 public class LocalFavoriteInfo extends GalleryInfo {
-
-    public static final Creator<LocalFavoriteInfo> CREATOR = new Creator<>() {
-        @Override
-        public LocalFavoriteInfo createFromParcel(Parcel source) {
-            return new LocalFavoriteInfo(source);
-        }
-
-        @Override
-        public LocalFavoriteInfo[] newArray(int size) {
-            return new LocalFavoriteInfo[size];
-        }
-    };
     @ColumnInfo(name = "TIME")
     public long time;
-
-    protected LocalFavoriteInfo(Parcel in) {
-        super(in);
-        this.time = in.readLong();
-    }
 
     public LocalFavoriteInfo(GalleryInfo galleryInfo) {
         this.gid = galleryInfo.gid;
@@ -133,16 +114,5 @@ public class LocalFavoriteInfo extends GalleryInfo {
 
     public void setTime(long time) {
         this.time = time;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeLong(this.time);
     }
 }

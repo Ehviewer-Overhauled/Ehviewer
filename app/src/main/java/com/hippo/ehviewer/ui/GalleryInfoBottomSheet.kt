@@ -33,7 +33,7 @@ import com.hippo.util.tellClipboard
 
 class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment() {
     private var mKeys: ArrayList<String> = arrayListOf()
-    private var mValues: ArrayList<String> = arrayListOf()
+    private var mValues: ArrayList<String?> = arrayListOf()
     private var mRecyclerView: RecyclerView? = null
     private val mDetail: GalleryDetail = detail
 

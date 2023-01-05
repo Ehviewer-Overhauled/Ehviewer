@@ -1,7 +1,5 @@
 package com.hippo.ehviewer.dao;
 
-import android.os.Parcel;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -10,17 +8,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "DOWNLOADS")
 public class DownloadInfo extends GalleryInfo {
-    public static final Creator<DownloadInfo> CREATOR = new Creator<>() {
-        @Override
-        public DownloadInfo createFromParcel(Parcel source) {
-            return new DownloadInfo(source);
-        }
-
-        @Override
-        public DownloadInfo[] newArray(int size) {
-            return new DownloadInfo[size];
-        }
-    };
     public static final int STATE_INVALID = -1;
     public static final int STATE_NONE = 0;
     public static final int STATE_WAIT = 1;
@@ -47,14 +34,6 @@ public class DownloadInfo extends GalleryInfo {
     public int total;
 
     DownloadInfo() {
-    }
-
-    protected DownloadInfo(Parcel in) {
-        super(in);
-        this.state = in.readInt();
-        this.legacy = in.readInt();
-        this.time = in.readLong();
-        this.label = in.readString();
     }
 
     public DownloadInfo(GalleryInfo galleryInfo) {
@@ -194,20 +173,6 @@ public class DownloadInfo extends GalleryInfo {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeInt(this.state);
-        dest.writeInt(this.legacy);
-        dest.writeLong(this.time);
-        dest.writeString(this.label);
     }
 
     public long getSpeed() {

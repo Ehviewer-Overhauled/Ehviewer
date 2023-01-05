@@ -1,7 +1,5 @@
 package com.hippo.ehviewer.dao;
 
-import android.os.Parcel;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
@@ -9,28 +7,11 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "HISTORY")
 public class HistoryInfo extends GalleryInfo {
-    public static final Creator<HistoryInfo> CREATOR = new Creator<>() {
-        @Override
-        public HistoryInfo createFromParcel(Parcel source) {
-            return new HistoryInfo(source);
-        }
-
-        @Override
-        public HistoryInfo[] newArray(int size) {
-            return new HistoryInfo[size];
-        }
-    };
     @ColumnInfo(name = "TIME")
     public long time;
     // Use MODE for favoriteSlot
     @ColumnInfo(name = "MODE")
     private int mode;
-
-    protected HistoryInfo(Parcel in) {
-        super(in);
-        this.mode = in.readInt();
-        this.time = in.readLong();
-    }
 
     public HistoryInfo(GalleryInfo galleryInfo) {
         this.gid = galleryInfo.gid;
@@ -146,17 +127,5 @@ public class HistoryInfo extends GalleryInfo {
 
     public void setTime(long time) {
         this.time = time;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeInt(this.mode);
-        dest.writeLong(this.time);
     }
 }

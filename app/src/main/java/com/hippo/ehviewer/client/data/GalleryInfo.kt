@@ -13,42 +13,149 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
+import java.util.regex.Pattern
 
-import android.os.Parcel;
-import android.os.Parcelable;
+@Parcelize
+open class GalleryInfo(
+    @JvmField
+    @PrimaryKey
+    @ColumnInfo(name = "GID")
+    var gid: Long = 0,
 
-import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
+    @JvmField
+    @ColumnInfo(name = "TOKEN")
+    var token: String? = null,
 
-import java.util.regex.Pattern;
+    @JvmField
+    @ColumnInfo(name = "TITLE")
+    var title: String? = null,
 
-public class GalleryInfo implements Parcelable {
+    @JvmField
+    @ColumnInfo(name = "TITLE_JPN")
+    var titleJpn: String? = null,
+
+    @JvmField
+    @ColumnInfo(name = "THUMB")
+    var thumb: String? = null,
+
+    @JvmField
+    @ColumnInfo(name = "CATEGORY")
+    var category: Int = 0,
+
+    @JvmField
+    @ColumnInfo(name = "POSTED")
+    var posted: String? = null,
+
+    @JvmField
+    @ColumnInfo(name = "UPLOADER")
+    var uploader: String? = null,
+
+    @JvmField
+    @Ignore
+    var disowned: Boolean = false,
+
+    @JvmField
+    @ColumnInfo(name = "RATING")
+    var rating: Float = 0f,
+
+    @JvmField
+    @Ignore
+    var rated: Boolean = false,
+
+    @JvmField
+    @Ignore
+    var simpleTags: Array<String>? = null,
+
+    @JvmField
+    @Ignore
+    var pages: Int = 0,
+
+    @JvmField
+    @Ignore
+    var thumbWidth: Int = 0,
+
+    @JvmField
+    @Ignore
+    var thumbHeight: Int = 0,
+
+    @Ignore
+    var spanSize: Int = 0,
+
+    @Ignore
+    var spanIndex: Int = 0,
+
+    @Ignore
+    var spanGroupIndex: Int = 0,
 
     /**
-     * ISO 639-1
+     * language from title
      */
-    @SuppressWarnings("unused")
-    public static final String S_LANG_JA = "JA";
-    public static final String S_LANG_EN = "EN";
-    public static final String S_LANG_ZH = "ZH";
-    public static final String S_LANG_NL = "NL";
-    public static final String S_LANG_FR = "FR";
-    public static final String S_LANG_DE = "DE";
-    public static final String S_LANG_HU = "HU";
-    public static final String S_LANG_IT = "IT";
-    public static final String S_LANG_KO = "KO";
-    public static final String S_LANG_PL = "PL";
-    public static final String S_LANG_PT = "PT";
-    public static final String S_LANG_RU = "RU";
-    public static final String S_LANG_ES = "ES";
-    public static final String S_LANG_TH = "TH";
-    public static final String S_LANG_VI = "VI";
+    @JvmField
+    @ColumnInfo(name = "SIMPLE_LANGUAGE")
+    var simpleLanguage: String? = null,
 
-    public static final String[] S_LANGS = {
+    @JvmField
+    @Ignore
+    var favoriteSlot: Int = -2,
+
+    @JvmField
+    @Ignore
+    var favoriteName: String? = null
+
+) : Parcelable {
+    fun generateSLang() {
+        simpleLanguage = simpleTags?.let { generateSLangFromTags(it) } ?: title?.let { generateSLangFromTitle(it) }
+    }
+
+    private fun generateSLangFromTags(simpleTags: Array<String>): String? {
+        for (tag in simpleTags) {
+            for (i in S_LANGS.indices) {
+                if (S_LANG_TAGS[i] == tag) {
+                    return S_LANGS[i]
+                }
+            }
+        }
+        return null
+    }
+
+    private fun generateSLangFromTitle(title: String): String? {
+        for (i in S_LANGS.indices) {
+            if (S_LANG_PATTERNS[i].matcher(title).find()) {
+                return S_LANGS[i]
+            }
+        }
+        return null
+    }
+
+    companion object {
+        /**
+         * ISO 639-1
+         */
+        const val S_LANG_JA = "JA"
+        const val S_LANG_EN = "EN"
+        const val S_LANG_ZH = "ZH"
+        const val S_LANG_NL = "NL"
+        const val S_LANG_FR = "FR"
+        const val S_LANG_DE = "DE"
+        const val S_LANG_HU = "HU"
+        const val S_LANG_IT = "IT"
+        const val S_LANG_KO = "KO"
+        const val S_LANG_PL = "PL"
+        const val S_LANG_PT = "PT"
+        const val S_LANG_RU = "RU"
+        const val S_LANG_ES = "ES"
+        const val S_LANG_TH = "TH"
+        const val S_LANG_VI = "VI"
+
+        @JvmField
+        val S_LANGS = arrayOf(
             S_LANG_EN,
             S_LANG_ZH,
             S_LANG_ES,
@@ -62,28 +169,40 @@ public class GalleryInfo implements Parcelable {
             S_LANG_VI,
             S_LANG_PL,
             S_LANG_HU,
-            S_LANG_NL,
-    };
-
-    public static final Pattern[] S_LANG_PATTERNS = {
-            Pattern.compile("[(\\[]eng(?:lish)?[)\\]]|英訳", Pattern.CASE_INSENSITIVE),
-            // [(（\[]ch(?:inese)?[)）\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳
-            Pattern.compile("[(\uFF08\\[]ch(?:inese)?[)\uFF09\\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[(\\[]spanish[)\\]]|[(\\[]Español[)\\]]|スペイン翻訳", Pattern.CASE_INSENSITIVE),
+            S_LANG_NL
+        )
+        val S_LANG_PATTERNS = arrayOf(
+            Pattern.compile(
+                "[(\\[]eng(?:lish)?[)\\]]|英訳",
+                Pattern.CASE_INSENSITIVE
+            ),  // [(（\[]ch(?:inese)?[)）\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳
+            Pattern.compile(
+                "[(\uFF08\\[]ch(?:inese)?[)\uFF09\\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳",
+                Pattern.CASE_INSENSITIVE
+            ),
+            Pattern.compile(
+                "[(\\[]spanish[)\\]]|[(\\[]Español[)\\]]|スペイン翻訳",
+                Pattern.CASE_INSENSITIVE
+            ),
             Pattern.compile("[(\\[]korean?[)\\]]|韓国翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]rus(?:sian)?[)\\]]|ロシア翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]fr(?:ench)?[)\\]]|フランス翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]portuguese|ポルトガル翻訳", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[(\\[]thai(?: ภาษาไทย)?[)\\]]|แปลไทย|タイ翻訳", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(
+                "[(\\[]thai(?: ภาษาไทย)?[)\\]]|แปลไทย|タイ翻訳",
+                Pattern.CASE_INSENSITIVE
+            ),
             Pattern.compile("[(\\[]german[)\\]]|ドイツ翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]italiano?[)\\]]|イタリア翻訳", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[(\\[]vietnamese(?: Tiếng Việt)?[)\\]]|ベトナム翻訳", Pattern.CASE_INSENSITIVE),
+            Pattern.compile(
+                "[(\\[]vietnamese(?: Tiếng Việt)?[)\\]]|ベトナム翻訳",
+                Pattern.CASE_INSENSITIVE
+            ),
             Pattern.compile("[(\\[]polish[)\\]]|ポーランド翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]hun(?:garian)?[)\\]]|ハンガリー翻訳", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[(\\[]dutch[)\\]]|オランダ翻訳", Pattern.CASE_INSENSITIVE),
-    };
-
-    public static final String[] S_LANG_TAGS = {
+            Pattern.compile("[(\\[]dutch[)\\]]|オランダ翻訳", Pattern.CASE_INSENSITIVE)
+        )
+        val S_LANG_TAGS = arrayOf(
             "language:english",
             "language:chinese",
             "language:spanish",
@@ -97,151 +216,7 @@ public class GalleryInfo implements Parcelable {
             "language:vietnamese",
             "language:polish",
             "language:hungarian",
-            "language:dutch",
-    };
-    public static final Parcelable.Creator<GalleryInfo> CREATOR = new Parcelable.Creator<GalleryInfo>() {
-
-        @Override
-        public GalleryInfo createFromParcel(Parcel source) {
-            return new GalleryInfo(source);
-        }
-
-        @Override
-        public GalleryInfo[] newArray(int size) {
-            return new GalleryInfo[size];
-        }
-    };
-    @PrimaryKey
-    @ColumnInfo(name = "GID")
-    public long gid;
-    @ColumnInfo(name = "TOKEN")
-    public String token;
-    @ColumnInfo(name = "TITLE")
-    public String title;
-    @ColumnInfo(name = "TITLE_JPN")
-    public String titleJpn;
-    @ColumnInfo(name = "THUMB")
-    public String thumb;
-    @ColumnInfo(name = "CATEGORY")
-    public int category;
-    @ColumnInfo(name = "POSTED")
-    public String posted;
-    @ColumnInfo(name = "UPLOADER")
-    public String uploader;
-    @Ignore
-    public boolean disowned;
-    @ColumnInfo(name = "RATING")
-    public float rating;
-    @Ignore
-    public boolean rated;
-    @Nullable
-    @Ignore
-    public String[] simpleTags;
-    @Ignore
-    public int pages;
-    @Ignore
-    public int thumbWidth;
-    @Ignore
-    public int thumbHeight;
-    @Ignore
-    public int spanSize;
-    @Ignore
-    public int spanIndex;
-    @Ignore
-    public int spanGroupIndex;
-    /**
-     * language from title
-     */
-    @ColumnInfo(name = "SIMPLE_LANGUAGE")
-    public String simpleLanguage;
-    @Ignore
-    public int favoriteSlot = -2;
-    @Ignore
-    public String favoriteName;
-
-    public GalleryInfo() {
-    }
-
-    protected GalleryInfo(Parcel in) {
-        this.gid = in.readLong();
-        this.token = in.readString();
-        this.title = in.readString();
-        this.titleJpn = in.readString();
-        this.thumb = in.readString();
-        this.category = in.readInt();
-        this.posted = in.readString();
-        this.uploader = in.readString();
-        this.rating = in.readFloat();
-        this.rated = in.readByte() != 0;
-        this.simpleLanguage = in.readString();
-        this.simpleTags = in.createStringArray();
-        this.thumbWidth = in.readInt();
-        this.thumbHeight = in.readInt();
-        this.spanSize = in.readInt();
-        this.spanIndex = in.readInt();
-        this.spanGroupIndex = in.readInt();
-        this.favoriteSlot = in.readInt();
-        this.favoriteName = in.readString();
-        this.disowned = in.readByte() != 0;
-    }
-
-    public final void generateSLang() {
-        if (simpleTags != null) {
-            generateSLangFromTags();
-        }
-        if (simpleLanguage == null && title != null) {
-            generateSLangFromTitle();
-        }
-    }
-
-    private void generateSLangFromTags() {
-        assert simpleTags != null;
-        for (String tag : simpleTags) {
-            for (int i = 0; i < S_LANGS.length; i++) {
-                if (S_LANG_TAGS[i].equals(tag)) {
-                    simpleLanguage = S_LANGS[i];
-                    return;
-                }
-            }
-        }
-    }
-
-    private void generateSLangFromTitle() {
-        for (int i = 0; i < S_LANGS.length; i++) {
-            if (S_LANG_PATTERNS[i].matcher(title).find()) {
-                simpleLanguage = S_LANGS[i];
-                return;
-            }
-        }
-        simpleLanguage = null;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.gid);
-        dest.writeString(this.token);
-        dest.writeString(this.title);
-        dest.writeString(this.titleJpn);
-        dest.writeString(this.thumb);
-        dest.writeInt(this.category);
-        dest.writeString(this.posted);
-        dest.writeString(this.uploader);
-        dest.writeFloat(this.rating);
-        dest.writeByte(this.rated ? (byte) 1 : (byte) 0);
-        dest.writeString(this.simpleLanguage);
-        dest.writeStringArray(this.simpleTags);
-        dest.writeInt(this.thumbWidth);
-        dest.writeInt(this.thumbHeight);
-        dest.writeInt(this.spanSize);
-        dest.writeInt(this.spanIndex);
-        dest.writeInt(this.spanGroupIndex);
-        dest.writeInt(this.favoriteSlot);
-        dest.writeString(this.favoriteName);
-        dest.writeByte(this.disowned ? (byte) 1 : (byte) 0);
+            "language:dutch"
+        )
     }
 }

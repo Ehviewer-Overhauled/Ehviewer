@@ -1,7 +1,5 @@
 package com.hippo.ehviewer.dao;
 
-import android.os.Parcel;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
@@ -9,27 +7,10 @@ import com.hippo.ehviewer.client.data.GalleryInfo;
 
 @Entity(tableName = "BOOKMARKS")
 public class BookmarkInfo extends GalleryInfo {
-    public static final Creator<BookmarkInfo> CREATOR = new Creator<>() {
-        @Override
-        public BookmarkInfo createFromParcel(Parcel source) {
-            return new BookmarkInfo(source);
-        }
-
-        @Override
-        public BookmarkInfo[] newArray(int size) {
-            return new BookmarkInfo[size];
-        }
-    };
     @ColumnInfo(name = "PAGE")
     public int page;
     @ColumnInfo(name = "TIME")
     public long time;
-
-    protected BookmarkInfo(Parcel in) {
-        super(in);
-        this.page = in.readInt();
-        this.time = in.readLong();
-    }
 
     public BookmarkInfo(GalleryInfo galleryInfo) {
         this.gid = galleryInfo.gid;
@@ -144,17 +125,5 @@ public class BookmarkInfo extends GalleryInfo {
 
     public void setTime(long time) {
         this.time = time;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeInt(this.page);
-        dest.writeLong(this.time);
     }
 }

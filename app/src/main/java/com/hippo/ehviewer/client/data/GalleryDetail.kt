@@ -13,99 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.data
 
-package com.hippo.ehviewer.client.data;
+import kotlinx.parcelize.Parcelize
 
-import android.os.Parcel;
-import android.os.Parcelable;
+@Parcelize // This is wrong Parcelize usage, TODO: use delegate and move galleryinfo to primary constructor
+class GalleryDetail(
+    @JvmField
+    var apiUid: Long = -1L,
 
-import java.util.ArrayList;
-import java.util.Arrays;
+    @JvmField
+    var apiKey: String? = null,
 
-public class GalleryDetail extends GalleryInfo {
+    @JvmField
+    var torrentCount: Int = 0,
 
-    public static final Creator<GalleryDetail> CREATOR = new Creator<GalleryDetail>() {
-        @Override
-        public GalleryDetail createFromParcel(Parcel source) {
-            return new GalleryDetail(source);
-        }
+    @JvmField
+    var torrentUrl: String? = null,
 
-        @Override
-        public GalleryDetail[] newArray(int size) {
-            return new GalleryDetail[size];
-        }
-    };
-    public long apiUid = -1L;
-    public String apiKey;
-    public int torrentCount;
-    public String torrentUrl;
-    public String archiveUrl;
-    public String parent;
-    public ArrayList<GalleryInfo> newerVersions = new ArrayList<>();
-    public String visible;
-    public String language;
-    public String size;
-    public int pages;
-    public int favoriteCount;
-    public boolean isFavorited;
-    public int ratingCount;
-    public GalleryTagGroup[] tags;
-    public GalleryCommentList comments;
-    public int previewPages;
-    public PreviewSet previewSet;
+    @JvmField
+    var archiveUrl: String? = null,
 
-    public GalleryDetail() {
-    }
+    @JvmField
+    var parent: String? = null,
 
-    protected GalleryDetail(Parcel in) {
-        super(in);
-        this.torrentCount = in.readInt();
-        this.torrentUrl = in.readString();
-        this.archiveUrl = in.readString();
-        this.parent = in.readString();
-        //noinspection unchecked
-        this.newerVersions = in.readArrayList(GalleryInfo.class.getClassLoader());
-        this.visible = in.readString();
-        this.language = in.readString();
-        this.size = in.readString();
-        this.pages = in.readInt();
-        this.favoriteCount = in.readInt();
-        this.isFavorited = in.readByte() != 0;
-        this.ratingCount = in.readInt();
-        Parcelable[] array = in.readParcelableArray(GalleryTagGroup.class.getClassLoader());
-        if (array != null) {
-            this.tags = Arrays.copyOf(array, array.length, GalleryTagGroup[].class);
-        } else {
-            this.tags = null;
-        }
-        this.comments = in.readParcelable(getClass().getClassLoader());
-        this.previewPages = in.readInt();
-        this.previewSet = in.readParcelable(PreviewSet.class.getClassLoader());
-    }
+    @JvmField
+    var newerVersions: ArrayList<GalleryInfo> = ArrayList(),
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+    @JvmField
+    var visible: String? = null,
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeInt(this.torrentCount);
-        dest.writeString(this.torrentUrl);
-        dest.writeString(this.archiveUrl);
-        dest.writeString(this.parent);
-        dest.writeList(this.newerVersions);
-        dest.writeString(this.visible);
-        dest.writeString(this.language);
-        dest.writeString(this.size);
-        dest.writeInt(this.pages);
-        dest.writeInt(this.favoriteCount);
-        dest.writeByte(isFavorited ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.ratingCount);
-        dest.writeParcelableArray(this.tags, flags);
-        dest.writeParcelable(this.comments, flags);
-        dest.writeInt(this.previewPages);
-        dest.writeParcelable(previewSet, flags);
-    }
-}
+    @JvmField
+    var language: String? = null,
+
+    @JvmField
+    var size: String? = null,
+
+    @JvmField
+    var favoriteCount: Int = 0,
+
+    @JvmField
+    var isFavorited: Boolean = false,
+
+    @JvmField
+    var ratingCount: Int = 0,
+
+    @JvmField
+    var tags: Array<GalleryTagGroup>? = null,
+
+    @JvmField
+    var comments: GalleryCommentList? = null,
+
+    @JvmField
+    var previewPages: Int = 0,
+
+    @JvmField
+    var previewSet: PreviewSet? = null,
+) : GalleryInfo()

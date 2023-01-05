@@ -182,7 +182,7 @@ class ReaderActivity : EhActivity() {
             val token: String
             if (mGalleryInfo != null) {
                 gid = mGalleryInfo!!.gid
-                token = mGalleryInfo!!.token
+                token = mGalleryInfo!!.token!!
             } else {
                 return null
             }
