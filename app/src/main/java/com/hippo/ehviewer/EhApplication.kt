@@ -110,34 +110,41 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         EhDB.initialize(this)
         BitmapUtils.initialize(this)
         EhTagDatabase.update()
-
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
-
         launchIO {
-            try {
-                val downloadLocation = Settings.getDownloadLocation()
-                if (Settings.getMediaScan()) {
-                    CommonOperations.removeNoMediaFile(downloadLocation)
-                } else {
-                    CommonOperations.ensureNoMediaFile(downloadLocation)
-                }
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                ExceptionUtils.throwIfFatal(t)
+            launchIO {
+                downloadManager
             }
-
-            // Clear temp files
-            try {
-                clearTempDir()
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                ExceptionUtils.throwIfFatal(t)
+            launchIO {
+                cleanupDownload()
             }
-        }
-        launchIO {
-            theDawnOfNewDay()
+            launchIO {
+                theDawnOfNewDay()
+            }
         }
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
+    }
+
+    private fun cleanupDownload() {
+        try {
+            val downloadLocation = Settings.getDownloadLocation()
+            if (Settings.getMediaScan()) {
+                CommonOperations.removeNoMediaFile(downloadLocation)
+            } else {
+                CommonOperations.ensureNoMediaFile(downloadLocation)
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            ExceptionUtils.throwIfFatal(t)
+        }
+
+        // Clear temp files
+        try {
+            clearTempDir()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            ExceptionUtils.throwIfFatal(t)
+        }
     }
 
     private fun theDawnOfNewDay() {
