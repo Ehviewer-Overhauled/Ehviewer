@@ -378,11 +378,8 @@
     <string name="settings_advanced_dump_logcat_summary">Sauvegarder le journal logcat au stockage externe</string>
     <string name="settings_advanced_dump_logcat_failed">Echec de sauvegarde</string>
     <string name="settings_advanced_dump_logcat_to">Fiche sauvegardé à %s</string>
-    <string name="settings_advanced_clear_download_path_cache">Vider le cache de la destination de téléchargement</string>
-    <string name="settings_advanced_clear_download_path_cache_summary">Quand il y a une erreur et vous devez télécharger quelque chose à nouveau, vider le cache là-dedans pouvait résoudre le problème.</string>
     <string name="clipboard_gallery_url_snack_message">Un lien d\'un galerie est détecté dans les presse-papiers. </string>
     <string name="clipboard_gallery_url_snack_action">Aller</string>
-    <string name="settings_advanced_clear_download_path_cache_message">Vider le cache ?</string>
     <string name="settings_advanced_read_cache_size">Taille du cache pour la lecture</string>
     <string name="settings_advanced_export_data">Exporter les données</string>
     <string name="settings_advanced_export_data_summary">Sauvegarder les données au stockage externe, y compris la liste de téléchargement, la liste de recherche rapide</string>

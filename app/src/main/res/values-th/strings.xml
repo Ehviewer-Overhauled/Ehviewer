@@ -373,9 +373,6 @@
     <string name="settings_advanced_dump_logcat_summary">บันทึก Logcat ไปที่พื้นที่จัดเก็บภายนอก</string>
     <string name="settings_advanced_dump_logcat_failed">การสร้าง Logcat เกิดข้อผิดพลาด</string>
     <string name="settings_advanced_dump_logcat_to">Logcat ถูกสร้างอยู่ที่ %s</string>
-    <string name="settings_advanced_clear_download_path_cache">ลบไฟล์ขยะในแหล่งดาวน์โหลด</string>
-    <string name="settings_advanced_clear_download_path_cache_summary">แกลเลอรี่ที่ดาวน์โหลดอยู่อาจเกิดข้อผิดพลาด และอาจจะต้องดาวน์โหลดใหม่อีกครั้ง การลบไฟล์ขยะในแหล่งดาวน์โหลดจะช่วยแก้ปัญหานี้ได้</string>
-    <string name="settings_advanced_clear_download_path_cache_message">ต้องการลบไฟล์ขยะในแหล่งดาวน์โหลดหรือไม่?</string>
     <string name="settings_advanced_read_cache_size">ขนาดในการเก็บไฟล์ชั่วคราวเพื่ออ่าน</string>
     <string name="settings_advanced_app_language_title">ภาษาของแอป</string>
     <string name="settings_advanced_proxy">พร็อกซี่</string>

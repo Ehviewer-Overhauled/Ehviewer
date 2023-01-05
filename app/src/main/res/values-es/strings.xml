@@ -338,9 +338,6 @@
     <string name="settings_advanced_dump_logcat_summary">Guardar logcat en almacenamiento externo</string>
     <string name="settings_advanced_dump_logcat_failed">Guardado de logcat fallido</string>
     <string name="settings_advanced_dump_logcat_to">Logcat guardado en %s</string>
-    <string name="settings_advanced_clear_download_path_cache">Borrar caché de la ruta de descarga</string>
-    <string name="settings_advanced_clear_download_path_cache_summary">La ruta de descarga de la galería podría ser incorrecta y necesita ser descargada de nuevo. Borrar el caché de la ruta de descarga debería resolver el problema</string>
-    <string name="settings_advanced_clear_download_path_cache_message">¿Borrar caché de la ruta de descarga?</string>
     <string name="settings_advanced_read_cache_size">Tamaño del caché (archivos temporales)</string>
     <string name="settings_advanced_app_language_title">Idioma de la aplicación</string>
     <string name="settings_advanced_proxy">Proxy</string>

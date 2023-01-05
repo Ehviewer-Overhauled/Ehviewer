@@ -318,7 +318,6 @@
     <string name="settings_advanced_dump_logcat_summary">Logcat-Protokolldatei auf externem Speicher speichern</string>
     <string name="settings_advanced_dump_logcat_failed">Speichern gescheitert</string>
     <string name="settings_advanced_dump_logcat_to">Protokolldatei wurde auf %s gespeichert.</string>
-    <string name="settings_advanced_clear_download_path_cache">Downloadpfadzwischenspeicher löschen</string>
     <string name="settings_advanced_proxy">Proxy</string>
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
@@ -352,8 +351,6 @@
     <string name="error_password_cannot_empty">Gibt das Passwort ein</string>
     <string name="tourist_mode">Anmeldung überspringen</string>
     <string name="sign_in_failed">Anmeldung fehlgeschlagen</string>
-    <string name="settings_advanced_clear_download_path_cache_summary">Wenn etwas dem Downloadpfad schiefgelaufen ist, den Downloadpfad reinigen, könnte das Problem lösen.</string>
-    <string name="settings_advanced_clear_download_path_cache_message">Downloadpfadszwischenspeicher löschen?</string>
     <string name="clipboard_gallery_url_snack_message">Ein Link von einen Galerie wurde in Zwischenablage erkennt.</string>
     <string name="clipboard_gallery_url_snack_action">Gehen</string>
     <string name="settings_advanced_read_cache_size">Größe des Lesezwischenspeichers</string>
