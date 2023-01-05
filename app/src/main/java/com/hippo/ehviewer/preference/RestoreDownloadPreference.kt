@@ -52,6 +52,7 @@ class RestoreDownloadPreference constructor(
     private class RestoreTask(context: Context) : Task(context) {
         private val mManager: DownloadManager = downloadManager
         private val mHttpClient: OkHttpClient = okHttpClient
+        private var restoreDirCount = 0
         private fun getRestoreItem(file: UniFile?): RestoreItem? {
             if (null == file || !file.isDirectory) {
                 return null
@@ -62,14 +63,21 @@ class RestoreDownloadPreference constructor(
                 `is` = siFile.openInputStream()
                 val spiderInfo = SpiderInfo.read(`is`) ?: return null
                 val gid = spiderInfo.gid
+                val dirname = file.name
                 if (mManager.containDownloadInfo(gid)) {
+                    // Restore download dir to avoid redownload
+                    val dbdirname = EhDB.getDownloadDirname(gid)
+                    if (null == dbdirname || dirname != dbdirname) {
+                        EhDB.putDownloadDirname(gid, dirname)
+                        restoreDirCount++
+                    }
                     return null
                 }
                 val token = spiderInfo.token
                 val restoreItem = RestoreItem()
                 restoreItem.gid = gid
                 restoreItem.token = token
-                restoreItem.dirname = file.name
+                restoreItem.dirname = dirname
                 restoreItem
             } catch (e: IOException) {
                 null
@@ -112,7 +120,10 @@ class RestoreDownloadPreference constructor(
                 val list = o as List<RestoreItem>
                 if (list.isEmpty()) {
                     mActivity.showTip(
-                        R.string.settings_download_restore_not_found,
+                        if (restoreDirCount == 0)
+                            mActivity.getString(R.string.settings_download_restore_not_found)
+                        else
+                            mActivity.getString(R.string.settings_download_restore_successfully, restoreDirCount),
                         BaseScene.LENGTH_SHORT
                     )
                 } else {
@@ -132,7 +143,7 @@ class RestoreDownloadPreference constructor(
                         i++
                     }
                     showTip(
-                        mActivity.getString(R.string.settings_download_restore_successfully, count),
+                        mActivity.getString(R.string.settings_download_restore_successfully, count + restoreDirCount),
                         BaseScene.LENGTH_SHORT
                     )
                     val preference: Preference? = preference
