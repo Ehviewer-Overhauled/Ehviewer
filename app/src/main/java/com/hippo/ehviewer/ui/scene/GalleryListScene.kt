@@ -524,7 +524,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
                 // Check name empty
                 if (TextUtils.isEmpty(text)) {
-                    builder.setError(getString(R.string.name_is_empty))
+                    withUIContext {
+                        builder.setError(getString(R.string.name_is_empty))
+                    }
                     return@launchIO
                 }
                 if (checked[0] && next != null) {
@@ -537,7 +539,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 // Check name duplicate
                 for ((_, name) in mQuickSearchList) {
                     if (text == name) {
-                        builder.setError(getString(R.string.duplicate_name))
+                        withUIContext {
+                            builder.setError(getString(R.string.duplicate_name))
+                        }
                         return@launchIO
                     }
                 }
