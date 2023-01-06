@@ -76,6 +76,9 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
+import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_SUBSCRIPTION
+import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TOPLIST
+import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_WHATS_HOT
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryListParser
@@ -112,7 +115,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-@SuppressLint("RtlHardcoded")
 class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper,
     OnClickFabListener, OnExpandListener {
     private val mCallback = SearchStateOnBackPressedCallback()
@@ -120,8 +122,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     /*---------------
      Whole life cycle
      ---------------*/
-    private var mClient: EhClient? = null
-    private var mUrlBuilder: ListUrlBuilder? = null
+    private lateinit var mUrlBuilder: ListUrlBuilder
     private var mRecyclerView: EasyRecyclerView? = null
     private var mSearchLayout: SearchLayout? = null
     private val selectImageLauncher = registerForActivityResult<PickVisualMediaRequest, Uri>(
@@ -183,36 +184,23 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun handleArgs(args: Bundle?) {
-        if (null == args || null == mUrlBuilder) {
-            return
-        }
-        val action = args.getString(KEY_ACTION)
-        if (ACTION_HOMEPAGE == action) {
-            mUrlBuilder!!.reset()
-        } else if (ACTION_SUBSCRIPTION == action) {
-            mUrlBuilder!!.reset()
-            mUrlBuilder!!.mode = ListUrlBuilder.MODE_SUBSCRIPTION
-        } else if (ACTION_WHATS_HOT == action) {
-            mUrlBuilder!!.reset()
-            mUrlBuilder!!.mode = ListUrlBuilder.MODE_WHATS_HOT
-        } else if (ACTION_TOP_LIST == action) {
-            mUrlBuilder!!.reset()
-            mUrlBuilder!!.mode = ListUrlBuilder.MODE_TOPLIST
-            mUrlBuilder!!.keyword = "11"
-        } else if (ACTION_LIST_URL_BUILDER == action) {
-            val builder = args.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
-            if (builder != null) {
-                mUrlBuilder = builder.copyJ()
-            }
+        args ?: return
+        mUrlBuilder = when (args.getString(KEY_ACTION)) {
+            ACTION_HOMEPAGE -> ListUrlBuilder()
+            ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)
+            ACTION_WHATS_HOT -> ListUrlBuilder(MODE_WHATS_HOT)
+            ACTION_TOP_LIST -> ListUrlBuilder(MODE_TOPLIST, mKeyword = "11")
+            ACTION_LIST_URL_BUILDER -> args.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
+                ?.copy() ?: ListUrlBuilder()
+
+            else -> throw IllegalStateException("Wrong KEY_ACTION:${args.getString(KEY_ACTION)} when handle args!")
         }
     }
 
     override fun onNewArguments(args: Bundle) {
         handleArgs(args)
         onUpdateUrlBuilder()
-        if (null != mHelper) {
-            mHelper!!.refresh()
-        }
+        mHelper?.refresh()
         setState(STATE_NORMAL)
         showSearchBar()
     }
@@ -222,7 +210,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         super.onCreate(savedInstanceState)
         val context = context
         AssertUtils.assertNotNull(context)
-        mClient = EhClient
         mDownloadManager = downloadManager
         mFavouriteStatusRouter = favouriteStatusRouter
         mDownloadInfoListener = object : DownloadInfoListener {
@@ -270,13 +257,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun onInit() {
-        mUrlBuilder = ListUrlBuilder()
         handleArgs(arguments)
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
-        mUrlBuilder = savedInstanceState.getParcelable(KEY_LIST_URL_BUILDER)
+        mUrlBuilder = savedInstanceState.getParcelable(KEY_LIST_URL_BUILDER)!!
         mState = savedInstanceState.getInt(KEY_STATE)
     }
 
@@ -294,8 +280,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     override fun onDestroy() {
         super.onDestroy()
-        mClient = null
-        mUrlBuilder = null
         mDownloadManager!!.removeDownloadInfoListener(mDownloadInfoListener)
         mFavouriteStatusRouter!!.removeListener(mFavouriteStatusRouterListener)
     }
@@ -352,16 +336,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     // Update search bar title, drawer checked item
     private fun onUpdateUrlBuilder() {
-        val builder = mUrlBuilder
         val resources = resourcesOrNull
-        if (resources == null || builder == null || mSearchLayout == null || mFabLayout == null) {
+        if (resources == null || mSearchLayout == null || mFabLayout == null) {
             return
         }
-        var keyword = builder.keyword
-        val category = builder.category
-        val mode = builder.mode
-        val isPopular = mode == ListUrlBuilder.MODE_WHATS_HOT
-        val isTopList = mode == ListUrlBuilder.MODE_TOPLIST
+        var keyword = mUrlBuilder.keyword
+        val category = mUrlBuilder.category
+        val mode = mUrlBuilder.mode
+        val isPopular = mode == MODE_WHATS_HOT
+        val isTopList = mode == MODE_TOPLIST
         if (isTopList != mIsTopList) {
             mIsTopList = isTopList
             recreateDrawerView()
@@ -372,7 +355,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         mFabLayout!!.setSecondaryFabVisibilityAt(2, !isPopular)
 
         // Update normal search mode
-        mSearchLayout!!.setNormalSearchMode(if (mode == ListUrlBuilder.MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
+        mSearchLayout!!.setNormalSearchMode(if (mode == MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
 
         // Update search edit text
         if (!mIsTopList) {
@@ -383,7 +366,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         // Update title
-        var title = getSuitableTitleForUrlBuilder(resources, builder, true)
+        var title = getSuitableTitleForUrlBuilder(resources, mUrlBuilder, true)
         if (null == title) {
             title = resources.getString(R.string.search)
         }
@@ -392,9 +375,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         // Update nav checked item
         val checkedItemId: Int = when (mode) {
             ListUrlBuilder.MODE_NORMAL -> if (EhUtils.NONE == category && TextUtils.isEmpty(keyword)) R.id.nav_homepage else 0
-            ListUrlBuilder.MODE_SUBSCRIPTION -> R.id.nav_subscription
-            ListUrlBuilder.MODE_WHATS_HOT -> R.id.nav_whats_hot
-            ListUrlBuilder.MODE_TOPLIST -> R.id.nav_toplist
+            MODE_SUBSCRIPTION -> R.id.nav_subscription
+            MODE_WHATS_HOT -> R.id.nav_whats_hot
+            MODE_TOPLIST -> R.id.nav_toplist
             ListUrlBuilder.MODE_TAG, ListUrlBuilder.MODE_UPLOADER, ListUrlBuilder.MODE_IMAGE_SEARCH -> 0
             else -> throw IllegalStateException("Unexpected value: $mode")
         }
@@ -527,13 +510,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         recyclerView: EasyRecyclerView, tip: TextView
     ) {
         val context = context
-        val urlBuilder = mUrlBuilder
-        if (null == context || null == urlBuilder || null == mHelper) {
+        if (null == context || null == mHelper) {
             return
         }
 
         // Can't add image search as quick search
-        if (ListUrlBuilder.MODE_IMAGE_SEARCH == urlBuilder.mode) {
+        if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
             showTip(R.string.image_search_not_quick_search, LENGTH_LONG)
             return
         }
@@ -542,7 +524,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
         // Check duplicate
         for (q in mQuickSearchList) {
-            if (urlBuilder.equalsQuickSearch(q)) {
+            if (mUrlBuilder.equalsQuickSearch(q)) {
                 val i = q.name!!.lastIndexOf("@")
                 if (i != -1 && q.name!!.substring(i) == next) {
                     showTip(getString(R.string.duplicate_quick_search, q.name), LENGTH_LONG)
@@ -552,7 +534,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
         val builder = EditTextDialogBuilder(
             context,
-            getSuitableTitleForUrlBuilder(context.resources, urlBuilder, false),
+            getSuitableTitleForUrlBuilder(context.resources, mUrlBuilder, false),
             getString(R.string.quick_search)
         )
         builder.setTitle(R.string.add_quick_search_dialog_title)
@@ -590,7 +572,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 }
                 builder.setError(null)
                 dialog.dismiss()
-                val quickSearch = urlBuilder.toQuickSearch()
+                val quickSearch = mUrlBuilder.toQuickSearch()
                 quickSearch.name = text
                 EhDB.insertQuickSearch(quickSearch)
                 mQuickSearchList.add(quickSearch)
@@ -676,7 +658,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private fun showGoToDialog() {
         val context = context
-        if (null == context || null == mHelper || null == mUrlBuilder) {
+        if (null == context || null == mHelper) {
             return
         }
         if (mIsTopList) {
@@ -1049,24 +1031,24 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun onApplySearch(query: String?) {
-        if (null == mUrlBuilder || null == mHelper || null == mSearchLayout) {
+        if (null == mHelper || null == mSearchLayout) {
             return
         }
         if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
             try {
-                mSearchLayout!!.formatListUrlBuilder(mUrlBuilder!!, query)
+                mSearchLayout!!.formatListUrlBuilder(mUrlBuilder, query)
             } catch (e: EhException) {
                 showTip(e.message, LENGTH_LONG)
                 return
             }
         } else {
-            val oldMode = mUrlBuilder!!.mode
+            val oldMode = mUrlBuilder.mode
             // If it's MODE_SUBSCRIPTION, keep it
             val newMode =
-                if (oldMode == ListUrlBuilder.MODE_SUBSCRIPTION) ListUrlBuilder.MODE_SUBSCRIPTION else ListUrlBuilder.MODE_NORMAL
-            mUrlBuilder!!.reset()
-            mUrlBuilder!!.mode = newMode
-            mUrlBuilder!!.keyword = query
+                if (oldMode == MODE_SUBSCRIPTION) MODE_SUBSCRIPTION else ListUrlBuilder.MODE_NORMAL
+            mUrlBuilder.reset()
+            mUrlBuilder.mode = newMode
+            mUrlBuilder.keyword = query
         }
         onUpdateUrlBuilder()
         mHelper!!.refresh()
@@ -1111,9 +1093,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
-        if (mHelper != null && mHelper!!.isCurrentTask(taskId) && mUrlBuilder != null) {
+        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             val emptyString =
-                getString(if (mUrlBuilder!!.mode == ListUrlBuilder.MODE_SUBSCRIPTION && result.noWatchedTags) R.string.gallery_list_empty_hit_subscription else R.string.gallery_list_empty_hit)
+                getString(if (mUrlBuilder.mode == MODE_SUBSCRIPTION && result.noWatchedTags) R.string.gallery_list_empty_hit_subscription else R.string.gallery_list_empty_hit)
             mHelper!!.setEmptyString(emptyString)
             if (mIsTopList) {
                 mHelper!!.onGetPageData(
@@ -1237,11 +1219,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             if (!mIsTopList) {
                 holder.key.text = mQuickSearchList[position].name
                 holder.itemView.setOnClickListener {
-                    if (null == mHelper || null == mUrlBuilder) {
+                    if (null == mHelper) {
                         return@setOnClickListener
                     }
                     val q = mQuickSearchList[position]
-                    mUrlBuilder!!.set(q)
+                    mUrlBuilder.set(q)
                     onUpdateUrlBuilder()
                     val i = q.name!!.lastIndexOf("@")
                     mHelper!!.goTo(if (i != -1) q.name!!.substring(i + 1) else null, true)
@@ -1259,10 +1241,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 holder.key.text = getString(toplists[position])
                 holder.option.visibility = View.GONE
                 holder.itemView.setOnClickListener {
-                    if (null == mHelper || null == mUrlBuilder) {
+                    if (null == mHelper) {
                         return@setOnClickListener
                     }
-                    mUrlBuilder!!.keyword = keywords[position].toString()
+                    mUrlBuilder.keyword = keywords[position].toString()
                     onUpdateUrlBuilder()
                     mHelper!!.refresh()
                     setState(STATE_NORMAL)
@@ -1371,16 +1353,16 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             isNext: Boolean
         ) {
             val activity = mainActivity
-            if (null == activity || null == mClient || null == mHelper || null == mUrlBuilder) {
+            if (null == activity || null == mHelper) {
                 return
             }
             if (mIsTopList) {
-                mUrlBuilder!!.setJumpTo(page.toString())
+                mUrlBuilder.setJumpTo(page.toString())
             } else {
-                mUrlBuilder!!.setIndex(index, isNext)
-                mUrlBuilder!!.setJumpTo(jumpTo)
+                mUrlBuilder.setIndex(index, isNext)
+                mUrlBuilder.setJumpTo(jumpTo)
             }
-            if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder!!.mode) {
+            if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
                 val request = EhRequest()
                 request.setMethod(EhClient.METHOD_IMAGE_SEARCH)
                 request.setCallback(
@@ -1390,13 +1372,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     )
                 )
                 request.setArgs(
-                    File(StringUtils.avoidNull(mUrlBuilder!!.imagePath)),
-                    mUrlBuilder!!.isUseSimilarityScan,
-                    mUrlBuilder!!.isOnlySearchCovers, mUrlBuilder!!.isShowExpunged
+                    File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
+                    mUrlBuilder.isUseSimilarityScan,
+                    mUrlBuilder.isOnlySearchCovers, mUrlBuilder.isShowExpunged
                 )
                 request.enqueue(this@GalleryListScene)
             } else {
-                val url = mUrlBuilder!!.build()
+                val url = mUrlBuilder.build()
                 val request = EhRequest()
                 request.setMethod(EhClient.METHOD_GET_GALLERY_LIST)
                 request.setCallback(
@@ -1522,13 +1504,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 TextUtils.isEmpty(keyword) && urlBuilder.advanceSearch == -1 && urlBuilder.minRating == -1 && urlBuilder.pageFrom == -1 && urlBuilder.pageTo == -1
             ) {
                 resources.getString(if (appName) R.string.app_name else R.string.homepage)
-            } else if (ListUrlBuilder.MODE_SUBSCRIPTION == urlBuilder.mode && EhUtils.NONE == category &&
+            } else if (MODE_SUBSCRIPTION == urlBuilder.mode && EhUtils.NONE == category &&
                 TextUtils.isEmpty(keyword) && urlBuilder.advanceSearch == -1 && urlBuilder.minRating == -1 && urlBuilder.pageFrom == -1 && urlBuilder.pageTo == -1
             ) {
                 resources.getString(R.string.subscription)
-            } else if (ListUrlBuilder.MODE_WHATS_HOT == urlBuilder.mode) {
+            } else if (MODE_WHATS_HOT == urlBuilder.mode) {
                 resources.getString(R.string.whats_hot)
-            } else if (ListUrlBuilder.MODE_TOPLIST == urlBuilder.mode) {
+            } else if (MODE_TOPLIST == urlBuilder.mode) {
                 when (urlBuilder.keyword) {
                     "11" -> resources.getString(R.string.toplist_alltime)
                     "12" -> resources.getString(R.string.toplist_pastyear)

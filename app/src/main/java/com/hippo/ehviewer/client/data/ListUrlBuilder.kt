@@ -68,9 +68,6 @@ data class ListUrlBuilder(
         mSHash = null
     }
 
-    // Temp for Java compatibility
-    fun copyJ() : ListUrlBuilder = this.copy()
-
     fun setIndex(index: String?, isNext: Boolean = true) {
         mNext = index?.takeIf { isNext }
         mPrev = index?.takeUnless { isNext }
