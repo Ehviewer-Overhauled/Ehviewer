@@ -80,6 +80,7 @@ import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import rikka.core.res.resolveColor
 import java.util.LinkedList
@@ -662,9 +663,11 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     }
 
     override fun onChange() {
-        mLabel = null
-        updateForLabel()
-        updateView()
+        lifecycleScope.launchUI {
+            mLabel = null
+            updateForLabel()
+            updateView()
+        }
     }
 
     override fun onRenameLabel(from: String, to: String) {
@@ -1172,16 +1175,19 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             return true
         }
 
-        @SuppressLint("NotifyDataSetChanged")
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             if (mDownloadManager == null) return
-            if (position != 0) {
-                val label = mLabels[position]
-                mDownloadManager!!.deleteLabel(label)
+            lifecycleScope.launchIO {
+                if (position != 0) {
+                    val label = mLabels[position]
+                    mDownloadManager!!.deleteLabel(label)
+                }
+                mLabels.removeAt(position)
+                withUIContext {
+                    mLabelAdapter!!.notifyItemRemoved(position)
+                }
             }
-            mLabels.removeAt(position)
-            mLabelAdapter!!.notifyDataSetChanged()
         }
     }
 
