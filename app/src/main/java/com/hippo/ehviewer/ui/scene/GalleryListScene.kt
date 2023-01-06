@@ -41,7 +41,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.IntDef
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -85,6 +84,7 @@ import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
+import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
@@ -101,7 +101,6 @@ import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.yorozuya.AnimationUtils
-import com.hippo.yorozuya.AssertUtils
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 import com.hippo.yorozuya.StringUtils
@@ -560,48 +559,47 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
-        val toolbar = ViewUtils.`$$`(view, R.id.toolbar) as Toolbar
-        val tip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        val context = context
-        AssertUtils.assertNotNull(context)
-        val recyclerView = view.findViewById<EasyRecyclerView>(R.id.recycler_view_drawer)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
+        drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
         val qsDrawerAdapter = QsDrawerAdapter(inflater)
         qsDrawerAdapter.setHasStableIds(true)
-        recyclerView.adapter = qsDrawerAdapter
+        drawerBinding.recyclerViewDrawer.adapter = qsDrawerAdapter
         val itemTouchHelper = ItemTouchHelper(GalleryListQSItemTouchHelperCallback(qsDrawerAdapter))
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+        itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
         if (!mIsTopList) {
-            tip.visibility = View.VISIBLE
-            recyclerView.visibility = View.GONE
+            drawerBinding.tip.visibility = View.VISIBLE
+            drawerBinding.recyclerViewDrawer.visibility = View.GONE
         }
         lifecycleScope.launchIO {
             mQuickSearchList = EhDB.getAllQuickSearch()
             if (mQuickSearchList.isNotEmpty()) {
                 withUIContext {
-                    tip.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
+                    drawerBinding.tip.visibility = View.GONE
+                    drawerBinding.recyclerViewDrawer.visibility = View.VISIBLE
                 }
             }
         }
-        tip.setText(R.string.quick_search_tip)
+        drawerBinding.tip.setText(R.string.quick_search_tip)
         if (mIsTopList) {
-            toolbar.setTitle(R.string.toplist)
+            drawerBinding.toolbar.setTitle(R.string.toplist)
         } else {
-            toolbar.setTitle(R.string.quick_search)
+            drawerBinding.toolbar.setTitle(R.string.quick_search)
         }
-        if (!mIsTopList) toolbar.inflateMenu(R.menu.drawer_gallery_list)
-        toolbar.setOnMenuItemClickListener { item: MenuItem ->
+        if (!mIsTopList) drawerBinding.toolbar.inflateMenu(R.menu.drawer_gallery_list)
+        drawerBinding.toolbar.setOnMenuItemClickListener { item: MenuItem ->
             val id = item.itemId
             if (id == R.id.action_add) {
-                showAddQuickSearchDialog(qsDrawerAdapter, recyclerView, tip)
+                showAddQuickSearchDialog(
+                    qsDrawerAdapter,
+                    drawerBinding.recyclerViewDrawer,
+                    drawerBinding.tip
+                )
             } else if (id == R.id.action_help) {
                 showQuickSearchTipDialog()
             }
             true
         }
-        return view
+        return drawerBinding.root
     }
 
     fun onItemClick(position: Int) {
