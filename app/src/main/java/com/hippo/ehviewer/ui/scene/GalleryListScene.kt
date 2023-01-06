@@ -566,40 +566,44 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         ) { _: DialogInterface?, which: Int, isChecked: Boolean -> checked[which] = isChecked }
         val dialog = builder.show()
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-            var text = builder.text.trim { it <= ' ' }
+            lifecycleScope.launchIO {
+                var text = builder.text.trim { it <= ' ' }
 
-            // Check name empty
-            if (TextUtils.isEmpty(text)) {
-                builder.setError(getString(R.string.name_is_empty))
-                return@setOnClickListener
-            }
-            if (checked[0] && next != null) {
-                text += next
-                Settings.putQSSaveProgress(true)
-            } else {
-                Settings.putQSSaveProgress(false)
-            }
-
-            // Check name duplicate
-            for ((_, name) in mQuickSearchList) {
-                if (text == name) {
-                    builder.setError(getString(R.string.duplicate_name))
-                    return@setOnClickListener
+                // Check name empty
+                if (TextUtils.isEmpty(text)) {
+                    builder.setError(getString(R.string.name_is_empty))
+                    return@launchIO
                 }
-            }
-            builder.setError(null)
-            dialog.dismiss()
-            val quickSearch = urlBuilder.toQuickSearch()
-            quickSearch.name = text
-            EhDB.insertQuickSearch(quickSearch)
-            mQuickSearchList.add(quickSearch)
-            adapter.notifyItemInserted(mQuickSearchList.size - 1)
-            if (0 == mQuickSearchList.size) {
-                tip.visibility = View.VISIBLE
-                recyclerView.visibility = View.GONE
-            } else {
-                tip.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
+                if (checked[0] && next != null) {
+                    text += next
+                    Settings.putQSSaveProgress(true)
+                } else {
+                    Settings.putQSSaveProgress(false)
+                }
+
+                // Check name duplicate
+                for ((_, name) in mQuickSearchList) {
+                    if (text == name) {
+                        builder.setError(getString(R.string.duplicate_name))
+                        return@launchIO
+                    }
+                }
+                builder.setError(null)
+                dialog.dismiss()
+                val quickSearch = urlBuilder.toQuickSearch()
+                quickSearch.name = text
+                EhDB.insertQuickSearch(quickSearch)
+                mQuickSearchList.add(quickSearch)
+                withUIContext {
+                    adapter.notifyItemInserted(mQuickSearchList.size - 1)
+                    if (0 == mQuickSearchList.size) {
+                        tip.visibility = View.VISIBLE
+                        recyclerView.visibility = View.GONE
+                    } else {
+                        tip.visibility = View.GONE
+                        recyclerView.visibility = View.VISIBLE
+                    }
+                }
             }
         }
     }
@@ -995,11 +999,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     STATE_SIMPLE_SEARCH -> {
                         selectSearchFab(animation)
                     }
+
                     STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
                         mSearchLayout!!.scrollSearchContainerToTop()
                         selectSearchFab(animation)
                     }
+
                     STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
                         mSearchLayout!!.scrollSearchContainerToTop()
@@ -1011,10 +1017,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     STATE_NORMAL -> {
                         selectActionFab(animation)
                     }
+
                     STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
                         mSearchLayout!!.scrollSearchContainerToTop()
                     }
+
                     STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
                         mSearchLayout!!.scrollSearchContainerToTop()
