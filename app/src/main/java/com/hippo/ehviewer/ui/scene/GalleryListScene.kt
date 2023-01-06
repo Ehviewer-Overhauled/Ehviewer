@@ -94,7 +94,6 @@ import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
 import com.hippo.scene.Announcer
 import com.hippo.scene.SceneFragment
-import com.hippo.util.ExceptionUtils
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -1058,14 +1057,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     override fun onSelectImage() {
-        try {
-            val builder = PickVisualMediaRequest.Builder()
-            builder.setMediaType(ImageOnly)
-            selectImageLauncher.launch(builder.build())
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            showTip(R.string.error_cant_find_activity, LENGTH_SHORT)
-        }
+        val builder = PickVisualMediaRequest.Builder()
+        builder.setMediaType(ImageOnly)
+        selectImageLauncher.launch(builder.build())
     }
 
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
