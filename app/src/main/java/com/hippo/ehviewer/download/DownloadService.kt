@@ -22,7 +22,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
-import android.os.Parcelable
 import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.IntDef
@@ -101,8 +100,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
             action = intent.action
         }
         if (ACTION_START == action) {
-            val gi = intent!!.getParcelableExtra<Parcelable>(KEY_GALLERY_INFO)
-            check(gi is GalleryInfo)
+            val gi = intent!!.getParcelableExtra<GalleryInfo>(KEY_GALLERY_INFO)
             val label = intent.getStringExtra(KEY_LABEL)
             if (gi != null && mDownloadManager != null) {
                 mDownloadManager!!.startDownload(gi, label)

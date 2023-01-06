@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -124,7 +123,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             hasFirstRefresh = mHasFirstRefresh;
         }
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
-        outState.putParcelable(KEY_GALLERY_INFO, (Parcelable) mGalleryInfo);
+        outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo);
     }
 
     @NonNull
@@ -225,7 +224,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             if (p != null) {
                 Intent intent = new Intent(context, ReaderActivity.class);
                 intent.setAction(ReaderActivity.ACTION_EH);
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, (Parcelable) mGalleryInfo);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryInfo);
                 intent.putExtra(ReaderActivity.KEY_PAGE, p.position);
                 startActivity(intent);
             }

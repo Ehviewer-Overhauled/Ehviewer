@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.TextUtils
 import android.view.*
 import android.widget.ImageView
@@ -217,7 +216,6 @@ class HistoryScene : BaseToolbarScene() {
     fun onItemClick(gi: GalleryInfo): Boolean {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
-        check(gi is Parcelable)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
         val announcer = Announcer(GalleryDetailScene::class.java).setArgs(args)
         startScene(announcer)
@@ -262,7 +260,6 @@ class HistoryScene : BaseToolbarScene() {
                     0 -> {
                         val intent = Intent(activity, ReaderActivity::class.java)
                         intent.action = ReaderActivity.ACTION_EH
-                        check(gi is Parcelable)
                         intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
                         startActivity(intent)
                     }

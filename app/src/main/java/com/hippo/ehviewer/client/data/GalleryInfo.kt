@@ -15,9 +15,10 @@
  */
 package com.hippo.ehviewer.client.data
 
+import android.os.Parcelable
 import java.util.regex.Pattern
 
-interface GalleryInfo {
+interface GalleryInfo : Parcelable {
     var gid: Long
     var token: String?
     var title: String?

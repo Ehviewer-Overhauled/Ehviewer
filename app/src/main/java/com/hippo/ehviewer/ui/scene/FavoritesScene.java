@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -460,7 +459,7 @@ public class FavoritesScene extends SearchBarScene implements
                 }
                 Bundle args = new Bundle();
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, (Parcelable) gi);
+                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
                 Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
                 startScene(announcer);
             }

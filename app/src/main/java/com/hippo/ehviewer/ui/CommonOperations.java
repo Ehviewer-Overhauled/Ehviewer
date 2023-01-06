@@ -19,7 +19,6 @@ package com.hippo.ehviewer.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Parcelable;
 
 import androidx.core.content.ContextCompat;
 
@@ -164,7 +163,7 @@ public final class CommonOperations {
                 Intent intent = new Intent(activity, DownloadService.class);
                 intent.setAction(DownloadService.ACTION_START);
                 intent.putExtra(DownloadService.KEY_LABEL, label);
-                intent.putExtra(DownloadService.KEY_GALLERY_INFO, (Parcelable) gi);
+                intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
                 ContextCompat.startForegroundService(activity, intent);
             }
             // Notify
@@ -194,7 +193,7 @@ public final class CommonOperations {
                             Intent intent = new Intent(activity, DownloadService.class);
                             intent.setAction(DownloadService.ACTION_START);
                             intent.putExtra(DownloadService.KEY_LABEL, label1);
-                            intent.putExtra(DownloadService.KEY_GALLERY_INFO, (Parcelable) gi);
+                            intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
                             ContextCompat.startForegroundService(activity, intent);
                         }
                         // Save settings
