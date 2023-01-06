@@ -35,6 +35,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
+import android.os.Parcelable
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.HapticFeedbackConstants
@@ -243,7 +244,9 @@ class ReaderActivity : EhActivity() {
         outState.putString(KEY_FILENAME, mFilename)
         outState.putParcelable(KEY_URI, mUri)
         if (mGalleryInfo != null) {
-            outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo)
+            val info = mGalleryInfo
+            check(info is Parcelable)
+            outState.putParcelable(KEY_GALLERY_INFO, info)
         }
         outState.putInt(KEY_PAGE, mPage)
         outState.putInt(KEY_CURRENT_INDEX, mCurrentIndex)

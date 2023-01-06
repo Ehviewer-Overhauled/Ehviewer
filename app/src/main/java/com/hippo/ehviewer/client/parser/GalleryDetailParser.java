@@ -16,6 +16,8 @@
 
 package com.hippo.ehviewer.client.parser;
 
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -114,7 +116,7 @@ public class GalleryDetailParser {
             throw new EhException(m.group(1));
         }
 
-        GalleryDetail galleryDetail = new GalleryDetail();
+        GalleryDetail galleryDetail = new GalleryDetail(new GalleryInfoImpl());
         Document document = Jsoup.parse(body);
         parseDetail(galleryDetail, document, body);
         galleryDetail.tags = parseTagGroups(document);
@@ -297,7 +299,7 @@ public class GalleryDetailParser {
                         gi.setToken(result.token);
                         gi.setTitle(StringUtils.trim(element.text()));
                         gi.setPosted(dates.get(i));
-                        gd.newerVersions.add(gi);
+                        gd.newerVersions.add((Parcelable) gi);
                     }
                 }
             }

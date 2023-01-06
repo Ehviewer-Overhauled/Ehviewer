@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -793,7 +794,7 @@ public final class GalleryListScene extends SearchBarScene
 
         Bundle args = new Bundle();
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
-        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
+        args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, (Parcelable) gi);
         Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
         startScene(announcer);
     }
@@ -965,7 +966,7 @@ public final class GalleryListScene extends SearchBarScene
                         case 0: // Read
                             Intent intent = new Intent(activity, ReaderActivity.class);
                             intent.setAction(ReaderActivity.ACTION_EH);
-                            intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi);
+                            intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, (Parcelable) gi);
                             startActivity(intent);
                             break;
                         case 1: // Download

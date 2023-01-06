@@ -170,7 +170,7 @@ public class ContentLayout extends FrameLayout {
         super.onRestoreInstanceState(mContentHelper.restoreInstanceState(state));
     }
 
-    public abstract static class ContentHelper<E extends Parcelable> implements ViewTransition.OnShowViewListener {
+    public abstract static class ContentHelper<E> implements ViewTransition.OnShowViewListener {
 
         public static final int TYPE_REFRESH = 0;
         public static final int TYPE_PRE_PAGE = 1;

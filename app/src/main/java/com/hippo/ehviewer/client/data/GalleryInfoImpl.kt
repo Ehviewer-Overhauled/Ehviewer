@@ -15,13 +15,14 @@
  */
 package com.hippo.ehviewer.client.data
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-open class GalleryInfoImpl(
+open class GalleryInfoImpl @JvmOverloads constructor(
     @PrimaryKey
     @ColumnInfo(name = "GID")
     override var gid: Long = 0,
@@ -86,4 +87,4 @@ open class GalleryInfoImpl(
     @Ignore
     override var favoriteName: String? = null
 
-) : GalleryInfo
+) : GalleryInfo, Parcelable

@@ -35,6 +35,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -448,7 +449,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             outState.putString(KEY_ACTION, mAction);
         }
         if (mGalleryInfo != null) {
-            outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo);
+            outState.putParcelable(KEY_GALLERY_INFO, (Parcelable) mGalleryInfo);
         }
         outState.putLong(KEY_GID, mGid);
         if (mToken != null) {
@@ -1104,18 +1105,19 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             if (galleryInfo != null) {
                 Intent intent = new Intent(activity, ReaderActivity.class);
                 intent.setAction(ReaderActivity.ACTION_EH);
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, (Parcelable) galleryInfo);
                 startActivity(intent);
             }
         } else if (mNewerVersion == v) {
             if (mGalleryDetail != null) {
                 ArrayList<CharSequence> titles = new ArrayList<>();
-                for (GalleryInfo newerVersion : mGalleryDetail.newerVersions) {
-                    titles.add(getString(R.string.newer_version_title, newerVersion.getTitle(), newerVersion.getPosted()));
+                for (Parcelable newerVersion : mGalleryDetail.newerVersions) {
+                    var gi = (GalleryInfo) newerVersion;
+                    titles.add(getString(R.string.newer_version_title, gi.getTitle(), gi.getPosted()));
                 }
                 new BaseDialogBuilder(requireContext())
                         .setItems(titles.toArray(new CharSequence[0]), (dialog, which) -> {
-                            GalleryInfo newerVersion = mGalleryDetail.newerVersions.get(which);
+                            GalleryInfo newerVersion = (GalleryInfo) mGalleryDetail.newerVersions.get(which);
                             Bundle args = new Bundle();
                             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
                             args.putLong(GalleryDetailScene.KEY_GID, newerVersion.getGid());
@@ -1238,7 +1240,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 int index = (Integer) o;
                 Intent intent = new Intent(context, ReaderActivity.class);
                 intent.setAction(ReaderActivity.ACTION_EH);
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo);
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, (Parcelable) galleryInfo);
                 intent.putExtra(ReaderActivity.KEY_PAGE, index);
                 startActivity(intent);
             }
