@@ -15,9 +15,7 @@
  */
 package com.hippo.ehviewer.client.data
 
-import kotlinx.parcelize.Parcelize
-
-@Parcelize // This is wrong Parcelize usage, TODO: use delegate and move galleryinfo to primary constructor
+// This is wrong Parcelize usage, TODO: use delegate and move galleryinfo to primary constructor
 class GalleryDetail(
     @JvmField
     var apiUid: Long = -1L,
