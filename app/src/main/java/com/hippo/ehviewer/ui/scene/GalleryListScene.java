@@ -298,7 +298,7 @@ public final class GalleryListScene extends SearchBarScene
         } else if (ACTION_LIST_URL_BUILDER.equals(action)) {
             ListUrlBuilder builder = args.getParcelable(KEY_LIST_URL_BUILDER);
             if (builder != null) {
-                mUrlBuilder.set(builder);
+                mUrlBuilder = builder.copyJ();
             }
         }
     }

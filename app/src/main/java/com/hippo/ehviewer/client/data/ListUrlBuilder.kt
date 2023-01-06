@@ -32,7 +32,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 
 @Parcelize
-open class ListUrlBuilder(
+data class ListUrlBuilder(
     @get:Mode @Mode var mode: Int = MODE_NORMAL,
     private var mPrev: String? = null,
     private var mNext: String? = null,
@@ -48,7 +48,7 @@ open class ListUrlBuilder(
     var isUseSimilarityScan: Boolean = false,
     var isOnlySearchCovers: Boolean = false,
     var isShowExpunged: Boolean = false,
-) : Cloneable, Parcelable {
+) : Parcelable {
 
     fun reset() {
         mode = MODE_NORMAL
@@ -68,6 +68,9 @@ open class ListUrlBuilder(
         mSHash = null
     }
 
+    // Temp for Java compatibility
+    fun copyJ() : ListUrlBuilder = this.copy()
+
     fun setIndex(index: String?, isNext: Boolean = true) {
         mNext = index?.takeIf { isNext }
         mPrev = index?.takeUnless { isNext }
@@ -82,29 +85,6 @@ open class ListUrlBuilder(
         set(keyword) {
             mKeyword = keyword
         }
-
-    /**
-     * Make them the same
-     *
-     * @param lub The template
-     */
-    fun set(lub: ListUrlBuilder) {
-        mode = lub.mode
-        mPrev = lub.mPrev
-        mNext = lub.mNext
-        mJumpTo = lub.mJumpTo
-        this.category = lub.category
-        mKeyword = lub.mKeyword
-        advanceSearch = lub.advanceSearch
-        minRating = lub.minRating
-        pageFrom = lub.pageFrom
-        pageTo = lub.pageTo
-        imagePath = lub.imagePath
-        isUseSimilarityScan = lub.isUseSimilarityScan
-        isOnlySearchCovers = lub.isOnlySearchCovers
-        isShowExpunged = lub.isShowExpunged
-        mSHash = lub.mSHash
-    }
 
     fun set(q: QuickSearch) {
         mode = q.mode
