@@ -26,7 +26,7 @@ import com.hippo.ehviewer.client.data.GalleryComment;
 import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.data.GalleryInfoImpl;
+import com.hippo.ehviewer.client.data.BaseGalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.LargePreviewSet;
 import com.hippo.ehviewer.client.data.NormalPreviewSet;
@@ -290,7 +290,7 @@ public class GalleryDetailParser {
                 Elements elements = gnd.select("a");
                 for (int i = 0; i < elements.size(); i++) {
                     Element element = elements.get(i);
-                    GalleryInfo gi = new GalleryInfoImpl();
+                    GalleryInfo gi = new BaseGalleryInfo();
                     GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(element.attr("href"));
                     if (result != null) {
                         gi.setGid(result.gid);

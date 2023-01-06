@@ -15,8 +15,6 @@
  */
 package com.hippo.ehviewer.client.data
 
-import kotlinx.parcelize.Parcelize
-
 // @Parcelize
 class GalleryDetail(
     // @JvmField
@@ -72,7 +70,7 @@ class GalleryDetail(
 
     @JvmField
     var previewSet: PreviewSet? = null,
-) : GalleryInfoImpl()
+) : BaseGalleryInfo()
 // ) : GalleryInfo by galleryInfo
 
 // Delegating 'Parcelable' is not allowed

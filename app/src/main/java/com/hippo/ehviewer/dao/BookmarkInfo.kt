@@ -2,11 +2,10 @@ package com.hippo.ehviewer.dao
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.client.data.GalleryInfoImpl
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 
 @Entity(tableName = "BOOKMARKS")
-class BookmarkInfo : GalleryInfoImpl() {
+class BookmarkInfo : BaseGalleryInfo() {
     @JvmField
     @ColumnInfo(name = "PAGE")
     var page = 0

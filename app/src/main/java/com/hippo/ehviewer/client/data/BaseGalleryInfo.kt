@@ -21,7 +21,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-open class GalleryInfoImpl(
+open class BaseGalleryInfo(
     @PrimaryKey
     @ColumnInfo(name = "GID")
     override var gid: Long = 0,

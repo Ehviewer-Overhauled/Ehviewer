@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.data.GalleryInfoImpl;
+import com.hippo.ehviewer.client.data.BaseGalleryInfo;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.spider.SpiderDen;
@@ -578,7 +578,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                GalleryInfo galleryInfo = new GalleryInfoImpl();
+                GalleryInfo galleryInfo = new BaseGalleryInfo();
                 for (DownloadInfo downloadInfo : list) {
                     galleryInfo.setGid(downloadInfo.getGid());
                     galleryInfo.setToken(downloadInfo.getToken());

@@ -4,10 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.client.data.GalleryInfoImpl
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
 
 @Entity(tableName = "DOWNLOADS")
-class DownloadInfo() : GalleryInfoImpl() {
+class DownloadInfo() : BaseGalleryInfo() {
     @JvmField
     @ColumnInfo(name = "STATE")
     var state = 0
