@@ -80,6 +80,7 @@ import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import rikka.core.res.resolveColor
 import java.util.LinkedList
 
@@ -1130,10 +1131,12 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             } else {
                 mBuilder.setError(null)
                 mDialog.dismiss()
-                downloadManager.addLabel(text)
-                initLabels()
-                if (mLabelAdapter != null) {
-                    mLabelAdapter!!.notifyItemInserted(mLabels.size - 1)
+                lifecycleScope.launchIO {
+                    downloadManager.addLabel(text)
+                    initLabels()
+                    withUIContext {
+                        mLabelAdapter?.notifyItemInserted(mLabels.size)
+                    }
                 }
             }
         }
