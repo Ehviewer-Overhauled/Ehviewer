@@ -557,8 +557,8 @@
     <string name="from_clipboard">从剪贴板导入</string>
     <string name="from_clipboard_error">未在剪贴板中发现 Cookies。</string>
     <string name="delete_search_history">从搜索记录中删除“%s”？</string>
-    <string name="settings_advanced_domain_fronting_title">域名前置</string>
-    <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁</string>
+    <string name="settings_advanced_domain_fronting_title">域名前置（重启应用后生效）</string>
+    <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁\n启用时会禁用代理</string>
     <string name="action_add_tag">添加标签</string>
     <string name="action_add_tag_tip">添加新标签，用逗号「，」分割</string>
     <string name="comment_user_uploader">%s （上传者）</string>
