@@ -312,7 +312,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_COMMENT)
-                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, id, vote)
+                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), id, vote)
                 .setCallback(new VoteCommentListener(context,
                         activity.getStageId(), getTag()));
         request.enqueue(this);
@@ -599,8 +599,8 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
     @Nullable
     private String getGalleryDetailUrl() {
-        if (mGalleryDetail != null && mGalleryDetail.gid != -1 && mGalleryDetail.token != null) {
-            return EhUrl.getGalleryDetailUrl(mGalleryDetail.gid, mGalleryDetail.token, 0, mShowAllComments);
+        if (mGalleryDetail != null && mGalleryDetail.getGid() != -1 && mGalleryDetail.getToken() != null) {
+            return EhUrl.getGalleryDetailUrl(mGalleryDetail.getGid(), mGalleryDetail.getToken(), 0, mShowAllComments);
         } else {
             return null;
         }

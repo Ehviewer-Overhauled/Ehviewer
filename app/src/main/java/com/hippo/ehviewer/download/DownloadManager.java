@@ -104,7 +104,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
             DownloadInfo info = allInfoList.get(i);
 
             // Add to all info map
-            allInfoMap.put(info.gid, info);
+            allInfoMap.put(info.getGid(), info);
 
             // Add to each label list
             LinkedList<DownloadInfo> list = getInfoListForLabel(info.label);
@@ -232,13 +232,13 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     }
 
     void startDownload(GalleryInfo galleryInfo, @Nullable String label) {
-        if (mCurrentTask != null && mCurrentTask.gid == galleryInfo.gid) {
+        if (mCurrentTask != null && mCurrentTask.getGid() == galleryInfo.getGid()) {
             // It is current task
             return;
         }
 
         // Check in download list
-        DownloadInfo info = mAllInfoMap.get(galleryInfo.gid);
+        DownloadInfo info = mAllInfoMap.get(galleryInfo.getGid());
         if (info != null) { // Get it in download list
             if (info.state != DownloadInfo.STATE_WAIT) {
                 // Set state DownloadInfo.STATE_WAIT
@@ -274,7 +274,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
             // Add to all download list and map
             mAllInfoList.addFirst(info);
-            mAllInfoMap.put(galleryInfo.gid, info);
+            mAllInfoMap.put(galleryInfo.getGid(), info);
 
             // Add to wait list
             mWaitList.add(info);
@@ -359,7 +359,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
     public void addDownload(List<DownloadInfo> downloadInfoList, boolean notify) {
         for (DownloadInfo info : downloadInfoList) {
-            if (containDownloadInfo(info.gid)) {
+            if (containDownloadInfo(info.getGid())) {
                 // Contain
                 return;
             }
@@ -387,7 +387,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
             // Add to all download list and map
             mAllInfoList.add(info);
-            mAllInfoMap.put(info.gid, info);
+            mAllInfoMap.put(info.getGid(), info);
 
             // Save to
             EhDB.putDownloadInfo(info);
@@ -415,7 +415,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     }
 
     public void addDownload(GalleryInfo galleryInfo, @Nullable String label) {
-        if (containDownloadInfo(galleryInfo.gid)) {
+        if (containDownloadInfo(galleryInfo.getGid())) {
             // Contain
             return;
         }
@@ -436,7 +436,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
         // Add to all download list and map
         mAllInfoList.addFirst(info);
-        mAllInfoMap.put(galleryInfo.gid, info);
+        mAllInfoMap.put(galleryInfo.getGid(), info);
 
         // Save to
         EhDB.putDownloadInfo(info);
@@ -516,7 +516,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
             // Remove all list and map
             mAllInfoList.remove(info);
-            mAllInfoMap.remove(info.gid);
+            mAllInfoMap.remove(info.getGid());
 
             // Remove label list
             LinkedList<DownloadInfo> list = getInfoListForLabel(info.label);
@@ -552,7 +552,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
             // Remove from all info map
             mAllInfoList.remove(info);
-            mAllInfoMap.remove(info.gid);
+            mAllInfoMap.remove(info.getGid());
 
             // Remove from label list
             LinkedList<DownloadInfo> list = getInfoListForLabel(info.label);
@@ -579,16 +579,16 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
             protected Void doInBackground(Void... voids) {
                 GalleryInfo galleryInfo = new GalleryInfo();
                 for (DownloadInfo downloadInfo : list) {
-                    galleryInfo.gid = downloadInfo.gid;
-                    galleryInfo.token = downloadInfo.token;
-                    galleryInfo.title = downloadInfo.title;
-                    galleryInfo.thumb = downloadInfo.thumb;
-                    galleryInfo.category = downloadInfo.category;
-                    galleryInfo.posted = downloadInfo.posted;
-                    galleryInfo.uploader = downloadInfo.uploader;
-                    galleryInfo.rating = downloadInfo.rating;
+                    galleryInfo.setGid(downloadInfo.getGid());
+                    galleryInfo.setToken(downloadInfo.getToken());
+                    galleryInfo.setTitle(downloadInfo.getTitle());
+                    galleryInfo.setThumb(downloadInfo.getThumb());
+                    galleryInfo.setCategory(downloadInfo.getCategory());
+                    galleryInfo.setPosted(downloadInfo.getPosted());
+                    galleryInfo.setUploader(downloadInfo.getUploader());
+                    galleryInfo.setRating(downloadInfo.getRating());
 
-                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.gid);
+                    UniFile downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.getGid());
                     if (downloadDir == null) {
                         continue;
                     }
@@ -618,14 +618,14 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
     // No ensureDownload
     private DownloadInfo stopDownloadInternal(long gid) {
         // Check current task
-        if (mCurrentTask != null && mCurrentTask.gid == gid) {
+        if (mCurrentTask != null && mCurrentTask.getGid() == gid) {
             // Stop current
             return stopCurrentDownloadInternal();
         }
 
         for (Iterator<DownloadInfo> iterator = mWaitList.iterator(); iterator.hasNext(); ) {
             DownloadInfo info = iterator.next();
-            if (info.gid == gid) {
+            if (info.getGid() == gid) {
                 // Remove from wait list
                 iterator.remove();
                 // Update state
@@ -677,7 +677,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
             }
         } else {
             // Check current task
-            if (mCurrentTask != null && gidList.contains(mCurrentTask.gid)) {
+            if (mCurrentTask != null && gidList.contains(mCurrentTask.getGid())) {
                 // Stop current
                 stopCurrentDownloadInternal();
             }
@@ -685,7 +685,7 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
             // Check all in wait list
             for (Iterator<DownloadInfo> iterator = mWaitList.iterator(); iterator.hasNext(); ) {
                 DownloadInfo info = iterator.next();
-                if (gidList.contains(info.gid)) {
+                if (gidList.contains(info.getGid())) {
                     // Remove from wait list
                     iterator.remove();
                     // Update state

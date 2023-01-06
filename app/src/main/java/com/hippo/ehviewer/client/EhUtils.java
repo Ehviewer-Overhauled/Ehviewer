@@ -133,9 +133,9 @@ public class EhUtils {
 
     public static String getSuitableTitle(GalleryInfo gi) {
         if (Settings.getShowJpnTitle()) {
-            return TextUtils.isEmpty(gi.titleJpn) ? gi.title : gi.titleJpn;
+            return TextUtils.isEmpty(gi.getTitleJpn()) ? gi.getTitle() : gi.getTitleJpn();
         } else {
-            return TextUtils.isEmpty(gi.title) ? gi.titleJpn : gi.title;
+            return TextUtils.isEmpty(gi.getTitle()) ? gi.getTitleJpn() : gi.getTitle();
         }
     }
 

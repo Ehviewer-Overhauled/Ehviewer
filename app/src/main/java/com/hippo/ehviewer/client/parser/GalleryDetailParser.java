@@ -124,7 +124,7 @@ public class GalleryDetailParser {
         // Generate simpleLanguage for local favorites
         for (int i = 0; i < LANGUAGES.length; i++) {
             if (galleryDetail.language.equals(LANGUAGES[i])) {
-                galleryDetail.simpleLanguage = GalleryInfo.S_LANGS[i];
+                galleryDetail.setSimpleLanguage(GalleryInfo.S_LANGS[i]);
                 break;
             }
         }
@@ -136,14 +136,14 @@ public class GalleryDetailParser {
     private static void parseDetail(GalleryDetail gd, Document d, String body) throws ParseException {
         Matcher matcher = PATTERN_DETAIL.matcher(body);
         if (matcher.find()) {
-            gd.gid = NumberUtils.parseLongSafely(matcher.group(1), -1L);
-            gd.token = matcher.group(2);
+            gd.setGid(NumberUtils.parseLongSafely(matcher.group(1), -1L));
+            gd.setToken(matcher.group(2));
             gd.apiUid = NumberUtils.parseLongSafely(matcher.group(3), -1L);
             gd.apiKey = matcher.group(4);
         } else {
             throw new ParseException("Can't parse gallery detail", body);
         }
-        if (gd.gid == -1L) {
+        if (gd.getGid() == -1L) {
             throw new ParseException("Can't parse gallery detail", body);
         }
 
@@ -169,26 +169,26 @@ public class GalleryDetailParser {
             // Thumb url
             Element gd1 = gm.getElementById("gd1");
             try {
-                gd.thumb = parseCoverStyle(StringUtils.trim(gd1.child(0).attr("style")));
+                gd.setThumb(parseCoverStyle(StringUtils.trim(gd1.child(0).attr("style"))));
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
-                gd.thumb = "";
+                gd.setThumb("");
             }
 
             // Title
             Element gn = gm.getElementById("gn");
             if (null != gn) {
-                gd.title = StringUtils.trim(gn.text());
+                gd.setTitle(StringUtils.trim(gn.text()));
             } else {
-                gd.title = "";
+                gd.setTitle("");
             }
 
             // Jpn title
             Element gj = gm.getElementById("gj");
             if (null != gj) {
-                gd.titleJpn = StringUtils.trim(gj.text());
+                gd.setTitleJpn(StringUtils.trim(gj.text()));
             } else {
-                gd.titleJpn = "";
+                gd.setTitleJpn("");
             }
 
             // Category
@@ -198,27 +198,27 @@ public class GalleryDetailParser {
                 if (ce == null) {
                     ce = JsoupUtils.getElementByClass(gdc, "cs");
                 }
-                gd.category = EhUtils.getCategory(ce.text());
+                gd.setCategory(EhUtils.getCategory(ce.text()));
             } catch (Throwable e) {
                 ExceptionUtils.throwIfFatal(e);
-                gd.category = EhUtils.UNKNOWN;
+                gd.setCategory(EhUtils.UNKNOWN);
             }
 
             // Uploader
             Element gdn = gm.getElementById("gdn");
             if (null != gdn) {
-                gd.disowned = gdn.attr("style").contains("opacity:0.5");
-                gd.uploader = StringUtils.trim(gdn.text());
+                gd.setDisowned(gdn.attr("style").contains("opacity:0.5"));
+                gd.setUploader(StringUtils.trim(gdn.text()));
             } else {
-                gd.uploader = "";
+                gd.setUploader("");
             }
 
             Element gdd = gm.getElementById("gdd");
-            gd.posted = "";
+            gd.setPosted("");
             gd.parent = "";
             gd.visible = "";
             gd.size = "";
-            gd.pages = 0;
+            gd.setPages(0);
             gd.favoriteCount = 0;
             Elements es = gdd.child(0).child(0).children();
             for (int i = 0, n = es.size(); i < n; i++) {
@@ -239,17 +239,17 @@ public class GalleryDetailParser {
             if (null != rating_label) {
                 String ratingStr = StringUtils.trim(rating_label.text());
                 if ("Not Yet Rated".equals(ratingStr)) {
-                    gd.rating = -1.0f;
+                    gd.setRating(-1.0f);
                 } else {
                     int index = ratingStr.indexOf(' ');
                     if (index == -1 || index >= ratingStr.length()) {
-                        gd.rating = 0f;
+                        gd.setRating(0f);
                     } else {
-                        gd.rating = NumberUtils.parseFloatSafely(ratingStr.substring(index + 1), 0f);
+                        gd.setRating(NumberUtils.parseFloatSafely(ratingStr.substring(index + 1), 0f));
                     }
                 }
             } else {
-                gd.rating = -1.0f;
+                gd.setRating(-1.0f);
             }
 
             // isFavorited
@@ -258,19 +258,19 @@ public class GalleryDetailParser {
             if (gdf != null) {
                 final String favoriteName = StringUtils.trim(gdf.text());
                 if (favoriteName.equals("Add to Favorites")) {
-                    gd.favoriteName = null;
+                    gd.setFavoriteName(null);
                 } else {
                     gd.isFavorited = true;
-                    gd.favoriteName = StringUtils.trim(gdf.text());
+                    gd.setFavoriteName(StringUtils.trim(gdf.text()));
 
                     matcher = PATTERN_FAVORITE_SLOT.matcher(body);
                     if (matcher.find()) {
-                        gd.favoriteSlot = (NumberUtils.parseIntSafely(matcher.group(1), 2) - 2) / 19;
+                        gd.setFavoriteSlot((NumberUtils.parseIntSafely(matcher.group(1), 2) - 2) / 19);
                     }
                 }
             }
-            if (gd.favoriteSlot == -2 && EhDB.containLocalFavorites(gd.gid)) {
-                gd.favoriteSlot = -1;
+            if (gd.getFavoriteSlot() == -2 && EhDB.containLocalFavorites(gd.getGid())) {
+                gd.setFavoriteSlot(-1);
             }
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
@@ -292,10 +292,10 @@ public class GalleryDetailParser {
                     GalleryInfo gi = new GalleryInfo();
                     GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(element.attr("href"));
                     if (result != null) {
-                        gi.gid = result.gid;
-                        gi.token = result.token;
-                        gi.title = StringUtils.trim(element.text());
-                        gi.posted = dates.get(i);
+                        gi.setGid(result.gid);
+                        gi.setToken(result.token);
+                        gi.setTitle(StringUtils.trim(element.text()));
+                        gi.setPosted(dates.get(i));
                         gd.newerVersions.add(gi);
                     }
                 }
@@ -324,7 +324,7 @@ public class GalleryDetailParser {
         String key = StringUtils.trim(es.get(0).text());
         String value = StringUtils.trim(es.get(1).ownText());
         if (key.startsWith("Posted")) {
-            gd.posted = value;
+            gd.setPosted(value);
         } else if (key.startsWith("Parent")) {
             Element a = es.get(1).children().first();
             if (a != null) {
@@ -339,9 +339,9 @@ public class GalleryDetailParser {
         } else if (key.startsWith("Length")) {
             int index = value.indexOf(' ');
             if (index >= 0) {
-                gd.pages = NumberUtils.parseIntSafely(value.substring(0, index), 1);
+                gd.setPages(NumberUtils.parseIntSafely(value.substring(0, index), 1));
             } else {
-                gd.pages = 1;
+                gd.setPages(1);
             }
         } else if (key.startsWith("Favorited")) {
             switch (value) {

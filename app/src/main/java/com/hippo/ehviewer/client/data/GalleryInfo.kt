@@ -24,64 +24,49 @@ import java.util.regex.Pattern
 
 @Parcelize
 open class GalleryInfo(
-    @JvmField
     @PrimaryKey
     @ColumnInfo(name = "GID")
     var gid: Long = 0,
 
-    @JvmField
     @ColumnInfo(name = "TOKEN")
     var token: String? = null,
 
-    @JvmField
     @ColumnInfo(name = "TITLE")
     var title: String? = null,
 
-    @JvmField
     @ColumnInfo(name = "TITLE_JPN")
     var titleJpn: String? = null,
 
-    @JvmField
     @ColumnInfo(name = "THUMB")
     var thumb: String? = null,
 
-    @JvmField
     @ColumnInfo(name = "CATEGORY")
     var category: Int = 0,
 
-    @JvmField
     @ColumnInfo(name = "POSTED")
     var posted: String? = null,
 
-    @JvmField
     @ColumnInfo(name = "UPLOADER")
     var uploader: String? = null,
 
-    @JvmField
     @Ignore
     var disowned: Boolean = false,
 
-    @JvmField
     @ColumnInfo(name = "RATING")
     var rating: Float = 0f,
 
-    @JvmField
     @Ignore
     var rated: Boolean = false,
 
-    @JvmField
     @Ignore
     var simpleTags: Array<String>? = null,
 
-    @JvmField
     @Ignore
     var pages: Int = 0,
 
-    @JvmField
     @Ignore
     var thumbWidth: Int = 0,
 
-    @JvmField
     @Ignore
     var thumbHeight: Int = 0,
 
@@ -97,15 +82,12 @@ open class GalleryInfo(
     /**
      * language from title
      */
-    @JvmField
     @ColumnInfo(name = "SIMPLE_LANGUAGE")
     var simpleLanguage: String? = null,
 
-    @JvmField
     @Ignore
     var favoriteSlot: Int = -2,
 
-    @JvmField
     @Ignore
     var favoriteName: String? = null
 

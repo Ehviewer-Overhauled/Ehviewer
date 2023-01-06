@@ -671,7 +671,7 @@ public final class GalleryListScene extends SearchBarScene
         }
 
         var gi = mHelper.getFirstVisibleItem();
-        var next = gi != null ? "@" + (gi.gid + 1) : null;
+        var next = gi != null ? "@" + (gi.getGid() + 1) : null;
 
         // Check duplicate
         for (QuickSearch q : mQuickSearchList) {
@@ -933,8 +933,8 @@ public final class GalleryListScene extends SearchBarScene
             return true;
         }
 
-        boolean downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID;
-        boolean favourited = gi.favoriteSlot != -2;
+        boolean downloaded = mDownloadManager.getDownloadState(gi.getGid()) != DownloadInfo.STATE_INVALID;
+        boolean favourited = gi.getFavoriteSlot() != -2;
 
         CharSequence[] items = downloaded ? new CharSequence[]{
                 context.getString(R.string.read),
@@ -972,8 +972,8 @@ public final class GalleryListScene extends SearchBarScene
                             if (downloaded) {
                                 new BaseDialogBuilder(context)
                                         .setTitle(R.string.download_remove_dialog_title)
-                                        .setMessage(getString(R.string.download_remove_dialog_message, gi.title))
-                                        .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.gid))
+                                        .setMessage(getString(R.string.download_remove_dialog_message, gi.getTitle()))
+                                        .setPositiveButton(android.R.string.ok, (dialog1, which1) -> mDownloadManager.deleteDownload(gi.getGid()))
                                         .show();
                             } else {
                                 CommonOperations.startDownload(activity, gi, false);
@@ -1387,7 +1387,7 @@ public final class GalleryListScene extends SearchBarScene
             }
 
             DownloadManager downloadManager = EhApplication.getDownloadManager();
-            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.gid);
+            DownloadInfo downloadInfo = downloadManager.getDownloadInfo(mGi.getGid());
             if (downloadInfo == null) {
                 return;
             }
@@ -1632,7 +1632,7 @@ public final class GalleryListScene extends SearchBarScene
 
         @Override
         protected boolean isDuplicate(GalleryInfo d1, GalleryInfo d2) {
-            return d1.gid == d2.gid;
+            return d1.getGid() == d2.getGid();
         }
 
         @Override

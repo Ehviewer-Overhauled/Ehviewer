@@ -905,7 +905,7 @@ public class FavoritesScene extends SearchBarScene implements
             if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
                 long[] gidArray = new long[mModifyGiList.size()];
                 for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                    gidArray[i] = mModifyGiList.get(i).gid;
+                    gidArray[i] = mModifyGiList.get(i).getGid();
                 }
                 EhDB.removeLocalFavorites(gidArray);
                 mModifyGiList.clear();
@@ -948,7 +948,7 @@ public class FavoritesScene extends SearchBarScene implements
             if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
                 long[] gidArray = new long[mModifyGiList.size()];
                 for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                    gidArray[i] = mModifyGiList.get(i).gid;
+                    gidArray[i] = mModifyGiList.get(i).getGid();
                 }
                 EhDB.removeLocalFavorites(gidArray);
                 mEnableModify = true;
@@ -1031,8 +1031,8 @@ public class FavoritesScene extends SearchBarScene implements
                     String[] tokenArray = new String[mModifyGiList.size()];
                     for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
                         GalleryInfo gi = mModifyGiList.get(i);
-                        gidArray[i] = gi.gid;
-                        tokenArray[i] = gi.token;
+                        gidArray[i] = gi.getGid();
+                        tokenArray[i] = gi.getToken();
                     }
                     List<GalleryInfo> modifyGiListBackup = new ArrayList<>(mModifyGiList);
                     mModifyGiList.clear();
@@ -1046,7 +1046,7 @@ public class FavoritesScene extends SearchBarScene implements
                     request.enqueue(FavoritesScene.this);
                 } else {
                     for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                        gidArray[i] = mModifyGiList.get(i).gid;
+                        gidArray[i] = mModifyGiList.get(i).getGid();
                     }
                     mModifyGiList.clear();
 
@@ -1115,7 +1115,7 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         protected boolean isDuplicate(GalleryInfo d1, GalleryInfo d2) {
-            return d1.gid == d2.gid;
+            return d1.getGid() == d2.getGid();
         }
 
         @Override

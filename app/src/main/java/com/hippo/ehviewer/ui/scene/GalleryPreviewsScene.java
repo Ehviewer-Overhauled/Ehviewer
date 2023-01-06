@@ -238,7 +238,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             int size = previewSet.size();
             ArrayList<GalleryPreview> list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(previewSet.getGalleryPreview(mGalleryInfo.gid, i));
+                list.add(previewSet.getGalleryPreview(mGalleryInfo.getGid(), i));
             }
 
             mHelper.onGetPageData(taskId, result.second, 0, null, null, list);
@@ -344,7 +344,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
                 return;
             }
 
-            String url = EhUrl.getGalleryDetailUrl(mGalleryInfo.gid, mGalleryInfo.token, page, false);
+            String url = EhUrl.getGalleryDetailUrl(mGalleryInfo.getGid(), mGalleryInfo.getToken(), page, false);
             EhRequest request = new EhRequest();
             request.setMethod(EhClient.METHOD_GET_PREVIEW_SET);
             request.setCallback(new GetPreviewSetListener(getContext(),

@@ -335,11 +335,11 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         long gid;
         String token;
         if (mGalleryDetail != null) {
-            gid = mGalleryDetail.gid;
-            token = mGalleryDetail.token;
+            gid = mGalleryDetail.getGid();
+            token = mGalleryDetail.getToken();
         } else if (mGalleryInfo != null) {
-            gid = mGalleryInfo.gid;
-            token = mGalleryInfo.token;
+            gid = mGalleryInfo.getGid();
+            token = mGalleryInfo.getToken();
         } else if (ACTION_GID_TOKEN.equals(mAction)) {
             gid = mGid;
             token = mToken;
@@ -352,9 +352,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     // -1 for error
     private long getGid() {
         if (mGalleryDetail != null) {
-            return mGalleryDetail.gid;
+            return mGalleryDetail.getGid();
         } else if (mGalleryInfo != null) {
-            return mGalleryInfo.gid;
+            return mGalleryInfo.getGid();
         } else if (ACTION_GID_TOKEN.equals(mAction)) {
             return mGid;
         } else {
@@ -364,9 +364,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
     private String getUploader() {
         if (mGalleryDetail != null) {
-            return mGalleryDetail.uploader;
+            return mGalleryDetail.getUploader();
         } else if (mGalleryInfo != null) {
-            return mGalleryInfo.uploader;
+            return mGalleryInfo.getUploader();
         } else {
             return null;
         }
@@ -380,9 +380,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     // -1 for error
     private int getCategory() {
         if (mGalleryDetail != null) {
-            return mGalleryDetail.category;
+            return mGalleryDetail.getCategory();
         } else if (mGalleryInfo != null) {
-            return mGalleryInfo.category;
+            return mGalleryInfo.getCategory();
         } else {
             return -1;
         }
@@ -776,12 +776,12 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         if (ACTION_GALLERY_INFO.equals(mAction) && mGalleryInfo != null) {
             GalleryInfo gi = mGalleryInfo;
-            mThumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb);
+            mThumb.load(EhCacheKeyFactory.getThumbKey(gi.getGid()), gi.getThumb());
             setTitle(EhUtils.getSuitableTitle(gi));
-            mUploader.setText(gi.uploader);
-            mUploader.setAlpha(gi.disowned ? .5f : 1f);
-            mCategory.setText(EhUtils.getCategory(gi.category));
-            mCategory.setTextColor(EhUtils.getCategoryColor(gi.category));
+            mUploader.setText(gi.getUploader());
+            mUploader.setAlpha(gi.getDisowned() ? .5f : 1f);
+            mCategory.setText(EhUtils.getCategory(gi.getCategory()));
+            mCategory.setTextColor(EhUtils.getCategoryColor(gi.getCategory()));
             updateDownloadText();
         }
     }
@@ -795,12 +795,12 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             return;
         }
 
-        if (gd.isFavorited || EhDB.containLocalFavorites(gd.gid)) {
+        if (gd.isFavorited || EhDB.containLocalFavorites(gd.getGid())) {
             mHeart.setVisibility(View.VISIBLE);
-            if (gd.favoriteName == null) {
+            if (gd.getFavoriteName() == null) {
                 mHeart.setText(R.string.local_favorites);
             } else {
-                mHeart.setText(gd.favoriteName);
+                mHeart.setText(gd.getFavoriteName());
             }
             mHeartOutline.setVisibility(View.GONE);
         } else {
@@ -833,26 +833,26 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         Resources resources = getResources();
 
-        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb, true);
+        mThumb.load(EhCacheKeyFactory.getThumbKey(gd.getGid()), gd.getThumb(), true);
         setTitle(EhUtils.getSuitableTitle(gd));
-        mUploader.setText(gd.uploader);
-        mUploader.setAlpha(gd.disowned ? .5f : 1f);
-        mCategory.setText(EhUtils.getCategory(gd.category));
-        mCategory.setTextColor(EhUtils.getCategoryColor(gd.category));
+        mUploader.setText(gd.getUploader());
+        mUploader.setAlpha(gd.getDisowned() ? .5f : 1f);
+        mCategory.setText(EhUtils.getCategory(gd.getCategory()));
+        mCategory.setTextColor(EhUtils.getCategoryColor(gd.getCategory()));
         updateDownloadText();
 
         mLanguage.setText(gd.language);
         mPages.setText(resources.getQuantityString(
-                R.plurals.page_count, gd.pages, gd.pages));
+                R.plurals.page_count, gd.getPages(), gd.getPages()));
         mSize.setText(gd.size);
-        mPosted.setText(gd.posted);
+        mPosted.setText(gd.getPosted());
         mFavoredTimes.setText(resources.getString(R.string.favored_times, gd.favoriteCount));
         if (gd.newerVersions != null && gd.newerVersions.size() != 0) {
             mNewerVersion.setVisibility(View.VISIBLE);
         }
 
-        mRatingText.setText(getAllRatingText(gd.rating, gd.ratingCount));
-        mRating.setRating(gd.rating);
+        mRatingText.setText(getAllRatingText(gd.getRating(), gd.ratingCount));
+        mRating.setRating(gd.getRating());
 
         updateFavoriteDrawable();
 
@@ -985,7 +985,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             mGridLayout.addView(view);
 
             LoadImageView image = view.findViewById(R.id.image);
-            previewSet.load(image, gd.gid, i);
+            previewSet.load(image, gd.getGid(), i);
             image.setTag(R.id.index, i);
             image.setOnClickListener(this);
             TextView text = view.findViewById(R.id.text);
@@ -1002,7 +1002,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         if (null == gd) {
             return;
         }
-        String keyword = EhUtils.extractTitle(gd.title);
+        String keyword = EhUtils.extractTitle(gd.getTitle());
         if (null != keyword) {
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_NORMAL);
@@ -1018,10 +1018,10 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             GalleryListScene.startScene(this, lub);
             return;
         }
-        if (null != gd.uploader) {
+        if (null != gd.getUploader()) {
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_UPLOADER);
-            lub.setKeyword(gd.uploader);
+            lub.setKeyword(gd.getUploader());
             GalleryListScene.startScene(this, lub);
         }
     }
@@ -1080,11 +1080,11 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } else if (mDownload == v) {
             GalleryInfo galleryInfo = getGalleryInfo();
             if (galleryInfo != null) {
-                if (EhApplication.getDownloadManager().getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
+                if (EhApplication.getDownloadManager().getDownloadState(galleryInfo.getGid()) == DownloadInfo.STATE_INVALID) {
                     CommonOperations.startDownload(activity, galleryInfo, false);
                 } else {
                     CheckBoxDialogBuilder builder = new CheckBoxDialogBuilder(context,
-                            getString(R.string.download_remove_dialog_message, galleryInfo.title),
+                            getString(R.string.download_remove_dialog_message, galleryInfo.getTitle()),
                             getString(R.string.download_remove_dialog_check_text),
                             Settings.getRemoveImageFiles());
                     DeleteDialogHelper helper = new DeleteDialogHelper(
@@ -1111,15 +1111,15 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             if (mGalleryDetail != null) {
                 ArrayList<CharSequence> titles = new ArrayList<>();
                 for (GalleryInfo newerVersion : mGalleryDetail.newerVersions) {
-                    titles.add(getString(R.string.newer_version_title, newerVersion.title, newerVersion.posted));
+                    titles.add(getString(R.string.newer_version_title, newerVersion.getTitle(), newerVersion.getPosted()));
                 }
                 new BaseDialogBuilder(requireContext())
                         .setItems(titles.toArray(new CharSequence[0]), (dialog, which) -> {
                             GalleryInfo newerVersion = mGalleryDetail.newerVersions.get(which);
                             Bundle args = new Bundle();
                             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
-                            args.putLong(GalleryDetailScene.KEY_GID, newerVersion.gid);
-                            args.putString(GalleryDetailScene.KEY_TOKEN, newerVersion.token);
+                            args.putLong(GalleryDetailScene.KEY_GID, newerVersion.getGid());
+                            args.putString(GalleryDetailScene.KEY_TOKEN, newerVersion.getToken());
                             startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
                         })
                         .show();
@@ -1131,7 +1131,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } else if (mHeart == v || mHeartOutline == v) {
             if (mGalleryDetail != null && !mModifyingFavorites) {
                 boolean remove = false;
-                if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
+                if (EhDB.containLocalFavorites(mGalleryDetail.getGid()) || mGalleryDetail.isFavorited) {
                     mModifyingFavorites = true;
                     CommonOperations.removeFromFavorites(activity, mGalleryDetail,
                             new ModifyFavoritesListener(context,
@@ -1197,7 +1197,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, helper)
                     .show();
-            helper.setDialog(dialog, mGalleryDetail.rating);
+            helper.setDialog(dialog, mGalleryDetail.getRating());
         } else if (mSimilar == v) {
             showSimilarGalleryList();
         } else if (mSearchCover == v) {
@@ -1209,8 +1209,8 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             Bundle args = new Bundle();
             args.putLong(GalleryCommentsScene.KEY_API_UID, mGalleryDetail.apiUid);
             args.putString(GalleryCommentsScene.KEY_API_KEY, mGalleryDetail.apiKey);
-            args.putLong(GalleryCommentsScene.KEY_GID, mGalleryDetail.gid);
-            args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail.token);
+            args.putLong(GalleryCommentsScene.KEY_GID, mGalleryDetail.getGid());
+            args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail.getToken());
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail.comments);
             args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail);
             startScene(new Announcer(GalleryCommentsScene.class)
@@ -1353,7 +1353,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_TAG)
-                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.gid, mGalleryDetail.token, tag, vote)
+                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), tag, vote)
                 .setCallback(new VoteTagListener(context,
                         activity.getStageId(), getTag()));
         request.enqueue(this);
@@ -1380,7 +1380,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         } else if (mHeart == v || mHeartOutline == v) {
             if (mGalleryDetail != null && !mModifyingFavorites) {
                 boolean remove = false;
-                if (EhDB.containLocalFavorites(mGalleryDetail.gid) || mGalleryDetail.isFavorited) {
+                if (EhDB.containLocalFavorites(mGalleryDetail.getGid()) || mGalleryDetail.isFavorited) {
                     mModifyingFavorites = true;
                     CommonOperations.removeFromFavorites(activity, mGalleryDetail,
                             new ModifyFavoritesListener(activity,
@@ -1510,7 +1510,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
     private void onRateGallerySuccess(RateGalleryParser.Result result) {
         if (mGalleryDetail != null) {
-            mGalleryDetail.rating = result.rating;
+            mGalleryDetail.setRating(result.rating);
             mGalleryDetail.ratingCount = result.ratingCount;
         }
 
@@ -1524,7 +1524,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     private void onModifyFavoritesSuccess(boolean addOrRemove) {
         mModifyingFavorites = false;
         if (mGalleryDetail != null) {
-            mGalleryDetail.isFavorited = !addOrRemove && mGalleryDetail.favoriteName != null;
+            mGalleryDetail.isFavorited = !addOrRemove && mGalleryDetail.getFavoriteName() != null;
             updateFavoriteDrawable();
         }
     }
@@ -1563,7 +1563,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             getApplication().removeGlobalStuff(this);
 
             // Put gallery detail to cache
-            EhApplication.getGalleryDetailCache().put(result.gid, result);
+            EhApplication.getGalleryDetailCache().put(result.getGid(), result);
 
             // Add history
             EhDB.putHistoryInfo(result);
@@ -1645,7 +1645,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 // Update rating in cache
                 GalleryDetail gd = EhApplication.getGalleryDetailCache().get(mGid);
                 if (gd != null) {
-                    gd.rating = result.rating;
+                    gd.setRating(result.rating);
                     gd.ratingCount = result.ratingCount;
                 }
             }
@@ -1727,7 +1727,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             if (result != null) {
                 // TODO: Don't use buggy system download service
                 DownloadManager.Request r = new DownloadManager.Request(Uri.parse(result));
-                var name = mGalleryInfo.gid + "-" + EhUtils.getSuitableTitle(mGalleryInfo) + ".zip";
+                var name = mGalleryInfo.getGid() + "-" + EhUtils.getSuitableTitle(mGalleryInfo) + ".zip";
                 r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
                         FileUtils.sanitizeFilename(name));
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -1783,15 +1783,15 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
             // Delete
             if (null != mDownloadManager) {
-                mDownloadManager.deleteDownload(mGalleryInfo.gid);
+                mDownloadManager.deleteDownload(mGalleryInfo.getGid());
             }
 
             // Delete image files
             boolean checked = mBuilder.isChecked();
             Settings.putRemoveImageFiles(checked);
             if (checked) {
-                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid);
-                EhDB.removeDownloadDirname(mGalleryInfo.gid);
+                UniFile file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.getGid());
+                EhDB.removeDownloadDirname(mGalleryInfo.getGid());
                 deleteFileAsync(file);
             }
         }
@@ -1861,7 +1861,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 boolean isHAtH = mArchiveList.get(position).isHAtH();
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
-                request.setArgs(mGalleryDetail.gid, mGalleryDetail.token, mArchiveFormParamOr, res, isHAtH);
+                request.setArgs(mGalleryDetail.getGid(), mGalleryDetail.getToken(), mArchiveFormParamOr, res, isHAtH);
                 request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag(), mGalleryDetail));
                 request.enqueue(GalleryDetailScene.this);
             }
@@ -2071,9 +2071,9 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             EhRequest request = new EhRequest()
                     .setMethod(EhClient.METHOD_GET_RATE_GALLERY)
                     .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey,
-                            mGalleryDetail.gid, mGalleryDetail.token, mRatingBar.getRating())
+                            mGalleryDetail.getGid(), mGalleryDetail.getToken(), mRatingBar.getRating())
                     .setCallback(new RateGalleryListener(context,
-                            activity.getStageId(), getTag(), mGalleryDetail.gid));
+                            activity.getStageId(), getTag(), mGalleryDetail.getGid()));
             request.enqueue(GalleryDetailScene.this);
         }
     }

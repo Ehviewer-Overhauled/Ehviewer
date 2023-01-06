@@ -39,13 +39,13 @@ public class GalleryApiParser {
             if (gi == null) {
                 continue;
             }
-            gi.title = ParserUtils.trim(g.getString("title"));
-            gi.titleJpn = ParserUtils.trim(g.getString("title_jpn"));
-            gi.category = EhUtils.getCategory(g.getString("category"));
-            gi.thumb = EhUtils.handleThumbUrlResolution(g.getString("thumb"));
-            gi.uploader = g.getString("uploader");
-            gi.posted = ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000);
-            gi.rating = NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f);
+            gi.setTitle(ParserUtils.trim(g.getString("title")));
+            gi.setTitleJpn(ParserUtils.trim(g.getString("title_jpn")));
+            gi.setCategory(EhUtils.getCategory(g.getString("category")));
+            gi.setThumb(EhUtils.handleThumbUrlResolution(g.getString("thumb")));
+            gi.setUploader(g.getString("uploader"));
+            gi.setPosted(ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000));
+            gi.setRating(NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f));
             // tags
             JSONArray tagJa = g.getJSONArray("tags");
             int tagLength = tagJa.length();
@@ -53,8 +53,8 @@ public class GalleryApiParser {
             for (int j = 0; j < tagLength; j++) {
                 tags[j] = tagJa.getString(j);
             }
-            gi.simpleTags = tags;
-            gi.pages = NumberUtils.parseIntSafely(g.getString("filecount"), 0);
+            gi.setSimpleTags(tags);
+            gi.setPages(NumberUtils.parseIntSafely(g.getString("filecount"), 0));
             gi.generateSLang();
         }
     }
@@ -62,7 +62,7 @@ public class GalleryApiParser {
     private static GalleryInfo getGalleryInfoByGid(List<GalleryInfo> galleryInfoList, long gid) {
         for (int i = 0, size = galleryInfoList.size(); i < size; i++) {
             GalleryInfo gi = galleryInfoList.get(i);
-            if (gi.gid == gid) {
+            if (gi.getGid() == gid) {
                 return gi;
             }
         }

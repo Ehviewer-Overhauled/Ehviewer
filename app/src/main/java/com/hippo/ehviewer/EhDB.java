@@ -118,7 +118,7 @@ public class EhDB {
     // Insert or update
     public static synchronized void putDownloadInfo(DownloadInfo downloadInfo) {
         DownloadsDao dao = db.downloadsDao();
-        if (null != dao.load(downloadInfo.gid)) {
+        if (null != dao.load(downloadInfo.getGid())) {
             // Update
             dao.update(downloadInfo);
         } else {
@@ -256,7 +256,7 @@ public class EhDB {
 
     public static synchronized void putLocalFavorites(GalleryInfo galleryInfo) {
         LocalFavoritesDao dao = db.localFavoritesDao();
-        if (null == dao.load(galleryInfo.gid)) {
+        if (null == dao.load(galleryInfo.getGid())) {
             LocalFavoriteInfo info;
             if (galleryInfo instanceof LocalFavoriteInfo) {
                 info = (LocalFavoriteInfo) galleryInfo;
@@ -335,7 +335,7 @@ public class EhDB {
             info = new HistoryInfo(galleryInfo);
         }
         info.time = System.currentTimeMillis();
-        if (null != dao.load(info.gid)) {
+        if (null != dao.load(info.getGid())) {
             dao.update(info);
         } else {
             dao.insert(info);
@@ -345,7 +345,7 @@ public class EhDB {
     public static synchronized void putHistoryInfo(List<HistoryInfo> historyInfoList) {
         HistoryDao dao = db.historyDao();
         for (HistoryInfo info : historyInfoList) {
-            if (null == dao.load(info.gid)) {
+            if (null == dao.load(info.getGid())) {
                 dao.insert(info);
             }
         }

@@ -464,7 +464,7 @@ public class DownloadsScene extends BaseToolbarScene
             for (int i = list.size() - 1; i > -1; i--) {
                 DownloadInfo info = list.get(i);
                 if (info.state != DownloadInfo.STATE_FINISH) {
-                    gidList.add(info.gid);
+                    gidList.add(info.getGid());
                 }
             }
             Intent intent = new Intent(activity, DownloadService.class);
@@ -652,7 +652,7 @@ public class DownloadsScene extends BaseToolbarScene
                         downloadInfoList.add(info);
                     }
                     if (collectGid) {
-                        gidList.add(info.gid);
+                        gidList.add(info.getGid());
                     }
                 }
             }
@@ -995,9 +995,9 @@ public class DownloadsScene extends BaseToolbarScene
                 int i = 0;
                 for (DownloadInfo info : mDownloadInfoList) {
                     // Put file
-                    files[i] = SpiderDen.getGalleryDownloadDir(info.gid);
+                    files[i] = SpiderDen.getGalleryDownloadDir(info.getGid());
                     // Remove download path
-                    EhDB.removeDownloadDirname(info.gid);
+                    EhDB.removeDownloadDirname(info.getGid());
                     i++;
                 }
                 // Delete file
@@ -1106,7 +1106,7 @@ public class DownloadsScene extends BaseToolbarScene
                 ContextCompat.startForegroundService(activity, intent);
             } else if (stop == v) {
                 if (null != mDownloadManager) {
-                    mDownloadManager.stopDownload(list.get(index).gid);
+                    mDownloadManager.stopDownload(list.get(index).getGid());
                 }
             }
         }
@@ -1133,7 +1133,7 @@ public class DownloadsScene extends BaseToolbarScene
             if (mList == null || position < 0 || position >= mList.size()) {
                 return 0;
             }
-            return mList.get(position).gid;
+            return mList.get(position).getGid();
         }
 
         @NonNull
@@ -1155,22 +1155,22 @@ public class DownloadsScene extends BaseToolbarScene
                 return;
             }
             DownloadInfo info = mList.get(position);
-            if (info.thumb != null) {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb);
+            if (info.getThumb() != null) {
+                holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.getGid()), info.getThumb());
             }
             holder.title.setText(EhUtils.getSuitableTitle(info));
-            holder.uploader.setText(info.uploader);
-            holder.rating.setRating(info.rating);
+            holder.uploader.setText(info.getUploader());
+            holder.rating.setRating(info.getRating());
             TextView category = holder.category;
-            String newCategoryText = EhUtils.getCategory(info.category);
+            String newCategoryText = EhUtils.getCategory(info.getCategory());
             if (!newCategoryText.contentEquals(category.getText())) {
                 category.setText(newCategoryText);
-                category.setBackgroundColor(EhUtils.getCategoryColor(info.category));
+                category.setBackgroundColor(EhUtils.getCategoryColor(info.getCategory()));
             }
             bindForState(holder, info);
 
             // Update transition name
-            ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(info.gid));
+            ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(info.getGid()));
 
             holder.itemView.setOnClickListener(v -> onItemClick(position));
             holder.itemView.setOnLongClickListener(v -> onItemLongClick(position));

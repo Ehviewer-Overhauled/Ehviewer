@@ -71,7 +71,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     @NonNull
     @Override
     public String getImageFilename(int index) {
-        return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.gid, mGalleryInfo.token, index + 1);
+        return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.getGid(), mGalleryInfo.getToken(), index + 1);
     }
 
     @NonNull
@@ -80,10 +80,10 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
         if (null != mSpiderQueen) {
             String extension = mSpiderQueen.getExtension(index);
             if (extension != null) {
-                return String.format(Locale.US, "%d-%s-%08d.%s", mGalleryInfo.gid, mGalleryInfo.token, index + 1, extension);
+                return String.format(Locale.US, "%d-%s-%08d.%s", mGalleryInfo.getGid(), mGalleryInfo.getToken(), index + 1, extension);
             }
         }
-        return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.gid, mGalleryInfo.token, index + 1);
+        return String.format(Locale.US, "%d-%s-%08d", mGalleryInfo.getGid(), mGalleryInfo.getToken(), index + 1);
     }
 
     @Override
