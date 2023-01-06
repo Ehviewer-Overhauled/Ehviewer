@@ -17,12 +17,14 @@ body:
     attributes:
       label: 复现步骤 / Step to reproduce
       description: |
-        在此处写下复现的方式
-        Describe how to reproduce here
+        请从全新安装应用开始，在此处写下复现的方式。请尽量附带录屏
+        Describe how to reproduce here with fresh installation, with screen recording if possible.
       placeholder: |
+        0. 重新安装应用 / Fresh install
         1.
         2.
         3.
+        [录屏] / [Screen recording]
     validations:
       required: true
 
@@ -108,15 +110,6 @@ body:
       label: SoC 型号 / Soc model
       description: 在此填入 SoC 型号 / Put Soc model here
       placeholder: 骁龙 8+ Gen 1, Snapdragon 8+ Gen 1
-    validations:
-      required: true
-
-  - type: textarea
-    id: log
-    attributes:
-      label: 应用日志 / App logs
-      description: 您可以通过设置-高级-导出日志来获得日志文件 / You can get logs file in Settings - Advanced - Dump logcat
-      placeholder: 06-15 17:44:53.704 23382 23382 E ...
     validations:
       required: true
 
