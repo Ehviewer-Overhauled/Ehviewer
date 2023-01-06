@@ -198,9 +198,13 @@ class HistoryScene : BaseToolbarScene() {
                 if (DialogInterface.BUTTON_POSITIVE != which) {
                     return@setPositiveButton
                 }
-                EhDB.clearHistoryInfo()
-                mAdapter.refresh()
-                mAdapter.notifyDataSetChanged()
+                lifecycleScope.launchIO {
+                    EhDB.clearHistoryInfo()
+                    withUIContext {
+                        mAdapter.refresh()
+                        mAdapter.notifyDataSetChanged()
+                    }
+                }
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
