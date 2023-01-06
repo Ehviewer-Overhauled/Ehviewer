@@ -16,84 +16,34 @@
 package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
 import java.util.regex.Pattern
 
-@Parcelize
-open class GalleryInfo(
-    @PrimaryKey
-    @ColumnInfo(name = "GID")
-    var gid: Long = 0,
+interface GalleryInfo : Parcelable {
+    var gid: Long
+    var token: String?
+    var title: String?
+    var titleJpn: String?
+    var thumb: String?
+    var category: Int
+    var posted: String?
+    var uploader: String?
+    var disowned: Boolean
+    var rating: Float
+    var rated: Boolean
+    var simpleTags: Array<String>?
+    var pages: Int
+    var thumbWidth: Int
+    var thumbHeight: Int
+    var spanSize: Int
+    var spanIndex: Int
+    var spanGroupIndex: Int
+    var simpleLanguage: String?
+    var favoriteSlot: Int
+    var favoriteName: String?
 
-    @ColumnInfo(name = "TOKEN")
-    var token: String? = null,
-
-    @ColumnInfo(name = "TITLE")
-    var title: String? = null,
-
-    @ColumnInfo(name = "TITLE_JPN")
-    var titleJpn: String? = null,
-
-    @ColumnInfo(name = "THUMB")
-    var thumb: String? = null,
-
-    @ColumnInfo(name = "CATEGORY")
-    var category: Int = 0,
-
-    @ColumnInfo(name = "POSTED")
-    var posted: String? = null,
-
-    @ColumnInfo(name = "UPLOADER")
-    var uploader: String? = null,
-
-    @Ignore
-    var disowned: Boolean = false,
-
-    @ColumnInfo(name = "RATING")
-    var rating: Float = 0f,
-
-    @Ignore
-    var rated: Boolean = false,
-
-    @Ignore
-    var simpleTags: Array<String>? = null,
-
-    @Ignore
-    var pages: Int = 0,
-
-    @Ignore
-    var thumbWidth: Int = 0,
-
-    @Ignore
-    var thumbHeight: Int = 0,
-
-    @Ignore
-    var spanSize: Int = 0,
-
-    @Ignore
-    var spanIndex: Int = 0,
-
-    @Ignore
-    var spanGroupIndex: Int = 0,
-
-    /**
-     * language from title
-     */
-    @ColumnInfo(name = "SIMPLE_LANGUAGE")
-    var simpleLanguage: String? = null,
-
-    @Ignore
-    var favoriteSlot: Int = -2,
-
-    @Ignore
-    var favoriteName: String? = null
-
-) : Parcelable {
     fun generateSLang() {
-        simpleLanguage = simpleTags?.let { generateSLangFromTags(it) } ?: title?.let { generateSLangFromTitle(it) }
+        simpleLanguage = simpleTags?.let { generateSLangFromTags(it) }
+            ?: title?.let { generateSLangFromTitle(it) }
     }
 
     private fun generateSLangFromTags(simpleTags: Array<String>): String? {
@@ -136,7 +86,6 @@ open class GalleryInfo(
         const val S_LANG_TH = "TH"
         const val S_LANG_VI = "VI"
 
-        @JvmField
         val S_LANGS = arrayOf(
             S_LANG_EN,
             S_LANG_ZH,

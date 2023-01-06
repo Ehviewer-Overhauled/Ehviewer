@@ -27,6 +27,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfoImpl
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.spider.SpiderInfo
 import com.hippo.ehviewer.spider.SpiderQueen
@@ -163,7 +164,7 @@ class RestoreDownloadPreference constructor(
         }
     }
 
-    private class RestoreItem : GalleryInfo() {
+    private class RestoreItem : GalleryInfoImpl() {
         var dirname: String? = null
     }
 }

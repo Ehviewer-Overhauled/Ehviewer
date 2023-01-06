@@ -3,9 +3,10 @@ package com.hippo.ehviewer.dao
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfoImpl
 
 @Entity(tableName = "HISTORY")
-class HistoryInfo() : GalleryInfo() {
+class HistoryInfo() : GalleryInfoImpl() {
     @JvmField
     @ColumnInfo(name = "TIME")
     var time: Long = 0

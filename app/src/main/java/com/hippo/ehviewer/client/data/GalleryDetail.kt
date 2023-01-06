@@ -15,8 +15,13 @@
  */
 package com.hippo.ehviewer.client.data
 
-// This is wrong Parcelize usage, TODO: use delegate and move galleryinfo to primary constructor
+import kotlinx.parcelize.Parcelize
+
+// @Parcelize
 class GalleryDetail(
+    // @JvmField
+    // val galleryInfo: GalleryInfo,
+
     @JvmField
     var apiUid: Long = -1L,
 
@@ -67,4 +72,8 @@ class GalleryDetail(
 
     @JvmField
     var previewSet: PreviewSet? = null,
-) : GalleryInfo()
+) : GalleryInfoImpl()
+// ) : GalleryInfo by galleryInfo
+
+// Delegating 'Parcelable' is not allowed
+// Fuck you Jetbrains!

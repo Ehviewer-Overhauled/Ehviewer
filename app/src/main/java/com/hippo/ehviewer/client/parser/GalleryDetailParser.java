@@ -26,6 +26,7 @@ import com.hippo.ehviewer.client.data.GalleryComment;
 import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
+import com.hippo.ehviewer.client.data.GalleryInfoImpl;
 import com.hippo.ehviewer.client.data.GalleryTagGroup;
 import com.hippo.ehviewer.client.data.LargePreviewSet;
 import com.hippo.ehviewer.client.data.NormalPreviewSet;
@@ -124,7 +125,7 @@ public class GalleryDetailParser {
         // Generate simpleLanguage for local favorites
         for (int i = 0; i < LANGUAGES.length; i++) {
             if (galleryDetail.language.equals(LANGUAGES[i])) {
-                galleryDetail.setSimpleLanguage(GalleryInfo.S_LANGS[i]);
+                galleryDetail.setSimpleLanguage(GalleryInfo.Companion.getS_LANGS()[i]);
                 break;
             }
         }
@@ -289,7 +290,7 @@ public class GalleryDetailParser {
                 Elements elements = gnd.select("a");
                 for (int i = 0; i < elements.size(); i++) {
                     Element element = elements.get(i);
-                    GalleryInfo gi = new GalleryInfo();
+                    GalleryInfo gi = new GalleryInfoImpl();
                     GalleryDetailUrlParser.Result result = GalleryDetailUrlParser.parse(element.attr("href"));
                     if (result != null) {
                         gi.setGid(result.gid);
