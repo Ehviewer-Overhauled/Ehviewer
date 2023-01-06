@@ -233,7 +233,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         showSearchBar()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
@@ -1413,7 +1412,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             )
         }
 
-        @SuppressLint("NotifyDataSetChanged")
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
@@ -1424,14 +1422,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             if (fromPosition == toPosition) {
                 return false
             }
-            EhDB.moveQuickSearch(fromPosition, toPosition)
-            val item = mQuickSearchList.removeAt(fromPosition)
-            mQuickSearchList.add(toPosition, item)
-            mAdapter.notifyDataSetChanged()
+            lifecycleScope.launchIO {
+                EhDB.moveQuickSearch(fromPosition, toPosition)
+                val item = mQuickSearchList.removeAt(fromPosition)
+                mQuickSearchList.add(toPosition, item)
+                withUIContext {
+                    mAdapter.notifyItemMoved(fromPosition, toPosition)
+                }
+            }
             return true
         }
 
-        @SuppressLint("NotifyDataSetChanged")
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             val quickSearch = mQuickSearchList[position]
@@ -1439,7 +1440,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 EhDB.deleteQuickSearch(quickSearch)
                 mQuickSearchList.removeAt(position)
                 withUIContext {
-                    mAdapter.notifyDataSetChanged()
+                    mAdapter.notifyItemRemoved(position)
                 }
             }
         }
