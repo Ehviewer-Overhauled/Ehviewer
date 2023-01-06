@@ -55,6 +55,8 @@ import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
@@ -450,9 +452,13 @@ class HistoryScene : BaseToolbarScene() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val mPosition = viewHolder.bindingAdapterPosition
-            val info: HistoryInfo? = mAdapter.peek(mPosition)
-            info?.let { EhDB.deleteHistoryInfo(info) }
-            mAdapter.refresh()
+            lifecycleScope.launchIO {
+                val info: HistoryInfo? = mAdapter.peek(mPosition)
+                info?.let { EhDB.deleteHistoryInfo(info) }
+                withUIContext {
+                    mAdapter.refresh()
+                }
+            }
         }
     }
 }
