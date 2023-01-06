@@ -116,7 +116,15 @@ import java.time.ZoneOffset
 
 class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper,
     OnClickFabListener, OnExpandListener {
-    private val mCallback = SearchStateOnBackPressedCallback()
+    private val mCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            when (mState) {
+                STATE_NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
+                STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL)
+                STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH)
+            }
+        }
+    }
     private lateinit var mUrlBuilder: ListUrlBuilder
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
@@ -1433,16 +1441,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 withUIContext {
                     mAdapter.notifyDataSetChanged()
                 }
-            }
-        }
-    }
-
-    internal inner class SearchStateOnBackPressedCallback : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            when (mState) {
-                STATE_NORMAL -> throw IllegalStateException("SearchStateOnBackPressedCallback should not be enabled on STATE_NORMAL")
-                STATE_SIMPLE_SEARCH, STATE_SEARCH -> setState(STATE_NORMAL)
-                STATE_SEARCH_SHOW_LIST -> setState(STATE_SEARCH)
             }
         }
     }
