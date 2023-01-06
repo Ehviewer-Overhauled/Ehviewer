@@ -127,7 +127,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private var mSearchLayout: SearchLayout? = null
     private val selectImageLauncher = registerForActivityResult<PickVisualMediaRequest, Uri>(
         ActivityResultContracts.PickVisualMedia()
-    ) { result: Uri? -> mSearchLayout!!.setImageUri(result) }
+    ) { result: Uri? -> mSearchLayout?.setImageUri(result) }
     private var mSearchFab: View? = null
     private val mSearchFabAnimatorListener: Animator.AnimatorListener =
         object : SimpleAnimatorListener() {
@@ -170,10 +170,40 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
     private var mHasFirstRefresh = false
     private var mNavCheckedId = 0
-    private var mDownloadManager: DownloadManager? = null
-    private var mDownloadInfoListener: DownloadInfoListener? = null
-    private var mFavouriteStatusRouter: FavouriteStatusRouter? = null
-    private var mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener? = null
+    private val mDownloadManager: DownloadManager = downloadManager
+
+    @SuppressLint("NotifyDataSetChanged")
+    private val mDownloadInfoListener: DownloadInfoListener = object : DownloadInfoListener {
+        override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+            mAdapter?.notifyDataSetChanged()
+        }
+
+        override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
+        override fun onUpdateAll() {}
+        override fun onReload() {
+            mAdapter?.notifyDataSetChanged()
+        }
+
+        override fun onChange() {
+            mAdapter?.notifyDataSetChanged()
+        }
+
+        override fun onRenameLabel(from: String, to: String) {}
+        override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
+            mAdapter?.notifyDataSetChanged()
+        }
+
+        override fun onUpdateLabels() {}
+    }
+
+    private val mFavouriteStatusRouter: FavouriteStatusRouter = favouriteStatusRouter
+
+    @SuppressLint("NotifyDataSetChanged")
+    private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener =
+        FavouriteStatusRouter.Listener { _: Long, _: Int ->
+            mAdapter?.notifyDataSetChanged()
+        }
+
     private var mIsTopList = false
     override fun getMenuResId(): Int {
         return R.menu.scene_gallery_list_searchbar_menu
@@ -208,47 +238,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val context = context
-        AssertUtils.assertNotNull(context)
-        mDownloadManager = downloadManager
-        mFavouriteStatusRouter = favouriteStatusRouter
-        mDownloadInfoListener = object : DownloadInfoListener {
-            override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                if (mAdapter != null) {
-                    mAdapter!!.notifyDataSetChanged()
-                }
-            }
-
-            override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
-            override fun onUpdateAll() {}
-            override fun onReload() {
-                if (mAdapter != null) {
-                    mAdapter!!.notifyDataSetChanged()
-                }
-            }
-
-            override fun onChange() {
-                if (mAdapter != null) {
-                    mAdapter!!.notifyDataSetChanged()
-                }
-            }
-
-            override fun onRenameLabel(from: String, to: String) {}
-            override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                if (mAdapter != null) {
-                    mAdapter!!.notifyDataSetChanged()
-                }
-            }
-
-            override fun onUpdateLabels() {}
-        }
-        mDownloadManager!!.addDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouterListener = FavouriteStatusRouter.Listener { _: Long, _: Int ->
-            if (mAdapter != null) {
-                mAdapter!!.notifyDataSetChanged()
-            }
-        }
-        mFavouriteStatusRouter!!.addListener(mFavouriteStatusRouterListener)
+        mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
+        mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -280,8 +271,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     override fun onDestroy() {
         super.onDestroy()
-        mDownloadManager!!.removeDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter!!.removeListener(mFavouriteStatusRouterListener)
+        mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener)
+        mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 
     private fun setSearchBarHint() {
@@ -391,10 +382,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     ): View {
         val view = inflater.inflate(R.layout.scene_gallery_list, container, false)
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
-        val context = context
-        AssertUtils.assertNotNull(context)
-        val resources = context!!.resources
-        mHideActionFabSlop = ViewConfiguration.get(context).scaledTouchSlop
+        mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
         val mainLayout = ViewUtils.`$$`(view, R.id.main_layout)
         val mContentLayout = ViewUtils.`$$`(mainLayout, R.id.content_layout) as ContentLayout
@@ -770,7 +758,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             return false
         }
         val gi = mHelper!!.getDataAtEx(position) ?: return true
-        val downloaded = mDownloadManager!!.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
+        val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourited = gi.favoriteSlot != -2
         val items = if (downloaded) arrayOf<CharSequence>(
             context.getString(R.string.read),
@@ -819,7 +807,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                                 )
                             )
                             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                                mDownloadManager!!.deleteDownload(
+                                mDownloadManager.deleteDownload(
                                     gi.gid
                                 )
                             }
