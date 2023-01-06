@@ -1478,9 +1478,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             val quickSearch = mQuickSearchList[position]
-            EhDB.deleteQuickSearch(quickSearch)
-            mQuickSearchList.removeAt(position)
-            mAdapter.notifyDataSetChanged()
+            lifecycleScope.launchIO {
+                EhDB.deleteQuickSearch(quickSearch)
+                mQuickSearchList.removeAt(position)
+                withUIContext {
+                    mAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 
