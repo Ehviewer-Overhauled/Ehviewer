@@ -1,6 +1,8 @@
 package com.hippo.ehviewer.dao
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
@@ -17,4 +19,10 @@ abstract class EhDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
     abstract fun localFavoritesDao(): LocalFavoritesDao
     abstract fun quickSearchDao(): QuickSearchDao
+}
+
+fun buildMainDB(context: Context): EhDatabase {
+    // TODO: Remove allowMainThreadQueries
+    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries()
+        .build()
 }

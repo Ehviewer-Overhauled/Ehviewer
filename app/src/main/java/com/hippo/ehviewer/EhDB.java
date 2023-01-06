@@ -58,7 +58,7 @@ import java.util.List;
 public class EhDB {
     private static final int CUR_DB_VER = 4;
 
-    private static EhDatabase db;
+    private static final EhDatabase db = EhApplication.getEhDatabase();
 
     private static void upgradeDB(SQLiteDatabase db, int oldVersion) {
         switch (oldVersion) {
@@ -97,10 +97,6 @@ public class EhDB {
                 db.execSQL("DROP TABLE QUICK_SEARCH");
                 db.execSQL("ALTER TABLE QUICK_SEARCH2 RENAME TO QUICK_SEARCH");
         }
-    }
-
-    public static void initialize(Context context) {
-        db = Room.databaseBuilder(context, EhDatabase.class, "eh.db").allowMainThreadQueries().build();
     }
 
     public static synchronized List<DownloadInfo> getAllDownloadInfo() {

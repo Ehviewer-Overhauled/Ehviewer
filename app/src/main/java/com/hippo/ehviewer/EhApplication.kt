@@ -44,6 +44,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhX509TrustManager
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.parser.EventPaneParser
+import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
@@ -107,11 +108,13 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
         SpiderDen.initialize(this)
-        EhDB.initialize(this)
         BitmapUtils.initialize(this)
         EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
         launchIO {
+            launchIO {
+                ehDatabase
+            }
             launchIO {
                 downloadManager
             }
@@ -342,5 +345,8 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
 
         @JvmStatic
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }
+
+        @JvmStatic
+        val ehDatabase by lazy { buildMainDB(application) }
     }
 }
