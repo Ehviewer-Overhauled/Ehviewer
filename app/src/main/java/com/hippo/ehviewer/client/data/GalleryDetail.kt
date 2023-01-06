@@ -21,7 +21,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class GalleryDetail @JvmOverloads constructor(
     @JvmField
-    val galleryInfo: GalleryInfoImpl,
+    val galleryInfo: GalleryInfoImpl = GalleryInfoImpl(),
 
     @JvmField
     var apiUid: Long = -1L,

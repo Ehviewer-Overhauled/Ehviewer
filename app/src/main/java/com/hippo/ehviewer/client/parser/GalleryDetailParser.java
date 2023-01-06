@@ -116,7 +116,7 @@ public class GalleryDetailParser {
             throw new EhException(m.group(1));
         }
 
-        GalleryDetail galleryDetail = new GalleryDetail(new GalleryInfoImpl());
+        GalleryDetail galleryDetail = new GalleryDetail();
         Document document = Jsoup.parse(body);
         parseDetail(galleryDetail, document, body);
         galleryDetail.tags = parseTagGroups(document);
