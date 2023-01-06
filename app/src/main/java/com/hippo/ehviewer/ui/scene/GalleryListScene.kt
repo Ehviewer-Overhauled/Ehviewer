@@ -85,6 +85,7 @@ import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
+import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
@@ -96,7 +97,6 @@ import com.hippo.scene.SceneFragment
 import com.hippo.util.ExceptionUtils
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
-import com.hippo.widget.ContentLayout
 import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
@@ -118,32 +118,23 @@ import java.time.ZoneOffset
 class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper,
     OnClickFabListener, OnExpandListener {
     private val mCallback = SearchStateOnBackPressedCallback()
-
-    /*---------------
-     Whole life cycle
-     ---------------*/
     private lateinit var mUrlBuilder: ListUrlBuilder
-    private var mRecyclerView: EasyRecyclerView? = null
-    private var mSearchLayout: SearchLayout? = null
+    private var _binding: SceneGalleryListBinding? = null
+    private val binding get() = _binding!!
     private val selectImageLauncher = registerForActivityResult<PickVisualMediaRequest, Uri>(
         ActivityResultContracts.PickVisualMedia()
-    ) { result: Uri? -> mSearchLayout?.setImageUri(result) }
+    ) { result: Uri? -> binding.searchLayout.setImageUri(result) }
     private var mSearchFab: View? = null
     private val mSearchFabAnimatorListener: Animator.AnimatorListener =
         object : SimpleAnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                if (null != mSearchFab) {
-                    mSearchFab!!.visibility = View.INVISIBLE
-                }
+                mSearchFab?.visibility = View.INVISIBLE
             }
         }
-    private var mFabLayout: FabLayout? = null
     private val mActionFabAnimatorListener: Animator.AnimatorListener =
         object : SimpleAnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                if (null != mFabLayout) {
-                    (mFabLayout!!.primaryFab as View?)!!.visibility = View.INVISIBLE
-                }
+                binding.fabLayout.primaryFab?.visibility = View.INVISIBLE
             }
         }
     private var fabAnimator: ViewPropertyAnimator? = null
@@ -327,10 +318,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     // Update search bar title, drawer checked item
     private fun onUpdateUrlBuilder() {
-        val resources = resourcesOrNull
-        if (resources == null || mSearchLayout == null || mFabLayout == null) {
-            return
-        }
+        _binding ?: return
         var keyword = mUrlBuilder.keyword
         val category = mUrlBuilder.category
         val mode = mUrlBuilder.mode
@@ -342,11 +330,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         // Update fab visibility
-        mFabLayout!!.setSecondaryFabVisibilityAt(0, !isPopular)
-        mFabLayout!!.setSecondaryFabVisibilityAt(2, !isPopular)
+        binding.fabLayout.setSecondaryFabVisibilityAt(0, !isPopular)
+        binding.fabLayout.setSecondaryFabVisibilityAt(2, !isPopular)
 
         // Update normal search mode
-        mSearchLayout!!.setNormalSearchMode(if (mode == MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
+        binding.searchLayout.setNormalSearchMode(if (mode == MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
 
         // Update search edit text
         if (!mIsTopList) {
@@ -380,64 +368,60 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.scene_gallery_list, container, false)
+        _binding = SceneGalleryListBinding.inflate(inflater, container, false)
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
-        val mainLayout = ViewUtils.`$$`(view, R.id.main_layout)
-        val mContentLayout = ViewUtils.`$$`(mainLayout, R.id.content_layout) as ContentLayout
-        mRecyclerView = mContentLayout.recyclerView
-        val fastScroller = mContentLayout.fastScroller
-        mSearchLayout = ViewUtils.`$$`(mainLayout, R.id.search_layout) as SearchLayout
-        mFabLayout = ViewUtils.`$$`(mainLayout, R.id.fab_layout) as FabLayout
-        AssertUtils.assertNotNull(container)
         mSearchFab = ViewUtils.`$$`(container, R.id.search_fab)
         ViewCompat.setWindowInsetsAnimationCallback(
-            view, WindowInsetsAnimationHelper(
+            binding.root, WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
-                mFabLayout,
+                binding.fabLayout,
                 mSearchFab!!.parent as View
             )
         )
-        (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
-        container!!.addView(mFabLayout)
+        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
+        container!!.addView(binding.fabLayout)
         val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
         val paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab)
-        mViewTransition = BringOutTransition(mContentLayout, mSearchLayout)
+        mViewTransition = BringOutTransition(binding.contentLayout, binding.searchLayout)
         mHelper = GalleryListHelper()
-        mContentLayout.setHelper(mHelper)
-        mContentLayout.fastScroller.setOnDragHandlerListener(this)
-        mContentLayout.setFitPaddingTop(paddingTopSB)
+        binding.contentLayout.setHelper(mHelper)
+        binding.contentLayout.fastScroller.setOnDragHandlerListener(this)
+        binding.contentLayout.setFitPaddingTop(paddingTopSB)
         mAdapter = GalleryListAdapter(
             inflater, resources,
-            mRecyclerView!!, Settings.getListMode()
+            binding.contentLayout.recyclerView, Settings.getListMode()
         )
-        mRecyclerView!!.clipToPadding = false
-        mRecyclerView!!.clipChildren = false
-        mRecyclerView!!.addOnScrollListener(mOnScrollListener)
-        fastScroller.setPadding(
-            fastScroller.paddingLeft, fastScroller.paddingTop + paddingTopSB,
-            fastScroller.paddingRight, fastScroller.paddingBottom
-        )
+        binding.contentLayout.recyclerView.clipToPadding = false
+        binding.contentLayout.recyclerView.clipChildren = false
+        binding.contentLayout.recyclerView.addOnScrollListener(mOnScrollListener)
+        binding.contentLayout.fastScroller.run {
+            setPadding(paddingLeft, paddingTopSB + paddingTop, paddingRight, paddingBottom)
+        }
         setOnApplySearch { query: String? ->
             onApplySearch(query)
         }
         setSearchBarHint()
         setSearchBarSuggestionProvider()
-        mSearchLayout!!.setHelper(this)
-        mSearchLayout!!.setPadding(
-            mSearchLayout!!.paddingLeft, mSearchLayout!!.paddingTop + paddingTopSB,
-            mSearchLayout!!.paddingRight, mSearchLayout!!.paddingBottom + paddingBottomFab
-        )
-        mFabLayout!!.setAutoCancel(true)
-        mFabLayout!!.isExpanded = false
-        mFabLayout!!.setHidePrimaryFab(false)
-        mFabLayout!!.setOnClickFabListener(this)
-        mFabLayout!!.addOnExpandListener(this)
-        addAboveSnackView(mFabLayout)
+        binding.searchLayout.setHelper(this)
+        binding.searchLayout.run {
+            setPadding(
+                paddingLeft,
+                paddingTop + paddingTopSB,
+                paddingRight,
+                paddingBottom + paddingBottomFab
+            )
+        }
+        binding.fabLayout.setAutoCancel(true)
+        binding.fabLayout.isExpanded = false
+        binding.fabLayout.setHidePrimaryFab(false)
+        binding.fabLayout.setOnClickFabListener(this)
+        binding.fabLayout.addOnExpandListener(this)
+        addAboveSnackView(binding.fabLayout)
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
         mActionFabDrawable = AddDeleteDrawable(context, colorID)
-        mFabLayout!!.primaryFab!!.setImageDrawable(mActionFabDrawable)
+        binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
         mSearchFab!!.setOnClickListener {
             if (STATE_NORMAL != mState) {
                 onApplySearch()
@@ -458,7 +442,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             mHasFirstRefresh = true
             mHelper!!.firstRefresh()
         }
-        return view
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -470,17 +454,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 mHasFirstRefresh = false
             }
         }
-        if (null != mRecyclerView) {
-            mRecyclerView!!.stopScroll()
-            mRecyclerView = null
-        }
-        if (null != mFabLayout) {
-            (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
-            removeAboveSnackView(mFabLayout)
-            mFabLayout = null
-        }
+        binding.contentLayout.recyclerView.stopScroll()
+        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
+        removeAboveSnackView(binding.fabLayout)
+        _binding = null
         mAdapter = null
-        mSearchLayout = null
         mViewTransition = null
         mActionFabDrawable = null
     }
@@ -627,9 +605,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     fun onItemClick(position: Int) {
-        if (null == mHelper || null == mRecyclerView) {
-            return
-        }
+        _binding ?: return
+        mHelper ?: return
         val gi = mHelper!!.getDataAtEx(position) ?: return
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
@@ -853,9 +830,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun showActionFab() {
-        if (null != mFabLayout && STATE_NORMAL == mState && !mShowActionFab) {
+        _binding ?: return
+        if (STATE_NORMAL == mState && !mShowActionFab) {
             mShowActionFab = true
-            val fab: View? = mFabLayout!!.primaryFab
+            val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
                 fabAnimator!!.cancel()
             }
@@ -869,9 +847,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun hideActionFab() {
-        if (null != mFabLayout && STATE_NORMAL == mState && mShowActionFab) {
+        _binding ?: return
+        if (STATE_NORMAL == mState && mShowActionFab) {
             mShowActionFab = false
-            val fab: View? = mFabLayout!!.primaryFab
+            val fab: View? = binding.fabLayout.primaryFab
             if (fabAnimator != null) {
                 fabAnimator!!.cancel()
             }
@@ -884,18 +863,19 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun selectSearchFab(animation: Boolean) {
-        if (null == mFabLayout || null == mSearchFab) {
+        _binding ?: return
+        if (null == mSearchFab) {
             return
         }
         mShowActionFab = false
         if (animation) {
-            val fab: View? = mFabLayout!!.primaryFab
+            val fab: View? = binding.fabLayout.primaryFab
             val delay: Long
             if (View.INVISIBLE == fab!!.visibility) {
                 delay = 0L
             } else {
                 delay = ANIMATE_TIME
-                mFabLayout!!.setExpanded(expanded = false, animation = true)
+                binding.fabLayout.setExpanded(expanded = false, animation = true)
                 fab.animate().scaleX(0.0f).scaleY(0.0f).setListener(mActionFabAnimatorListener)
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
                     .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start()
@@ -906,8 +886,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 .setDuration(ANIMATE_TIME).setStartDelay(delay)
                 .setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR).start()
         } else {
-            mFabLayout!!.setExpanded(expanded = false, animation = false)
-            val fab: View? = mFabLayout!!.primaryFab
+            binding.fabLayout.setExpanded(expanded = false, animation = false)
+            val fab: View? = binding.fabLayout.primaryFab
             fab!!.visibility = View.INVISIBLE
             fab.scaleX = 0.0f
             fab.scaleY = 0.0f
@@ -918,7 +898,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun selectActionFab(animation: Boolean) {
-        if (null == mFabLayout || null == mSearchFab) {
+        _binding ?: return
+        if (null == mSearchFab) {
             return
         }
         mShowActionFab = true
@@ -933,15 +914,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     .setDuration(ANIMATE_TIME).setStartDelay(0L)
                     .setInterpolator(AnimationUtils.SLOW_FAST_INTERPOLATOR).start()
             }
-            val fab: View? = mFabLayout!!.primaryFab
+            val fab: View? = binding.fabLayout.primaryFab
             fab!!.visibility = View.VISIBLE
             fab.rotation = -45.0f
             fab.animate().scaleX(1.0f).scaleY(1.0f).rotation(0.0f).setListener(null)
                 .setDuration(ANIMATE_TIME).setStartDelay(delay)
                 .setInterpolator(AnimationUtils.FAST_SLOW_INTERPOLATOR).start()
         } else {
-            mFabLayout!!.setExpanded(expanded = false, animation = false)
-            val fab: View? = mFabLayout!!.primaryFab
+            binding.fabLayout.setExpanded(expanded = false, animation = false)
+            val fab: View? = binding.fabLayout.primaryFab
             fab!!.visibility = View.VISIBLE
             fab.scaleX = 1.0f
             fab.scaleY = 1.0f
@@ -956,7 +937,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun setState(@State state: Int, animation: Boolean) {
-        if (null == mViewTransition || null == mSearchLayout) {
+        _binding ?: return
+        if (null == mViewTransition) {
             return
         }
         if (mState != state) {
@@ -972,13 +954,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
                     STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
-                        mSearchLayout!!.scrollSearchContainerToTop()
+                        binding.searchLayout.scrollSearchContainerToTop()
                         selectSearchFab(animation)
                     }
 
                     STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
-                        mSearchLayout!!.scrollSearchContainerToTop()
+                        binding.searchLayout.scrollSearchContainerToTop()
                         selectSearchFab(animation)
                     }
                 }
@@ -990,12 +972,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
                     STATE_SEARCH -> {
                         mViewTransition!!.showView(1, animation)
-                        mSearchLayout!!.scrollSearchContainerToTop()
+                        binding.searchLayout.scrollSearchContainerToTop()
                     }
 
                     STATE_SEARCH_SHOW_LIST -> {
                         mViewTransition!!.showView(1, animation)
-                        mSearchLayout!!.scrollSearchContainerToTop()
+                        binding.searchLayout.scrollSearchContainerToTop()
                     }
                 }
 
@@ -1019,12 +1001,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun onApplySearch(query: String?) {
-        if (null == mHelper || null == mSearchLayout) {
+        _binding ?: return
+        if (null == mHelper) {
             return
         }
         if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
             try {
-                mSearchLayout!!.formatListUrlBuilder(mUrlBuilder, query)
+                binding.searchLayout.formatListUrlBuilder(mUrlBuilder, query)
             } catch (e: EhException) {
                 showTip(e.message, LENGTH_LONG)
                 return
@@ -1186,10 +1169,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     ) : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             // Cancel check mode
-            context ?: return
-            if (null != mRecyclerView) {
-                mRecyclerView!!.outOfCustomChoiceMode()
-            }
+            _binding ?: return
+            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
             val downloadManager = downloadManager
             val downloadInfo = downloadManager.getDownloadInfo(mGi.gid) ?: return
             val label = if (which == 0) null else mLabels[which]
