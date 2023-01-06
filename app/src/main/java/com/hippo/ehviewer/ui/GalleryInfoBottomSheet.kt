@@ -29,7 +29,7 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.util.tellClipboard
+import com.hippo.util.tellClipboardWithToast
 
 class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment() {
     private var mKeys: ArrayList<String> = arrayListOf()
@@ -117,7 +117,7 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
             if (position == INDEX_PARENT) {
                 UrlOpener.openUrl(context, mValues[position], true)
             } else {
-                requireActivity() tellClipboard mValues[position]
+                requireActivity() tellClipboardWithToast mValues[position]
                 if (position == INDEX_URL) {
                     // Save it to avoid detect the gallery
                     Settings.putClipboardTextHashCode(mValues[position].hashCode())

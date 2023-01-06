@@ -38,7 +38,12 @@ infix fun Context.tellClipboard(text: String?) {
     addTextToClipboard(text, false)
 }
 
-fun Context.addTextToClipboard(text: String?, isSensitive: Boolean) {
+infix fun Context.tellClipboardWithToast(text: String?) {
+    addTextToClipboard(text, false, true)
+}
+
+@JvmOverloads
+fun Context.addTextToClipboard(text: String?, isSensitive: Boolean, useToast: Boolean = false) {
     getClipboardManager().apply {
         setPrimaryClip(ClipData.newPlainText(null, text).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive)
@@ -50,7 +55,7 @@ fun Context.addTextToClipboard(text: String?, isSensitive: Boolean) {
     // Avoid double notify user since system have done that on Tiramisu above
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
         if (this is MainActivity) {
-            showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
+            showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT, useToast)
         } else if (this is SettingsActivity) {
             showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
         }

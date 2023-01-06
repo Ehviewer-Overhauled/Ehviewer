@@ -516,15 +516,17 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
         }
     }
 
-    fun showTip(@StringRes id: Int, length: Int) {
-        showTip(getString(id), length)
+    @JvmOverloads
+    fun showTip(@StringRes id: Int, length: Int, useToast: Boolean = false) {
+        showTip(getString(id), length, useToast)
     }
 
     /**
      * If activity is running, show snack bar, otherwise show toast
      */
-    fun showTip(message: CharSequence, length: Int) {
-        findViewById<View>(R.id.snackbar)?.apply {
+    @JvmOverloads
+    fun showTip(message: CharSequence, length: Int, useToast: Boolean = false) {
+        findViewById<View>(R.id.snackbar)?.takeUnless { useToast }?.apply {
             Snackbar.make(
                 this, message,
                 if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
