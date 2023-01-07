@@ -1395,11 +1395,13 @@ public final class SpiderQueen implements Runnable {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    Thread.sleep(0); // to make allow to catch InterruptedException
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
                     error = GetText.getString(R.string.error_socket);
                     forceHtml = true;
+                } catch (InterruptedException ignored) {
                 } finally {
                     IOUtils.closeQuietly(is);
 
