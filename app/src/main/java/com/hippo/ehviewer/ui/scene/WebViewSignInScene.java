@@ -147,8 +147,7 @@ public class WebViewSignInScene extends BaseScene {
             }
 
             if (getId && getHash) {
-                // setResult(RESULT_OK, null);
-                // finish();
+                navigateToTop();
             }
         }
     }
