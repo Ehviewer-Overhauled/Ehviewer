@@ -24,8 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.BaseGalleryInfo;
+import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.dao.DownloadInfo;
 import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.spider.SpiderDen;
@@ -54,7 +54,7 @@ import java.util.Map;
 public class DownloadManager implements SpiderQueen.OnSpiderListener {
 
     private static final String TAG = DownloadManager.class.getSimpleName();
-    private static final Comparator<DownloadInfo> DATE_DESC_COMPARATOR = (lhs, rhs) -> (int) (rhs.time - lhs.time);
+    private static final Comparator<DownloadInfo> DATE_DESC_COMPARATOR = (lhs, rhs) -> lhs.time == rhs.time ? 0 : lhs.time - rhs.time > 0 ? -1 : 1;
     // All download info list
     private final LinkedList<DownloadInfo> mAllInfoList;
     // All download info map
