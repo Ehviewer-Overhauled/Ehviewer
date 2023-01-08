@@ -207,8 +207,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         arg.putLong(GalleryDetailScene.KEY_GID, mGid);
         arg.putString(GalleryDetailScene.KEY_TOKEN, result);
         arg.putInt(GalleryDetailScene.KEY_PAGE, mPage);
-        // startScene(new Announcer(GalleryDetailScene.class).setArgs(arg));
-        // finish();
+        navigate(R.id.galleryDetailScene, arg);
     }
 
     private void onGetGalleryTokenFailure(Exception e) {
