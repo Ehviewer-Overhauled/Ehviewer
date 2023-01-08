@@ -7,5 +7,13 @@
     <fragment
         android:id="@+id/galleryListScene"
         android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
-        android:label="GalleryListScene" />
+        android:label="GalleryListScene" >
+        <action
+            android:id="@+id/action_galleryListScene_to_galleryDetailScene"
+            app:destination="@id/galleryDetailScene" />
+    </fragment>
+    <fragment
+        android:id="@+id/galleryDetailScene"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryDetailScene"
+        android:label="GalleryDetailScene" />
 </navigation>
