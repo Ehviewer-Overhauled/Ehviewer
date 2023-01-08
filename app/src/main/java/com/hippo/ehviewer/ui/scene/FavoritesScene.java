@@ -724,6 +724,18 @@ public class FavoritesScene extends SearchBarScene implements
         }
     }
 
+    private static class FavDrawerHolder extends RecyclerView.ViewHolder {
+
+        private final TextView key;
+        private final TextView value;
+
+        private FavDrawerHolder(View itemView) {
+            super(itemView);
+            key = (TextView) ViewUtils.$$(itemView, R.id.key);
+            value = (TextView) ViewUtils.$$(itemView, R.id.value);
+        }
+    }
+
     private class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
 
         private final int mTaskId;
@@ -798,18 +810,6 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         public void onCancel() {
-        }
-    }
-
-    private static class FavDrawerHolder extends RecyclerView.ViewHolder {
-
-        private final TextView key;
-        private final TextView value;
-
-        private FavDrawerHolder(View itemView) {
-            super(itemView);
-            key = (TextView) ViewUtils.$$(itemView, R.id.key);
-            value = (TextView) ViewUtils.$$(itemView, R.id.value);
         }
     }
 

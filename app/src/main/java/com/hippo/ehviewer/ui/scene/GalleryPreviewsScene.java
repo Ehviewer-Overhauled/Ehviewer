@@ -250,6 +250,19 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         }
     }
 
+    private static class GalleryPreviewHolder extends RecyclerView.ViewHolder {
+
+        public LoadImageView image;
+        public TextView text;
+
+        public GalleryPreviewHolder(View itemView) {
+            super(itemView);
+
+            image = itemView.findViewById(R.id.image);
+            text = itemView.findViewById(R.id.text);
+        }
+    }
+
     private class GetPreviewSetListener extends EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Integer>> {
 
         private final int mTaskId;
@@ -274,19 +287,6 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         @Override
         public void onCancel() {
 
-        }
-    }
-
-    private static class GalleryPreviewHolder extends RecyclerView.ViewHolder {
-
-        public LoadImageView image;
-        public TextView text;
-
-        public GalleryPreviewHolder(View itemView) {
-            super(itemView);
-
-            image = itemView.findViewById(R.id.image);
-            text = itemView.findViewById(R.id.text);
         }
     }
 

@@ -21,7 +21,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DownloadManager;
-import android.app.assist.AssistContent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -76,7 +75,6 @@ import com.hippo.ehviewer.client.EhTagDatabase;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryComment;
-import com.hippo.ehviewer.client.data.GalleryCommentList;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.GalleryTagGroup;
@@ -622,7 +620,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         EhApplication.getDownloadManager().addDownloadInfoListener(this);
-        ((MainActivity)requireActivity()).setMShareUrl(getGalleryDetailUrl());
+        ((MainActivity) requireActivity()).setMShareUrl(getGalleryDetailUrl());
 
         return view;
     }
@@ -634,7 +632,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         Context context = getContext();
         AssertUtils.assertNotNull(context);
         EhApplication.getDownloadManager().removeDownloadInfoListener(this);
-        ((MainActivity)requireActivity()).setMShareUrl(null);
+        ((MainActivity) requireActivity()).setMShareUrl(null);
 
         mTip = null;
         mViewTransition = null;
@@ -1517,40 +1515,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     private @interface State {
     }
 
-    private class GetGalleryDetailListener extends EhCallback<GalleryDetailScene, GalleryDetail> {
-
-        public GetGalleryDetailListener(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void onSuccess(GalleryDetail result) {
-            getApplication().removeGlobalStuff(this);
-
-            // Put gallery detail to cache
-            EhApplication.getGalleryDetailCache().put(result.getGid(), result);
-
-            // Add history
-            EhDB.putHistoryInfo(result);
-
-            // Notify success
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onGetGalleryDetailSuccess(result);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            getApplication().removeGlobalStuff(this);
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onGetGalleryDetailFailure(e);
-        }
-
-        @Override
-        public void onCancel() {
-            getApplication().removeGlobalStuff(this);
-        }
-    }
-
     private static class VoteTagListener extends EhCallback<GalleryDetailScene, VoteTagParser.Result> {
 
         public VoteTagListener(Context context) {
@@ -1573,69 +1537,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         @Override
         public void onCancel() {
-        }
-    }
-
-    private class RateGalleryListener extends EhCallback<GalleryDetailScene, RateGalleryParser.Result> {
-
-        private final long mGid;
-
-        public RateGalleryListener(Context context, int stageId, String sceneTag, long gid) {
-            super(context);
-            mGid = gid;
-        }
-
-        @Override
-        public void onSuccess(RateGalleryParser.Result result) {
-            showTip(R.string.rate_successfully, LENGTH_SHORT);
-
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onRateGallerySuccess(result);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            e.printStackTrace();
-            showTip(R.string.rate_failed, LENGTH_LONG);
-        }
-
-        @Override
-        public void onCancel() {
-        }
-    }
-
-    private class ModifyFavoritesListener extends EhCallback<GalleryDetailScene, Void> {
-
-        private final boolean mAddOrRemove;
-
-        /**
-         * @param addOrRemove false for add, true for remove
-         */
-        public ModifyFavoritesListener(Context context, boolean addOrRemove) {
-            super(context);
-            mAddOrRemove = addOrRemove;
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            showTip(mAddOrRemove ? R.string.remove_from_favorite_success :
-                    R.string.add_to_favorite_success, LENGTH_SHORT);
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onModifyFavoritesSuccess(mAddOrRemove);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            showTip(mAddOrRemove ? R.string.remove_from_favorite_failure :
-                    R.string.add_to_favorite_failure, LENGTH_LONG);
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onModifyFavoritesFailure();
-        }
-
-        @Override
-        public void onCancel() {
-            GalleryDetailScene scene = GalleryDetailScene.this;
-            scene.onModifyFavoritesCancel();
         }
     }
 
@@ -1715,6 +1616,103 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 EhDB.removeDownloadDirname(mGalleryInfo.getGid());
                 deleteFileAsync(file);
             }
+        }
+    }
+
+    private class GetGalleryDetailListener extends EhCallback<GalleryDetailScene, GalleryDetail> {
+
+        public GetGalleryDetailListener(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onSuccess(GalleryDetail result) {
+            getApplication().removeGlobalStuff(this);
+
+            // Put gallery detail to cache
+            EhApplication.getGalleryDetailCache().put(result.getGid(), result);
+
+            // Add history
+            EhDB.putHistoryInfo(result);
+
+            // Notify success
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onGetGalleryDetailSuccess(result);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            getApplication().removeGlobalStuff(this);
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onGetGalleryDetailFailure(e);
+        }
+
+        @Override
+        public void onCancel() {
+            getApplication().removeGlobalStuff(this);
+        }
+    }
+
+    private class RateGalleryListener extends EhCallback<GalleryDetailScene, RateGalleryParser.Result> {
+
+        private final long mGid;
+
+        public RateGalleryListener(Context context, int stageId, String sceneTag, long gid) {
+            super(context);
+            mGid = gid;
+        }
+
+        @Override
+        public void onSuccess(RateGalleryParser.Result result) {
+            showTip(R.string.rate_successfully, LENGTH_SHORT);
+
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onRateGallerySuccess(result);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            e.printStackTrace();
+            showTip(R.string.rate_failed, LENGTH_LONG);
+        }
+
+        @Override
+        public void onCancel() {
+        }
+    }
+
+    private class ModifyFavoritesListener extends EhCallback<GalleryDetailScene, Void> {
+
+        private final boolean mAddOrRemove;
+
+        /**
+         * @param addOrRemove false for add, true for remove
+         */
+        public ModifyFavoritesListener(Context context, boolean addOrRemove) {
+            super(context);
+            mAddOrRemove = addOrRemove;
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            showTip(mAddOrRemove ? R.string.remove_from_favorite_success :
+                    R.string.add_to_favorite_success, LENGTH_SHORT);
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onModifyFavoritesSuccess(mAddOrRemove);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            showTip(mAddOrRemove ? R.string.remove_from_favorite_failure :
+                    R.string.add_to_favorite_failure, LENGTH_LONG);
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onModifyFavoritesFailure();
+        }
+
+        @Override
+        public void onCancel() {
+            GalleryDetailScene scene = GalleryDetailScene.this;
+            scene.onModifyFavoritesCancel();
         }
     }
 

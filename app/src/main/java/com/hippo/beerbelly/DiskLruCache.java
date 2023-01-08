@@ -352,21 +352,7 @@ public final class DiskLruCache implements Closeable {
                 i.remove();
             }
         }
-    }    private final Callable<Void> cleanupCallable = new Callable<>() {
-        public Void call() throws Exception {
-            synchronized (DiskLruCache.this) {
-                if (journalWriter == null) {
-                    return null; // Closed.
-                }
-                trimToSize();
-                if (journalRebuildRequired()) {
-                    rebuildJournal();
-                    redundantOpCount = 0;
-                }
-            }
-            return null;
-        }
-    };
+    }
 
     /**
      * Creates a new journal that omits redundant information. This replaces the
@@ -406,7 +392,21 @@ public final class DiskLruCache implements Closeable {
 
         journalWriter = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(journalFile, true), Util.US_ASCII));
-    }
+    }    private final Callable<Void> cleanupCallable = new Callable<>() {
+        public Void call() throws Exception {
+            synchronized (DiskLruCache.this) {
+                if (journalWriter == null) {
+                    return null; // Closed.
+                }
+                trimToSize();
+                if (journalRebuildRequired()) {
+                    rebuildJournal();
+                    redundantOpCount = 0;
+                }
+            }
+            return null;
+        }
+    };
 
     /**
      * Return {@code true} if it contains the key

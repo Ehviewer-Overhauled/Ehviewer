@@ -3,8 +3,8 @@ package com.hippo.ehviewer.dao
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo
 
 @Entity(tableName = "DOWNLOADS")
 class DownloadInfo() : BaseGalleryInfo() {

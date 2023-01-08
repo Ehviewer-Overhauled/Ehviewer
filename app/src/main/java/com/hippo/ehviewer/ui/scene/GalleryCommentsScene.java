@@ -733,6 +733,36 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
     }
 
+    private static class InfoHolder extends RecyclerView.ViewHolder {
+
+        private final TextView key;
+        private final TextView value;
+
+        public InfoHolder(View itemView) {
+            super(itemView);
+            key = (TextView) ViewUtils.$$(itemView, R.id.key);
+            value = (TextView) ViewUtils.$$(itemView, R.id.value);
+        }
+    }
+
+    private abstract static class CommentHolder extends RecyclerView.ViewHolder {
+        public CommentHolder(LayoutInflater inflater, int resId, ViewGroup parent) {
+            super(inflater.inflate(resId, parent, false));
+        }
+    }
+
+    private static class MoreCommentHolder extends CommentHolder {
+        public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, R.layout.item_gallery_comment_more, parent);
+        }
+    }
+
+    private static class ProgressCommentHolder extends CommentHolder {
+        public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater, R.layout.item_gallery_comment_progress, parent);
+        }
+    }
+
     private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
 
         public RefreshCommentListener(Context context) {
@@ -807,36 +837,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         @Override
         public void onCancel() {
-        }
-    }
-
-    private static class InfoHolder extends RecyclerView.ViewHolder {
-
-        private final TextView key;
-        private final TextView value;
-
-        public InfoHolder(View itemView) {
-            super(itemView);
-            key = (TextView) ViewUtils.$$(itemView, R.id.key);
-            value = (TextView) ViewUtils.$$(itemView, R.id.value);
-        }
-    }
-
-    private abstract static class CommentHolder extends RecyclerView.ViewHolder {
-        public CommentHolder(LayoutInflater inflater, int resId, ViewGroup parent) {
-            super(inflater.inflate(resId, parent, false));
-        }
-    }
-
-    private static class MoreCommentHolder extends CommentHolder {
-        public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_more, parent);
-        }
-    }
-
-    private static class ProgressCommentHolder extends CommentHolder {
-        public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_progress, parent);
         }
     }
 

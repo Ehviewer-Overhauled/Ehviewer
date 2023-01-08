@@ -1241,6 +1241,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 setState(STATE_SEARCH)
             }
         }
+
         abstract fun getDestination(): Int
 
         abstract fun getArgs(): Bundle
