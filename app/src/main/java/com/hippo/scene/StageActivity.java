@@ -52,13 +52,6 @@ public abstract class StageActivity extends EhActivity {
     protected void onUnrecognizedIntent(@Nullable Intent intent) {
     }
 
-
-    public void onSceneViewCreated(SceneFragment scene, Bundle savedInstanceState) {
-    }
-
-    public void onSceneViewDestroyed(SceneFragment scene) {
-    }
-
     void onSceneDestroyed(SceneFragment scene) {
     }
 

@@ -387,11 +387,6 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
         Settings.putClipboardTextHashCode(hashCode)
     }
 
-    override fun onSceneViewCreated(scene: SceneFragment, savedInstanceState: Bundle?) {
-        super.onSceneViewCreated(scene, savedInstanceState)
-        createDrawerView(scene)
-    }
-
     @SuppressLint("RtlHardcoded")
     fun createDrawerView(scene: SceneFragment?) {
         if (scene is BaseScene && mRightDrawer != null && mDrawerLayout != null) {
@@ -411,13 +406,6 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
                     GravityCompat.END
                 )
             }
-        }
-    }
-
-    override fun onSceneViewDestroyed(scene: SceneFragment) {
-        super.onSceneViewDestroyed(scene)
-        if (scene is BaseScene) {
-            scene.destroyDrawerView()
         }
     }
 

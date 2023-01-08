@@ -207,6 +207,14 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         hideSoftInput();
+
+        getMainActivity().createDrawerView(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        destroyDrawerView();
     }
 
     @Nullable
