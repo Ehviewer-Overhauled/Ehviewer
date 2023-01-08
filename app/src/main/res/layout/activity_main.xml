@@ -38,13 +38,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fragment_container"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
+                <com.hippo.ehviewer.widget.AboveSnackerLayout
+                    android:id="@+id/absnacker"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:defaultNavHost="true"
-                    app:navGraph="@navigation/nav_graph" />
+                    android:layout_height="match_parent">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/fragment_container"
+                        android:name="androidx.navigation.fragment.NavHostFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:defaultNavHost="true"
+                        app:navGraph="@navigation/nav_graph" />
+
+                </com.hippo.ehviewer.widget.AboveSnackerLayout>
+
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         </com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout>
