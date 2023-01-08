@@ -26,8 +26,7 @@
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
         <com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout
             android:layout_width="match_parent"
@@ -63,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:fitsSystemWindows="false"
+            android:fitsSystemWindows="true"
             android:maxWidth="@dimen/drawer_max_width" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
