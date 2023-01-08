@@ -31,7 +31,6 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.view.GravityCompat
@@ -67,7 +66,9 @@ import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
 import com.hippo.yorozuya.IOUtils
 import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -332,13 +333,13 @@ class MainActivity : EhActivity() {
 
     override fun onResume() {
         super.onResume()
-        lifecycleScope.launchUI {
+        lifecycleScope.launch {
             delay(300)
             checkClipboardUrl()
         }
     }
 
-    private fun checkClipboardUrl() {
+    private suspend fun checkClipboardUrl() {
         val text = this.getClipboardManager().getUrlFromClipboard(this)
         val hashCode = text?.hashCode() ?: 0
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
@@ -361,15 +362,17 @@ class MainActivity : EhActivity() {
                 launch = { navController.navigate(R.id.progressScene, args) }
             }
             launch?.let {
-                val snackbar = Snackbar.make(
-                    binding.drawView,
-                    R.string.clipboard_gallery_url_snack_message,
-                    Snackbar.LENGTH_SHORT
-                )
-                snackbar.setAction(R.string.clipboard_gallery_url_snack_action) {
-                    it()
+                withUIContext {
+                    val snackbar = Snackbar.make(
+                        binding.drawView,
+                        R.string.clipboard_gallery_url_snack_message,
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.setAction(R.string.clipboard_gallery_url_snack_action) {
+                        it()
+                    }
+                    snackbar.show()
                 }
-                snackbar.show()
             }
         }
         Settings.putClipboardTextHashCode(hashCode)
