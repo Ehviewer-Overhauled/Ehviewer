@@ -9,6 +9,42 @@
         android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
         android:label="GalleryListScene" />
     <fragment
+        android:id="@+id/nav_homepage"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
+        android:label="GalleryListScene" >
+        <argument
+            android:name="action"
+            app:argType="string"
+            android:defaultValue="action_homepage" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_subscription"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
+        android:label="GalleryListScene" >
+        <argument
+            android:name="action"
+            app:argType="string"
+            android:defaultValue="action_subscription" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_whats_hot"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
+        android:label="GalleryListScene" >
+        <argument
+            android:name="action"
+            app:argType="string"
+            android:defaultValue="action_whats_hot" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_toplist"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
+        android:label="GalleryListScene" >
+        <argument
+            android:name="action"
+            app:argType="string"
+            android:defaultValue="action_top_list" />
+    </fragment>
+    <fragment
         android:id="@+id/galleryDetailScene"
         android:name="com.hippo.ehviewer.ui.scene.GalleryDetailScene"
         android:label="GalleryDetailScene" />
