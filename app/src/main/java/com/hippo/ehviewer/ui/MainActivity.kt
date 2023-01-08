@@ -27,6 +27,7 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -43,11 +44,14 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
+import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
+import com.hippo.ehviewer.client.parser.GalleryListUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
@@ -57,6 +61,7 @@ import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.unifile.UniFile
 import com.hippo.util.BitmapUtils
+import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
 import com.hippo.yorozuya.IOUtils
@@ -103,17 +108,68 @@ class MainActivity : EhActivity() {
         }
     }
 
-    private fun handleIntent(intent: Intent?): Boolean {
-        /*
-        if (intent == null) {
-            return false
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        lifecycleScope.launchUI {
+            if (!handleIntent(intent)) {
+                if (intent != null && Intent.ACTION_VIEW == intent.action) {
+                    if (intent.data != null) {
+                        val url = intent.data.toString()
+                        EditTextDialogBuilder(this@MainActivity, url, "")
+                            .setTitle(R.string.error_cannot_parse_the_url)
+                            .setPositiveButton(android.R.string.copy) { _: DialogInterface?, _: Int ->
+                                this@MainActivity.addTextToClipboard(
+                                    url,
+                                    false
+                                )
+                            }
+                            .show()
+                    }
+                }
+            }
         }
+    }
+
+    private fun handleIntent(intent: Intent?): Boolean {
+        intent ?: return false
         val action = intent.action
         if (Intent.ACTION_VIEW == action) {
             val uri = intent.data ?: return false
-            val announcer = EhUrlOpener.parseUrl(uri.toString())
-            if (announcer != null) {
-                // startScene(announcer)
+            val url = uri.toString()
+            if (TextUtils.isEmpty(url)) {
+                return false
+            }
+
+            val listUrlBuilder = GalleryListUrlParser.parse(url)
+            if (listUrlBuilder != null) {
+                val args = Bundle()
+                args.putString(
+                    GalleryListScene.KEY_ACTION,
+                    GalleryListScene.ACTION_LIST_URL_BUILDER
+                )
+                args.putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, listUrlBuilder)
+                navController.navigate(R.id.galleryListScene, args)
+                return true
+            }
+
+            val result1 = GalleryDetailUrlParser.parse(url)
+            if (result1 != null) {
+                val args = Bundle()
+                args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+                args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
+                args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
+                navController.navigate(R.id.galleryDetailScene, args)
+                return true
+            }
+
+            val result2 = GalleryPageUrlParser.parse(url)
+            if (result2 != null) {
+                val args = Bundle()
+                args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
+                args.putLong(ProgressScene.KEY_GID, result2.gid)
+                args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
+                args.putInt(ProgressScene.KEY_PAGE, result2.page)
+                navController.navigate(R.id.progressScene, args)
                 return true
             }
         } else if (Intent.ACTION_SEND == action) {
@@ -121,7 +177,10 @@ class MainActivity : EhActivity() {
             if ("text/plain" == type) {
                 val builder = ListUrlBuilder()
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
-                // startScene(GalleryListScene.getStartAnnouncer(builder))
+                navController.navigate(
+                    R.id.galleryListScene,
+                    GalleryListScene.getStartArgs(builder)
+                )
                 return true
             } else if (type != null && type.startsWith("image/")) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
@@ -133,14 +192,16 @@ class MainActivity : EhActivity() {
                         builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
                         builder.imagePath = temp.path
                         builder.isUseSimilarityScan = true
-                        // startScene(GalleryListScene.getStartAnnouncer(builder))
+                        navController.navigate(
+                            R.id.galleryListScene,
+                            GalleryListScene.getStartArgs(builder)
+                        )
                         return true
                     }
                 }
             }
         }
 
-         */
         return false
     }
 
