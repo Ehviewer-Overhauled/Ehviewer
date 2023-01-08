@@ -285,6 +285,7 @@ public class CookieSignInScene extends BaseScene implements EditText.OnEditorAct
     private class CookieSignInListener implements EhClient.Callback<Object> {
         @Override
         public void onSuccess(Object result) {
+            // TODO: getProfile
             navigateToTop();
         }
 

@@ -148,6 +148,7 @@ public class WebViewSignInScene extends BaseScene {
 
             if (getId && getHash) {
                 navigateToTop();
+                // TODO: getProfile
             }
         }
     }
