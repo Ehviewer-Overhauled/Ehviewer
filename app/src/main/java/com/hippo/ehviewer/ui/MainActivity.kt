@@ -37,6 +37,8 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
@@ -44,9 +46,7 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhUrlOpener
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
@@ -60,6 +60,8 @@ import com.hippo.util.BitmapUtils
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
 import com.hippo.yorozuya.IOUtils
+import eu.kanade.tachiyomi.util.lang.launchUI
+import kotlinx.coroutines.delay
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -67,6 +69,7 @@ import java.io.OutputStream
 
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     private fun saveImageToTempFile(file: UniFile?): File? {
         file ?: return null
@@ -147,7 +150,7 @@ class MainActivity : EhActivity() {
         setContentView(binding.root)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
         navController.apply {
             graph = navInflater.inflate(R.navigation.nav_graph).apply {
                 when (Settings.getLaunchPageGalleryListSceneAction()) {
@@ -261,56 +264,45 @@ class MainActivity : EhActivity() {
 
     override fun onResume() {
         super.onResume()
-        checkClipboardUrl()
+        lifecycleScope.launchUI {
+            delay(300)
+            checkClipboardUrl()
+        }
     }
 
     private fun checkClipboardUrl() {
-        // launch checkClipboardUrlInternal()
-    }
-    /*
-
-    private fun createAnnouncerFromClipboardUrl(url: String): Announcer? {
-        val result1 = GalleryDetailUrlParser.parse(url, false)
-        if (result1 != null) {
-            val args = Bundle()
-            args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-            args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
-            args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
-            return Announcer(GalleryDetailScene::class.java).setArgs(args)
-        }
-        val result2 = GalleryPageUrlParser.parse(url, false)
-        if (result2 != null) {
-            val args = Bundle()
-            args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-            args.putLong(ProgressScene.KEY_GID, result2.gid)
-            args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
-            args.putInt(ProgressScene.KEY_PAGE, result2.page)
-            return Announcer(ProgressScene::class.java).setArgs(args)
-        }
-        return null
-    }
-
-     */
-
-    private fun checkClipboardUrlInternal() {
         val text = this.getClipboardManager().getUrlFromClipboard(this)
         val hashCode = text?.hashCode() ?: 0
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
-            /*
-            val announcer = createAnnouncerFromClipboardUrl(text)
-            if (announcer != null) {
+            val result1 = GalleryDetailUrlParser.parse(text, false)
+            var launch: (() -> Unit)? = null
+            if (result1 != null) {
+                val args = Bundle()
+                args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+                args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
+                args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
+                launch = { navController.navigate(R.id.galleryDetailScene, args) }
+            }
+            val result2 = GalleryPageUrlParser.parse(text, false)
+            if (result2 != null) {
+                val args = Bundle()
+                args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
+                args.putLong(ProgressScene.KEY_GID, result2.gid)
+                args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
+                args.putInt(ProgressScene.KEY_PAGE, result2.page)
+                launch = { navController.navigate(R.id.progressScene, args) }
+            }
+            launch?.let {
                 val snackbar = Snackbar.make(
                     binding.drawView,
                     R.string.clipboard_gallery_url_snack_message,
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.setAction(R.string.clipboard_gallery_url_snack_action) {
-                    // startScene(announcer)
+                    it()
                 }
                 snackbar.show()
             }
-
-             */
         }
         Settings.putClipboardTextHashCode(hashCode)
     }
