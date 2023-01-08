@@ -46,7 +46,6 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrlOpener
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
@@ -64,7 +63,6 @@ import com.hippo.ehviewer.ui.scene.SelectSiteScene
 import com.hippo.ehviewer.ui.scene.SignInScene
 import com.hippo.ehviewer.ui.scene.SolidScene
 import com.hippo.ehviewer.ui.scene.WebViewSignInScene
-import com.hippo.ehviewer.widget.EhStageLayout
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.scene.Announcer
 import com.hippo.scene.SceneFragment
@@ -93,46 +91,9 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
      Whole life cycle
      ---------------*/
     private var mDrawerLayout: DrawerLayout? = null
-    private var mStageLayout: EhStageLayout? = null
     private var mNavView: NavigationView? = null
     private var mRightDrawer: DrawerView? = null
     private var mNavCheckedItem = 0
-    override fun getContainerViewId(): Int {
-        return R.id.fragment_container
-    }
-
-    override fun getLaunchAnnouncer(): Announcer {
-        return if (EhUtils.needSignedIn()) {
-            Announcer(SignInScene::class.java)
-        } else if (Settings.getSelectSite()) {
-            Announcer(SelectSiteScene::class.java)
-        } else {
-            val args = Bundle()
-            args.putString(
-                GalleryListScene.KEY_ACTION,
-                Settings.getLaunchPageGalleryListSceneAction()
-            )
-            Announcer(GalleryListScene::class.java).setArgs(args)
-        }
-    }
-
-    // Sometimes scene can't show directly
-    private fun processAnnouncer(announcer: Announcer): Announcer {
-        if (0 == sceneCount) {
-            if (EhUtils.needSignedIn()) {
-                val newArgs = Bundle()
-                newArgs.putString(SignInScene.KEY_TARGET_SCENE, announcer.clazz.name)
-                newArgs.putBundle(SignInScene.KEY_TARGET_ARGS, announcer.args)
-                return Announcer(SignInScene::class.java).setArgs(newArgs)
-            } else if (Settings.getSelectSite()) {
-                val newArgs = Bundle()
-                newArgs.putString(SelectSiteScene.KEY_TARGET_SCENE, announcer.clazz.name)
-                newArgs.putBundle(SelectSiteScene.KEY_TARGET_ARGS, announcer.args)
-                return Announcer(SelectSiteScene::class.java).setArgs(newArgs)
-            }
-        }
-        return announcer
-    }
 
     private fun saveImageToTempFile(file: UniFile?): File? {
         file ?: return null
@@ -175,7 +136,7 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
             val uri = intent.data ?: return false
             val announcer = EhUrlOpener.parseUrl(uri.toString())
             if (announcer != null) {
-                startScene(processAnnouncer(announcer))
+                startScene(announcer)
                 return true
             }
         } else if (Intent.ACTION_SEND == action) {
@@ -183,7 +144,7 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
             if ("text/plain" == type) {
                 val builder = ListUrlBuilder()
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
-                startScene(processAnnouncer(GalleryListScene.getStartAnnouncer(builder)))
+                startScene(GalleryListScene.getStartAnnouncer(builder))
                 return true
             } else if (type != null && type.startsWith("image/")) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
@@ -195,7 +156,7 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
                         builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
                         builder.imagePath = temp.path
                         builder.isUseSimilarityScan = true
-                        startScene(processAnnouncer(GalleryListScene.getStartAnnouncer(builder)))
+                        startScene(GalleryListScene.getStartAnnouncer(builder))
                         return true
                     }
                 }
@@ -211,9 +172,7 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
             return
         }
         if (!handleIntent(intent)) {
-            var handleUrl = false
             if (intent != null && Intent.ACTION_VIEW == intent.action) {
-                handleUrl = true
                 if (intent.data != null) {
                     val url = intent.data.toString()
                     EditTextDialogBuilder(this, url, "")
@@ -227,28 +186,15 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
                         .show()
                 }
             }
-            if (0 == sceneCount) {
-                if (handleUrl) {
-                    finish()
-                } else {
-                    val args = Bundle()
-                    args.putString(
-                        GalleryListScene.KEY_ACTION,
-                        Settings.getLaunchPageGalleryListSceneAction()
-                    )
-                    startScene(processAnnouncer(Announcer(GalleryListScene::class.java).setArgs(args)))
-                }
-            }
         }
     }
 
     override fun onStartSceneFromIntent(clazz: Class<*>, args: Bundle?): Announcer {
-        return processAnnouncer(Announcer(clazz).setArgs(args))
+        return Announcer(clazz).setArgs(args)
     }
 
     override fun onCreate2(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
-        mStageLayout = ViewUtils.`$$`(this, R.id.fragment_container) as EhStageLayout
         mDrawerLayout = ViewUtils.`$$`(this, R.id.draw_view) as DrawerLayout
         mNavView = ViewUtils.`$$`(this, R.id.nav_view) as NavigationView
         mRightDrawer = ViewUtils.`$$`(this, R.id.right_drawer) as DrawerView
@@ -472,11 +418,9 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
     }
 
     fun addAboveSnackView(view: View?) {
-        mStageLayout?.addAboveSnackView(view)
     }
 
     fun removeAboveSnackView(view: View?) {
-        mStageLayout?.removeAboveSnackView(view)
     }
 
     fun setDrawerLockMode(lockMode: Int, edgeGravity: Int) {

@@ -49,117 +49,31 @@ public class SceneFragment extends Fragment {
      * Standard scene result: operation succeeded.
      */
     public static final int RESULT_OK = -1;
-    int resultCode = RESULT_CANCELED;
-    Bundle result = null;
-    List<String> mRequestSceneTagList = new ArrayList<>(0);
-    IntList mRequestCodeList = new IntList(0);
 
     public void onNewArguments(@NonNull Bundle args) {
     }
 
     public void startScene(Announcer announcer, boolean horizontal) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).startScene(announcer, horizontal);
-        }
+
     }
 
     public void startScene(Announcer announcer) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).startScene(announcer);
-        }
+
     }
 
     public void finish() {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).finishScene(this);
-        }
-    }
 
-    public void finishStage() {
-        FragmentActivity activity = getActivity();
-        if (activity != null) {
-            activity.finish();
-        }
-    }
-
-    /**
-     * @return negative for error
-     */
-    public int getStackIndex() {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            return ((StageActivity) activity).getSceneIndex(this);
-        } else {
-            return -1;
-        }
     }
 
     public void onProvideAssistContent(AssistContent outContent) {
 
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        view.setTag(R.id.fragment_tag, getTag());
-        view.setBackground(ResourcesKt.resolveDrawable(requireActivity().getTheme(), android.R.attr.windowBackground));
-
-        // Notify
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).onSceneViewCreated(this, savedInstanceState);
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        // Notify
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).onSceneViewDestroyed(this);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        FragmentActivity activity = getActivity();
-        if (activity instanceof StageActivity) {
-            ((StageActivity) activity).onSceneDestroyed(this);
-        }
-    }
-
-    void addRequest(String requestSceneTag, int requestCode) {
-        mRequestSceneTagList.add(requestSceneTag);
-        mRequestCodeList.add(requestCode);
-    }
-
-    void returnResult(StageActivity stage) {
-        for (int i = 0, size = Math.min(mRequestSceneTagList.size(), mRequestCodeList.size()); i < size; i++) {
-            String tag = mRequestSceneTagList.get(i);
-            int code = mRequestCodeList.get(i);
-            SceneFragment scene = stage.findSceneByTag(tag);
-            if (scene != null) {
-                scene.onSceneResult(code, resultCode, result);
-            }
-        }
-        mRequestSceneTagList.clear();
-        mRequestCodeList.clear();
-    }
-
     protected void onSceneResult(int requestCode, int resultCode, Bundle data) {
     }
 
     public void setResult(int resultCode, Bundle result) {
-        this.resultCode = resultCode;
-        this.result = result;
+
     }
 
     @IntDef({LAUNCH_MODE_STANDARD, LAUNCH_MODE_SINGLE_TOP, LAUNCH_MODE_SINGLE_TASK})

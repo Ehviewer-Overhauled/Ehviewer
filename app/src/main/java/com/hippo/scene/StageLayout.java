@@ -116,7 +116,6 @@ public class StageLayout extends FrameLayout {
             }
         }
 
-        stage.sortSceneViews(sortedScenes);
 
         return true;
     }
