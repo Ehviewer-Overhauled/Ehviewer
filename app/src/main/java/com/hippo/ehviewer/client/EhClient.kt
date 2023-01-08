@@ -28,7 +28,12 @@ object EhClient {
         request.job = scope.launchIO {
             val callback: Callback<Any?>? = request.callback
             try {
-                val result: Any? = execute(request.method, request.args)
+                val result: Any? = request.run {
+                    if (args == null)
+                        execute(method)
+                    else
+                        execute(method, *args!!)
+                }
                 withUIContext { callback?.onSuccess(result) }
             } catch (e: Exception) {
                 if (e is CancellationException)
