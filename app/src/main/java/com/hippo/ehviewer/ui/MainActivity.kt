@@ -26,12 +26,9 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -40,7 +37,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
@@ -51,6 +47,7 @@ import com.hippo.ehviewer.client.EhUrlOpener
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
+import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.CookieSignInScene
 import com.hippo.ehviewer.ui.scene.DownloadsScene
@@ -74,28 +71,15 @@ import com.hippo.util.BitmapUtils
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
-import com.hippo.widget.DrawerView
 import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.SimpleHandler
-import com.hippo.yorozuya.ViewUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
 class MainActivity : StageActivity() {
-    private var settingsLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) refreshTopScene()
-        }
-
-    /*---------------
-     Whole life cycle
-     ---------------*/
-    private var mDrawerLayout: DrawerLayout? = null
-    private var mNavView: NavigationView? = null
-    private var mRightDrawer: DrawerView? = null
-    private var mNavCheckedItem = 0
+    private lateinit var binding: ActivityMainBinding
 
     private fun saveImageToTempFile(file: UniFile?): File? {
         file ?: return null
@@ -197,14 +181,13 @@ class MainActivity : StageActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
-        mDrawerLayout = ViewUtils.`$$`(this, R.id.draw_view) as DrawerLayout
-        mNavView = ViewUtils.`$$`(this, R.id.nav_view) as NavigationView
-        mNavView?.setupWithNavController(navController)
-        mRightDrawer = ViewUtils.`$$`(this, R.id.right_drawer) as DrawerView
-        mDrawerLayout?.addDrawerListener(mDrawerOnBackPressedCallback)
+        binding.navView.setupWithNavController(navController)
+        binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
         if (savedInstanceState == null) {
             checkDownloadLocation()
@@ -219,8 +202,6 @@ class MainActivity : StageActivity() {
                     }
                 }
             }
-        } else {
-            onRestore(savedInstanceState)
         }
     }
 
@@ -284,9 +265,9 @@ class MainActivity : StageActivity() {
     private fun checkMeteredNetwork() {
         val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         if (cm.isActiveNetworkMetered) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && mDrawerLayout != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 Snackbar.make(
-                    mDrawerLayout!!,
+                    binding.drawView,
                     R.string.metered_network_warning,
                     Snackbar.LENGTH_LONG
                 )
@@ -302,25 +283,8 @@ class MainActivity : StageActivity() {
         }
     }
 
-    private fun onRestore(savedInstanceState: Bundle) {
-        mNavCheckedItem = savedInstanceState.getInt(KEY_NAV_CHECKED_ITEM)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        outState.putInt(KEY_NAV_CHECKED_ITEM, mNavCheckedItem)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mDrawerLayout = null
-        mNavView = null
-        mRightDrawer = null
-    }
-
     override fun onResume() {
         super.onResume()
-        setNavCheckedItem(mNavCheckedItem)
         checkClipboardUrl()
     }
 
@@ -369,9 +333,9 @@ class MainActivity : StageActivity() {
         val hashCode = text?.hashCode() ?: 0
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
             val announcer = createAnnouncerFromClipboardUrl(text)
-            if (announcer != null && mDrawerLayout != null) {
+            if (announcer != null) {
                 val snackbar = Snackbar.make(
-                    mDrawerLayout!!,
+                    binding.drawView,
                     R.string.clipboard_gallery_url_snack_message,
                     Snackbar.LENGTH_SHORT
                 )
@@ -388,19 +352,19 @@ class MainActivity : StageActivity() {
 
     @SuppressLint("RtlHardcoded")
     fun createDrawerView(scene: SceneFragment?) {
-        if (scene is BaseScene && mRightDrawer != null && mDrawerLayout != null) {
-            mRightDrawer!!.removeAllViews()
+        if (scene is BaseScene) {
+            binding.rightDrawer.removeAllViews()
             val drawerView = scene.createDrawerView(
-                scene.layoutInflater, mRightDrawer, null
+                scene.layoutInflater, binding.rightDrawer, null
             )
             if (drawerView != null) {
-                mRightDrawer!!.addView(drawerView)
-                mDrawerLayout!!.setDrawerLockMode(
+                binding.rightDrawer.addView(drawerView)
+                binding.drawView.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_UNLOCKED,
                     GravityCompat.END
                 )
             } else {
-                mDrawerLayout!!.setDrawerLockMode(
+                binding.drawView.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
                     GravityCompat.END
                 )
@@ -415,23 +379,23 @@ class MainActivity : StageActivity() {
     }
 
     fun setDrawerLockMode(lockMode: Int, edgeGravity: Int) {
-        mDrawerLayout?.setDrawerLockMode(lockMode, edgeGravity)
+        binding.drawView.setDrawerLockMode(lockMode, edgeGravity)
     }
 
-    fun getDrawerLockMode(edgeGravity: Int): Int? {
-        return mDrawerLayout?.getDrawerLockMode(edgeGravity)
+    fun getDrawerLockMode(edgeGravity: Int): Int {
+        return binding.drawView.getDrawerLockMode(edgeGravity)
     }
 
     fun openDrawer(drawerGravity: Int) {
-        mDrawerLayout?.openDrawer(drawerGravity)
+        binding.drawView.openDrawer(drawerGravity)
     }
 
     fun closeDrawer(drawerGravity: Int) {
-        mDrawerLayout?.closeDrawer(drawerGravity)
+        binding.drawView.closeDrawer(drawerGravity)
     }
 
     fun toggleDrawer(drawerGravity: Int) {
-        mDrawerLayout?.run {
+        binding.drawView.run {
             if (isDrawerOpen(drawerGravity)) {
                 closeDrawer(drawerGravity)
             } else {
@@ -441,14 +405,6 @@ class MainActivity : StageActivity() {
     }
 
     fun setNavCheckedItem(@IdRes resId: Int) {
-        mNavCheckedItem = resId
-        mNavView?.run {
-            if (resId == 0) {
-                setCheckedItem(R.id.nav_stub)
-            } else {
-                setCheckedItem(resId)
-            }
-        }
     }
 
     @JvmOverloads
@@ -476,7 +432,7 @@ class MainActivity : StageActivity() {
         object : OnBackPressedCallback(false), DrawerListener {
             val slideThreshold = 0.05
             override fun handleOnBackPressed() {
-                mDrawerLayout?.closeDrawers()
+                binding.drawView.closeDrawers()
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
