@@ -92,7 +92,6 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
-import com.hippo.scene.Announcer
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -1477,13 +1476,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             } else {
                 null
             }
-        }
-
-        fun getStartAnnouncer(lub: ListUrlBuilder?): Announcer {
-            val args = Bundle()
-            args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
-            args.putParcelable(KEY_LIST_URL_BUILDER, lub)
-            return Announcer(GalleryListScene::class.java).setArgs(args)
         }
 
         @JvmStatic

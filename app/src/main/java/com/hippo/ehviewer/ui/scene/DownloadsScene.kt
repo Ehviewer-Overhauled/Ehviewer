@@ -65,7 +65,6 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.widget.SimpleRatingView
-import com.hippo.scene.Announcer
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout

@@ -26,11 +26,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabsIntent;
 
-import com.hippo.ehviewer.client.EhUrlOpener;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.Announcer;
 
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
 
@@ -76,19 +73,20 @@ public final class UrlOpener {
                     }
                 }
             }
+            /*
             Announcer announcer = EhUrlOpener.parseUrl(url);
             if (null != announcer) {
                 intent = new Intent(context, MainActivity.class);
-                /*
                 intent.setAction(StageActivity.ACTION_START_SCENE);
                 intent.putExtra(StageActivity.KEY_SCENE_NAME, announcer.getClazz().getName());
                 intent.putExtra(StageActivity.KEY_SCENE_ARGS, announcer.getArgs());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                 */
                 context.startActivity(intent);
                 return;
             }
+
+             */
         }
 
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();

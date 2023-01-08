@@ -42,7 +42,6 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.parser.ProfileParser;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.Announcer;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;

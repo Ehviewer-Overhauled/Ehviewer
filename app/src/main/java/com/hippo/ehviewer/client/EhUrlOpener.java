@@ -29,11 +29,11 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.ehviewer.ui.scene.ProgressScene;
-import com.hippo.scene.Announcer;
 
 public class EhUrlOpener {
 
     private static final String TAG = EhUrlOpener.class.getSimpleName();
+    /*
 
     @Nullable
     public static Announcer parseUrl(String url) {
@@ -72,4 +72,6 @@ public class EhUrlOpener {
 
         return null;
     }
+
+     */
 }

@@ -52,7 +52,6 @@ import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.io.UniFileInputStreamPipe
-import com.hippo.scene.Announcer
 import com.hippo.unifile.UniFile
 import com.hippo.util.BitmapUtils
 import com.hippo.util.getClipboardManager
@@ -99,6 +98,7 @@ class MainActivity : EhActivity() {
     }
 
     private fun handleIntent(intent: Intent?): Boolean {
+        /*
         if (intent == null) {
             return false
         }
@@ -133,6 +133,8 @@ class MainActivity : EhActivity() {
                 }
             }
         }
+
+         */
         return false
     }
 
@@ -248,6 +250,7 @@ class MainActivity : EhActivity() {
     private fun checkClipboardUrl() {
         // launch checkClipboardUrlInternal()
     }
+    /*
 
     private fun createAnnouncerFromClipboardUrl(url: String): Announcer? {
         val result1 = GalleryDetailUrlParser.parse(url, false)
@@ -270,10 +273,13 @@ class MainActivity : EhActivity() {
         return null
     }
 
+     */
+
     private fun checkClipboardUrlInternal() {
         val text = this.getClipboardManager().getUrlFromClipboard(this)
         val hashCode = text?.hashCode() ?: 0
         if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
+            /*
             val announcer = createAnnouncerFromClipboardUrl(text)
             if (announcer != null) {
                 val snackbar = Snackbar.make(
@@ -286,6 +292,8 @@ class MainActivity : EhActivity() {
                 }
                 snackbar.show()
             }
+
+             */
         }
         Settings.putClipboardTextHashCode(hashCode)
     }
