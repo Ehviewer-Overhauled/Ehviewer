@@ -230,6 +230,9 @@ class MainActivity : EhActivity() {
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
         if (savedInstanceState == null) {
+            if (intent.action != Intent.ACTION_MAIN) {
+                onNewIntent(intent)
+            }
             checkDownloadLocation()
             if (Settings.getMeteredNetworkWarning()) {
                 checkMeteredNetwork()
