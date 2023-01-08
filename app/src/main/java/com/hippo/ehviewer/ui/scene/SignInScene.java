@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.app.BaseDialogBuilder;
@@ -52,9 +51,6 @@ public final class SignInScene extends BaseScene implements EditText.OnEditorAct
         View.OnClickListener {
 
     private static final String KEY_REQUEST_ID = "request_id";
-
-    private static final int REQUEST_CODE_WEBVIEW = 0;
-    private static final int REQUEST_CODE_COOKIE = 0;
 
     /*---------------
      View life cycle
@@ -213,9 +209,9 @@ public final class SignInScene extends BaseScene implements EditText.OnEditorAct
         } else if (mSignIn == v) {
             signIn();
         } else if (mSignInViaWebView == v) {
-            // startScene(new Announcer(WebViewSignInScene.class).setRequestCode(REQUEST_CODE_WEBVIEW));
+            navigate(R.id.webViewSignInScene, null);
         } else if (mSignInViaCookies == v) {
-            // startScene(new Announcer(CookieSignInScene.class).setRequestCode(REQUEST_CODE_COOKIE));
+            navigate(R.id.cookieSignInScene, null);
         } else if (mSkipSigningIn == v) {
             // Set gallery size SITE_E if skip sign in
             Settings.putGallerySite(EhUrl.SITE_E);
