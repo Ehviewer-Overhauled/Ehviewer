@@ -27,6 +27,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingDataAdapter
@@ -48,8 +49,6 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.SimpleRatingView
-import com.hippo.scene.Announcer
-import com.hippo.scene.SceneFragment
 import com.hippo.view.ViewTransition
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
@@ -223,8 +222,7 @@ class HistoryScene : BaseToolbarScene() {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        val announcer = Announcer(GalleryDetailScene::class.java).setArgs(args)
-        startScene(announcer)
+        findNavController().navigate(R.id.galleryDetailScene, args)
         return true
     }
 

@@ -72,4 +72,8 @@
         android:id="@+id/nav_settings"
         android:name="com.hippo.ehviewer.ui.SettingsActivity"
         android:label="SettingsActivity" />
+    <fragment
+        android:id="@+id/progressScene"
+        android:name="com.hippo.ehviewer.ui.scene.ProgressScene"
+        android:label="ProgressScene" />
 </navigation>

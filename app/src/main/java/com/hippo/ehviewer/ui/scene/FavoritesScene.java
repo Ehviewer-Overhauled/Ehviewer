@@ -36,6 +36,8 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavHost;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -460,8 +462,7 @@ public class FavoritesScene extends SearchBarScene implements
                 Bundle args = new Bundle();
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
-                Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-                startScene(announcer);
+                NavHostFragment.findNavController(this).navigate(R.id.galleryDetailScene, args);
             }
         }
         return true;

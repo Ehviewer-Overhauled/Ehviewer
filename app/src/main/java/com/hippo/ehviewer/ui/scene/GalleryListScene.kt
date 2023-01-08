@@ -41,6 +41,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.IntDef
+import androidx.annotation.IntegerRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -1247,27 +1248,32 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onClick() {
-            startScene(createAnnouncer())
+            findNavController().navigate(getDestination(), getArgs())
             if (mState == STATE_SIMPLE_SEARCH) {
                 setState(STATE_NORMAL)
             } else if (mState == STATE_SEARCH_SHOW_LIST) {
                 setState(STATE_SEARCH)
             }
         }
+        abstract fun getDestination(): Int
 
-        abstract fun createAnnouncer(): Announcer?
+        abstract fun getArgs(): Bundle
     }
 
     private inner class GalleryDetailUrlSuggestion(
         private val mGid: Long,
         private val mToken: String
     ) : UrlSuggestion() {
-        override fun createAnnouncer(): Announcer? {
+        override fun getDestination(): Int {
+            return R.id.galleryDetailScene
+        }
+
+        override fun getArgs(): Bundle {
             val args = Bundle()
             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
             args.putLong(GalleryDetailScene.KEY_GID, mGid)
             args.putString(GalleryDetailScene.KEY_TOKEN, mToken)
-            return Announcer(GalleryDetailScene::class.java).setArgs(args)
+            return args
         }
     }
 
@@ -1276,13 +1282,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         private val mPToken: String,
         private val mPage: Int
     ) : UrlSuggestion() {
-        override fun createAnnouncer(): Announcer? {
+        override fun getDestination(): Int {
+            return R.id.progressScene
+        }
+
+        override fun getArgs(): Bundle {
             val args = Bundle()
             args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
             args.putLong(ProgressScene.KEY_GID, mGid)
             args.putString(ProgressScene.KEY_PTOKEN, mPToken)
             args.putInt(ProgressScene.KEY_PAGE, mPage)
-            return Announcer(ProgressScene::class.java).setArgs(args)
+            return args
         }
     }
 
