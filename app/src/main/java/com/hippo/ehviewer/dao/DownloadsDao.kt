@@ -18,7 +18,7 @@ interface DownloadsDao : BasicDao<DownloadInfo> {
     fun update(downloadInfo: DownloadInfo)
 
     @Insert
-    override fun insert(downloadInfo: DownloadInfo): Long
+    override fun insert(t: DownloadInfo): Long
 
     @Delete
     fun delete(downloadInfo: DownloadInfo)
