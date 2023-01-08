@@ -16,7 +16,6 @@
 
 package com.hippo.scene;
 
-import android.app.assist.AssistContent;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -52,11 +51,6 @@ public abstract class StageActivity extends EhActivity {
      */
     protected void onUnrecognizedIntent(@Nullable Intent intent) {
     }
-
-    /**
-     * Call {@code setContentView} here. Do <b>NOT</b> call {@code startScene} here
-     */
-    protected abstract void onCreate2(@Nullable Bundle savedInstanceState);
 
 
     public void onSceneViewCreated(SceneFragment scene, Bundle savedInstanceState) {

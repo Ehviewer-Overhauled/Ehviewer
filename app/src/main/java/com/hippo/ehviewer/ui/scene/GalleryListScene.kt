@@ -211,16 +211,16 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun handleArgs(args: Bundle?) {
-        args ?: return
-        mUrlBuilder = when (args.getString(KEY_ACTION)) {
+        val action = args?.getString(KEY_ACTION) ?: Settings.getLaunchPageGalleryListSceneAction()
+        mUrlBuilder = when (action) {
             ACTION_HOMEPAGE -> ListUrlBuilder()
             ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)
             ACTION_WHATS_HOT -> ListUrlBuilder(MODE_WHATS_HOT)
             ACTION_TOP_LIST -> ListUrlBuilder(MODE_TOPLIST, mKeyword = "11")
-            ACTION_LIST_URL_BUILDER -> args.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
+            ACTION_LIST_URL_BUILDER -> args?.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
                 ?.copy() ?: ListUrlBuilder()
 
-            else -> throw IllegalStateException("Wrong KEY_ACTION:${args.getString(KEY_ACTION)} when handle args!")
+            else -> throw IllegalStateException("Wrong KEY_ACTION:${args?.getString(KEY_ACTION)} when handle args!")
         }
     }
 
@@ -1102,20 +1102,20 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     @IntDef(STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST)
     @Retention(AnnotationRetention.SOURCE)
     private annotation class State
-    private class GetGalleryListListener(
+    private inner class GetGalleryListListener(
         context: Context,
         stageId: Int,
         sceneTag: String?,
         private val mTaskId: Int
     ) : EhCallback<GalleryListScene, GalleryListParser.Result>(context, stageId, sceneTag) {
         override fun onSuccess(result: GalleryListParser.Result) {
-            val scene = scene
-            scene?.onGetGalleryListSuccess(result, mTaskId)
+            val scene = this@GalleryListScene
+            scene.onGetGalleryListSuccess(result, mTaskId)
         }
 
         override fun onFailure(e: Exception) {
-            val scene = scene
-            scene?.onGetGalleryListFailure(e, mTaskId)
+            val scene = this@GalleryListScene
+            scene.onGetGalleryListFailure(e, mTaskId)
         }
 
         override fun onCancel() {}
