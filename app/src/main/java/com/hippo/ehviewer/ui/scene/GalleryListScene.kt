@@ -207,7 +207,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         return R.menu.scene_gallery_list_searchbar_menu
     }
 
-    override var navCheckedItem: Int = mNavCheckedId
+    override fun getNavCheckedItem(): Int {
+        return mNavCheckedId
+    }
 
     private fun handleArgs(args: Bundle?) {
         val action = args?.getString(KEY_ACTION) ?: Settings.getLaunchPageGalleryListSceneAction()
