@@ -109,9 +109,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     private var mLabelAdapter: DownloadLabelAdapter? = null
     private lateinit var mLabels: MutableList<String>
     private var mType = -1
-    override fun getNavCheckedItem(): Int {
-        return R.id.nav_downloads
-    }
+
+    override var navCheckedItem: Int = R.id.nav_downloads
 
     private fun initLabels() {
         context ?: return

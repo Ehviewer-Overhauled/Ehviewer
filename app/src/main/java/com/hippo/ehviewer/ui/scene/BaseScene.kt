@@ -13,269 +13,235 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
+import android.annotation.SuppressLint
+import android.content.res.Resources
+import android.content.res.Resources.Theme
+import android.os.Bundle
+import android.os.Parcelable
+import android.util.SparseArray
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import androidx.annotation.StringRes
+import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.scene.SceneFragment
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentActivity;
-
-import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
-
-public abstract class BaseScene extends SceneFragment {
-
-    public static final int LENGTH_SHORT = 0;
-    public static final int LENGTH_LONG = 1;
-
-    public static final String KEY_DRAWER_VIEW_STATE =
-            "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE";
-
-    private WindowInsetsControllerCompat insetsController;
-
-    @Nullable
-    private View drawerView;
-    @Nullable
-    private SparseArray<Parcelable> drawerViewState;
-
-    public void addAboveSnackView(View view) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).addAboveSnackView(view);
+abstract class BaseScene : SceneFragment() {
+    private var insetsController: WindowInsetsControllerCompat? = null
+    private var drawerView: View? = null
+    private var drawerViewState: SparseArray<Parcelable?>? = null
+    fun addAboveSnackView(view: View?) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.addAboveSnackView(view)
         }
     }
 
-    public void removeAboveSnackView(View view) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).removeAboveSnackView(view);
+    fun removeAboveSnackView(view: View?) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.removeAboveSnackView(view)
         }
     }
 
-    public void setDrawerLockMode(int lockMode, int edgeGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).setDrawerLockMode(lockMode, edgeGravity);
+    fun setDrawerLockMode(lockMode: Int, edgeGravity: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.setDrawerLockMode(lockMode, edgeGravity)
         }
     }
 
-    public Integer getDrawerLockMode(int edgeGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            return ((MainActivity) activity).getDrawerLockMode(edgeGravity);
-        }
-        return null;
+    fun getDrawerLockMode(edgeGravity: Int): Int? {
+        val activity = activity
+        return if (activity is MainActivity) {
+            activity.getDrawerLockMode(edgeGravity)
+        } else null
     }
 
-    public void openDrawer(int drawerGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).openDrawer(drawerGravity);
-        }
-    }
-
-    public void closeDrawer(int drawerGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).closeDrawer(drawerGravity);
+    fun openDrawer(drawerGravity: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.openDrawer(drawerGravity)
         }
     }
 
-    public void toggleDrawer(int drawerGravity) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).toggleDrawer(drawerGravity);
+    fun closeDrawer(drawerGravity: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.closeDrawer(drawerGravity)
         }
     }
 
-    public void showTip(CharSequence message, int length) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).showTip(message, length);
+    fun toggleDrawer(drawerGravity: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.toggleDrawer(drawerGravity)
         }
     }
 
-    public void showTip(@StringRes int id, int length) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).showTip(id, length);
+    fun showTip(message: CharSequence?, length: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.showTip(message!!, length)
         }
     }
 
-    public boolean needShowLeftDrawer() {
-        return true;
+    fun showTip(@StringRes id: Int, length: Int) {
+        val activity = activity
+        if (activity is MainActivity) {
+            activity.showTip(id, length)
+        }
     }
 
-    public int getNavCheckedItem() {
-        return 0;
+    open fun needShowLeftDrawer(): Boolean {
+        return true
     }
 
     /**
      * @param resId 0 for clear
      */
-    public void setNavCheckedItem(@IdRes int resId) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).setNavCheckedItem(resId);
+    open var navCheckedItem: Int
+        get() = 0
+        set(resId) {
+            val activity = activity
+            if (activity is MainActivity) {
+                activity.setNavCheckedItem(resId)
+            }
         }
+
+    fun recreateDrawerView() {
+        val activity = mainActivity
+        activity?.createDrawerView(this)
     }
 
-    public void recreateDrawerView() {
-        MainActivity activity = getMainActivity();
-        if (activity != null) {
-            activity.createDrawerView(this);
-        }
-    }
-
-    public final View createDrawerView(LayoutInflater inflater,
-                                       @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        drawerView = onCreateDrawerView(inflater, container, savedInstanceState);
-
+    fun createDrawerView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        drawerView = onCreateDrawerView(inflater, container, savedInstanceState)
         if (drawerView != null) {
-            SparseArray<Parcelable> saved = drawerViewState;
+            var saved = drawerViewState
             if (saved == null && savedInstanceState != null) {
-                saved = savedInstanceState.getSparseParcelableArray(KEY_DRAWER_VIEW_STATE);
+                saved = savedInstanceState.getSparseParcelableArray(KEY_DRAWER_VIEW_STATE)
             }
             if (saved != null) {
-                drawerView.restoreHierarchyState(saved);
+                drawerView!!.restoreHierarchyState(saved)
             }
         }
-
-        return drawerView;
+        return drawerView
     }
 
-    public View onCreateDrawerView(LayoutInflater inflater,
-                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return null;
+    open fun onCreateDrawerView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        return null
     }
 
-    public final void destroyDrawerView() {
+    fun destroyDrawerView() {
         if (drawerView != null) {
-            drawerViewState = new SparseArray<>();
-            drawerView.saveHierarchyState(drawerViewState);
+            drawerViewState = SparseArray()
+            drawerView!!.saveHierarchyState(drawerViewState)
         }
-
-        onDestroyDrawerView();
-
-        drawerView = null;
+        onDestroyDrawerView()
+        drawerView = null
     }
 
-    public void onDestroyDrawerView() {
-    }
-
+    open fun onDestroyDrawerView() {}
     @SuppressLint("RtlHardcoded")
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        postponeEnterTransition();
-        view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                view.getViewTreeObserver().removeOnPreDrawListener(this);
-                startPostponedEnterTransition();
-                return true;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                view.viewTreeObserver.removeOnPreDrawListener(this)
+                startPostponedEnterTransition()
+                return true
             }
-        });
+        })
 
         // Update left drawer locked state
         if (needShowLeftDrawer()) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
         } else {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
         }
 
         // Update nav checked item
-        setNavCheckedItem(getNavCheckedItem());
+        navCheckedItem = navCheckedItem
 
         // Hide soft ime
-        hideSoftInput();
+        hideSoftInput()
     }
 
-    @Nullable
-    public Resources getResourcesOrNull() {
-        Context context = getContext();
-        if (context != null) {
-            return context.getResources();
-        } else {
-            return null;
+    val resourcesOrNull: Resources?
+        get() {
+            val context = context
+            return context?.resources
         }
-    }
-
-    @Nullable
-    public MainActivity getMainActivity() {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            return (MainActivity) activity;
-        } else {
-            return null;
-        }
-    }
-
-    public void hideSoftInput() {
-        var insetsController = getInsetsController();
-        if (insetsController != null) {
-            insetsController.hide(WindowInsetsCompat.Type.ime());
-        }
-    }
-
-    public void showSoftInput(@Nullable View view) {
-        if (view != null) {
-            view.requestFocus();
-            view.post(() -> {
-                var insetsController = getInsetsController();
-                if (insetsController != null) {
-                    insetsController.show(WindowInsetsCompat.Type.ime());
-                }
-            });
-        }
-    }
-
-    public WindowInsetsControllerCompat getInsetsController() {
-        if (insetsController == null) {
-            var activity = getActivity();
-            if (activity != null) {
-                insetsController = ViewCompat.getWindowInsetsController(activity.getWindow().getDecorView());
+    val mainActivity: MainActivity?
+        get() {
+            val activity = activity
+            return if (activity is MainActivity) {
+                activity
+            } else {
+                null
             }
         }
-        return insetsController;
+
+    fun hideSoftInput() {
+        val insetsController = getInsetsController()
+        insetsController?.hide(WindowInsetsCompat.Type.ime())
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        insetsController = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        if (drawerView != null) {
-            drawerViewState = new SparseArray<>();
-            drawerView.saveHierarchyState(drawerViewState);
-            outState.putSparseParcelableArray(KEY_DRAWER_VIEW_STATE, drawerViewState);
+    fun showSoftInput(view: View?) {
+        if (view != null) {
+            view.requestFocus()
+            view.post(Runnable {
+                val insetsController = getInsetsController()
+                insetsController?.show(WindowInsetsCompat.Type.ime())
+            })
         }
     }
 
-    public Resources.Theme getTheme() {
-        return requireActivity().getTheme();
+    fun getInsetsController(): WindowInsetsControllerCompat? {
+        if (insetsController == null) {
+            val activity = activity
+            if (activity != null) {
+                insetsController = ViewCompat.getWindowInsetsController(activity.window.decorView)
+            }
+        }
+        return insetsController
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        insetsController = null
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (drawerView != null) {
+            drawerViewState = SparseArray()
+            drawerView!!.saveHierarchyState(drawerViewState)
+            outState.putSparseParcelableArray(KEY_DRAWER_VIEW_STATE, drawerViewState)
+        }
+    }
+
+    val theme: Theme
+        get() = requireActivity().theme
+
+    companion object {
+        const val LENGTH_SHORT = 0
+        const val LENGTH_LONG = 1
+        const val KEY_DRAWER_VIEW_STATE = "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE"
     }
 }
