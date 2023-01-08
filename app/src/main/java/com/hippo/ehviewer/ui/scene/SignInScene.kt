@@ -15,55 +15,35 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.lifecycle.lifecycleScope
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.parser.ProfileParser
 import com.hippo.ehviewer.databinding.SceneLoginBinding
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.IntIdGenerator
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 
 class SignInScene : BaseScene() {
     private var _binding: SceneLoginBinding? = null
     private val binding
         get() = _binding!!
-    private var mSigningIn = false
-    private var mRequestId = IntIdGenerator.INVALID_ID
+    private var mSignInJob: Job? = null
     override fun needShowLeftDrawer(): Boolean {
         return false
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            onInit()
-        } else {
-            onRestore(savedInstanceState)
-        }
-    }
-
-    private fun onInit() {}
-    private fun onRestore(savedInstanceState: Bundle) {
-        mRequestId = savedInstanceState.getInt(KEY_REQUEST_ID)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(KEY_REQUEST_ID, mRequestId)
     }
 
     override fun onCreateView(
@@ -98,24 +78,9 @@ class SignInScene : BaseScene() {
         binding.touristMode.setOnClickListener {
             // Set gallery size SITE_E if skip sign in
             Settings.putGallerySite(EhUrl.SITE_E)
-            redirectTo()
-        }
-        val application = EhApplication.application
-        if (application.containGlobalStuff(mRequestId)) {
-            mSigningIn = true
-            // request exist
-            showProgress(false)
+            finishSignIn()
         }
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // Show IME
-        if (View.INVISIBLE != binding.progress.visibility) {
-            showSoftInput(binding.username)
-        }
     }
 
     override fun onDestroyView() {
@@ -123,17 +88,12 @@ class SignInScene : BaseScene() {
         _binding = null
     }
 
-    private fun showProgress(animation: Boolean) {
+    private fun showProgress() {
         if (View.VISIBLE != binding.progress.visibility) {
             binding.progress.run {
-                if (animation) {
-                    alpha = 0.0f
-                    visibility = View.VISIBLE
-                    animate().alpha(1.0f).setDuration(500).start()
-                } else {
-                    alpha = 1.0f
-                    visibility = View.VISIBLE
-                }
+                alpha = 0.0f
+                visibility = View.VISIBLE
+                animate().alpha(1.0f).setDuration(500).start()
             }
         }
     }
@@ -143,9 +103,7 @@ class SignInScene : BaseScene() {
     }
 
     private fun signIn() {
-        if (mSigningIn) {
-            return
-        }
+        if (mSignInJob?.isActive == true) return
         val username = binding.username.text.toString()
         val password = binding.password.text.toString()
         if (username.isEmpty()) {
@@ -161,40 +119,33 @@ class SignInScene : BaseScene() {
             binding.passwordLayout.error = null
         }
         hideSoftInput()
-        showProgress(true)
+        showProgress()
 
-        // Clean up for sign in
         EhUtils.signOut()
-        val callback: EhCallback<*, *> = SignInListener(context)
-        mRequestId =
-            (requireActivity().applicationContext as EhApplication).putGlobalStuff(callback)
-        val request = EhRequest()
-            .setMethod(EhClient.METHOD_SIGN_IN)
-            .setArgs(username, password)
-            .setCallback(callback)
-        request.enqueue(this)
-        mSigningIn = true
+        mSignInJob = lifecycleScope.launchIO {
+            runCatching {
+                (EhClient.execute(EhClient.METHOD_SIGN_IN, username, password) as String).let {
+                    Settings.putDisplayName(it)
+                }
+            }.onFailure {
+                it.printStackTrace()
+                withUIContext {
+                    hideProgress()
+                    showResultErrorDialog(it)
+                }
+            }.onSuccess {
+                // This fragment's lifecycle is to be finished
+                GlobalScope.launchIO {
+                    getProfile()
+                }
+                withUIContext {
+                    finishSignIn()
+                }
+            }
+        }
     }
 
-    private val profile: Unit
-        get() {
-            val context = context
-            val activity = mainActivity
-            if (null == context || null == activity) {
-                return
-            }
-            hideSoftInput()
-            showProgress(true)
-            val callback: EhCallback<*, *> = GetProfileListener(context)
-            mRequestId = (context.applicationContext as EhApplication).putGlobalStuff(callback)
-            val request = EhRequest()
-                .setMethod(EhClient.METHOD_GET_PROFILE)
-                .setCallback(callback)
-            request.enqueue()
-            EhRequest().setMethod(EhClient.METHOD_GET_UCONFIG).enqueue()
-        }
-
-    private fun redirectTo() {
+    private fun finishSignIn() {
         Settings.putNeedSignIn(false)
         if (Settings.getSelectSite()) {
             navigate(R.id.selectSiteScene, null)
@@ -203,81 +154,25 @@ class SignInScene : BaseScene() {
         }
     }
 
-    private fun whetherToSkip(e: Exception?) {
-        val context = context ?: return
-        BaseDialogBuilder(context)
+    private fun showResultErrorDialog(e: Throwable) {
+        BaseDialogBuilder(requireContext())
             .setTitle(R.string.sign_in_failed)
             .setMessage(
                 """
-    ${ExceptionUtils.getReadableString(e!!)}
-    
-    ${getString(R.string.sign_in_failed_tip)}
-    """.trimIndent()
+                    ${ExceptionUtils.getReadableString(e)}
+                    ${getString(R.string.sign_in_failed_tip)}
+                """.trimIndent()
             )
             .setPositiveButton(R.string.get_it, null)
             .show()
     }
+}
 
-    fun onSignInEnd(e: Exception?) {
-        context ?: return
-        if (ehCookieStore.hasSignedIn()) {
-            profile
-        } else {
-            mSigningIn = false
-            hideProgress()
-            whetherToSkip(e)
+suspend fun getProfile() {
+    runCatching {
+        (EhClient.execute(EhClient.METHOD_GET_PROFILE) as ProfileParser.Result).run {
+            Settings.putDisplayName(displayName)
+            Settings.putAvatar(avatar)
         }
-    }
-
-    fun onGetProfileEnd() {
-        mSigningIn = false
-        redirectTo()
-    }
-
-    private inner class SignInListener(context: Context?) :
-        EhCallback<SignInScene?, String>(context) {
-        override fun onSuccess(result: String) {
-            application.removeGlobalStuff(this)
-            Settings.putDisplayName(result)
-            val scene = this@SignInScene
-            scene.onSignInEnd(null)
-        }
-
-        override fun onFailure(e: Exception) {
-            application.removeGlobalStuff(this)
-            e.printStackTrace()
-            val scene = this@SignInScene
-            scene.onSignInEnd(e)
-        }
-
-        override fun onCancel() {
-            application.removeGlobalStuff(this)
-        }
-    }
-
-    private inner class GetProfileListener(context: Context?) :
-        EhCallback<SignInScene?, ProfileParser.Result>(context) {
-        override fun onSuccess(result: ProfileParser.Result) {
-            application.removeGlobalStuff(this)
-            Settings.putDisplayName(result.displayName)
-            Settings.putAvatar(result.avatar)
-            val scene = this@SignInScene
-            scene.onGetProfileEnd()
-        }
-
-        override fun onFailure(e: Exception) {
-            application.removeGlobalStuff(this)
-            e.printStackTrace()
-            val scene = this@SignInScene
-            scene.onGetProfileEnd()
-        }
-
-        override fun onCancel() {
-            application.removeGlobalStuff(this)
-        }
-    }
-
-    companion object {
-        private const val KEY_REQUEST_ID = "request_id"
     }
 }
