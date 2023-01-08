@@ -1489,16 +1489,19 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             }
         }
 
-        @JvmStatic
-        fun startScene(scene: SceneFragment, lub: ListUrlBuilder?) {
-            scene.startScene(getStartAnnouncer(lub))
-        }
-
         fun getStartAnnouncer(lub: ListUrlBuilder?): Announcer {
             val args = Bundle()
             args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
             args.putParcelable(KEY_LIST_URL_BUILDER, lub)
             return Announcer(GalleryListScene::class.java).setArgs(args)
+        }
+
+        @JvmStatic
+        fun getStartArgs(lub: ListUrlBuilder): Bundle {
+            val args = Bundle()
+            args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
+            args.putParcelable(KEY_LIST_URL_BUILDER, lub)
+            return args
         }
     }
 }

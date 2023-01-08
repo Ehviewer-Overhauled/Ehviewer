@@ -57,6 +57,8 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
@@ -1007,7 +1009,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_NORMAL);
             lub.setKeyword("\"" + keyword + "\"");
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
             return;
         }
         String artist = getArtist(gd.tags);
@@ -1015,14 +1017,14 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_TAG);
             lub.setKeyword("artist:" + artist);
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
             return;
         }
         if (null != gd.getUploader()) {
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_UPLOADER);
             lub.setKeyword(gd.getUploader());
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
         }
     }
 
@@ -1042,7 +1044,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             lub.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
             lub.setImagePath(path.toString());
             lub.setUseSimilarityScan(true);
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -1068,7 +1070,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_UPLOADER);
             lub.setKeyword(uploader);
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
         } else if (mCategory == v) {
             int category = getCategory();
             if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
@@ -1076,7 +1078,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setCategory(category);
-            GalleryListScene.startScene(this, lub);
+            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
         } else if (mDownload == v) {
             GalleryInfo galleryInfo = getGalleryInfo();
             if (galleryInfo != null) {
@@ -1228,7 +1230,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_TAG);
                 lub.setKeyword(tag);
-                GalleryListScene.startScene(this, lub);
+                NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
                 return;
             }
 

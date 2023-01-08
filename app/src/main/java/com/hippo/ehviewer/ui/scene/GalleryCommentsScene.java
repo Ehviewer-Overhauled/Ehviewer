@@ -50,6 +50,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -925,7 +927,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_UPLOADER);
                 lub.setKeyword(value.user);
-                GalleryListScene.startScene(GalleryCommentsScene.this, lub);
+                NavHostFragment.findNavController(GalleryCommentsScene.this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
             });
             time.setText(ReadableTime.getTimeAgo(value.time));
             comment.setText(generateComment(comment.getContext(), comment, value));
