@@ -727,7 +727,7 @@ public class FavoritesScene extends SearchBarScene implements
         }
     }
 
-    private static class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
+    private class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
 
         private final int mTaskId;
         private final String mKeyword;
@@ -743,10 +743,8 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         public void onSuccess(Void result) {
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
-            }
+            FavoritesScene scene = FavoritesScene.this;
+            scene.onGetFavoritesLocal(mKeyword, mTaskId);
         }
 
         @Override
@@ -755,10 +753,8 @@ public class FavoritesScene extends SearchBarScene implements
             // But how to known which one is failed?
             EhDB.putLocalFavorites(mBackup);
 
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
-            }
+            FavoritesScene scene = FavoritesScene.this;
+            scene.onGetFavoritesLocal(mKeyword, mTaskId);
         }
 
         @Override
@@ -771,7 +767,7 @@ public class FavoritesScene extends SearchBarScene implements
         }
     }
 
-    private static class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
+    private class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
 
         private final int mTaskId;
         // Local fav is shown now, but operation need be done for cloud fav
@@ -791,26 +787,22 @@ public class FavoritesScene extends SearchBarScene implements
             // Put fav cat
             Settings.putFavCat(result.catArray);
             Settings.putFavCount(result.countArray);
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                if (mLocal) {
-                    scene.onGetFavoritesLocal(mKeyword, mTaskId);
-                } else {
-                    scene.onGetFavoritesSuccess(result, mTaskId);
-                }
+            FavoritesScene scene = FavoritesScene.this;
+            if (mLocal) {
+                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+            } else {
+                scene.onGetFavoritesSuccess(result, mTaskId);
             }
         }
 
         @Override
         public void onFailure(Exception e) {
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                if (mLocal) {
-                    e.printStackTrace();
-                    scene.onGetFavoritesLocal(mKeyword, mTaskId);
-                } else {
-                    scene.onGetFavoritesFailure(e, mTaskId);
-                }
+            FavoritesScene scene = FavoritesScene.this;
+            if (mLocal) {
+                e.printStackTrace();
+                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+            } else {
+                scene.onGetFavoritesFailure(e, mTaskId);
             }
         }
 

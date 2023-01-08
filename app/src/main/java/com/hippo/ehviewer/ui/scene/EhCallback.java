@@ -31,12 +31,10 @@ public abstract class EhCallback<E extends SceneFragment, T> implements EhClient
 
     private final EhApplication mApplication;
     private final int mStageId;
-    private final String mSceneTag;
 
     public EhCallback(Context context, int stageId, String sceneTag) {
         mApplication = (EhApplication) context.getApplicationContext();
         mStageId = stageId;
-        mSceneTag = sceneTag;
     }
 
     public abstract boolean isInstance(SceneFragment scene);
@@ -55,20 +53,6 @@ public abstract class EhCallback<E extends SceneFragment, T> implements EhClient
 
     public StageActivity getStageActivity() {
         return mApplication.findStageActivityById(mStageId);
-    }
-
-    @SuppressWarnings("unchecked")
-    public E getScene() {
-        StageActivity stage = mApplication.findStageActivityById(mStageId);
-        if (stage == null) {
-            return null;
-        }
-        SceneFragment scene = stage.findSceneByTag(mSceneTag);
-        if (isInstance(scene)) {
-            return (E) scene;
-        } else {
-            return null;
-        }
     }
 
     public void showTip(@StringRes int id, int length) {

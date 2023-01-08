@@ -357,7 +357,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         redirectTo();
     }
 
-    private static class SignInListener extends EhCallback<SignInScene, String> {
+    private class SignInListener extends EhCallback<SignInScene, String> {
 
         public SignInListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -368,10 +368,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             Settings.putDisplayName(result);
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onSignInEnd(null);
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onSignInEnd(null);
         }
 
         @Override
@@ -379,10 +377,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             e.printStackTrace();
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onSignInEnd(e);
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onSignInEnd(e);
         }
 
         @Override
@@ -396,7 +392,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         }
     }
 
-    private static class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
+    private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
 
         public GetProfileListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -408,10 +404,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             Settings.putDisplayName(result.displayName);
             Settings.putAvatar(result.avatar);
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onGetProfileEnd();
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onGetProfileEnd();
         }
 
         @Override
@@ -419,10 +413,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             e.printStackTrace();
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onGetProfileEnd();
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onGetProfileEnd();
         }
 
         @Override

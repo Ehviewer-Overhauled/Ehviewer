@@ -226,7 +226,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         }
     }
 
-    private static class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
+    private class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
 
         public GetGalleryTokenListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -234,18 +234,14 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
 
         @Override
         public void onSuccess(String result) {
-            ProgressScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryTokenSuccess(result);
-            }
+            ProgressScene scene = ProgressScene.this;
+            scene.onGetGalleryTokenSuccess(result);
         }
 
         @Override
         public void onFailure(Exception e) {
-            ProgressScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryTokenFailure(e);
-            }
+            ProgressScene scene = ProgressScene.this;
+            scene.onGetGalleryTokenFailure(e);
         }
 
         @Override
