@@ -718,8 +718,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             return false;
         }
 
-        EhClient.Callback<?> callback = new GetGalleryDetailListener(context,
-                activity.getStageId(), getTag());
+        EhClient.Callback<?> callback = new GetGalleryDetailListener(context);
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
@@ -1132,15 +1131,13 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 if (EhDB.containLocalFavorites(mGalleryDetail.getGid()) || mGalleryDetail.isFavorited) {
                     mModifyingFavorites = true;
                     CommonOperations.removeFromFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(context,
-                                    activity.getStageId(), getTag(), true));
+                            new ModifyFavoritesListener(context, true));
                     remove = true;
                 }
                 if (!remove) {
                     mModifyingFavorites = true;
                     CommonOperations.addToFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(context,
-                                    activity.getStageId(), getTag(), false));
+                            new ModifyFavoritesListener(context, false));
                 }
                 // Update UI
                 updateFavoriteDrawable();
@@ -1350,8 +1347,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_TAG)
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), tag, vote)
-                .setCallback(new VoteTagListener(context,
-                        activity.getStageId(), getTag()));
+                .setCallback(new VoteTagListener(context));
         request.enqueue(this);
     }
 
@@ -1379,15 +1375,13 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 if (EhDB.containLocalFavorites(mGalleryDetail.getGid()) || mGalleryDetail.isFavorited) {
                     mModifyingFavorites = true;
                     CommonOperations.removeFromFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(activity,
-                                    activity.getStageId(), getTag(), true));
+                            new ModifyFavoritesListener(activity, true));
                     remove = true;
                 }
                 if (!remove) {
                     mModifyingFavorites = true;
                     CommonOperations.addToFavorites(activity, mGalleryDetail,
-                            new ModifyFavoritesListener(activity,
-                                    activity.getStageId(), getTag(), false), true);
+                            new ModifyFavoritesListener(activity, false), true);
                 }
                 // Update UI
                 updateFavoriteDrawable();
@@ -1523,7 +1517,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
     private class GetGalleryDetailListener extends EhCallback<GalleryDetailScene, GalleryDetail> {
 
-        public GetGalleryDetailListener(Context context, int stageId, String sceneTag) {
+        public GetGalleryDetailListener(Context context) {
             super(context);
         }
 
@@ -1557,7 +1551,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
     private static class VoteTagListener extends EhCallback<GalleryDetailScene, VoteTagParser.Result> {
 
-        public VoteTagListener(Context context, int stageId, String sceneTag) {
+        public VoteTagListener(Context context) {
             super(context);
         }
 
@@ -1615,7 +1609,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         /**
          * @param addOrRemove false for add, true for remove
          */
-        public ModifyFavoritesListener(Context context, int stageId, String sceneTag, boolean addOrRemove) {
+        public ModifyFavoritesListener(Context context, boolean addOrRemove) {
             super(context);
             mAddOrRemove = addOrRemove;
         }
@@ -1787,7 +1781,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE);
                 request.setArgs(mGalleryDetail.getGid(), mGalleryDetail.getToken(), mArchiveFormParamOr, res, isHAtH);
-                request.setCallback(new DownloadArchiveListener(context, activity.getStageId(), getTag(), mGalleryDetail));
+                request.setCallback(new DownloadArchiveListener(context, 1, getTag(), mGalleryDetail));
                 request.enqueue(GalleryDetailScene.this);
             }
 
@@ -1998,7 +1992,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                     .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey,
                             mGalleryDetail.getGid(), mGalleryDetail.getToken(), mRatingBar.getRating())
                     .setCallback(new RateGalleryListener(context,
-                            activity.getStageId(), getTag(), mGalleryDetail.getGid()));
+                            1, getTag(), mGalleryDetail.getGid()));
             request.enqueue(GalleryDetailScene.this);
         }
     }

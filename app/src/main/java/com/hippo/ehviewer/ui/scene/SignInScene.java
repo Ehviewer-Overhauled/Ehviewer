@@ -271,7 +271,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         EhUtils.signOut();
 
         EhCallback<?, ?> callback = new SignInListener(context,
-                activity.getStageId(), getTag());
+                1, getTag());
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_SIGN_IN)
@@ -293,7 +293,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         showProgress(true);
 
         EhCallback<?, ?> callback = new GetProfileListener(context,
-                activity.getStageId(), getTag());
+                1, getTag());
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)

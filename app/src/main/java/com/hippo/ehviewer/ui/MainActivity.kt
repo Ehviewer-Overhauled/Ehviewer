@@ -40,7 +40,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -51,25 +50,20 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
-import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
-import com.hippo.ehviewer.ui.scene.SolidScene
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.scene.Announcer
-import com.hippo.scene.StageActivity
 import com.hippo.unifile.UniFile
 import com.hippo.util.BitmapUtils
-import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
 import com.hippo.yorozuya.IOUtils
-import com.hippo.yorozuya.SimpleHandler
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-class MainActivity : StageActivity() {
+class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private fun saveImageToTempFile(file: UniFile?): File? {
@@ -113,7 +107,7 @@ class MainActivity : StageActivity() {
             val uri = intent.data ?: return false
             val announcer = EhUrlOpener.parseUrl(uri.toString())
             if (announcer != null) {
-                startScene(announcer)
+                // startScene(announcer)
                 return true
             }
         } else if (Intent.ACTION_SEND == action) {
@@ -121,7 +115,7 @@ class MainActivity : StageActivity() {
             if ("text/plain" == type) {
                 val builder = ListUrlBuilder()
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
-                startScene(GalleryListScene.getStartAnnouncer(builder))
+                // startScene(GalleryListScene.getStartAnnouncer(builder))
                 return true
             } else if (type != null && type.startsWith("image/")) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
@@ -133,41 +127,13 @@ class MainActivity : StageActivity() {
                         builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
                         builder.imagePath = temp.path
                         builder.isUseSimilarityScan = true
-                        startScene(GalleryListScene.getStartAnnouncer(builder))
+                        // startScene(GalleryListScene.getStartAnnouncer(builder))
                         return true
                     }
                 }
             }
         }
         return false
-    }
-
-    override fun onUnrecognizedIntent(intent: Intent?) {
-        val clazz = topSceneClass
-        if (clazz != null && SolidScene::class.java.isAssignableFrom(clazz)) {
-            // TODO the intent lost
-            return
-        }
-        if (!handleIntent(intent)) {
-            if (intent != null && Intent.ACTION_VIEW == intent.action) {
-                if (intent.data != null) {
-                    val url = intent.data.toString()
-                    EditTextDialogBuilder(this, url, "")
-                        .setTitle(R.string.error_cannot_parse_the_url)
-                        .setPositiveButton(android.R.string.copy) { _: DialogInterface?, _: Int ->
-                            this.addTextToClipboard(
-                                url,
-                                false
-                            )
-                        }
-                        .show()
-                }
-            }
-        }
-    }
-
-    override fun onStartSceneFromIntent(clazz: Class<*>, args: Bundle?): Announcer {
-        return Announcer(clazz).setArgs(args)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -279,24 +245,9 @@ class MainActivity : StageActivity() {
         checkClipboardUrl()
     }
 
-    override fun onTransactScene() {
-        super.onTransactScene()
-        checkClipboardUrl()
-    }
-
     private fun checkClipboardUrl() {
-        SimpleHandler.getInstance().postDelayed({
-            if (!isSolid) {
-                checkClipboardUrlInternal()
-            }
-        }, 300)
+        // launch checkClipboardUrlInternal()
     }
-
-    private val isSolid: Boolean
-        get() {
-            val topClass = topSceneClass
-            return topClass == null || SolidScene::class.java.isAssignableFrom(topClass)
-        }
 
     private fun createAnnouncerFromClipboardUrl(url: String): Announcer? {
         val result1 = GalleryDetailUrlParser.parse(url, false)
@@ -331,9 +282,7 @@ class MainActivity : StageActivity() {
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.setAction(R.string.clipboard_gallery_url_snack_action) {
-                    startScene(
-                        announcer
-                    )
+                    // startScene(announcer)
                 }
                 snackbar.show()
             }

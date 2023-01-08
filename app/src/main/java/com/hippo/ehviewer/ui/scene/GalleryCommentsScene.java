@@ -312,8 +312,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_COMMENT)
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), id, vote)
-                .setCallback(new VoteCommentListener(context,
-                        activity.getStageId(), getTag()));
+                .setCallback(new VoteCommentListener(context));
         request.enqueue(this);
     }
 
@@ -449,7 +448,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
+                        .setCallback(new RefreshCommentListener(activity));
                 request.enqueue(this);
             }
         }
@@ -633,8 +632,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_COMMENT_GALLERY)
                         .setArgs(url, comment, mCommentId != 0 ? Long.toString(mCommentId) : null)
-                        .setCallback(new CommentGalleryListener(context,
-                                activity.getStageId(), getTag(), mCommentId));
+                        .setCallback(new CommentGalleryListener(context, mCommentId));
                 request.enqueue(this);
                 hideSoftInput();
                 hideEditPanel(true);
@@ -729,7 +727,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
+                        .setCallback(new RefreshCommentListener(activity));
                 request.enqueue(this);
             }
         }
@@ -737,7 +735,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
     private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
 
-        public RefreshCommentListener(Context context, int stageId, String sceneTag) {
+        public RefreshCommentListener(Context context) {
             super(context);
         }
 
@@ -762,7 +760,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         private final long mCommentId;
 
-        public CommentGalleryListener(Context context, int stageId, String sceneTag, long commentId) {
+        public CommentGalleryListener(Context context, long commentId) {
             super(context);
             mCommentId = commentId;
         }
@@ -787,7 +785,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
     private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
 
-        public VoteCommentListener(Context context, int stageId, String sceneTag) {
+        public VoteCommentListener(Context context) {
             super(context);
         }
 

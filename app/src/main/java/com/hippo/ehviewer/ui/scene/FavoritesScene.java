@@ -730,8 +730,7 @@ public class FavoritesScene extends SearchBarScene implements
         private final String mKeyword;
         private final List<GalleryInfo> mBackup;
 
-        private AddFavoritesListener(Context context, int stageId,
-                                     String sceneTag, int taskId, String keyword, List<GalleryInfo> backup) {
+        private AddFavoritesListener(Context context, int taskId, String keyword, List<GalleryInfo> backup) {
             super(context);
             mTaskId = taskId;
             mKeyword = keyword;
@@ -766,8 +765,7 @@ public class FavoritesScene extends SearchBarScene implements
         private final boolean mLocal;
         private final String mKeyword;
 
-        private GetFavoritesListener(Context context, int stageId,
-                                     String sceneTag, int taskId, boolean local, String keyword) {
+        private GetFavoritesListener(Context context, int taskId, boolean local, String keyword) {
             super(context);
             mTaskId = taskId;
             mLocal = local;
@@ -1018,9 +1016,7 @@ public class FavoritesScene extends SearchBarScene implements
 
                     EhRequest request = new EhRequest();
                     request.setMethod(EhClient.METHOD_ADD_FAVORITES_RANGE);
-                    request.setCallback(new AddFavoritesListener(getContext(),
-                            activity.getStageId(), getTag(),
-                            taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
+                    request.setCallback(new AddFavoritesListener(getContext(), taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
                     request.setArgs(gidArray, tokenArray, mModifyFavCat);
                     request.enqueue(FavoritesScene.this);
                 } else {
@@ -1041,7 +1037,6 @@ public class FavoritesScene extends SearchBarScene implements
                     EhRequest request = new EhRequest();
                     request.setMethod(EhClient.METHOD_MODIFY_FAVORITES);
                     request.setCallback(new GetFavoritesListener(getContext(),
-                            activity.getStageId(), getTag(),
                             taskId, local, mUrlBuilder.getKeyword()));
                     request.setArgs(url, gidArray, mModifyFavCat);
                     request.enqueue(FavoritesScene.this);
@@ -1056,7 +1051,6 @@ public class FavoritesScene extends SearchBarScene implements
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_GET_FAVORITES);
                 request.setCallback(new GetFavoritesListener(getContext(),
-                        activity.getStageId(), getTag(),
                         taskId, false, mUrlBuilder.getKeyword()));
                 request.setArgs(url);
                 request.enqueue(FavoritesScene.this);

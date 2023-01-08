@@ -338,7 +338,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             EhRequest request = new EhRequest();
             request.setMethod(EhClient.METHOD_GET_PREVIEW_SET);
             request.setCallback(new GetPreviewSetListener(getContext(),
-                    activity.getStageId(), getTag(), taskId));
+                    1, getTag(), taskId));
             request.setArgs(url);
             request.enqueue(GalleryPreviewsScene.this);
         }

@@ -96,7 +96,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
                     .setMethod(EhClient.METHOD_GET_GALLERY_TOKEN)
                     .setArgs(mGid, mPToken, mPage)
                     .setCallback(new GetGalleryTokenListener(context,
-                            activity.getStageId(), getTag()));
+                            1, getTag()));
             request.enqueue(this);
             return true;
         }

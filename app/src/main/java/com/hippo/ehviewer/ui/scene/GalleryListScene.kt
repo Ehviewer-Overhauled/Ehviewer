@@ -1328,7 +1328,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        activity.stageId
+                        1
                     )
                 )
                 request.setArgs(
@@ -1344,7 +1344,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        activity.stageId
+                        0
                     )
                 )
                 request.setArgs(url)
