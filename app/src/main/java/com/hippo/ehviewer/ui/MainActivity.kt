@@ -39,6 +39,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
@@ -82,7 +83,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : StageActivity() {
     private var settingsLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) refreshTopScene()
@@ -201,12 +202,10 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
         val navController = navHostFragment.navController
         mDrawerLayout = ViewUtils.`$$`(this, R.id.draw_view) as DrawerLayout
         mNavView = ViewUtils.`$$`(this, R.id.nav_view) as NavigationView
+        mNavView?.setupWithNavController(navController)
         mRightDrawer = ViewUtils.`$$`(this, R.id.right_drawer) as DrawerView
         mDrawerLayout?.addDrawerListener(mDrawerOnBackPressedCallback)
         onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
-        if (mNavView != null) {
-            mNavView!!.setNavigationItemSelectedListener(this)
-        }
         if (savedInstanceState == null) {
             checkDownloadLocation()
             if (Settings.getMeteredNetworkWarning()) {
@@ -471,72 +470,6 @@ class MainActivity : StageActivity(), NavigationView.OnNavigationItemSelectedLis
             this, message,
             if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         ).show()
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Don't select twice
-        if (item.isChecked) {
-            return false
-        }
-        val id = item.itemId
-        when (id) {
-            R.id.nav_homepage -> {
-                val args = Bundle()
-                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_HOMEPAGE)
-                startSceneFirstly(
-                    Announcer(GalleryListScene::class.java)
-                        .setArgs(args)
-                )
-            }
-
-            R.id.nav_subscription -> {
-                val args = Bundle()
-                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_SUBSCRIPTION)
-                startSceneFirstly(
-                    Announcer(GalleryListScene::class.java)
-                        .setArgs(args)
-                )
-            }
-
-            R.id.nav_whats_hot -> {
-                val args = Bundle()
-                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_WHATS_HOT)
-                startSceneFirstly(
-                    Announcer(GalleryListScene::class.java)
-                        .setArgs(args)
-                )
-            }
-
-            R.id.nav_toplist -> {
-                val args = Bundle()
-                args.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_TOP_LIST)
-                startSceneFirstly(
-                    Announcer(GalleryListScene::class.java)
-                        .setArgs(args)
-                )
-            }
-
-            R.id.nav_favourite -> {
-                startScene(Announcer(FavoritesScene::class.java))
-            }
-
-            R.id.nav_history -> {
-                startScene(Announcer(HistoryScene::class.java))
-            }
-
-            R.id.nav_downloads -> {
-                startScene(Announcer(DownloadsScene::class.java))
-            }
-
-            R.id.nav_settings -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                settingsLauncher.launch(intent)
-            }
-        }
-        if (id != R.id.nav_stub) {
-            mDrawerLayout?.closeDrawers()
-        }
-        return true
     }
 
     private val mDrawerOnBackPressedCallback =

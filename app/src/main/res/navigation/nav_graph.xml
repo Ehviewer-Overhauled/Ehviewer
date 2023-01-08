@@ -20,4 +20,20 @@
         android:id="@+id/galleryPreviewsScene"
         android:name="com.hippo.ehviewer.ui.scene.GalleryPreviewsScene"
         android:label="GalleryPreviewsScene" />
+    <fragment
+        android:id="@+id/nav_favourite"
+        android:name="com.hippo.ehviewer.ui.scene.FavoritesScene"
+        android:label="FavoritesScene" />
+    <fragment
+        android:id="@+id/nav_history"
+        android:name="com.hippo.ehviewer.ui.scene.HistoryScene"
+        android:label="HistoryScene" />
+    <fragment
+        android:id="@+id/nav_downloads"
+        android:name="com.hippo.ehviewer.ui.scene.DownloadsScene"
+        android:label="DownloadsScene" />
+    <activity
+        android:id="@+id/nav_settings"
+        android:name="com.hippo.ehviewer.ui.SettingsActivity"
+        android:label="SettingsActivity" />
 </navigation>
