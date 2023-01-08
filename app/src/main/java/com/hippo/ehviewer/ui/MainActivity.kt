@@ -44,6 +44,7 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrlOpener
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
@@ -156,6 +157,10 @@ class MainActivity : EhActivity() {
                 }
             }
         }
+        if (EhUtils.needSignedIn()) {
+            navController.navigate(R.id.signInScene)
+        }
+
         binding.navView.setupWithNavController(navController)
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)

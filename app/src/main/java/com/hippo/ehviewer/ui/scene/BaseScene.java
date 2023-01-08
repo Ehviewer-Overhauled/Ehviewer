@@ -294,4 +294,15 @@ public abstract class BaseScene extends Fragment {
                 .build();
         NavHostFragment.findNavController(this).navigate(id, args, options);
     }
+
+    public void navigateToTop() {
+        var navController = NavHostFragment.findNavController(this);
+        var id = navController.getGraph().getStartDestinationId();
+        var options = new NavOptions.Builder()
+                .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
+                .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
+                .setPopUpTo(id, true)
+                .build();
+        navController.navigate(id, null, options);
+    }
 }

@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.app.BaseDialogBuilder;
@@ -47,7 +48,7 @@ import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
 
-public final class SignInScene extends SolidScene implements EditText.OnEditorActionListener,
+public final class SignInScene extends BaseScene implements EditText.OnEditorActionListener,
         View.OnClickListener {
 
     private static final String KEY_REQUEST_ID = "request_id";
@@ -269,8 +270,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         // Clean up for sign in
         EhUtils.signOut();
 
-        EhCallback<?, ?> callback = new SignInListener(context,
-                1, getTag());
+        EhCallback<?, ?> callback = new SignInListener(context);
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_SIGN_IN)
@@ -291,8 +291,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         hideSoftInput();
         showProgress(true);
 
-        EhCallback<?, ?> callback = new GetProfileListener(context,
-                1, getTag());
+        EhCallback<?, ?> callback = new GetProfileListener(context);
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
@@ -304,11 +303,11 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     private void redirectTo() {
         Settings.putNeedSignIn(false);
-        MainActivity activity = getMainActivity();
-        if (null != activity) {
-            startSceneForCheckStep(CHECK_STEP_SIGN_IN, getArguments());
+        if (Settings.getSelectSite()) {
+            navigate(R.id.selectSiteScene, null);
+        } else {
+            navigateToTop();
         }
-        // finish();
     }
 
     private void whetherToSkip(Exception e) {
@@ -346,7 +345,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     private class SignInListener extends EhCallback<SignInScene, String> {
 
-        public SignInListener(Context context, int stageId, String sceneTag) {
+        public SignInListener(Context context) {
             super(context);
         }
 
@@ -376,7 +375,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
 
-        public GetProfileListener(Context context, int stageId, String sceneTag) {
+        public GetProfileListener(Context context) {
             super(context);
         }
 
