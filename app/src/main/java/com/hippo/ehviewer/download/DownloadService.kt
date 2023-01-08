@@ -185,12 +185,8 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
         val bundle = Bundle()
         bundle.putString(DownloadsScene.KEY_ACTION, DownloadsScene.ACTION_CLEAR_DOWNLOAD_SERVICE)
         val activityIntent = Intent(this, MainActivity::class.java)
-        /*
-        activityIntent.action = StageActivity.ACTION_START_SCENE
-        activityIntent.putExtra(StageActivity.KEY_SCENE_NAME, DownloadsScene::class.java.name)
-        activityIntent.putExtra(StageActivity.KEY_SCENE_ARGS, bundle)
-
-         */
+        activityIntent.action = ACTION_START_DOWNLOADSCENE
+        activityIntent.putExtra(ACTION_START_DOWNLOADSCENE_ARGS, bundle)
         val piActivity = PendingIntent.getActivity(
             this@DownloadService, 0,
             activityIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -243,12 +239,8 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
         val bundle = Bundle()
         bundle.putLong(DownloadsScene.KEY_GID, info.gid)
         val activityIntent = Intent(this, MainActivity::class.java)
-        /*
-        activityIntent.action = StageActivity.ACTION_START_SCENE
-        activityIntent.putExtra(StageActivity.KEY_SCENE_NAME, DownloadsScene::class.java.name)
-        activityIntent.putExtra(StageActivity.KEY_SCENE_ARGS, bundle)
-
-         */
+        activityIntent.action = ACTION_START_DOWNLOADSCENE
+        activityIntent.putExtra(ACTION_START_DOWNLOADSCENE_ARGS, bundle)
         val piActivity = PendingIntent.getActivity(
             this@DownloadService, 0,
             activityIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -521,6 +513,9 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
     }
 
     companion object {
+        const val ACTION_START_DOWNLOADSCENE = "start_download_scene"
+        const val ACTION_START_DOWNLOADSCENE_ARGS = "start_download_scene_args"
+
         const val ACTION_START = "start"
         const val ACTION_START_RANGE = "start_range"
         const val ACTION_START_ALL = "start_all"

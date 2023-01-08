@@ -54,6 +54,7 @@ import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryListUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
+import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
@@ -200,6 +201,9 @@ class MainActivity : EhActivity() {
                     }
                 }
             }
+        } else if (action == DownloadService.ACTION_START_DOWNLOADSCENE) {
+            val args = intent.getBundleExtra(DownloadService.ACTION_START_DOWNLOADSCENE_ARGS)
+            navController.navigate(R.id.nav_downloads, args)
         }
 
         return false
