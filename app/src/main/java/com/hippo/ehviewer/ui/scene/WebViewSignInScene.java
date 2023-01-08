@@ -44,7 +44,7 @@ import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import rikka.core.res.ResourcesKt;
 
-public class WebViewSignInScene extends SolidScene {
+public class WebViewSignInScene extends BaseScene {
 
     /*---------------
      View life cycle
@@ -147,8 +147,8 @@ public class WebViewSignInScene extends SolidScene {
             }
 
             if (getId && getHash) {
-                setResult(RESULT_OK, null);
-                finish();
+                navigateToTop();
+                // TODO: getProfile
             }
         }
     }

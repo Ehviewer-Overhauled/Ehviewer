@@ -65,7 +65,6 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.widget.SimpleRatingView
-import com.hippo.scene.Announcer
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -152,10 +151,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             }
         }
         return false
-    }
-
-    override fun onNewArguments(args: Bundle) {
-        handleArguments(args)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -969,8 +964,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     GalleryDetailScene.ACTION_GALLERY_INFO
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
-                val announcer = Announcer(GalleryDetailScene::class.java).setArgs(args)
-                startScene(announcer)
+                navigate(R.id.galleryDetailScene, args)
             } else if (start === v) {
                 val intent = Intent(activity, DownloadService::class.java)
                 intent.action = DownloadService.ACTION_START

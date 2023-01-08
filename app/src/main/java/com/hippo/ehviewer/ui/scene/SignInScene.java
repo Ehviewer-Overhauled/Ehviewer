@@ -42,20 +42,15 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.parser.ProfileParser;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
 import com.hippo.yorozuya.ViewUtils;
 
-public final class SignInScene extends SolidScene implements EditText.OnEditorActionListener,
+public final class SignInScene extends BaseScene implements EditText.OnEditorActionListener,
         View.OnClickListener {
 
     private static final String KEY_REQUEST_ID = "request_id";
-
-    private static final int REQUEST_CODE_WEBVIEW = 0;
-    private static final int REQUEST_CODE_COOKIE = 0;
 
     /*---------------
      View life cycle
@@ -203,17 +198,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    protected void onSceneResult(int requestCode, int resultCode, Bundle data) {
-        if (REQUEST_CODE_WEBVIEW == requestCode) {
-            if (RESULT_OK == resultCode) {
-                getProfile();
-            }
-        } else {
-            super.onSceneResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         MainActivity activity = getMainActivity();
         if (null == activity) {
@@ -225,9 +209,9 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         } else if (mSignIn == v) {
             signIn();
         } else if (mSignInViaWebView == v) {
-            startScene(new Announcer(WebViewSignInScene.class).setRequestCode(this, REQUEST_CODE_WEBVIEW));
+            navigate(R.id.webViewSignInScene, null);
         } else if (mSignInViaCookies == v) {
-            startScene(new Announcer(CookieSignInScene.class).setRequestCode(this, REQUEST_CODE_COOKIE));
+            navigate(R.id.cookieSignInScene, null);
         } else if (mSkipSigningIn == v) {
             // Set gallery size SITE_E if skip sign in
             Settings.putGallerySite(EhUrl.SITE_E);
@@ -282,8 +266,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         // Clean up for sign in
         EhUtils.signOut();
 
-        EhCallback<?, ?> callback = new SignInListener(context,
-                activity.getStageId(), getTag());
+        EhCallback<?, ?> callback = new SignInListener(context);
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_SIGN_IN)
@@ -304,8 +287,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         hideSoftInput();
         showProgress(true);
 
-        EhCallback<?, ?> callback = new GetProfileListener(context,
-                activity.getStageId(), getTag());
+        EhCallback<?, ?> callback = new GetProfileListener(context);
         mRequestId = ((EhApplication) context.getApplicationContext()).putGlobalStuff(callback);
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_GET_PROFILE)
@@ -317,11 +299,11 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
 
     private void redirectTo() {
         Settings.putNeedSignIn(false);
-        MainActivity activity = getMainActivity();
-        if (null != activity) {
-            startSceneForCheckStep(CHECK_STEP_SIGN_IN, getArguments());
+        if (Settings.getSelectSite()) {
+            navigate(R.id.selectSiteScene, null);
+        } else {
+            navigateToTop();
         }
-        finish();
     }
 
     private void whetherToSkip(Exception e) {
@@ -357,10 +339,10 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         redirectTo();
     }
 
-    private static class SignInListener extends EhCallback<SignInScene, String> {
+    private class SignInListener extends EhCallback<SignInScene, String> {
 
-        public SignInListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+        public SignInListener(Context context) {
+            super(context);
         }
 
         @Override
@@ -368,10 +350,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             Settings.putDisplayName(result);
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onSignInEnd(null);
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onSignInEnd(null);
         }
 
         @Override
@@ -379,27 +359,20 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             e.printStackTrace();
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onSignInEnd(e);
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onSignInEnd(e);
         }
 
         @Override
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof SignInScene;
-        }
     }
 
-    private static class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
+    private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
 
-        public GetProfileListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+        public GetProfileListener(Context context) {
+            super(context);
         }
 
         @Override
@@ -408,10 +381,8 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             Settings.putDisplayName(result.displayName);
             Settings.putAvatar(result.avatar);
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onGetProfileEnd();
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onGetProfileEnd();
         }
 
         @Override
@@ -419,20 +390,13 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
             getApplication().removeGlobalStuff(this);
             e.printStackTrace();
 
-            SignInScene scene = getScene();
-            if (scene != null) {
-                scene.onGetProfileEnd();
-            }
+            SignInScene scene = SignInScene.this;
+            scene.onGetProfileEnd();
         }
 
         @Override
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof SignInScene;
         }
     }
 }

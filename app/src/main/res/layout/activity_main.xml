@@ -26,8 +26,7 @@
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
         <com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout
             android:layout_width="match_parent"
@@ -39,10 +38,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.hippo.ehviewer.widget.EhStageLayout
-                    android:id="@+id/fragment_container"
+                <com.hippo.ehviewer.widget.AboveSnackerLayout
+                    android:id="@+id/absnacker"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/fragment_container"
+                        android:name="androidx.navigation.fragment.NavHostFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:defaultNavHost="true"
+                        app:navGraph="@navigation/nav_graph" />
+
+                </com.hippo.ehviewer.widget.AboveSnackerLayout>
+
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         </com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout>
@@ -60,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:fitsSystemWindows="false"
+            android:fitsSystemWindows="true"
             android:maxWidth="@dimen/drawer_max_width" />
 
     </androidx.drawerlayout.widget.DrawerLayout>

@@ -47,7 +47,7 @@ import com.hippo.yorozuya.ViewUtils;
 
 import okhttp3.Cookie;
 
-public class CookieSignInScene extends SolidScene implements EditText.OnEditorActionListener,
+public class CookieSignInScene extends BaseScene implements EditText.OnEditorActionListener,
         View.OnClickListener {
 
     /*---------------
@@ -285,8 +285,8 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     private class CookieSignInListener implements EhClient.Callback<Object> {
         @Override
         public void onSuccess(Object result) {
-            setResult(RESULT_OK, null);
-            finish();
+            // TODO: getProfile
+            navigateToTop();
         }
 
         @Override

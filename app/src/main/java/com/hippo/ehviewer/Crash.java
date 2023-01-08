@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -25,7 +24,6 @@ import android.os.Debug;
 
 import androidx.annotation.NonNull;
 
-import com.hippo.scene.StageActivity;
 import com.hippo.util.PackageUtils;
 import com.hippo.util.ReadableTime;
 import com.hippo.yorozuya.FileUtils;
@@ -78,27 +76,10 @@ public final class Crash {
 
         // Runtime
         String topActivityClazzName = "null";
-        String topSceneClazzName = "null";
-        try {
-            Activity topActivity = ((EhApplication) context.getApplicationContext()).getTopActivity();
-            if (null != topActivity) {
-                topActivityClazzName = topActivity.getClass().getName();
-                if (topActivity instanceof StageActivity) {
-                    Class<?> clazz = ((StageActivity) topActivity).getTopSceneClass();
-                    if (clazz != null) {
-                        topSceneClazzName = clazz.getName();
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            // Ignore
-        }
         fw.write("======== Runtime ========\r\n");
         fw.write("TopActivity=");
         fw.write(avoidNull(topActivityClazzName));
         fw.write("\r\n");
-        fw.write("TopScene=");
-        fw.write(avoidNull(topSceneClazzName));
         fw.write("\r\n");
         fw.write("\r\n");
 

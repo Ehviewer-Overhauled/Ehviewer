@@ -1,26 +1,9 @@
-/*
- * Copyright 2022 Tarsin Norbin
- *
- * This file is part of EhViewer
- *
- * EhViewer is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * EhViewer is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with EhViewer.
- * If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.hippo.ehviewer.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,21 +12,20 @@ import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.hippo.scene.StageLayout;
 import com.hippo.yorozuya.LayoutUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EhStageLayout extends StageLayout implements CoordinatorLayout.AttachedBehavior {
+public class AboveSnackerLayout extends FrameLayout implements CoordinatorLayout.AttachedBehavior {
 
     private List<View> mAboveSnackViewList;
 
-    public EhStageLayout(Context context, AttributeSet attrs) {
+    public AboveSnackerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public EhStageLayout(Context context, AttributeSet attrs, int defStyle) {
+    public AboveSnackerLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -76,19 +58,19 @@ public class EhStageLayout extends StageLayout implements CoordinatorLayout.Atta
 
     @NonNull
     @Override
-    public EhStageLayout.Behavior getBehavior() {
-        return new EhStageLayout.Behavior();
+    public AboveSnackerLayout.Behavior getBehavior() {
+        return new AboveSnackerLayout.Behavior();
     }
 
-    public static class Behavior extends CoordinatorLayout.Behavior<EhStageLayout> {
+    public static class Behavior extends CoordinatorLayout.Behavior<AboveSnackerLayout> {
 
         @Override
-        public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull EhStageLayout child, @NonNull View dependency) {
+        public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull AboveSnackerLayout child, @NonNull View dependency) {
             return dependency instanceof Snackbar.SnackbarLayout;
         }
 
         @Override
-        public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, EhStageLayout child, @NonNull View dependency) {
+        public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, AboveSnackerLayout child, @NonNull View dependency) {
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {
@@ -100,7 +82,7 @@ public class EhStageLayout extends StageLayout implements CoordinatorLayout.Atta
         }
 
         @Override
-        public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull EhStageLayout child, @NonNull View dependency) {
+        public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull AboveSnackerLayout child, @NonNull View dependency) {
             for (int i = 0, n = child.getAboveSnackViewCount(); i < n; i++) {
                 View view = child.getAboveSnackViewAt(i);
                 if (view != null) {

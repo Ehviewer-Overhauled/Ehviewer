@@ -72,7 +72,6 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.dao.Filter;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
@@ -313,8 +312,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         EhRequest request = new EhRequest()
                 .setMethod(EhClient.METHOD_VOTE_COMMENT)
                 .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), id, vote)
-                .setCallback(new VoteCommentListener(context,
-                        activity.getStageId(), getTag()));
+                .setCallback(new VoteCommentListener(context));
         request.enqueue(this);
     }
 
@@ -450,7 +448,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
+                        .setCallback(new RefreshCommentListener(activity));
                 request.enqueue(this);
             }
         }
@@ -634,8 +632,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_COMMENT_GALLERY)
                         .setArgs(url, comment, mCommentId != 0 ? Long.toString(mCommentId) : null)
-                        .setCallback(new CommentGalleryListener(context,
-                                activity.getStageId(), getTag(), mCommentId));
+                        .setCallback(new CommentGalleryListener(context, mCommentId));
                 request.enqueue(this);
                 hideSoftInput();
                 hideEditPanel(true);
@@ -654,10 +651,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         mAdapter.notifyDataSetChanged();
 
         updateView(true);
-
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, result);
-        setResult(SceneFragment.RESULT_OK, re);
     }
 
     private void onRefreshGalleryFailure() {
@@ -680,9 +673,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         mGalleryDetail.comments = result;
         mAdapter.notifyDataSetChanged();
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, result);
-        setResult(SceneFragment.RESULT_OK, re);
 
         // Remove text
         if (mEditText != null) {
@@ -723,10 +713,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
 
         mAdapter.notifyItemChanged(position);
-
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, mGalleryDetail.comments);
-        setResult(SceneFragment.RESULT_OK, re);
     }
 
     @Override
@@ -741,50 +727,41 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 EhRequest request = new EhRequest()
                         .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
                         .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity, activity.getStageId(), getTag()));
+                        .setCallback(new RefreshCommentListener(activity));
                 request.enqueue(this);
             }
         }
     }
 
-    private static class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
+    private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
 
-        public RefreshCommentListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+        public RefreshCommentListener(Context context) {
+            super(context);
         }
 
         @Override
         public void onSuccess(GalleryDetail result) {
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onRefreshGallerySuccess(result.comments);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onRefreshGallerySuccess(result.comments);
         }
 
         @Override
         public void onFailure(Exception e) {
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onRefreshGalleryFailure();
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onRefreshGalleryFailure();
         }
 
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
-        }
     }
 
-    private static class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
+    private class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
 
         private final long mCommentId;
 
-        public CommentGalleryListener(Context context, int stageId, String sceneTag, long commentId) {
-            super(context, stageId, sceneTag);
+        public CommentGalleryListener(Context context, long commentId) {
+            super(context);
             mCommentId = commentId;
         }
 
@@ -792,10 +769,8 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         public void onSuccess(GalleryCommentList result) {
             showTip(mCommentId != 0 ? R.string.edit_comment_successfully : R.string.comment_successfully, LENGTH_SHORT);
 
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onCommentGallerySuccess(result);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onCommentGallerySuccess(result);
         }
 
         @Override
@@ -806,17 +781,12 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
-        }
     }
 
-    private static class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
+    private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
 
-        public VoteCommentListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+        public VoteCommentListener(Context context) {
+            super(context);
         }
 
         @Override
@@ -826,10 +796,8 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                             (0 != result.vote ? R.string.vote_down_successfully : R.string.cancel_vote_down_successfully),
                     LENGTH_SHORT);
 
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onVoteCommentSuccess(result);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onVoteCommentSuccess(result);
         }
 
         @Override
@@ -839,11 +807,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
         }
     }
 
@@ -925,7 +888,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_UPLOADER);
                 lub.setKeyword(value.user);
-                GalleryListScene.startScene(GalleryCommentsScene.this, lub);
+                navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
             });
             time.setText(ReadableTime.getTimeAgo(value.time));
             comment.setText(generateComment(comment.getContext(), comment, value));

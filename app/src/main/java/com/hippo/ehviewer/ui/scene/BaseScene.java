@@ -25,7 +25,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -36,12 +35,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 
-public abstract class BaseScene extends SceneFragment {
+import rikka.core.res.ResourcesKt;
+
+public abstract class BaseScene extends Fragment {
 
     public static final int LENGTH_SHORT = 0;
     public static final int LENGTH_LONG = 1;
@@ -185,15 +189,7 @@ public abstract class BaseScene extends SceneFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        postponeEnterTransition();
-        view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                view.getViewTreeObserver().removeOnPreDrawListener(this);
-                startPostponedEnterTransition();
-                return true;
-            }
-        });
+        view.setBackground(ResourcesKt.resolveDrawable(requireActivity().getTheme(), android.R.attr.windowBackground));
 
         // Update left drawer locked state
         if (needShowLeftDrawer()) {
@@ -207,6 +203,14 @@ public abstract class BaseScene extends SceneFragment {
 
         // Hide soft ime
         hideSoftInput();
+
+        getMainActivity().createDrawerView(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        destroyDrawerView();
     }
 
     @Nullable
@@ -277,5 +281,28 @@ public abstract class BaseScene extends SceneFragment {
 
     public Resources.Theme getTheme() {
         return requireActivity().getTheme();
+    }
+
+    public void navigate(int id, Bundle args) {
+        navigate(id, args, false);
+    }
+
+    public void navigate(int id, Bundle args, boolean singleTop) {
+        var options = new NavOptions.Builder().setLaunchSingleTop(singleTop)
+                .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
+                .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
+                .build();
+        NavHostFragment.findNavController(this).navigate(id, args, options);
+    }
+
+    public void navigateToTop() {
+        var navController = NavHostFragment.findNavController(this);
+        var id = navController.getGraph().getStartDestinationId();
+        var options = new NavOptions.Builder()
+                .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
+                .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
+                .setPopUpTo(id, true)
+                .build();
+        navController.navigate(id, null, options);
     }
 }

@@ -32,8 +32,6 @@ import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AssertUtils;
@@ -97,7 +95,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
                     .setMethod(EhClient.METHOD_GET_GALLERY_TOKEN)
                     .setArgs(mGid, mPToken, mPage)
                     .setCallback(new GetGalleryTokenListener(context,
-                            activity.getStageId(), getTag()));
+                            1, getTag()));
             request.enqueue(this);
             return true;
         }
@@ -209,8 +207,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         arg.putLong(GalleryDetailScene.KEY_GID, mGid);
         arg.putString(GalleryDetailScene.KEY_TOKEN, result);
         arg.putInt(GalleryDetailScene.KEY_PAGE, mPage);
-        startScene(new Announcer(GalleryDetailScene.class).setArgs(arg));
-        finish();
+        navigate(R.id.galleryDetailScene, arg);
     }
 
     private void onGetGalleryTokenFailure(Exception e) {
@@ -226,35 +223,26 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         }
     }
 
-    private static class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
+    private class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
 
         public GetGalleryTokenListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override
         public void onSuccess(String result) {
-            ProgressScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryTokenSuccess(result);
-            }
+            ProgressScene scene = ProgressScene.this;
+            scene.onGetGalleryTokenSuccess(result);
         }
 
         @Override
         public void onFailure(Exception e) {
-            ProgressScene scene = getScene();
-            if (scene != null) {
-                scene.onGetGalleryTokenFailure(e);
-            }
+            ProgressScene scene = ProgressScene.this;
+            scene.onGetGalleryTokenFailure(e);
         }
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof ProgressScene;
         }
     }
 }

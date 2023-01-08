@@ -65,8 +65,6 @@ import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
 import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
-import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
 import com.hippo.yorozuya.AssertUtils;
@@ -460,8 +458,7 @@ public class FavoritesScene extends SearchBarScene implements
                 Bundle args = new Bundle();
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
-                Announcer announcer = new Announcer(GalleryDetailScene.class).setArgs(args);
-                startScene(announcer);
+                navigate(R.id.galleryDetailScene, args);
             }
         }
         return true;
@@ -727,15 +724,14 @@ public class FavoritesScene extends SearchBarScene implements
         }
     }
 
-    private static class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
+    private class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
 
         private final int mTaskId;
         private final String mKeyword;
         private final List<GalleryInfo> mBackup;
 
-        private AddFavoritesListener(Context context, int stageId,
-                                     String sceneTag, int taskId, String keyword, List<GalleryInfo> backup) {
-            super(context, stageId, sceneTag);
+        private AddFavoritesListener(Context context, int taskId, String keyword, List<GalleryInfo> backup) {
+            super(context);
             mTaskId = taskId;
             mKeyword = keyword;
             mBackup = backup;
@@ -743,10 +739,8 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         public void onSuccess(Void result) {
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
-            }
+            FavoritesScene scene = FavoritesScene.this;
+            scene.onGetFavoritesLocal(mKeyword, mTaskId);
         }
 
         @Override
@@ -755,32 +749,24 @@ public class FavoritesScene extends SearchBarScene implements
             // But how to known which one is failed?
             EhDB.putLocalFavorites(mBackup);
 
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
-            }
+            FavoritesScene scene = FavoritesScene.this;
+            scene.onGetFavoritesLocal(mKeyword, mTaskId);
         }
 
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof FavoritesScene;
-        }
     }
 
-    private static class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
+    private class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
 
         private final int mTaskId;
         // Local fav is shown now, but operation need be done for cloud fav
         private final boolean mLocal;
         private final String mKeyword;
 
-        private GetFavoritesListener(Context context, int stageId,
-                                     String sceneTag, int taskId, boolean local, String keyword) {
-            super(context, stageId, sceneTag);
+        private GetFavoritesListener(Context context, int taskId, boolean local, String keyword) {
+            super(context);
             mTaskId = taskId;
             mLocal = local;
             mKeyword = keyword;
@@ -791,36 +777,27 @@ public class FavoritesScene extends SearchBarScene implements
             // Put fav cat
             Settings.putFavCat(result.catArray);
             Settings.putFavCount(result.countArray);
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                if (mLocal) {
-                    scene.onGetFavoritesLocal(mKeyword, mTaskId);
-                } else {
-                    scene.onGetFavoritesSuccess(result, mTaskId);
-                }
+            FavoritesScene scene = FavoritesScene.this;
+            if (mLocal) {
+                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+            } else {
+                scene.onGetFavoritesSuccess(result, mTaskId);
             }
         }
 
         @Override
         public void onFailure(Exception e) {
-            FavoritesScene scene = getScene();
-            if (scene != null) {
-                if (mLocal) {
-                    e.printStackTrace();
-                    scene.onGetFavoritesLocal(mKeyword, mTaskId);
-                } else {
-                    scene.onGetFavoritesFailure(e, mTaskId);
-                }
+            FavoritesScene scene = FavoritesScene.this;
+            if (mLocal) {
+                e.printStackTrace();
+                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+            } else {
+                scene.onGetFavoritesFailure(e, mTaskId);
             }
         }
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof FavoritesScene;
         }
     }
 
@@ -1039,9 +1016,7 @@ public class FavoritesScene extends SearchBarScene implements
 
                     EhRequest request = new EhRequest();
                     request.setMethod(EhClient.METHOD_ADD_FAVORITES_RANGE);
-                    request.setCallback(new AddFavoritesListener(getContext(),
-                            activity.getStageId(), getTag(),
-                            taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
+                    request.setCallback(new AddFavoritesListener(getContext(), taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
                     request.setArgs(gidArray, tokenArray, mModifyFavCat);
                     request.enqueue(FavoritesScene.this);
                 } else {
@@ -1062,7 +1037,6 @@ public class FavoritesScene extends SearchBarScene implements
                     EhRequest request = new EhRequest();
                     request.setMethod(EhClient.METHOD_MODIFY_FAVORITES);
                     request.setCallback(new GetFavoritesListener(getContext(),
-                            activity.getStageId(), getTag(),
                             taskId, local, mUrlBuilder.getKeyword()));
                     request.setArgs(url, gidArray, mModifyFavCat);
                     request.enqueue(FavoritesScene.this);
@@ -1077,7 +1051,6 @@ public class FavoritesScene extends SearchBarScene implements
                 EhRequest request = new EhRequest();
                 request.setMethod(EhClient.METHOD_GET_FAVORITES);
                 request.setCallback(new GetFavoritesListener(getContext(),
-                        activity.getStageId(), getTag(),
                         taskId, false, mUrlBuilder.getKeyword()));
                 request.setArgs(url);
                 request.enqueue(FavoritesScene.this);

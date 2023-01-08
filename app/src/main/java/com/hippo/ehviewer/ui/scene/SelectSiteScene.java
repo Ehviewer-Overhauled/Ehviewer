@@ -33,7 +33,7 @@ import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.yorozuya.ViewUtils;
 
-public class SelectSiteScene extends SolidScene implements View.OnClickListener {
+public class SelectSiteScene extends BaseScene implements View.OnClickListener {
 
     private MaterialButtonToggleGroup mButtonGroup;
     private View mOk;
@@ -82,13 +82,11 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
             if (id == R.id.site_e) {
                 Settings.putSelectSite(false);
                 Settings.putGallerySite(EhUrl.SITE_E);
-                startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                finish();
+                navigateToTop();
             } else if (id == R.id.site_ex) {
                 Settings.putSelectSite(false);
                 Settings.putGallerySite(EhUrl.SITE_EX);
-                startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                finish();
+                navigateToTop();
             } else {
                 showTip(R.string.no_select, LENGTH_SHORT);
             }

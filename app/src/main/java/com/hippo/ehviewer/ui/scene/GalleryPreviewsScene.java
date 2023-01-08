@@ -49,7 +49,6 @@ import com.hippo.ehviewer.client.data.GalleryPreview;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.LoadImageView;
 import com.hippo.widget.recyclerview.AutoGridLayoutManager;
@@ -251,39 +250,30 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         }
     }
 
-    private static class GetPreviewSetListener extends EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Integer>> {
+    private class GetPreviewSetListener extends EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Integer>> {
 
         private final int mTaskId;
 
         public GetPreviewSetListener(Context context, int stageId, String sceneTag, int taskId) {
-            super(context, stageId, sceneTag);
+            super(context);
             mTaskId = taskId;
         }
 
         @Override
         public void onSuccess(Pair<PreviewSet, Integer> result) {
-            GalleryPreviewsScene scene = getScene();
-            if (scene != null) {
-                scene.onGetPreviewSetSuccess(result, mTaskId);
-            }
+            GalleryPreviewsScene scene = GalleryPreviewsScene.this;
+            scene.onGetPreviewSetSuccess(result, mTaskId);
         }
 
         @Override
         public void onFailure(Exception e) {
-            GalleryPreviewsScene scene = getScene();
-            if (scene != null) {
-                scene.onGetPreviewSetFailure(e, mTaskId);
-            }
+            GalleryPreviewsScene scene = GalleryPreviewsScene.this;
+            scene.onGetPreviewSetFailure(e, mTaskId);
         }
 
         @Override
         public void onCancel() {
 
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryPreviewsScene;
         }
     }
 
@@ -348,7 +338,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
             EhRequest request = new EhRequest();
             request.setMethod(EhClient.METHOD_GET_PREVIEW_SET);
             request.setCallback(new GetPreviewSetListener(getContext(),
-                    activity.getStageId(), getTag(), taskId));
+                    1, getTag(), taskId));
             request.setArgs(url);
             request.enqueue(GalleryPreviewsScene.this);
         }

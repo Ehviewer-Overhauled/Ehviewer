@@ -92,8 +92,6 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
-import com.hippo.scene.Announcer
-import com.hippo.scene.SceneFragment
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -211,25 +209,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun handleArgs(args: Bundle?) {
-        args ?: return
-        mUrlBuilder = when (args.getString(KEY_ACTION)) {
+        val action = args?.getString(KEY_ACTION) ?: ACTION_HOMEPAGE
+        mUrlBuilder = when (action) {
             ACTION_HOMEPAGE -> ListUrlBuilder()
             ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)
             ACTION_WHATS_HOT -> ListUrlBuilder(MODE_WHATS_HOT)
             ACTION_TOP_LIST -> ListUrlBuilder(MODE_TOPLIST, mKeyword = "11")
-            ACTION_LIST_URL_BUILDER -> args.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
+            ACTION_LIST_URL_BUILDER -> args?.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
                 ?.copy() ?: ListUrlBuilder()
 
-            else -> throw IllegalStateException("Wrong KEY_ACTION:${args.getString(KEY_ACTION)} when handle args!")
+            else -> throw IllegalStateException("Wrong KEY_ACTION:${args?.getString(KEY_ACTION)} when handle args!")
         }
-    }
-
-    override fun onNewArguments(args: Bundle) {
-        handleArgs(args)
-        onUpdateUrlBuilder()
-        mHelper?.refresh()
-        setState(STATE_NORMAL)
-        showSearchBar()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -619,8 +609,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        val announcer = Announcer(GalleryDetailScene::class.java).setArgs(args)
-        startScene(announcer)
+        navigate(R.id.galleryDetailScene, args)
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
@@ -805,13 +794,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         CommonOperations.removeFromFavorites(
                             activity,
                             gi,
-                            RemoveFromFavoriteListener(context, activity.stageId, tag)
+                            RemoveFromFavoriteListener(context)
                         )
                     } else {
                         CommonOperations.addToFavorites(
                             activity,
                             gi,
-                            AddToFavoriteListener(context, activity.stageId, tag)
+                            AddToFavoriteListener(context)
                         )
                     }
 
@@ -1102,30 +1091,25 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     @IntDef(STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST)
     @Retention(AnnotationRetention.SOURCE)
     private annotation class State
-    private class GetGalleryListListener(
+    private inner class GetGalleryListListener(
         context: Context,
-        stageId: Int,
-        sceneTag: String?,
         private val mTaskId: Int
-    ) : EhCallback<GalleryListScene, GalleryListParser.Result>(context, stageId, sceneTag) {
+    ) : EhCallback<GalleryListScene, GalleryListParser.Result>(context) {
         override fun onSuccess(result: GalleryListParser.Result) {
-            val scene = scene
-            scene?.onGetGalleryListSuccess(result, mTaskId)
+            val scene = this@GalleryListScene
+            scene.onGetGalleryListSuccess(result, mTaskId)
         }
 
         override fun onFailure(e: Exception) {
-            val scene = scene
-            scene?.onGetGalleryListFailure(e, mTaskId)
+            val scene = this@GalleryListScene
+            scene.onGetGalleryListFailure(e, mTaskId)
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
-    private class AddToFavoriteListener(context: Context, stageId: Int, sceneTag: String?) :
-        EhCallback<GalleryListScene, Void>(context, stageId, sceneTag) {
+    private class AddToFavoriteListener(context: Context) :
+        EhCallback<GalleryListScene, Void>(context) {
         override fun onSuccess(result: Void) {
             showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
         }
@@ -1135,13 +1119,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
-    private class RemoveFromFavoriteListener(context: Context, stageId: Int, sceneTag: String?) :
-        EhCallback<GalleryListScene, Void>(context, stageId, sceneTag) {
+    private class RemoveFromFavoriteListener(context: Context) :
+        EhCallback<GalleryListScene, Void>(context) {
         override fun onSuccess(result: Void) {
             showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
         }
@@ -1151,9 +1132,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class QsDrawerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -1256,27 +1234,32 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onClick() {
-            startScene(createAnnouncer())
+            navigate(getDestination(), getArgs())
             if (mState == STATE_SIMPLE_SEARCH) {
                 setState(STATE_NORMAL)
             } else if (mState == STATE_SEARCH_SHOW_LIST) {
                 setState(STATE_SEARCH)
             }
         }
+        abstract fun getDestination(): Int
 
-        abstract fun createAnnouncer(): Announcer?
+        abstract fun getArgs(): Bundle
     }
 
     private inner class GalleryDetailUrlSuggestion(
         private val mGid: Long,
         private val mToken: String
     ) : UrlSuggestion() {
-        override fun createAnnouncer(): Announcer? {
+        override fun getDestination(): Int {
+            return R.id.galleryDetailScene
+        }
+
+        override fun getArgs(): Bundle {
             val args = Bundle()
             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
             args.putLong(GalleryDetailScene.KEY_GID, mGid)
             args.putString(GalleryDetailScene.KEY_TOKEN, mToken)
-            return Announcer(GalleryDetailScene::class.java).setArgs(args)
+            return args
         }
     }
 
@@ -1285,13 +1268,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         private val mPToken: String,
         private val mPage: Int
     ) : UrlSuggestion() {
-        override fun createAnnouncer(): Announcer? {
+        override fun getDestination(): Int {
+            return R.id.progressScene
+        }
+
+        override fun getArgs(): Bundle {
             val args = Bundle()
             args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
             args.putLong(ProgressScene.KEY_GID, mGid)
             args.putString(ProgressScene.KEY_PTOKEN, mPToken)
             args.putInt(ProgressScene.KEY_PAGE, mPage)
-            return Announcer(ProgressScene::class.java).setArgs(args)
+            return args
         }
     }
 
@@ -1340,7 +1327,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        activity.stageId, tag, taskId
+                        taskId
                     )
                 )
                 request.setArgs(
@@ -1356,7 +1343,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        activity.stageId, tag, taskId
+                        taskId
                     )
                 )
                 request.setArgs(url)
@@ -1492,15 +1479,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         @JvmStatic
-        fun startScene(scene: SceneFragment, lub: ListUrlBuilder?) {
-            scene.startScene(getStartAnnouncer(lub))
-        }
-
-        fun getStartAnnouncer(lub: ListUrlBuilder?): Announcer {
+        fun getStartArgs(lub: ListUrlBuilder): Bundle {
             val args = Bundle()
             args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
             args.putParcelable(KEY_LIST_URL_BUILDER, lub)
-            return Announcer(GalleryListScene::class.java).setArgs(args)
+            return args
         }
     }
 }
