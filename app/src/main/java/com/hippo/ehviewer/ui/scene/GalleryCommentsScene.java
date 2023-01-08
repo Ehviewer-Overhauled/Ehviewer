@@ -904,7 +904,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_UPLOADER);
                 lub.setKeyword(value.user);
-                NavHostFragment.findNavController(GalleryCommentsScene.this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+                navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
             });
             time.setText(ReadableTime.getTimeAgo(value.time));
             comment.setText(generateComment(comment.getContext(), comment, value));

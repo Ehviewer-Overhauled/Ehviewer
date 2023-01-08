@@ -462,7 +462,7 @@ public class FavoritesScene extends SearchBarScene implements
                 Bundle args = new Bundle();
                 args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
-                NavHostFragment.findNavController(this).navigate(R.id.galleryDetailScene, args);
+                navigate(R.id.galleryDetailScene, args);
             }
         }
         return true;

@@ -37,9 +37,16 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavOptions;
+import androidx.navigation.NavOptionsBuilder;
+import androidx.navigation.NavOptionsBuilderKt;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
+
+import rikka.core.res.ResourcesKt;
 
 public abstract class BaseScene extends SceneFragment {
 
@@ -185,15 +192,7 @@ public abstract class BaseScene extends SceneFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        postponeEnterTransition();
-        view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                view.getViewTreeObserver().removeOnPreDrawListener(this);
-                startPostponedEnterTransition();
-                return true;
-            }
-        });
+        view.setBackground(ResourcesKt.resolveDrawable(requireActivity().getTheme(), android.R.attr.windowBackground));
 
         // Update left drawer locked state
         if (needShowLeftDrawer()) {
@@ -285,5 +284,17 @@ public abstract class BaseScene extends SceneFragment {
 
     public Resources.Theme getTheme() {
         return requireActivity().getTheme();
+    }
+
+    public void navigate(int id, Bundle args) {
+        navigate(id, args, false);
+    }
+
+    public void navigate(int id, Bundle args, boolean singleTop) {
+        var options = new NavOptions.Builder().setLaunchSingleTop(singleTop)
+                .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
+                .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
+                .build();
+        NavHostFragment.findNavController(this).navigate(id, args, options);
     }
 }

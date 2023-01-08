@@ -20,6 +20,7 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.ActivityNavigator
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -77,5 +78,10 @@ class SettingsActivity : EhActivity() {
 
     fun resetAppbarLiftStatus() {
         mAppbarLayout?.setExpanded(true)
+    }
+
+    override fun finish() {
+        super.finish()
+        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 }

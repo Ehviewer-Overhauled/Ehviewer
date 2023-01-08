@@ -1009,7 +1009,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_NORMAL);
             lub.setKeyword("\"" + keyword + "\"");
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
             return;
         }
         String artist = getArtist(gd.tags);
@@ -1017,14 +1017,14 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_TAG);
             lub.setKeyword("artist:" + artist);
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
             return;
         }
         if (null != gd.getUploader()) {
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_UPLOADER);
             lub.setKeyword(gd.getUploader());
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
         }
     }
 
@@ -1044,7 +1044,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             lub.setMode(ListUrlBuilder.MODE_IMAGE_SEARCH);
             lub.setImagePath(path.toString());
             lub.setUseSimilarityScan(true);
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -1070,7 +1070,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setMode(ListUrlBuilder.MODE_UPLOADER);
             lub.setKeyword(uploader);
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
         } else if (mCategory == v) {
             int category = getCategory();
             if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
@@ -1078,7 +1078,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             }
             ListUrlBuilder lub = new ListUrlBuilder();
             lub.setCategory(category);
-            NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+            navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
         } else if (mDownload == v) {
             GalleryInfo galleryInfo = getGalleryInfo();
             if (galleryInfo != null) {
@@ -1122,7 +1122,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
                             args.putLong(GalleryDetailScene.KEY_GID, newerVersion.getGid());
                             args.putString(GalleryDetailScene.KEY_TOKEN, newerVersion.getToken());
-                            NavHostFragment.findNavController(this).navigate(R.id.galleryDetailScene, args);
+                            navigate(R.id.galleryDetailScene, args);
                         })
                         .show();
             }
@@ -1215,12 +1215,12 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail.getToken());
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail.comments);
             args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail);
-            NavHostFragment.findNavController(this).navigate(R.id.galleryCommentsScene, args);
+            navigate(R.id.galleryCommentsScene, args);
         } else if (mPreviews == v) {
             if (null != mGalleryDetail) {
                 Bundle args = new Bundle();
                 args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, mGalleryDetail);
-                NavHostFragment.findNavController(this).navigate(R.id.galleryPreviewsScene, args);
+                navigate(R.id.galleryPreviewsScene, args);
             }
         } else {
             Object o = v.getTag(R.id.tag);
@@ -1228,7 +1228,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 ListUrlBuilder lub = new ListUrlBuilder();
                 lub.setMode(ListUrlBuilder.MODE_TAG);
                 lub.setKeyword(tag);
-                NavHostFragment.findNavController(this).navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), new NavOptions.Builder().setLaunchSingleTop(true).build());
+                navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
                 return;
             }
 

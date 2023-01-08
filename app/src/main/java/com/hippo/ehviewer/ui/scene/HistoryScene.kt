@@ -27,7 +27,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingDataAdapter
@@ -222,7 +221,7 @@ class HistoryScene : BaseToolbarScene() {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        findNavController().navigate(R.id.galleryDetailScene, args)
+        navigate(R.id.galleryDetailScene, args)
         return true
     }
 

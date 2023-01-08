@@ -41,14 +41,12 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.IntDef
-import androidx.annotation.IntegerRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -95,7 +93,6 @@ import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
 import com.hippo.scene.Announcer
-import com.hippo.scene.SceneFragment
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -621,7 +618,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
-        findNavController().navigate(R.id.galleryDetailScene, args)
+        navigate(R.id.galleryDetailScene, args)
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
@@ -1248,7 +1245,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onClick() {
-            findNavController().navigate(getDestination(), getArgs())
+            navigate(getDestination(), getArgs())
             if (mState == STATE_SIMPLE_SEARCH) {
                 setState(STATE_NORMAL)
             } else if (mState == STATE_SEARCH_SHOW_LIST) {

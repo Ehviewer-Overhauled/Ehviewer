@@ -37,7 +37,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -970,7 +969,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     GalleryDetailScene.ACTION_GALLERY_INFO
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
-                findNavController().navigate(R.id.galleryDetailScene, args)
+                navigate(R.id.galleryDetailScene, args)
             } else if (start === v) {
                 val intent = Intent(activity, DownloadService::class.java)
                 intent.action = DownloadService.ACTION_START
