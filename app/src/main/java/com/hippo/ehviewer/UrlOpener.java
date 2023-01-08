@@ -73,20 +73,6 @@ public final class UrlOpener {
                     }
                 }
             }
-            /*
-            Announcer announcer = EhUrlOpener.parseUrl(url);
-            if (null != announcer) {
-                intent = new Intent(context, MainActivity.class);
-                intent.setAction(StageActivity.ACTION_START_SCENE);
-                intent.putExtra(StageActivity.KEY_SCENE_NAME, announcer.getClazz().getName());
-                intent.putExtra(StageActivity.KEY_SCENE_ARGS, announcer.getArgs());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                context.startActivity(intent);
-                return;
-            }
-
-             */
         }
 
         CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
