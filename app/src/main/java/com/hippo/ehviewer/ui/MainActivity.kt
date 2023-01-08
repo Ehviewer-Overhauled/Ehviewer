@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.ui
 
 import android.annotation.SuppressLint
+import android.app.assist.AssistContent
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -390,6 +391,12 @@ class MainActivity : EhActivity() {
             this, message,
             if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         ).show()
+    }
+
+    var mShareUrl: String? = null
+    override fun onProvideAssistContent(outContent: AssistContent?) {
+        super.onProvideAssistContent(outContent)
+        mShareUrl?.let { outContent?.webUri = Uri.parse(mShareUrl) }
     }
 
     private val mDrawerOnBackPressedCallback =

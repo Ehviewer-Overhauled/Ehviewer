@@ -622,6 +622,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         }
 
         EhApplication.getDownloadManager().addDownloadInfoListener(this);
+        ((MainActivity)requireActivity()).setMShareUrl(getGalleryDetailUrl());
 
         return view;
     }
@@ -633,6 +634,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         Context context = getContext();
         AssertUtils.assertNotNull(context);
         EhApplication.getDownloadManager().removeDownloadInfoListener(this);
+        ((MainActivity)requireActivity()).setMShareUrl(null);
 
         mTip = null;
         mViewTransition = null;
