@@ -7,13 +7,17 @@
     <fragment
         android:id="@+id/galleryListScene"
         android:name="com.hippo.ehviewer.ui.scene.GalleryListScene"
-        android:label="GalleryListScene" >
-        <action
-            android:id="@+id/action_galleryListScene_to_galleryDetailScene"
-            app:destination="@id/galleryDetailScene" />
-    </fragment>
+        android:label="GalleryListScene" />
     <fragment
         android:id="@+id/galleryDetailScene"
         android:name="com.hippo.ehviewer.ui.scene.GalleryDetailScene"
         android:label="GalleryDetailScene" />
+    <fragment
+        android:id="@+id/galleryCommentsScene"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryCommentsScene"
+        android:label="GalleryCommentsScene" />
+    <fragment
+        android:id="@+id/galleryPreviewsScene"
+        android:name="com.hippo.ehviewer.ui.scene.GalleryPreviewsScene"
+        android:label="GalleryPreviewsScene" />
 </navigation>

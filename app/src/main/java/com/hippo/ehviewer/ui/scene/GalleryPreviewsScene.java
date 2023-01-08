@@ -251,7 +251,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         }
     }
 
-    private static class GetPreviewSetListener extends EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Integer>> {
+    private class GetPreviewSetListener extends EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Integer>> {
 
         private final int mTaskId;
 
@@ -262,18 +262,14 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
 
         @Override
         public void onSuccess(Pair<PreviewSet, Integer> result) {
-            GalleryPreviewsScene scene = getScene();
-            if (scene != null) {
-                scene.onGetPreviewSetSuccess(result, mTaskId);
-            }
+            GalleryPreviewsScene scene = GalleryPreviewsScene.this;
+            scene.onGetPreviewSetSuccess(result, mTaskId);
         }
 
         @Override
         public void onFailure(Exception e) {
-            GalleryPreviewsScene scene = getScene();
-            if (scene != null) {
-                scene.onGetPreviewSetFailure(e, mTaskId);
-            }
+            GalleryPreviewsScene scene = GalleryPreviewsScene.this;
+            scene.onGetPreviewSetFailure(e, mTaskId);
         }
 
         @Override

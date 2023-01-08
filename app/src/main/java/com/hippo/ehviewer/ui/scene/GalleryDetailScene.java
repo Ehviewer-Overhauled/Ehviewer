@@ -1122,7 +1122,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                             args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
                             args.putLong(GalleryDetailScene.KEY_GID, newerVersion.getGid());
                             args.putString(GalleryDetailScene.KEY_TOKEN, newerVersion.getToken());
-                            startScene(new Announcer(GalleryDetailScene.class).setArgs(args));
+                            NavHostFragment.findNavController(this).navigate(R.id.galleryDetailScene, args);
                         })
                         .show();
             }
@@ -1215,14 +1215,12 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
             args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail.getToken());
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail.comments);
             args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail);
-            startScene(new Announcer(GalleryCommentsScene.class)
-                    .setArgs(args)
-                    .setRequestCode(this, REQUEST_CODE_COMMENT_GALLERY));
+            NavHostFragment.findNavController(this).navigate(R.id.galleryCommentsScene, args);
         } else if (mPreviews == v) {
             if (null != mGalleryDetail) {
                 Bundle args = new Bundle();
                 args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, mGalleryDetail);
-                startScene(new Announcer(GalleryPreviewsScene.class).setArgs(args));
+                NavHostFragment.findNavController(this).navigate(R.id.galleryPreviewsScene, args);
             }
         } else {
             Object o = v.getTag(R.id.tag);

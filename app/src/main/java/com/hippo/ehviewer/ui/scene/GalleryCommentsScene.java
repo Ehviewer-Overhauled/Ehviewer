@@ -749,7 +749,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
     }
 
-    private static class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
+    private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
 
         public RefreshCommentListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -757,18 +757,14 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         @Override
         public void onSuccess(GalleryDetail result) {
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onRefreshGallerySuccess(result.comments);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onRefreshGallerySuccess(result.comments);
         }
 
         @Override
         public void onFailure(Exception e) {
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onRefreshGalleryFailure();
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onRefreshGalleryFailure();
         }
 
         @Override
@@ -781,7 +777,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
     }
 
-    private static class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
+    private class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
 
         private final long mCommentId;
 
@@ -794,10 +790,8 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         public void onSuccess(GalleryCommentList result) {
             showTip(mCommentId != 0 ? R.string.edit_comment_successfully : R.string.comment_successfully, LENGTH_SHORT);
 
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onCommentGallerySuccess(result);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onCommentGallerySuccess(result);
         }
 
         @Override
@@ -815,7 +809,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
     }
 
-    private static class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
+    private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
 
         public VoteCommentListener(Context context, int stageId, String sceneTag) {
             super(context, stageId, sceneTag);
@@ -828,10 +822,8 @@ public final class GalleryCommentsScene extends BaseToolbarScene
                             (0 != result.vote ? R.string.vote_down_successfully : R.string.cancel_vote_down_successfully),
                     LENGTH_SHORT);
 
-            GalleryCommentsScene scene = getScene();
-            if (scene != null) {
-                scene.onVoteCommentSuccess(result);
-            }
+            GalleryCommentsScene scene = GalleryCommentsScene.this;
+            scene.onVoteCommentSuccess(result);
         }
 
         @Override
