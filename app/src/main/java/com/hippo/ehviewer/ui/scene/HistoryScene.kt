@@ -112,10 +112,6 @@ class HistoryScene : BaseToolbarScene() {
         mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 
-    override fun getNavCheckedItem(): Int {
-        return R.id.nav_history
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -204,10 +204,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         return R.menu.scene_gallery_list_searchbar_menu
     }
 
-    override fun getNavCheckedItem(): Int {
-        return mNavCheckedId
-    }
-
     private fun handleArgs(args: Bundle?) {
         val action = args?.getString(KEY_ACTION) ?: ACTION_HOMEPAGE
         mUrlBuilder = when (action) {
@@ -345,18 +341,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             title = resources.getString(R.string.search)
         }
         setSearchBarHint(title)
-
-        // Update nav checked item
-        val checkedItemId: Int = when (mode) {
-            ListUrlBuilder.MODE_NORMAL -> if (EhUtils.NONE == category && TextUtils.isEmpty(keyword)) R.id.nav_homepage else 0
-            MODE_SUBSCRIPTION -> R.id.nav_subscription
-            MODE_WHATS_HOT -> R.id.nav_whats_hot
-            MODE_TOPLIST -> R.id.nav_toplist
-            ListUrlBuilder.MODE_TAG, ListUrlBuilder.MODE_UPLOADER, ListUrlBuilder.MODE_IMAGE_SEARCH -> 0
-            else -> throw IllegalStateException("Unexpected value: $mode")
-        }
-        navCheckedItem = checkedItemId
-        mNavCheckedId = checkedItemId
     }
 
     override fun onCreateViewWithToolbar(

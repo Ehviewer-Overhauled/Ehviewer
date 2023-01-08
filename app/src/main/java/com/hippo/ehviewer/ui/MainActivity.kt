@@ -431,9 +431,6 @@ class MainActivity : EhActivity() {
         }
     }
 
-    fun setNavCheckedItem(@IdRes resId: Int) {
-    }
-
     @JvmOverloads
     fun showTip(@StringRes id: Int, length: Int, useToast: Boolean = false) {
         showTip(getString(id), length, useToast)

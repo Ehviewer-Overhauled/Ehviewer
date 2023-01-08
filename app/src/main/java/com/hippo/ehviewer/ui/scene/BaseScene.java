@@ -128,20 +128,6 @@ public abstract class BaseScene extends Fragment {
         return true;
     }
 
-    public int getNavCheckedItem() {
-        return 0;
-    }
-
-    /**
-     * @param resId 0 for clear
-     */
-    public void setNavCheckedItem(@IdRes int resId) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).setNavCheckedItem(resId);
-        }
-    }
-
     public void recreateDrawerView() {
         MainActivity activity = getMainActivity();
         if (activity != null) {
@@ -197,9 +183,6 @@ public abstract class BaseScene extends Fragment {
         } else {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
         }
-
-        // Update nav checked item
-        setNavCheckedItem(getNavCheckedItem());
 
         // Hide soft ime
         hideSoftInput();

@@ -155,11 +155,6 @@ public class FavoritesScene extends SearchBarScene implements
     private boolean mModifyAdd;
 
     @Override
-    public int getNavCheckedItem() {
-        return R.id.nav_favourite;
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
