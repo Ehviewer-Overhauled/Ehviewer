@@ -19,6 +19,7 @@ package com.hippo.ehviewer
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.Application
 import android.content.ComponentCallbacks2
 import android.text.Html
 import android.text.method.LinkMovementMethod
@@ -49,7 +50,6 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.scene.SceneApplication
 import com.hippo.util.BitmapUtils
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
@@ -71,7 +71,7 @@ import java.util.Arrays
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
-class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderFactory {
+class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
     private val mIdGenerator = IntIdGenerator()
     private val mGlobalStuffMap = HashMap<Int, Any>()
     private val mActivityList = ArrayList<Activity>()
@@ -101,7 +101,7 @@ class EhApplication : SceneApplication(), DefaultLifecycleObserver, ImageLoaderF
             }
             handler?.uncaughtException(t, e)
         }
-        super<SceneApplication>.onCreate()
+        super<Application>.onCreate()
         Native.initialize()
         GetText.initialize(this)
         Settings.initialize()
