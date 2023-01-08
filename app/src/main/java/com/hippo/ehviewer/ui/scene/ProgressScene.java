@@ -247,10 +247,5 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof ProgressScene;
-        }
     }
 }

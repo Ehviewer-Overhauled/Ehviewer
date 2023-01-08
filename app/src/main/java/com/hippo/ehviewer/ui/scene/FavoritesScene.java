@@ -760,11 +760,6 @@ public class FavoritesScene extends SearchBarScene implements
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof FavoritesScene;
-        }
     }
 
     private class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
@@ -808,11 +803,6 @@ public class FavoritesScene extends SearchBarScene implements
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof FavoritesScene;
         }
     }
 

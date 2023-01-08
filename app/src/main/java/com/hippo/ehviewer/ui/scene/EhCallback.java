@@ -23,6 +23,7 @@ import androidx.annotation.StringRes;
 
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.client.EhClient;
+import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.SceneFragment;
 import com.hippo.scene.StageActivity;
@@ -30,17 +31,13 @@ import com.hippo.scene.StageActivity;
 public abstract class EhCallback<E extends SceneFragment, T> implements EhClient.Callback<T> {
 
     private final EhApplication mApplication;
-    private final int mStageId;
 
     public EhCallback(Context context, int stageId, String sceneTag) {
         mApplication = (EhApplication) context.getApplicationContext();
-        mStageId = stageId;
     }
 
-    public abstract boolean isInstance(SceneFragment scene);
-
     public Context getContent() {
-        Context context = getStageActivity();
+        Context context = mApplication.getTopActivity();
         if (context == null) {
             context = getApplication();
         }
@@ -51,12 +48,8 @@ public abstract class EhCallback<E extends SceneFragment, T> implements EhClient
         return mApplication;
     }
 
-    public StageActivity getStageActivity() {
-        return mApplication.findStageActivityById(mStageId);
-    }
-
     public void showTip(@StringRes int id, int length) {
-        StageActivity activity = getStageActivity();
+        EhActivity activity = mApplication.getTopActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).showTip(id, length);
         } else {
@@ -66,7 +59,7 @@ public abstract class EhCallback<E extends SceneFragment, T> implements EhClient
     }
 
     public void showTip(String tip, int length) {
-        StageActivity activity = getStageActivity();
+        EhActivity activity = mApplication.getTopActivity();
         if (activity instanceof MainActivity) {
             ((MainActivity) activity).showTip(tip, length);
         } else {

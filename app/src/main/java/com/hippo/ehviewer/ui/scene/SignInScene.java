@@ -385,11 +385,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof SignInScene;
-        }
     }
 
     private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
@@ -420,11 +415,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         @Override
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof SignInScene;
         }
     }
 }

@@ -336,9 +336,6 @@ class HistoryScene : BaseToolbarScene() {
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class RemoveFromFavoriteListener(context: Context?, stageId: Int, sceneTag: String?) :
@@ -352,9 +349,6 @@ class HistoryScene : BaseToolbarScene() {
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

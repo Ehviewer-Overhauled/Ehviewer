@@ -770,11 +770,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
-        }
     }
 
     private class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
@@ -802,11 +797,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         @Override
         public void onCancel() {
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
-        }
     }
 
     private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
@@ -833,11 +823,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryCommentsScene;
         }
     }
 

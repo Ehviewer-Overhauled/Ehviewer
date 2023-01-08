@@ -1584,11 +1584,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         public void onCancel() {
             getApplication().removeGlobalStuff(this);
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryDetailScene;
-        }
     }
 
     private static class VoteTagListener extends EhCallback<GalleryDetailScene, VoteTagParser.Result> {
@@ -1613,11 +1608,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryDetailScene;
         }
     }
 
@@ -1646,11 +1636,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryDetailScene;
         }
     }
 
@@ -1686,11 +1671,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         public void onCancel() {
             GalleryDetailScene scene = GalleryDetailScene.this;
             scene.onModifyFavoritesCancel();
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryDetailScene;
         }
     }
 
@@ -1736,11 +1716,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
 
         @Override
         public void onCancel() {
-        }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryDetailScene;
         }
     }
 

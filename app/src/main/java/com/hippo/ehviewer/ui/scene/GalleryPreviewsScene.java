@@ -276,11 +276,6 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         public void onCancel() {
 
         }
-
-        @Override
-        public boolean isInstance(SceneFragment scene) {
-            return scene instanceof GalleryPreviewsScene;
-        }
     }
 
     private static class GalleryPreviewHolder extends RecyclerView.ViewHolder {

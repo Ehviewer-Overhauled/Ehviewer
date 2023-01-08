@@ -1119,9 +1119,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class AddToFavoriteListener(context: Context, stageId: Int, sceneTag: String?) :
@@ -1135,9 +1132,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class RemoveFromFavoriteListener(context: Context, stageId: Int, sceneTag: String?) :
@@ -1151,9 +1145,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onCancel() {}
-        override fun isInstance(scene: SceneFragment): Boolean {
-            return scene is GalleryListScene
-        }
     }
 
     private class QsDrawerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
