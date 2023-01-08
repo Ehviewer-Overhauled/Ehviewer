@@ -22,7 +22,6 @@ public final class Announcer {
 
     Class<?> clazz;
     Bundle args;
-    SceneFragment requestFrom;
     int requestCode;
 
     public Announcer(Class<?> clazz) {
@@ -42,8 +41,7 @@ public final class Announcer {
         return this;
     }
 
-    public Announcer setRequestCode(SceneFragment requestFrom, int requestCode) {
-        this.requestFrom = requestFrom;
+    public Announcer setRequestCode(int requestCode) {
         this.requestCode = requestCode;
         return this;
     }

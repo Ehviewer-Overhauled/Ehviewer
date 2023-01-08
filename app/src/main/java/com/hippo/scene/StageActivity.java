@@ -30,9 +30,6 @@ public abstract class StageActivity extends EhActivity {
     public static final String KEY_SCENE_NAME = "stage_activity_scene_name";
     public static final String KEY_SCENE_ARGS = "stage_activity_scene_args";
 
-    public static void registerLaunchMode(Class<?> clazz, @SceneFragment.LaunchMode int launchMode) {
-    }
-
     /**
      * Start scene from {@code Intent}, it might be not safe,
      * Correct it here.
@@ -50,9 +47,6 @@ public abstract class StageActivity extends EhActivity {
      * null included.
      */
     protected void onUnrecognizedIntent(@Nullable Intent intent) {
-    }
-
-    void onSceneDestroyed(SceneFragment scene) {
     }
 
     protected void onRegister(int id) {
@@ -77,15 +71,7 @@ public abstract class StageActivity extends EhActivity {
     public void startSceneFirstly(Announcer announcer) {
     }
 
-    public void finishScene(SceneFragment scene) {
-    }
 
-    public void refreshTopScene() {
-    }
-
-    public SceneFragment findSceneByTag(String tag) {
-        return null;
-    }
 
     @Nullable
     public Class<?> getTopSceneClass() {

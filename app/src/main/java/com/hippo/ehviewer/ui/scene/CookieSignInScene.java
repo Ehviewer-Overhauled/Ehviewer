@@ -285,8 +285,8 @@ public class CookieSignInScene extends SolidScene implements EditText.OnEditorAc
     private class CookieSignInListener implements EhClient.Callback<Object> {
         @Override
         public void onSuccess(Object result) {
-            setResult(RESULT_OK, null);
-            finish();
+            // setResult(RESULT_OK, null);
+            // finish();
         }
 
         @Override

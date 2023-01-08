@@ -83,12 +83,12 @@ public class SelectSiteScene extends SolidScene implements View.OnClickListener 
                 Settings.putSelectSite(false);
                 Settings.putGallerySite(EhUrl.SITE_E);
                 startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                finish();
+                // finish();
             } else if (id == R.id.site_ex) {
                 Settings.putSelectSite(false);
                 Settings.putGallerySite(EhUrl.SITE_EX);
                 startSceneForCheckStep(CHECK_STEP_SELECT_SITE, getArguments());
-                finish();
+                // finish();
             } else {
                 showTip(R.string.no_select, LENGTH_SHORT);
             }

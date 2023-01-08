@@ -57,8 +57,6 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
-import androidx.navigation.NavOptions;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
@@ -99,8 +97,6 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryRatingBar;
-import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.AppHelper;
@@ -1406,23 +1402,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         return false;
     }
 
-    @Override
-    protected void onSceneResult(int requestCode, int resultCode, Bundle data) {
-        if (requestCode == REQUEST_CODE_COMMENT_GALLERY) {
-            if (resultCode != RESULT_OK || data == null) {
-                return;
-            }
-            GalleryCommentList comments = data.getParcelable(GalleryCommentsScene.KEY_COMMENT_LIST);
-            if (mGalleryDetail == null && comments == null) {
-                return;
-            }
-            mGalleryDetail.comments = comments;
-            bindComments(comments.comments);
-        } else {
-            super.onSceneResult(requestCode, resultCode, data);
-        }
-    }
-
     private void updateDownloadText() {
         if (null == mDownload) {
             return;
@@ -1537,16 +1516,6 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         mModifyingFavorites = false;
     }
 
-    @Override
-    public void onProvideAssistContent(AssistContent outContent) {
-        super.onProvideAssistContent(outContent);
-
-        String url = getGalleryDetailUrl();
-        if (url != null) {
-            outContent.setWebUri(Uri.parse(url));
-        }
-    }
-
     @IntDef({STATE_INIT, STATE_NORMAL, STATE_REFRESH, STATE_REFRESH_HEADER, STATE_FAILED})
     @Retention(RetentionPolicy.SOURCE)
     private @interface State {
@@ -1555,7 +1524,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     private class GetGalleryDetailListener extends EhCallback<GalleryDetailScene, GalleryDetail> {
 
         public GetGalleryDetailListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override
@@ -1589,7 +1558,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
     private static class VoteTagListener extends EhCallback<GalleryDetailScene, VoteTagParser.Result> {
 
         public VoteTagListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override
@@ -1616,7 +1585,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         private final long mGid;
 
         public RateGalleryListener(Context context, int stageId, String sceneTag, long gid) {
-            super(context, stageId, sceneTag);
+            super(context);
             mGid = gid;
         }
 
@@ -1647,7 +1616,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
          * @param addOrRemove false for add, true for remove
          */
         public ModifyFavoritesListener(Context context, int stageId, String sceneTag, boolean addOrRemove) {
-            super(context, stageId, sceneTag);
+            super(context);
             mAddOrRemove = addOrRemove;
         }
 
@@ -1679,7 +1648,7 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
         private final GalleryInfo mGalleryInfo;
 
         public DownloadArchiveListener(Context context, int stageId, String sceneTag, GalleryInfo galleryInfo) {
-            super(context, stageId, sceneTag);
+            super(context);
             mGalleryInfo = galleryInfo;
         }
 

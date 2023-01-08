@@ -290,13 +290,13 @@ class HistoryScene : BaseToolbarScene() {
                         CommonOperations.removeFromFavorites(
                             activity,
                             gi,
-                            RemoveFromFavoriteListener(context, activity.stageId, tag)
+                            RemoveFromFavoriteListener(context)
                         )
                     } else {
                         CommonOperations.addToFavorites(
                             activity,
                             gi,
-                            AddToFavoriteListener(context, activity.stageId, tag)
+                            AddToFavoriteListener(context)
                         )
                     }
 
@@ -322,8 +322,8 @@ class HistoryScene : BaseToolbarScene() {
         return true
     }
 
-    private class AddToFavoriteListener(context: Context?, stageId: Int, sceneTag: String?) :
-        EhCallback<GalleryListScene?, Void?>(context, stageId, sceneTag) {
+    private class AddToFavoriteListener(context: Context?) :
+        EhCallback<GalleryListScene?, Void?>(context) {
         override fun onSuccess(result: Void?) {
             showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
         }
@@ -335,8 +335,8 @@ class HistoryScene : BaseToolbarScene() {
         override fun onCancel() {}
     }
 
-    private class RemoveFromFavoriteListener(context: Context?, stageId: Int, sceneTag: String?) :
-        EhCallback<GalleryListScene?, Void?>(context, stageId, sceneTag) {
+    private class RemoveFromFavoriteListener(context: Context?) :
+        EhCallback<GalleryListScene?, Void?>(context) {
         override fun onSuccess(result: Void?) {
             showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
         }

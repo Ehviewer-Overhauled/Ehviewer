@@ -49,7 +49,6 @@ import com.hippo.ehviewer.client.data.GalleryPreview;
 import com.hippo.ehviewer.client.data.PreviewSet;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.LoadImageView;
 import com.hippo.widget.recyclerview.AutoGridLayoutManager;
@@ -256,7 +255,7 @@ public class GalleryPreviewsScene extends BaseToolbarScene {
         private final int mTaskId;
 
         public GetPreviewSetListener(Context context, int stageId, String sceneTag, int taskId) {
-            super(context, stageId, sceneTag);
+            super(context);
             mTaskId = taskId;
         }
 

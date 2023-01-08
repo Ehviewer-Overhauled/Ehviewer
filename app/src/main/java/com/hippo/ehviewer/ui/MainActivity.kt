@@ -35,7 +35,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
-import androidx.fragment.app.FragmentTransaction
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
@@ -50,22 +50,12 @@ import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.ui.scene.CookieSignInScene
-import com.hippo.ehviewer.ui.scene.DownloadsScene
-import com.hippo.ehviewer.ui.scene.FavoritesScene
-import com.hippo.ehviewer.ui.scene.GalleryCommentsScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
-import com.hippo.ehviewer.ui.scene.GalleryPreviewsScene
-import com.hippo.ehviewer.ui.scene.HistoryScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
-import com.hippo.ehviewer.ui.scene.SelectSiteScene
-import com.hippo.ehviewer.ui.scene.SignInScene
 import com.hippo.ehviewer.ui.scene.SolidScene
-import com.hippo.ehviewer.ui.scene.WebViewSignInScene
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.scene.Announcer
-import com.hippo.scene.SceneFragment
 import com.hippo.scene.StageActivity
 import com.hippo.unifile.UniFile
 import com.hippo.util.BitmapUtils
@@ -352,7 +342,7 @@ class MainActivity : StageActivity() {
     }
 
     @SuppressLint("RtlHardcoded")
-    fun createDrawerView(scene: SceneFragment?) {
+    fun createDrawerView(scene: Fragment?) {
         if (scene is BaseScene) {
             binding.rightDrawer.removeAllViews()
             val drawerView = scene.createDrawerView(
@@ -444,26 +434,4 @@ class MainActivity : StageActivity() {
             override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerStateChanged(newState: Int) {}
         }
-
-    companion object {
-        private const val KEY_NAV_CHECKED_ITEM = "nav_checked_item"
-
-        init {
-            registerLaunchMode(SignInScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(
-                WebViewSignInScene::class.java,
-                SceneFragment.LAUNCH_MODE_SINGLE_TASK
-            )
-            registerLaunchMode(CookieSignInScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(SelectSiteScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(GalleryListScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TOP)
-            registerLaunchMode(GalleryDetailScene::class.java, SceneFragment.LAUNCH_MODE_STANDARD)
-            registerLaunchMode(GalleryCommentsScene::class.java, SceneFragment.LAUNCH_MODE_STANDARD)
-            registerLaunchMode(GalleryPreviewsScene::class.java, SceneFragment.LAUNCH_MODE_STANDARD)
-            registerLaunchMode(DownloadsScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(FavoritesScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TASK)
-            registerLaunchMode(HistoryScene::class.java, SceneFragment.LAUNCH_MODE_SINGLE_TOP)
-            registerLaunchMode(ProgressScene::class.java, SceneFragment.LAUNCH_MODE_STANDARD)
-        }
-    }
 }

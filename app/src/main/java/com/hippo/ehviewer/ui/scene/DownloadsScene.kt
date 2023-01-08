@@ -154,10 +154,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         return false
     }
 
-    override fun onNewArguments(args: Bundle) {
-        handleArguments(args)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context = context

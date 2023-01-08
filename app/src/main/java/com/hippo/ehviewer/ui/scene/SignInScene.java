@@ -43,7 +43,6 @@ import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.parser.ProfileParser;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.AssertUtils;
 import com.hippo.yorozuya.IntIdGenerator;
@@ -203,17 +202,6 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     }
 
     @Override
-    protected void onSceneResult(int requestCode, int resultCode, Bundle data) {
-        if (REQUEST_CODE_WEBVIEW == requestCode) {
-            if (RESULT_OK == resultCode) {
-                getProfile();
-            }
-        } else {
-            super.onSceneResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         MainActivity activity = getMainActivity();
         if (null == activity) {
@@ -225,9 +213,9 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         } else if (mSignIn == v) {
             signIn();
         } else if (mSignInViaWebView == v) {
-            startScene(new Announcer(WebViewSignInScene.class).setRequestCode(this, REQUEST_CODE_WEBVIEW));
+            // startScene(new Announcer(WebViewSignInScene.class).setRequestCode(REQUEST_CODE_WEBVIEW));
         } else if (mSignInViaCookies == v) {
-            startScene(new Announcer(CookieSignInScene.class).setRequestCode(this, REQUEST_CODE_COOKIE));
+            // startScene(new Announcer(CookieSignInScene.class).setRequestCode(REQUEST_CODE_COOKIE));
         } else if (mSkipSigningIn == v) {
             // Set gallery size SITE_E if skip sign in
             Settings.putGallerySite(EhUrl.SITE_E);
@@ -321,7 +309,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
         if (null != activity) {
             startSceneForCheckStep(CHECK_STEP_SIGN_IN, getArguments());
         }
-        finish();
+        // finish();
     }
 
     private void whetherToSkip(Exception e) {
@@ -360,7 +348,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     private class SignInListener extends EhCallback<SignInScene, String> {
 
         public SignInListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override
@@ -390,7 +378,7 @@ public final class SignInScene extends SolidScene implements EditText.OnEditorAc
     private class GetProfileListener extends EhCallback<SignInScene, ProfileParser.Result> {
 
         public GetProfileListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override

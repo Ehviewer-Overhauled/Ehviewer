@@ -33,7 +33,6 @@ import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.view.ViewTransition;
 import com.hippo.yorozuya.AssertUtils;
@@ -209,8 +208,8 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
         arg.putLong(GalleryDetailScene.KEY_GID, mGid);
         arg.putString(GalleryDetailScene.KEY_TOKEN, result);
         arg.putInt(GalleryDetailScene.KEY_PAGE, mPage);
-        startScene(new Announcer(GalleryDetailScene.class).setArgs(arg));
-        finish();
+        // startScene(new Announcer(GalleryDetailScene.class).setArgs(arg));
+        // finish();
     }
 
     private void onGetGalleryTokenFailure(Exception e) {
@@ -229,7 +228,7 @@ public final class ProgressScene extends BaseScene implements View.OnClickListen
     private class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
 
         public GetGalleryTokenListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override

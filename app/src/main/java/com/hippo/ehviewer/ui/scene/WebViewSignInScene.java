@@ -147,8 +147,8 @@ public class WebViewSignInScene extends SolidScene {
             }
 
             if (getId && getHash) {
-                setResult(RESULT_OK, null);
-                finish();
+                // setResult(RESULT_OK, null);
+                // finish();
             }
         }
     }

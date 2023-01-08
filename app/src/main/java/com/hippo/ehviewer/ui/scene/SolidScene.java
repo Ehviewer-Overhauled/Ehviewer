@@ -37,7 +37,7 @@ public class SolidScene extends BaseScene {
         switch (checkStep) {
             case CHECK_STEP_SIGN_IN:
                 if (Settings.getSelectSite()) {
-                    startScene(new Announcer(SelectSiteScene.class).setArgs(args), true);
+                    // startScene(new Announcer(SelectSiteScene.class).setArgs(args), true);
                     break;
                 }
             case CHECK_STEP_SELECT_SITE:
@@ -58,11 +58,11 @@ public class SolidScene extends BaseScene {
                 }
 
                 if (clazz != null) {
-                    startScene(new Announcer(clazz).setArgs(targetArgs));
+                    // startScene(new Announcer(clazz).setArgs(targetArgs));
                 } else {
                     Bundle newArgs = new Bundle();
                     newArgs.putString(GalleryListScene.KEY_ACTION, Settings.getLaunchPageGalleryListSceneAction());
-                    startScene(new Announcer(GalleryListScene.class).setArgs(newArgs));
+                    // startScene(new Announcer(GalleryListScene.class).setArgs(newArgs));
                 }
                 break;
         }

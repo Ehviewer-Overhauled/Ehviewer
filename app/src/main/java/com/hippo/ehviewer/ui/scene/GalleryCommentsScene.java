@@ -50,8 +50,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.navigation.NavOptions;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -74,7 +72,6 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.parser.VoteCommentParser;
 import com.hippo.ehviewer.dao.Filter;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 import com.hippo.text.URLImageGetter;
 import com.hippo.util.ClipboardUtilKt;
 import com.hippo.util.ExceptionUtils;
@@ -656,10 +653,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         mAdapter.notifyDataSetChanged();
 
         updateView(true);
-
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, result);
-        setResult(SceneFragment.RESULT_OK, re);
     }
 
     private void onRefreshGalleryFailure() {
@@ -682,9 +675,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
 
         mGalleryDetail.comments = result;
         mAdapter.notifyDataSetChanged();
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, result);
-        setResult(SceneFragment.RESULT_OK, re);
 
         // Remove text
         if (mEditText != null) {
@@ -725,10 +715,6 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         }
 
         mAdapter.notifyItemChanged(position);
-
-        Bundle re = new Bundle();
-        re.putParcelable(KEY_COMMENT_LIST, mGalleryDetail.comments);
-        setResult(SceneFragment.RESULT_OK, re);
     }
 
     @Override
@@ -752,7 +738,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
     private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
 
         public RefreshCommentListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override
@@ -777,7 +763,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
         private final long mCommentId;
 
         public CommentGalleryListener(Context context, int stageId, String sceneTag, long commentId) {
-            super(context, stageId, sceneTag);
+            super(context);
             mCommentId = commentId;
         }
 
@@ -802,7 +788,7 @@ public final class GalleryCommentsScene extends BaseToolbarScene
     private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
 
         public VoteCommentListener(Context context, int stageId, String sceneTag) {
-            super(context, stageId, sceneTag);
+            super(context);
         }
 
         @Override

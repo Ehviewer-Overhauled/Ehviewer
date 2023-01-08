@@ -36,8 +36,6 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.navigation.NavHost;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -67,8 +65,6 @@ import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
 import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
 import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
-import com.hippo.scene.Announcer;
-import com.hippo.scene.SceneFragment;
 import com.hippo.widget.ContentLayout;
 import com.hippo.widget.FabLayout;
 import com.hippo.yorozuya.AssertUtils;
@@ -736,7 +732,7 @@ public class FavoritesScene extends SearchBarScene implements
 
         private AddFavoritesListener(Context context, int stageId,
                                      String sceneTag, int taskId, String keyword, List<GalleryInfo> backup) {
-            super(context, stageId, sceneTag);
+            super(context);
             mTaskId = taskId;
             mKeyword = keyword;
             mBackup = backup;
@@ -772,7 +768,7 @@ public class FavoritesScene extends SearchBarScene implements
 
         private GetFavoritesListener(Context context, int stageId,
                                      String sceneTag, int taskId, boolean local, String keyword) {
-            super(context, stageId, sceneTag);
+            super(context);
             mTaskId = taskId;
             mLocal = local;
             mKeyword = keyword;

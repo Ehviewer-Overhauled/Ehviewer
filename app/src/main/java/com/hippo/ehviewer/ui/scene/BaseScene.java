@@ -25,7 +25,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -36,19 +35,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavOptions;
-import androidx.navigation.NavOptionsBuilder;
-import androidx.navigation.NavOptionsBuilderKt;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.scene.SceneFragment;
 
 import rikka.core.res.ResourcesKt;
 
-public abstract class BaseScene extends SceneFragment {
+public abstract class BaseScene extends Fragment {
 
     public static final int LENGTH_SHORT = 0;
     public static final int LENGTH_LONG = 1;
