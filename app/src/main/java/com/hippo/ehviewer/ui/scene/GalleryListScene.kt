@@ -209,7 +209,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun handleArgs(args: Bundle?) {
-        val action = args?.getString(KEY_ACTION) ?: Settings.getLaunchPageGalleryListSceneAction()
+        val action = args?.getString(KEY_ACTION) ?: ACTION_HOMEPAGE
         mUrlBuilder = when (action) {
             ACTION_HOMEPAGE -> ListUrlBuilder()
             ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)

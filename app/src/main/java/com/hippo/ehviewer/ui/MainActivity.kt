@@ -50,6 +50,7 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
+import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.unifile.UniFile
@@ -145,6 +146,16 @@ class MainActivity : EhActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
+        navController.apply {
+            graph = navInflater.inflate(R.navigation.nav_graph).apply {
+                when (Settings.getLaunchPageGalleryListSceneAction()) {
+                    GalleryListScene.ACTION_HOMEPAGE -> setStartDestination(R.id.nav_homepage)
+                    GalleryListScene.ACTION_SUBSCRIPTION -> setStartDestination(R.id.nav_subscription)
+                    GalleryListScene.ACTION_WHATS_HOT -> setStartDestination(R.id.nav_whats_hot)
+                    GalleryListScene.ACTION_TOP_LIST -> setStartDestination(R.id.nav_toplist)
+                }
+            }
+        }
         binding.navView.setupWithNavController(navController)
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
