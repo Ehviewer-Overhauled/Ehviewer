@@ -232,8 +232,12 @@ class MainActivity : EhActivity() {
         }
 
         binding.navView.setupWithNavController(navController)
-        binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
-        onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
+        lifecycleScope.launchUI {
+            delay(100)
+            // delay 100ms to make sure it take precedence over androidx navigation's callback
+            binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
+            onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
+        }
         if (savedInstanceState == null) {
             if (intent.action != Intent.ACTION_MAIN) {
                 onNewIntent(intent)
