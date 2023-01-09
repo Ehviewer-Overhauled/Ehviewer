@@ -122,7 +122,7 @@ class SignInScene : BaseScene() {
         showProgress()
 
         EhUtils.signOut()
-        mSignInJob = lifecycleScope.launchIO {
+        mSignInJob = viewLifecycleOwner.lifecycleScope.launchIO {
             runCatching {
                 (EhClient.execute(EhClient.METHOD_SIGN_IN, username, password) as String).let {
                     Settings.putDisplayName(it)

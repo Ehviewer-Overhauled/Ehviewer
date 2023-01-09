@@ -62,7 +62,7 @@ class EhRequest {
     }
 
     fun enqueue(fragment: Fragment) {
-        enqueue(fragment.lifecycleScope)
+        enqueue(fragment.viewLifecycleOwner.lifecycleScope)
     }
 
     fun enqueue(activity: Activity) {
