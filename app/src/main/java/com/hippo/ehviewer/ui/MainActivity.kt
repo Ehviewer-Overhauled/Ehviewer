@@ -230,14 +230,8 @@ class MainActivity : EhActivity() {
         if (EhUtils.needSignedIn()) {
             navController.navigate(R.id.signInScene)
         }
-
+        binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
-        lifecycleScope.launchUI {
-            delay(100)
-            // delay 100ms to make sure it take precedence over androidx navigation's callback
-            binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
-            onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
-        }
         if (savedInstanceState == null) {
             if (intent.action != Intent.ACTION_MAIN) {
                 onNewIntent(intent)
@@ -338,7 +332,11 @@ class MainActivity : EhActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            delay(300)
+            delay(100)
+            // delay 100ms to make sure it take precedence over androidx navigation's callback
+            mDrawerOnBackPressedCallback.remove()
+            onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
+            delay(200)
             checkClipboardUrl()
         }
     }
