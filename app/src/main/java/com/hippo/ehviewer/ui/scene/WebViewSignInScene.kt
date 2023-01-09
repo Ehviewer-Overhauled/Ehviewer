@@ -13,142 +13,108 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.CookieManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
+import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.widget.DialogWebChromeClient
+import eu.kanade.tachiyomi.util.lang.launchIO
+import okhttp3.Cookie
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.client.EhCookieStore;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.EhUtils;
-import com.hippo.ehviewer.widget.DialogWebChromeClient;
-import com.hippo.yorozuya.AssertUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-import rikka.core.res.ResourcesKt;
-
-public class WebViewSignInScene extends BaseScene {
-
-    /*---------------
-     View life cycle
-     ---------------*/
-    @Nullable
-    private WebView mWebView;
-
-    @Override
-    public boolean needShowLeftDrawer() {
-        return false;
+class WebViewSignInScene : BaseScene() {
+    private var mWebView: WebView? = null
+    override fun needShowLeftDrawer(): Boolean {
+        return false
     }
 
-    @Nullable
-    @Override
     @SuppressLint("SetJavaScriptEnabled")
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Context context = getContext();
-        AssertUtils.assertNotNull(context);
-
-        EhUtils.signOut();
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        EhUtils.signOut()
 
         // http://stackoverflow.com/questions/32284642/how-to-handle-an-uncatched-exception
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.flush();
-        cookieManager.removeAllCookies(null);
-        cookieManager.removeSessionCookies(null);
-
-        mWebView = new WebView(context);
-        mWebView.setBackgroundColor(ResourcesKt.resolveColor(getTheme(), android.R.attr.colorBackground));
-        mWebView.getSettings().setBuiltInZoomControls(true);
-        mWebView.getSettings().setDisplayZoomControls(false);
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.setWebViewClient(new LoginWebViewClient());
-        mWebView.setWebChromeClient(new DialogWebChromeClient(context));
-        mWebView.loadUrl(EhUrl.URL_SIGN_IN);
-        return mWebView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        if (null != mWebView) {
-            mWebView.destroy();
-            mWebView = null;
+        CookieManager.getInstance().apply {
+            flush()
+            removeAllCookies(null)
+            removeSessionCookies(null)
+        }
+        return WebView(requireContext()).apply {
+            setBackgroundColor(Color.TRANSPARENT)
+            settings.run {
+                builtInZoomControls = true
+                displayZoomControls = true
+                javaScriptEnabled = true
+            }
+            webViewClient = LoginWebViewClient()
+            webChromeClient = DialogWebChromeClient(context)
+            loadUrl(EhUrl.URL_SIGN_IN)
+            mWebView = this
         }
     }
 
-    private class LoginWebViewClient extends WebViewClient {
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mWebView?.destroy()
+        mWebView = null
+    }
 
-        public List<Cookie> parseCookies(HttpUrl url, String cookieStrings) {
+    private inner class LoginWebViewClient : WebViewClient() {
+        fun parseCookies(url: HttpUrl?, cookieStrings: String?): List<Cookie> {
             if (cookieStrings == null) {
-                return Collections.emptyList();
+                return emptyList()
             }
-
-            List<Cookie> cookies = null;
-            String[] pieces = cookieStrings.split(";");
-            for (String piece : pieces) {
-                Cookie cookie = Cookie.parse(url, piece);
-                if (cookie == null) {
-                    continue;
-                }
+            var cookies: MutableList<Cookie>? = null
+            val pieces =
+                cookieStrings.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            for (piece in pieces) {
+                val cookie = Cookie.parse(url!!, piece) ?: continue
                 if (cookies == null) {
-                    cookies = new ArrayList<>();
+                    cookies = ArrayList()
                 }
-                cookies.add(cookie);
+                cookies.add(cookie)
             }
-
-            return cookies != null ? cookies : Collections.emptyList();
+            return cookies ?: emptyList()
         }
 
-        private void addCookie(String domain, Cookie cookie) {
-            EhApplication.getEhCookieStore().addCookie(EhCookieStore.newCookie(cookie, domain, true, true, true));
+        private fun addCookie(domain: String, cookie: Cookie) {
+            ehCookieStore.addCookie(EhCookieStore.newCookie(cookie, domain, true, true, true))
         }
 
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            Context context = getContext();
-            if (context == null) {
-                return;
-            }
-            HttpUrl httpUrl = HttpUrl.parse(url);
-            if (httpUrl == null) {
-                return;
-            }
-
-            String cookieString = CookieManager.getInstance().getCookie(EhUrl.HOST_E);
-            List<Cookie> cookies = parseCookies(httpUrl, cookieString);
-            boolean getId = false;
-            boolean getHash = false;
-            for (Cookie cookie : cookies) {
-                if (EhCookieStore.KEY_IPD_MEMBER_ID.equals(cookie.name())) {
-                    getId = true;
-                } else if (EhCookieStore.KEY_IPD_PASS_HASH.equals(cookie.name())) {
-                    getHash = true;
+        override fun onPageFinished(view: WebView, url: String) {
+            val httpUrl = url.toHttpUrlOrNull() ?: return
+            val cookieString = CookieManager.getInstance().getCookie(EhUrl.HOST_E)
+            val cookies = parseCookies(httpUrl, cookieString)
+            var getId = false
+            var getHash = false
+            for (cookie in cookies) {
+                if (EhCookieStore.KEY_IPD_MEMBER_ID == cookie.name) {
+                    getId = true
+                } else if (EhCookieStore.KEY_IPD_PASS_HASH == cookie.name) {
+                    getHash = true
                 }
-                addCookie(EhUrl.DOMAIN_EX, cookie);
-                addCookie(EhUrl.DOMAIN_E, cookie);
+                addCookie(EhUrl.DOMAIN_EX, cookie)
+                addCookie(EhUrl.DOMAIN_E, cookie)
             }
-
             if (getId && getHash) {
-                navigateToTop();
-                // TODO: getProfile
+                navigateToTop()
+                launchIO {
+                    getProfile()
+                }
             }
         }
     }
