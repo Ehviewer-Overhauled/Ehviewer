@@ -33,6 +33,7 @@ import com.hippo.ehviewer.databinding.SceneCookieSignInBinding
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getTextFromClipboard
+import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import java.util.Locale
 
@@ -183,7 +184,9 @@ class CookieSignInScene : BaseScene() {
 
     private inner class CookieSignInListener : EhClient.Callback<Any?> {
         override fun onSuccess(result: Any?) {
-            // TODO: getProfile
+            launchIO {
+                getProfile()
+            }
             navigateToTop()
         }
 
