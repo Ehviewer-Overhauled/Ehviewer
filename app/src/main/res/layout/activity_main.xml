@@ -14,8 +14,9 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/draw_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
@@ -23,55 +24,49 @@
     app:edgeToEdge="true"
     app:fitsSystemWindowsInsets="start|end">
 
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/draw_view"
+    <com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-        <com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/snackbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent">
 
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/snackbar"
+            <com.hippo.ehviewer.widget.AboveSnackerLayout
+                android:id="@+id/absnacker"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.hippo.ehviewer.widget.AboveSnackerLayout
-                    android:id="@+id/absnacker"
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fragment_container"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    app:defaultNavHost="true"
+                    app:navGraph="@navigation/nav_graph" />
 
-                    <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/fragment_container"
-                        android:name="androidx.navigation.fragment.NavHostFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:defaultNavHost="true"
-                        app:navGraph="@navigation/nav_graph" />
+            </com.hippo.ehviewer.widget.AboveSnackerLayout>
 
-                </com.hippo.ehviewer.widget.AboveSnackerLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout>
 
-        </com.hippo.widget.IgnoreFitsSystemWindowsFullyDraggableDrawerContentLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/nav_drawer_main" />
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/nav_header_main"
-            app:menu="@menu/nav_drawer_main" />
+    <com.hippo.widget.DrawerView
+        android:id="@+id/right_drawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:fitsSystemWindows="true"
+        android:maxWidth="@dimen/drawer_max_width" />
 
-        <com.hippo.widget.DrawerView
-            android:id="@+id/right_drawer"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:fitsSystemWindows="true"
-            android:maxWidth="@dimen/drawer_max_width" />
-
-    </androidx.drawerlayout.widget.DrawerLayout>
-</FrameLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
