@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.hippo.ehviewer.ui.compose.SignInScreen
 import com.hippo.ehviewer.ui.compose.theme.EhViewerTheme
 
 class LoginActivity : ComponentActivity() {
@@ -17,7 +18,7 @@ class LoginActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
                     composable(SIGN_IN_ROUTE_NAME) {
-
+                        SignInScreen()
                     }
 
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {

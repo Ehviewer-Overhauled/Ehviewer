@@ -36,7 +36,8 @@
         <activity
             android:name=".ui.LoginActivity"
             android:exported="false"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.MainActivity"
             android:banner="@mipmap/ic_leanback_banner"
