@@ -6,14 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.ui.compose.SignInScreen
-import com.hippo.ehviewer.ui.compose.theme.EhViewerTheme
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            EhViewerTheme {
+            Mdc3Theme {
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
