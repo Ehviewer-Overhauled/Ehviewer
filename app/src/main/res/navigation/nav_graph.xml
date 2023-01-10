@@ -92,4 +92,8 @@
         android:id="@+id/cookieSignInScene"
         android:name="com.hippo.ehviewer.ui.scene.CookieSignInScene"
         android:label="CookieSignInScene" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.hippo.ehviewer.ui.LoginActivity"
+        android:label="LoginActivity" />
 </navigation>
