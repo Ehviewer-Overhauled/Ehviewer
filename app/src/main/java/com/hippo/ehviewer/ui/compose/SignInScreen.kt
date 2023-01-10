@@ -19,6 +19,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -30,6 +35,11 @@ import com.hippo.ehviewer.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen() {
+    val coroutineScope = rememberCoroutineScope()
+    val isProgressIndicatorVisible by remember { mutableStateOf(false) }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Box(
         contentAlignment = Alignment.Center
     ) {
@@ -47,21 +57,23 @@ fun SignInScreen() {
             )
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = username,
+                onValueChange = { username = it },
                 Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
                 label = {
                     Text(text = stringResource(id = R.string.username))
                 },
+                singleLine = true
             )
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = password,
+                onValueChange = { password = it },
                 Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
                 label = {
                     Text(text = stringResource(id = R.string.password))
                 },
+                singleLine = true
             )
 
             Text(
@@ -117,6 +129,8 @@ fun SignInScreen() {
                 Text(text = stringResource(id = R.string.tourist_mode))
             }
         }
-        CircularProgressIndicator()
+        if (isProgressIndicatorVisible) {
+            CircularProgressIndicator()
+        }
     }
 }
