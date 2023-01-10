@@ -178,6 +178,8 @@
     <string name="rate_successfully">评分成功</string>
     <string name="rate_failed">评分失败</string>
     <string name="no_torrents">没有种子</string>
+    <string name="download_torrent_started">开始下载种子</string>
+    <string name="download_torrent_failure">无法下载种子</string>
     <string name="torrents">种子</string>
     <string name="favorited">已收藏</string>
     <string name="not_favorited">未收藏</string>

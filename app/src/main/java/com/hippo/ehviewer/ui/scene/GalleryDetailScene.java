@@ -1903,9 +1903,11 @@ public class GalleryDetailScene extends CollapsingToolbarScene implements View.O
                 if (dm != null) {
                     try {
                         dm.enqueue(r);
+                        showTip(R.string.download_torrent_started, LENGTH_SHORT);
                     } catch (Throwable e) {
                         e.printStackTrace();
                         ExceptionUtils.throwIfFatal(e);
+                        showTip(R.string.download_torrent_failure, LENGTH_SHORT);
                     }
                 }
             }
