@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.ui.theme
+package com.hippo.ehviewer.ui.compose.theme
 
 import android.app.Activity
 import android.graphics.Color
