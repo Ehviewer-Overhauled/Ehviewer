@@ -223,6 +223,8 @@
     <string name="rate_successfully">Rate successfully</string>
     <string name="rate_failed">Rate failed</string>
     <string name="no_torrents">No torrents</string>
+    <string name="download_torrent_started">Torrent download started</string>
+    <string name="download_torrent_failure">Failed to download torrent</string>
     <string name="torrents">Torrents</string>
     <string name="favorited">Favorited</string>
     <string name="not_favorited">Not favorited</string>
