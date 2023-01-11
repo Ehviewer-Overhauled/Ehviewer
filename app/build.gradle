@@ -138,7 +138,7 @@ dependencies {
     def fragment_version = "1.6.0-alpha04"
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
-    def lifecycle_version = "2.6.0-alpha03"
+    def lifecycle_version = "2.6.0-alpha04"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
