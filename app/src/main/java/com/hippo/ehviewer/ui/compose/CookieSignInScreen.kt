@@ -34,7 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -56,8 +56,6 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.util.ExceptionUtils
-import com.hippo.util.getClipboardManager
-import com.hippo.util.getTextFromClipboard
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
@@ -69,7 +67,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CookieSignInScene(navController: NavController) {
-    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -146,7 +144,7 @@ fun CookieSignInScene(navController: NavController) {
 
     fun fillCookiesFromClipboard() {
         focusManager.clearFocus()
-        val text = context.getClipboardManager().getTextFromClipboard(context)
+        val text = clipboardManager.getText()
         if (text == null) {
             coroutineScope.launch { snackbarHostState.showSnackbar(noCookies) }
             return
