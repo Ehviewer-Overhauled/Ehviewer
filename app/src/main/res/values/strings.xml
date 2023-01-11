@@ -187,6 +187,7 @@
     <string name="duplicate_quick_search">A duplicate quick search exists. The name is \"%s\".</string>
     <string name="duplicate_name">This name is already in use.</string>
     <string name="save_progress">Save progress</string>
+    <string name="delete_quick_search">Delete quick search \"%s\"?</string>
 
     <string name="go_to_hint">Page %1$d, total %2$d pages</string>
 
