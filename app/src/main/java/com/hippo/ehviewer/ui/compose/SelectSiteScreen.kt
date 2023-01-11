@@ -34,7 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.parser.ProfileParser
+import eu.kanade.tachiyomi.util.lang.launchIO
+import kotlinx.coroutines.GlobalScope
 
 @Composable
 fun SelectSiteScreen(finish: () -> Unit) {
@@ -113,10 +117,22 @@ fun SelectSiteScreen(finish: () -> Unit) {
                     Settings.putGallerySite(EhUrl.SITE_E)
                 else
                     Settings.putGallerySite(EhUrl.SITE_EX)
+                GlobalScope.launchIO {
+                    getProfile()
+                }
                 finish()
             }, Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = android.R.string.ok))
             }
+        }
+    }
+}
+
+suspend fun getProfile() {
+    runCatching {
+        (EhClient.execute(EhClient.METHOD_GET_PROFILE) as ProfileParser.Result).run {
+            Settings.putDisplayName(displayName)
+            Settings.putAvatar(avatar)
         }
     }
 }

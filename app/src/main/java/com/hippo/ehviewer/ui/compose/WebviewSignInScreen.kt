@@ -16,7 +16,6 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.widget.DialogWebChromeClient
-import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -99,9 +98,6 @@ fun WebviewSignInScreen(navController: NavController) {
                     if (getId && getHash) {
                         present = true
                         navController.navigate(SELECT_SITE_ROUTE_NAME)
-                        launchIO {
-                            getProfile()
-                        }
                     }
                 }
             }

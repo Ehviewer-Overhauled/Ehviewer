@@ -125,9 +125,6 @@ fun CookieSignInScene(navController: NavController) {
             runCatching {
                 EhClient.execute(METHOD_GET_PROFILE)
             }.onSuccess {
-                launchIO {
-                    getProfile()
-                }
                 withUIContext {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }

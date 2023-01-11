@@ -64,7 +64,6 @@ import com.hippo.ehviewer.ui.LoginActivity.Companion.WEBVIEW_SIGN_IN_ROUTE_NAME
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import rikka.core.util.ContextUtils.requireActivity
 
@@ -117,10 +116,6 @@ fun SignInScreen(navController: NavController) {
                     showErrorDialog = true
                 }
             }.onSuccess {
-                // This composable is to be finished
-                GlobalScope.launchIO {
-                    getProfile()
-                }
                 withUIContext {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
