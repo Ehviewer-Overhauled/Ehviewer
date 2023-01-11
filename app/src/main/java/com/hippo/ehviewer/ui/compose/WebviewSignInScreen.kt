@@ -46,6 +46,7 @@ fun WebviewSignInScreen(navController: NavController) {
                 javaScriptEnabled = true
             }
             webViewClient = object : WebViewClient() {
+                private var present = false
                 fun parseCookies(url: HttpUrl?, cookieStrings: String?): List<Cookie> {
                     if (cookieStrings == null) {
                         return emptyList()
@@ -77,6 +78,10 @@ fun WebviewSignInScreen(navController: NavController) {
                 }
 
                 override fun onPageFinished(view: WebView, url: String) {
+                    if (present) {
+                        view.destroy()
+                        return
+                    }
                     val httpUrl = url.toHttpUrlOrNull() ?: return
                     val cookieString = CookieManager.getInstance().getCookie(EhUrl.HOST_E)
                     val cookies = parseCookies(httpUrl, cookieString)
@@ -92,6 +97,7 @@ fun WebviewSignInScreen(navController: NavController) {
                         addCookie(EhUrl.DOMAIN_E, cookie)
                     }
                     if (getId && getHash) {
+                        present = true
                         navController.navigate(SELECT_SITE_ROUTE_NAME)
                         launchIO {
                             getProfile()
