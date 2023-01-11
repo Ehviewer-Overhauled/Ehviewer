@@ -785,7 +785,35 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     private inner class DownloadLabelAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<DownloadLabelHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadLabelHolder {
-            return DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
+            val holder = DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
+            holder.itemView.setOnClickListener {
+                val position = holder.bindingAdapterPosition
+                val label1: String? = if (position == 0) {
+                    null
+                } else {
+                    mLabels[position]
+                }
+                if (!ObjectUtils.equal(label1, mLabel)) {
+                    mLabel = label1
+                    updateForLabel()
+                    updateView()
+                    closeDrawer(GravityCompat.END)
+                }
+            }
+            holder.edit.setOnClickListener {
+                val context = context
+                val label = mLabels[holder.bindingAdapterPosition]
+                if (context != null) {
+                    val builder = EditTextDialogBuilder(
+                        context, label, getString(R.string.download_labels)
+                    )
+                    builder.setTitle(R.string.rename_label_title)
+                    builder.setPositiveButton(android.R.string.ok, null)
+                    val dialog = builder.show()
+                    RenameLabelDialogHelper(builder, dialog, label)
+                }
+            }
+            return holder
         }
 
         @SuppressLint("SetTextI18n")
@@ -810,32 +838,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             } else {
                 holder.label.text = label
             }
-            holder.itemView.setOnClickListener {
-                val label1: String? = if (position == 0) {
-                    null
-                } else {
-                    mLabels[position]
-                }
-                if (!ObjectUtils.equal(label1, mLabel)) {
-                    mLabel = label1
-                    updateForLabel()
-                    updateView()
-                    closeDrawer(GravityCompat.END)
-                }
-            }
             if (position > 0) {
                 holder.edit.visibility = View.VISIBLE
-                holder.edit.setOnClickListener {
-                    if (context != null) {
-                        val builder = EditTextDialogBuilder(
-                            context, label, getString(R.string.download_labels)
-                        )
-                        builder.setTitle(R.string.rename_label_title)
-                        builder.setPositiveButton(android.R.string.ok, null)
-                        val dialog = builder.show()
-                        RenameLabelDialogHelper(builder, dialog, label)
-                    }
-                }
                 holder.option.visibility = View.VISIBLE
             } else {
                 holder.edit.visibility = View.GONE
@@ -1005,6 +1009,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             lp.width = mListThumbWidth
             lp.height = mListThumbHeight
             holder.thumb.layoutParams = lp
+            holder.itemView.setOnClickListener { onItemClick(holder.bindingAdapterPosition) }
+            holder.itemView.setOnLongClickListener { onItemLongClick(holder.bindingAdapterPosition) }
             return holder
         }
 
@@ -1032,8 +1038,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 holder.thumb,
                 TransitionNameFactory.getThumbTransitionName(info.gid)
             )
-            holder.itemView.setOnClickListener { onItemClick(position) }
-            holder.itemView.setOnLongClickListener { onItemLongClick(position) }
         }
 
         override fun getItemCount(): Int {

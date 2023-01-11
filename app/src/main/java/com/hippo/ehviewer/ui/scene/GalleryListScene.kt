@@ -1146,17 +1146,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private inner class QsDrawerAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<QsDrawerHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QsDrawerHolder {
-            return QsDrawerHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
-        }
-
-        override fun onBindViewHolder(holder: QsDrawerHolder, position: Int) {
+            val holder = QsDrawerHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
             if (!mIsTopList) {
-                holder.key.text = mQuickSearchList[position].name
                 holder.itemView.setOnClickListener {
                     if (null == mHelper) {
                         return@setOnClickListener
                     }
-                    val q = mQuickSearchList[position]
+                    val q = mQuickSearchList[holder.bindingAdapterPosition]
                     mUrlBuilder.set(q)
                     onUpdateUrlBuilder()
                     val i = q.name!!.lastIndexOf("@")
@@ -1166,6 +1162,24 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 }
             } else {
                 val keywords = intArrayOf(11, 12, 13, 15)
+                holder.itemView.setOnClickListener {
+                    if (null == mHelper) {
+                        return@setOnClickListener
+                    }
+                    mUrlBuilder.keyword = keywords[holder.bindingAdapterPosition].toString()
+                    onUpdateUrlBuilder()
+                    mHelper!!.refresh()
+                    setState(STATE_NORMAL)
+                    closeDrawer(GravityCompat.END)
+                }
+            }
+            return holder
+        }
+
+        override fun onBindViewHolder(holder: QsDrawerHolder, position: Int) {
+            if (!mIsTopList) {
+                holder.key.text = mQuickSearchList[position].name
+            } else {
                 val toplists = intArrayOf(
                     R.string.toplist_alltime,
                     R.string.toplist_pastyear,
@@ -1174,16 +1188,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 )
                 holder.key.text = getString(toplists[position])
                 holder.option.visibility = View.GONE
-                holder.itemView.setOnClickListener {
-                    if (null == mHelper) {
-                        return@setOnClickListener
-                    }
-                    mUrlBuilder.keyword = keywords[position].toString()
-                    onUpdateUrlBuilder()
-                    mHelper!!.refresh()
-                    setState(STATE_NORMAL)
-                    closeDrawer(GravityCompat.END)
-                }
             }
         }
 
