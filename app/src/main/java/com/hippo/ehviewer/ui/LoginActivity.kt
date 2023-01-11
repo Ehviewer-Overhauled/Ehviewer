@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.ui.compose.CookieSignInScene
+import com.hippo.ehviewer.ui.compose.SelectSiteScreen
 import com.hippo.ehviewer.ui.compose.SignInScreen
 
 class LoginActivity : ComponentActivity() {
@@ -32,7 +33,7 @@ class LoginActivity : ComponentActivity() {
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {
-
+                        SelectSiteScreen()
                     }
                 }
             }

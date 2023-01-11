@@ -123,7 +123,7 @@ fun SignInScreen(navController: NavController) {
                     getProfile()
                 }
                 withUIContext {
-                    // navigate to selectSite
+                    navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
             }
         }
