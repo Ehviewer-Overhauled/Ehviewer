@@ -67,46 +67,44 @@ fun SignInScreen() {
     var signInJob by remember { mutableStateOf<Job?>(null) }
 
     // Basic login request
-    val signIn = remember {
-        return@remember lambda@{
-            if (signInJob?.isActive == true) return@lambda
-            if (username.isEmpty()) {
-                showUsernameError = true
-                return@lambda
-            } else {
-                showUsernameError = false
-            }
-            if (password.isEmpty()) {
-                showPasswordError = true
-                return@lambda
-            } else {
-                showPasswordError = false
-            }
-            focusManager.clearFocus()
-            isProgressIndicatorVisible = true
+    fun signIn() {
+        if (signInJob?.isActive == true) return
+        if (username.isEmpty()) {
+            showUsernameError = true
+            return
+        } else {
+            showUsernameError = false
+        }
+        if (password.isEmpty()) {
+            showPasswordError = true
+            return
+        } else {
+            showPasswordError = false
+        }
+        focusManager.clearFocus()
+        isProgressIndicatorVisible = true
 
-            EhUtils.signOut()
-            signInJob = coroutineScope.launchIO {
-                runCatching {
-                    (EhClient.execute(EhClient.METHOD_SIGN_IN, username, password) as String).let {
-                        Settings.putDisplayName(it)
-                    }
-                }.onFailure {
-                    it.printStackTrace()
-                    withUIContext {
-                        focusManager.clearFocus()
-                        isProgressIndicatorVisible = false
-                        showErrorDialog = true
-                        loginErrorException = it
-                    }
-                }.onSuccess {
-                    // This composable is to be finished
-                    GlobalScope.launchIO {
-                        getProfile()
-                    }
-                    withUIContext {
-                        // navigate to selectSite
-                    }
+        EhUtils.signOut()
+        signInJob = coroutineScope.launchIO {
+            runCatching {
+                (EhClient.execute(EhClient.METHOD_SIGN_IN, username, password) as String).let {
+                    Settings.putDisplayName(it)
+                }
+            }.onFailure {
+                it.printStackTrace()
+                withUIContext {
+                    focusManager.clearFocus()
+                    isProgressIndicatorVisible = false
+                    showErrorDialog = true
+                    loginErrorException = it
+                }
+            }.onSuccess {
+                // This composable is to be finished
+                GlobalScope.launchIO {
+                    getProfile()
+                }
+                withUIContext {
+                    // navigate to selectSite
                 }
             }
         }
@@ -176,7 +174,7 @@ fun SignInScreen() {
                 }
 
                 Button(
-                    onClick = signIn,
+                    onClick = { signIn() },
                     Modifier
                         .weight(1f)
                         .padding(horizontal = 4.dp)
