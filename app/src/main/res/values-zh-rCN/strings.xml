@@ -306,6 +306,7 @@
     <string name="label_text_is_invalid">“默认”是无效标签</string>
     <string name="label_text_exist">标签已存在</string>
     <string name="rename_label_title">重命名标签</string>
+    <string name="delete_label">删除标签“%s”？</string>
 
     <!-- History -->
     <string name="no_history">这里是阅读历史</string>
