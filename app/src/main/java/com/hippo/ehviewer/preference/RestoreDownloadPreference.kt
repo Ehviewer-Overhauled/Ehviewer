@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication.Companion.downloadManager
-import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -35,7 +34,6 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.IOUtils
 import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
 import java.io.IOException
 import java.io.InputStream
 import java.util.Collections
@@ -49,7 +47,6 @@ class RestoreDownloadPreference constructor(
 
     private class RestoreTask(context: Context) : Task(context) {
         private val mManager: DownloadManager = downloadManager
-        private val mHttpClient: OkHttpClient = okHttpClient
         private var restoreDirCount = 0
         private fun getRestoreItem(file: UniFile?): RestoreItem? {
             if (null == file || !file.isDirectory) {
@@ -99,7 +96,6 @@ class RestoreDownloadPreference constructor(
             } else try {
                 runBlocking {
                     fillGalleryListByApi(
-                        mHttpClient,
                         ArrayList(restoreItemList),
                         EhUrl.getReferer()
                     )

@@ -19,6 +19,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.Pair
 import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
@@ -55,7 +56,6 @@ import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -76,6 +76,7 @@ object EhEngine {
     private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
     private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
     private var sEhFilter = EhFilter.getInstance()
+    private val okHttpClient = EhApplication.okHttpClient
 
     private fun transformException(code: Int, headers: Headers?, body: String?, e: Throwable?) {
         // Check sad panda
@@ -116,7 +117,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun signIn(okHttpClient: OkHttpClient, username: String, password: String): String {
+    suspend fun signIn(username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val builder = FormBody.Builder()
             .add("referer", referer)
@@ -151,7 +152,6 @@ object EhEngine {
 
     @Throws(Throwable::class)
     private suspend fun fillGalleryList(
-        okHttpClient: OkHttpClient,
         list: MutableList<GalleryInfo>,
         url: String,
         filter: Boolean
@@ -188,7 +188,7 @@ object EhEngine {
             filter && sEhFilter.needTags() && !hasTags || Settings.getShowGalleryPages() && !hasPages ||
                     hasRated
         if (needApi) {
-            fillGalleryListByApi(okHttpClient, list, url)
+            fillGalleryListByApi(list, url)
         }
 
         // Filter tag
@@ -212,7 +212,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getGalleryList(okHttpClient: OkHttpClient, url: String): GalleryListParser.Result {
+    suspend fun getGalleryList(url: String): GalleryListParser.Result {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
@@ -234,7 +234,7 @@ object EhEngine {
             transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(okHttpClient, result.galleryInfoList, url, true)
+        fillGalleryList(result.galleryInfoList, url, true)
         return result
     }
 
@@ -242,7 +242,6 @@ object EhEngine {
     @JvmStatic
     @Throws(Throwable::class)
     suspend fun fillGalleryListByApi(
-        okHttpClient: OkHttpClient,
         galleryInfoList: List<GalleryInfo>,
         referer: String
     ): List<GalleryInfo> {
@@ -252,7 +251,7 @@ object EhEngine {
         while (i < size) {
             requestItems.add(galleryInfoList[i])
             if (requestItems.size == MAX_REQUEST_SIZE || i == size - 1) {
-                doFillGalleryListByApi(okHttpClient, requestItems, referer)
+                doFillGalleryListByApi(requestItems, referer)
                 requestItems.clear()
             }
             i++
@@ -262,7 +261,6 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun doFillGalleryListByApi(
-        okHttpClient: OkHttpClient,
         galleryInfoList: List<GalleryInfo>,
         referer: String
     ) {
@@ -307,7 +305,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getGalleryDetail(okHttpClient: OkHttpClient, url: String?): GalleryDetail {
+    suspend fun getGalleryDetail(url: String?): GalleryDetail {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
@@ -335,7 +333,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getPreviewSet(okHttpClient: OkHttpClient, url: String?): Pair<PreviewSet, Int> {
+    suspend fun getPreviewSet(url: String?): Pair<PreviewSet, Int> {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
@@ -363,7 +361,6 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun rateGallery(
-        okHttpClient: OkHttpClient,
         apiUid: Long, apiKey: String?, gid: Long, token: String?,
         rating: Float
     ): RateGalleryParser.Result {
@@ -403,7 +400,6 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun commentGallery(
-        okHttpClient: OkHttpClient,
         url: String?, comment: String, id: String?
     ): GalleryCommentList {
         val builder = FormBody.Builder()
@@ -444,7 +440,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getGalleryToken(
-        okHttpClient: OkHttpClient, gid: Long,
+        gid: Long,
         gtoken: String?, page: Int
     ): String {
         val json = JSONObject()
@@ -482,7 +478,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getFavorites(
-        okHttpClient: OkHttpClient, url: String
+        url: String
     ): FavoritesParser.Result {
         val referer = EhUrl.getReferer()
         Log.d(TAG, url)
@@ -505,7 +501,7 @@ object EhEngine {
             transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(okHttpClient, result.galleryInfoList, url, false)
+        fillGalleryList(result.galleryInfoList, url, false)
         return result
     }
 
@@ -515,7 +511,7 @@ object EhEngine {
      */
     @Throws(Throwable::class)
     suspend fun addFavorites(
-        okHttpClient: OkHttpClient, gid: Long,
+        gid: Long,
         token: String?, dstCat: Int, note: String?
     ): Void? {
         val catStr: String = when (dstCat) {
@@ -564,14 +560,14 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun addFavoritesRange(
-        okHttpClient: OkHttpClient, gidArray: LongArray,
+        gidArray: LongArray,
         tokenArray: Array<String?>, dstCat: Int
     ): Void? {
         AssertUtils.assertEquals(gidArray.size, tokenArray.size)
         var i = 0
         val n = gidArray.size
         while (i < n) {
-            addFavorites(okHttpClient, gidArray[i], tokenArray[i], dstCat, null)
+            addFavorites(gidArray[i], tokenArray[i], dstCat, null)
             i++
         }
         return null
@@ -579,7 +575,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun modifyFavorites(
-        okHttpClient: OkHttpClient, url: String,
+        url: String,
         gidArray: LongArray, dstCat: Int
     ): FavoritesParser.Result {
         val catStr: String = when (dstCat) {
@@ -623,13 +619,13 @@ object EhEngine {
             transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(okHttpClient, result.galleryInfoList, url, false)
+        fillGalleryList(result.galleryInfoList, url, false)
         return result
     }
 
     @Throws(Throwable::class)
     suspend fun getTorrentList(
-        okHttpClient: OkHttpClient, url: String?,
+        url: String?,
         gid: Long, token: String?
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
@@ -657,7 +653,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getArchiveList(
-        okHttpClient: OkHttpClient, url: String?,
+        url: String?,
         gid: Long, token: String?
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
@@ -685,7 +681,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun downloadArchive(
-        okHttpClient: OkHttpClient, gid: Long,
+        gid: Long,
         token: String?, or: String?, res: String?, isHAtH: Boolean
     ): String? {
         if (or.isNullOrEmpty()) {
@@ -756,7 +752,6 @@ object EhEngine {
 
     @Throws(Throwable::class)
     private suspend fun getProfileInternal(
-        okHttpClient: OkHttpClient,
         url: String, referer: String
     ): ProfileParser.Result {
         Log.d(TAG, url)
@@ -780,9 +775,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getProfile(
-        okHttpClient: OkHttpClient
-    ): ProfileParser.Result {
+    suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, null).build()
@@ -795,7 +788,7 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                return getProfileInternal(okHttpClient, ForumsParser.parse(body), url)
+                return getProfileInternal(ForumsParser.parse(body), url)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
@@ -805,9 +798,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getUConfig(
-        okHttpClient: OkHttpClient
-    ): Void? {
+    suspend fun getUConfig(): Void? {
         val url = EhUrl.getUConfigUrl()
         Log.d(TAG, url)
         var request = EhRequestBuilder(url, null).build()
@@ -852,7 +843,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun voteComment(
-        okHttpClient: OkHttpClient, apiUid: Long,
+        apiUid: Long,
         apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
     ): VoteCommentParser.Result {
         val json = JSONObject()
@@ -891,7 +882,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun voteTag(
-        okHttpClient: OkHttpClient, apiUid: Long,
+        apiUid: Long,
         apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
     ): VoteTagParser.Result {
         val json = JSONObject()
@@ -933,7 +924,7 @@ object EhEngine {
      */
     @Throws(Throwable::class)
     suspend fun imageSearch(
-        okHttpClient: OkHttpClient, image: File,
+        image: File,
         uss: Boolean, osc: Boolean, se: Boolean
     ): GalleryListParser.Result {
         val builder = MultipartBody.Builder()
@@ -992,14 +983,13 @@ object EhEngine {
             transformException(code, headers, body, e)
             throw e
         }
-        fillGalleryList(okHttpClient, result.galleryInfoList, url, true)
+        fillGalleryList(result.galleryInfoList, url, true)
         return result
     }
 
     @JvmStatic
     @Throws(Throwable::class)
     fun getGalleryPage(
-        okHttpClient: OkHttpClient,
         url: String?,
         gid: Long,
         token: String?
@@ -1029,7 +1019,6 @@ object EhEngine {
     @JvmStatic
     @Throws(Throwable::class)
     fun getGalleryPageApi(
-        okHttpClient: OkHttpClient,
         gid: Long,
         index: Int,
         pToken: String?,

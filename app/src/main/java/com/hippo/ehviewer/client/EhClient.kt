@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
@@ -47,28 +46,23 @@ object EhClient {
     suspend fun execute(method: Int, vararg params: Any?): Any? {
         return when (method) {
             METHOD_SIGN_IN -> EhEngine.signIn(
-                mOkHttpClient,
                 params[0] as String,
                 params[1] as String
             )
 
             METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
-                mOkHttpClient,
                 params[0] as String
             )
 
             METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
-                mOkHttpClient,
                 params[0] as String?
             )
 
             METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
-                mOkHttpClient,
                 params[0] as String?
             )
 
             METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as Long,
@@ -77,26 +71,22 @@ object EhClient {
             )
 
             METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
-                mOkHttpClient,
                 params[0] as String?,
                 params[1] as String,
                 params[2] as String?
             )
 
             METHOD_GET_GALLERY_TOKEN -> EhEngine.getGalleryToken(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as Int
             )
 
             METHOD_GET_FAVORITES -> EhEngine.getFavorites(
-                mOkHttpClient,
                 params[0] as String
             )
 
             METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as Int,
@@ -104,29 +94,25 @@ object EhClient {
             )
 
             METHOD_ADD_FAVORITES_RANGE -> @Suppress("UNCHECKED_CAST") EhEngine.addFavoritesRange(
-                mOkHttpClient,
                 params[0] as LongArray,
                 params[1] as Array<String?>,
                 params[2] as Int
             )
 
             METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
-                mOkHttpClient,
                 params[0] as String,
                 params[1] as LongArray,
                 params[2] as Int
             )
 
             METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
-                mOkHttpClient,
                 params[0] as String?,
                 params[1] as Long,
                 params[2] as String?
             )
 
-            METHOD_GET_PROFILE -> EhEngine.getProfile(mOkHttpClient)
+            METHOD_GET_PROFILE -> EhEngine.getProfile()
             METHOD_VOTE_COMMENT -> EhEngine.voteComment(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as Long,
@@ -136,7 +122,6 @@ object EhClient {
             )
 
             METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
-                mOkHttpClient,
                 params[0] as File,
                 params[1] as Boolean,
                 params[2] as Boolean,
@@ -144,14 +129,12 @@ object EhClient {
             )
 
             METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
-                mOkHttpClient,
                 params[0] as String?,
                 params[1] as Long,
                 params[2] as String?
             )
 
             METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as String?,
@@ -160,7 +143,6 @@ object EhClient {
             )
 
             METHOD_VOTE_TAG -> EhEngine.voteTag(
-                mOkHttpClient,
                 params[0] as Long,
                 params[1] as String?,
                 params[2] as Long,
@@ -169,7 +151,7 @@ object EhClient {
                 params[5] as Int
             )
 
-            METHOD_GET_UCONFIG -> EhEngine.getUConfig(mOkHttpClient)
+            METHOD_GET_UCONFIG -> EhEngine.getUConfig()
             else -> throw IllegalStateException("Can't detect method $method")
         }
     }
@@ -199,5 +181,4 @@ object EhClient {
     const val METHOD_DOWNLOAD_ARCHIVE = 18
     const val METHOD_VOTE_TAG = 19
     const val METHOD_GET_UCONFIG = 20
-    private val mOkHttpClient = okHttpClient
 }
