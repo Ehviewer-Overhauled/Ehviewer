@@ -211,6 +211,8 @@ class MainActivity : EhActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (EhUtils.needSignedIn())
+            startActivity(Intent(this, LoginActivity::class.java))
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -226,9 +228,6 @@ class MainActivity : EhActivity() {
                     GalleryListScene.ACTION_TOP_LIST -> setStartDestination(R.id.nav_toplist)
                 }
             }
-        }
-        if (EhUtils.needSignedIn()) {
-            navController.navigate(R.id.signInScene)
         }
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
