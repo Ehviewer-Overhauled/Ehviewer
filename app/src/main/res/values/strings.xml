@@ -352,6 +352,7 @@
     <string name="label_text_is_invalid">\"Default\" is an invalid label</string>
     <string name="label_text_exist">Label exists</string>
     <string name="rename_label_title">Rename label</string>
+    <string name="delete_label">Delete label \"%s\"?</string>
 
     <!-- History -->
     <string name="no_history">Viewed galleries will be shown here</string>

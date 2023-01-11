@@ -834,7 +834,9 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                         RenameLabelDialogHelper(builder, dialog, label)
                     }
                 }
+                holder.option.visibility = View.VISIBLE
             } else {
+                holder.edit.visibility = View.GONE
                 holder.option.visibility = View.GONE
             }
         }
@@ -1169,16 +1171,24 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             if (mDownloadManager == null) return
-            lifecycleScope.launchIO {
-                if (position != 0) {
-                    val label = mLabels[position]
-                    mDownloadManager!!.deleteLabel(label)
-                }
-                mLabels.removeAt(position)
-                withUIContext {
-                    mLabelAdapter!!.notifyItemRemoved(position)
-                }
+            if (position == 0) {
+                mLabelAdapter!!.notifyItemChanged(position)
+                return
             }
+            val label = mLabels[position]
+            BaseDialogBuilder(context!!)
+                .setMessage(getString(R.string.delete_label, label))
+                .setPositiveButton(R.string.delete) { _, _ ->
+                    lifecycleScope.launchIO {
+                        mDownloadManager!!.deleteLabel(label)
+                        mLabels.removeAt(position)
+                        withUIContext {
+                            mLabelAdapter!!.notifyItemRemoved(position)
+                        }
+                    }
+                }.setNegativeButton(android.R.string.cancel) { _, _ ->
+                    mLabelAdapter!!.notifyItemChanged(position)
+                }.show()
         }
     }
 
