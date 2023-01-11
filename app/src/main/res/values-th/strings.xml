@@ -40,7 +40,6 @@
     <string name="text_is_empty">ข้อความห้ามเว้นว่างไว้</string>
     <string name="waring">คำเตือน</string>
     <string name="wrong_cookie_warning">ดูเหมือนว่าคุกกี้ที่คุณกรอกมานั้นมันผิด คุณลองตรวจสอบใหม่ดูอีกรอบ</string>
-    <string name="found_cookies">พบคุกกี้แล้ว!</string>
 
     <string name="invalid_download_location">ดูเหมือนที่อยู่ในการดาวน์โหลดนั้นไม่พร้อมใช้งาน โปรดตั้งค่าในเมนูการตั้งค่า</string>
 
@@ -77,7 +76,6 @@
     <!-- Select scene -->
     <string name="select_scene">เว็บแกลเลอรี่ไหนที่คุณอยากเข้าชม?</string>
     <string name="select_scene_explain">e-hentai: เขตแดนที่ทุกๆคนสามารถเข้าถึงได้\nexhentai: เขตแดนอันแสนศักศิทธิ์สำหรับคนที่ลงชื่อเข้าใช้ระบบแล้วเท่านั้นที่จะเข้าไปได้</string>
-    <string name="no_select">โปรดเลือกหนึ่งเว็บไซต์</string>
 
     <!-- Update -->
 

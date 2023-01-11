@@ -35,7 +35,6 @@
     <string name="text_is_empty">Der Text wird nicht eingegeben</string>
     <string name="waring">Achtung</string>
     <string name="wrong_cookie_warning">Die eingegebenen Cookies sehen korrekt nicht aus. Überprüfe sie.</string>
-    <string name="found_cookies">Cookies werden gefunden</string>
     <string name="invalid_download_location">Der Downloadpfad ist nicht verfügbar. Geh zu die Einstellungen und stelle einen neue Pfad fest.</string>
     <string name="error_bad_status_code">Inkorrekter Statuscode: %d</string>
     <string name="error_timeout">Timeout</string>
@@ -60,7 +59,6 @@
     <string name="get_it">Verstanden</string>
     <string name="select_scene">Wähle eine Galerie-Webseite aus.</string>
     <string name="select_scene_explain">e-hentai: für jeden verfügbar\nexhentai: nur für diejenigen verfügbar, die sich angemeldet haben</string>
-    <string name="no_select">Wähle eine Webseite aus.</string>
     <string name="gallery_list_search_bar_hint_exhentai">ExHentai durchsuchen</string>
     <string name="gallery_list_search_bar_hint_e_hentai">E-Hentai durchsuchen</string>
     <string name="gallery_list_empty_hit">Die Welt ist so groß und der Panda sitzt ganz allein</string>

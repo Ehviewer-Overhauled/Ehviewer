@@ -41,7 +41,6 @@
     <string name="text_is_empty">文本为空</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">看起来您输入的 Cookie 是错误的，最好检查一下。</string>
-    <string name="found_cookies">找到旧版 Cookie</string>
 
     <string name="invalid_download_location">似乎下载路径不可用。请到重新设置下载路径。</string>
 
@@ -83,7 +82,6 @@
     <!-- Select scene -->
     <string name="select_scene">你想选择哪个画廊站点？</string>
     <string name="select_scene_explain">e-hentai：对任何人开放\nexhentai：仅对登录用户开放</string>
-    <string name="no_select">请选择一个站点</string>
 
     <!-- Update -->
 

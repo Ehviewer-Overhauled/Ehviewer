@@ -41,7 +41,6 @@
     <string name="text_is_empty">Entrez le texte.</string>
     <string name="waring">Attention</string>
     <string name="wrong_cookie_warning">Les cookies entrés n\'ont pas l\'air corrects. Vérifiez-les.</string>
-    <string name="found_cookies">Cookies trouvés</string>
 
     <string name="invalid_download_location">La location de téléchargement actuelle n\'est pas disponible. Choissez-en une à nouveau dans les Paramétres.</string>
 
@@ -76,7 +75,6 @@
     <!-- Select scene -->
     <string name="select_scene">Sélectionnez un site galerie.</string>
     <string name="select_scene_explain">e-hentai : disponible pour tout le monde\nexhentai : disponible pour ce qui s\'est connecté(e)</string>
-    <string name="no_select">Sélectionnez un site</string>
 
     <!-- Update -->
 

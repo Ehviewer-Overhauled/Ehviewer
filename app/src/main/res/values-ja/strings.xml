@@ -39,7 +39,6 @@
     <string name="text_is_empty">テキストを入力してください</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">入力したCookieは正しくないようです。確認してください。</string>
-    <string name="found_cookies">Cookieが見つかりました</string>
 
     <string name="invalid_download_location">ダウンロードパスは現在利用できません。ダウンロードパスを設定してください。</string>
 
@@ -74,7 +73,6 @@
     <!-- Select scene -->
     <string name="select_scene">ギャラリーサイトを選択してください</string>
     <string name="select_scene_explain">e-hentai：誰にも公開です\nexhentai：ログインしないとアクセスできません</string>
-    <string name="no_select">サイトを選択してください</string>
 
     <!-- Update -->
 

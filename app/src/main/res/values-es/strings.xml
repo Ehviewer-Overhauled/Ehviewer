@@ -41,7 +41,6 @@
     <string name="text_is_empty">El texto está vacío</string>
     <string name="waring">Advertencia</string>
     <string name="wrong_cookie_warning">Parece que las cookies que ingresaste son incorrectas. Debe revisarlos.</string>
-    <string name="found_cookies">¡Cookies encontradas!</string>
 
     <string name="invalid_download_location">Parece que la ubicación de descarga no está disponible. Establece la ubicación en Configuración.</string>
 
@@ -74,7 +73,6 @@
     <!-- Select scene -->
     <string name="select_scene">¿Qué galería deseas seleccionar?</string>
     <string name="select_scene_explain">e-hentai: Disponible para cualquiera .\nexhentai: Solo para usuarios que han iniciado sesión</string>
-    <string name="no_select">Por favor seleccione un sitio</string>
 
     <!-- Update -->
 

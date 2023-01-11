@@ -57,7 +57,6 @@
     <string name="text_is_empty">Text is empty</string>
     <string name="waring">Warning</string>
     <string name="wrong_cookie_warning">It seems that the cookies you entered are wrong. You\'d better check them.</string>
-    <string name="found_cookies">Found cookies!</string>
 
     <string name="invalid_download_location">It seems download location is not available. Please set it in Settings.</string>
 
@@ -125,7 +124,6 @@
     <!-- Select scene -->
     <string name="select_scene">Which gallery site do you want to visit?</string>
     <string name="select_scene_explain">e-hentai: available for anyone\nexhentai: available for who has signed in</string>
-    <string name="no_select">Please select one site</string>
 
     <!-- Update -->
 
