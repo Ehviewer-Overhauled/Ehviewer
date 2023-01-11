@@ -111,6 +111,30 @@ public class EhDB {
         return list;
     }
 
+    public static synchronized void moveDownloadInfo(int fromPosition, int toPosition) {
+        if (fromPosition == toPosition) {
+            return;
+        }
+
+        boolean reverse = fromPosition > toPosition;
+        int offset = reverse ? toPosition : fromPosition;
+        int limit = reverse ? fromPosition - toPosition + 1 : toPosition - fromPosition + 1;
+
+        DownloadsDao dao = db.downloadsDao();
+        List<DownloadInfo> list = dao.list(offset, limit);
+
+        int step = reverse ? 1 : -1;
+        int start = reverse ? limit - 1 : 0;
+        int end = reverse ? 0 : limit - 1;
+        long toTime = list.get(end).time;
+        for (int i = end; reverse ? i < start : i > start; i += step) {
+            list.get(i).time = list.get(i + step).time;
+        }
+        list.get(start).time = toTime;
+
+        dao.update(list);
+    }
+
     // Insert or update
     public static synchronized void putDownloadInfo(DownloadInfo downloadInfo) {
         DownloadsDao dao = db.downloadsDao();
