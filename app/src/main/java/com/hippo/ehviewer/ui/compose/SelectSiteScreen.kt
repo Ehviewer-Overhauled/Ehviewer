@@ -37,7 +37,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrl
 
 @Composable
-fun SelectSiteScreen() {
+fun SelectSiteScreen(finish: () -> Unit) {
     var site by remember { mutableStateOf(EhApplication.ehCookieStore.hasSignedIn()) } // false for e, true for ex
 
     Column(
@@ -112,7 +112,7 @@ fun SelectSiteScreen() {
                     Settings.putGallerySite(EhUrl.SITE_E)
                 else
                     Settings.putGallerySite(EhUrl.SITE_EX)
-                // finish activity
+                finish()
             }, Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = android.R.string.ok))
             }

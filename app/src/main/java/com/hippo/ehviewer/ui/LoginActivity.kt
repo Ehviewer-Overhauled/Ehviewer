@@ -33,7 +33,9 @@ class LoginActivity : ComponentActivity() {
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {
-                        SelectSiteScreen()
+                        SelectSiteScreen() {
+                            finish()
+                        }
                     }
                 }
             }
