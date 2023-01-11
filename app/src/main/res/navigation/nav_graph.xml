@@ -76,8 +76,4 @@
         android:id="@+id/progressScene"
         android:name="com.hippo.ehviewer.ui.scene.ProgressScene"
         android:label="ProgressScene" />
-    <fragment
-        android:id="@+id/webViewSignInScene"
-        android:name="com.hippo.ehviewer.ui.scene.WebViewSignInScene"
-        android:label="WebViewSignInScene" />
 </navigation>

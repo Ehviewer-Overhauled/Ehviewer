@@ -11,6 +11,7 @@ import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.ui.compose.CookieSignInScene
 import com.hippo.ehviewer.ui.compose.SelectSiteScreen
 import com.hippo.ehviewer.ui.compose.SignInScreen
+import com.hippo.ehviewer.ui.compose.WebviewSignInScreen
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class LoginActivity : ComponentActivity() {
                     }
 
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
-
+                        WebviewSignInScreen(navController)
                     }
 
                     composable(COOKIE_SIGN_IN_ROUTE_NAME) {
@@ -33,7 +34,7 @@ class LoginActivity : ComponentActivity() {
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {
-                        SelectSiteScreen() {
+                        SelectSiteScreen {
                             finish()
                         }
                     }
