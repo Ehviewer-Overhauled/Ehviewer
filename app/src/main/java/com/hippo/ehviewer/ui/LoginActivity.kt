@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
+import com.hippo.ehviewer.ui.compose.CookieSignInScene
 import com.hippo.ehviewer.ui.compose.SignInScreen
 
 class LoginActivity : ComponentActivity() {
@@ -19,7 +20,7 @@ class LoginActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
                     composable(SIGN_IN_ROUTE_NAME) {
-                        SignInScreen()
+                        SignInScreen(navController)
                     }
 
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
@@ -27,7 +28,7 @@ class LoginActivity : ComponentActivity() {
                     }
 
                     composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-
+                        CookieSignInScene(navController)
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {

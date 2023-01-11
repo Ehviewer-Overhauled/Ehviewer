@@ -32,13 +32,21 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.LoginActivity.Companion.COOKIE_SIGN_IN_ROUTE_NAME
+import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
+import com.hippo.ehviewer.ui.LoginActivity.Companion.WEBVIEW_SIGN_IN_ROUTE_NAME
 import com.hippo.ehviewer.ui.scene.getProfile
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -49,7 +57,7 @@ import rikka.core.util.ContextUtils.requireActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen() {
+fun SignInScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var isProgressIndicatorVisible by remember { mutableStateOf(false) }
@@ -187,24 +195,48 @@ fun SignInScreen() {
                 Modifier.padding(horizontal = 4.dp)
             ) {
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate(WEBVIEW_SIGN_IN_ROUTE_NAME) },
                     Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.sign_in_via_webview))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(textDecoration = TextDecoration.Underline)
+                            ) {
+                                append(stringResource(id = R.string.sign_in_via_webview))
+                            }
+                        }
+                    )
                 }
 
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate(COOKIE_SIGN_IN_ROUTE_NAME) },
                     Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text(text = stringResource(id = R.string.sign_in_via_cookies))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(textDecoration = TextDecoration.Underline)
+                            ) {
+                                append(stringResource(id = R.string.sign_in_via_cookies))
+                            }
+                        }
+                    )
                 }
             }
 
             TextButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(SELECT_SITE_ROUTE_NAME) },
             ) {
-                Text(text = stringResource(id = R.string.tourist_mode))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(textDecoration = TextDecoration.Underline)
+                        ) {
+                            append(stringResource(id = R.string.tourist_mode))
+                        }
+                    }
+                )
             }
         }
         if (isProgressIndicatorVisible) {
