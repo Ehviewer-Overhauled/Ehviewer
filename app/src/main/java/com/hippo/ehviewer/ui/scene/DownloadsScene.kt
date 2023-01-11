@@ -286,6 +286,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             mRecyclerView!!.scrollToPosition(mInitPosition)
             mInitPosition = -1
         }
+        val itemTouchHelper = ItemTouchHelper(DownloadItemTouchHelperCallback())
+        itemTouchHelper.attachToRecyclerView(mRecyclerView)
         mFastScroller!!.attachToRecyclerView(mRecyclerView)
         val handlerDrawable = HandlerDrawable()
         handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
@@ -1149,7 +1151,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             )
         }
 
-        @SuppressLint("NotifyDataSetChanged")
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
@@ -1164,7 +1165,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             downloadManager.moveLabel(fromPosition - 1, toPosition - 1)
             val item = mLabels.removeAt(fromPosition)
             mLabels.add(toPosition, item)
-            mLabelAdapter!!.notifyDataSetChanged()
+            mLabelAdapter!!.notifyItemMoved(fromPosition, toPosition)
             return true
         }
 
@@ -1189,6 +1190,42 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 }.setNegativeButton(android.R.string.cancel) { _, _ ->
                     mLabelAdapter!!.notifyItemChanged(position)
                 }.show()
+        }
+    }
+
+    private inner class DownloadItemTouchHelperCallback : ItemTouchHelper.Callback() {
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return makeMovementFlags(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                0
+            )
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.bindingAdapterPosition
+            val toPosition = target.bindingAdapterPosition
+            if (fromPosition == toPosition) {
+                return false
+            }
+            lifecycleScope.launchIO {
+                EhDB.moveDownloadInfo(fromPosition, toPosition)
+                val item = mList!!.removeAt(fromPosition)
+                mList!!.add(toPosition, item)
+                withUIContext {
+                    mAdapter!!.notifyItemMoved(fromPosition, toPosition)
+                }
+            }
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         }
     }
 
