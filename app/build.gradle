@@ -163,7 +163,7 @@ dependencies {
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
-    implementation 'androidx.startup:startup-runtime:1.2.0-alpha01'
+    implementation 'androidx.startup:startup-runtime:1.2.0-alpha02'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation "androidx.transition:transition-ktx:1.4.1"
     implementation "androidx.vectordrawable:vectordrawable:1.2.0-beta01"
