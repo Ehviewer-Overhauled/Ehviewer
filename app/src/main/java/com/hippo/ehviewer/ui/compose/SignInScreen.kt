@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -154,6 +156,9 @@ fun SignInScreen(navController: NavController) {
                         contentDescription = null
                     )
                 },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
                 singleLine = true,
                 isError = showUsernameError
             )
@@ -166,6 +171,9 @@ fun SignInScreen(navController: NavController) {
                 visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
                 supportingText = { if (showPasswordError) Text(stringResource(R.string.error_password_cannot_empty)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardActions = KeyboardActions(
+                    onDone = { signIn() }
+                ),
                 trailingIcon = {
                     if (showPasswordError)
                         Icon(imageVector = Icons.Filled.Info, contentDescription = null)
