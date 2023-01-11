@@ -10,11 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,8 +30,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +42,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -60,19 +71,16 @@ import rikka.core.util.ContextUtils.requireActivity
 fun SignInScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
-    var isProgressIndicatorVisible by remember { mutableStateOf(false) }
-    val labelUsername = stringResource(R.string.username)
-    val labelPassword = stringResource(R.string.password)
-    val errorTextUsername = stringResource(R.string.error_username_cannot_empty)
-    val errorTextPasswd = stringResource(R.string.error_password_cannot_empty)
-    var showUsernameError by remember { mutableStateOf(false) }
-    var showPasswordError by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var loginErrorException by remember { mutableStateOf<Throwable?>(null) }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var isProgressIndicatorVisible by rememberSaveable { mutableStateOf(false) }
+    var showUsernameError by rememberSaveable { mutableStateOf(false) }
+    var showPasswordError by rememberSaveable { mutableStateOf(false) }
+    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
+    var loginErrorException by rememberSaveable { mutableStateOf<Throwable?>(null) }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
-    var signInJob by remember { mutableStateOf<Job?>(null) }
+    var signInJob by rememberSaveable { mutableStateOf<Job?>(null) }
 
     // Basic login request
     fun signIn() {
@@ -138,8 +146,13 @@ fun SignInScreen(navController: NavController) {
                 value = username,
                 onValueChange = { username = it },
                 Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                label = {
-                    Text(text = if (!showUsernameError) labelUsername else errorTextUsername)
+                label = { Text(stringResource(R.string.username)) },
+                supportingText = { if (showUsernameError) Text(stringResource(R.string.error_username_cannot_empty)) },
+                trailingIcon = {
+                    if (showUsernameError) Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null
+                    )
                 },
                 singleLine = true,
                 isError = showUsernameError
@@ -149,8 +162,19 @@ fun SignInScreen(navController: NavController) {
                 value = password,
                 onValueChange = { password = it },
                 Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                label = {
-                    Text(text = if (!showPasswordError) labelPassword else errorTextPasswd)
+                label = { Text(stringResource(R.string.password)) },
+                visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
+                supportingText = { if (showPasswordError) Text(stringResource(R.string.error_password_cannot_empty)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    if (showPasswordError)
+                        Icon(imageVector = Icons.Filled.Info, contentDescription = null)
+                    else
+                        IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                            val visibilityIcon =
+                                if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                            Icon(imageVector = visibilityIcon, contentDescription = null)
+                        }
                 },
                 singleLine = true,
                 isError = showPasswordError
@@ -160,7 +184,8 @@ fun SignInScreen(navController: NavController) {
                 text = stringResource(id = R.string.app_waring),
                 Modifier
                     .widthIn(max = dimensionResource(id = R.dimen.single_max_width))
-                    .padding(top = 24.dp)
+                    .padding(top = 24.dp),
+                style = MaterialTheme.typography.labelLarge
             )
 
             Spacer(modifier = Modifier.weight(1f))
