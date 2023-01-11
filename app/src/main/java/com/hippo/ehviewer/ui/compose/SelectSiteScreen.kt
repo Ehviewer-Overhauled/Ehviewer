@@ -108,6 +108,7 @@ fun SelectSiteScreen(finish: () -> Unit) {
         ) {
             Button(onClick = {
                 Settings.putSelectSite(false)
+                Settings.putNeedSignIn(false)
                 if (!site)
                     Settings.putGallerySite(EhUrl.SITE_E)
                 else

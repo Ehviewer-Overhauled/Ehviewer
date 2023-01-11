@@ -28,6 +28,7 @@ import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.compose.getProfile
 import com.hippo.ehviewer.widget.DialogWebChromeClient
 import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
