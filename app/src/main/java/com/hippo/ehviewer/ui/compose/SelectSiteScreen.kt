@@ -56,6 +56,9 @@ fun SelectSiteScreen(finish: () -> Unit) {
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.weight(1f))
+
+        // TODO: Replace this dummy impl with official one when available
+        // See https://m3.material.io/components/segmented-buttons/overview
         Row(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
@@ -98,6 +101,8 @@ fun SelectSiteScreen(finish: () -> Unit) {
                 )
             }
         }
+        // Dummy impl end
+
         Text(
             text = stringResource(id = R.string.select_scene_explain),
             modifier = Modifier.padding(top = 16.dp)
