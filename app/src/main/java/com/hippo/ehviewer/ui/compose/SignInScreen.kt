@@ -31,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -77,12 +78,12 @@ fun SignInScreen(navController: NavController) {
     var showUsernameError by rememberSaveable { mutableStateOf(false) }
     var showPasswordError by rememberSaveable { mutableStateOf(false) }
     var showErrorDialog by rememberSaveable { mutableStateOf(false) }
-    var loginErrorException by rememberSaveable { mutableStateOf<Throwable?>(null) }
+    var loginErrorException by remember { mutableStateOf<Throwable?>(null) }
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
-    var signInJob by rememberSaveable { mutableStateOf<Job?>(null) }
+    var signInJob by remember { mutableStateOf<Job?>(null) }
 
     // Basic login request
     fun signIn() {
@@ -113,8 +114,8 @@ fun SignInScreen(navController: NavController) {
                 withUIContext {
                     focusManager.clearFocus()
                     isProgressIndicatorVisible = false
-                    showErrorDialog = true
                     loginErrorException = it
+                    showErrorDialog = true
                 }
             }.onSuccess {
                 // This composable is to be finished
