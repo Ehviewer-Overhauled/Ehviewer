@@ -41,7 +41,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
-import android.widget.RatingBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
@@ -123,19 +122,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private val binding
         get() = _binding!!
     private var mViewTransition: ViewTransition? = null
-
-    // Actions
-    private var mActions: View? = null
-    private var mRatingText: TextView? = null
-    private var mRating: RatingBar? = null
-    private var mHeart: TextView? = null
-    private var mHeartOutline: TextView? = null
-    private var mTorrent: TextView? = null
-    private var mArchive: TextView? = null
-    private var mShare: TextView? = null
-    private var mRate: View? = null
-    private var mSimilar: TextView? = null
-    private var mSearchCover: TextView? = null
 
     // Tags
     private var mTags: LinearLayout? = null
@@ -410,28 +396,20 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             it.uploader.setOnLongClickListener(this)
         }
         binding.content.header.info.setOnClickListener(this)
-        mActions = ViewUtils.`$$`(binding.content.belowHeader, R.id.actions)
-        mRatingText = ViewUtils.`$$`(mActions, R.id.rating_text) as TextView
-        mRating = ViewUtils.`$$`(mActions, R.id.rating) as RatingBar
-        mHeart = ViewUtils.`$$`(mActions, R.id.heart) as TextView
-        mHeartOutline = ViewUtils.`$$`(mActions, R.id.heart_outline) as TextView
-        mTorrent = ViewUtils.`$$`(mActions, R.id.torrent) as TextView
-        mArchive = ViewUtils.`$$`(mActions, R.id.archive) as TextView
-        mShare = ViewUtils.`$$`(mActions, R.id.share) as TextView
-        mRate = ViewUtils.`$$`(mActions, R.id.rate)
-        mSimilar = ViewUtils.`$$`(mActions, R.id.similar) as TextView
-        mSearchCover = ViewUtils.`$$`(mActions, R.id.search_cover) as TextView
+        binding.content.actions.let {
+            it.newerVersion.setOnClickListener(this)
+            it.heart.setOnClickListener(this)
+            it.heart.setOnLongClickListener(this)
+            it.heartOutline.setOnClickListener(this)
+            it.heartOutline.setOnLongClickListener(this)
+            it.torrent.setOnClickListener(this)
+            it.archive.setOnClickListener(this)
+            it.share.setOnClickListener(this)
+            it.rate.setOnClickListener(this)
+            it.similar.setOnClickListener(this)
+            it.searchCover.setOnClickListener(this)
+        }
         binding.content.actions.newerVersion.setOnClickListener(this)
-        mHeart!!.setOnClickListener(this)
-        mHeart!!.setOnLongClickListener(this)
-        mHeartOutline!!.setOnClickListener(this)
-        mHeartOutline!!.setOnLongClickListener(this)
-        mTorrent!!.setOnClickListener(this)
-        mArchive!!.setOnClickListener(this)
-        mShare!!.setOnClickListener(this)
-        mRate!!.setOnClickListener(this)
-        mSimilar!!.setOnClickListener(this)
-        mSearchCover!!.setOnClickListener(this)
         mTags = ViewUtils.`$$`(binding.content.belowHeader, R.id.tags) as LinearLayout
         mNoTags = ViewUtils.`$$`(mTags, R.id.no_tags) as TextView
         mComments = ViewUtils.`$$`(binding.content.belowHeader, R.id.comments) as LinearLayout
@@ -473,17 +451,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
-        mActions = null
-        mRatingText = null
-        mRating = null
-        mHeart = null
-        mHeartOutline = null
-        mTorrent = null
-        mArchive = null
-        mShare = null
-        mRate = null
-        mSimilar = null
-        mSearchCover = null
         mTags = null
         mNoTags = null
         mComments = null
@@ -589,20 +556,20 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private fun updateFavoriteDrawable() {
         val gd = mGalleryDetail ?: return
-        if (mHeart == null || mHeartOutline == null) {
-            return
-        }
-        if (gd.isFavorited || EhDB.containLocalFavorites(gd.gid)) {
-            mHeart!!.visibility = View.VISIBLE
-            if (gd.favoriteName == null) {
-                mHeart!!.setText(R.string.local_favorites)
+        _binding ?: return
+        binding.content.actions.run {
+            if (gd.isFavorited || EhDB.containLocalFavorites(gd.gid)) {
+                heart.visibility = View.VISIBLE
+                if (gd.favoriteName == null) {
+                    heart.setText(R.string.local_favorites)
+                } else {
+                    heart.text = gd.favoriteName
+                }
+                heartOutline.visibility = View.GONE
             } else {
-                mHeart!!.text = gd.favoriteName
+                heart.visibility = View.GONE
+                heartOutline.visibility = View.VISIBLE
             }
-            mHeartOutline!!.visibility = View.GONE
-        } else {
-            mHeart!!.visibility = View.GONE
-            mHeartOutline!!.visibility = View.VISIBLE
         }
     }
 
@@ -644,10 +611,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         if (gd.newerVersions.size != 0) {
             binding.content.actions.newerVersion.visibility = View.VISIBLE
         }
-        mRatingText!!.text = getAllRatingText(gd.rating, gd.ratingCount)
-        mRating!!.rating = gd.rating
-        updateFavoriteDrawable()
-        mTorrent!!.text = resources.getString(R.string.torrent_count, gd.torrentCount)
+        binding.content.actions.run {
+            ratingText.text = getAllRatingText(gd.rating, gd.ratingCount)
+            rating.rating = gd.rating
+            updateFavoriteDrawable()
+            torrent.text = resources.getString(R.string.torrent_count, gd.torrentCount)
+        }
         bindTags(gd.tags)
         bindComments(gd.comments!!.comments)
         bindPreviews(gd)
@@ -923,7 +892,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 requireActivity().supportFragmentManager,
                 GalleryInfoBottomSheet.TAG
             )
-        } else if (mHeart === v || mHeartOutline === v) {
+        } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
             if (mGalleryDetail != null && !mModifyingFavorites) {
                 var remove = false
                 if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
@@ -944,12 +913,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 // Update UI
                 updateFavoriteDrawable()
             }
-        } else if (mShare === v) {
+        } else if (binding.content.actions.share === v) {
             val url = galleryDetailUrl
             if (url != null) {
                 AppHelper.share(activity, url)
             }
-        } else if (mTorrent === v) {
+        } else if (binding.content.actions.torrent === v) {
             if (mGalleryDetail != null) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
                         requireActivity(),
@@ -968,7 +937,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     helper.setDialog(dialog, mGalleryDetail!!.torrentUrl)
                 }
             }
-        } else if (mArchive === v) {
+        } else if (binding.content.actions.archive === v) {
             if (mGalleryDetail == null) {
                 return
             }
@@ -983,7 +952,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 .setOnDismissListener(helper)
                 .show()
             helper.setDialog(dialog, mGalleryDetail!!.archiveUrl)
-        } else if (mRate === v) {
+        } else if (binding.content.actions.rate === v) {
             if (mGalleryDetail == null) {
                 return
             }
@@ -999,9 +968,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 .setPositiveButton(android.R.string.ok, helper)
                 .show()
             helper.setDialog(dialog, mGalleryDetail!!.rating)
-        } else if (mSimilar === v) {
+        } else if (binding.content.actions.similar === v) {
             showSimilarGalleryList()
-        } else if (mSearchCover === v) {
+        } else if (binding.content.actions.searchCover === v) {
             showCoverGalleryList()
         } else if (mComments === v) {
             if (mGalleryDetail == null) {
@@ -1171,7 +1140,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 CommonOperations.startDownload(activity, galleryInfo, true)
             }
             return true
-        } else if (mHeart === v || mHeartOutline === v) {
+        } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
             if (mGalleryDetail != null && !mModifyingFavorites) {
                 var remove = false
                 if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
@@ -1281,9 +1250,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
 
         // Update UI
-        if (mRatingText != null && mRating != null) {
-            mRatingText!!.text = getAllRatingText(result.rating, result.ratingCount)
-            mRating!!.rating = result.rating
+        _binding ?: return
+        binding.content.actions.run {
+            ratingText.text = getAllRatingText(result.rating, result.ratingCount)
+            rating.rating = result.rating
         }
     }
 
