@@ -236,17 +236,6 @@ abstract class BaseScene : Fragment() {
         NavHostFragment.findNavController(this).navigate(id, args, options)
     }
 
-    fun navigateToTop() {
-        val navController = NavHostFragment.findNavController(this)
-        val id = navController.graph.startDestinationId
-        val options: NavOptions = NavOptions.Builder()
-            .setEnterAnim(R.anim.scene_open_enter).setExitAnim(R.anim.scene_open_exit)
-            .setPopEnterAnim(R.anim.scene_close_enter).setPopExitAnim(R.anim.scene_close_exit)
-            .setPopUpTo(id, true)
-            .build()
-        navController.navigate(id, null, options)
-    }
-
     companion object {
         const val LENGTH_SHORT = 0
         const val LENGTH_LONG = 1
