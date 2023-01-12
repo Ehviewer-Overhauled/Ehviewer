@@ -13,236 +13,199 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
-
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.view.ViewTransition;
-import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.ViewUtils;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhRequest
+import com.hippo.util.ExceptionUtils
+import com.hippo.view.ViewTransition
+import com.hippo.yorozuya.AssertUtils
+import com.hippo.yorozuya.ViewUtils
 
 /**
  * Only show a progress with jobs in background
  */
-public final class ProgressScene extends BaseScene implements View.OnClickListener {
-
-    public static final String KEY_ACTION = "action";
-    public static final String ACTION_GALLERY_TOKEN = "gallery_token";
-    public static final String KEY_GID = "gid";
-    public static final String KEY_PTOKEN = "ptoken";
-    public static final String KEY_PAGE = "page";
-    private static final String KEY_VALID = "valid";
-    private static final String KEY_ERROR = "error";
-    private boolean mValid;
-    private String mError;
-
-    private String mAction;
-
-    private long mGid;
-    private String mPToken;
-    private int mPage;
-
-    @Nullable
-    private TextView mTip;
-    @Nullable
-    private ViewTransition mViewTransition;
-
-    @Override
-    public boolean needShowLeftDrawer() {
-        return false;
+class ProgressScene : BaseScene(), View.OnClickListener {
+    private var mValid = false
+    private var mError: String? = null
+    private var mAction: String? = null
+    private var mGid: Long = 0
+    private var mPToken: String? = null
+    private var mPage = 0
+    private var mTip: TextView? = null
+    private var mViewTransition: ViewTransition? = null
+    override fun needShowLeftDrawer(): Boolean {
+        return false
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
-            onInit();
+            onInit()
         } else {
-            onRestore(savedInstanceState);
+            onRestore(savedInstanceState)
         }
     }
 
-    private boolean doJobs() {
-        Context context = getContext();
-        MainActivity activity = getMainActivity();
+    private fun doJobs(): Boolean {
+        val context = context
+        val activity = mainActivity
         if (null == context || null == activity) {
-            return false;
+            return false
         }
-
-        if (ACTION_GALLERY_TOKEN.equals(mAction)) {
-            if (mGid == -1 || mPToken == null || mPage == -1) {
-                return false;
+        if (ACTION_GALLERY_TOKEN == mAction) {
+            if (mGid == -1L || mPToken == null || mPage == -1) {
+                return false
             }
-
-            EhRequest request = new EhRequest()
-                    .setMethod(EhClient.METHOD_GET_GALLERY_TOKEN)
-                    .setArgs(mGid, mPToken, mPage)
-                    .setCallback(new GetGalleryTokenListener(context,
-                            1, getTag()));
-            request.enqueue(this);
-            return true;
+            val request = EhRequest()
+                .setMethod(EhClient.METHOD_GET_GALLERY_TOKEN)
+                .setArgs(mGid, mPToken!!, mPage)
+                .setCallback(
+                    GetGalleryTokenListener(
+                        context
+                    )
+                )
+            request.enqueue(this)
+            return true
         }
-        return false;
+        return false
     }
 
-    private boolean handleArgs(Bundle args) {
+    private fun handleArgs(args: Bundle?): Boolean {
         if (args == null) {
-            return false;
+            return false
         }
-
-        mAction = args.getString(KEY_ACTION);
-        if (ACTION_GALLERY_TOKEN.equals(mAction)) {
-            mGid = args.getLong(KEY_GID, -1);
-            mPToken = args.getString(KEY_PTOKEN, null);
-            mPage = args.getInt(KEY_PAGE, -1);
-            return mGid != -1 && mPToken != null && mPage != -1;
+        mAction = args.getString(KEY_ACTION)
+        if (ACTION_GALLERY_TOKEN == mAction) {
+            mGid = args.getLong(KEY_GID, -1)
+            mPToken = args.getString(KEY_PTOKEN, null)
+            mPage = args.getInt(KEY_PAGE, -1)
+            return mGid != -1L && mPToken != null && mPage != -1
         }
-
-        return false;
+        return false
     }
 
-    private void onInit() {
-        mValid = handleArgs(getArguments());
+    private fun onInit() {
+        mValid = handleArgs(arguments)
         if (mValid) {
-            mValid = doJobs();
+            mValid = doJobs()
         }
         if (!mValid) {
-            mError = getString(R.string.error_something_wrong_happened);
+            mError = getString(R.string.error_something_wrong_happened)
         }
     }
 
-    private void onRestore(@NonNull Bundle savedInstanceState) {
-        mValid = savedInstanceState.getBoolean(KEY_VALID);
-        mError = savedInstanceState.getString(KEY_ERROR);
-
-        mAction = savedInstanceState.getString(KEY_ACTION);
-
-        mGid = savedInstanceState.getLong(KEY_GID, -1);
-        mPToken = savedInstanceState.getString(KEY_PTOKEN, null);
-        mPage = savedInstanceState.getInt(KEY_PAGE, -1);
+    private fun onRestore(savedInstanceState: Bundle) {
+        mValid = savedInstanceState.getBoolean(KEY_VALID)
+        mError = savedInstanceState.getString(KEY_ERROR)
+        mAction = savedInstanceState.getString(KEY_ACTION)
+        mGid = savedInstanceState.getLong(KEY_GID, -1)
+        mPToken = savedInstanceState.getString(KEY_PTOKEN, null)
+        mPage = savedInstanceState.getInt(KEY_PAGE, -1)
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_VALID, mValid);
-        outState.putString(KEY_ERROR, mError);
-
-        outState.putString(KEY_ACTION, mAction);
-
-        outState.putLong(KEY_GID, mGid);
-        outState.putString(KEY_PTOKEN, mPToken);
-        outState.putInt(KEY_PAGE, mPage);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_VALID, mValid)
+        outState.putString(KEY_ERROR, mError)
+        outState.putString(KEY_ACTION, mAction)
+        outState.putLong(KEY_GID, mGid)
+        outState.putString(KEY_PTOKEN, mPToken)
+        outState.putInt(KEY_PAGE, mPage)
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.scene_progress, container, false);
-        View progress = ViewUtils.$$(view, R.id.progress);
-        mTip = (TextView) ViewUtils.$$(view, R.id.tip);
-
-        Context context = getContext();
-        AssertUtils.assertNotNull(context);
-
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        mTip.setCompoundDrawables(null, drawable, null, null);
-        mTip.setOnClickListener(this);
-        mTip.setText(mError);
-
-        mViewTransition = new ViewTransition(progress, mTip);
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.scene_progress, container, false)
+        val progress = ViewUtils.`$$`(view, R.id.progress)
+        mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
+        val context = context
+        AssertUtils.assertNotNull(context)
+        val drawable = ContextCompat.getDrawable(context!!, R.drawable.big_sad_pandroid)
+        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        mTip!!.setCompoundDrawables(null, drawable, null, null)
+        mTip!!.setOnClickListener(this)
+        mTip!!.text = mError
+        mViewTransition = ViewTransition(progress, mTip)
         if (mValid) {
-            mViewTransition.showView(0, false);
+            mViewTransition!!.showView(0, false)
         } else {
-            mViewTransition.showView(1, false);
+            mViewTransition!!.showView(1, false)
         }
-
-        return view;
+        return view
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        mTip = null;
-        mViewTransition = null;
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mTip = null
+        mViewTransition = null
     }
 
-    @Override
-    public void onClick(View v) {
-        if (mTip == v) {
+    override fun onClick(v: View) {
+        if (mTip === v) {
             if (doJobs()) {
-                mValid = true;
+                mValid = true
                 // Show progress
                 if (null != mViewTransition) {
-                    mViewTransition.showView(0, true);
+                    mViewTransition!!.showView(0, true)
                 }
             }
         }
     }
 
-    private void onGetGalleryTokenSuccess(String result) {
-        Bundle arg = new Bundle();
-        arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN);
-        arg.putLong(GalleryDetailScene.KEY_GID, mGid);
-        arg.putString(GalleryDetailScene.KEY_TOKEN, result);
-        arg.putInt(GalleryDetailScene.KEY_PAGE, mPage);
-        navigate(R.id.galleryDetailScene, arg);
+    private fun onGetGalleryTokenSuccess(result: String) {
+        val arg = Bundle()
+        arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+        arg.putLong(GalleryDetailScene.KEY_GID, mGid)
+        arg.putString(GalleryDetailScene.KEY_TOKEN, result)
+        arg.putInt(GalleryDetailScene.KEY_PAGE, mPage)
+        navigate(R.id.galleryDetailScene, arg)
     }
 
-    private void onGetGalleryTokenFailure(Exception e) {
-        mValid = false;
-
-        Context context = getContext();
-
+    private fun onGetGalleryTokenFailure(e: Exception) {
+        mValid = false
+        val context = context
         if (null != context && null != mViewTransition && null != mTip) {
             // Show tip
-            mError = ExceptionUtils.getReadableString(e);
-            mViewTransition.showView(1);
-            mTip.setText(mError);
+            mError = ExceptionUtils.getReadableString(e)
+            mViewTransition!!.showView(1)
+            mTip!!.text = mError
         }
     }
 
-    private class GetGalleryTokenListener extends EhCallback<ProgressScene, String> {
-
-        public GetGalleryTokenListener(Context context, int stageId, String sceneTag) {
-            super(context);
+    private inner class GetGalleryTokenListener(
+        context: Context?
+    ) : EhCallback<ProgressScene, String>(context) {
+        override fun onSuccess(result: String) {
+            val scene = this@ProgressScene
+            scene.onGetGalleryTokenSuccess(result)
         }
 
-        @Override
-        public void onSuccess(String result) {
-            ProgressScene scene = ProgressScene.this;
-            scene.onGetGalleryTokenSuccess(result);
+        override fun onFailure(e: Exception) {
+            val scene = this@ProgressScene
+            scene.onGetGalleryTokenFailure(e)
         }
 
-        @Override
-        public void onFailure(Exception e) {
-            ProgressScene scene = ProgressScene.this;
-            scene.onGetGalleryTokenFailure(e);
-        }
+        override fun onCancel() {}
+    }
 
-        @Override
-        public void onCancel() {
-        }
+    companion object {
+        const val KEY_ACTION = "action"
+        const val ACTION_GALLERY_TOKEN = "gallery_token"
+        const val KEY_GID = "gid"
+        const val KEY_PTOKEN = "ptoken"
+        const val KEY_PAGE = "page"
+        private const val KEY_VALID = "valid"
+        private const val KEY_ERROR = "error"
     }
 }
