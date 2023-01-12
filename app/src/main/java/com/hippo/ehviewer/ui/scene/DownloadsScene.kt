@@ -286,7 +286,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             mRecyclerView!!.scrollToPosition(mInitPosition)
             mInitPosition = -1
         }
-        val itemTouchHelper = ItemTouchHelper(DownloadItemTouchHelperCallback())
         itemTouchHelper.attachToRecyclerView(mRecyclerView)
         mFastScroller!!.attachToRecyclerView(mRecyclerView)
         val handlerDrawable = HandlerDrawable()
@@ -785,7 +784,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     private inner class DownloadLabelAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<DownloadLabelHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadLabelHolder {
-            val holder = DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
+            val holder =
+                DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
             holder.itemView.setOnClickListener {
                 val position = holder.bindingAdapterPosition
                 val label1: String? = if (position == 0) {
@@ -1197,7 +1197,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
     }
 
-    private inner class DownloadItemTouchHelperCallback : ItemTouchHelper.Callback() {
+    private val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
@@ -1231,7 +1231,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         }
-    }
+    })
 
     companion object {
         const val KEY_GID = "gid"
