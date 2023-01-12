@@ -33,7 +33,7 @@ android {
         minSdkVersion 28
         targetSdkVersion 33
         versionCode 180030
-        versionName "1.8.5.3-alpha03"
+        versionName "1.8.5.3-alpha04"
         resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th'
     }
 
