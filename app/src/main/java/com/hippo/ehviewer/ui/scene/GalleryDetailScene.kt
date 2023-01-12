@@ -124,11 +124,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         get() = _binding!!
     private var mViewTransition: ViewTransition? = null
 
-    // Below header
-    private var mBelowHeader: View? = null
-
-    private var mNewerVersion: TextView? = null
-
     // Actions
     private var mActions: View? = null
     private var mRatingText: TextView? = null
@@ -414,11 +409,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             it.read.setOnClickListener(this)
             it.uploader.setOnLongClickListener(this)
         }
-        mBelowHeader = binding.scrollView.findViewById(R.id.below_header)
-        val belowHeader = mBelowHeader
         binding.content.header.info.setOnClickListener(this)
-        mActions = ViewUtils.`$$`(belowHeader, R.id.actions)
-        mNewerVersion = ViewUtils.`$$`(mActions, R.id.newerVersion) as TextView
+        mActions = ViewUtils.`$$`(binding.content.belowHeader, R.id.actions)
         mRatingText = ViewUtils.`$$`(mActions, R.id.rating_text) as TextView
         mRating = ViewUtils.`$$`(mActions, R.id.rating) as RatingBar
         mHeart = ViewUtils.`$$`(mActions, R.id.heart) as TextView
@@ -429,7 +421,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mRate = ViewUtils.`$$`(mActions, R.id.rate)
         mSimilar = ViewUtils.`$$`(mActions, R.id.similar) as TextView
         mSearchCover = ViewUtils.`$$`(mActions, R.id.search_cover) as TextView
-        mNewerVersion!!.setOnClickListener(this)
+        binding.content.actions.newerVersion.setOnClickListener(this)
         mHeart!!.setOnClickListener(this)
         mHeart!!.setOnLongClickListener(this)
         mHeartOutline!!.setOnClickListener(this)
@@ -440,21 +432,21 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mRate!!.setOnClickListener(this)
         mSimilar!!.setOnClickListener(this)
         mSearchCover!!.setOnClickListener(this)
-        mTags = ViewUtils.`$$`(belowHeader, R.id.tags) as LinearLayout
+        mTags = ViewUtils.`$$`(binding.content.belowHeader, R.id.tags) as LinearLayout
         mNoTags = ViewUtils.`$$`(mTags, R.id.no_tags) as TextView
-        mComments = ViewUtils.`$$`(belowHeader, R.id.comments) as LinearLayout
+        mComments = ViewUtils.`$$`(binding.content.belowHeader, R.id.comments) as LinearLayout
         if (Settings.getShowComments()) {
             mCommentsText = ViewUtils.`$$`(mComments, R.id.comments_text) as TextView
             mComments!!.setOnClickListener(this)
         } else {
             mComments!!.visibility = View.GONE
         }
-        mPreviews = ViewUtils.`$$`(belowHeader, R.id.previews)
+        mPreviews = ViewUtils.`$$`(binding.content.belowHeader, R.id.previews)
         mGridLayout = ViewUtils.`$$`(mPreviews, R.id.grid_layout) as SimpleGridAutoSpanLayout
         mPreviewText = ViewUtils.`$$`(mPreviews, R.id.preview_text) as TextView
         mPreviews!!.setOnClickListener(this)
         mProgress = ViewUtils.`$$`(binding.scrollView, R.id.progress)
-        mViewTransition2 = ViewTransition(mBelowHeader, mProgress)
+        mViewTransition2 = ViewTransition(binding.content.belowHeader, mProgress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
                 bindViewSecond()
@@ -481,9 +473,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
-        mBelowHeader = null
         mActions = null
-        mNewerVersion = null
         mRatingText = null
         mRating = null
         mHeart = null
@@ -652,7 +642,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             favoredTimes.text = resources.getString(R.string.favored_times, gd.favoriteCount)
         }
         if (gd.newerVersions.size != 0) {
-            mNewerVersion!!.visibility = View.VISIBLE
+            binding.content.actions.newerVersion.visibility = View.VISIBLE
         }
         mRatingText!!.text = getAllRatingText(gd.rating, gd.ratingCount)
         mRating!!.rating = gd.rating
@@ -903,7 +893,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo)
                 startActivity(intent)
             }
-        } else if (mNewerVersion === v) {
+        } else if (binding.content.actions.newerVersion === v) {
             if (mGalleryDetail != null) {
                 val titles = ArrayList<CharSequence>()
                 for (newerVersion in mGalleryDetail!!.newerVersions) {
