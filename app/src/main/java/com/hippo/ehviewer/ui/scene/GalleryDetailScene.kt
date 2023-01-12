@@ -122,14 +122,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private val binding
         get() = _binding!!
     private var mViewTransition: ViewTransition? = null
-
-    // Previews
-    private var mPreviews: View? = null
-    private var mGridLayout: SimpleGridAutoSpanLayout? = null
-    private var mPreviewText: TextView? = null
-
-    // Progress
-    private var mProgress: View? = null
     private var mViewTransition2: ViewTransition? = null
 
     @WholeLifeCircle
@@ -407,12 +399,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         } else {
             binding.content.comments.comments.visibility = View.GONE
         }
-        mPreviews = ViewUtils.`$$`(binding.content.belowHeader, R.id.previews)
-        mGridLayout = ViewUtils.`$$`(mPreviews, R.id.grid_layout) as SimpleGridAutoSpanLayout
-        mPreviewText = ViewUtils.`$$`(mPreviews, R.id.preview_text) as TextView
-        mPreviews!!.setOnClickListener(this)
-        mProgress = ViewUtils.`$$`(binding.scrollView, R.id.progress)
-        mViewTransition2 = ViewTransition(binding.content.belowHeader, mProgress)
+        binding.content.previews.previews.setOnClickListener(this)
+        mViewTransition2 = ViewTransition(binding.content.belowHeader, binding.content.progress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
                 bindViewSecond()
@@ -439,10 +427,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
-        mPreviews = null
-        mGridLayout = null
-        mPreviewText = null
-        mProgress = null
         mViewTransition2 = null
         _binding = null
     }
@@ -706,34 +690,34 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     @SuppressLint("SetTextI18n")
     private fun bindPreviews(gd: GalleryDetail) {
         val inflater = layoutInflater
-        val resources = resourcesOrNull
+        resourcesOrNull ?: return
         val previewNum = Settings.getPreviewNum()
-        if (null == resources || null == mGridLayout || null == mPreviewText) {
-            return
-        }
-        mGridLayout!!.removeAllViews()
-        val previewSet = gd.previewSet
-        if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
-            mPreviewText!!.setText(R.string.no_previews)
-            return
-        } else if (gd.previewPages == 1 && previewSet.size() <= previewNum) {
-            mPreviewText!!.setText(R.string.no_more_previews)
-        } else {
-            mPreviewText!!.setText(R.string.more_previews)
-        }
-        val columnWidth = Settings.getThumbSize()
-        mGridLayout!!.setColumnSize(columnWidth)
-        mGridLayout!!.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-        val size = previewNum.coerceAtMost(previewSet.size())
-        for (i in 0 until size) {
-            val view = inflater.inflate(R.layout.item_gallery_preview, mGridLayout, false)
-            mGridLayout!!.addView(view)
-            val image = view.findViewById<LoadImageView>(R.id.image)
-            previewSet.load(image, gd.gid, i)
-            image.setTag(R.id.index, i)
-            image.setOnClickListener(this)
-            val text = view.findViewById<TextView>(R.id.text)
-            text.text = (previewSet.getPosition(i) + 1).toString()
+        _binding ?: return
+        binding.content.previews.run {
+            gridLayout.removeAllViews()
+            val previewSet = gd.previewSet
+            if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
+                previewText.setText(R.string.no_previews)
+                return
+            } else if (gd.previewPages == 1 && previewSet.size() <= previewNum) {
+                previewText.setText(R.string.no_more_previews)
+            } else {
+                previewText.setText(R.string.more_previews)
+            }
+            val columnWidth = Settings.getThumbSize()
+            gridLayout.setColumnSize(columnWidth)
+            gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
+            val size = previewNum.coerceAtMost(previewSet.size())
+            for (i in 0 until size) {
+                val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
+                gridLayout.addView(view)
+                val image = view.findViewById<LoadImageView>(R.id.image)
+                previewSet.load(image, gd.gid, i)
+                image.setTag(R.id.index, i)
+                image.setOnClickListener(this@GalleryDetailScene)
+                val text = view.findViewById<TextView>(R.id.text)
+                text.text = (previewSet.getPosition(i) + 1).toString()
+            }
         }
     }
 
@@ -973,7 +957,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail!!.comments)
             args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail)
             navigate(R.id.galleryCommentsScene, args)
-        } else if (mPreviews === v) {
+        } else if (binding.content.previews.previews === v) {
             if (null != mGalleryDetail) {
                 val args = Bundle()
                 args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, mGalleryDetail)
