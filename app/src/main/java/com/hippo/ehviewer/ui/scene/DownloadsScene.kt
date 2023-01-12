@@ -833,9 +833,11 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     0 -> {
                         mDownloadManager!!.allDownloadInfoList
                     }
+
                     1 -> {
                         mDownloadManager!!.defaultDownloadInfoList
                     }
+
                     else -> {
                         mDownloadManager!!.getLabelDownloadInfoList(label)
                     }
@@ -1193,7 +1195,9 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                             mLabelAdapter!!.notifyItemRemoved(position)
                         }
                     }
-                }.setNegativeButton(android.R.string.cancel) { _, _ ->
+                }.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.cancel()
+                }.setOnCancelListener {
                     mLabelAdapter!!.notifyItemChanged(position)
                 }.show()
         }
