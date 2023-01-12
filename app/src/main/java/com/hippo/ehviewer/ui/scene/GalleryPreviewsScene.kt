@@ -31,7 +31,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -43,7 +42,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.widget.ContentLayout
+import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
@@ -53,8 +52,10 @@ import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import java.util.Locale
 
 class GalleryPreviewsScene : BaseToolbarScene() {
+    private var _binding: SceneGalleryPreviewsBinding? = null
+    private val binding
+        get() = _binding!!
     private var mGalleryInfo: GalleryInfo? = null
-    private var mRecyclerView: EasyRecyclerView? = null
     private var mAdapter: GalleryPreviewAdapter? = null
     private var mHelper: GalleryPreviewHelper? = null
     private var mHasFirstRefresh = false
@@ -92,32 +93,29 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val mContentLayout = inflater.inflate(
-            R.layout.scene_gallery_previews, container, false
-        ) as ContentLayout
-        mContentLayout.hideFastScroll()
-        mRecyclerView = mContentLayout.recyclerView
-        setLiftOnScrollTargetView(mRecyclerView)
+        _binding = SceneGalleryPreviewsBinding.inflate(inflater, container, false)
+        binding.contentLayout.hideFastScroll()
+        setLiftOnScrollTargetView(binding.contentLayout)
         mAdapter = GalleryPreviewAdapter()
-        mRecyclerView!!.adapter = mAdapter
+        binding.contentLayout.recyclerView.adapter = mAdapter
         val columnWidth = Settings.getThumbSize()
         val layoutManager =
             AutoGridLayoutManager(context, columnWidth, LayoutUtils.dp2pix(context, 16f))
         layoutManager.setStrategy(AutoGridLayoutManager.STRATEGY_SUITABLE_SIZE)
-        mRecyclerView!!.layoutManager = layoutManager
-        mRecyclerView!!.clipToPadding = false
+        binding.contentLayout.recyclerView.layoutManager = layoutManager
+        binding.contentLayout.recyclerView.clipToPadding = false
         val padding = LayoutUtils.dp2pix(context, 4f)
         val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
-        mRecyclerView!!.addItemDecoration(decoration)
+        binding.contentLayout.recyclerView.addItemDecoration(decoration)
         mHelper = GalleryPreviewHelper()
-        mContentLayout.setHelper(mHelper)
+        binding.contentLayout.setHelper(mHelper)
 
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
             mHasFirstRefresh = true
-            mHelper!!.firstRefresh()
+            mHelper?.firstRefresh()
         }
-        return mContentLayout
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -127,10 +125,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                 mHasFirstRefresh = false
             }
         }
-        if (null != mRecyclerView) {
-            mRecyclerView!!.stopScroll()
-            mRecyclerView = null
-        }
+        binding.contentLayout.recyclerView.stopScroll()
+        _binding = null
         mAdapter = null
     }
 
