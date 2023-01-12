@@ -1220,10 +1220,17 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             if (fromPosition == toPosition) {
                 return false
             }
+            val allInfoList = mDownloadManager!!.allDownloadInfoList
+            val dbFromPosition = allInfoList.indexOf(mList!![fromPosition])
+            val dbToPosition = allInfoList.indexOf(mList!![toPosition])
             lifecycleScope.launchIO {
-                EhDB.moveDownloadInfo(fromPosition, toPosition)
-                val item = mList!!.removeAt(fromPosition)
-                mList!!.add(toPosition, item)
+                EhDB.moveDownloadInfo(dbFromPosition, dbToPosition)
+                val item = allInfoList.removeAt(dbFromPosition)
+                allInfoList.add(dbToPosition, item)
+                if (mLabel != null) {
+                    val item1 = mList!!.removeAt(fromPosition)
+                    mList!!.add(toPosition, item1)
+                }
                 withUIContext {
                     mAdapter!!.notifyItemMoved(fromPosition, toPosition)
                 }
