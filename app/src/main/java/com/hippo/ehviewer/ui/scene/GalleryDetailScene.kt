@@ -127,13 +127,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     // Below header
     private var mBelowHeader: View? = null
 
-    // Info
-    private var mInfo: View? = null
-    private var mLanguage: TextView? = null
-    private var mPages: TextView? = null
-    private var mSize: TextView? = null
-    private var mPosted: TextView? = null
-    private var mFavoredTimes: TextView? = null
     private var mNewerVersion: TextView? = null
 
     // Actions
@@ -423,13 +416,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         mBelowHeader = binding.scrollView.findViewById(R.id.below_header)
         val belowHeader = mBelowHeader
-        mInfo = ViewUtils.`$$`(binding.content.header.header, R.id.info)
-        mLanguage = ViewUtils.`$$`(mInfo, R.id.language) as TextView
-        mPages = ViewUtils.`$$`(mInfo, R.id.pages) as TextView
-        mSize = ViewUtils.`$$`(mInfo, R.id.size) as TextView
-        mPosted = ViewUtils.`$$`(mInfo, R.id.posted) as TextView
-        mFavoredTimes = ViewUtils.`$$`(mInfo, R.id.favoredTimes) as TextView
-        mInfo!!.setOnClickListener(this)
+        binding.content.header.info.setOnClickListener(this)
         mActions = ViewUtils.`$$`(belowHeader, R.id.actions)
         mNewerVersion = ViewUtils.`$$`(mActions, R.id.newerVersion) as TextView
         mRatingText = ViewUtils.`$$`(mActions, R.id.rating_text) as TextView
@@ -495,12 +482,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
         mBelowHeader = null
-        mInfo = null
-        mLanguage = null
-        mPages = null
-        mSize = null
-        mPosted = null
-        mFavoredTimes = null
         mActions = null
         mNewerVersion = null
         mRatingText = null
@@ -663,13 +644,13 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             category.setTextColor(EhUtils.getCategoryColor(gd.category))
         }
         updateDownloadText()
-        mLanguage!!.text = gd.language
-        mPages!!.text = resources.getQuantityString(
-            R.plurals.page_count, gd.pages, gd.pages
-        )
-        mSize!!.text = gd.size
-        mPosted!!.text = gd.posted
-        mFavoredTimes!!.text = resources.getString(R.string.favored_times, gd.favoriteCount)
+        binding.content.header.run {
+            language.text = gd.language
+            pages.text = resources.getQuantityString(R.plurals.page_count, gd.pages, gd.pages)
+            size.text = gd.size
+            posted.text = gd.posted
+            favoredTimes.text = resources.getString(R.string.favored_times, gd.favoriteCount)
+        }
         if (gd.newerVersions.size != 0) {
             mNewerVersion!!.visibility = View.VISIBLE
         }
@@ -945,7 +926,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     }
                     .show()
             }
-        } else if (mInfo === v) {
+        } else if (binding.content.header.info === v) {
             assert(mGalleryDetail != null)
             val galleryInfoBottomSheet = GalleryInfoBottomSheet(mGalleryDetail!!)
             galleryInfoBottomSheet.show(
