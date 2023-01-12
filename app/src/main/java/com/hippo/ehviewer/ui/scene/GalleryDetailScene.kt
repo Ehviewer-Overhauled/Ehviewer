@@ -123,10 +123,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         get() = _binding!!
     private var mViewTransition: ViewTransition? = null
 
-    // Comments
-    private var mComments: LinearLayout? = null
-    private var mCommentsText: TextView? = null
-
     // Previews
     private var mPreviews: View? = null
     private var mGridLayout: SimpleGridAutoSpanLayout? = null
@@ -406,12 +402,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             it.searchCover.setOnClickListener(this)
         }
         binding.content.actions.newerVersion.setOnClickListener(this)
-        mComments = ViewUtils.`$$`(binding.content.belowHeader, R.id.comments) as LinearLayout
         if (Settings.getShowComments()) {
-            mCommentsText = ViewUtils.`$$`(mComments, R.id.comments_text) as TextView
-            mComments!!.setOnClickListener(this)
+            binding.content.comments.comments.setOnClickListener(this)
         } else {
-            mComments!!.visibility = View.GONE
+            binding.content.comments.comments.visibility = View.GONE
         }
         mPreviews = ViewUtils.`$$`(binding.content.belowHeader, R.id.previews)
         mGridLayout = ViewUtils.`$$`(mPreviews, R.id.grid_layout) as SimpleGridAutoSpanLayout
@@ -445,8 +439,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
-        mComments = null
-        mCommentsText = null
         mPreviews = null
         mGridLayout = null
         mPreviewText = null
@@ -675,39 +667,39 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
-    private fun bindComments(comments: Array<GalleryComment>?) {
-        val context = context
+    private fun bindComments(commentsList: Array<GalleryComment>?) {
+        context ?: return
         val inflater = layoutInflater
-        if (null == context || null == mComments || null == mCommentsText) {
-            return
-        }
-        mComments!!.removeViews(0, mComments!!.childCount - 1)
-        val maxShowCount = 2
-        if (comments.isNullOrEmpty()) {
-            mCommentsText!!.setText(R.string.no_comments)
-            return
-        } else if (comments.size <= maxShowCount) {
-            mCommentsText!!.setText(R.string.no_more_comments)
-        } else {
-            mCommentsText!!.setText(R.string.more_comment)
-        }
-        val length = maxShowCount.coerceAtMost(comments.size)
-        for (i in 0 until length) {
-            val comment = comments[i]
-            val v = inflater.inflate(R.layout.item_gallery_comment, mComments, false)
-            mComments!!.addView(v, i)
-            val user = v.findViewById<TextView>(R.id.user)
-            user.text = comment.user
-            user.setBackgroundColor(Color.TRANSPARENT)
-            val time = v.findViewById<TextView>(R.id.time)
-            time.text = ReadableTime.getTimeAgo(comment.time)
-            val c = v.findViewById<ObservedTextView>(R.id.comment)
-            c.maxLines = 5
-            c.text = Html.fromHtml(
-                comment.comment, Html.FROM_HTML_MODE_LEGACY,
-                URLImageGetter(c), null
-            )
-            v.setBackgroundColor(Color.TRANSPARENT)
+        _binding ?: return
+        binding.content.comments.run {
+            comments.removeViews(0, comments.childCount - 1)
+            val maxShowCount = 2
+            if (commentsList.isNullOrEmpty()) {
+                commentsText.setText(R.string.no_comments)
+                return
+            } else if (commentsList.size <= maxShowCount) {
+                commentsText.setText(R.string.no_more_comments)
+            } else {
+                commentsText.setText(R.string.more_comment)
+            }
+            val length = maxShowCount.coerceAtMost(commentsList.size)
+            for (i in 0 until length) {
+                val comment = commentsList[i]
+                val v = inflater.inflate(R.layout.item_gallery_comment, comments, false)
+                comments.addView(v, i)
+                val user = v.findViewById<TextView>(R.id.user)
+                user.text = comment.user
+                user.setBackgroundColor(Color.TRANSPARENT)
+                val time = v.findViewById<TextView>(R.id.time)
+                time.text = ReadableTime.getTimeAgo(comment.time)
+                val c = v.findViewById<ObservedTextView>(R.id.comment)
+                c.maxLines = 5
+                c.text = Html.fromHtml(
+                    comment.comment, Html.FROM_HTML_MODE_LEGACY,
+                    URLImageGetter(c), null
+                )
+                v.setBackgroundColor(Color.TRANSPARENT)
+            }
         }
     }
 
@@ -969,7 +961,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             showSimilarGalleryList()
         } else if (binding.content.actions.searchCover === v) {
             showCoverGalleryList()
-        } else if (mComments === v) {
+        } else if (binding.content.comments.comments === v) {
             if (mGalleryDetail == null) {
                 return
             }
