@@ -13,47 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.widget.SimpleRatingView
+import com.hippo.widget.LoadImageView
 
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+internal class GalleryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    @JvmField
+    val thumb: LoadImageView = itemView.findViewById(R.id.thumb)
 
-import androidx.recyclerview.widget.RecyclerView;
+    @JvmField
+    val title: TextView = itemView.findViewById(R.id.title)
 
-import com.google.android.material.card.MaterialCardView;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.widget.SimpleRatingView;
-import com.hippo.widget.LoadImageView;
+    @JvmField
+    val uploader: TextView = itemView.findViewById(R.id.uploader)
 
-class GalleryHolder extends RecyclerView.ViewHolder {
+    @JvmField
+    val rating: SimpleRatingView = itemView.findViewById(R.id.rating)
 
-    public final LoadImageView thumb;
-    public final TextView title;
-    public final TextView uploader;
-    public final SimpleRatingView rating;
-    public final TextView category;
-    public final TextView posted;
-    public final TextView pages;
-    public final TextView simpleLanguage;
-    public final ImageView favourited;
-    public final ImageView downloaded;
-    public final MaterialCardView card;
+    @JvmField
+    val category: TextView = itemView.findViewById(R.id.category)
 
-    public GalleryHolder(View itemView) {
-        super(itemView);
+    @JvmField
+    val posted: TextView = itemView.findViewById(R.id.posted)
 
-        thumb = itemView.findViewById(R.id.thumb);
-        title = itemView.findViewById(R.id.title);
-        uploader = itemView.findViewById(R.id.uploader);
-        rating = itemView.findViewById(R.id.rating);
-        category = itemView.findViewById(R.id.category);
-        posted = itemView.findViewById(R.id.posted);
-        pages = itemView.findViewById(R.id.pages);
-        simpleLanguage = itemView.findViewById(R.id.simple_language);
-        favourited = itemView.findViewById(R.id.favourited);
-        downloaded = itemView.findViewById(R.id.downloaded);
-        card = itemView.findViewById(R.id.card);
-    }
+    @JvmField
+    val pages: TextView = itemView.findViewById(R.id.pages)
+
+    @JvmField
+    val simpleLanguage: TextView = itemView.findViewById(R.id.simple_language)
+
+    @JvmField
+    val favourited: ImageView = itemView.findViewById(R.id.favourited)
+
+    @JvmField
+    val downloaded: ImageView = itemView.findViewById(R.id.downloaded)
+
+    @JvmField
+    val card: MaterialCardView = itemView.findViewById(R.id.card)
 }
