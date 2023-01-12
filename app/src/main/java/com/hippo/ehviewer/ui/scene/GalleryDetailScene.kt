@@ -112,6 +112,7 @@ import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import rikka.core.res.resolveColor
 import kotlin.math.roundToInt
@@ -521,17 +522,22 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         val gd = mGalleryDetail ?: return
         _binding ?: return
         binding.content.actions.run {
-            if (gd.isFavorited || EhDB.containLocalFavorites(gd.gid)) {
-                heart.visibility = View.VISIBLE
-                if (gd.favoriteName == null) {
-                    heart.setText(R.string.local_favorites)
-                } else {
-                    heart.text = gd.favoriteName
+            lifecycleScope.launchIO {
+                val containLocalFav = EhDB.containLocalFavorites(gd.gid)
+                withUIContext {
+                    if (gd.isFavorited || containLocalFav) {
+                        heart.visibility = View.VISIBLE
+                        if (gd.favoriteName == null) {
+                            heart.setText(R.string.local_favorites)
+                        } else {
+                            heart.text = gd.favoriteName
+                        }
+                        heartOutline.visibility = View.GONE
+                    } else {
+                        heart.visibility = View.GONE
+                        heartOutline.visibility = View.VISIBLE
+                    }
                 }
-                heartOutline.visibility = View.GONE
-            } else {
-                heart.visibility = View.GONE
-                heartOutline.visibility = View.VISIBLE
             }
         }
     }
@@ -861,25 +867,30 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 GalleryInfoBottomSheet.TAG
             )
         } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
-            if (mGalleryDetail != null && !mModifyingFavorites) {
-                var remove = false
-                if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
-                    mModifyingFavorites = true
-                    CommonOperations.removeFromFavorites(
-                        activity, mGalleryDetail,
-                        ModifyFavoritesListener(context, true)
-                    )
-                    remove = true
+            lifecycleScope.launchIO {
+                if (mGalleryDetail != null && !mModifyingFavorites) {
+                    var remove = false
+                    val containLocalFavorites = EhDB.containLocalFavorites(mGalleryDetail!!.gid)
+                    if (containLocalFavorites || mGalleryDetail!!.isFavorited) {
+                        mModifyingFavorites = true
+                        CommonOperations.removeFromFavorites(
+                            activity, mGalleryDetail,
+                            ModifyFavoritesListener(context, true)
+                        )
+                        remove = true
+                    }
+                    withUIContext {
+                        if (!remove) {
+                            mModifyingFavorites = true
+                            CommonOperations.addToFavorites(
+                                activity, mGalleryDetail,
+                                ModifyFavoritesListener(context, false)
+                            )
+                        }
+                        // Update UI
+                        updateFavoriteDrawable()
+                    }
                 }
-                if (!remove) {
-                    mModifyingFavorites = true
-                    CommonOperations.addToFavorites(
-                        activity, mGalleryDetail,
-                        ModifyFavoritesListener(context, false)
-                    )
-                }
-                // Update UI
-                updateFavoriteDrawable()
             }
         } else if (binding.content.actions.share === v) {
             val url = galleryDetailUrl
@@ -1109,25 +1120,29 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             }
             return true
         } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
-            if (mGalleryDetail != null && !mModifyingFavorites) {
-                var remove = false
-                if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
-                    mModifyingFavorites = true
-                    CommonOperations.removeFromFavorites(
-                        activity, mGalleryDetail,
-                        ModifyFavoritesListener(activity, true)
-                    )
-                    remove = true
+            lifecycleScope.launchIO {
+                if (mGalleryDetail != null && !mModifyingFavorites) {
+                    var remove = false
+                    if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
+                        mModifyingFavorites = true
+                        CommonOperations.removeFromFavorites(
+                            activity, mGalleryDetail,
+                            ModifyFavoritesListener(activity, true)
+                        )
+                        remove = true
+                    }
+                    withUIContext {
+                        if (!remove) {
+                            mModifyingFavorites = true
+                            CommonOperations.addToFavorites(
+                                activity, mGalleryDetail,
+                                ModifyFavoritesListener(activity, false), true
+                            )
+                        }
+                        // Update UI
+                        updateFavoriteDrawable()
+                    }
                 }
-                if (!remove) {
-                    mModifyingFavorites = true
-                    CommonOperations.addToFavorites(
-                        activity, mGalleryDetail,
-                        ModifyFavoritesListener(activity, false), true
-                    )
-                }
-                // Update UI
-                updateFavoriteDrawable()
             }
         } else {
             val tag = v.getTag(R.id.tag) as? String
@@ -1332,7 +1347,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             galleryDetailCache.put(result.gid, result)
 
             // Add history
-            EhDB.putHistoryInfo(result)
+            lifecycleScope.launchIO { EhDB.putHistoryInfo(result) }
 
             // Notify success
             val scene = this@GalleryDetailScene
