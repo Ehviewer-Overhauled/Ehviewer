@@ -173,17 +173,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun handleArgs(args: Bundle?) {
-        if (args == null) {
-            return
-        }
-        val action = args.getString(KEY_ACTION)
+        val action = args?.getString(KEY_ACTION) ?: return
         mAction = action
         if (ACTION_GALLERY_INFO == action) {
             mGalleryInfo = args.getParcelable(KEY_GALLERY_INFO)
             // Add history
-            if (null != mGalleryInfo) {
-                EhDB.putHistoryInfo(mGalleryInfo)
-            }
+            mGalleryInfo?.let { lifecycleScope.launchIO { EhDB.putHistoryInfo(it) } }
         } else if (ACTION_GID_TOKEN == action) {
             mGid = args.getLong(KEY_GID)
             mToken = args.getString(KEY_TOKEN)
