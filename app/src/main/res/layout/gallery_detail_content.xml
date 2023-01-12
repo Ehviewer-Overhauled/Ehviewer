@@ -19,7 +19,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/gallery_detail_header" />
+    <include
+        android:id="@+id/header"
+        layout="@layout/gallery_detail_header" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,13 +33,21 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/gallery_detail_actions" />
+            <include
+                android:id="@+id/actions"
+                layout="@layout/gallery_detail_actions" />
 
-            <include layout="@layout/gallery_detail_tags" />
+            <include
+                android:id="@+id/tags"
+                layout="@layout/gallery_detail_tags" />
 
-            <include layout="@layout/gallery_detail_comments" />
+            <include
+                android:id="@+id/comments"
+                layout="@layout/gallery_detail_comments" />
 
-            <include layout="@layout/gallery_detail_previews" />
+            <include
+                android:id="@+id/previews"
+                layout="@layout/gallery_detail_previews" />
 
         </LinearLayout>
 

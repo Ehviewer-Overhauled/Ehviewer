@@ -26,7 +26,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/gallery_detail_content" />
+        <include
+            android:id="@+id/content"
+            layout="@layout/gallery_detail_content" />
 
     </androidx.core.widget.NestedScrollView>
 

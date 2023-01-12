@@ -47,7 +47,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
@@ -85,6 +84,7 @@ import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.databinding.SceneGalleryDetailBinding
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
@@ -119,20 +119,10 @@ import kotlin.math.roundToInt
 
 class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, DownloadInfoListener,
     OnLongClickListener {
-    /*---------------
-     View life cycle
-     ---------------*/
-    private var mTip: TextView? = null
+    private var _binding: SceneGalleryDetailBinding? = null
+    private val binding
+        get() = _binding!!
     private var mViewTransition: ViewTransition? = null
-
-    // Header
-    private var mHeader: LinearLayout? = null
-    private var mThumb: LoadImageView? = null
-    private var mUploader: TextView? = null
-    private var mCategory: TextView? = null
-    private var mActionGroup: ViewGroup? = null
-    private var mDownload: TextView? = null
-    private var mRead: TextView? = null
 
     // Below header
     private var mBelowHeader: View? = null
@@ -315,17 +305,16 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     override fun onResume() {
         super.onResume()
-        if (mRead != null) {
-            try {
-                val galleryProvider: PageLoader2 = EhPageLoader(mGalleryInfo)
-                galleryProvider.start()
-                val startPage = galleryProvider.startPage
-                if (startPage != 0) {
-                    mRead!!.text = getString(R.string.read_from, startPage + 1)
-                }
-                galleryProvider.stop()
-            } catch (ignore: Exception) {
+        _binding ?: return
+        try {
+            val galleryProvider: PageLoader2 = EhPageLoader(mGalleryInfo)
+            galleryProvider.start()
+            val startPage = galleryProvider.startPage
+            if (startPage != 0) {
+                binding.content.header.read.text = getString(R.string.read_from, startPage + 1)
             }
+            galleryProvider.stop()
+        } catch (ignore: Exception) {
         }
     }
 
@@ -417,35 +406,24 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         } else {
             DownloadInfo.STATE_INVALID
         }
-        val view = inflater.inflate(R.layout.scene_gallery_detail, container, false)
-        val main = ViewUtils.`$$`(view, R.id.main) as ViewGroup
-        val mainView = ViewUtils.`$$`(main, R.id.scroll_view) as NestedScrollView
-        setLiftOnScrollTargetView(mainView)
-        val progressView = ViewUtils.`$$`(main, R.id.progress_view)
-        mTip = ViewUtils.`$$`(main, R.id.tip) as TextView
-        mViewTransition = ViewTransition(mainView, progressView, mTip)
-        val context = context
-        AssertUtils.assertNotNull(context)
-        val drawable = ContextCompat.getDrawable(context!!, R.drawable.big_sad_pandroid)
-        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        mTip!!.setCompoundDrawables(null, drawable, null, null)
-        mTip!!.setOnClickListener(this)
-        mHeader = ViewUtils.`$$`(mainView, R.id.header) as LinearLayout
-        mThumb = ViewUtils.`$$`(mHeader, R.id.thumb) as LoadImageView
-        mUploader = ViewUtils.`$$`(mHeader, R.id.uploader) as TextView
-        mCategory = ViewUtils.`$$`(mHeader, R.id.category) as TextView
-        mActionGroup = ViewUtils.`$$`(mHeader, R.id.action_card) as ViewGroup
-        mDownload = ViewUtils.`$$`(mActionGroup, R.id.download) as TextView
-        mRead = ViewUtils.`$$`(mActionGroup, R.id.read) as TextView
-        mUploader!!.setOnClickListener(this)
-        mCategory!!.setOnClickListener(this)
-        mDownload!!.setOnClickListener(this)
-        mDownload!!.setOnLongClickListener(this)
-        mRead!!.setOnClickListener(this)
-        mUploader!!.setOnLongClickListener(this)
-        mBelowHeader = mainView.findViewById(R.id.below_header)
+        _binding = SceneGalleryDetailBinding.inflate(inflater, container, false)
+        setLiftOnScrollTargetView(binding.scrollView)
+        mViewTransition = ViewTransition(binding.scrollView, binding.progressView, binding.tip)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_sad_pandroid)!!
+        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        binding.tip.setCompoundDrawables(null, drawable, null, null)
+        binding.tip.setOnClickListener(this)
+        binding.content.header.let {
+            it.uploader.setOnClickListener(this)
+            it.category.setOnClickListener(this)
+            it.download.setOnClickListener(this)
+            it.download.setOnLongClickListener(this)
+            it.read.setOnClickListener(this)
+            it.uploader.setOnLongClickListener(this)
+        }
+        mBelowHeader = binding.scrollView.findViewById(R.id.below_header)
         val belowHeader = mBelowHeader
-        mInfo = ViewUtils.`$$`(mHeader, R.id.info)
+        mInfo = ViewUtils.`$$`(binding.content.header.header, R.id.info)
         mLanguage = ViewUtils.`$$`(mInfo, R.id.language) as TextView
         mPages = ViewUtils.`$$`(mInfo, R.id.pages) as TextView
         mSize = ViewUtils.`$$`(mInfo, R.id.size) as TextView
@@ -488,7 +466,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mGridLayout = ViewUtils.`$$`(mPreviews, R.id.grid_layout) as SimpleGridAutoSpanLayout
         mPreviewText = ViewUtils.`$$`(mPreviews, R.id.preview_text) as TextView
         mPreviews!!.setOnClickListener(this)
-        mProgress = ViewUtils.`$$`(mainView, R.id.progress)
+        mProgress = ViewUtils.`$$`(binding.scrollView, R.id.progress)
         mViewTransition2 = ViewTransition(mBelowHeader, mProgress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
@@ -501,12 +479,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 adjustViewVisibility(STATE_REFRESH)
             }
         } else {
-            mTip!!.setText(R.string.error_cannot_find_gallery)
+            binding.tip.setText(R.string.error_cannot_find_gallery)
             adjustViewVisibility(STATE_FAILED)
         }
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
-        return view
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -515,15 +493,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         AssertUtils.assertNotNull(context)
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
-        mTip = null
         mViewTransition = null
-        mHeader = null
-        mThumb = null
-        mUploader = null
-        mCategory = null
-        mActionGroup = null
-        mDownload = null
-        mRead = null
         mBelowHeader = null
         mInfo = null
         mLanguage = null
@@ -552,6 +522,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mPreviewText = null
         mProgress = null
         mViewTransition2 = null
+        _binding = null
     }
 
     private fun prepareData(): Boolean {
@@ -629,21 +600,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun bindViewFirst() {
-        if (mGalleryDetail != null) {
-            return
-        }
-        if (mThumb == null || mUploader == null || mCategory == null) {
-            return
-        }
+        mGalleryDetail ?: return
+        _binding ?: return
         if (ACTION_GALLERY_INFO == mAction && mGalleryInfo != null) {
             val gi: GalleryInfo = mGalleryInfo!!
-            mThumb!!.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
-            setTitle(EhUtils.getSuitableTitle(gi))
-            mUploader!!.text = gi.uploader
-            mUploader!!.alpha = if (gi.disowned) .5f else 1f
-            mCategory!!.text = EhUtils.getCategory(gi.category)
-            mCategory!!.setTextColor(EhUtils.getCategoryColor(gi.category))
-            updateDownloadText()
+            binding.content.header.run {
+                (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                setTitle(EhUtils.getSuitableTitle(gi))
+                uploader.text = gi.uploader
+                uploader.alpha = if (gi.disowned) .5f else 1f
+                category.text = EhUtils.getCategory(gi.category)
+                category.setTextColor(EhUtils.getCategoryColor(gi.category))
+                updateDownloadText()
+            }
         }
     }
 
@@ -683,16 +652,16 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 }
                 .show()
         }
-        if (mThumb == null || mUploader == null || mCategory == null || mLanguage == null || mPages == null || mSize == null || mPosted == null || mFavoredTimes == null || mRatingText == null || mRating == null || mTorrent == null || mNewerVersion == null) {
-            return
-        }
+        _binding ?: return
         val resources = resources
-        mThumb!!.load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb!!, true)
-        setTitle(EhUtils.getSuitableTitle(gd))
-        mUploader!!.text = gd.uploader
-        mUploader!!.alpha = if (gd.disowned) .5f else 1f
-        mCategory!!.text = EhUtils.getCategory(gd.category)
-        mCategory!!.setTextColor(EhUtils.getCategoryColor(gd.category))
+        binding.content.header.run {
+            (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb!!, true)
+            setTitle(EhUtils.getSuitableTitle(gd))
+            uploader.text = gd.uploader
+            uploader.alpha = if (gd.disowned) .5f else 1f
+            category.text = EhUtils.getCategory(gd.category)
+            category.setTextColor(EhUtils.getCategoryColor(gd.category))
+        }
         updateDownloadText()
         mLanguage!!.text = gd.language
         mPages!!.text = resources.getQuantityString(
@@ -899,11 +868,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         if (null == context || null == activity) {
             return
         }
-        if (mTip === v) {
+        if (binding.tip === v) {
             if (request()) {
                 adjustViewVisibility(STATE_REFRESH)
             }
-        } else if (mUploader === v) {
+        } else if (binding.content.header.uploader === v) {
             val uploader = uploader
             if (TextUtils.isEmpty(uploader) || disowned) {
                 return
@@ -912,7 +881,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             lub.mode = ListUrlBuilder.MODE_UPLOADER
             lub.keyword = uploader
             navigate(R.id.galleryListScene, getStartArgs(lub), true)
-        } else if (mCategory === v) {
+        } else if (binding.content.header.category === v) {
             val category = this.category
             if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
                 return
@@ -920,7 +889,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val lub = ListUrlBuilder()
             lub.category = category
             navigate(R.id.galleryListScene, getStartArgs(lub), true)
-        } else if (mDownload === v) {
+        } else if (binding.content.header.download === v) {
             val galleryInfo = galleryInfo
             if (galleryInfo != null) {
                 if (downloadManager.getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
@@ -940,7 +909,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         .show()
                 }
             }
-        } else if (mRead === v) {
+        } else if (binding.content.header.read === v) {
             var galleryInfo: GalleryInfo? = null
             if (mGalleryInfo != null) {
                 galleryInfo = mGalleryInfo
@@ -1220,12 +1189,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     override fun onLongClick(v: View): Boolean {
         val activity = mainActivity ?: return false
-        if (mUploader === v) {
+        if (binding.content.header.uploader === v) {
             if (TextUtils.isEmpty(uploader) || disowned) {
                 return false
             }
             showFilterUploaderDialog()
-        } else if (mDownload === v) {
+        } else if (binding.content.header.download === v) {
             val galleryInfo = galleryInfo
             if (galleryInfo != null) {
                 CommonOperations.startDownload(activity, galleryInfo, true)
@@ -1263,16 +1232,16 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun updateDownloadText() {
-        if (null == mDownload) {
-            return
-        }
-        when (mDownloadState) {
-            DownloadInfo.STATE_INVALID -> mDownload!!.setText(R.string.download)
-            DownloadInfo.STATE_NONE -> mDownload!!.setText(R.string.download_state_none)
-            DownloadInfo.STATE_WAIT -> mDownload!!.setText(R.string.download_state_wait)
-            DownloadInfo.STATE_DOWNLOAD -> mDownload!!.setText(R.string.download_state_downloading)
-            DownloadInfo.STATE_FINISH -> mDownload!!.setText(R.string.download_state_downloaded)
-            DownloadInfo.STATE_FAILED -> mDownload!!.setText(R.string.download_state_failed)
+        _binding ?: return
+        binding.content.header.download.run {
+            when (mDownloadState) {
+                DownloadInfo.STATE_INVALID -> setText(R.string.download)
+                DownloadInfo.STATE_NONE -> setText(R.string.download_state_none)
+                DownloadInfo.STATE_WAIT -> setText(R.string.download_state_wait)
+                DownloadInfo.STATE_DOWNLOAD -> setText(R.string.download_state_downloading)
+                DownloadInfo.STATE_FINISH -> setText(R.string.download_state_downloaded)
+                DownloadInfo.STATE_FAILED -> setText(R.string.download_state_failed)
+            }
         }
     }
 
@@ -1325,10 +1294,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private fun onGetGalleryDetailFailure(e: Exception) {
         e.printStackTrace()
+        _binding ?: return
         val context = context
-        if (null != context && null != mTip) {
+        if (null != context) {
             val error = ExceptionUtils.getReadableString(e)
-            mTip!!.text = error
+            binding.tip.text = error
             adjustViewVisibility(STATE_FAILED)
         }
     }
