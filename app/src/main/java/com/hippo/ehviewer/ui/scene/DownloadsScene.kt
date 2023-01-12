@@ -34,7 +34,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -1032,12 +1031,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 category.setBackgroundColor(EhUtils.getCategoryColor(info.category))
             }
             bindForState(holder, info)
-
-            // Update transition name
-            ViewCompat.setTransitionName(
-                holder.thumb,
-                TransitionNameFactory.getThumbTransitionName(info.gid)
-            )
         }
 
         override fun getItemCount(): Int {

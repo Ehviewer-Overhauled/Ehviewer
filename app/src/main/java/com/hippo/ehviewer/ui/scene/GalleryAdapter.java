@@ -28,7 +28,6 @@ import android.widget.TextView;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -233,9 +232,6 @@ abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 holder.simpleLanguage.setText(gi.getSimpleLanguage());
             }
         }
-
-        // Update transition name
-        ViewCompat.setTransitionName(holder.thumb, TransitionNameFactory.getThumbTransitionName(gi.getGid()));
     }
 
     @IntDef({TYPE_LIST, TYPE_GRID})
