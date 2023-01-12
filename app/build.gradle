@@ -52,9 +52,7 @@ android {
         jvmTarget = '19'
         freeCompilerArgs += [
                 // https://kotlinlang.org/docs/compiler-reference.html#progressive
-                "-progressive",
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+                "-progressive"
         ]
     }
 
@@ -95,7 +93,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.0-alpha02"
+        kotlinCompilerExtensionVersion = "1.4.0-dev-k1.8.0-33c0ad36f83"
     }
 
     namespace 'com.hippo.ehviewer'

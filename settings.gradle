@@ -12,6 +12,7 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url "https://jcenter.bintray.com" }
         maven { url "https://jitpack.io" }
+        maven { url "https://androidx.dev/storage/compose-compiler/repository/" }
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
