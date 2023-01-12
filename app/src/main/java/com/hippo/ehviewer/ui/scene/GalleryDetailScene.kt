@@ -123,10 +123,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         get() = _binding!!
     private var mViewTransition: ViewTransition? = null
 
-    // Tags
-    private var mTags: LinearLayout? = null
-    private var mNoTags: TextView? = null
-
     // Comments
     private var mComments: LinearLayout? = null
     private var mCommentsText: TextView? = null
@@ -410,8 +406,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             it.searchCover.setOnClickListener(this)
         }
         binding.content.actions.newerVersion.setOnClickListener(this)
-        mTags = ViewUtils.`$$`(binding.content.belowHeader, R.id.tags) as LinearLayout
-        mNoTags = ViewUtils.`$$`(mTags, R.id.no_tags) as TextView
         mComments = ViewUtils.`$$`(binding.content.belowHeader, R.id.comments) as LinearLayout
         if (Settings.getShowComments()) {
             mCommentsText = ViewUtils.`$$`(mComments, R.id.comments_text) as TextView
@@ -451,8 +445,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
-        mTags = null
-        mNoTags = null
         mComments = null
         mCommentsText = null
         mPreviews = null
@@ -623,26 +615,31 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun bindTags(tagGroups: Array<GalleryTagGroup>?) {
-        val context = context
+        context ?: return
         val inflater = layoutInflater
-        if (null == context || null == mTags || null == mNoTags) {
-            return
+        _binding ?: return
+        binding.content.tags.run {
+            tags.removeViews(1, tags.childCount - 1)
+            if (tagGroups.isNullOrEmpty()) {
+                noTags.visibility = View.VISIBLE
+                return
+            } else {
+                noTags.visibility = View.GONE
+            }
         }
-        mTags!!.removeViews(1, mTags!!.childCount - 1)
-        if (tagGroups.isNullOrEmpty()) {
-            mNoTags!!.visibility = View.VISIBLE
-            return
-        } else {
-            mNoTags!!.visibility = View.GONE
-        }
+        tagGroups ?: return
         val ehTags =
-            if (Settings.getShowTagTranslations() && isTranslatable(context)) EhTagDatabase else null
+            if (Settings.getShowTagTranslations() && isTranslatable(requireContext())) EhTagDatabase else null
         val colorTag = theme.resolveColor(R.attr.tagBackgroundColor)
         val colorName = theme.resolveColor(R.attr.tagGroupBackgroundColor)
         for (tg in tagGroups) {
-            val ll = inflater.inflate(R.layout.gallery_tag_group, mTags, false) as LinearLayout
+            val ll = inflater.inflate(
+                R.layout.gallery_tag_group,
+                binding.content.tags.tags,
+                false
+            ) as LinearLayout
             ll.orientation = LinearLayout.HORIZONTAL
-            mTags!!.addView(ll)
+            binding.content.tags.tags.addView(ll)
             var readableTagName: String? = null
             if (ehTags != null && ehTags.isInitialized()) {
                 readableTagName = ehTags.getTranslation("n", tg.groupName)
