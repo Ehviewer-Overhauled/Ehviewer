@@ -111,7 +111,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     private fun initLabels() {
         context ?: return
         val listLabel = downloadManager.labelList
-        mLabels = ArrayList(listLabel.size + 1)
+        mLabels = ArrayList(listLabel.size + 2)
+        mLabels.add(getString(R.string.download_all))
         // Add default label name
         mLabels.add(getString(R.string.default_download_label_name))
         for ((_, label) in listLabel) {
@@ -184,12 +185,14 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
         var list: MutableList<DownloadInfo>?
         if (mLabel == null) {
+            list = mDownloadManager!!.allDownloadInfoList
+        } else if (mLabel == getString(R.string.default_download_label_name)) {
             list = mDownloadManager!!.defaultDownloadInfoList
         } else {
             list = mDownloadManager!!.getLabelDownloadInfoList(mLabel)
             if (list == null) {
                 mLabel = null
-                list = mDownloadManager!!.defaultDownloadInfoList
+                list = mDownloadManager!!.allDownloadInfoList
             }
         }
         if (mType != -1) {
@@ -212,7 +215,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         setTitle(
             getString(
                 R.string.scene_download_title,
-                if (mLabel != null) mLabel else getString(R.string.default_download_label_name)
+                if (mLabel != null) mLabel else getString(R.string.download_all)
             )
         )
     }
@@ -826,10 +829,16 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             }
             var list: List<DownloadInfo?>? = null
             if (mDownloadManager != null) {
-                list = if (position == 0) {
-                    mDownloadManager!!.defaultDownloadInfoList
-                } else {
-                    mDownloadManager!!.getLabelDownloadInfoList(label)
+                list = when (position) {
+                    0 -> {
+                        mDownloadManager!!.allDownloadInfoList
+                    }
+                    1 -> {
+                        mDownloadManager!!.defaultDownloadInfoList
+                    }
+                    else -> {
+                        mDownloadManager!!.getLabelDownloadInfoList(label)
+                    }
                 }
             }
             if (list != null) {
@@ -837,7 +846,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             } else {
                 holder.label.text = label
             }
-            if (position > 0) {
+            if (position > 1) {
                 holder.edit.visibility = View.VISIBLE
                 holder.option.visibility = View.VISIBLE
             } else {
@@ -847,7 +856,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
 
         override fun getItemId(position: Int): Long {
-            return mLabels[position].hashCode().toLong()
+            return (if (position <= 1) position else mLabels[position].hashCode()).toLong()
         }
 
         override fun getItemCount(): Int {
@@ -1169,7 +1178,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             if (mDownloadManager == null) return
-            if (position == 0) {
+            if (position <= 1) {
                 mLabelAdapter!!.notifyItemChanged(position)
                 return
             }
