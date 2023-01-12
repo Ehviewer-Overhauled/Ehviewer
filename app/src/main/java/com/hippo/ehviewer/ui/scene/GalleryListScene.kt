@@ -1420,7 +1420,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                             mAdapter.notifyItemRemoved(position)
                         }
                     }
-                }.setNegativeButton(android.R.string.cancel) { _, _ ->
+                }.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.cancel()
+                }.setOnCancelListener {
                     mAdapter.notifyItemChanged(position)
                 }.show()
         }
