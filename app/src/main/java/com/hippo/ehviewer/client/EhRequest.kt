@@ -31,7 +31,7 @@ class EhRequest {
         get() = job?.isActive ?: false
     var method = 0
         private set
-    var args: Array<out Any>? = null
+    var args: Array<out Any?>? = null
         private set
     var callback: EhClient.Callback<Any?>? = null
         private set
@@ -41,7 +41,7 @@ class EhRequest {
         return this
     }
 
-    fun setArgs(vararg args: Any): EhRequest {
+    fun setArgs(vararg args: Any?): EhRequest {
         this.args = args
         return this
     }
