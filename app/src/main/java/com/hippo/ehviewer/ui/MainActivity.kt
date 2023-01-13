@@ -34,13 +34,17 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.view.GravityCompat
+import androidx.customview.widget.Openable
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.onNavDestinationSelected2
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
@@ -231,6 +235,26 @@ class MainActivity : EhActivity() {
         }
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
+
+        // Trick: Tweak NavigationUI to disable multiple backstack
+        binding.navView.setNavigationItemSelectedListener {
+            val navigationView = binding.navView
+            val handled = onNavDestinationSelected2(it, navController)
+            if (handled) {
+                val parent = navigationView.parent
+                if (parent is Openable) {
+                    parent.close()
+                } else {
+                    val bottomSheetBehavior = NavigationUI.findBottomSheetBehavior(navigationView)
+                    if (bottomSheetBehavior != null) {
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    }
+                }
+            }
+            handled
+        }
+        // Trick End
+
         if (savedInstanceState == null) {
             if (intent.action != Intent.ACTION_MAIN) {
                 onNewIntent(intent)
