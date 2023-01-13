@@ -29,31 +29,31 @@ internal class GalleryHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     val thumb: LoadImageView = itemView.findViewById(R.id.thumb)
 
     @JvmField
-    val title: TextView = itemView.findViewById(R.id.title)
+    val title: TextView? = itemView.findViewById(R.id.title)
 
     @JvmField
-    val uploader: TextView = itemView.findViewById(R.id.uploader)
+    val uploader: TextView? = itemView.findViewById(R.id.uploader)
 
     @JvmField
-    val rating: SimpleRatingView = itemView.findViewById(R.id.rating)
+    val rating: SimpleRatingView? = itemView.findViewById(R.id.rating)
 
     @JvmField
     val category: TextView = itemView.findViewById(R.id.category)
 
     @JvmField
-    val posted: TextView = itemView.findViewById(R.id.posted)
+    val posted: TextView? = itemView.findViewById(R.id.posted)
 
     @JvmField
-    val pages: TextView = itemView.findViewById(R.id.pages)
+    val pages: TextView? = itemView.findViewById(R.id.pages)
 
     @JvmField
     val simpleLanguage: TextView = itemView.findViewById(R.id.simple_language)
 
     @JvmField
-    val favourited: ImageView = itemView.findViewById(R.id.favourited)
+    val favourited: ImageView? = itemView.findViewById(R.id.favourited)
 
     @JvmField
-    val downloaded: ImageView = itemView.findViewById(R.id.downloaded)
+    val downloaded: ImageView? = itemView.findViewById(R.id.downloaded)
 
     @JvmField
     val card: MaterialCardView = itemView.findViewById(R.id.card)
