@@ -232,7 +232,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 val filter = Filter()
                 filter.mode = EhFilter.MODE_COMMENTER
                 filter.text = commenter
-                EhFilter.getInstance().addFilter(filter)
+                EhFilter.addFilter(filter)
                 hideComment(position)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }

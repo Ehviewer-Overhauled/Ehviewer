@@ -477,7 +477,7 @@ public class GalleryDetailParser {
             comment.comment = JsoupUtils.getElementByClass(element, "c6").html();
             // filter comment
             if (!comment.uploader) {
-                EhFilter sEhFilter = EhFilter.getInstance();
+                EhFilter sEhFilter = EhFilter.INSTANCE;
                 if (!sEhFilter.filterCommenter(comment.user) || !sEhFilter.filterComment(comment.comment)) {
                     return null;
                 }

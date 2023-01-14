@@ -13,303 +13,303 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import android.util.Log
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.dao.Filter
+import java.util.Locale
+import java.util.regex.Pattern
 
-import android.util.Log;
+object EhFilter {
+    private val mTitleFilterList: MutableList<Filter> = ArrayList()
+    private val mUploaderFilterList: MutableList<Filter> = ArrayList()
+    private val mTagFilterList: MutableList<Filter> = ArrayList()
+    private val mTagNamespaceFilterList: MutableList<Filter> = ArrayList()
+    private val mCommenterFilterList: MutableList<Filter> = ArrayList()
+    private val mCommentFilterList: MutableList<Filter> = ArrayList()
 
-import androidx.annotation.NonNull;
+    const val MODE_TITLE = 0
+    const val MODE_UPLOADER = 1
+    const val MODE_TAG = 2
+    const val MODE_TAG_NAMESPACE = 3
+    const val MODE_COMMENTER = 4
+    const val MODE_COMMENT = 5
+    private val TAG = EhFilter::class.java.simpleName
 
-import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.dao.Filter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public final class EhFilter {
-
-    public static final int MODE_TITLE = 0;
-    public static final int MODE_UPLOADER = 1;
-    public static final int MODE_TAG = 2;
-    public static final int MODE_TAG_NAMESPACE = 3;
-    public static final int MODE_COMMENTER = 4;
-    public static final int MODE_COMMENT = 5;
-    private static final String TAG = EhFilter.class.getSimpleName();
-    private static EhFilter sInstance;
-    private final List<Filter> mTitleFilterList = new ArrayList<>();
-    private final List<Filter> mUploaderFilterList = new ArrayList<>();
-    private final List<Filter> mTagFilterList = new ArrayList<>();
-    private final List<Filter> mTagNamespaceFilterList = new ArrayList<>();
-    private final List<Filter> mCommenterFilterList = new ArrayList<>();
-    private final List<Filter> mCommentFilterList = new ArrayList<>();
-
-    private EhFilter() {
-        List<Filter> list = EhDB.getAllFilter();
-        for (int i = 0, n = list.size(); i < n; i++) {
-            Filter filter = list.get(i);
-            switch (filter.mode) {
-                case MODE_TITLE -> {
-                    filter.text = filter.text.toLowerCase();
-                    mTitleFilterList.add(filter);
+    init {
+        val list = EhDB.getAllFilter()
+        var i = 0
+        val n = list.size
+        while (i < n) {
+            val filter = list[i]
+            when (filter.mode) {
+                MODE_TITLE -> {
+                    filter.text = filter.text!!.lowercase(Locale.getDefault())
+                    mTitleFilterList.add(filter)
                 }
-                case MODE_TAG -> {
-                    filter.text = filter.text.toLowerCase();
-                    mTagFilterList.add(filter);
+
+                MODE_TAG -> {
+                    filter.text = filter.text!!.lowercase(Locale.getDefault())
+                    mTagFilterList.add(filter)
                 }
-                case MODE_TAG_NAMESPACE -> {
-                    filter.text = filter.text.toLowerCase();
-                    mTagNamespaceFilterList.add(filter);
+
+                MODE_TAG_NAMESPACE -> {
+                    filter.text = filter.text!!.lowercase(Locale.getDefault())
+                    mTagNamespaceFilterList.add(filter)
                 }
-                case MODE_UPLOADER -> mUploaderFilterList.add(filter);
-                case MODE_COMMENTER -> mCommenterFilterList.add(filter);
-                case MODE_COMMENT -> mCommentFilterList.add(filter);
-                default -> Log.d(TAG, "Unknown mode: " + filter.mode);
+
+                MODE_UPLOADER -> mUploaderFilterList.add(filter)
+                MODE_COMMENTER -> mCommenterFilterList.add(filter)
+                MODE_COMMENT -> mCommentFilterList.add(filter)
+                else -> Log.d(TAG, "Unknown mode: " + filter.mode)
             }
+            i++
         }
     }
 
-    public static @NonNull EhFilter getInstance() {
-        if (sInstance == null) {
-            sInstance = new EhFilter();
-        }
-        return sInstance;
-    }
+    val titleFilterList: List<Filter>
+        get() = mTitleFilterList
+    val uploaderFilterList: List<Filter>
+        get() = mUploaderFilterList
+    val tagFilterList: List<Filter>
+        get() = mTagFilterList
+    val tagNamespaceFilterList: List<Filter>
+        get() = mTagNamespaceFilterList
+    val commenterFilterList: List<Filter>
+        get() = mCommenterFilterList
+    val commentFilterList: List<Filter>
+        get() = mCommentFilterList
 
-    public List<Filter> getTitleFilterList() {
-        return mTitleFilterList;
-    }
-
-    public List<Filter> getUploaderFilterList() {
-        return mUploaderFilterList;
-    }
-
-    public List<Filter> getTagFilterList() {
-        return mTagFilterList;
-    }
-
-    public List<Filter> getTagNamespaceFilterList() {
-        return mTagNamespaceFilterList;
-    }
-
-    public List<Filter> getCommenterFilterList() {
-        return mCommenterFilterList;
-    }
-
-    public List<Filter> getCommentFilterList() {
-        return mCommentFilterList;
-    }
-
-    public synchronized boolean addFilter(Filter filter) {
+    @Synchronized
+    fun addFilter(filter: Filter): Boolean {
         // enable filter by default before it is added to database
-        filter.enable = true;
-        if (!EhDB.addFilter(filter)) return false;
+        filter.enable = true
+        if (!EhDB.addFilter(filter)) return false
+        when (filter.mode) {
+            MODE_TITLE -> {
+                filter.text = filter.text!!.lowercase(Locale.getDefault())
+                mTitleFilterList.add(filter)
+            }
 
-        switch (filter.mode) {
-            case MODE_TITLE -> {
-                filter.text = filter.text.toLowerCase();
-                mTitleFilterList.add(filter);
+            MODE_TAG -> {
+                filter.text = filter.text!!.lowercase(Locale.getDefault())
+                mTagFilterList.add(filter)
             }
-            case MODE_TAG -> {
-                filter.text = filter.text.toLowerCase();
-                mTagFilterList.add(filter);
+
+            MODE_TAG_NAMESPACE -> {
+                filter.text = filter.text!!.lowercase(Locale.getDefault())
+                mTagNamespaceFilterList.add(filter)
             }
-            case MODE_TAG_NAMESPACE -> {
-                filter.text = filter.text.toLowerCase();
-                mTagNamespaceFilterList.add(filter);
-            }
-            case MODE_UPLOADER -> mUploaderFilterList.add(filter);
-            case MODE_COMMENTER -> mCommenterFilterList.add(filter);
-            case MODE_COMMENT -> mCommentFilterList.add(filter);
-            default -> Log.d(TAG, "Unknown mode: " + filter.mode);
+
+            MODE_UPLOADER -> mUploaderFilterList.add(filter)
+            MODE_COMMENTER -> mCommenterFilterList.add(filter)
+            MODE_COMMENT -> mCommentFilterList.add(filter)
+            else -> Log.d(TAG, "Unknown mode: " + filter.mode)
         }
-        return true;
+        return true
     }
 
-    public synchronized void triggerFilter(Filter filter) {
-        EhDB.triggerFilter(filter);
+    @Synchronized
+    fun triggerFilter(filter: Filter?) {
+        EhDB.triggerFilter(filter)
     }
 
-    public synchronized void deleteFilter(Filter filter) {
-        EhDB.deleteFilter(filter);
-
-        switch (filter.mode) {
-            case MODE_TITLE -> mTitleFilterList.remove(filter);
-            case MODE_TAG -> mTagFilterList.remove(filter);
-            case MODE_TAG_NAMESPACE -> mTagNamespaceFilterList.remove(filter);
-            case MODE_UPLOADER -> mUploaderFilterList.remove(filter);
-            case MODE_COMMENTER -> mCommenterFilterList.remove(filter);
-            case MODE_COMMENT -> mCommentFilterList.remove(filter);
-            default -> Log.d(TAG, "Unknown mode: " + filter.mode);
+    @Synchronized
+    fun deleteFilter(filter: Filter) {
+        EhDB.deleteFilter(filter)
+        when (filter.mode) {
+            MODE_TITLE -> mTitleFilterList.remove(filter)
+            MODE_TAG -> mTagFilterList.remove(filter)
+            MODE_TAG_NAMESPACE -> mTagNamespaceFilterList.remove(filter)
+            MODE_UPLOADER -> mUploaderFilterList.remove(filter)
+            MODE_COMMENTER -> mCommenterFilterList.remove(filter)
+            MODE_COMMENT -> mCommentFilterList.remove(filter)
+            else -> Log.d(TAG, "Unknown mode: " + filter.mode)
         }
     }
 
-    public synchronized boolean needTags() {
-        return 0 != mTagFilterList.size() || 0 != mTagNamespaceFilterList.size();
+    @Synchronized
+    fun needTags(): Boolean {
+        return 0 != mTagFilterList.size || 0 != mTagNamespaceFilterList.size
     }
 
-    public synchronized boolean filterTitle(GalleryInfo info) {
+    @Synchronized
+    fun filterTitle(info: GalleryInfo?): Boolean {
         if (null == info) {
-            return false;
+            return false
         }
 
         // Title
-        String title = info.getTitle();
-        List<Filter> filters = mTitleFilterList;
-        if (null != title && filters.size() > 0) {
-            for (int i = 0, n = filters.size(); i < n; i++) {
-                if (filters.get(i).enable && title.toLowerCase().contains(filters.get(i).text)) {
-                    return false;
+        val title = info.title
+        val filters: List<Filter> = mTitleFilterList
+        if (null != title && filters.isNotEmpty()) {
+            var i = 0
+            val n = filters.size
+            while (i < n) {
+                if (filters[i].enable!! && title.lowercase(Locale.getDefault()).contains(
+                        filters[i].text!!
+                    )
+                ) {
+                    return false
                 }
+                i++
             }
         }
-
-        return true;
+        return true
     }
 
-    public synchronized boolean filterUploader(GalleryInfo info) {
+    @Synchronized
+    fun filterUploader(info: GalleryInfo?): Boolean {
         if (null == info) {
-            return false;
+            return false
         }
 
         // Uploader
-        String uploader = info.getUploader();
-        List<Filter> filters = mUploaderFilterList;
-        if (null != uploader && filters.size() > 0) {
-            for (int i = 0, n = filters.size(); i < n; i++) {
-                if (filters.get(i).enable && uploader.equals(filters.get(i).text)) {
-                    return false;
+        val uploader = info.uploader
+        val filters: List<Filter> = mUploaderFilterList
+        if (null != uploader && filters.isNotEmpty()) {
+            var i = 0
+            val n = filters.size
+            while (i < n) {
+                if (filters[i].enable!! && uploader == filters[i].text) {
+                    return false
                 }
+                i++
             }
         }
-
-        return true;
+        return true
     }
 
-    private boolean matchTag(String tag, String filter) {
+    private fun matchTag(tag: String?, filter: String?): Boolean {
         if (null == tag || null == filter) {
-            return false;
+            return false
         }
-
-        String tagNamespace;
-        String tagName;
-        String filterNamespace;
-        String filterName;
-        int index = tag.indexOf(':');
+        val tagNamespace: String?
+        val tagName: String
+        val filterNamespace: String?
+        val filterName: String
+        var index = tag.indexOf(':')
         if (index < 0) {
-            tagNamespace = null;
-            tagName = tag;
+            tagNamespace = null
+            tagName = tag
         } else {
-            tagNamespace = tag.substring(0, index);
-            tagName = tag.substring(index + 1);
+            tagNamespace = tag.substring(0, index)
+            tagName = tag.substring(index + 1)
         }
-        index = filter.indexOf(':');
+        index = filter.indexOf(':')
         if (index < 0) {
-            filterNamespace = null;
-            filterName = filter;
+            filterNamespace = null
+            filterName = filter
         } else {
-            filterNamespace = filter.substring(0, index);
-            filterName = filter.substring(index + 1);
+            filterNamespace = filter.substring(0, index)
+            filterName = filter.substring(index + 1)
         }
-
-        if (null != tagNamespace && null != filterNamespace &&
-                !tagNamespace.equals(filterNamespace)) {
-            return false;
-        }
-        return tagName.equals(filterName);
+        return if (null != tagNamespace && null != filterNamespace &&
+            tagNamespace != filterNamespace
+        ) {
+            false
+        } else tagName == filterName
     }
 
-    public synchronized boolean filterTag(GalleryInfo info) {
+    @Synchronized
+    fun filterTag(info: GalleryInfo?): Boolean {
         if (null == info) {
-            return false;
+            return false
         }
 
         // Tag
-        String[] tags = info.getSimpleTags();
-        List<Filter> filters = mTagFilterList;
-        if (null != tags && filters.size() > 0) {
-            for (String tag : tags) {
-                for (int i = 0, n = filters.size(); i < n; i++) {
-                    if (filters.get(i).enable && matchTag(tag, filters.get(i).text)) {
-                        return false;
+        val tags = info.simpleTags
+        val filters: List<Filter> = mTagFilterList
+        if (null != tags && filters.isNotEmpty()) {
+            for (tag in tags) {
+                var i = 0
+                val n = filters.size
+                while (i < n) {
+                    if (filters[i].enable!! && matchTag(tag, filters[i].text)) {
+                        return false
                     }
+                    i++
                 }
             }
         }
-
-        return true;
+        return true
     }
 
-    private boolean matchTagNamespace(String tag, String filter) {
+    private fun matchTagNamespace(tag: String?, filter: String?): Boolean {
         if (null == tag || null == filter) {
-            return false;
+            return false
         }
-
-        String tagNamespace;
-        int index = tag.indexOf(':');
-        if (index >= 0) {
-            tagNamespace = tag.substring(0, index);
-            return tagNamespace.equals(filter);
+        val tagNamespace: String
+        val index = tag.indexOf(':')
+        return if (index >= 0) {
+            tagNamespace = tag.substring(0, index)
+            tagNamespace == filter
         } else {
-            return false;
+            false
         }
     }
 
-    public synchronized boolean filterTagNamespace(GalleryInfo info) {
+    @Synchronized
+    fun filterTagNamespace(info: GalleryInfo?): Boolean {
         if (null == info) {
-            return false;
+            return false
         }
-
-        String[] tags = info.getSimpleTags();
-        List<Filter> filters = mTagNamespaceFilterList;
-        if (null != tags && filters.size() > 0) {
-            for (String tag : tags) {
-                for (int i = 0, n = filters.size(); i < n; i++) {
-                    if (filters.get(i).enable && matchTagNamespace(tag, filters.get(i).text)) {
-                        return false;
+        val tags = info.simpleTags
+        val filters: List<Filter> = mTagNamespaceFilterList
+        if (null != tags && filters.isNotEmpty()) {
+            for (tag in tags) {
+                var i = 0
+                val n = filters.size
+                while (i < n) {
+                    if (filters[i].enable!! && matchTagNamespace(tag, filters[i].text)) {
+                        return false
                     }
+                    i++
                 }
             }
         }
-
-        return true;
+        return true
     }
 
-    public synchronized boolean filterCommenter(String commenter) {
+    @Synchronized
+    fun filterCommenter(commenter: String?): Boolean {
         if (null == commenter) {
-            return false;
+            return false
         }
-
-        List<Filter> filters = mCommenterFilterList;
-        if (filters.size() > 0) {
-            for (int i = 0, n = filters.size(); i < n; i++) {
-                if (filters.get(i).enable && commenter.equals(filters.get(i).text)) {
-                    return false;
+        val filters: List<Filter> = mCommenterFilterList
+        if (filters.isNotEmpty()) {
+            var i = 0
+            val n = filters.size
+            while (i < n) {
+                if (filters[i].enable!! && commenter == filters[i].text) {
+                    return false
                 }
+                i++
             }
         }
-
-        return true;
+        return true
     }
 
-    public synchronized boolean filterComment(String comment) {
+    @Synchronized
+    fun filterComment(comment: String?): Boolean {
         if (null == comment) {
-            return false;
+            return false
         }
-
-        List<Filter> filters = mCommentFilterList;
-        if (filters.size() > 0) {
-            for (int i = 0, n = filters.size(); i < n; i++) {
-                if (filters.get(i).enable) {
-                    Pattern p = Pattern.compile(filters.get(i).text);
-                    Matcher m = p.matcher(comment);
-                    if (m.find()) return false;
+        val filters: List<Filter> = mCommentFilterList
+        if (filters.isNotEmpty()) {
+            var i = 0
+            val n = filters.size
+            while (i < n) {
+                if (filters[i].enable!!) {
+                    val p = Pattern.compile(filters[i].text!!)
+                    val m = p.matcher(comment)
+                    if (m.find()) return false
                 }
+                i++
             }
         }
-
-        return true;
+        return true
     }
 }

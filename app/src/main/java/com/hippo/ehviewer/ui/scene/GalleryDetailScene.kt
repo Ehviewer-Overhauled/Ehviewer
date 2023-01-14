@@ -1002,7 +1002,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 val filter = Filter()
                 filter.mode = EhFilter.MODE_UPLOADER
                 filter.text = uploader
-                EhFilter.getInstance().addFilter(filter)
+                EhFilter.addFilter(filter)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -1017,7 +1017,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 val filter = Filter()
                 filter.mode = EhFilter.MODE_TAG
                 filter.text = tag
-                EhFilter.getInstance().addFilter(filter)
+                EhFilter.addFilter(filter)
                 showTip(R.string.filter_added, LENGTH_SHORT)
             }
             .setNegativeButton(android.R.string.cancel, null)

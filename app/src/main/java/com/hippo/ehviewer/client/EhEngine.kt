@@ -75,7 +75,7 @@ object EhEngine {
     private const val SAD_PANDA_LENGTH = "9615"
     private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
     private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
-    private var sEhFilter = EhFilter.getInstance()
+    private var sEhFilter = EhFilter
     private val okHttpClient = EhApplication.okHttpClient
 
     private fun transformException(code: Int, headers: Headers?, body: String?, e: Throwable?) {
