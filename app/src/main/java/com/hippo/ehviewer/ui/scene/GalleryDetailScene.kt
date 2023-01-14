@@ -500,18 +500,18 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun bindViewFirst() {
-        mGalleryDetail ?: return
         _binding ?: return
-        if (ACTION_GALLERY_INFO == mAction && mGalleryInfo != null) {
-            val gi: GalleryInfo = mGalleryInfo!!
-            binding.content.header.run {
-                (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
-                setTitle(EhUtils.getSuitableTitle(gi))
-                uploader.text = gi.uploader
-                uploader.alpha = if (gi.disowned) .5f else 1f
-                category.text = EhUtils.getCategory(gi.category)
-                category.setTextColor(EhUtils.getCategoryColor(gi.category))
-                updateDownloadText()
+        mGalleryInfo?.let { gi ->
+            if (mAction == ACTION_GALLERY_INFO) {
+                binding.content.header.run {
+                    (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                    setTitle(EhUtils.getSuitableTitle(gi))
+                    uploader.text = gi.uploader
+                    uploader.alpha = if (gi.disowned) .5f else 1f
+                    category.text = EhUtils.getCategory(gi.category)
+                    category.setTextColor(EhUtils.getCategoryColor(gi.category))
+                    updateDownloadText()
+                }
             }
         }
     }
