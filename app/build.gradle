@@ -129,6 +129,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation 'com.drakeet.drawer:drawer:1.0.3'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation 'com.github.tachiyomiorg:DirectionalViewPager:1.0.0'
     implementation "com.google.accompanist:accompanist-themeadapter-material3:0.28.0"
     implementation 'com.google.android.material:material:1.8.0-rc01'
 

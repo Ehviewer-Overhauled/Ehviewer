@@ -141,8 +141,4 @@
         <attr name="summary" format="reference|string" />
     </declare-styleable>
 
-    <declare-styleable name="DirectionalViewPager">
-        <attr name="android:orientation" />
-    </declare-styleable>
-
 </resources>
