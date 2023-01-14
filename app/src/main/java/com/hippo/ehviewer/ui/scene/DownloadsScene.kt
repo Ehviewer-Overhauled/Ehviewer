@@ -111,9 +111,9 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     private fun initLabels() {
         context ?: return
         val listLabel = downloadManager.labelList
-        mLabels = ArrayList(listLabel.size + 2)
+        mLabels = ArrayList(listLabel.size + LABEL_OFFSET)
+        // Add "All" and "Default" label names
         mLabels.add(getString(R.string.download_all))
-        // Add default label name
         mLabels.add(getString(R.string.default_download_label_name))
         for ((_, label) in listLabel) {
             mLabels.add(label!!)
@@ -635,10 +635,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     }
 
     override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {
-        if (mList !== list) {
+        if (mLabel != null && mList !== list) {
             return
         }
-        val index = list.indexOf(info)
+        val index = mList!!.indexOf(info)
         if (index >= 0 && mAdapter != null) {
             mAdapter!!.notifyItemChanged(index)
         }
@@ -848,17 +848,17 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             } else {
                 holder.label.text = label
             }
-            if (position > 1) {
-                holder.edit.visibility = View.VISIBLE
-                holder.option.visibility = View.VISIBLE
-            } else {
+            if (position < LABEL_OFFSET) {
                 holder.edit.visibility = View.GONE
                 holder.option.visibility = View.GONE
+            } else {
+                holder.edit.visibility = View.VISIBLE
+                holder.option.visibility = View.VISIBLE
             }
         }
 
         override fun getItemId(position: Int): Long {
-            return (if (position <= 1) position else mLabels[position].hashCode()).toLong()
+            return (if (position < LABEL_OFFSET) position else mLabels[position].hashCode()).toLong()
         }
 
         override fun getItemCount(): Int {
@@ -1153,10 +1153,15 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ): Int {
-            return makeMovementFlags(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.LEFT
-            )
+            val position = viewHolder.bindingAdapterPosition
+            return if (position < LABEL_OFFSET) {
+                makeMovementFlags(0, 0)
+            } else {
+                makeMovementFlags(
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                    ItemTouchHelper.LEFT
+                )
+            }
         }
 
         override fun onMove(
@@ -1167,10 +1172,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             val fromPosition = viewHolder.bindingAdapterPosition
             val toPosition = target.bindingAdapterPosition
             val context = context
-            if (null == context || fromPosition == toPosition || toPosition == 0 || fromPosition == 0) {
+            if (null == context || fromPosition == toPosition || toPosition < LABEL_OFFSET) {
                 return false
             }
-            downloadManager.moveLabel(fromPosition - 1, toPosition - 1)
+            downloadManager.moveLabel(fromPosition - LABEL_OFFSET, toPosition - LABEL_OFFSET)
             val item = mLabels.removeAt(fromPosition)
             mLabels.add(toPosition, item)
             mLabelAdapter!!.notifyItemMoved(fromPosition, toPosition)
@@ -1180,10 +1185,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.bindingAdapterPosition
             if (mDownloadManager == null) return
-            if (position <= 1) {
-                mLabelAdapter!!.notifyItemChanged(position)
-                return
-            }
             val label = mLabels[position]
             BaseDialogBuilder(context!!)
                 .setMessage(getString(R.string.delete_label, label))
@@ -1252,5 +1253,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         const val ACTION_CLEAR_DOWNLOAD_SERVICE = "clear_download_service"
         private val TAG = DownloadsScene::class.java.simpleName
         private const val KEY_LABEL = "label"
+        private const val LABEL_OFFSET = 2
     }
 }
