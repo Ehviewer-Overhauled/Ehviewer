@@ -55,7 +55,7 @@ import androidx.navigation.NavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
-import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.LoginActivity.Companion.COOKIE_SIGN_IN_ROUTE_NAME
@@ -104,9 +104,7 @@ fun SignInScreen(navController: NavController) {
         EhUtils.signOut()
         signInJob = coroutineScope.launchIO {
             runCatching {
-                (EhClient.execute(EhClient.METHOD_SIGN_IN, username, password) as String).let {
-                    Settings.putDisplayName(it)
-                }
+                EhEngine.signIn(username, password)
             }.onFailure {
                 it.printStackTrace()
                 withUIContext {

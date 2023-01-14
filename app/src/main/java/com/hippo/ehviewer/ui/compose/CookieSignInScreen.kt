@@ -49,16 +49,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhClient.METHOD_GET_PROFILE
 import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.Cookie
@@ -105,7 +103,7 @@ fun CookieSignInScene(navController: NavController) {
     }
 
     fun login() {
-        signInJob?.cancel()
+        if (signInJob?.isActive == true) return
         if (ipbMemberId.isBlank()) {
             ipbMemberIdErrorState = true
             return
@@ -123,18 +121,16 @@ fun CookieSignInScene(navController: NavController) {
         isProgressIndicatorVisible = true
         signInJob = coroutineScope.launchIO {
             runCatching {
-                EhClient.execute(METHOD_GET_PROFILE)
+                EhEngine.getProfile()
             }.onSuccess {
                 withUIContext {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
             }.onFailure {
                 EhApplication.ehCookieStore.signOut()
-                if (it !is CancellationException) {
-                    loginErrorException = it
-                    showErrorDialog = true
-                    isProgressIndicatorVisible = false
-                }
+                loginErrorException = it
+                showErrorDialog = true
+                isProgressIndicatorVisible = false
             }
         }
     }
