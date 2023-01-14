@@ -100,48 +100,57 @@ android {
 }
 
 dependencies {
+    // https://developer.android.com/jetpack/androidx/releases/activity
     implementation "androidx.activity:activity-compose:1.6.1"
     implementation "androidx.appcompat:appcompat:1.6.0"
     implementation "androidx.biometric:biometric-ktx:1.2.0-alpha05"
     implementation "androidx.browser:browser:1.4.0"
 
+    // https://developer.android.com/jetpack/androidx/releases/compose-material3
     implementation platform("androidx.compose:compose-bom:2023.01.00")
     implementation "androidx.compose.material:material-icons-extended"
     implementation "androidx.compose.material3:material3"
 
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha05"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
+    // https://developer.android.com/jetpack/androidx/releases/lifecycle
     implementation "androidx.lifecycle:lifecycle-process:2.5.1"
 
+    // https://developer.android.com/jetpack/androidx/releases/navigation
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
+    // https://developer.android.com/jetpack/androidx/releases/paging
     implementation "androidx.paging:paging-runtime-ktx:3.2.0-alpha03"
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.0-rc01'
 
+    // https://developer.android.com/jetpack/androidx/releases/room
     def room_version = "2.5.0"
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
     implementation 'com.drakeet.drawer:drawer:1.0.3'
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'com.github.tachiyomiorg:DirectionalViewPager:1.0.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0' // Dead Dependency
+    implementation 'com.github.tachiyomiorg:DirectionalViewPager:1.0.0' // Dead Dependency
+    // https://github.com/google/accompanist/releases
     implementation "com.google.accompanist:accompanist-themeadapter-material3:0.28.0"
     implementation 'com.google.android.material:material:1.8.0-rc01'
 
+    // https://square.github.io/okhttp/changelogs/changelog/
     implementation 'com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11'
     implementation 'com.squareup.okhttp3:okhttp-coroutines'
 
-    implementation 'dev.chrisbanes.insetter:insetter:0.6.1'
+    implementation 'dev.chrisbanes.insetter:insetter:0.6.1' // Dead Dependency
     implementation 'dev.rikka.rikkax.core:core-ktx:1.4.1'
     implementation 'dev.rikka.rikkax.insets:insets:1.3.0'
     implementation 'dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0'
     implementation 'dev.rikka.rikkax.preference:simplemenu-preference:1.0.3'
     implementation 'dev.rikka.rikkax.material:material-preference:2.0.0'
+    // https://coil-kt.github.io/coil/changelog/
     implementation 'io.coil-kt:coil:2.2.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jsoup:jsoup:1.15.3'
