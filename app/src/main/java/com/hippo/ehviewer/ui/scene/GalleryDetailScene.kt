@@ -91,7 +91,7 @@ import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.getStartArgs
+import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -736,7 +736,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_NORMAL
             lub.keyword = "\"" + keyword + "\""
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
             return
         }
         val artist = getArtist(gd.tags)
@@ -744,14 +744,14 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_TAG
             lub.keyword = "artist:$artist"
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
             return
         }
         if (null != gd.uploader) {
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_UPLOADER
             lub.keyword = gd.uploader
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
         }
     }
 
@@ -768,7 +768,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             lub.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
             lub.imagePath = path.toString()
             lub.isUseSimilarityScan = true
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
         } catch (e: Throwable) {
             e.printStackTrace()
         }
@@ -792,7 +792,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_UPLOADER
             lub.keyword = uploader
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
         } else if (binding.content.header.category === v) {
             val category = this.category
             if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
@@ -800,7 +800,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             }
             val lub = ListUrlBuilder()
             lub.category = category
-            navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
         } else if (binding.content.header.download === v) {
             val galleryInfo = galleryInfo
             if (galleryInfo != null) {
@@ -973,7 +973,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 val lub = ListUrlBuilder()
                 lub.mode = ListUrlBuilder.MODE_TAG
                 lub.keyword = o
-                navigate(R.id.galleryListScene, getStartArgs(lub), true)
+                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                 return
             }
             val galleryInfo = galleryInfo

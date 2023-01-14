@@ -61,6 +61,7 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
+import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.io.UniFileInputStreamPipe
 import com.hippo.unifile.UniFile
@@ -185,7 +186,7 @@ class MainActivity : EhActivity() {
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
                 navController.navigate(
                     R.id.galleryListScene,
-                    GalleryListScene.getStartArgs(builder)
+                    builder.toStartArgs()
                 )
                 return true
             } else if (type != null && type.startsWith("image/")) {
@@ -200,7 +201,7 @@ class MainActivity : EhActivity() {
                         builder.isUseSimilarityScan = true
                         navController.navigate(
                             R.id.galleryListScene,
-                            GalleryListScene.getStartArgs(builder)
+                            builder.toStartArgs()
                         )
                         return true
                     }

@@ -66,7 +66,7 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.getStartArgs
+import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
@@ -834,7 +834,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 val lub = ListUrlBuilder()
                 lub.mode = ListUrlBuilder.MODE_UPLOADER
                 lub.keyword = value.user
-                navigate(R.id.galleryListScene, getStartArgs(lub), true)
+                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
             }
             time.text = ReadableTime.getTimeAgo(value.time)
             comment.text = generateComment(comment.context, comment, value)
