@@ -13,960 +13,902 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
+import android.animation.Animator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Typeface
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.os.Looper
+import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.text.style.URLSpan
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.hippo.app.BaseDialogBuilder
+import com.hippo.easyrecyclerview.EasyRecyclerView
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.UrlOpener
+import com.hippo.ehviewer.WindowInsetsAnimationHelper
+import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhFilter
+import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.GalleryComment
+import com.hippo.ehviewer.client.data.GalleryCommentList
+import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.data.ListUrlBuilder
+import com.hippo.ehviewer.client.parser.VoteCommentParser
+import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.getStartArgs
+import com.hippo.text.URLImageGetter
+import com.hippo.util.ExceptionUtils
+import com.hippo.util.ReadableTime
+import com.hippo.util.TextUrl
+import com.hippo.util.addTextToClipboard
+import com.hippo.view.ViewTransition
+import com.hippo.widget.FabLayout
+import com.hippo.widget.LinkifyTextView
+import com.hippo.widget.ObservedTextView
+import com.hippo.yorozuya.AnimationUtils
+import com.hippo.yorozuya.SimpleAnimatorListener
+import com.hippo.yorozuya.StringUtils
+import com.hippo.yorozuya.ViewUtils
+import com.hippo.yorozuya.collect.IntList
+import rikka.core.res.resolveColor
+import kotlin.math.hypot
 
-import android.animation.Animator;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Looper;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextUtils;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.text.style.URLSpan;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.app.BaseDialogBuilder;
-import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.UrlOpener;
-import com.hippo.ehviewer.WindowInsetsAnimationHelper;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhFilter;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.data.GalleryComment;
-import com.hippo.ehviewer.client.data.GalleryCommentList;
-import com.hippo.ehviewer.client.data.GalleryDetail;
-import com.hippo.ehviewer.client.data.ListUrlBuilder;
-import com.hippo.ehviewer.client.parser.VoteCommentParser;
-import com.hippo.ehviewer.dao.Filter;
-import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.text.URLImageGetter;
-import com.hippo.util.ClipboardUtilKt;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.util.ReadableTime;
-import com.hippo.util.TextUrl;
-import com.hippo.view.ViewTransition;
-import com.hippo.widget.FabLayout;
-import com.hippo.widget.LinkifyTextView;
-import com.hippo.widget.ObservedTextView;
-import com.hippo.yorozuya.AnimationUtils;
-import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.SimpleAnimatorListener;
-import com.hippo.yorozuya.StringUtils;
-import com.hippo.yorozuya.ViewUtils;
-import com.hippo.yorozuya.collect.IntList;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import rikka.core.res.ResourcesKt;
-
-public final class GalleryCommentsScene extends BaseToolbarScene
-        implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
-
-    public static final String TAG = GalleryCommentsScene.class.getSimpleName();
-
-    public static final String KEY_API_UID = "api_uid";
-    public static final String KEY_API_KEY = "api_key";
-    public static final String KEY_GID = "gid";
-    public static final String KEY_TOKEN = "token";
-    public static final String KEY_COMMENT_LIST = "comment_list";
-    public static final String KEY_GALLERY_DETAIL = "gallery_detail";
-    private static final int TYPE_COMMENT = 0;
-    private static final int TYPE_MORE = 1;
-    private static final int TYPE_PROGRESS = 2;
-    private final EditPanelOnBackPressedCallback mCallback = new EditPanelOnBackPressedCallback();
-    private GalleryDetail mGalleryDetail;
-    @Nullable
-    private EasyRecyclerView mRecyclerView;
-    @Nullable
-    private FabLayout mFabLayout;
-    @Nullable
-    private FloatingActionButton mFab;
-    @Nullable
-    private View mEditPanel;
-    @Nullable
-    private ImageView mSendImage;
-    @Nullable
-    private EditText mEditText;
-    @Nullable
-    private CommentAdapter mAdapter;
-    @Nullable
-    private ViewTransition mViewTransition;
-    private SwipeRefreshLayout mRefreshLayout;
-    private Drawable mSendDrawable;
-    private Drawable mPencilDrawable;
-    private long mCommentId;
-    private boolean mInAnimation = false;
-    private boolean mShowAllComments = false;
-    private boolean mRefreshingComments = false;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requireActivity().getOnBackPressedDispatcher().addCallback(mCallback);
+class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefreshListener {
+    private val mCallback = EditPanelOnBackPressedCallback()
+    private var mGalleryDetail: GalleryDetail? = null
+    private var mRecyclerView: EasyRecyclerView? = null
+    private var mFabLayout: FabLayout? = null
+    private var mFab: FloatingActionButton? = null
+    private var mEditPanel: View? = null
+    private var mSendImage: ImageView? = null
+    private var mEditText: EditText? = null
+    private var mAdapter: CommentAdapter? = null
+    private var mViewTransition: ViewTransition? = null
+    private var mRefreshLayout: SwipeRefreshLayout? = null
+    private var mSendDrawable: Drawable? = null
+    private var mPencilDrawable: Drawable? = null
+    private var mCommentId: Long = 0
+    private var mInAnimation = false
+    private var mShowAllComments = false
+    private var mRefreshingComments = false
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(mCallback)
         if (savedInstanceState == null) {
-            onInit();
+            onInit()
         } else {
-            onRestore(savedInstanceState);
+            onRestore(savedInstanceState)
         }
     }
 
-    private void handleArgs(Bundle args) {
+    private fun handleArgs(args: Bundle?) {
         if (args == null) {
-            return;
+            return
         }
-
-        mGalleryDetail = args.getParcelable(KEY_GALLERY_DETAIL);
-        mShowAllComments = mGalleryDetail != null && mGalleryDetail.comments != null && !mGalleryDetail.comments.hasMore;
+        mGalleryDetail = args.getParcelable(KEY_GALLERY_DETAIL)
+        mShowAllComments =
+            mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
     }
 
-    private void onInit() {
-        handleArgs(getArguments());
+    private fun onInit() {
+        handleArgs(arguments)
     }
 
-    private void onRestore(@NonNull Bundle savedInstanceState) {
-        mGalleryDetail = savedInstanceState.getParcelable(KEY_GALLERY_DETAIL);
-        mShowAllComments = mGalleryDetail != null && mGalleryDetail.comments != null && !mGalleryDetail.comments.hasMore;
+    private fun onRestore(savedInstanceState: Bundle) {
+        mGalleryDetail = savedInstanceState.getParcelable(KEY_GALLERY_DETAIL)
+        mShowAllComments =
+            mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(KEY_GALLERY_DETAIL, mGalleryDetail);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(KEY_GALLERY_DETAIL, mGalleryDetail)
     }
 
-    @NonNull
-    @Override
-    public View onCreateViewWithToolbar(LayoutInflater inflater,
-                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup view = (ViewGroup) inflater.inflate(R.layout.scene_gallery_comments, container, false);
-        mRecyclerView = (EasyRecyclerView) ViewUtils.$$(view, R.id.recycler_view);
-        setLiftOnScrollTargetView(mRecyclerView);
-        TextView tip = (TextView) ViewUtils.$$(view, R.id.tip);
-        mEditPanel = ViewUtils.$$(view, R.id.edit_panel);
-        mSendImage = (ImageView) ViewUtils.$$(mEditPanel, R.id.send);
-        mEditText = (EditText) ViewUtils.$$(mEditPanel, R.id.edit_text);
-        mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
-        mFab = (FloatingActionButton) ViewUtils.$$(view, R.id.fab);
-        mRefreshLayout = (SwipeRefreshLayout) ViewUtils.$$(view, R.id.refresh_layout);
+    override fun onCreateViewWithToolbar(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.scene_gallery_comments, container, false) as ViewGroup
+        mRecyclerView = ViewUtils.`$$`(view, R.id.recycler_view) as EasyRecyclerView
+        setLiftOnScrollTargetView(mRecyclerView)
+        val tip = ViewUtils.`$$`(view, R.id.tip) as TextView
+        mEditPanel = ViewUtils.`$$`(view, R.id.edit_panel)
+        mSendImage = ViewUtils.`$$`(mEditPanel, R.id.send) as ImageView
+        mEditText = ViewUtils.`$$`(mEditPanel, R.id.edit_text) as EditText
+        mFabLayout = ViewUtils.`$$`(view, R.id.fab_layout) as FabLayout
+        mFab = ViewUtils.`$$`(view, R.id.fab) as FloatingActionButton
+        mRefreshLayout = ViewUtils.`$$`(view, R.id.refresh_layout) as SwipeRefreshLayout
 
 
         // Workaround for fab and edittext render out of screen
-        view.removeView(mFabLayout);
-        view.removeView((View) mEditPanel.getParent());
-        assert container != null;
-        container.addView(mFabLayout);
-        container.addView((View) mEditPanel.getParent());
-
-        ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
+        view.removeView(mFabLayout)
+        view.removeView(mEditPanel!!.parent as View)
+        assert(container != null)
+        container!!.addView(mFabLayout)
+        container.addView(mEditPanel!!.parent as View)
+        ViewCompat.setWindowInsetsAnimationCallback(
+            view, WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mEditPanel,
                 mFabLayout
-        ));
-        mRefreshLayout.setOnRefreshListener(this);
-
-        Context context = requireContext();
-
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        tip.setCompoundDrawables(null, drawable, null, null);
-
-        mSendDrawable = ContextCompat.getDrawable(context, R.drawable.v_send_dark_x24);
-        mPencilDrawable = ContextCompat.getDrawable(context, R.drawable.v_pencil_dark_x24);
-
-        mAdapter = new CommentAdapter();
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context,
-                RecyclerView.VERTICAL, false));
-        mRecyclerView.setHasFixedSize(true);
+            )
+        )
+        mRefreshLayout!!.setOnRefreshListener(this)
+        val context = requireContext()
+        val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)
+        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        tip.setCompoundDrawables(null, drawable, null, null)
+        mSendDrawable = ContextCompat.getDrawable(context, R.drawable.v_send_dark_x24)
+        mPencilDrawable = ContextCompat.getDrawable(context, R.drawable.v_pencil_dark_x24)
+        mAdapter = CommentAdapter()
+        mRecyclerView!!.adapter = mAdapter
+        mRecyclerView!!.layoutManager = LinearLayoutManager(
+            context,
+            RecyclerView.VERTICAL, false
+        )
+        mRecyclerView!!.setHasFixedSize(true)
         // Cancel change animator
-        RecyclerView.ItemAnimator itemAnimator = mRecyclerView.getItemAnimator();
-        if (itemAnimator instanceof DefaultItemAnimator) {
-            ((DefaultItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
+        val itemAnimator = mRecyclerView!!.itemAnimator
+        if (itemAnimator is DefaultItemAnimator) {
+            itemAnimator.supportsChangeAnimations = false
         }
-
-        mSendImage.setOnClickListener(this);
-        mFab.setOnClickListener(this);
-
-        addAboveSnackView(mEditPanel);
-        addAboveSnackView(mFabLayout);
-
-        mViewTransition = new ViewTransition(mRecyclerView, tip);
-
-        updateView(false);
-
-        return view;
+        mSendImage!!.setOnClickListener(this)
+        mFab!!.setOnClickListener(this)
+        addAboveSnackView(mEditPanel)
+        addAboveSnackView(mFabLayout)
+        mViewTransition = ViewTransition(mRecyclerView, tip)
+        updateView(false)
+        return view
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mCallback.remove();
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mCallback.remove()
         if (null != mRecyclerView) {
-            mRecyclerView.stopScroll();
-            mRecyclerView = null;
+            mRecyclerView!!.stopScroll()
+            mRecyclerView = null
         }
         if (null != mEditPanel) {
-            removeAboveSnackView(mEditPanel);
-            mEditPanel = null;
+            removeAboveSnackView(mEditPanel)
+            mEditPanel = null
         }
         if (null != mFabLayout) {
-            removeAboveSnackView(mFabLayout);
-            mFabLayout = null;
+            removeAboveSnackView(mFabLayout)
+            mFabLayout = null
         }
-
-        mFab = null;
-        mSendImage = null;
-        mEditText = null;
-        mAdapter = null;
-        mViewTransition = null;
+        mFab = null
+        mSendImage = null
+        mEditText = null
+        mAdapter = null
+        mViewTransition = null
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setTitle(R.string.gallery_comments);
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setTitle(R.string.gallery_comments)
+        setNavigationIcon(R.drawable.v_arrow_left_dark_x24)
     }
 
-    private void showFilterCommenterDialog(String commenter, int position) {
-        Context context = getContext();
+    private fun showFilterCommenterDialog(commenter: String?, position: Int) {
+        val context = context
         if (context == null || commenter == null) {
-            return;
+            return
         }
-
-        new BaseDialogBuilder(context)
-                .setMessage(getString(R.string.filter_the_commenter, commenter))
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    Filter filter = new Filter();
-                    filter.mode = EhFilter.MODE_COMMENTER;
-                    filter.text = commenter;
-                    EhFilter.getInstance().addFilter(filter);
-                    hideComment(position);
-                    showTip(R.string.filter_added, LENGTH_SHORT);
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    private void hideComment(int position) {
-        if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
-            return;
-        }
-
-        GalleryComment[] oldCommentsList = mGalleryDetail.comments.comments;
-        GalleryComment[] newCommentsList = new GalleryComment[oldCommentsList.length - 1];
-        for (int i = 0, j = 0; i < oldCommentsList.length; i++) {
-            if (i != position) {
-                newCommentsList[j] = oldCommentsList[i];
-                j++;
+        BaseDialogBuilder(context)
+            .setMessage(getString(R.string.filter_the_commenter, commenter))
+            .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
+                val filter = Filter()
+                filter.mode = EhFilter.MODE_COMMENTER
+                filter.text = commenter
+                EhFilter.getInstance().addFilter(filter)
+                hideComment(position)
+                showTip(R.string.filter_added, LENGTH_SHORT)
             }
-        }
-
-        mGalleryDetail.comments.comments = newCommentsList;
-        mAdapter.notifyDataSetChanged();
-        updateView(true);
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
-    private void voteComment(long id, int vote) {
-        Context context = getContext();
-        MainActivity activity = getMainActivity();
-        if (null == context || null == activity) {
-            return;
+    private fun hideComment(position: Int) {
+        if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+            return
         }
+        val oldCommentsList = mGalleryDetail!!.comments!!.comments
+        val newCommentsList = arrayOfNulls<GalleryComment>(
+            oldCommentsList!!.size - 1
+        )
+        var i = 0
+        var j = 0
+        while (i < oldCommentsList.size) {
+            if (i != position) {
+                newCommentsList[j] = oldCommentsList[i]
+                j++
+            }
+            i++
+        }
+        mGalleryDetail!!.comments!!.comments = newCommentsList.requireNoNulls()
+        mAdapter!!.notifyDataSetChanged()
+        updateView(true)
+    }
 
-        EhRequest request = new EhRequest()
-                .setMethod(EhClient.METHOD_VOTE_COMMENT)
-                .setArgs(mGalleryDetail.apiUid, mGalleryDetail.apiKey, mGalleryDetail.getGid(), mGalleryDetail.getToken(), id, vote)
-                .setCallback(new VoteCommentListener(context));
-        request.enqueue(this);
+    private fun voteComment(id: Long, vote: Int) {
+        val context = context
+        val activity = mainActivity
+        if (null == context || null == activity) {
+            return
+        }
+        val request = EhRequest()
+            .setMethod(EhClient.METHOD_VOTE_COMMENT)
+            .setArgs(
+                mGalleryDetail!!.apiUid,
+                mGalleryDetail!!.apiKey,
+                mGalleryDetail!!.gid,
+                mGalleryDetail!!.token,
+                id,
+                vote
+            )
+            .setCallback(VoteCommentListener(context))
+        request.enqueue(this)
     }
 
     @SuppressLint("InflateParams")
-    public void showVoteStatusDialog(Context context, String voteStatus) {
-        String[] temp = StringUtils.split(voteStatus, ',');
-        final int length = temp.length;
-        final String[] userArray = new String[length];
-        final String[] voteArray = new String[length];
-        for (int i = 0; i < length; i++) {
-            String str = StringUtils.trim(temp[i]);
-            int index = str.lastIndexOf(' ');
+    fun showVoteStatusDialog(context: Context?, voteStatus: String?) {
+        var context = context
+        val temp = StringUtils.split(voteStatus, ',')
+        val length = temp.size
+        val userArray = arrayOfNulls<String>(length)
+        val voteArray = arrayOfNulls<String>(length)
+        for (i in 0 until length) {
+            val str = StringUtils.trim(temp[i])
+            val index = str.lastIndexOf(' ')
             if (index < 0) {
-                Log.d(TAG, "Something wrong happened about vote state");
-                userArray[i] = str;
-                voteArray[i] = "";
+                Log.d(TAG, "Something wrong happened about vote state")
+                userArray[i] = str
+                voteArray[i] = ""
             } else {
-                userArray[i] = StringUtils.trim(str.substring(0, index));
-                voteArray[i] = StringUtils.trim(str.substring(index + 1));
+                userArray[i] = StringUtils.trim(str.substring(0, index))
+                voteArray[i] = StringUtils.trim(str.substring(index + 1))
             }
         }
-
-        BaseDialogBuilder builder = new BaseDialogBuilder(context);
-        context = builder.getContext();
-        final LayoutInflater inflater = LayoutInflater.from(context);
-        EasyRecyclerView rv = (EasyRecyclerView) inflater.inflate(R.layout.dialog_recycler_view, null);
-        rv.setAdapter(new RecyclerView.Adapter<InfoHolder>() {
-            @NonNull
-            @Override
-            public InfoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return new InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false));
+        val builder = BaseDialogBuilder(context!!)
+        context = builder.context
+        val inflater = LayoutInflater.from(context)
+        val rv = inflater.inflate(R.layout.dialog_recycler_view, null) as EasyRecyclerView
+        rv.adapter = object : RecyclerView.Adapter<InfoHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoHolder {
+                return InfoHolder(inflater.inflate(R.layout.item_drawer_favorites, parent, false))
             }
 
-            @Override
-            public void onBindViewHolder(@NonNull InfoHolder holder, int position) {
-                holder.key.setText(userArray[position]);
-                holder.value.setText(voteArray[position]);
+            override fun onBindViewHolder(holder: InfoHolder, position: Int) {
+                holder.key.text = userArray[position]
+                holder.value.text = voteArray[position]
             }
 
-            @Override
-            public int getItemCount() {
-                return length;
+            override fun getItemCount(): Int {
+                return length
             }
-        });
-        rv.setLayoutManager(new LinearLayoutManager(context));
-        rv.setClipToPadding(false);
-        builder.setView(rv).show();
+        }
+        rv.layoutManager = LinearLayoutManager(context)
+        rv.clipToPadding = false
+        builder.setView(rv).show()
     }
 
-    private void showCommentDialog(int position) {
-        final Context context = getContext();
-        if (context == null || mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null || position >= mGalleryDetail.comments.comments.length || position < 0) {
-            return;
+    private fun showCommentDialog(position: Int) {
+        val context = context
+        if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null || position >= mGalleryDetail!!.comments!!.comments!!.size || position < 0) {
+            return
         }
-
-        final GalleryComment comment = mGalleryDetail.comments.comments[position];
-        List<String> menu = new ArrayList<>();
-        final IntList menuId = new IntList();
-        Resources resources = context.getResources();
-
-        menu.add(resources.getString(R.string.copy_comment_text));
-        menuId.add(R.id.copy);
+        val comment = mGalleryDetail!!.comments!!.comments!![position]
+        val menu: MutableList<String> = ArrayList()
+        val menuId = IntList()
+        val resources = context.resources
+        menu.add(resources.getString(R.string.copy_comment_text))
+        menuId.add(R.id.copy)
         if (!comment.uploader && !comment.editable) {
-            menu.add(resources.getString(R.string.block_commenter));
-            menuId.add(R.id.block_commenter);
+            menu.add(resources.getString(R.string.block_commenter))
+            menuId.add(R.id.block_commenter)
         }
         if (comment.editable) {
-            menu.add(resources.getString(R.string.edit_comment));
-            menuId.add(R.id.edit_comment);
+            menu.add(resources.getString(R.string.edit_comment))
+            menuId.add(R.id.edit_comment)
         }
         if (comment.voteUpAble) {
-            menu.add(resources.getString(comment.voteUpEd ? R.string.cancel_vote_up : R.string.vote_up));
-            menuId.add(R.id.vote_up);
+            menu.add(resources.getString(if (comment.voteUpEd) R.string.cancel_vote_up else R.string.vote_up))
+            menuId.add(R.id.vote_up)
         }
         if (comment.voteDownAble) {
-            menu.add(resources.getString(comment.voteDownEd ? R.string.cancel_vote_down : R.string.vote_down));
-            menuId.add(R.id.vote_down);
+            menu.add(resources.getString(if (comment.voteDownEd) R.string.cancel_vote_down else R.string.vote_down))
+            menuId.add(R.id.vote_down)
         }
         if (!TextUtils.isEmpty(comment.voteState)) {
-            menu.add(resources.getString(R.string.check_vote_status));
-            menuId.add(R.id.check_vote_status);
+            menu.add(resources.getString(R.string.check_vote_status))
+            menuId.add(R.id.check_vote_status)
         }
-
-        new BaseDialogBuilder(context)
-                .setItems(menu.toArray(new String[0]), (dialog, which) -> {
-                    if (which < 0 || which >= menuId.size()) {
-                        return;
+        BaseDialogBuilder(context)
+            .setItems(menu.toTypedArray()) { _: DialogInterface?, which: Int ->
+                if (which < 0 || which >= menuId.size()) {
+                    return@setItems
+                }
+                val id = menuId[which]
+                if (id == R.id.copy) {
+                    requireActivity().addTextToClipboard(comment.comment, false)
+                } else if (id == R.id.block_commenter) {
+                    showFilterCommenterDialog(comment.user, position)
+                } else if (id == R.id.vote_up) {
+                    voteComment(comment.id, 1)
+                } else if (id == R.id.vote_down) {
+                    voteComment(comment.id, -1)
+                } else if (id == R.id.check_vote_status) {
+                    showVoteStatusDialog(context, comment.voteState)
+                } else if (id == R.id.edit_comment) {
+                    prepareEditComment(comment.id)
+                    if (!mInAnimation && mEditPanel != null && mEditPanel!!.visibility != View.VISIBLE) {
+                        showEditPanel(true)
                     }
-                    int id = menuId.get(which);
-                    if (id == R.id.copy) {
-                        ClipboardUtilKt.addTextToClipboard(requireActivity(), comment.comment, false);
-                    } else if (id == R.id.block_commenter) {
-                        showFilterCommenterDialog(comment.user, position);
-                    } else if (id == R.id.vote_up) {
-                        voteComment(comment.id, 1);
-                    } else if (id == R.id.vote_down) {
-                        voteComment(comment.id, -1);
-                    } else if (id == R.id.check_vote_status) {
-                        showVoteStatusDialog(context, comment.voteState);
-                    } else if (id == R.id.edit_comment) {
-                        prepareEditComment(comment.id);
-                        if (!mInAnimation && mEditPanel != null && mEditPanel.getVisibility() != View.VISIBLE) {
-                            showEditPanel(true);
-                        }
-                    }
-                }).show();
+                }
+            }.show()
     }
 
-    public boolean onItemClick(EasyRecyclerView parent, View view, int position) {
-        MainActivity activity = getMainActivity();
-        if (null == activity) {
-            return false;
-        }
-
-        RecyclerView.ViewHolder holder = parent.getChildViewHolder(view);
-        if (holder instanceof ActualCommentHolder commentHolder) {
-            ClickableSpan span = commentHolder.comment.getCurrentSpan();
-            commentHolder.comment.clearCurrentSpan();
-
-            if (span instanceof URLSpan) {
-                UrlOpener.openUrl(activity, ((URLSpan) span).getURL(), true, mGalleryDetail);
+    fun onItemClick(parent: EasyRecyclerView?, view2: View?, position: Int): Boolean {
+        val activity = mainActivity ?: return false
+        val holder = parent!!.getChildViewHolder(view2!!)
+        if (holder is ActualCommentHolder) {
+            val span = holder.comment.currentSpan
+            holder.comment.clearCurrentSpan()
+            if (span is URLSpan) {
+                UrlOpener.openUrl(activity, span.url, true, mGalleryDetail)
             } else {
-                showCommentDialog(position);
+                showCommentDialog(position)
             }
-        } else if (holder instanceof MoreCommentHolder && !mRefreshingComments && mAdapter != null) {
-            mRefreshingComments = true;
-            mShowAllComments = true;
-            mAdapter.notifyItemChanged(position);
-
-            String url = getGalleryDetailUrl();
+        } else if (holder is MoreCommentHolder && !mRefreshingComments && mAdapter != null) {
+            mRefreshingComments = true
+            mShowAllComments = true
+            mAdapter!!.notifyItemChanged(position)
+            val url = galleryDetailUrl
             if (url != null) {
                 // Request
-                EhRequest request = new EhRequest()
-                        .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
-                        .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity));
-                request.enqueue(this);
+                val request = EhRequest()
+                    .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
+                    .setArgs(url)
+                    .setCallback(RefreshCommentListener(activity))
+                request.enqueue(this)
             }
         }
-
-        return true;
+        return true
     }
 
-    private void updateView(boolean animation) {
+    private fun updateView(animation: Boolean) {
         if (null == mViewTransition) {
-            return;
+            return
         }
-
-        if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null || mGalleryDetail.comments.comments.length <= 0) {
-            mViewTransition.showView(1, animation);
+        if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null || mGalleryDetail!!.comments!!.comments!!.isEmpty()) {
+            mViewTransition!!.showView(1, animation)
         } else {
-            mViewTransition.showView(0, animation);
+            mViewTransition!!.showView(0, animation)
         }
     }
 
-    private void prepareNewComment() {
-        mCommentId = 0;
+    private fun prepareNewComment() {
+        mCommentId = 0
         if (mSendImage != null) {
-            mSendImage.setImageDrawable(mSendDrawable);
+            mSendImage!!.setImageDrawable(mSendDrawable)
         }
     }
 
-    private void prepareEditComment(long commentId) {
-        mCommentId = commentId;
+    private fun prepareEditComment(commentId: Long) {
+        mCommentId = commentId
         if (mSendImage != null) {
-            mSendImage.setImageDrawable(mPencilDrawable);
+            mSendImage!!.setImageDrawable(mPencilDrawable)
         }
     }
 
-    private void showEditPanelWithAnimation() {
+    private fun showEditPanelWithAnimation() {
         if (null == mFab || null == mEditPanel) {
-            return;
+            return
         }
-
-        mInAnimation = true;
-        mFab.setTranslationX(0.0f);
-        mFab.setTranslationY(0.0f);
-        mFab.setScaleX(1.0f);
-        mFab.setScaleY(1.0f);
-        int fabEndX = mEditPanel.getLeft() + (mEditPanel.getWidth() / 2) - (mFab.getWidth() / 2);
-        int fabEndY = mEditPanel.getTop() + (mEditPanel.getHeight() / 2) - (mFab.getHeight() / 2);
-        mFab.animate().x(fabEndX).y(fabEndY).scaleX(0.0f).scaleY(0.0f)
-                .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
-                .setDuration(300L).setListener(new SimpleAnimatorListener() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        if (null == mFab || null == mEditPanel) {
-                            return;
-                        }
-
-                        ((View) mFab).setVisibility(View.INVISIBLE);
-                        mEditPanel.setVisibility(View.VISIBLE);
-                        int halfW = mEditPanel.getWidth() / 2;
-                        int halfH = mEditPanel.getHeight() / 2;
-                        Animator animator = ViewAnimationUtils.createCircularReveal(mEditPanel, halfW, halfH, 0,
-                                (float) Math.hypot(halfW, halfH)).setDuration(300L);
-                        animator.addListener(new SimpleAnimatorListener() {
-                            @Override
-                            public void onAnimationEnd(Animator a) {
-                                mInAnimation = false;
-                            }
-                        });
-                        animator.start();
+        mInAnimation = true
+        mFab!!.translationX = 0.0f
+        mFab!!.translationY = 0.0f
+        mFab!!.scaleX = 1.0f
+        mFab!!.scaleY = 1.0f
+        val fabEndX = mEditPanel!!.left + mEditPanel!!.width / 2 - mFab!!.width / 2
+        val fabEndY = mEditPanel!!.top + mEditPanel!!.height / 2 - mFab!!.height / 2
+        mFab!!.animate().x(fabEndX.toFloat()).y(fabEndY.toFloat()).scaleX(0.0f).scaleY(0.0f)
+            .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
+            .setDuration(300L).setListener(object : SimpleAnimatorListener() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (null == mFab || null == mEditPanel) {
+                        return
                     }
-                }).start();
+                    (mFab as View).visibility = View.INVISIBLE
+                    mEditPanel!!.visibility = View.VISIBLE
+                    val halfW = mEditPanel!!.width / 2
+                    val halfH = mEditPanel!!.height / 2
+                    val animator = ViewAnimationUtils.createCircularReveal(
+                        mEditPanel,
+                        halfW,
+                        halfH,
+                        0f,
+                        hypot(halfW.toDouble(), halfH.toDouble()).toFloat()
+                    ).setDuration(300L)
+                    animator.addListener(object : SimpleAnimatorListener() {
+                        override fun onAnimationEnd(a: Animator) {
+                            mInAnimation = false
+                        }
+                    })
+                    animator.start()
+                }
+            }).start()
     }
 
-    private void showEditPanel(boolean animation) {
-        mCallback.setEnabled(true);
+    private fun showEditPanel(animation: Boolean) {
+        mCallback.isEnabled = true
         if (animation) {
-            showEditPanelWithAnimation();
+            showEditPanelWithAnimation()
         } else {
             if (null == mFab || null == mEditPanel) {
-                return;
+                return
             }
-
-            ((View) mFab).setVisibility(View.INVISIBLE);
-            mEditPanel.setVisibility(View.VISIBLE);
+            (mFab as View).visibility = View.INVISIBLE
+            mEditPanel!!.visibility = View.VISIBLE
         }
     }
 
-    private void hideEditPanelWithAnimation() {
+    private fun hideEditPanelWithAnimation() {
         if (null == mFab || null == mEditPanel) {
-            return;
+            return
         }
-
-        mInAnimation = true;
-        int halfW = mEditPanel.getWidth() / 2;
-        int halfH = mEditPanel.getHeight() / 2;
-        Animator animator = ViewAnimationUtils.createCircularReveal(mEditPanel, halfW, halfH,
-                (float) Math.hypot(halfW, halfH), 0.0f).setDuration(300L);
-        animator.addListener(new SimpleAnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator a) {
+        mInAnimation = true
+        val halfW = mEditPanel!!.width / 2
+        val halfH = mEditPanel!!.height / 2
+        val animator = ViewAnimationUtils.createCircularReveal(
+            mEditPanel,
+            halfW,
+            halfH,
+            hypot(halfW.toDouble(), halfH.toDouble()).toFloat(),
+            0.0f
+        ).setDuration(300L)
+        animator.addListener(object : SimpleAnimatorListener() {
+            override fun onAnimationEnd(a: Animator) {
                 if (null == mFab || null == mEditPanel) {
-                    return;
+                    return
                 }
-
                 if (Looper.myLooper() != Looper.getMainLooper()) {
                     // Some devices may run this block in non-UI thread.
                     // It might be a bug of Android OS.
                     // Check it here to avoid crash.
-                    return;
+                    return
                 }
-
-                mEditPanel.setVisibility(View.GONE);
-                ((View) mFab).setVisibility(View.VISIBLE);
-                int fabStartX = mEditPanel.getLeft() + (mEditPanel.getWidth() / 2) - (mFab.getWidth() / 2);
-                int fabStartY = mEditPanel.getTop() + (mEditPanel.getHeight() / 2) - (mFab.getHeight() / 2);
-                mFab.setX(fabStartX);
-                mFab.setY(fabStartY);
-                mFab.setScaleX(0.0f);
-                mFab.setScaleY(0.0f);
-                mFab.setRotation(-45.0f);
-                mFab.animate().translationX(0.0f).translationY(0.0f).scaleX(1.0f).scaleY(1.0f).rotation(0.0f)
-                        .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
-                        .setDuration(300L).setListener(new SimpleAnimatorListener() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                mInAnimation = false;
-                            }
-                        }).start();
+                mEditPanel!!.visibility = View.GONE
+                (mFab as View).visibility = View.VISIBLE
+                val fabStartX = mEditPanel!!.left + mEditPanel!!.width / 2 - mFab!!.width / 2
+                val fabStartY = mEditPanel!!.top + mEditPanel!!.height / 2 - mFab!!.height / 2
+                mFab!!.x = fabStartX.toFloat()
+                mFab!!.y = fabStartY.toFloat()
+                mFab!!.scaleX = 0.0f
+                mFab!!.scaleY = 0.0f
+                mFab!!.rotation = -45.0f
+                mFab!!.animate().translationX(0.0f).translationY(0.0f).scaleX(1.0f).scaleY(1.0f)
+                    .rotation(0.0f)
+                    .setInterpolator(AnimationUtils.SLOW_FAST_SLOW_INTERPOLATOR)
+                    .setDuration(300L).setListener(object : SimpleAnimatorListener() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            mInAnimation = false
+                        }
+                    }).start()
             }
-        });
-        animator.start();
+        })
+        animator.start()
     }
 
-    private void hideEditPanel(boolean animation) {
-        mCallback.setEnabled(false);
-        hideSoftInput();
+    private fun hideEditPanel(animation: Boolean) {
+        mCallback.isEnabled = false
+        hideSoftInput()
         if (animation) {
-            hideEditPanelWithAnimation();
+            hideEditPanelWithAnimation()
         } else {
             if (null == mFab || null == mEditPanel) {
-                return;
+                return
             }
-
-            ((View) mFab).setVisibility(View.VISIBLE);
-            mEditPanel.setVisibility(View.INVISIBLE);
+            (mFab as View).visibility = View.VISIBLE
+            mEditPanel!!.visibility = View.INVISIBLE
         }
     }
 
-    @Nullable
-    private String getGalleryDetailUrl() {
-        if (mGalleryDetail != null && mGalleryDetail.getGid() != -1 && mGalleryDetail.getToken() != null) {
-            return EhUrl.getGalleryDetailUrl(mGalleryDetail.getGid(), mGalleryDetail.getToken(), 0, mShowAllComments);
+    private val galleryDetailUrl: String?
+        get() = if (mGalleryDetail != null && mGalleryDetail!!.gid != -1L && mGalleryDetail!!.token != null) {
+            EhUrl.getGalleryDetailUrl(
+                mGalleryDetail!!.gid,
+                mGalleryDetail!!.token,
+                0,
+                mShowAllComments
+            )
         } else {
-            return null;
+            null
         }
-    }
 
-    @Override
-    public void onClick(View v) {
-        Context context = getContext();
-        MainActivity activity = getMainActivity();
+    override fun onClick(v: View) {
+        val context = context
+        val activity = mainActivity
         if (null == context || null == activity || null == mEditText) {
-            return;
+            return
         }
-
-        if (mFab == v) {
+        if (mFab === v) {
             if (!mInAnimation) {
-                prepareNewComment();
-                showEditPanel(true);
+                prepareNewComment()
+                showEditPanel(true)
             }
-        } else if (mSendImage == v) {
+        } else if (mSendImage === v) {
             if (!mInAnimation) {
-                String comment = mEditText.getText().toString();
+                val comment = mEditText!!.text.toString()
                 if (TextUtils.isEmpty(comment)) {
                     // Comment is empty
-                    return;
+                    return
                 }
-                String url = getGalleryDetailUrl();
-                if (url == null) {
-                    return;
-                }
+                val url = galleryDetailUrl ?: return
                 // Request
-                EhRequest request = new EhRequest()
-                        .setMethod(EhClient.METHOD_GET_COMMENT_GALLERY)
-                        .setArgs(url, comment, mCommentId != 0 ? Long.toString(mCommentId) : null)
-                        .setCallback(new CommentGalleryListener(context, mCommentId));
-                request.enqueue(this);
-                hideSoftInput();
-                hideEditPanel(true);
+                val request = EhRequest()
+                    .setMethod(EhClient.METHOD_GET_COMMENT_GALLERY)
+                    .setArgs(
+                        url,
+                        comment,
+                        if (mCommentId != 0L) mCommentId.toString() else null
+                    )
+                    .setCallback(CommentGalleryListener(context, mCommentId))
+                request.enqueue(this)
+                hideSoftInput()
+                hideEditPanel(true)
             }
         }
     }
 
-    private void onRefreshGallerySuccess(GalleryCommentList result) {
+    private fun onRefreshGallerySuccess(result: GalleryCommentList?) {
         if (mGalleryDetail == null || mAdapter == null) {
-            return;
+            return
         }
-
-        mRefreshLayout.setRefreshing(false);
-        mRefreshingComments = false;
-        mGalleryDetail.comments = result;
-        mAdapter.notifyDataSetChanged();
-
-        updateView(true);
+        mRefreshLayout!!.isRefreshing = false
+        mRefreshingComments = false
+        mGalleryDetail!!.comments = result
+        mAdapter!!.notifyDataSetChanged()
+        updateView(true)
     }
 
-    private void onRefreshGalleryFailure() {
+    private fun onRefreshGalleryFailure() {
         if (mAdapter == null) {
-            return;
+            return
         }
-
-        mRefreshLayout.setRefreshing(false);
-        mRefreshingComments = false;
-        int position = mAdapter.getItemCount() - 1;
+        mRefreshLayout!!.isRefreshing = false
+        mRefreshingComments = false
+        val position = mAdapter!!.itemCount - 1
         if (position >= 0) {
-            mAdapter.notifyItemChanged(position);
+            mAdapter!!.notifyItemChanged(position)
         }
     }
 
-    private void onCommentGallerySuccess(GalleryCommentList result) {
+    private fun onCommentGallerySuccess(result: GalleryCommentList) {
         if (mGalleryDetail == null || mAdapter == null) {
-            return;
+            return
         }
-
-        mGalleryDetail.comments = result;
-        mAdapter.notifyDataSetChanged();
+        mGalleryDetail!!.comments = result
+        mAdapter!!.notifyDataSetChanged()
 
         // Remove text
         if (mEditText != null) {
-            mEditText.setText("");
+            mEditText!!.setText("")
         }
-
-        updateView(true);
+        updateView(true)
     }
 
-    private void onVoteCommentSuccess(VoteCommentParser.Result result) {
-        if (mAdapter == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
-            return;
+    private fun onVoteCommentSuccess(result: VoteCommentParser.Result) {
+        if (mAdapter == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+            return
         }
-
-        int position = -1;
-        for (int i = 0, n = mGalleryDetail.comments.comments.length; i < n; i++) {
-            GalleryComment comment = mGalleryDetail.comments.comments[i];
+        var position = -1
+        var i = 0
+        val n = mGalleryDetail!!.comments!!.comments!!.size
+        while (i < n) {
+            val comment = mGalleryDetail!!.comments!!.comments!![i]
             if (comment.id == result.id) {
-                position = i;
-                break;
+                position = i
+                break
             }
+            i++
         }
-
         if (-1 == position) {
-            Log.d(TAG, "Can't find comment with id " + result.id);
-            return;
+            Log.d(TAG, "Can't find comment with id " + result.id)
+            return
         }
 
         // Update comment
-        GalleryComment comment = mGalleryDetail.comments.comments[position];
-        comment.score = result.score;
+        val comment = mGalleryDetail!!.comments!!.comments!![position]
+        comment.score = result.score
         if (result.expectVote > 0) {
-            comment.voteUpEd = 0 != result.vote;
-            comment.voteDownEd = false;
+            comment.voteUpEd = 0 != result.vote
+            comment.voteDownEd = false
         } else {
-            comment.voteDownEd = 0 != result.vote;
-            comment.voteUpEd = false;
+            comment.voteDownEd = 0 != result.vote
+            comment.voteUpEd = false
         }
-
-        mAdapter.notifyItemChanged(position);
+        mAdapter!!.notifyItemChanged(position)
     }
 
-    @Override
-    public void onRefresh() {
+    override fun onRefresh() {
         if (!mRefreshingComments && mAdapter != null) {
-            MainActivity activity = (MainActivity) requireActivity();
-            mRefreshingComments = true;
-
-            String url = getGalleryDetailUrl();
+            val activity = requireActivity() as MainActivity
+            mRefreshingComments = true
+            val url = galleryDetailUrl
             if (url != null) {
                 // Request
-                EhRequest request = new EhRequest()
-                        .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
-                        .setArgs(url)
-                        .setCallback(new RefreshCommentListener(activity));
-                request.enqueue(this);
+                val request = EhRequest()
+                    .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
+                    .setArgs(url)
+                    .setCallback(RefreshCommentListener(activity))
+                request.enqueue(this)
             }
         }
     }
 
-    private static class InfoHolder extends RecyclerView.ViewHolder {
+    private class InfoHolder(itemView: View?) : RecyclerView.ViewHolder(
+        itemView!!
+    ) {
+        val key: TextView
+        val value: TextView
 
-        private final TextView key;
-        private final TextView value;
-
-        public InfoHolder(View itemView) {
-            super(itemView);
-            key = (TextView) ViewUtils.$$(itemView, R.id.key);
-            value = (TextView) ViewUtils.$$(itemView, R.id.value);
+        init {
+            key = ViewUtils.`$$`(itemView, R.id.key) as TextView
+            value = ViewUtils.`$$`(itemView, R.id.value) as TextView
         }
     }
 
-    private abstract static class CommentHolder extends RecyclerView.ViewHolder {
-        public CommentHolder(LayoutInflater inflater, int resId, ViewGroup parent) {
-            super(inflater.inflate(resId, parent, false));
+    private abstract class CommentHolder(inflater: LayoutInflater, resId: Int, parent: ViewGroup?) :
+        RecyclerView.ViewHolder(inflater.inflate(resId, parent, false))
+
+    private class MoreCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
+        CommentHolder(inflater, R.layout.item_gallery_comment_more, parent)
+
+    private class ProgressCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
+        CommentHolder(inflater, R.layout.item_gallery_comment_progress, parent)
+
+    private inner class RefreshCommentListener(context: Context?) :
+        EhCallback<GalleryCommentsScene?, GalleryDetail>(context) {
+        override fun onSuccess(result: GalleryDetail) {
+            val scene = this@GalleryCommentsScene
+            scene.onRefreshGallerySuccess(result.comments)
         }
+
+        override fun onFailure(e: Exception) {
+            val scene = this@GalleryCommentsScene
+            scene.onRefreshGalleryFailure()
+        }
+
+        override fun onCancel() {}
     }
 
-    private static class MoreCommentHolder extends CommentHolder {
-        public MoreCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_more, parent);
+    private inner class CommentGalleryListener(context: Context?, private val mCommentId: Long) :
+        EhCallback<GalleryCommentsScene?, GalleryCommentList>(context) {
+        override fun onSuccess(result: GalleryCommentList) {
+            showTip(
+                if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully,
+                LENGTH_SHORT
+            )
+            val scene = this@GalleryCommentsScene
+            scene.onCommentGallerySuccess(result)
         }
+
+        override fun onFailure(e: Exception) {
+            showTip(
+                """
+    ${content.getString(if (mCommentId != 0L) R.string.edit_comment_failed else R.string.comment_failed)}
+    ${ExceptionUtils.getReadableString(e)}
+    """.trimIndent(), LENGTH_LONG
+            )
+        }
+
+        override fun onCancel() {}
     }
 
-    private static class ProgressCommentHolder extends CommentHolder {
-        public ProgressCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment_progress, parent);
+    private inner class VoteCommentListener(context: Context?) :
+        EhCallback<GalleryCommentsScene?, VoteCommentParser.Result>(context) {
+        override fun onSuccess(result: VoteCommentParser.Result) {
+            showTip(
+                if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
+                LENGTH_SHORT
+            )
+            val scene = this@GalleryCommentsScene
+            scene.onVoteCommentSuccess(result)
         }
+
+        override fun onFailure(e: Exception) {
+            showTip(R.string.vote_failed, LENGTH_LONG)
+        }
+
+        override fun onCancel() {}
     }
 
-    private class RefreshCommentListener extends EhCallback<GalleryCommentsScene, GalleryDetail> {
+    private inner class ActualCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
+        CommentHolder(inflater, R.layout.item_gallery_comment, parent) {
+        private val user: TextView = itemView.findViewById(R.id.user)
+        private val time: TextView = itemView.findViewById(R.id.time)
+        val comment: LinkifyTextView = itemView.findViewById(R.id.comment)
 
-        public RefreshCommentListener(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void onSuccess(GalleryDetail result) {
-            GalleryCommentsScene scene = GalleryCommentsScene.this;
-            scene.onRefreshGallerySuccess(result.comments);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            GalleryCommentsScene scene = GalleryCommentsScene.this;
-            scene.onRefreshGalleryFailure();
-        }
-
-        @Override
-        public void onCancel() {
-        }
-    }
-
-    private class CommentGalleryListener extends EhCallback<GalleryCommentsScene, GalleryCommentList> {
-
-        private final long mCommentId;
-
-        public CommentGalleryListener(Context context, long commentId) {
-            super(context);
-            mCommentId = commentId;
-        }
-
-        @Override
-        public void onSuccess(GalleryCommentList result) {
-            showTip(mCommentId != 0 ? R.string.edit_comment_successfully : R.string.comment_successfully, LENGTH_SHORT);
-
-            GalleryCommentsScene scene = GalleryCommentsScene.this;
-            scene.onCommentGallerySuccess(result);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            showTip(getContent().getString(mCommentId != 0 ? R.string.edit_comment_failed : R.string.comment_failed) + "\n" + ExceptionUtils.getReadableString(e), LENGTH_LONG);
-        }
-
-        @Override
-        public void onCancel() {
-        }
-    }
-
-    private class VoteCommentListener extends EhCallback<GalleryCommentsScene, VoteCommentParser.Result> {
-
-        public VoteCommentListener(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void onSuccess(VoteCommentParser.Result result) {
-            showTip(result.expectVote > 0 ?
-                            (0 != result.vote ? R.string.vote_up_successfully : R.string.cancel_vote_up_successfully) :
-                            (0 != result.vote ? R.string.vote_down_successfully : R.string.cancel_vote_down_successfully),
-                    LENGTH_SHORT);
-
-            GalleryCommentsScene scene = GalleryCommentsScene.this;
-            scene.onVoteCommentSuccess(result);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
-            showTip(R.string.vote_failed, LENGTH_LONG);
-        }
-
-        @Override
-        public void onCancel() {
-        }
-    }
-
-    private class ActualCommentHolder extends CommentHolder {
-
-        private final TextView user;
-        private final TextView time;
-        private final LinkifyTextView comment;
-
-        public ActualCommentHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater, R.layout.item_gallery_comment, parent);
-            user = itemView.findViewById(R.id.user);
-            time = itemView.findViewById(R.id.time);
-            comment = itemView.findViewById(R.id.comment);
-        }
-
-        private CharSequence generateComment(Context context, ObservedTextView textView, GalleryComment comment) {
-            Spanned sp = Html.fromHtml(comment.comment, Html.FROM_HTML_MODE_LEGACY, new URLImageGetter(textView), null);
-
-            SpannableStringBuilder ssb = new SpannableStringBuilder(sp);
-
-            if (0 != comment.id && 0 != comment.score) {
-                int score = comment.score;
-                String scoreString = score > 0 ? "+" + score : Integer.toString(score);
-                SpannableString ss = new SpannableString(scoreString);
-                ss.setSpan(new RelativeSizeSpan(0.8f), 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new StyleSpan(Typeface.BOLD), 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new ForegroundColorSpan(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary))
-                        , 0, scoreString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ssb.append("  ").append(ss);
+        private fun generateComment(
+            context: Context,
+            textView: ObservedTextView,
+            comment: GalleryComment
+        ): CharSequence {
+            val sp = Html.fromHtml(
+                comment.comment,
+                Html.FROM_HTML_MODE_LEGACY,
+                URLImageGetter(textView),
+                null
+            )
+            val ssb = SpannableStringBuilder(sp)
+            if (0L != comment.id && 0 != comment.score) {
+                val score = comment.score
+                val scoreString = if (score > 0) "+$score" else score.toString()
+                val ss = SpannableString(scoreString)
+                ss.setSpan(
+                    RelativeSizeSpan(0.8f),
+                    0,
+                    scoreString.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ss.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    scoreString.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ss.setSpan(
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
+                    0,
+                    scoreString.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ssb.append("  ").append(ss)
             }
-
-            if (comment.lastEdited != 0) {
-                String str = context.getString(R.string.last_edited, ReadableTime.getTimeAgo(comment.lastEdited));
-                SpannableString ss = new SpannableString(str);
-                ss.setSpan(new RelativeSizeSpan(0.8f), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new StyleSpan(Typeface.BOLD), 0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new ForegroundColorSpan(ResourcesKt.resolveColor(getTheme(), android.R.attr.textColorSecondary)),
-                        0, str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ssb.append("\n\n").append(ss);
+            if (comment.lastEdited != 0L) {
+                val str = context.getString(
+                    R.string.last_edited,
+                    ReadableTime.getTimeAgo(comment.lastEdited)
+                )
+                val ss = SpannableString(str)
+                ss.setSpan(
+                    RelativeSizeSpan(0.8f),
+                    0,
+                    str.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ss.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    str.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ss.setSpan(
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
+                    0, str.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                ssb.append("\n\n").append(ss)
             }
-
-            return TextUrl.handleTextUrl(ssb);
+            return TextUrl.handleTextUrl(ssb)
         }
 
-        public void bind(GalleryComment value) {
-            user.setText(value.uploader ? getString(R.string.comment_user_uploader, value.user) : value.user);
-            user.setOnClickListener(v -> {
-                ListUrlBuilder lub = new ListUrlBuilder();
-                lub.setMode(ListUrlBuilder.MODE_UPLOADER);
-                lub.setKeyword(value.user);
-                navigate(R.id.galleryListScene, GalleryListScene.getStartArgs(lub), true);
-            });
-            time.setText(ReadableTime.getTimeAgo(value.time));
-            comment.setText(generateComment(comment.getContext(), comment, value));
+        fun bind(value: GalleryComment) {
+            user.text = if (value.uploader) getString(
+                R.string.comment_user_uploader,
+                value.user
+            ) else value.user
+            user.setOnClickListener {
+                val lub = ListUrlBuilder()
+                lub.mode = ListUrlBuilder.MODE_UPLOADER
+                lub.keyword = value.user
+                navigate(R.id.galleryListScene, getStartArgs(lub), true)
+            }
+            time.text = ReadableTime.getTimeAgo(value.time)
+            comment.text = generateComment(comment.context, comment, value)
         }
     }
 
-    private class CommentAdapter extends RecyclerView.Adapter<CommentHolder> {
+    private inner class CommentAdapter : RecyclerView.Adapter<CommentHolder>() {
+        private val mInflater: LayoutInflater = layoutInflater
 
-        private final LayoutInflater mInflater;
-
-        public CommentAdapter() {
-            mInflater = getLayoutInflater();
-            AssertUtils.assertNotNull(mInflater);
-        }
-
-        @NonNull
-        @Override
-        public CommentHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            switch (viewType) {
-                case TYPE_COMMENT:
-                    return new ActualCommentHolder(mInflater, parent);
-                case TYPE_MORE:
-                    return new MoreCommentHolder(mInflater, parent);
-                case TYPE_PROGRESS:
-                    return new ProgressCommentHolder(mInflater, parent);
-                default:
-                    throw new IllegalStateException("Invalid view type: " + viewType);
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentHolder {
+            return when (viewType) {
+                TYPE_COMMENT -> ActualCommentHolder(mInflater, parent)
+                TYPE_MORE -> MoreCommentHolder(mInflater, parent)
+                TYPE_PROGRESS -> ProgressCommentHolder(mInflater, parent)
+                else -> throw IllegalStateException("Invalid view type: $viewType")
             }
         }
 
-        @Override
-        public void onBindViewHolder(@NonNull CommentHolder holder, int position) {
-            Context context = getContext();
-            if (context == null || mGalleryDetail == null || mGalleryDetail.comments == null) {
-                return;
+        override fun onBindViewHolder(holder: CommentHolder, position: Int) {
+            val context = context
+            if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments == null) {
+                return
             }
-
-            holder.itemView.setOnClickListener(v -> onItemClick(mRecyclerView, holder.itemView, position));
-            holder.itemView.setClickable(true);
-            holder.itemView.setFocusable(true);
-
-
-            if (holder instanceof ActualCommentHolder) {
-                ((ActualCommentHolder) holder).bind(mGalleryDetail.comments.comments[position]);
+            holder.itemView.setOnClickListener {
+                onItemClick(
+                    mRecyclerView,
+                    holder.itemView,
+                    position
+                )
+            }
+            holder.itemView.isClickable = true
+            holder.itemView.isFocusable = true
+            if (holder is ActualCommentHolder) {
+                holder.bind(mGalleryDetail!!.comments!!.comments!![position])
             }
         }
 
-        @Override
-        public int getItemCount() {
-            if (mGalleryDetail == null || mGalleryDetail.comments == null || mGalleryDetail.comments.comments == null) {
-                return 0;
-            } else if (mGalleryDetail.comments.hasMore) {
-                return mGalleryDetail.comments.comments.length + 1;
+        override fun getItemCount(): Int {
+            return if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+                0
+            } else if (mGalleryDetail!!.comments!!.hasMore) {
+                mGalleryDetail!!.comments!!.comments!!.size + 1
             } else {
-                return mGalleryDetail.comments.comments.length;
+                mGalleryDetail!!.comments!!.comments!!.size
             }
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            if (position >= mGalleryDetail.comments.comments.length) {
-                return mRefreshingComments ? TYPE_PROGRESS : TYPE_MORE;
+        override fun getItemViewType(position: Int): Int {
+            return if (position >= mGalleryDetail!!.comments!!.comments!!.size) {
+                if (mRefreshingComments) TYPE_PROGRESS else TYPE_MORE
             } else {
-                return TYPE_COMMENT;
+                TYPE_COMMENT
             }
         }
     }
 
-    class EditPanelOnBackPressedCallback extends OnBackPressedCallback {
-        public EditPanelOnBackPressedCallback() {
-            super(false);
-        }
-
-        @Override
-        public void handleOnBackPressed() {
-            if (!mInAnimation && null != mEditPanel && mEditPanel.getVisibility() == View.VISIBLE) {
-                hideEditPanel(true);
+    internal inner class EditPanelOnBackPressedCallback : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            if (!mInAnimation && null != mEditPanel && mEditPanel!!.visibility == View.VISIBLE) {
+                hideEditPanel(true)
             }
         }
+    }
+
+    companion object {
+        val TAG: String = GalleryCommentsScene::class.java.simpleName
+        const val KEY_API_UID = "api_uid"
+        const val KEY_API_KEY = "api_key"
+        const val KEY_GID = "gid"
+        const val KEY_TOKEN = "token"
+        const val KEY_COMMENT_LIST = "comment_list"
+        const val KEY_GALLERY_DETAIL = "gallery_detail"
+        private const val TYPE_COMMENT = 0
+        private const val TYPE_MORE = 1
+        private const val TYPE_PROGRESS = 2
     }
 }
