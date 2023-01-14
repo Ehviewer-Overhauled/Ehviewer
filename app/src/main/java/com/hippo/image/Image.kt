@@ -25,9 +25,8 @@ import android.graphics.ImageDecoder.Source
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import coil.decode.DecodeUtils
 import coil.decode.FrameDelayRewritingSource
-import coil.decode.isGif
+import com.hippo.Native
 import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.EhApplication
 import okio.Buffer
@@ -87,35 +86,41 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(stream: FileInputStream): Image {
-            val source = stream.source().buffer()
-            val buffer = if (DecodeUtils.isGif(source)) {
-                rewriteSource(source)
+            val buffer = stream.channel.map(
+                FileChannel.MapMode.READ_ONLY, 0,
+                stream.available().toLong()
+            )
+            val source = if (checkIsGif(buffer)) {
+                rewriteSource(stream.source().buffer())
             } else {
-                stream.channel.map(
-                    FileChannel.MapMode.READ_ONLY, 0,
-                    stream.available().toLong()
-                )
+                buffer
             }
-            val src = ImageDecoder.createSource(buffer)
+            val src = ImageDecoder.createSource(source)
             return Image(src)
         }
 
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(buffer: ByteBuffer): Image {
-            val source = Buffer().apply { write(buffer) }
-            val byteBuffer = if (DecodeUtils.isGif(source)) {
-                rewriteSource(source)
+            return if (checkIsGif(buffer)) {
+                val rewritten = rewriteSource(Buffer().apply {
+                    write(buffer)
+                    UriArchiveAccessor.releaseByteBuffer(buffer)
+                })
+                Image(ImageDecoder.createSource(rewritten))
             } else {
-                buffer.position(0) as ByteBuffer
+                Image(ImageDecoder.createSource(buffer), buffer)
             }
-            val src = ImageDecoder.createSource(byteBuffer)
-            return Image(src, buffer)
         }
 
         private fun rewriteSource(source: BufferedSource): ByteBuffer {
             val bufferedSource = FrameDelayRewritingSource(source).buffer()
             return ByteBuffer.wrap(bufferedSource.use { it.readByteArray() })
+        }
+
+        private fun checkIsGif(buffer: ByteBuffer): Boolean {
+            check(buffer.isDirect)
+            return Native.isGif(buffer)
         }
     }
 }

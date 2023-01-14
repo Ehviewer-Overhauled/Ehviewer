@@ -18,6 +18,7 @@
 package com.hippo
 
 import java.io.FileDescriptor
+import java.nio.ByteBuffer
 
 object Native {
     fun initialize() {
@@ -26,4 +27,6 @@ object Native {
 
     @JvmStatic
     external fun getFd(fd: FileDescriptor?): Int
+
+    external fun isGif(buffer: ByteBuffer): Boolean
 }
