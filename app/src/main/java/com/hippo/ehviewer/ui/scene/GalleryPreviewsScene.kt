@@ -208,7 +208,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     }
 
     private inner class GetPreviewSetListener(
-        context: Context?,
+        context: Context,
         private val mTaskId: Int
     ) : EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Int>>(context) {
         override fun onSuccess(result: Pair<PreviewSet, Int>) {

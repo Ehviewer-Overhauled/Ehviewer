@@ -700,7 +700,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     private class ProgressCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
         CommentHolder(inflater, R.layout.item_gallery_comment_progress, parent)
 
-    private inner class RefreshCommentListener(context: Context?) :
+    private inner class RefreshCommentListener(context: Context) :
         EhCallback<GalleryCommentsScene?, GalleryDetail>(context) {
         override fun onSuccess(result: GalleryDetail) {
             val scene = this@GalleryCommentsScene
@@ -715,7 +715,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         override fun onCancel() {}
     }
 
-    private inner class CommentGalleryListener(context: Context?, private val mCommentId: Long) :
+    private inner class CommentGalleryListener(context: Context, private val mCommentId: Long) :
         EhCallback<GalleryCommentsScene?, GalleryCommentList>(context) {
         override fun onSuccess(result: GalleryCommentList) {
             showTip(
@@ -738,7 +738,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         override fun onCancel() {}
     }
 
-    private inner class VoteCommentListener(context: Context?) :
+    private inner class VoteCommentListener(context: Context) :
         EhCallback<GalleryCommentsScene?, VoteCommentParser.Result>(context) {
         override fun onSuccess(result: VoteCommentParser.Result) {
             showTip(

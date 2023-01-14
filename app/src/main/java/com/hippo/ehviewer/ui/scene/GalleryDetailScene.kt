@@ -1259,7 +1259,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     @IntDef(STATE_INIT, STATE_NORMAL, STATE_REFRESH, STATE_REFRESH_HEADER, STATE_FAILED)
     @Retention(AnnotationRetention.SOURCE)
     private annotation class State
-    private class VoteTagListener(context: Context?) :
+    private class VoteTagListener(context: Context) :
         EhCallback<GalleryDetailScene?, VoteTagParser.Result>(context) {
         override fun onSuccess(result: VoteTagParser.Result) {
             if (!TextUtils.isEmpty(result.error)) {
@@ -1277,7 +1277,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private class DownloadArchiveListener(
-        context: Context?,
+        context: Context,
         private val mGalleryInfo: GalleryInfo?
     ) : EhCallback<GalleryDetailScene?, String>(context) {
         override fun onSuccess(result: String) {
@@ -1338,7 +1338,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
-    private inner class GetGalleryDetailListener(context: Context?) :
+    private inner class GetGalleryDetailListener(context: Context) :
         EhCallback<GalleryDetailScene?, GalleryDetail>(context) {
         override fun onSuccess(result: GalleryDetail) {
             application.removeGlobalStuff(this)
@@ -1366,7 +1366,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private inner class RateGalleryListener(
-        context: Context?
+        context: Context
     ) : EhCallback<GalleryDetailScene?, RateGalleryParser.Result>(context) {
         override fun onSuccess(result: RateGalleryParser.Result) {
             showTip(R.string.rate_successfully, LENGTH_SHORT)
@@ -1383,7 +1383,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private inner class ModifyFavoritesListener(
-        context: Context?,
+        context: Context,
         private val mAddOrRemove: Boolean
     ) :
         EhCallback<GalleryDetailScene?, Void?>(context) {

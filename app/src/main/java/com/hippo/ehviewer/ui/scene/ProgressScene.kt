@@ -184,7 +184,7 @@ class ProgressScene : BaseScene(), View.OnClickListener {
     }
 
     private inner class GetGalleryTokenListener(
-        context: Context?
+        context: Context
     ) : EhCallback<ProgressScene, String>(context) {
         override fun onSuccess(result: String) {
             val scene = this@ProgressScene
