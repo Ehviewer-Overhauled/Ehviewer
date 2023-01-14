@@ -13,1084 +13,1021 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsAnimationCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.datepicker.CalendarConstraints;
-import com.google.android.material.datepicker.CompositeDateValidator;
-import com.google.android.material.datepicker.DateValidatorPointBackward;
-import com.google.android.material.datepicker.DateValidatorPointForward;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.app.BaseDialogBuilder;
-import com.hippo.drawable.AddDeleteDrawable;
-import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.easyrecyclerview.FastScroller;
-import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.WindowInsetsAnimationHelper;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.data.FavListUrlBuilder;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.parser.FavoritesParser;
-import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.MainActivity;
-import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle;
-import com.hippo.ehviewer.ui.annotation.ViewLifeCircle;
-import com.hippo.ehviewer.ui.annotation.WholeLifeCircle;
-import com.hippo.ehviewer.widget.GalleryInfoContentHelper;
-import com.hippo.widget.ContentLayout;
-import com.hippo.widget.FabLayout;
-import com.hippo.yorozuya.AssertUtils;
-import com.hippo.yorozuya.ObjectUtils;
-import com.hippo.yorozuya.SimpleHandler;
-import com.hippo.yorozuya.ViewUtils;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import rikka.core.res.ResourcesKt;
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.DialogInterface
+import android.content.res.Resources
+import android.os.Bundle
+import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.CompositeDateValidator
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.hippo.app.BaseDialogBuilder
+import com.hippo.drawable.AddDeleteDrawable
+import com.hippo.easyrecyclerview.EasyRecyclerView
+import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
+import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.WindowInsetsAnimationHelper
+import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.parser.FavoritesParser
+import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle
+import com.hippo.ehviewer.ui.annotation.ViewLifeCircle
+import com.hippo.ehviewer.ui.annotation.WholeLifeCircle
+import com.hippo.ehviewer.widget.GalleryInfoContentHelper
+import com.hippo.widget.ContentLayout
+import com.hippo.widget.FabLayout
+import com.hippo.widget.FabLayout.OnClickFabListener
+import com.hippo.widget.FabLayout.OnExpandListener
+import com.hippo.yorozuya.AssertUtils
+import com.hippo.yorozuya.ObjectUtils
+import com.hippo.yorozuya.SimpleHandler
+import com.hippo.yorozuya.ViewUtils
+import rikka.core.res.resolveColor
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
-@SuppressLint({"NotifyDataSetChanged", "RtlHardcoded"})
-public class FavoritesScene extends SearchBarScene implements
-        FastScroller.OnDragHandlerListener,
-        FabLayout.OnClickFabListener, FabLayout.OnExpandListener,
-        EasyRecyclerView.CustomChoiceListener {
-
-    private static final long ANIMATE_TIME = 300L;
-
-    private static final String KEY_URL_BUILDER = "url_builder";
-    private static final String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
-    private static final String KEY_FAV_COUNT_ARRAY = "fav_count_array";
+@SuppressLint("NotifyDataSetChanged", "RtlHardcoded")
+class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener,
+    OnExpandListener, CustomChoiceListener {
     // For modify action
-    private final List<GalleryInfo> mModifyGiList = new ArrayList<>();
-    public int current; // -1 for error
-    public int limit; // -1 for error
-    @Nullable
+    private val mModifyGiList: MutableList<GalleryInfo> = ArrayList()
+    var current // -1 for error
+            = 0
+    var limit // -1 for error
+            = 0
+
     @ViewLifeCircle
-    private EasyRecyclerView mRecyclerView;
-    @Nullable
+    private var mRecyclerView: EasyRecyclerView? = null
+
     @ViewLifeCircle
-    private FabLayout mFabLayout;
-    @Nullable
+    private var mFabLayout: FabLayout? = null
+
     @ViewLifeCircle
-    private FavoritesAdapter mAdapter;
-    @Nullable
+    private var mAdapter: FavoritesAdapter? = null
+
     @ViewLifeCircle
-    private FavoritesHelper mHelper;
-    private AddDeleteDrawable mActionFabDrawable;
-    @Nullable
-    private DrawerLayout mDrawerLayout;
-    @Nullable
+    private var mHelper: FavoritesHelper? = null
+    private var mActionFabDrawable: AddDeleteDrawable? = null
+    private var mDrawerLayout: DrawerLayout? = null
+
     @DrawerLifeCircle
-    private FavDrawerAdapter mDrawerAdapter;
-    @Nullable
+    private var mDrawerAdapter: FavDrawerAdapter? = null
+
     @WholeLifeCircle
-    private EhClient mClient;
-    @Nullable
+    private var mClient: EhClient? = null
+
     @WholeLifeCircle
-    private String[] mFavCatArray;
-    @Nullable
+    private var mFavCatArray: Array<String>? = Settings.getFavCat()
+
     @WholeLifeCircle
-    private int[] mFavCountArray;
-    @Nullable
+    private var mFavCountArray: IntArray? = Settings.getFavCount()
+
     @WholeLifeCircle
-    private FavListUrlBuilder mUrlBuilder;
-    private final Runnable showNormalFabsRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (mFabLayout != null) {
-                updateJumpFab(); // index: 0, 2
-                mFabLayout.setSecondaryFabVisibilityAt(1, true);
-                mFabLayout.setSecondaryFabVisibilityAt(3, false);
-                mFabLayout.setSecondaryFabVisibilityAt(4, false);
-                mFabLayout.setSecondaryFabVisibilityAt(5, false);
-                mFabLayout.setSecondaryFabVisibilityAt(6, false);
-            }
+    private var mUrlBuilder: FavListUrlBuilder? = null
+    private val showNormalFabsRunnable = Runnable {
+        if (mFabLayout != null) {
+            updateJumpFab() // index: 0, 2
+            mFabLayout!!.setSecondaryFabVisibilityAt(1, true)
+            mFabLayout!!.setSecondaryFabVisibilityAt(3, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(4, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(5, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(6, false)
         }
-    };
-    private int mFavLocalCount = 0;
-    private int mFavCountSum = 0;
-    private boolean mHasFirstRefresh;
+    }
+    private var mFavLocalCount = 0
+    private var mFavCountSum = 0
+    private var mHasFirstRefresh = false
+
     // Avoid unnecessary search bar update
-    private String mOldFavCat;
+    private var mOldFavCat: String? = null
+
     // Avoid unnecessary search bar update
-    private String mOldKeyword;
-    // For modify action
-    private boolean mEnableModify;
-    // For modify action
-    private int mModifyFavCat;
-    // For modify action
-    private boolean mModifyAdd;
+    private var mOldKeyword: String? = null
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    // For modify action
+    private var mEnableModify = false
 
-        Context context = getContext();
-        AssertUtils.assertNotNull(context);
-        mClient = EhClient.INSTANCE;
-        mFavCatArray = Settings.getFavCat();
-        mFavCountArray = Settings.getFavCount();
-        mFavLocalCount = Settings.getFavLocalCount();
-        mFavCountSum = Settings.getFavCloudCount();
+    // For modify action
+    private var mModifyFavCat = 0
 
+    // For modify action
+    private var mModifyAdd = false
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val context = context
+        AssertUtils.assertNotNull(context)
+        mClient = EhClient
+        mFavLocalCount = Settings.getFavLocalCount()
+        mFavCountSum = Settings.getFavCloudCount()
         if (savedInstanceState == null) {
-            onInit();
+            onInit()
         } else {
-            onRestore(savedInstanceState);
+            onRestore(savedInstanceState)
         }
     }
 
-    private void onInit() {
-        mUrlBuilder = new FavListUrlBuilder();
-        mUrlBuilder.setFavCat(Settings.getRecentFavCat());
+    private fun onInit() {
+        mUrlBuilder = FavListUrlBuilder()
+        mUrlBuilder!!.favCat = Settings.getRecentFavCat()
     }
 
-    private void onRestore(Bundle savedInstanceState) {
-        mUrlBuilder = savedInstanceState.getParcelable(KEY_URL_BUILDER);
+    private fun onRestore(savedInstanceState: Bundle) {
+        mUrlBuilder = savedInstanceState.getParcelable(KEY_URL_BUILDER)
         if (mUrlBuilder == null) {
-            mUrlBuilder = new FavListUrlBuilder();
+            mUrlBuilder = FavListUrlBuilder()
         }
-        mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH);
-        mFavCountArray = savedInstanceState.getIntArray(KEY_FAV_COUNT_ARRAY);
+        mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
+        mFavCountArray = savedInstanceState.getIntArray(KEY_FAV_COUNT_ARRAY)
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        boolean hasFirstRefresh;
-        if (mHelper != null && 1 == mHelper.getShownViewIndex()) {
-            hasFirstRefresh = false;
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val hasFirstRefresh: Boolean = if (mHelper != null && 1 == mHelper!!.shownViewIndex) {
+            false
         } else {
-            hasFirstRefresh = mHasFirstRefresh;
+            mHasFirstRefresh
         }
-        outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh);
-        outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder);
-        outState.putIntArray(KEY_FAV_COUNT_ARRAY, mFavCountArray);
+        outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
+        outState.putParcelable(KEY_URL_BUILDER, mUrlBuilder)
+        outState.putIntArray(KEY_FAV_COUNT_ARRAY, mFavCountArray)
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mClient = null;
-        mFavCatArray = null;
-        mFavCountArray = null;
-        mFavCountSum = 0;
-        mUrlBuilder = null;
+    override fun onDestroy() {
+        super.onDestroy()
+        mClient = null
+        mFavCatArray = null
+        mFavCountArray = null
+        mFavCountSum = 0
+        mUrlBuilder = null
     }
 
-    @NonNull
-    @Override
-    public View onCreateViewWithToolbar(@NonNull LayoutInflater inflater,
-                                        @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.scene_favorites, container, false);
-        ContentLayout mContentLayout = view.findViewById(R.id.content_layout);
-        MainActivity activity = getMainActivity();
-        AssertUtils.assertNotNull(activity);
-        setOnApplySearch((query) -> {
-            onApplySearch(query);
-            return null;
-        });
-        mDrawerLayout = (DrawerLayout) ViewUtils.$$(activity, R.id.draw_view);
-        mRecyclerView = mContentLayout.getRecyclerView();
-        FastScroller fastScroller = mContentLayout.getFastScroller();
-        mFabLayout = (FabLayout) ViewUtils.$$(view, R.id.fab_layout);
-        mFabLayout.addOnExpandListener(new FabLayoutListener());
-        ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
-        AssertUtils.assertNotNull(container);
-        container.addView(mFabLayout);
-        ViewCompat.setWindowInsetsAnimationCallback(view, new WindowInsetsAnimationHelper(
+    override fun onCreateViewWithToolbar(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.scene_favorites, container, false)
+        val mContentLayout = view.findViewById<ContentLayout>(R.id.content_layout)
+        val activity = mainActivity!!
+        AssertUtils.assertNotNull(activity)
+        setOnApplySearch { query: String? ->
+            onApplySearch(query)
+        }
+        mDrawerLayout = ViewUtils.`$$`(activity, R.id.draw_view) as DrawerLayout
+        mRecyclerView = mContentLayout.recyclerView
+        val fastScroller = mContentLayout.fastScroller
+        mFabLayout = ViewUtils.`$$`(view, R.id.fab_layout) as FabLayout
+        mFabLayout!!.addOnExpandListener(FabLayoutListener())
+        (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
+        AssertUtils.assertNotNull(container)
+        container!!.addView(mFabLayout)
+        ViewCompat.setWindowInsetsAnimationCallback(
+            view, WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mFabLayout
-        ));
-
-        Context context = getContext();
-        AssertUtils.assertNotNull(context);
-        Resources resources = context.getResources();
-        int paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
-
-        mHelper = new FavoritesHelper();
-        mHelper.setEmptyString(resources.getString(R.string.gallery_list_empty_hit));
-        mContentLayout.setHelper(mHelper);
-        mContentLayout.getFastScroller().setOnDragHandlerListener(this);
-        mContentLayout.setFitPaddingTop(paddingTopSB);
-
-        mAdapter = new FavoritesAdapter(inflater, resources, mRecyclerView, Settings.getListMode());
-        mRecyclerView.setClipToPadding(false);
-        mRecyclerView.setClipChildren(false);
-        mRecyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM);
-        mRecyclerView.setCustomCheckedListener(this);
-
-        fastScroller.setPadding(fastScroller.getPaddingLeft(), fastScroller.getPaddingTop() + paddingTopSB,
-                fastScroller.getPaddingRight(), fastScroller.getPaddingBottom());
-
-        setAllowEmptySearch(false);
-        updateSearchBar();
-        updateJumpFab();
-
-        int colorID = ResourcesKt.resolveColor(getTheme(), com.google.android.material.R.attr.colorOnSurface);
-        mActionFabDrawable = new AddDeleteDrawable(context, colorID);
-        mFabLayout.getPrimaryFab().setImageDrawable(mActionFabDrawable);
-        mFabLayout.setExpanded(false, false);
-        mFabLayout.setAutoCancel(true);
-        mFabLayout.setHidePrimaryFab(false);
-        mFabLayout.setOnClickFabListener(this);
-        mFabLayout.addOnExpandListener(this);
-        addAboveSnackView(mFabLayout);
+            )
+        )
+        val context = context
+        AssertUtils.assertNotNull(context)
+        val resources = context!!.resources
+        val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
+        mHelper = FavoritesHelper()
+        mHelper!!.setEmptyString(resources.getString(R.string.gallery_list_empty_hit))
+        mContentLayout.setHelper(mHelper)
+        mContentLayout.fastScroller.setOnDragHandlerListener(this)
+        mContentLayout.setFitPaddingTop(paddingTopSB)
+        mAdapter = FavoritesAdapter(inflater, resources, mRecyclerView!!, Settings.getListMode())
+        mRecyclerView!!.clipToPadding = false
+        mRecyclerView!!.clipChildren = false
+        mRecyclerView!!.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
+        mRecyclerView!!.setCustomCheckedListener(this)
+        fastScroller.setPadding(
+            fastScroller.paddingLeft, fastScroller.paddingTop + paddingTopSB,
+            fastScroller.paddingRight, fastScroller.paddingBottom
+        )
+        setAllowEmptySearch(false)
+        updateSearchBar()
+        updateJumpFab()
+        val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
+        mActionFabDrawable = AddDeleteDrawable(context, colorID)
+        mFabLayout!!.primaryFab!!.setImageDrawable(mActionFabDrawable)
+        mFabLayout!!.setExpanded(expanded = false, animation = false)
+        mFabLayout!!.setAutoCancel(true)
+        mFabLayout!!.setHidePrimaryFab(false)
+        mFabLayout!!.setOnClickFabListener(this)
+        mFabLayout!!.addOnExpandListener(this)
+        addAboveSnackView(mFabLayout)
 
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
-            mHasFirstRefresh = true;
-            mHelper.firstRefresh();
+            mHasFirstRefresh = true
+            mHelper!!.firstRefresh()
         }
-
-        return view;
+        return view
     }
 
     // keyword of mUrlBuilder, fav cat of mUrlBuilder, mFavCatArray.
     // They changed, call it
-    private void updateSearchBar() {
-        Context context = getContext();
+    private fun updateSearchBar() {
+        val context = context
         if (null == context || null == mUrlBuilder || null == mFavCatArray) {
-            return;
+            return
         }
 
         // Update title
-        int favCat = mUrlBuilder.getFavCat();
-        String favCatName;
-        if (favCat >= 0 && favCat < 10) {
-            favCatName = mFavCatArray[favCat];
-        } else if (favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
-            favCatName = getString(R.string.local_favorites);
-        } else {
-            favCatName = getString(R.string.cloud_favorites);
+        val favCatName: String = when (val favCat = mUrlBuilder!!.favCat) {
+            in 0..9 -> {
+                mFavCatArray!![favCat]
+            }
+
+            FavListUrlBuilder.FAV_CAT_LOCAL -> {
+                getString(R.string.local_favorites)
+            }
+
+            else -> {
+                getString(R.string.cloud_favorites)
+            }
         }
-        String keyword = mUrlBuilder.getKeyword();
+        val keyword = mUrlBuilder!!.keyword
         if (TextUtils.isEmpty(keyword)) {
             if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-                setSearchBarHint(getString(R.string.favorites_title, favCatName));
+                setSearchBarHint(getString(R.string.favorites_title, favCatName))
             }
         } else {
-            if (!ObjectUtils.equal(favCatName, mOldFavCat) || !ObjectUtils.equal(keyword, mOldKeyword)) {
-                setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword));
+            if (!ObjectUtils.equal(favCatName, mOldFavCat) || !ObjectUtils.equal(
+                    keyword,
+                    mOldKeyword
+                )
+            ) {
+                setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
             }
         }
 
         // Update hint
         if (!ObjectUtils.equal(favCatName, mOldFavCat)) {
-            setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName));
+            setEditTextHint(getString(R.string.favorites_search_bar_hint, favCatName))
         }
-
-        mOldFavCat = favCatName;
-        mOldKeyword = keyword;
+        mOldFavCat = favCatName
+        mOldKeyword = keyword
 
         // Save recent fav cat
-        Settings.putRecentFavCat(mUrlBuilder.getFavCat());
+        Settings.putRecentFavCat(mUrlBuilder!!.favCat)
     }
 
     // Hide jump fab on local fav cat
-    private void updateJumpFab() {
+    private fun updateJumpFab() {
         if (mFabLayout != null && mUrlBuilder != null) {
-            mFabLayout.setSecondaryFabVisibilityAt(0, mUrlBuilder.getFavCat() != FavListUrlBuilder.FAV_CAT_LOCAL);
-            mFabLayout.setSecondaryFabVisibilityAt(2, mUrlBuilder.getFavCat() != FavListUrlBuilder.FAV_CAT_LOCAL);
+            mFabLayout!!.setSecondaryFabVisibilityAt(
+                0,
+                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL
+            )
+            mFabLayout!!.setSecondaryFabVisibilityAt(
+                2,
+                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL
+            )
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
+    override fun onDestroyView() {
+        super.onDestroyView()
         if (null != mHelper) {
-            mHelper.destroy();
-            if (1 == mHelper.getShownViewIndex()) {
-                mHasFirstRefresh = false;
+            mHelper!!.destroy()
+            if (1 == mHelper!!.shownViewIndex) {
+                mHasFirstRefresh = false
             }
         }
         if (null != mRecyclerView) {
-            mRecyclerView.stopScroll();
-            mRecyclerView = null;
+            mRecyclerView!!.stopScroll()
+            mRecyclerView = null
         }
         if (null != mFabLayout) {
-            ((ViewGroup) mFabLayout.getParent()).removeView(mFabLayout);
-            removeAboveSnackView(mFabLayout);
-            mFabLayout = null;
+            (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
+            removeAboveSnackView(mFabLayout)
+            mFabLayout = null
         }
-
-        mAdapter = null;
-
-        mOldFavCat = null;
-        mOldKeyword = null;
+        mAdapter = null
+        mOldFavCat = null
+        mOldKeyword = null
     }
 
-    @Override
-    public View onCreateDrawerView(LayoutInflater inflater,
-                                   @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.drawer_list_rv, container, false);
-        final Context context = getContext();
-        Toolbar toolbar = (Toolbar) ViewUtils.$$(view, R.id.toolbar);
-
-        AssertUtils.assertNotNull(context);
-
-        toolbar.setTitle(R.string.collections);
-        toolbar.inflateMenu(R.menu.drawer_favorites);
-        toolbar.setOnMenuItemClickListener(item -> {
-            int id = item.getItemId();
+    override fun onCreateDrawerView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
+        val context = context
+        val toolbar = ViewUtils.`$$`(view, R.id.toolbar) as Toolbar
+        AssertUtils.assertNotNull(context)
+        toolbar.setTitle(R.string.collections)
+        toolbar.inflateMenu(R.menu.drawer_favorites)
+        toolbar.setOnMenuItemClickListener { item: MenuItem ->
+            val id = item.itemId
             if (id == R.id.action_default_favorites_slot) {
-                String[] items = new String[12];
-                items[0] = getString(R.string.let_me_select);
-                items[1] = getString(R.string.local_favorites);
-                String[] favCat = Settings.getFavCat();
-                System.arraycopy(favCat, 0, items, 2, 10);
-                new BaseDialogBuilder(context)
-                        .setTitle(R.string.default_favorites_collection)
-                        .setItems(items, (dialog, which) -> Settings.putDefaultFavSlot(which - 2)).show();
-                return true;
+                val items = arrayOfNulls<String>(12)
+                items[0] = getString(R.string.let_me_select)
+                items[1] = getString(R.string.local_favorites)
+                val favCat = Settings.getFavCat()
+                System.arraycopy(favCat, 0, items, 2, 10)
+                BaseDialogBuilder(context!!)
+                    .setTitle(R.string.default_favorites_collection)
+                    .setItems(items) { _: DialogInterface?, which: Int ->
+                        Settings.putDefaultFavSlot(
+                            which - 2
+                        )
+                    }
+                    .show()
+                return@setOnMenuItemClickListener true
             }
-            return false;
-        });
-
-        EasyRecyclerView recyclerView = view.findViewById(R.id.recycler_view_drawer);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        mDrawerAdapter = new FavDrawerAdapter(inflater);
-        recyclerView.setAdapter(mDrawerAdapter);
-
-        return view;
-    }
-
-    @Override
-    public void onDestroyDrawerView() {
-        super.onDestroyDrawerView();
-
-        mDrawerAdapter = null;
-    }
-
-    @Override
-    public void onStartDragHandler() {
-        // Lock right drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
-    }
-
-    @Override
-    public void onEndDragHandler() {
-        // Restore right drawer
-        if (null != mRecyclerView && !mRecyclerView.isInCustomChoice()) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
+            false
         }
-
-        showSearchBar();
+        val recyclerView = view.findViewById<EasyRecyclerView>(R.id.recycler_view_drawer)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        mDrawerAdapter = FavDrawerAdapter(inflater)
+        recyclerView.adapter = mDrawerAdapter
+        return view
     }
 
-    public boolean onItemClick(int position) {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.END)) {
-            // Skip if in search mode
-            if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-                return true;
-            }
+    override fun onDestroyDrawerView() {
+        super.onDestroyDrawerView()
+        mDrawerAdapter = null
+    }
 
+    override fun onStartDragHandler() {
+        // Lock right drawer
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+    }
+
+    override fun onEndDragHandler() {
+        // Restore right drawer
+        if (null != mRecyclerView && !mRecyclerView!!.isInCustomChoice) {
+            setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+        }
+        showSearchBar()
+    }
+
+    fun onItemClick(position: Int): Boolean {
+        if (mDrawerLayout != null && mDrawerLayout!!.isDrawerOpen(GravityCompat.END)) {
+            // Skip if in search mode
+            if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {
+                return true
+            }
             if (mUrlBuilder == null || mHelper == null) {
-                return true;
+                return true
             }
 
             // Local favorite position is 0, All favorite position is 1, so position - 2 is OK
-            int newFavCat = position - 2;
+            val newFavCat = position - 2
 
             // Check is the same
-            if (mUrlBuilder.getFavCat() == newFavCat) {
-                return true;
+            if (mUrlBuilder!!.favCat == newFavCat) {
+                return true
             }
-
-            mUrlBuilder.setKeyword(null);
-            mUrlBuilder.setFavCat(newFavCat);
-            updateSearchBar();
-            updateJumpFab();
-            mHelper.refresh();
-
-            closeDrawer(GravityCompat.END);
-
+            mUrlBuilder!!.keyword = null
+            mUrlBuilder!!.favCat = newFavCat
+            updateSearchBar()
+            updateJumpFab()
+            mHelper!!.refresh()
+            closeDrawer(GravityCompat.END)
         } else {
-            if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-                mRecyclerView.toggleItemChecked(position);
+            if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {
+                mRecyclerView!!.toggleItemChecked(position)
             } else if (mHelper != null) {
-                GalleryInfo gi = mHelper.getDataAtEx(position);
-                if (gi == null) {
-                    return true;
-                }
-                Bundle args = new Bundle();
-                args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO);
-                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi);
-                navigate(R.id.galleryDetailScene, args);
+                val gi = mHelper!!.getDataAtEx(position) ?: return true
+                val args = Bundle()
+                args.putString(
+                    GalleryDetailScene.KEY_ACTION,
+                    GalleryDetailScene.ACTION_GALLERY_INFO
+                )
+                args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
+                navigate(R.id.galleryDetailScene, args)
             }
         }
-        return true;
+        return true
     }
 
-    public boolean onItemLongClick(int position) {
+    fun onItemLongClick(position: Int): Boolean {
         // Can not into
         if (mRecyclerView != null) {
-            if (!mRecyclerView.isInCustomChoice()) {
-                mRecyclerView.intoCustomChoiceMode();
+            if (!mRecyclerView!!.isInCustomChoice) {
+                mRecyclerView!!.intoCustomChoiceMode()
             }
-            mRecyclerView.toggleItemChecked(position);
+            mRecyclerView!!.toggleItemChecked(position)
         }
-        return true;
+        return true
     }
 
-    public void onApplySearch(String query) {
+    private fun onApplySearch(query: String?) {
         // Skip if in search mode
-        if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-            return;
+        if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {
+            return
         }
-
         if (mUrlBuilder == null || mHelper == null) {
-            return;
+            return
         }
-
-        mUrlBuilder.setKeyword(query);
-        updateSearchBar();
-        mHelper.refresh();
+        mUrlBuilder!!.keyword = query
+        updateSearchBar()
+        mHelper!!.refresh()
     }
 
-    @Override
-    public void onExpand(boolean expanded) {
+    override fun onExpand(expanded: Boolean) {
         if (expanded) {
-            mActionFabDrawable.setDelete(ANIMATE_TIME);
+            mActionFabDrawable!!.setDelete(ANIMATE_TIME)
         } else {
-            mActionFabDrawable.setAdd(ANIMATE_TIME);
+            mActionFabDrawable!!.setAdd(ANIMATE_TIME)
         }
     }
 
-    @Override
-    public void onClickPrimaryFab(FabLayout view, FloatingActionButton fab) {
+    override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
         if (mRecyclerView != null && mFabLayout != null) {
-            if (mRecyclerView.isInCustomChoice()) {
-                mRecyclerView.outOfCustomChoiceMode();
+            if (mRecyclerView!!.isInCustomChoice) {
+                mRecyclerView!!.outOfCustomChoiceMode()
             } else {
-                mFabLayout.toggle();
+                mFabLayout!!.toggle()
             }
         }
     }
 
-    private void showGoToDialog() {
-        Context context = getContext();
+    private fun showGoToDialog() {
+        val context = context
         if (null == context || null == mHelper) {
-            return;
+            return
         }
-
-        LocalDateTime local = LocalDateTime.of(2007, 3, 21, 0, 0);
-        long fromDate = local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli();
-        long toDate = MaterialDatePicker.todayInUtcMilliseconds();
-
-        ArrayList<CalendarConstraints.DateValidator> listValidators = new ArrayList<>();
-        listValidators.add(DateValidatorPointForward.from(fromDate));
-        listValidators.add(DateValidatorPointBackward.before(toDate));
-
-        var constraintsBuilder = new CalendarConstraints.Builder()
-                .setStart(fromDate)
-                .setEnd(toDate)
-                .setValidator(CompositeDateValidator.allOf(listValidators));
-
-        var datePicker = MaterialDatePicker.Builder.datePicker()
-                .setCalendarConstraints(constraintsBuilder.build())
-                .setTitleText(R.string.go_to)
-                .setSelection(toDate)
-                .build();
-        datePicker.show(requireActivity().getSupportFragmentManager(), "date-picker");
-        datePicker.addOnPositiveButtonClickListener(v -> mHelper.goTo(v, true));
+        val local = LocalDateTime.of(2007, 3, 21, 0, 0)
+        val fromDate =
+            local.atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)).toInstant().toEpochMilli()
+        val toDate = MaterialDatePicker.todayInUtcMilliseconds()
+        val listValidators = ArrayList<DateValidator>()
+        listValidators.add(DateValidatorPointForward.from(fromDate))
+        listValidators.add(DateValidatorPointBackward.before(toDate))
+        val constraintsBuilder = CalendarConstraints.Builder()
+            .setStart(fromDate)
+            .setEnd(toDate)
+            .setValidator(CompositeDateValidator.allOf(listValidators))
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setCalendarConstraints(constraintsBuilder.build())
+            .setTitleText(R.string.go_to)
+            .setSelection(toDate)
+            .build()
+        datePicker.show(requireActivity().supportFragmentManager, "date-picker")
+        datePicker.addOnPositiveButtonClickListener { v: Long? ->
+            mHelper!!.goTo(
+                v!!, true
+            )
+        }
     }
 
-    @Override
-    public void onClickSecondaryFab(FabLayout view, FloatingActionButton fab, int position) {
-        Context context = getContext();
+    override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
+        val context = context
         if (null == context || null == mRecyclerView || null == mHelper) {
-            return;
+            return
         }
-
-        if (!mRecyclerView.isInCustomChoice()) {
-            switch (position) {
-                // Go to
-                case 0 -> {
-                    if (mHelper.canGoTo()) showGoToDialog();
+        if (!mRecyclerView!!.isInCustomChoice) {
+            when (position) {
+                0 -> {
+                    if (mHelper!!.canGoTo()) showGoToDialog()
                 }
-                // Refresh
-                case 1 -> mHelper.refresh();
-                // Last page
-                case 2 -> mHelper.goTo("1-0", false);
-            }
-            view.setExpanded(false);
-            return;
-        }
 
-        mModifyGiList.clear();
-        SparseBooleanArray stateArray = mRecyclerView.getCheckedItemPositions();
-        for (int i = 0, n = stateArray.size(); i < n; i++) {
+                1 -> mHelper!!.refresh()
+                2 -> mHelper!!.goTo("1-0", false)
+            }
+            view.isExpanded = false
+            return
+        }
+        mModifyGiList.clear()
+        val stateArray = mRecyclerView!!.checkedItemPositions
+        var i = 0
+        val n = stateArray.size()
+        while (i < n) {
             if (stateArray.valueAt(i)) {
-                GalleryInfo gi = mHelper.getDataAtEx(stateArray.keyAt(i));
+                val gi = mHelper!!.getDataAtEx(stateArray.keyAt(i))
                 if (gi != null) {
-                    mModifyGiList.add(gi);
+                    mModifyGiList.add(gi)
                 }
             }
+            i++
         }
+        when (position) {
+            3 ->  // Check all
+                mRecyclerView!!.checkAll()
 
-        switch (position) {
-            case 3 -> // Check all
-                    mRecyclerView.checkAll();
-            case 4 -> { // Download
-                Activity activity = getMainActivity();
+            4 -> { // Download
+                val activity: Activity? = mainActivity
                 if (activity != null) {
-                    CommonOperations.startDownload(getMainActivity(), mModifyGiList, false);
+                    CommonOperations.startDownload(mainActivity, mModifyGiList, false)
                 }
-                mModifyGiList.clear();
-                if (mRecyclerView != null && mRecyclerView.isInCustomChoice()) {
-                    mRecyclerView.outOfCustomChoiceMode();
+                mModifyGiList.clear()
+                if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {
+                    mRecyclerView!!.outOfCustomChoiceMode()
                 }
             }
-            case 5 -> { // Delete
-                DeleteDialogHelper helper = new DeleteDialogHelper();
-                new BaseDialogBuilder(context)
-                        .setTitle(R.string.delete_favorites_dialog_title)
-                        .setMessage(getString(R.string.delete_favorites_dialog_message, mModifyGiList.size()))
-                        .setPositiveButton(android.R.string.ok, helper)
-                        .setOnCancelListener(helper)
-                        .show();
+
+            5 -> { // Delete
+                val helper = DeleteDialogHelper()
+                BaseDialogBuilder(context)
+                    .setTitle(R.string.delete_favorites_dialog_title)
+                    .setMessage(
+                        getString(
+                            R.string.delete_favorites_dialog_message,
+                            mModifyGiList.size
+                        )
+                    )
+                    .setPositiveButton(android.R.string.ok, helper)
+                    .setOnCancelListener(helper)
+                    .show()
             }
-            case 6 -> { // Move
-                MoveDialogHelper helper = new MoveDialogHelper();
+
+            6 -> { // Move
+                val helper = MoveDialogHelper()
                 // First is local favorite, the other 10 is cloud favorite
-                String[] array = new String[11];
-                array[0] = getString(R.string.local_favorites);
-                System.arraycopy(Settings.getFavCat(), 0, array, 1, 10);
-                new BaseDialogBuilder(context)
-                        .setTitle(R.string.move_favorites_dialog_title)
-                        .setItems(array, helper)
-                        .setOnCancelListener(helper)
-                        .show();
+                val array = arrayOfNulls<String>(11)
+                array[0] = getString(R.string.local_favorites)
+                System.arraycopy(Settings.getFavCat(), 0, array, 1, 10)
+                BaseDialogBuilder(context)
+                    .setTitle(R.string.move_favorites_dialog_title)
+                    .setItems(array, helper)
+                    .setOnCancelListener(helper)
+                    .show()
             }
         }
     }
 
-    private void showNormalFabs() {
+    private fun showNormalFabs() {
         // Delay showing normal fabs to avoid mutation
-        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable);
-        SimpleHandler.getInstance().postDelayed(showNormalFabsRunnable, 300);
+        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable)
+        SimpleHandler.getInstance().postDelayed(showNormalFabsRunnable, 300)
     }
 
-    private void showSelectionFabs() {
-        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable);
-
+    private fun showSelectionFabs() {
+        SimpleHandler.getInstance().removeCallbacks(showNormalFabsRunnable)
         if (mFabLayout != null) {
-            mFabLayout.setSecondaryFabVisibilityAt(0, false);
-            mFabLayout.setSecondaryFabVisibilityAt(1, false);
-            mFabLayout.setSecondaryFabVisibilityAt(2, false);
-            mFabLayout.setSecondaryFabVisibilityAt(3, true);
-            mFabLayout.setSecondaryFabVisibilityAt(4, true);
-            mFabLayout.setSecondaryFabVisibilityAt(5, true);
-            mFabLayout.setSecondaryFabVisibilityAt(6, true);
+            mFabLayout!!.setSecondaryFabVisibilityAt(0, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(1, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(2, false)
+            mFabLayout!!.setSecondaryFabVisibilityAt(3, true)
+            mFabLayout!!.setSecondaryFabVisibilityAt(4, true)
+            mFabLayout!!.setSecondaryFabVisibilityAt(5, true)
+            mFabLayout!!.setSecondaryFabVisibilityAt(6, true)
         }
     }
 
-    @Override
-    public void onIntoCustomChoice(EasyRecyclerView view) {
+    override fun onIntoCustomChoice(view: EasyRecyclerView) {
         if (mFabLayout != null) {
-            showSelectionFabs();
-            mFabLayout.setAutoCancel(false);
+            showSelectionFabs()
+            mFabLayout!!.setAutoCancel(false)
             // Delay expanding action to make layout work fine
-            SimpleHandler.getInstance().post(() -> mFabLayout.setExpanded(true));
+            SimpleHandler.getInstance().post { mFabLayout!!.isExpanded = true }
         }
         if (mHelper != null) {
-            mHelper.setRefreshLayoutEnable(false);
+            mHelper!!.setRefreshLayoutEnable(false)
         }
         // Lock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
     }
 
-    @Override
-    public void onOutOfCustomChoice(EasyRecyclerView view) {
+    override fun onOutOfCustomChoice(view: EasyRecyclerView) {
         if (mFabLayout != null) {
-            showNormalFabs();
-            mFabLayout.setAutoCancel(true);
-            mFabLayout.setExpanded(false);
+            showNormalFabs()
+            mFabLayout!!.setAutoCancel(true)
+            mFabLayout!!.isExpanded = false
         }
         if (mHelper != null) {
-            mHelper.setRefreshLayoutEnable(true);
+            mHelper!!.setRefreshLayoutEnable(true)
         }
         // Unlock drawer
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
-        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+        setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
     }
 
-    @Override
-    public void onItemCheckedStateChanged(EasyRecyclerView view, int position, long id, boolean checked) {
-
-        if (view.getCheckedItemCount() == 0) {
-            view.outOfCustomChoiceMode();
+    override fun onItemCheckedStateChanged(
+        view: EasyRecyclerView,
+        position: Int,
+        id: Long,
+        checked: Boolean
+    ) {
+        if (view.checkedItemCount == 0) {
+            view.outOfCustomChoiceMode()
         }
     }
 
-    private void onGetFavoritesSuccess(FavoritesParser.Result result, int taskId) {
-        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
-
+    private fun onGetFavoritesSuccess(result: FavoritesParser.Result, taskId: Int) {
+        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             if (mFavCatArray != null) {
-                System.arraycopy(result.catArray, 0, mFavCatArray, 0, 10);
+                System.arraycopy(result.catArray, 0, mFavCatArray, 0, 10)
             }
-
-            mFavCountArray = result.countArray;
+            mFavCountArray = result.countArray
             if (mFavCountArray != null) {
-                mFavCountSum = 0;
-                for (int i = 0; i < 10; i++) {
-                    mFavCountSum = mFavCountSum + mFavCountArray[i];
+                mFavCountSum = 0
+                for (i in 0..9) {
+                    mFavCountSum += mFavCountArray!![i]
                 }
-                Settings.putFavCloudCount(mFavCountSum);
+                Settings.putFavCloudCount(mFavCountSum)
             }
-
-            updateSearchBar();
-            mHelper.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList);
-
+            updateSearchBar()
+            mHelper!!.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
             if (mDrawerAdapter != null) {
-                mDrawerAdapter.notifyDataSetChanged();
+                mDrawerAdapter!!.notifyDataSetChanged()
             }
         }
     }
 
-    private void onGetFavoritesFailure(Exception e, int taskId) {
-        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
-            mHelper.onGetException(taskId, e);
+    private fun onGetFavoritesFailure(e: Exception, taskId: Int) {
+        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
+            mHelper!!.onGetException(taskId, e)
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void onGetFavoritesLocal(String keyword, int taskId) {
-        if (mHelper != null && mHelper.isCurrentTask(taskId)) {
-            List<GalleryInfo> list;
-            if (TextUtils.isEmpty(keyword)) {
-                list = EhDB.getAllLocalFavorites();
+    private fun onGetFavoritesLocal(keyword: String?, taskId: Int) {
+        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
+            val list: List<GalleryInfo> = if (TextUtils.isEmpty(keyword)) {
+                EhDB.getAllLocalFavorites()
             } else {
-                list = EhDB.searchLocalFavorites(keyword);
+                EhDB.searchLocalFavorites(keyword)
             }
-
-            if (list.size() == 0) {
-                mHelper.onGetPageData(taskId, 0, 0, null, null, Collections.EMPTY_LIST);
+            if (list.isEmpty()) {
+                mHelper!!.onGetPageData(taskId, 0, 0, null, null, list)
             } else {
-                mHelper.onGetPageData(taskId, 1, 0, null, null, list);
+                mHelper!!.onGetPageData(taskId, 1, 0, null, null, list)
             }
-
             if (TextUtils.isEmpty(keyword)) {
-                mFavLocalCount = list.size();
-                Settings.putFavLocalCount(mFavLocalCount);
+                mFavLocalCount = list.size
+                Settings.putFavLocalCount(mFavLocalCount)
                 if (mDrawerAdapter != null) {
-                    mDrawerAdapter.notifyDataSetChanged();
+                    mDrawerAdapter!!.notifyDataSetChanged()
                 }
             }
         }
     }
 
-    private static class FavDrawerHolder extends RecyclerView.ViewHolder {
+    private class FavDrawerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val key: TextView
+        val value: TextView
 
-        private final TextView key;
-        private final TextView value;
-
-        private FavDrawerHolder(View itemView) {
-            super(itemView);
-            key = (TextView) ViewUtils.$$(itemView, R.id.key);
-            value = (TextView) ViewUtils.$$(itemView, R.id.value);
+        init {
+            key = ViewUtils.`$$`(itemView, R.id.key) as TextView
+            value = ViewUtils.`$$`(itemView, R.id.value) as TextView
         }
     }
 
-    private class AddFavoritesListener extends EhCallback<FavoritesScene, Void> {
-
-        private final int mTaskId;
-        private final String mKeyword;
-        private final List<GalleryInfo> mBackup;
-
-        private AddFavoritesListener(Context context, int taskId, String keyword, List<GalleryInfo> backup) {
-            super(context);
-            mTaskId = taskId;
-            mKeyword = keyword;
-            mBackup = backup;
+    private inner class AddFavoritesListener(
+        context: Context,
+        private val mTaskId: Int,
+        private val mKeyword: String?,
+        private val mBackup: List<GalleryInfo>
+    ) : EhCallback<FavoritesScene?, Void?>(context) {
+        override fun onSuccess(result: Void?) {
+            val scene = this@FavoritesScene
+            scene.onGetFavoritesLocal(mKeyword, mTaskId)
         }
 
-        @Override
-        public void onSuccess(Void result) {
-            FavoritesScene scene = FavoritesScene.this;
-            scene.onGetFavoritesLocal(mKeyword, mTaskId);
-        }
-
-        @Override
-        public void onFailure(Exception e) {
+        override fun onFailure(e: Exception) {
             // TODO It's a failure, add all of backup back to db.
             // But how to known which one is failed?
-            EhDB.putLocalFavorites(mBackup);
-
-            FavoritesScene scene = FavoritesScene.this;
-            scene.onGetFavoritesLocal(mKeyword, mTaskId);
+            EhDB.putLocalFavorites(mBackup)
+            val scene = this@FavoritesScene
+            scene.onGetFavoritesLocal(mKeyword, mTaskId)
         }
 
-        @Override
-        public void onCancel() {
-        }
+        override fun onCancel() {}
     }
 
-    private class GetFavoritesListener extends EhCallback<FavoritesScene, FavoritesParser.Result> {
-
-        private final int mTaskId;
-        // Local fav is shown now, but operation need be done for cloud fav
-        private final boolean mLocal;
-        private final String mKeyword;
-
-        private GetFavoritesListener(Context context, int taskId, boolean local, String keyword) {
-            super(context);
-            mTaskId = taskId;
-            mLocal = local;
-            mKeyword = keyword;
-        }
-
-        @Override
-        public void onSuccess(FavoritesParser.Result result) {
+    private inner class GetFavoritesListener(
+        context: Context,
+        private val mTaskId: Int, // Local fav is shown now, but operation need be done for cloud fav
+        private val mLocal: Boolean,
+        private val mKeyword: String?
+    ) : EhCallback<FavoritesScene?, FavoritesParser.Result>(context) {
+        override fun onSuccess(result: FavoritesParser.Result) {
             // Put fav cat
-            Settings.putFavCat(result.catArray);
-            Settings.putFavCount(result.countArray);
-            FavoritesScene scene = FavoritesScene.this;
+            Settings.putFavCat(result.catArray)
+            Settings.putFavCount(result.countArray)
+            val scene = this@FavoritesScene
             if (mLocal) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+                scene.onGetFavoritesLocal(mKeyword, mTaskId)
             } else {
-                scene.onGetFavoritesSuccess(result, mTaskId);
+                scene.onGetFavoritesSuccess(result, mTaskId)
             }
         }
 
-        @Override
-        public void onFailure(Exception e) {
-            FavoritesScene scene = FavoritesScene.this;
+        override fun onFailure(e: Exception) {
+            val scene = this@FavoritesScene
             if (mLocal) {
-                e.printStackTrace();
-                scene.onGetFavoritesLocal(mKeyword, mTaskId);
+                e.printStackTrace()
+                scene.onGetFavoritesLocal(mKeyword, mTaskId)
             } else {
-                scene.onGetFavoritesFailure(e, mTaskId);
+                scene.onGetFavoritesFailure(e, mTaskId)
             }
         }
 
-        @Override
-        public void onCancel() {
-        }
+        override fun onCancel() {}
     }
 
-    private class FavDrawerAdapter extends RecyclerView.Adapter<FavDrawerHolder> {
-
-        private final LayoutInflater mInflater;
-
-        private FavDrawerAdapter(LayoutInflater inflater) {
-            mInflater = inflater;
+    private inner class FavDrawerAdapter(private val mInflater: LayoutInflater) :
+        RecyclerView.Adapter<FavDrawerHolder>() {
+        override fun getItemViewType(position: Int): Int {
+            return position
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            return position;
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavDrawerHolder {
+            return FavDrawerHolder(mInflater.inflate(R.layout.item_drawer_favorites, parent, false))
         }
 
-        @NonNull
-        @Override
-        public FavDrawerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new FavDrawerHolder(mInflater.inflate(R.layout.item_drawer_favorites, parent, false));
-        }
-
-        @Override
         @SuppressLint("SetTextI18n")
-        public void onBindViewHolder(@NonNull FavDrawerHolder holder, int position) {
-            if (0 == position) {
-                holder.key.setText(R.string.local_favorites);
-                holder.value.setText(Integer.toString(mFavLocalCount));
-                holder.itemView.setEnabled(true);
-            } else if (1 == position) {
-                holder.key.setText(R.string.cloud_favorites);
-                holder.value.setText(Integer.toString(mFavCountSum));
-                holder.itemView.setEnabled(true);
-            } else {
-                if (null == mFavCatArray || null == mFavCountArray ||
-                        mFavCatArray.length < (position - 1) ||
-                        mFavCountArray.length < (position - 1)) {
-                    return;
+        override fun onBindViewHolder(holder: FavDrawerHolder, position: Int) {
+            when (position) {
+                0 -> {
+                    holder.key.setText(R.string.local_favorites)
+                    holder.value.text = mFavLocalCount.toString()
+                    holder.itemView.isEnabled = true
                 }
-                holder.key.setText(mFavCatArray[position - 2]);
-                holder.value.setText(Integer.toString(mFavCountArray[position - 2]));
-                holder.itemView.setEnabled(true);
+
+                1 -> {
+                    holder.key.setText(R.string.cloud_favorites)
+                    holder.value.text = mFavCountSum.toString()
+                    holder.itemView.isEnabled = true
+                }
+
+                else -> {
+                    if (null == mFavCatArray || null == mFavCountArray || mFavCatArray!!.size < position - 1 || mFavCountArray!!.size < position - 1) {
+                        return
+                    }
+                    holder.key.text = mFavCatArray!![position - 2]
+                    holder.value.text = mFavCountArray!![position - 2].toString()
+                    holder.itemView.isEnabled = true
+                }
             }
-            holder.itemView.setOnClickListener(v -> onItemClick(position));
+            holder.itemView.setOnClickListener { onItemClick(position) }
         }
 
-        @Override
-        public int getItemCount() {
-            if (null == mFavCatArray) {
-                return 2;
-            }
-            return 12;
+        override fun getItemCount(): Int {
+            return if (null == mFavCatArray) {
+                2
+            } else 12
         }
     }
 
-    private class DeleteDialogHelper implements DialogInterface.OnClickListener,
-            DialogInterface.OnCancelListener {
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
+    private inner class DeleteDialogHelper : DialogInterface.OnClickListener,
+        DialogInterface.OnCancelListener {
+        override fun onClick(dialog: DialogInterface, which: Int) {
             if (which != DialogInterface.BUTTON_POSITIVE) {
-                return;
+                return
             }
             if (mRecyclerView == null || mHelper == null || mUrlBuilder == null) {
-                return;
+                return
             }
-
-            mRecyclerView.outOfCustomChoiceMode();
-
-            if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
-                long[] gidArray = new long[mModifyGiList.size()];
-                for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                    gidArray[i] = mModifyGiList.get(i).getGid();
+            mRecyclerView!!.outOfCustomChoiceMode()
+            if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
+                val gidArray = LongArray(mModifyGiList.size)
+                var i = 0
+                val n = mModifyGiList.size
+                while (i < n) {
+                    gidArray[i] = mModifyGiList[i].gid
+                    i++
                 }
-                EhDB.removeLocalFavorites(gidArray);
-                mModifyGiList.clear();
-                mHelper.refresh();
+                EhDB.removeLocalFavorites(gidArray)
+                mModifyGiList.clear()
+                mHelper!!.refresh()
             } else { // Delete cloud fav
-                mEnableModify = true;
-                mModifyFavCat = -1;
-                mModifyAdd = false;
-                mHelper.refresh();
+                mEnableModify = true
+                mModifyFavCat = -1
+                mModifyAdd = false
+                mHelper!!.refresh()
             }
         }
 
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            mModifyGiList.clear();
+        override fun onCancel(dialog: DialogInterface) {
+            mModifyGiList.clear()
         }
     }
 
-    private class MoveDialogHelper implements DialogInterface.OnClickListener,
-            DialogInterface.OnCancelListener {
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
+    private inner class MoveDialogHelper : DialogInterface.OnClickListener,
+        DialogInterface.OnCancelListener {
+        override fun onClick(dialog: DialogInterface, which: Int) {
             if (mRecyclerView == null || mHelper == null || mUrlBuilder == null) {
-                return;
+                return
             }
-            int srcCat = mUrlBuilder.getFavCat();
-            int dstCat;
-            if (which == 0) {
-                dstCat = FavListUrlBuilder.FAV_CAT_LOCAL;
+            val srcCat = mUrlBuilder!!.favCat
+            val dstCat: Int = if (which == 0) {
+                FavListUrlBuilder.FAV_CAT_LOCAL
             } else {
-                dstCat = which - 1;
+                which - 1
             }
             if (srcCat == dstCat) {
-                return;
+                return
             }
-
-            mRecyclerView.outOfCustomChoiceMode();
-
+            mRecyclerView!!.outOfCustomChoiceMode()
             if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
-                long[] gidArray = new long[mModifyGiList.size()];
-                for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                    gidArray[i] = mModifyGiList.get(i).getGid();
+                val gidArray = LongArray(mModifyGiList.size)
+                var i = 0
+                val n = mModifyGiList.size
+                while (i < n) {
+                    gidArray[i] = mModifyGiList[i].gid
+                    i++
                 }
-                EhDB.removeLocalFavorites(gidArray);
-                mEnableModify = true;
-                mModifyFavCat = dstCat;
-                mModifyAdd = true;
-                mHelper.refresh();
+                EhDB.removeLocalFavorites(gidArray)
+                mEnableModify = true
+                mModifyFavCat = dstCat
+                mModifyAdd = true
+                mHelper!!.refresh()
             } else if (dstCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from cloud to local
-                EhDB.putLocalFavorites(mModifyGiList);
-                mEnableModify = true;
-                mModifyFavCat = -1;
-                mModifyAdd = false;
-                mHelper.refresh();
+                EhDB.putLocalFavorites(mModifyGiList)
+                mEnableModify = true
+                mModifyFavCat = -1
+                mModifyAdd = false
+                mHelper!!.refresh()
             } else {
-                mEnableModify = true;
-                mModifyFavCat = dstCat;
-                mModifyAdd = false;
-                mHelper.refresh();
+                mEnableModify = true
+                mModifyFavCat = dstCat
+                mModifyAdd = false
+                mHelper!!.refresh()
             }
         }
 
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            mModifyGiList.clear();
+        override fun onCancel(dialog: DialogInterface) {
+            mModifyGiList.clear()
         }
     }
 
-    private class FavoritesAdapter extends GalleryAdapter {
-
-        public FavoritesAdapter(@NonNull LayoutInflater inflater, @NonNull Resources resources,
-                                @NonNull RecyclerView recyclerView, int type) {
-            super(inflater, resources, recyclerView, type, false);
+    private inner class FavoritesAdapter(
+        inflater: LayoutInflater, resources: Resources,
+        recyclerView: RecyclerView, type: Int
+    ) : GalleryAdapter(inflater, resources, recyclerView, type, false) {
+        override fun getItemCount(): Int {
+            return if (null != mHelper) mHelper!!.size() else 0
         }
 
-        @Override
-        public int getItemCount() {
-            return null != mHelper ? mHelper.size() : 0;
+        override fun onItemClick(view: View, position: Int) {
+            this@FavoritesScene.onItemClick(position)
         }
 
-        @Override
-        public void onItemClick(View view, int position) {
-            FavoritesScene.this.onItemClick(position);
+        override fun onItemLongClick(view: View, position: Int): Boolean {
+            return this@FavoritesScene.onItemLongClick(position)
         }
 
-        @Override
-        public boolean onItemLongClick(View view, int position) {
-            return FavoritesScene.this.onItemLongClick(position);
-        }
-
-        @Nullable
-        @Override
-        public GalleryInfo getDataAt(int position) {
-            return null != mHelper ? mHelper.getDataAtEx(position) : null;
+        override fun getDataAt(position: Int): GalleryInfo? {
+            return if (null != mHelper) mHelper!!.getDataAtEx(position) else null
         }
     }
 
-    private class FabLayoutListener implements FabLayout.OnExpandListener {
-        @Override
-        public void onExpand(boolean expanded) {
-            if (!expanded && mRecyclerView != null && mRecyclerView.isInCustomChoice())
-                mRecyclerView.outOfCustomChoiceMode();
+    private inner class FabLayoutListener : OnExpandListener {
+        override fun onExpand(expanded: Boolean) {
+            if (!expanded && mRecyclerView != null && mRecyclerView!!.isInCustomChoice) mRecyclerView!!.outOfCustomChoiceMode()
         }
     }
 
-    private class FavoritesHelper extends GalleryInfoContentHelper {
-
-        @Override
-        protected void getPageData(final int taskId, int type, int page, String index, boolean isNext) {
-            MainActivity activity = getMainActivity();
+    private inner class FavoritesHelper : GalleryInfoContentHelper() {
+        override fun getPageData(
+            taskId: Int,
+            type: Int,
+            page: Int,
+            index: String?,
+            isNext: Boolean
+        ) {
+            val activity = mainActivity
             if (null == activity || null == mUrlBuilder || null == mClient) {
-                return;
+                return
             }
-
             if (mEnableModify) {
-                mEnableModify = false;
-
-                boolean local = mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL;
-
-                long[] gidArray = new long[mModifyGiList.size()];
+                mEnableModify = false
+                val local = mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL
+                val gidArray = LongArray(mModifyGiList.size)
                 if (mModifyAdd) {
-                    String[] tokenArray = new String[mModifyGiList.size()];
-                    for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                        GalleryInfo gi = mModifyGiList.get(i);
-                        gidArray[i] = gi.getGid();
-                        tokenArray[i] = gi.getToken();
+                    val tokenArray = arrayOfNulls<String>(mModifyGiList.size)
+                    var i = 0
+                    val n = mModifyGiList.size
+                    while (i < n) {
+                        val gi = mModifyGiList[i]
+                        gidArray[i] = gi.gid
+                        tokenArray[i] = gi.token
+                        i++
                     }
-                    List<GalleryInfo> modifyGiListBackup = new ArrayList<>(mModifyGiList);
-                    mModifyGiList.clear();
-
-                    EhRequest request = new EhRequest();
-                    request.setMethod(EhClient.METHOD_ADD_FAVORITES_RANGE);
-                    request.setCallback(new AddFavoritesListener(getContext(), taskId, mUrlBuilder.getKeyword(), modifyGiListBackup));
-                    request.setArgs(gidArray, tokenArray, mModifyFavCat);
-                    request.enqueue(FavoritesScene.this);
+                    val modifyGiListBackup: List<GalleryInfo> = ArrayList(mModifyGiList)
+                    mModifyGiList.clear()
+                    val request = EhRequest()
+                    request.setMethod(EhClient.METHOD_ADD_FAVORITES_RANGE)
+                    request.setCallback(
+                        AddFavoritesListener(
+                            context,
+                            taskId,
+                            mUrlBuilder!!.keyword,
+                            modifyGiListBackup
+                        )
+                    )
+                    request.setArgs(gidArray, tokenArray, mModifyFavCat)
+                    request.enqueue(this@FavoritesScene)
                 } else {
-                    for (int i = 0, n = mModifyGiList.size(); i < n; i++) {
-                        gidArray[i] = mModifyGiList.get(i).getGid();
+                    var i = 0
+                    val n = mModifyGiList.size
+                    while (i < n) {
+                        gidArray[i] = mModifyGiList[i].gid
+                        i++
                     }
-                    mModifyGiList.clear();
-
-                    String url;
-                    if (local) {
+                    mModifyGiList.clear()
+                    val url: String = if (local) {
                         // Local fav is shown now, but operation need be done for cloud fav
-                        url = EhUrl.getFavoritesUrl();
+                        EhUrl.getFavoritesUrl()
                     } else {
-                        url = mUrlBuilder.build();
+                        mUrlBuilder!!.build()
                     }
-
-                    mUrlBuilder.setIndex(index, true);
-                    EhRequest request = new EhRequest();
-                    request.setMethod(EhClient.METHOD_MODIFY_FAVORITES);
-                    request.setCallback(new GetFavoritesListener(getContext(),
-                            taskId, local, mUrlBuilder.getKeyword()));
-                    request.setArgs(url, gidArray, mModifyFavCat);
-                    request.enqueue(FavoritesScene.this);
+                    mUrlBuilder!!.setIndex(index, true)
+                    val request = EhRequest()
+                    request.setMethod(EhClient.METHOD_MODIFY_FAVORITES)
+                    request.setCallback(
+                        GetFavoritesListener(
+                            context,
+                            taskId, local, mUrlBuilder!!.keyword
+                        )
+                    )
+                    request.setArgs(url, gidArray, mModifyFavCat)
+                    request.enqueue(this@FavoritesScene)
                 }
-            } else if (mUrlBuilder.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
-                final String keyword = mUrlBuilder.getKeyword();
-                SimpleHandler.getInstance().post(() -> onGetFavoritesLocal(keyword, taskId));
+            } else if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                val keyword = mUrlBuilder!!.keyword
+                SimpleHandler.getInstance().post { onGetFavoritesLocal(keyword, taskId) }
             } else {
-                mUrlBuilder.setIndex(index, isNext);
-                mUrlBuilder.setJumpTo(jumpTo);
-                String url = mUrlBuilder.build();
-                EhRequest request = new EhRequest();
-                request.setMethod(EhClient.METHOD_GET_FAVORITES);
-                request.setCallback(new GetFavoritesListener(getContext(),
-                        taskId, false, mUrlBuilder.getKeyword()));
-                request.setArgs(url);
-                request.enqueue(FavoritesScene.this);
+                mUrlBuilder!!.setIndex(index, isNext)
+                mUrlBuilder!!.jumpTo = jumpTo
+                val url = mUrlBuilder!!.build()
+                val request = EhRequest()
+                request.setMethod(EhClient.METHOD_GET_FAVORITES)
+                request.setCallback(
+                    GetFavoritesListener(
+                        context,
+                        taskId, false, mUrlBuilder!!.keyword
+                    )
+                )
+                request.setArgs(url)
+                request.enqueue(this@FavoritesScene)
             }
         }
 
-        @Override
-        protected Context getContext() {
-            return FavoritesScene.this.getContext();
+        override fun getContext(): Context {
+            return this@FavoritesScene.requireContext()
         }
 
-        @Override
-        protected void notifyDataSetChanged() {
+        override fun notifyDataSetChanged() {
             // Ensure outOfCustomChoiceMode to avoid error
             if (mRecyclerView != null) {
-                mRecyclerView.outOfCustomChoiceMode();
+                mRecyclerView!!.outOfCustomChoiceMode()
             }
-
             if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+                mAdapter!!.notifyDataSetChanged()
             }
         }
 
-        @Override
-        protected void notifyItemRangeInserted(int positionStart, int itemCount) {
+        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
             if (mAdapter != null) {
-                mAdapter.notifyItemRangeInserted(positionStart, itemCount);
+                mAdapter!!.notifyItemRangeInserted(positionStart, itemCount)
             }
         }
 
-        @Override
-        public void onShowView(View hiddenView, View shownView) {
-            showSearchBar();
+        override fun onShowView(hiddenView: View, shownView: View) {
+            showSearchBar()
         }
 
-        @Override
-        protected boolean isDuplicate(GalleryInfo d1, GalleryInfo d2) {
-            return d1.getGid() == d2.getGid();
+        override fun isDuplicate(d1: GalleryInfo?, d2: GalleryInfo?): Boolean {
+            return d1?.gid == d2?.gid && d1 != null && d2 != null
         }
 
-        @Override
-        protected void onScrollToPosition(int position) {
+        override fun onScrollToPosition(position: Int) {
             if (0 == position) {
-                showSearchBar();
+                showSearchBar()
             }
         }
+    }
+
+    companion object {
+        private const val ANIMATE_TIME = 300L
+        private const val KEY_URL_BUILDER = "url_builder"
+        private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
+        private const val KEY_FAV_COUNT_ARRAY = "fav_count_array"
     }
 }
