@@ -960,12 +960,12 @@ public class FavoritesScene extends SearchBarScene implements
         }
 
         @Override
-        void onItemClick(View view, int position) {
+        public void onItemClick(View view, int position) {
             FavoritesScene.this.onItemClick(position);
         }
 
         @Override
-        boolean onItemLongClick(View view, int position) {
+        public boolean onItemLongClick(View view, int position) {
             return FavoritesScene.this.onItemLongClick(position);
         }
 

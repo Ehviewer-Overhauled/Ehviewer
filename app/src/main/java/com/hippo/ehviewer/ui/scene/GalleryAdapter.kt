@@ -13,229 +13,219 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.scene
 
-package com.hippo.ehviewer.ui.scene;
+import android.annotation.SuppressLint
+import android.content.res.Resources
+import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.IntDef
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.hippo.drawable.TriangleDrawable
+import com.hippo.easyrecyclerview.MarginItemDecoration
+import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCacheKeyFactory
+import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.widget.TileThumb
+import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
+import com.hippo.yorozuya.ViewUtils
 
-import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+internal abstract class GalleryAdapter(
+    private val mInflater: LayoutInflater, private val mResources: Resources,
+    private val mRecyclerView: RecyclerView, type: Int, showFavourited: Boolean
+) : RecyclerView.Adapter<GalleryHolder>() {
+    private val mLayoutManager: AutoStaggeredGridLayoutManager =
+        AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
+    private val mPaddingTopSB: Int =
+        mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
+    private val mListThumbWidth: Int
+    private val mListThumbHeight: Int
+    private val mShowFavourited: Boolean
+    private val mDownloadManager: DownloadManager
+    private var mListDecoration: MarginItemDecoration? = null
+    private var mGirdDecoration: MarginItemDecoration? = null
+    private var mType = TYPE_INVALID
 
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
-import com.hippo.drawable.TriangleDrawable;
-import com.hippo.easyrecyclerview.MarginItemDecoration;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhCacheKeyFactory;
-import com.hippo.ehviewer.client.EhUtils;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.ehviewer.widget.TileThumb;
-import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager;
-import com.hippo.yorozuya.ViewUtils;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-abstract class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
-
-    public static final int TYPE_INVALID = -1;
-    public static final int TYPE_LIST = 0;
-    public static final int TYPE_GRID = 1;
-    private final LayoutInflater mInflater;
-    private final Resources mResources;
-    private final RecyclerView mRecyclerView;
-    private final AutoStaggeredGridLayoutManager mLayoutManager;
-    private final int mPaddingTopSB;
-    private final int mListThumbWidth;
-    private final int mListThumbHeight;
-    private final boolean mShowFavourited;
-    private final DownloadManager mDownloadManager;
-    private MarginItemDecoration mListDecoration;
-    private MarginItemDecoration mGirdDecoration;
-    private int mType = TYPE_INVALID;
-
-    public GalleryAdapter(@NonNull LayoutInflater inflater, @NonNull Resources resources,
-                          @NonNull RecyclerView recyclerView, int type, boolean showFavourited) {
-        mInflater = inflater;
-        mResources = resources;
-        mRecyclerView = recyclerView;
-        mLayoutManager = new AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL);
-        mPaddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar);
-        mShowFavourited = showFavourited;
-
-        mRecyclerView.setAdapter(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        @SuppressLint("InflateParams") View calculator = inflater.inflate(R.layout.item_gallery_list_thumb_height, null);
-        ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mListThumbHeight = calculator.getMeasuredHeight();
-        mListThumbWidth = mListThumbHeight * 2 / 3;
-
-        setType(type);
-
-        mDownloadManager = EhApplication.getDownloadManager();
-    }
-
-    private void adjustPaddings() {
-        RecyclerView recyclerView = mRecyclerView;
-        recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop() + mPaddingTopSB,
-                recyclerView.getPaddingRight(), recyclerView.getPaddingBottom());
-    }
-
-    public int getType() {
-        return mType;
-    }
-
-    public void setType(int type) {
-        if (type == mType) {
-            return;
-        }
-        mType = type;
-
-        RecyclerView recyclerView = mRecyclerView;
-        switch (type) {
-            case GalleryAdapter.TYPE_LIST -> {
-                int columnWidth = mResources.getDimensionPixelOffset(Settings.getDetailSizeResId());
-                mLayoutManager.setColumnSize(columnWidth);
-                mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE);
-                if (null != mGirdDecoration) {
-                    recyclerView.removeItemDecoration(mGirdDecoration);
-                }
-                if (null == mListDecoration) {
-                    int interval = mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval);
-                    int paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h);
-                    int paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v);
-                    mListDecoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
-                }
-                recyclerView.addItemDecoration(mListDecoration);
-                adjustPaddings();
-                notifyDataSetChanged();
+    var type: Int
+        get() = mType
+        set(type) {
+            if (type == mType) {
+                return
             }
-            case GalleryAdapter.TYPE_GRID -> {
-                int columnWidth = Settings.getThumbSize();
-                mLayoutManager.setColumnSize(columnWidth);
-                mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_SUITABLE_SIZE);
-                if (null != mListDecoration) {
-                    recyclerView.removeItemDecoration(mListDecoration);
+            mType = type
+            val recyclerView = mRecyclerView
+            when (type) {
+                TYPE_LIST -> {
+                    val columnWidth =
+                        mResources.getDimensionPixelOffset(Settings.getDetailSizeResId())
+                    mLayoutManager.setColumnSize(columnWidth)
+                    mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+                    if (null != mGirdDecoration) {
+                        recyclerView.removeItemDecoration(mGirdDecoration!!)
+                    }
+                    if (null == mListDecoration) {
+                        val interval =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
+                        val paddingH =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+                        val paddingV =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+                        mListDecoration =
+                            MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+                    }
+                    recyclerView.addItemDecoration(mListDecoration!!)
+                    adjustPaddings()
+                    notifyDataSetChanged()
                 }
-                if (null == mGirdDecoration) {
-                    int interval = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval);
-                    int paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h);
-                    int paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v);
-                    mGirdDecoration = new MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV);
+
+                TYPE_GRID -> {
+                    val columnWidth = Settings.getThumbSize()
+                    mLayoutManager.setColumnSize(columnWidth)
+                    mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_SUITABLE_SIZE)
+                    if (null != mListDecoration) {
+                        recyclerView.removeItemDecoration(mListDecoration!!)
+                    }
+                    if (null == mGirdDecoration) {
+                        val interval =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
+                        val paddingH =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
+                        val paddingV =
+                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
+                        mGirdDecoration =
+                            MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+                    }
+                    recyclerView.addItemDecoration(mGirdDecoration!!)
+                    adjustPaddings()
+                    notifyDataSetChanged()
                 }
-                recyclerView.addItemDecoration(mGirdDecoration);
-                adjustPaddings();
-                notifyDataSetChanged();
             }
         }
+
+    init {
+        mShowFavourited = showFavourited
+        mRecyclerView.adapter = this
+        mRecyclerView.layoutManager = mLayoutManager
+        @SuppressLint("InflateParams") val calculator =
+            mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
+        ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
+        mListThumbHeight = calculator.measuredHeight
+        mListThumbWidth = mListThumbHeight * 2 / 3
+        this.type = type
+        mDownloadManager = downloadManager
     }
 
-    @NonNull
-    @Override
-    public GalleryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layoutId = switch (viewType) {
-            case TYPE_LIST -> R.layout.item_gallery_list;
-            case TYPE_GRID -> R.layout.item_gallery_grid;
-            default -> throw new IllegalStateException("Unexpected value: " + viewType);
-        };
+    private fun adjustPaddings() {
+        val recyclerView = mRecyclerView
+        recyclerView.setPadding(
+            recyclerView.paddingLeft, recyclerView.paddingTop + mPaddingTopSB,
+            recyclerView.paddingRight, recyclerView.paddingBottom
+        )
+    }
 
-        GalleryHolder holder = new GalleryHolder(mInflater.inflate(layoutId, parent, false));
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryHolder {
+        val layoutId = when (viewType) {
+            TYPE_LIST -> R.layout.item_gallery_list
+            TYPE_GRID -> R.layout.item_gallery_grid
+            else -> throw IllegalStateException("Unexpected value: $viewType")
+        }
+        val holder = GalleryHolder(mInflater.inflate(layoutId, parent, false))
         if (viewType == TYPE_LIST) {
-            ViewGroup.LayoutParams lp = holder.thumb.getLayoutParams();
-            lp.width = mListThumbWidth;
-            lp.height = mListThumbHeight;
-            holder.thumb.setLayoutParams(lp);
+            val lp = holder.thumb.layoutParams
+            lp.width = mListThumbWidth
+            lp.height = mListThumbHeight
+            holder.thumb.layoutParams = lp
         }
-
-        holder.card.setOnClickListener(v -> onItemClick(holder.itemView, holder.getBindingAdapterPosition()));
-        holder.card.setOnLongClickListener(v -> onItemLongClick(holder.itemView, holder.getBindingAdapterPosition()));
-
-        return holder;
+        holder.card.setOnClickListener {
+            onItemClick(
+                holder.itemView,
+                holder.bindingAdapterPosition
+            )
+        }
+        holder.card.setOnLongClickListener {
+            onItemLongClick(
+                holder.itemView,
+                holder.bindingAdapterPosition
+            )
+        }
+        return holder
     }
 
-    abstract void onItemClick(View view, int position);
-
-    abstract boolean onItemLongClick(View view, int position);
-
-    @Override
-    public int getItemViewType(int position) {
-        return mType;
+    abstract fun onItemClick(view: View, position: Int)
+    abstract fun onItemLongClick(view: View, position: Int): Boolean
+    override fun getItemViewType(position: Int): Int {
+        return mType
     }
 
-    @Nullable
-    public abstract GalleryInfo getDataAt(int position);
+    abstract fun getDataAt(position: Int): GalleryInfo?
 
     @SuppressLint("SetTextI18n")
-    @Override
-    public void onBindViewHolder(@NonNull GalleryHolder holder, int position) {
-        GalleryInfo gi = getDataAt(position);
-        if (null == gi) {
-            return;
-        }
-
-        switch (mType) {
-            case TYPE_LIST -> {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.getGid()), gi.getThumb());
-                holder.title.setText(EhUtils.getSuitableTitle(gi));
-                holder.uploader.setText(gi.getUploader());
-                holder.uploader.setAlpha(gi.getDisowned() ? .5f : 1f);
-                holder.rating.setRating(gi.getRating());
-                TextView category = holder.category;
-                String newCategoryText = EhUtils.getCategory(gi.getCategory());
-                if (!newCategoryText.equals(category.getText().toString())) {
-                    category.setText(newCategoryText);
-                    category.setBackgroundColor(EhUtils.getCategoryColor(gi.getCategory()));
+    override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
+        val gi = getDataAt(position) ?: return
+        when (mType) {
+            TYPE_LIST -> {
+                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                holder.title!!.text = EhUtils.getSuitableTitle(gi)
+                holder.uploader!!.text = gi.uploader
+                holder.uploader.alpha = if (gi.disowned) .5f else 1f
+                holder.rating!!.rating = gi.rating
+                val category = holder.category
+                val newCategoryText = EhUtils.getCategory(gi.category)
+                if (newCategoryText != category.text.toString()) {
+                    category.text = newCategoryText
+                    category.setBackgroundColor(EhUtils.getCategoryColor(gi.category))
                 }
-                holder.posted.setText(gi.getPosted());
-                if (gi.getPages() == 0 || !Settings.getShowGalleryPages()) {
-                    holder.pages.setText(null);
-                    holder.pages.setVisibility(View.GONE);
+                holder.posted!!.text = gi.posted
+                if (gi.pages == 0 || !Settings.getShowGalleryPages()) {
+                    holder.pages?.text = null
+                    holder.pages!!.visibility = View.GONE
                 } else {
-                    holder.pages.setText(gi.getPages() + "P");
-                    holder.pages.setVisibility(View.VISIBLE);
+                    holder.pages!!.text = gi.pages.toString() + "P"
+                    holder.pages.visibility = View.VISIBLE
                 }
-                if (TextUtils.isEmpty(gi.getSimpleLanguage())) {
-                    holder.simpleLanguage.setText(null);
-                    holder.simpleLanguage.setVisibility(View.GONE);
+                if (TextUtils.isEmpty(gi.simpleLanguage)) {
+                    holder.simpleLanguage.text = null
+                    holder.simpleLanguage.visibility = View.GONE
                 } else {
-                    holder.simpleLanguage.setText(gi.getSimpleLanguage());
-                    holder.simpleLanguage.setVisibility(View.VISIBLE);
+                    holder.simpleLanguage.text = gi.simpleLanguage
+                    holder.simpleLanguage.visibility = View.VISIBLE
                 }
-                holder.favourited.setVisibility((mShowFavourited && gi.getFavoriteSlot() >= -1 && gi.getFavoriteSlot() <= 10) ? View.VISIBLE : View.GONE);
-                holder.downloaded.setVisibility(mDownloadManager.containDownloadInfo(gi.getGid()) ? View.VISIBLE : View.GONE);
+                holder.favourited!!.visibility =
+                    if (mShowFavourited && gi.favoriteSlot >= -1 && gi.favoriteSlot <= 10) View.VISIBLE else View.GONE
+                holder.downloaded!!.visibility =
+                    if (mDownloadManager.containDownloadInfo(gi.gid)) View.VISIBLE else View.GONE
             }
-            case TYPE_GRID -> {
-                ((TileThumb) holder.thumb).setThumbSize(gi.getThumbWidth(), gi.getThumbHeight());
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.getGid()), gi.getThumb());
-                View category = holder.category;
-                Drawable drawable = category.getBackground();
-                int color = EhUtils.getCategoryColor(gi.getCategory());
-                if (!(drawable instanceof TriangleDrawable)) {
-                    drawable = new TriangleDrawable(color);
-                    category.setBackground(drawable);
+
+            TYPE_GRID -> {
+                (holder.thumb as TileThumb).setThumbSize(gi.thumbWidth, gi.thumbHeight)
+                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                val category: View = holder.category
+                var drawable = category.background
+                val color = EhUtils.getCategoryColor(gi.category)
+                if (drawable !is TriangleDrawable) {
+                    drawable = TriangleDrawable(color)
+                    category.background = drawable
                 } else {
-                    ((TriangleDrawable) drawable).setColor(color);
+                    drawable.setColor(color)
                 }
-                holder.simpleLanguage.setText(gi.getSimpleLanguage());
+                holder.simpleLanguage.text = gi.simpleLanguage
             }
         }
     }
 
-    @IntDef({TYPE_LIST, TYPE_GRID})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Type {
+    @IntDef(TYPE_LIST, TYPE_GRID)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class Type
+    companion object {
+        const val TYPE_INVALID = -1
+        const val TYPE_LIST = 0
+        const val TYPE_GRID = 1
     }
 }
