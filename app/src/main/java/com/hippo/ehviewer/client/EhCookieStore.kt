@@ -13,104 +13,87 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
+import com.hippo.ehviewer.EhApplication
+import com.hippo.network.CookieRepository
+import okhttp3.Cookie
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.util.Collections
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.hippo.network.CookieRepository;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-
-public class EhCookieStore extends CookieRepository {
-
-    public static final String KEY_IPD_MEMBER_ID = "ipb_member_id";
-    public static final String KEY_IPD_PASS_HASH = "ipb_pass_hash";
-    public static final String KEY_IGNEOUS = "igneous";
-
-    public static final Cookie sTipsCookie =
-            new Cookie.Builder()
-                    .name(EhConfig.KEY_CONTENT_WARNING)
-                    .value(EhConfig.CONTENT_WARNING_NOT_SHOW)
-                    .domain(EhUrl.DOMAIN_E)
-                    .path("/")
-                    .expiresAt(Long.MAX_VALUE)
-                    .build();
-
-    public EhCookieStore(Context context) {
-        super(context, "okhttp3-cookie.db");
+object EhCookieStore : CookieRepository(EhApplication.application, "okhttp3-cookie.db") {
+    fun signOut() {
+        clear()
     }
 
-    public static Cookie newCookie(Cookie cookie, String newDomain, boolean forcePersistent,
-                                   boolean forceLongLive, boolean forceNotHostOnly) {
-        Cookie.Builder builder = new Cookie.Builder();
-        builder.name(cookie.name());
-        builder.value(cookie.value());
-
-        if (forceLongLive) {
-            builder.expiresAt(Long.MAX_VALUE);
-        } else if (cookie.persistent()) {
-            builder.expiresAt(cookie.expiresAt());
-        } else if (forcePersistent) {
-            builder.expiresAt(Long.MAX_VALUE);
-        }
-        if (cookie.hostOnly() && !forceNotHostOnly) {
-            builder.hostOnlyDomain(newDomain);
-        } else {
-            builder.domain(newDomain);
-        }
-        builder.path(cookie.path());
-        if (cookie.secure()) {
-            builder.secure();
-        }
-        if (cookie.httpOnly()) {
-            builder.httpOnly();
-        }
-        return builder.build();
-    }
-
-    public void signOut() {
-        clear();
-    }
-
-    public boolean hasSignedIn() {
-        HttpUrl url = HttpUrl.parse(EhUrl.HOST_E);
+    fun hasSignedIn(): Boolean {
+        val url = EhUrl.HOST_E.toHttpUrl()
         return contains(url, KEY_IPD_MEMBER_ID) &&
-                contains(url, KEY_IPD_PASS_HASH);
+                contains(url, KEY_IPD_PASS_HASH)
     }
 
-    @NonNull
-    @Override
-    public List<Cookie> loadForRequest(@NonNull HttpUrl url) {
-        List<Cookie> cookies = super.loadForRequest(url);
-
-        boolean checkTips = domainMatch(url, EhUrl.DOMAIN_E);
-
-        if (checkTips) {
-            List<Cookie> result = new ArrayList<>(cookies.size() + 1);
+    override fun loadForRequest(url: HttpUrl): List<Cookie> {
+        val cookies = super.loadForRequest(url)
+        val checkTips = domainMatch(url, EhUrl.DOMAIN_E)
+        return if (checkTips) {
+            val result: MutableList<Cookie> = ArrayList(cookies.size + 1)
             // Add all but skip some
-            for (Cookie cookie : cookies) {
-                String name = cookie.name();
-                if (EhConfig.KEY_CONTENT_WARNING.equals(name)) {
-                    continue;
+            for (cookie in cookies) {
+                val name = cookie.name
+                if (EhConfig.KEY_CONTENT_WARNING == name) {
+                    continue
                 }
-                if (EhConfig.KEY_UCONFIG.equals(name)) {
-                    continue;
+                if (EhConfig.KEY_UCONFIG == name) {
+                    continue
                 }
-                result.add(cookie);
+                result.add(cookie)
             }
             // Add some
-            result.add(sTipsCookie);
-            return Collections.unmodifiableList(result);
+            result.add(sTipsCookie)
+            Collections.unmodifiableList(result)
         } else {
-            return cookies;
+            cookies
         }
+    }
+
+    const val KEY_IPD_MEMBER_ID = "ipb_member_id"
+    const val KEY_IPD_PASS_HASH = "ipb_pass_hash"
+    const val KEY_IGNEOUS = "igneous"
+    private val sTipsCookie: Cookie = Cookie.Builder()
+        .name(EhConfig.KEY_CONTENT_WARNING)
+        .value(EhConfig.CONTENT_WARNING_NOT_SHOW)
+        .domain(EhUrl.DOMAIN_E)
+        .path("/")
+        .expiresAt(Long.MAX_VALUE)
+        .build()
+
+    fun newCookie(
+        cookie: Cookie, newDomain: String, forcePersistent: Boolean,
+        forceLongLive: Boolean, forceNotHostOnly: Boolean
+    ): Cookie {
+        val builder = Cookie.Builder()
+        builder.name(cookie.name)
+        builder.value(cookie.value)
+        if (forceLongLive) {
+            builder.expiresAt(Long.MAX_VALUE)
+        } else if (cookie.persistent) {
+            builder.expiresAt(cookie.expiresAt)
+        } else if (forcePersistent) {
+            builder.expiresAt(Long.MAX_VALUE)
+        }
+        if (cookie.hostOnly && !forceNotHostOnly) {
+            builder.hostOnlyDomain(newDomain)
+        } else {
+            builder.domain(newDomain)
+        }
+        builder.path(cookie.path)
+        if (cookie.secure) {
+            builder.secure()
+        }
+        if (cookie.httpOnly) {
+            builder.httpOnly()
+        }
+        return builder.build()
     }
 }

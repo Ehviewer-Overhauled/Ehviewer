@@ -281,7 +281,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             private set
 
         @JvmStatic
-        val ehCookieStore by lazy { EhCookieStore(application) }
+        val ehCookieStore by lazy { EhCookieStore }
 
         @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
