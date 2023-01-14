@@ -36,6 +36,7 @@ import okio.buffer
 import okio.source
 import java.io.FileInputStream
 import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.math.min
 
 class Image private constructor(source: Source, private val byteBuffer: ByteBuffer? = null) {
@@ -87,7 +88,15 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @JvmStatic
         fun decode(stream: FileInputStream): Image {
             val source = stream.source().buffer()
-            val src = createSource(source)
+            val buffer = if (DecodeUtils.isGif(source)) {
+                rewriteSource(source)
+            } else {
+                stream.channel.map(
+                    FileChannel.MapMode.READ_ONLY, 0,
+                    stream.available().toLong()
+                )
+            }
+            val src = ImageDecoder.createSource(buffer)
             return Image(src)
         }
 
@@ -95,19 +104,18 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @JvmStatic
         fun decode(buffer: ByteBuffer): Image {
             val source = Buffer().apply { write(buffer) }
-            val src = createSource(source)
+            val byteBuffer = if (DecodeUtils.isGif(source)) {
+                rewriteSource(source)
+            } else {
+                buffer.position(0) as ByteBuffer
+            }
+            val src = ImageDecoder.createSource(byteBuffer)
             return Image(src, buffer)
         }
 
-        private fun createSource(source: BufferedSource): Source {
-            val bufferedSource = if (DecodeUtils.isGif(source)) {
-                FrameDelayRewritingSource(source).buffer()
-            } else {
-                source
-            }
-            return ImageDecoder.createSource(
-                ByteBuffer.wrap(bufferedSource.use { it.readByteArray() })
-            )
+        private fun rewriteSource(source: BufferedSource): ByteBuffer {
+            val bufferedSource = FrameDelayRewritingSource(source).buffer()
+            return ByteBuffer.wrap(bufferedSource.use { it.readByteArray() })
         }
     }
 }
