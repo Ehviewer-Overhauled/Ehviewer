@@ -91,7 +91,6 @@ import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.annotation.WholeLifeCircle
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.getStartArgs
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
@@ -125,7 +124,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mViewTransition: ViewTransition? = null
     private var mViewTransition2: ViewTransition? = null
 
-    @WholeLifeCircle
     private var mDownloadState = 0
     private var mAction: String? = null
     private var mGalleryInfo: GalleryInfo? = null

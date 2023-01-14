@@ -57,9 +57,6 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.CommonOperations
-import com.hippo.ehviewer.ui.annotation.DrawerLifeCircle
-import com.hippo.ehviewer.ui.annotation.ViewLifeCircle
-import com.hippo.ehviewer.ui.annotation.WholeLifeCircle
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.widget.ContentLayout
 import com.hippo.widget.FabLayout
@@ -85,33 +82,24 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     var limit // -1 for error
             = 0
 
-    @ViewLifeCircle
     private var mRecyclerView: EasyRecyclerView? = null
 
-    @ViewLifeCircle
     private var mFabLayout: FabLayout? = null
 
-    @ViewLifeCircle
     private var mAdapter: FavoritesAdapter? = null
 
-    @ViewLifeCircle
     private var mHelper: FavoritesHelper? = null
     private var mActionFabDrawable: AddDeleteDrawable? = null
     private var mDrawerLayout: DrawerLayout? = null
 
-    @DrawerLifeCircle
     private var mDrawerAdapter: FavDrawerAdapter? = null
 
-    @WholeLifeCircle
     private var mClient: EhClient? = null
 
-    @WholeLifeCircle
     private var mFavCatArray: Array<String>? = Settings.getFavCat()
 
-    @WholeLifeCircle
     private var mFavCountArray: IntArray? = Settings.getFavCount()
 
-    @WholeLifeCircle
     private var mUrlBuilder: FavListUrlBuilder? = null
     private val showNormalFabsRunnable = Runnable {
         if (mFabLayout != null) {
