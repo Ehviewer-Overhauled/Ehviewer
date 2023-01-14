@@ -25,11 +25,17 @@ import android.graphics.ImageDecoder.Source
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import coil.decode.DecodeUtils
+import coil.decode.FrameDelayRewritingSource
+import coil.decode.isGif
 import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.EhApplication
+import okio.Buffer
+import okio.BufferedSource
+import okio.buffer
+import okio.source
 import java.io.FileInputStream
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 import kotlin.math.min
 
 class Image private constructor(source: Source, private val byteBuffer: ByteBuffer? = null) {
@@ -80,20 +86,28 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(stream: FileInputStream): Image {
-            val src = ImageDecoder.createSource(
-                stream.channel.map(
-                    FileChannel.MapMode.READ_ONLY, 0,
-                    stream.available().toLong()
-                )
-            )
+            val source = stream.source().buffer()
+            val src = createSource(source)
             return Image(src)
         }
 
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(buffer: ByteBuffer): Image {
-            val src = ImageDecoder.createSource(buffer)
+            val source = Buffer().apply { write(buffer) }
+            val src = createSource(source)
             return Image(src, buffer)
+        }
+
+        private fun createSource(source: BufferedSource): Source {
+            val bufferedSource = if (DecodeUtils.isGif(source)) {
+                FrameDelayRewritingSource(source).buffer()
+            } else {
+                source
+            }
+            return ImageDecoder.createSource(
+                ByteBuffer.wrap(bufferedSource.use { it.readByteArray() })
+            )
         }
     }
 }
