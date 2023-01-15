@@ -69,11 +69,7 @@ class EhFragment : BasePreferenceFragment() {
             return true
         } else if (Settings.KEY_GALLERY_SITE == key) {
             requireActivity().setResult(Activity.RESULT_OK)
-            launchIO {
-                runCatching {
-                    EhEngine.getUConfig()
-                }
-            }
+            launchIO { runCatching { EhEngine.getUConfig() } }
             return true
         } else if (Settings.KEY_LIST_MODE == key) {
             requireActivity().setResult(Activity.RESULT_OK)
