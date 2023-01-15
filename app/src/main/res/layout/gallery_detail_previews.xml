@@ -35,9 +35,10 @@
         app:columnCount="3"
         app:itemMargin="8dp" />
 
-    <TextView
+    <Button
+        style="@style/Widget.Material3.Button.TextButton"
         android:id="@+id/preview_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
 

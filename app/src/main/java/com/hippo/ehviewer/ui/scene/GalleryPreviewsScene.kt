@@ -59,6 +59,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     private var mAdapter: GalleryPreviewAdapter? = null
     private var mHelper: GalleryPreviewHelper? = null
     private var mHasFirstRefresh = false
+    private var mNextPage: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
@@ -71,6 +72,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     private fun onInit() {
         val args = arguments ?: return
         mGalleryInfo = args.getParcelable(KEY_GALLERY_INFO)
+        mNextPage = args.getBoolean(KEY_NEXT_PAGE)
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
@@ -136,6 +138,12 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24)
         if (mGalleryInfo != null) {
             if ((mGalleryInfo as GalleryDetail).previewPages > 2) showMenu(R.menu.scene_gallery_previews)
+        }
+        runCatching {
+            mHelper!!.mPages = (mGalleryInfo as GalleryDetail).previewPages
+            if (mNextPage && mHelper!!.pages > 1) mHelper!!.goTo(1)
+        }.onFailure {
+            it.printStackTrace()
         }
     }
 
@@ -344,6 +352,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     companion object {
         const val KEY_GALLERY_INFO = "gallery_info"
+        const val KEY_NEXT_PAGE = "next_page"
         private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
     }
 }

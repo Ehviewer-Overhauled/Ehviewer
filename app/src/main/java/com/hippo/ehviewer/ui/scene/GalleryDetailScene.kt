@@ -393,7 +393,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         } else {
             binding.content.comments.comments.visibility = View.GONE
         }
-        binding.content.previews.previews.setOnClickListener(this)
+        binding.content.previews.previews.setOnClickListener { navigateToPreview() }
+        binding.content.previews.previewText.setOnClickListener { navigateToPreview(true) }
         mViewTransition2 = ViewTransition(binding.content.belowHeader, binding.content.progress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
@@ -776,6 +777,15 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
+    fun navigateToPreview(nextPage: Boolean = false) {
+        mGalleryDetail?.let {
+            val args = Bundle()
+            args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, it)
+            args.putBoolean(GalleryPreviewsScene.KEY_NEXT_PAGE, nextPage)
+            navigate(R.id.galleryPreviewsScene, args)
+        }
+    }
+
     override fun onClick(v: View) {
         val context = context
         val activity = mainActivity
@@ -963,12 +973,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail!!.comments)
             args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail)
             navigate(R.id.galleryCommentsScene, args)
-        } else if (binding.content.previews.previews === v) {
-            if (null != mGalleryDetail) {
-                val args = Bundle()
-                args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, mGalleryDetail)
-                navigate(R.id.galleryPreviewsScene, args)
-            }
         } else {
             var o = v.getTag(R.id.tag)
             if (o is String) {
