@@ -64,7 +64,8 @@ android {
 
     packagingOptions {
         resources {
-            excludes += "/META-INF/**"
+            excludes += "/META-INF/CHANGES"
+            excludes += "/META-INF/README.md"
             excludes += "/kotlin/**"
             excludes += "**.txt"
             excludes += "**.bin"
