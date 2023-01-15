@@ -988,6 +988,10 @@ class ReaderActivity : EhActivity() {
                 .onEach { setPageNumberVisibility(it) }
                 .launchIn(lifecycleScope)
 
+            readerPreferences.showReaderSeekbar().changes()
+                .onEach { setReaderSeekbarVisibility(it) }
+                .launchIn(lifecycleScope)
+
             readerPreferences.trueColor().changes()
                 .onEach { setTrueColor(it) }
                 .launchIn(lifecycleScope)
@@ -1048,6 +1052,10 @@ class ReaderActivity : EhActivity() {
          */
         fun setPageNumberVisibility(visible: Boolean) {
             binding.pageNumber.isVisible = visible
+        }
+
+        fun setReaderSeekbarVisibility(visible: Boolean) {
+            binding.readerSeekbar.isVisible = visible
         }
 
         /**

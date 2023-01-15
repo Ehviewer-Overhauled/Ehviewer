@@ -27,6 +27,15 @@
             android:textColor="?android:attr/textColorSecondary" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/show_reader_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/pref_show_reader_seekbar"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/fullscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
