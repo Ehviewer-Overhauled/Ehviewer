@@ -24,6 +24,8 @@ import java.util.regex.Pattern
 object ArchiveParser {
     private val PATTERN_ARCHIVE_URL =
         Pattern.compile("<strong>(.*)</strong>.*<a href=\"([^\"]*)\">Click Here To Start Downloading</a>")
+    private val PATTERN_CURRENT_FUNDS =
+        Pattern.compile("<p>([\\d,]+) GP \\[[^]]*] &nbsp; ([\\d,]+) Credits \\[[^]]*]</p>")
     private val PATTERN_HATH_FORM =
         Pattern.compile("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">")
     private val PATTERN_HATH_ARCHIVE =
@@ -42,18 +44,17 @@ object ArchiveParser {
         val d = Jsoup.parse(body)
         val es = d.select("#db>div>div")
         for (e in es) {
-            try {
-                val btn = e.selectFirst("form>div>input")
-                if (!btn!!.hasAttr("disabled")) {
+            if (!e.attr("style").contains("color:#CCCCCC")) {
+                try {
                     val res = e.selectFirst("form>input")!!.attr("value")
-                    val name = btn.attr("value")
+                    val name = e.selectFirst("form>div>input")!!.attr("value")
                     val size = e.selectFirst("p>strong")!!.text()
                     val cost = e.selectFirst("div>strong")!!.text().replace(",", "")
                     val item = Archive(res, name, size, cost, false)
                     archiveList.add(item)
+                } catch (ex: NullPointerException) {
+                    ex.printStackTrace()
                 }
-            } catch (ex: NullPointerException) {
-                ex.printStackTrace()
             }
         }
         m = PATTERN_HATH_ARCHIVE.matcher(body)
@@ -65,7 +66,14 @@ object ArchiveParser {
             val item = Archive(res, name, size, cost, true)
             archiveList.add(item)
         }
-        return Result(paramOr, archiveList)
+        var funds: Funds? = null
+        m = PATTERN_CURRENT_FUNDS.matcher(body)
+        if (m.find()) {
+            val fundsGP = ParserUtils.parseInt(m.group(1), 0)
+            val fundsC = ParserUtils.parseInt(m.group(2), 0)
+            funds = Funds(fundsGP, fundsC)
+        }
+        return Result(paramOr, archiveList, funds)
     }
 
     @Throws(NoHAtHClientException::class)
@@ -104,5 +112,7 @@ object ArchiveParser {
         }
     }
 
-    class Result(val paramOr: String?, val archiveList: List<Archive>)
+    class Funds(var fundsGP: Int, var fundsC: Int)
+
+    class Result(val paramOr: String?, val archiveList: List<Archive>, val funds: Funds?)
 }
