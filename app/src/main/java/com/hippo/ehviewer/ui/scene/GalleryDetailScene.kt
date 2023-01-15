@@ -705,7 +705,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val columnWidth = Settings.getThumbSize()
             gridLayout.setColumnSize(columnWidth)
             gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-            lifecycleScope.launchIO {
+            viewLifecycleOwner.lifecycleScope.launchIO {
                 for (i in 0 until previewSet.size()) {
                     val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
                     withUIContext {
