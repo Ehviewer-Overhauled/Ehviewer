@@ -57,7 +57,6 @@ import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.OSUtils;
 import com.hippo.yorozuya.StringUtils;
-import com.hippo.yorozuya.Utilities;
 import com.hippo.yorozuya.collect.SparseJLArray;
 import com.hippo.yorozuya.thread.PriorityThread;
 import com.hippo.yorozuya.thread.PriorityThreadFactory;
@@ -1275,10 +1274,6 @@ public final class SpiderQueen implements Runnable {
                     MediaType mediaType = responseBody.contentType();
                     if (mediaType != null) {
                         extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mediaType.toString());
-                    }
-                    // Ensure extension
-                    if (!Utilities.contain(PageLoader2.SUPPORT_IMAGE_EXTENSIONS, extension)) {
-                        extension = PageLoader2.SUPPORT_IMAGE_EXTENSIONS[0];
                     }
 
                     OutputStreamPipe osPipe = null;
