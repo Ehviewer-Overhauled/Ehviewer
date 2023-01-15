@@ -78,6 +78,7 @@ import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import com.hippo.ehviewer.client.parser.ArchiveParser
+import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
@@ -148,6 +149,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
+    private var mCurrentFunds: ArchiveParser.Funds? = null
 
     @State
     private var mState = STATE_INIT
@@ -1438,12 +1440,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         .setCallback(this)
                     mRequest!!.enqueue(this@GalleryDetailScene)
                 } else {
-                    bind(mArchiveList)
+                    bind(mArchiveList, mCurrentFunds)
                 }
             }
         }
 
-        private fun bind(data: List<ArchiveParser.Archive>?) {
+        private fun bind(data: List<ArchiveParser.Archive>?, funds: ArchiveParser.Funds?) {
             if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
                 return
             }
@@ -1463,6 +1465,15 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 mListView!!.visibility = View.VISIBLE
                 mListView!!.adapter =
                     ArrayAdapter(mDialog!!.context, R.layout.item_select_dialog, nameArray)
+                if (funds != null) {
+                    mDialog!!.setTitle(
+                        getString(
+                            R.string.current_funds,
+                            funds.fundsGP,
+                            funds.fundsC
+                        )
+                    )
+                }
             }
         }
 
@@ -1470,6 +1481,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val context = context
             val activity = mainActivity
             if (null != context && null != activity && null != mArchiveList && position < mArchiveList!!.size) {
+                if (mCurrentFunds != null) {
+                    val cost = ParserUtils.parseInt(
+                        mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"), 0
+                    )
+                    if (cost <= mCurrentFunds!!.fundsGP) {
+                        mCurrentFunds!!.fundsGP -= cost
+                    } else if (cost <= mCurrentFunds!!.fundsC) {
+                        mCurrentFunds!!.fundsC -= cost
+                    } else {
+                        showTip(R.string.insufficient_funds, LENGTH_SHORT)
+                        return
+                    }
+                }
                 val res = mArchiveList!![position].res
                 val isHAtH = mArchiveList!![position].isHAtH
                 val request = EhRequest()
@@ -1506,7 +1530,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 mRequest = null
                 mArchiveFormParamOr = result.paramOr
                 mArchiveList = result.archiveList
-                bind(result.archiveList)
+                mCurrentFunds = result.funds
+                bind(result.archiveList, result.funds)
             }
         }
 
