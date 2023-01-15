@@ -25,7 +25,9 @@ import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
+import eu.kanade.tachiyomi.util.lang.launchIO
 
 class EhFragment : BasePreferenceFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -67,6 +69,11 @@ class EhFragment : BasePreferenceFragment() {
             return true
         } else if (Settings.KEY_GALLERY_SITE == key) {
             requireActivity().setResult(Activity.RESULT_OK)
+            launchIO {
+                runCatching {
+                    EhEngine.getUConfig()
+                }
+            }
             return true
         } else if (Settings.KEY_LIST_MODE == key) {
             requireActivity().setResult(Activity.RESULT_OK)

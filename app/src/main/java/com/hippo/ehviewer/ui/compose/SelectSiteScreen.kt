@@ -138,5 +138,6 @@ suspend fun getProfile() {
             Settings.putDisplayName(displayName)
             Settings.putAvatar(avatar)
         }
+        EhEngine.getUConfig()
     }
 }
