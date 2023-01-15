@@ -705,15 +705,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val columnWidth = Settings.getThumbSize()
             gridLayout.setColumnSize(columnWidth)
             gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-            for (i in 0 until previewSet.size()) {
-                val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
-                gridLayout.addView(view)
-                val image = view.findViewById<LoadImageView>(R.id.image)
-                previewSet.load(image, gd.gid, i)
-                image.setTag(R.id.index, i)
-                image.setOnClickListener(this@GalleryDetailScene)
-                val text = view.findViewById<TextView>(R.id.text)
-                text.text = (previewSet.getPosition(i) + 1).toString()
+            lifecycleScope.launchIO {
+                for (i in 0 until previewSet.size()) {
+                    val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
+                    withUIContext {
+                        gridLayout.addView(view)
+                    }
+                    val image = view.findViewById<LoadImageView>(R.id.image)
+                    previewSet.load(image, gd.gid, i)
+                    image.setTag(R.id.index, i)
+                    image.setOnClickListener(this@GalleryDetailScene)
+                    val text = view.findViewById<TextView>(R.id.text)
+                    text.text = (previewSet.getPosition(i) + 1).toString()
+                }
             }
         }
     }
