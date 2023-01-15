@@ -146,17 +146,6 @@
         app:iconSpaceReserved="false"
         app:url="@string/settings_eh_tag_translations_source_url" />
 
-    <SeekBarPreference
-        android:defaultValue="60"
-        android:key="preview_num"
-        android:max="200"
-        android:summary="@string/settings_eh_preview_num_summary"
-        android:title="@string/settings_eh_preview_num"
-        app:iconSpaceReserved="false"
-        app:min="10"
-        app:showSeekBarValue="true"
-        app:singleLineTitle="false" />
-
     <Preference
         android:key="filter"
         android:summary="@string/settings_eh_filter_summary"

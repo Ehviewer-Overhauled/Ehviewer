@@ -690,7 +690,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private fun bindPreviews(gd: GalleryDetail) {
         val inflater = layoutInflater
         resourcesOrNull ?: return
-        val previewNum = Settings.getPreviewNum()
         _binding ?: return
         binding.content.previews.run {
             gridLayout.removeAllViews()
@@ -698,7 +697,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
                 previewText.setText(R.string.no_previews)
                 return
-            } else if (gd.previewPages == 1 && previewSet.size() <= previewNum) {
+            } else if (gd.previewPages == 1) {
                 previewText.setText(R.string.no_more_previews)
             } else {
                 previewText.setText(R.string.more_previews)
@@ -706,8 +705,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val columnWidth = Settings.getThumbSize()
             gridLayout.setColumnSize(columnWidth)
             gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-            val size = previewNum.coerceAtMost(previewSet.size())
-            for (i in 0 until size) {
+            for (i in 0 until previewSet.size()) {
                 val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
                 gridLayout.addView(view)
                 val image = view.findViewById<LoadImageView>(R.id.image)

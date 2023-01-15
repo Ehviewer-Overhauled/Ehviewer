@@ -90,8 +90,6 @@ public class Settings {
     private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
     private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
     private static final boolean DEFAULT_SHOW_COMMENTS = true;
-    private static final String KEY_PREVIEW_NUM = "preview_num";
-    private static final int DEFAULT_PREVIEW_NUM = 60;
     private static final String TAG = Settings.class.getSimpleName();
     private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String DEFAULT_DISPLAY_NAME = null;
@@ -421,10 +419,6 @@ public class Settings {
 
     public static void putShowTagTranslations(boolean value) {
         putBoolean(KEY_SHOW_TAG_TRANSLATIONS, value);
-    }
-
-    public static int getPreviewNum() {
-        return getInt(KEY_PREVIEW_NUM, DEFAULT_PREVIEW_NUM);
     }
 
     public static int getDefaultCategories() {
