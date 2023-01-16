@@ -187,7 +187,7 @@ public final class SpiderDen {
         OutputStream os = null;
         try (snapshot; FileInputStream is = new FileInputStream(snapshot.getData().toFile()); BufferedSource buf = Okio.buffer(Okio.source(snapshot.getMetadata().toFile()))) {
             // Get extension
-            String extension = buf.readUtf8Line();
+            String extension = fixExtension("." + buf.readUtf8Line());
             // Copy from cache to download dir
             UniFile file = dir.createFile(generateImageFilename(index, extension));
             if (file == null) {
