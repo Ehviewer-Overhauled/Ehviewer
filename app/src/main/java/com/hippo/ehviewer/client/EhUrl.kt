@@ -44,6 +44,7 @@ object EhUrl {
     const val URL_SIGN_IN = "https://forums.e-hentai.org/index.php?act=Login"
     const val URL_REGISTER = "https://forums.e-hentai.org/index.php?act=Reg&CODE=00"
     const val URL_FORUMS = "https://forums.e-hentai.org/"
+    const val URL_FUNDS = "https://e-hentai.org/exchange.php?t=gp"
     const val REFERER_EX = "https://$DOMAIN_EX"
     const val ORIGIN_EX = REFERER_EX
     const val REFERER_E = "https://$DOMAIN_E"
