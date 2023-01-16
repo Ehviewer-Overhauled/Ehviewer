@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.loader
 
+import android.graphics.drawable.Animatable
 import androidx.annotation.CallSuper
 import androidx.collection.LruCache
 import com.hippo.image.Image
@@ -99,6 +100,7 @@ abstract class PageLoader {
         }
 
         override fun sizeOf(key: Int, value: Image): Int {
+            if (value.mObtainedDrawable is Animatable) return value.height * value.width * 15
             return value.height * value.width * 4
         }
 
