@@ -712,7 +712,7 @@ public final class SpiderQueen implements Runnable {
                 return spiderInfo;
             }
         } catch (IOException e) {
-            // Ignore
+            e.printStackTrace();
         }
 
         return null;
@@ -867,6 +867,7 @@ public final class SpiderQueen implements Runnable {
             editor.commit();
         } catch (IOException e) {
             editor.abort();
+            e.printStackTrace();
         }
     }
 
