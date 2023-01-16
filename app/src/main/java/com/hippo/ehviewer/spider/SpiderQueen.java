@@ -46,6 +46,7 @@ import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
+import com.hippo.ehviewer.gallery.PageLoader2;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
@@ -1325,8 +1326,8 @@ public final class SpiderQueen implements Runnable {
                         }
                     } finally {
                         if (osPipe != null) {
-                            // Avoid being interrupted when completing editor, this cause journal errors
-                            UtilsKt.completeUninterruptible(osPipe);
+                            osPipe.close();
+                            osPipe.release();
                         }
                     }
 
