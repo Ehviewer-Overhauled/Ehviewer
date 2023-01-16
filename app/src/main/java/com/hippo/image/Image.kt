@@ -25,15 +25,8 @@ import android.graphics.ImageDecoder.Source
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import coil.decode.DecodeUtils
-import coil.decode.FrameDelayRewritingSource
-import coil.decode.isGif
 import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.EhApplication
-import okio.Buffer
-import okio.BufferedSource
-import okio.buffer
-import okio.source
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
@@ -87,35 +80,20 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(stream: FileInputStream): Image {
-            val source = stream.source().buffer()
-            val buffer = if (DecodeUtils.isGif(source)) {
-                rewriteSource(source)
-            } else {
+            val src = ImageDecoder.createSource(
                 stream.channel.map(
                     FileChannel.MapMode.READ_ONLY, 0,
                     stream.available().toLong()
                 )
-            }
-            val src = ImageDecoder.createSource(buffer)
+            )
             return Image(src)
         }
 
         @Throws(DecodeException::class)
         @JvmStatic
         fun decode(buffer: ByteBuffer): Image {
-            val source = Buffer().apply { write(buffer) }
-            val byteBuffer = if (DecodeUtils.isGif(source)) {
-                rewriteSource(source)
-            } else {
-                buffer.position(0) as ByteBuffer
-            }
-            val src = ImageDecoder.createSource(byteBuffer)
+            val src = ImageDecoder.createSource(buffer)
             return Image(src, buffer)
-        }
-
-        private fun rewriteSource(source: BufferedSource): ByteBuffer {
-            val bufferedSource = FrameDelayRewritingSource(source).buffer()
-            return ByteBuffer.wrap(bufferedSource.use { it.readByteArray() })
         }
     }
 }
