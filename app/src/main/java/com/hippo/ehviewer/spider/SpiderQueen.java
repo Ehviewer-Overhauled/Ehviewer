@@ -1325,8 +1325,8 @@ public final class SpiderQueen implements Runnable {
                         }
                     } finally {
                         if (osPipe != null) {
-                            // Avoid being interrupted when completing editor, this cause journal errors
-                            UtilsKt.completeUninterruptible(osPipe);
+                            osPipe.close();
+                            osPipe.release();
                         }
                     }
 

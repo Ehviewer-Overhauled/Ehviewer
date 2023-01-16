@@ -142,7 +142,7 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        var snapshot = sCache.get(key);
+        var snapshot = UtilsKt.getSnapShotUninterruptible(key, sCache);
         var exist = snapshot != null;
         if (exist) snapshot.close();
         return exist;
@@ -179,7 +179,7 @@ public final class SpiderDen {
         }
         // Find image file in cache
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        var snapshot = sCache.get(key);
+        var snapshot = UtilsKt.getSnapShotUninterruptible(key, sCache);
         if (snapshot == null) {
             return false;
         }
@@ -219,7 +219,7 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        return sCache.remove(key);
+        return UtilsKt.removeUninterruptible(key, sCache);
     }
 
     private boolean removeFromDownloadDir(int index) {
@@ -252,7 +252,7 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        var editor = sCache.edit(key);
+        var editor = UtilsKt.getEditorUninterruptible(key, sCache);
         if (editor == null) return null;
         try (var sink = Okio.buffer(Okio.sink(editor.getMetadata().toFile()))) {
             sink.writeUtf8(extension);
@@ -276,7 +276,7 @@ public final class SpiderDen {
 
             @Override
             public void close() {
-                editor.commit();
+                UtilsKt.completeEditorUninterruptible(editor);
             }
         };
     }
@@ -323,7 +323,7 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        var snapshot = sCache.get(key);
+        var snapshot = UtilsKt.getSnapShotUninterruptible(key, sCache);
         if (snapshot == null) return null;
         return new InputStreamPipe() {
             @Override
@@ -344,7 +344,7 @@ public final class SpiderDen {
 
             @Override
             public void close() {
-                snapshot.close();
+                UtilsKt.closeSnapShotUninterruptible(snapshot);
             }
         };
     }
