@@ -17,12 +17,10 @@
 package com.hippo.ehviewer.spider;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.webkit.MimeTypeMap;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
@@ -40,14 +38,21 @@ import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.Utilities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+
+import coil.disk.DiskCache;
+import okio.BufferedSource;
+import okio.Okio;
 
 public final class SpiderDen {
 
     @Nullable
-    private static SimpleDiskCache sCache;
+    private static DiskCache sCache; // We use data to store image file, and metadata for image type
     private final GalleryInfo mGalleryInfo;
     private final long mGid;
     @Nullable
@@ -61,8 +66,8 @@ public final class SpiderDen {
     }
 
     public static void initialize(Context context) {
-        sCache = new SimpleDiskCache(new File(context.getCacheDir(), "image"),
-                MathUtils.clamp(Settings.getReadCacheSize(), 40, 1280) * 1024 * 1024);
+        sCache = new DiskCache.Builder().directory(new File(context.getCacheDir(), "gallery_image"))
+                .maxSizeBytes((long) MathUtils.clamp(Settings.getReadCacheSize(), 40, 1280) * 1024 * 1024).build();
     }
 
     public static UniFile getGalleryDownloadDir(long gid) {
@@ -137,7 +142,10 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        return sCache.contain(key);
+        var snapshot = sCache.get(key);
+        var exist = snapshot != null;
+        if (exist) snapshot.close();
+        return exist;
     }
 
     private boolean containInDownloadDir(int index) {
@@ -171,42 +179,27 @@ public final class SpiderDen {
         }
         // Find image file in cache
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        InputStreamPipe pipe = sCache.getInputStreamPipe(key);
-        if (pipe == null) {
+        var snapshot = sCache.get(key);
+        if (snapshot == null) {
             return false;
         }
 
         OutputStream os = null;
-        try {
+        try (snapshot; FileInputStream is = new FileInputStream(snapshot.getData().toFile()); BufferedSource buf = Okio.buffer(Okio.source(snapshot.getMetadata().toFile()))) {
             // Get extension
-            String extension;
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            pipe.obtain();
-            BitmapFactory.decodeStream(pipe.open(), null, options);
-            pipe.close();
-            extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(options.outMimeType);
-            if (extension != null) {
-                extension = '.' + extension;
-            } else {
-                return false;
-            }
-            // Fix extension
-            extension = fixExtension(extension);
+            String extension = buf.readUtf8Line();
             // Copy from cache to download dir
             UniFile file = dir.createFile(generateImageFilename(index, extension));
             if (file == null) {
                 return false;
             }
             os = file.openOutputStream();
-            IOUtils.copy(pipe.open(), os);
+            IOUtils.copy(is, os);
             return true;
         } catch (IOException e) {
             return false;
         } finally {
             IOUtils.closeQuietly(os);
-            pipe.close();
-            pipe.release();
         }
     }
 
@@ -253,13 +246,39 @@ public final class SpiderDen {
     }
 
     @Nullable
-    private OutputStreamPipe openCacheOutputStreamPipe(int index) {
+    private OutputStreamPipe openCacheOutputStreamPipe(int index, @Nullable String extension) {
         if (sCache == null) {
             return null;
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        return sCache.getOutputStreamPipe(key);
+        var editor = sCache.edit(key);
+        if (editor == null) return null;
+        try (var sink = Okio.buffer(Okio.sink(editor.getMetadata().toFile()))) {
+            sink.writeUtf8(extension);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new OutputStreamPipe() {
+            @Override
+            public void obtain() {
+            }
+
+            @Override
+            public void release() {
+            }
+
+            @NonNull
+            @Override
+            public OutputStream open() throws IOException {
+                return new FileOutputStream(editor.getData().toFile());
+            }
+
+            @Override
+            public void close() {
+                editor.commit();
+            }
+        };
     }
 
     /**
@@ -287,7 +306,7 @@ public final class SpiderDen {
             // Return the download pipe is the gallery has been downloaded
             OutputStreamPipe pipe = openDownloadOutputStreamPipe(index, extension);
             if (pipe == null) {
-                pipe = openCacheOutputStreamPipe(index);
+                pipe = openCacheOutputStreamPipe(index, extension);
             }
             return pipe;
         } else if (mMode == SpiderQueen.MODE_DOWNLOAD) {
@@ -304,7 +323,30 @@ public final class SpiderDen {
         }
 
         String key = EhCacheKeyFactory.getImageKey(mGid, index);
-        return sCache.getInputStreamPipe(key);
+        var snapshot = sCache.get(key);
+        if (snapshot == null) return null;
+        return new InputStreamPipe() {
+            @Override
+            public void obtain() {
+
+            }
+
+            @Override
+            public void release() {
+
+            }
+
+            @NonNull
+            @Override
+            public InputStream open() throws IOException {
+                return new FileInputStream(snapshot.getData().toFile());
+            }
+
+            @Override
+            public void close() {
+                snapshot.close();
+            }
+        };
     }
 
     @Nullable
