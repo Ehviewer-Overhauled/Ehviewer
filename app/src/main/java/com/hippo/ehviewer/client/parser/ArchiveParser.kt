@@ -26,6 +26,8 @@ object ArchiveParser {
         Pattern.compile("<strong>(.*)</strong>.*<a href=\"([^\"]*)\">Click Here To Start Downloading</a>")
     private val PATTERN_CURRENT_FUNDS =
         Pattern.compile("<p>([\\d,]+) GP \\[[^]]*] &nbsp; ([\\d,]+) Credits \\[[^]]*]</p>")
+    private val PATTERN_FUNDS =
+        Pattern.compile("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", Pattern.DOTALL)
     private val PATTERN_HATH_FORM =
         Pattern.compile("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">")
     private val PATTERN_HATH_ARCHIVE =
@@ -33,8 +35,7 @@ object ArchiveParser {
     private val PATTERN_NEED_HATH_CLIENT =
         Pattern.compile("You must have a H@H client assigned to your account to use this feature\\.")
 
-    fun parse(body: String?): Result? {
-        body ?: return null
+    fun parse(body: String): Result? {
         var m = PATTERN_HATH_FORM.matcher(body)
         if (!m.find()) {
             return null
@@ -44,7 +45,7 @@ object ArchiveParser {
         val d = Jsoup.parse(body)
         val es = d.select("#db>div>div")
         for (e in es) {
-            if (!e.attr("style").contains("color:#CCCCCC")) {
+            if (e.childrenSize() > 0 && !e.attr("style").contains("color:#CCCCCC")) {
                 try {
                     val res = e.selectFirst("form>input")!!.attr("value")
                     val name = e.selectFirst("form>div>input")!!.attr("value")
@@ -77,8 +78,7 @@ object ArchiveParser {
     }
 
     @Throws(NoHAtHClientException::class)
-    fun parseArchiveUrl(body: String?): String? {
-        body ?: return null
+    fun parseArchiveUrl(body: String): String? {
         val m = PATTERN_NEED_HATH_CLIENT.matcher(body)
         if (m.find()) {
             throw NoHAtHClientException("No H@H client")
@@ -90,6 +90,15 @@ object ArchiveParser {
         } else null
 
         // TODO: Check more errors
+    }
+
+    fun parseFunds(body: String): Funds? {
+        val m = PATTERN_FUNDS.matcher(body)
+        return if (m.find()) {
+            val fundsC = ParserUtils.parseInt(m.group(1), 0)
+            val fundsGP = ParserUtils.parseInt(m.group(2), 0) * 1000
+            return Funds(fundsGP, fundsC)
+        } else null
     }
 
     class Archive(
@@ -114,5 +123,5 @@ object ArchiveParser {
 
     class Funds(var fundsGP: Int, var fundsC: Int)
 
-    class Result(val paramOr: String?, val archiveList: List<Archive>, val funds: Funds?)
+    class Result(val paramOr: String?, val archiveList: List<Archive>, var funds: Funds?)
 }

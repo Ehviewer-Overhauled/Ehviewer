@@ -669,7 +669,14 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                result = ArchiveParser.parse(body)!!
+                result = ArchiveParser.parse(body!!)!!
+                if (result.funds == null) {
+                    try {
+                        result.funds = getFunds()
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                    }
+                }
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
@@ -711,6 +718,7 @@ object EhEngine {
         val call = okHttpClient.newCall(request)
         var body: String? = null
         var headers: Headers? = null
+        var result: String?
         var code = -1
         try {
             call.executeAsync().use { response ->
@@ -718,15 +726,16 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 transformException(code, headers, body, null)
+                result = ArchiveParser.parseArchiveUrl(body!!)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
             transformException(code, headers, body, e)
             throw e
         }
-        var result = ArchiveParser.parseArchiveUrl(body)
         if (!isHAtH) {
             if (result == null) {
+                // Wait for the server to prepare archives
                 delay(1000)
                 try {
                     call.clone().executeAsync().use { response ->
@@ -734,13 +743,13 @@ object EhEngine {
                         headers = response.headers
                         body = response.body.string()
                         transformException(code, headers, body, null)
+                        result = ArchiveParser.parseArchiveUrl(body!!)
                     }
                 } catch (e: Throwable) {
                     ExceptionUtils.throwIfFatal(e)
                     transformException(code, headers, body, e)
                     throw e
                 }
-                result = ArchiveParser.parseArchiveUrl(body)
                 if (result == null) {
                     throw EhException("Archive unavailable")
                 }
@@ -748,6 +757,29 @@ object EhEngine {
             return result
         }
         return null
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getFunds(): ArchiveParser.Funds? {
+        val url = EhUrl.URL_FUNDS
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, null).build()
+        val call = okHttpClient.newCall(request)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.executeAsync().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return ArchiveParser.parseFunds(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            transformException(code, headers, body, e)
+            throw e
+        }
     }
 
     @Throws(Throwable::class)

@@ -1466,13 +1466,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 mListView!!.adapter =
                     ArrayAdapter(mDialog!!.context, R.layout.item_select_dialog, nameArray)
                 if (funds != null) {
-                    mDialog!!.setTitle(
-                        getString(
-                            R.string.current_funds,
-                            funds.fundsGP,
-                            funds.fundsC
-                        )
-                    )
+                    var fundsGP = funds.fundsGP.toString()
+                    // Ex GP numbers are rounded down to the nearest thousand
+                    if (Settings.getGallerySite() == EhUrl.SITE_EX) {
+                        fundsGP += "+"
+                    }
+                    mDialog!!.setTitle(getString(R.string.current_funds, fundsGP, funds.fundsC))
                 }
             }
         }
@@ -1481,7 +1480,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val context = context
             val activity = mainActivity
             if (null != context && null != activity && null != mArchiveList && position < mArchiveList!!.size) {
-                if (mCurrentFunds != null) {
+                if (mArchiveList!![position].name == "Insufficient Funds") {
+                    showTip(R.string.insufficient_funds, LENGTH_SHORT)
+                    return
+                } else if (mCurrentFunds != null) {
                     val cost = ParserUtils.parseInt(
                         mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"), 0
                     )
