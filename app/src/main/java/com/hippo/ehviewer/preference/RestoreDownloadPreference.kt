@@ -97,7 +97,7 @@ class RestoreDownloadPreference constructor(
                 runBlocking {
                     fillGalleryListByApi(
                         ArrayList(restoreItemList),
-                        EhUrl.getReferer()
+                        EhUrl.referer
                     )
                 }
             } catch (e: Throwable) {

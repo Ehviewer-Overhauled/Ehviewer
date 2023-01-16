@@ -275,9 +275,9 @@ data class ListUrlBuilder(
         return when (mode) {
             MODE_NORMAL, MODE_SUBSCRIPTION -> {
                 val url: String = if (mode == MODE_NORMAL) {
-                    EhUrl.getHost()
+                    EhUrl.host
                 } else {
-                    EhUrl.getWatchedUrl()
+                    EhUrl.watchedUrl
                 }
                 val ub = UrlBuilder(url)
                 if (this.category != EhUtils.NONE) {
@@ -326,7 +326,7 @@ data class ListUrlBuilder(
             }
 
             MODE_UPLOADER -> {
-                val sb = StringBuilder(EhUrl.getHost())
+                val sb = StringBuilder(EhUrl.host)
                 mKeyword?.let {
                     sb.append("uploader/")
                     sb.append(encodeUTF8(it))
@@ -344,7 +344,7 @@ data class ListUrlBuilder(
             }
 
             MODE_TAG -> {
-                val sb = StringBuilder(EhUrl.getHost())
+                val sb = StringBuilder(EhUrl.host)
                 mKeyword?.let {
                     sb.append("tag/")
                     sb.append(encodeUTF8(it))
@@ -361,8 +361,8 @@ data class ListUrlBuilder(
                 sb.toString()
             }
 
-            MODE_WHATS_HOT -> EhUrl.getPopularUrl()
-            MODE_IMAGE_SEARCH -> EhUrl.getImageSearchUrl()
+            MODE_WHATS_HOT -> EhUrl.popularUrl
+            MODE_IMAGE_SEARCH -> EhUrl.imageSearchUrl
             MODE_TOPLIST -> {
                 val sb = StringBuilder(EhUrl.HOST_E)
                 sb.append("toplist.php?tl=")
