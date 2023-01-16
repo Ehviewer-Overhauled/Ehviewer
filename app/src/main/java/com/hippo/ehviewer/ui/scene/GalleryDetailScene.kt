@@ -717,9 +717,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     withUIContext {
                         gridLayout.addView(view)
                         image.setOnClickListener(this@GalleryDetailScene)
+                        val text = view.findViewById<TextView>(R.id.text)
+                        text.text = (previewSet.getPosition(i) + 1).toString()
                     }
-                    val text = view.findViewById<TextView>(R.id.text)
-                    text.text = (previewSet.getPosition(i) + 1).toString()
                 }
             }
         }
