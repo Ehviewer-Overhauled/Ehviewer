@@ -46,7 +46,6 @@ import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import com.hippo.ehviewer.gallery.PageLoader2;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
@@ -102,7 +101,7 @@ public final class SpiderQueen implements Runnable {
     public static final String SPIDER_INFO_FILENAME = ".ehviewer";
     private static final String TAG = SpiderQueen.class.getSimpleName();
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
-    private static final boolean DEBUG_LOG = false;
+    private static final boolean DEBUG_LOG = true;
     private static final boolean DEBUG_PTOKEN = true;
     private static final String[] URL_509_SUFFIX_ARRAY = {
             "/509.gif",
@@ -154,6 +153,8 @@ public final class SpiderQueen implements Runnable {
     private volatile int[] mPageStateArray;
     // For download, when it go to mPageStateArray.size(), done
     private volatile int mDownloadPage = -1;
+
+    private boolean mStoped = false;
 
     private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
         mHttpClient = EhApplication.getOkHttpClient();
@@ -387,10 +388,15 @@ public final class SpiderQueen implements Runnable {
     }
 
     private void stop() {
-        Thread queenThread = mQueenThread;
-        if (queenThread != null) {
-            queenThread.interrupt();
-            mQueenThread = null;
+        mStoped = true;
+        synchronized (mQueenLock) {
+            mQueenLock.notifyAll();
+        }
+        synchronized (mDecodeRequestQueue) {
+            mDecodeRequestQueue.notifyAll();
+        }
+        synchronized (mWorkerLock) {
+            mWorkerLock.notifyAll();
         }
     }
 
@@ -875,8 +881,8 @@ public final class SpiderQueen implements Runnable {
         // Read spider info
         SpiderInfo spiderInfo = readSpiderInfoFromLocal();
 
-        // Check interrupted
-        if (Thread.currentThread().isInterrupted()) {
+        // Check Stopped
+        if (mStoped) {
             return;
         }
 
@@ -891,16 +897,16 @@ public final class SpiderQueen implements Runnable {
         }
         mSpiderInfo.lazySet(spiderInfo);
 
-        // Check interrupted
-        if (Thread.currentThread().isInterrupted()) {
+        // Check Stopped
+        if (mStoped) {
             return;
         }
 
         // Write spider info to file
         writeSpiderInfoToLocal(spiderInfo);
 
-        // Check interrupted
-        if (Thread.currentThread().isInterrupted()) {
+        // Check Stopped
+        if (mStoped) {
             return;
         }
 
@@ -924,17 +930,19 @@ public final class SpiderQueen implements Runnable {
         }
 
         // handle pToken request
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!mStoped) {
             Integer index = mRequestPTokenQueue.poll();
 
             if (index == null) {
                 // No request index, wait here
                 synchronized (mQueenLock) {
+                    if (mStoped) break;
                     try {
                         mQueenLock.wait();
                     } catch (InterruptedException e) {
                         break;
                     }
+                    if (mStoped) break;
                 }
                 continue;
             }
@@ -989,16 +997,9 @@ public final class SpiderQueen implements Runnable {
         // Set mQueenThread null
         mQueenThread = null;
 
-        // Interrupt decoder
-        for (Thread decoderThread : mDecodeThreadArray) {
-            if (decoderThread != null) {
-                decoderThread.interrupt();
-            }
-        }
-
-        // Interrupt all workers
+        // Stop all workers
         synchronized (mWorkerLock) {
-            mWorkerPoolExecutor.shutdownNow();
+            mWorkerPoolExecutor.shutdown();
             mWorkerPoolExecutor = null;
         }
         notifyFinish();
@@ -1146,7 +1147,6 @@ public final class SpiderQueen implements Runnable {
             String pageUrl = null;
             String error = null;
             boolean forceHtml = false;
-            boolean interrupt = false;
             boolean leakSkipHathKey = false;
 
             for (int i = 0; i < 5; i++) {
@@ -1191,10 +1191,9 @@ public final class SpiderQueen implements Runnable {
                             break;
                         }
 
-                        // Check interrupted
-                        if (Thread.currentThread().isInterrupted()) {
+                        // Check Stopped
+                        if (mStoped) {
                             error = "Interrupted";
-                            interrupt = true;
                             break;
                         }
                     }
@@ -1226,10 +1225,9 @@ public final class SpiderQueen implements Runnable {
                         }
                     }
 
-                    // Check interrupted
-                    if (Thread.currentThread().isInterrupted()) {
+                    // Check Stopped
+                    if (mStoped) {
                         error = "Interrupted";
-                        interrupt = true;
                         break;
                     }
                 }
@@ -1296,7 +1294,7 @@ public final class SpiderQueen implements Runnable {
                         final byte[] data = new byte[1024 * 4];
                         long receivedSize = 0;
 
-                        while (!Thread.currentThread().isInterrupted()) {
+                        while (!mStoped) {
                             int bytesRead = is.read(data);
                             if (bytesRead == -1) {
                                 response.close();
@@ -1373,9 +1371,8 @@ public final class SpiderQueen implements Runnable {
                         }
                     }
 
-                    // Check interrupted
-                    if (Thread.currentThread().isInterrupted()) {
-                        interrupt = true;
+                    // Check Stopped
+                    if (mStoped) {
                         error = "Interrupted";
                         break;
                     }
@@ -1391,13 +1388,11 @@ public final class SpiderQueen implements Runnable {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Thread.sleep(0); // to make allow to catch InterruptedException
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
                     error = GetText.getString(R.string.error_socket);
                     forceHtml = true;
-                } catch (InterruptedException ignored) {
                 } finally {
                     IOUtils.closeQuietly(is);
 
@@ -1411,7 +1406,7 @@ public final class SpiderQueen implements Runnable {
             mSpiderDen.remove(index);
 
             updatePageState(index, STATE_FAILED, error);
-            return !interrupt;
+            return !mStoped;
         }
 
         // false for stop
@@ -1482,7 +1477,7 @@ public final class SpiderQueen implements Runnable {
 
             String pToken = null;
             // Get token
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!mStoped) {
                 synchronized (mPTokenLock) {
                     pToken = spiderInfo.pTokenMap.get(index);
                 }
@@ -1494,6 +1489,7 @@ public final class SpiderQueen implements Runnable {
                     }
                     // Wait
                     synchronized (mWorkerLock) {
+                        if (mStoped) break;
                         try {
                             mWorkerLock.wait();
                         } catch (InterruptedException e) {
@@ -1503,6 +1499,7 @@ public final class SpiderQueen implements Runnable {
                             }
                             break;
                         }
+                        if (mStoped) break;
                     }
                 } else {
                     break;
@@ -1519,7 +1516,7 @@ public final class SpiderQueen implements Runnable {
             String previousPToken = null;
             int previousIndex = index - 1;
             // Get token
-            while (previousIndex >= 0 && !Thread.currentThread().isInterrupted()) {
+            while (previousIndex >= 0 && !mStoped) {
                 synchronized (mPTokenLock) {
                     previousPToken = spiderInfo.pTokenMap.get(previousIndex);
                 }
@@ -1531,6 +1528,7 @@ public final class SpiderQueen implements Runnable {
                     }
                     // Wait
                     synchronized (mWorkerLock) {
+                        if (mStoped) break;
                         try {
                             mWorkerLock.wait();
                         } catch (InterruptedException e) {
@@ -1540,6 +1538,7 @@ public final class SpiderQueen implements Runnable {
                             }
                             break;
                         }
+                        if (mStoped) break;
                     }
                 } else {
                     break;
@@ -1563,8 +1562,7 @@ public final class SpiderQueen implements Runnable {
                 Log.i(TAG, Thread.currentThread().getName() + ": start");
             }
 
-            while (mSpiderDen.isReady() && !Thread.currentThread().isInterrupted() && runInternal())
-                ;
+            while (mSpiderDen.isReady() && !mStoped && runInternal()) ;
 
             boolean finish;
             // Clear in spider worker array
@@ -1607,9 +1605,10 @@ public final class SpiderQueen implements Runnable {
                 Log.i(TAG, Thread.currentThread().getName() + ": start");
             }
 
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!mStoped) {
                 int index;
                 synchronized (mDecodeRequestQueue) {
+                    if (mStoped) break;
                     if (mDecodeRequestQueue.isEmpty()) {
                         try {
                             mDecodeRequestQueue.wait();
@@ -1617,6 +1616,7 @@ public final class SpiderQueen implements Runnable {
                             // Interrupted
                             break;
                         }
+                        if (mStoped) break;
                         continue;
                     }
                     index = mDecodeRequestQueue.remove();
