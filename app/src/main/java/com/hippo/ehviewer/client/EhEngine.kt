@@ -213,7 +213,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getGalleryList(url: String): GalleryListParser.Result {
-        val referer = EhUrl.getReferer()
+        val referer = EhUrl.referer
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
@@ -279,8 +279,8 @@ object EhEngine {
         }
         json.put("gidlist", ja)
         json.put("namespace", 1)
-        val url = EhUrl.getApiUrl()
-        val origin = EhUrl.getOrigin()
+        val url = EhUrl.apiUrl
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(json.toString().toRequestBody(MEDIA_TYPE_JSON))
@@ -306,7 +306,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getGalleryDetail(url: String?): GalleryDetail {
-        val referer = EhUrl.getReferer()
+        val referer = EhUrl.referer
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
@@ -334,7 +334,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getPreviewSet(url: String?): Pair<PreviewSet, Int> {
-        val referer = EhUrl.getReferer()
+        val referer = EhUrl.referer
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
@@ -372,9 +372,9 @@ object EhEngine {
         json.put("token", token)
         json.put("rating", ceil((rating * 2).toDouble()).toInt())
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.getApiUrl()
+        val url = EhUrl.apiUrl
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
@@ -409,7 +409,7 @@ object EhEngine {
             builder.add("commenttext_edit", comment)
             builder.add("edit_comment", id)
         }
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
@@ -451,9 +451,9 @@ object EhEngine {
                 )
             )
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.getApiUrl()
-        val referer = EhUrl.getReferer()
-        val origin = EhUrl.getOrigin()
+        val url = EhUrl.apiUrl
+        val referer = EhUrl.referer
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
@@ -480,7 +480,7 @@ object EhEngine {
     suspend fun getFavorites(
         url: String
     ): FavoritesParser.Result {
-        val referer = EhUrl.getReferer()
+        val referer = EhUrl.referer
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         val call = okHttpClient.newCall(request)
@@ -534,7 +534,7 @@ object EhEngine {
         builder.add("submit", "Apply Changes")
         builder.add("update", "1")
         val url = EhUrl.getAddFavorites(gid, token)
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
@@ -597,7 +597,7 @@ object EhEngine {
             builder.add("modifygids[]", gid.toString())
         }
         builder.add("apply", "Apply")
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
@@ -703,7 +703,7 @@ object EhEngine {
         }
         val url = EhUrl.getDownloadArchive(gid, token, or)
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(builder.build())
@@ -799,7 +799,7 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun getUConfig(): Void? {
-        val url = EhUrl.getUConfigUrl()
+        val url = EhUrl.uConfigUrl
         Log.d(TAG, url)
         var request = EhRequestBuilder(url, null).build()
         var call = okHttpClient.newCall(request)
@@ -855,9 +855,9 @@ object EhEngine {
         json.put("comment_id", commentId)
         json.put("comment_vote", commentVote)
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.getApiUrl()
-        val referer = EhUrl.getReferer()
-        val origin = EhUrl.getOrigin()
+        val url = EhUrl.apiUrl
+        val referer = EhUrl.referer
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
@@ -894,9 +894,9 @@ object EhEngine {
         json.put("tags", tags)
         json.put("vote", vote)
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.getApiUrl()
-        val referer = EhUrl.getReferer()
-        val origin = EhUrl.getOrigin()
+        val url = EhUrl.apiUrl
+        val referer = EhUrl.referer
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
@@ -958,9 +958,9 @@ object EhEngine {
             Headers.headersOf("Content-Disposition", "form-data; name=\"f_sfile\""),
             "File Search".toRequestBody()
         )
-        val url = EhUrl.getImageSearchUrl()
-        val referer = EhUrl.getReferer()
-        val origin = EhUrl.getOrigin()
+        val url = EhUrl.imageSearchUrl
+        val referer = EhUrl.referer
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(builder.build())
@@ -1032,12 +1032,12 @@ object EhEngine {
         json.put("imgkey", pToken)
         json.put("showkey", showKey)
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.getApiUrl()
+        val url = EhUrl.apiUrl
         var referer: String? = null
         if (index > 0 && previousPToken != null) {
             referer = EhUrl.getPageUrl(gid, index - 1, previousPToken)
         }
-        val origin = EhUrl.getOrigin()
+        val origin = EhUrl.origin
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)

@@ -35,7 +35,7 @@ class FavListUrlBuilder(
     }
 
     fun build(): String {
-        val ub = UrlBuilder(EhUrl.getFavoritesUrl())
+        val ub = UrlBuilder(EhUrl.favoritesUrl)
         if (isValidFavCat(favCat)) {
             ub.addQuery("favcat", favCat.toString())
         } else if (favCat == FAV_CAT_ALL) {
