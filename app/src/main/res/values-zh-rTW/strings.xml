@@ -113,7 +113,9 @@
     <string name="search_sr">最低評分：</string>
     <string name="search_sp">頁數：</string>
     <string name="search_sp_to">到</string>
-    <string name="search_sf">禁用排除項：</string>
+    <string name="search_sp_err1">頁數最大值至少為 10</string>
+    <string name="search_sp_err2">頁數範圍差至少為 20</string>
+    <string name="search_sf">停用排除項：</string>
     <string name="search_sfl">語言</string>
     <string name="search_sfu">上傳者</string>
     <string name="search_sft">標籤</string>
@@ -138,6 +140,8 @@
     <string name="image_search_not_quick_search">無法將圖片搜尋加入快速搜尋</string>
     <string name="duplicate_quick_search">已存在相同的快速搜尋，名稱為“%s”。</string>
     <string name="duplicate_name">已經由重複的名稱了</string>
+    <string name="save_progress">儲存進度</string>
+    <string name="delete_quick_search">刪除快速搜尋“%s”？</string>
 
     <string name="go_to_hint">第 %1$d 頁，共 %2$d 頁</string>
 
@@ -173,6 +177,8 @@
     <string name="rate_successfully">評分成功</string>
     <string name="rate_failed">評分失敗</string>
     <string name="no_torrents">沒有種子</string>
+    <string name="download_torrent_started">開始下載種子</string>
+    <string name="download_torrent_failure">無法下載種子</string>
     <string name="torrents">種子</string>
     <string name="favorited">已收藏</string>
     <string name="not_favorited">未收藏</string>
@@ -233,6 +239,8 @@
     <string name="comment_successfully">留言成功</string>
     <string name="comment_failed">留言失敗</string>
     <string name="copy_comment_text">複製留言文字</string>
+    <string name="block_commenter">隱藏評論者</string>
+    <string name="filter_the_commenter">隱藏評論者“%s”？</string>
     <string name="edit_comment">修改留言</string>
     <string name="edit_comment_successfully">留言已被修改</string>
     <string name="edit_comment_failed">修改留言失敗</string>
@@ -297,6 +305,7 @@
     <string name="label_text_is_invalid">“預設”是無效的標籤</string>
     <string name="label_text_exist">標籤已存在</string>
     <string name="rename_label_title">重新命名標籤</string>
+    <string name="delete_label">刪除標籤“%s”？</string>
 
     <!-- History -->
     <string name="no_history">歷史紀錄將會顯示在這裡</string>
@@ -304,17 +313,19 @@
     <string name="clear_all_history">清除所有歷史紀錄？</string>
 
     <!-- Filter -->
-    <string name="filter">遮蔽圖庫</string>
+    <string name="filter">隱藏圖庫</string>
     <string name="filter_title">標題</string>
     <string name="filter_uploader">上傳者</string>
     <string name="filter_tag">標籤</string>
     <string name="filter_tag_namespace">標籤組</string>
-    <string name="delete_filter">刪除遮蔽項“%s”？</string>
+    <string name="filter_commenter">評論者</string>
+    <string name="filter_comment">評論</string>
+    <string name="delete_filter">刪除隱藏項“%s”？</string>
     <string name="tip">提示</string>
-    <string name="add_filter">新增遮蔽項</string>
+    <string name="add_filter">新增隱藏項</string>
     <string name="show_definition">檢視定義</string>
-    <string name="filter_text">遮蔽項文字</string>
-    <string name="filter_tip">該遮蔽系統會在 EHentai 網站遮蔽系統的基礎上繼續遮蔽圖庫。\n\n標題遮蔽項：排除標題含有該關鍵字的圖庫。\n\n上傳者遮蔽項：排除該上傳者上傳的圖庫。\n\n標籤遮蔽項：排除包含該標籤的圖庫，這會使獲取圖庫列表花費更多時間。\n\n標籤組遮蔽項：排除包含該標籤組的圖庫，這會使獲取圖庫列表花費更多時間。</string>
+    <string name="filter_text">隱藏項文字</string>
+    <string name="filter_tip">該隱藏系統會在 EHentai 網站隱藏系統的基礎上繼續隱藏圖庫。\n\n標題隱藏項：排除標題含有該關鍵字的圖庫。\n\n上傳者隱藏項：排除該上傳者上傳的圖庫。\n\n標籤隱藏項：排除包含該標籤的圖庫，這會使獲取圖庫列表花費更多時間。\n\n標籤組隱藏項：排除包含該標籤組的圖庫，這會使獲取圖庫列表花費更多時間。</string>
 
     <!-- Set Security -->
 
@@ -369,12 +380,14 @@
     <string name="settings_eh_show_jpn_title_summary">需同時在 EHentai 網站設定中啟用 Japanese Title</string>
     <string name="settings_eh_show_gallery_pages">顯示圖庫頁數</string>
     <string name="settings_eh_show_gallery_pages_summary">在圖庫列表中顯示頁數</string>
+    <string name="settings_eh_show_gallery_comments">顯示畫廊評論</string>
+    <string name="settings_eh_show_gallery_comments_summary">在畫廊詳情頁中顯示評論</string>
     <string name="settings_eh_show_tag_translations">顯示標籤翻譯</string>
     <string name="settings_eh_show_tag_translations_summary">顯示翻譯後的標籤而非原始文字（需花費時間來下載資料檔案）</string>
     <string name="settings_eh_tag_translations_source">補充翻譯（由 EhTagTranslation 提供）</string>
     <string name="settings_eh_tag_translations_source_url">https://github.com/EhTagTranslation/Editor/wiki</string>
-    <string name="settings_eh_filter">遮蔽圖庫</string>
-    <string name="settings_eh_filter_summary">根據標題、上傳者、標籤遮蔽圖庫</string>
+    <string name="settings_eh_filter">隱藏圖庫</string>
+    <string name="settings_eh_filter_summary">根據標題、上傳者、標籤隱藏圖庫</string>
 
     <string name="settings_read_volume_page">使用音量鍵翻頁</string>
     <string name="settings_read_reverse_volume">翻轉音量鍵</string>
@@ -456,6 +469,7 @@
     <string name="proxy_invalid_port">無效的通訊埠</string>
 
     <string name="cant_read_the_file">無法讀取檔案</string>
+    <string name="db_version_too_high">資料庫版本過高</string>
 
     <string name="app_language_system">系統語言（預設）</string>
 
@@ -513,7 +527,12 @@
     <string name="download_archive_started">開始下載壓縮檔</string>
     <string name="download_archive_failure">下載失敗</string>
     <string name="archive">壓縮檔</string>
+    <string name="archive_free">免費</string>
+    <string name="archive_original">原始檔案</string>
+    <string name="archive_resample">重新採樣檔案</string>
     <string name="download_archive_failure_no_hath">下載壓縮檔需要 H@H 客戶端</string>
+    <string name="current_funds">資金：%s GP，%d Credits</string>
+    <string name="insufficient_funds">餘額不足</string>
     <string name="settings_privacy">隱私</string>
     <string name="settings_privacy_secure">不允許螢幕擷取</string>
     <string name="settings_privacy_secure_summary">啟用後，將無法對本程式進行螢幕擷取，同時，將不會在系統任務切換器中顯示該程式的預覽內容，重新啟動本程式以套用此變更</string>
@@ -549,6 +568,7 @@
     <string name="metered_network_warning">正在使用流量計費網路</string>
     <string name="read_from">從第 %d 頁閱讀</string>
     <string name="settings_eh_request_news">啟動時請求新聞頁面</string>
+    <string name="settings_eh_hide_hv_events">隱藏 HV 事件通知</string>
     <string name="copy_trans">複製翻譯</string>
     <string name="reset_download_location">恢復預設路徑</string>
     <string name="pick_new_download_location">選擇新路徑</string>
@@ -576,28 +596,18 @@
     <string name="action_settings">設定</string>
     <string name="action_retry">重試</string>
     <string name="action_share">分享</string>
+    <string name="action_copy">複製</string>
     <string name="action_save">儲存</string>
     <string name="action_save_to">儲存到&#8230;</string>
     <string name="pref_category_general">一般</string>
     <string name="pref_fullscreen">全螢幕</string>
+    <string name="pref_page_transitions">翻頁轉場動畫</string>
     <string name="pref_show_page_number">顯示頁碼</string>
+    <string name="pref_show_reader_seekbar">顯示跳頁拖動條</string>
+    <string name="pref_crop_borders">邊緣裁剪</string>
     <string name="pref_custom_brightness">自訂亮度</string>
     <string name="pref_custom_color_filter">色彩濾鏡</string>
     <string name="pref_keep_screen_on">保持螢幕恆亮</string>
-    <string name="pref_rotation_type">預設螢幕方向</string>
-    <string name="rotation_free">自動</string>
-    <string name="rotation_force_portrait">鎖定直向</string>
-    <string name="rotation_force_landscape">鎖定橫向</string>
-    <string name="color_filter_r_value">R</string>
-    <string name="color_filter_g_value">G</string>
-    <string name="color_filter_b_value">B</string>
-    <string name="color_filter_a_value">A</string>
-    <string name="pref_page_transitions">翻頁轉場動畫</string>
-    <string name="pref_crop_borders">邊緣裁剪</string>
-    <string name="pref_color_filter_mode">濾鏡融合機制</string>
-    <string name="filter_mode_multiply">色彩增值</string>
-    <string name="filter_mode_screen">濾色</string>
-    <string name="pref_read_with_long_tap">長按顯示</string>
     <string name="pref_reader_theme">背景顏色</string>
     <string name="white_background">白色</string>
     <string name="black_background">黑色</string>
@@ -618,39 +628,51 @@
     <string name="zoom_start_left">左邊</string>
     <string name="zoom_start_right">右邊</string>
     <string name="zoom_start_center">中間</string>
-    <string name="decode_image_error">無法載入該圖片</string>
+    <string name="pref_rotation_type">預設螢幕方向</string>
+    <string name="rotation_free">自動</string>
+    <string name="rotation_force_portrait">鎖定直向</string>
+    <string name="rotation_force_landscape">鎖定橫向</string>
+    <string name="color_filter_r_value">R</string>
+    <string name="color_filter_g_value">G</string>
+    <string name="color_filter_b_value">B</string>
+    <string name="color_filter_a_value">A</string>
     <string name="custom_filter">濾鏡</string>
-    <string name="gray_background">灰色</string>
+    <string name="decode_image_error">無法載入該圖片</string>
+    <string name="pref_read_with_long_tap">長按顯示</string>
+    <string name="pref_color_filter_mode">濾鏡融合機制</string>
+    <string name="filter_mode_multiply">色彩增值</string>
+    <string name="filter_mode_screen">濾色</string>
+    <string name="pref_cutout_short">使用螢幕凹口區域</string>
+    <string name="action_menu">選單</string>
     <string name="webtoon_side_padding_25">25%</string>
     <string name="webtoon_side_padding_20">20%</string>
     <string name="webtoon_side_padding_15">15%</string>
     <string name="webtoon_side_padding_10">10%</string>
     <string name="webtoon_side_padding_0">無</string>
-    <string name="action_menu">選單</string>
-    <string name="pref_cutout_short">使用螢幕凹口區域</string>
     <string name="pref_webtoon_side_padding">頁緣留白</string>
+    <string name="vertical_plus_viewer">垂直連貫</string>
+    <string name="gray_background">灰色</string>
     <string name="viewer">閱讀模式</string>
-    <string name="tapping_inverted_both">全部</string>
+    <string name="tapping_inverted_both">水平 + 垂直</string>
     <string name="tapping_inverted_vertical">垂直</string>
     <string name="tapping_inverted_horizontal">水平</string>
-    <string name="pref_read_with_tapping_inverted">反轉輕觸區域</string>
-    <string name="vertical_plus_viewer">垂直連貫</string>
     <string name="tapping_inverted_none">無</string>
     <string name="pref_category_reading_mode">閱讀模式</string>
+    <string name="pref_read_with_tapping_inverted">反轉輕觸區域</string>
+    <string name="pref_viewer_nav">輕觸區域</string>
     <string name="edge_nav">邊緣式</string>
     <string name="kindlish_nav">Kindle 式</string>
     <string name="l_nav">L 式</string>
-    <string name="pref_viewer_nav">輕觸區域</string>
     <string name="right_and_left_nav">左右式</string>
+    <string name="nav_zone_right">右邊</string>
+    <string name="nav_zone_left">左邊</string>
+    <string name="nav_zone_next">下一頁</string>
+    <string name="nav_zone_prev">上一頁</string>
+    <string name="rotation_landscape">橫向</string>
     <string name="rotation_portrait">直向</string>
     <string name="rotation_type">螢幕方向</string>
-    <string name="nav_zone_left">左邊</string>
-    <string name="nav_zone_prev">上一頁</string>
-    <string name="nav_zone_next">下一頁</string>
-    <string name="nav_zone_right">右邊</string>
-    <string name="rotation_landscape">橫向</string>
-    <string name="automatic_background">自動</string>
     <string name="pref_grayscale">灰階</string>
+    <string name="automatic_background">自動</string>
     <string name="pref_inverted_colors">反轉</string>
     <string name="label_default">預設</string>
     <string name="webtoon_side_padding_5">5%</string>
@@ -658,5 +680,6 @@
     <string name="pref_navigate_pan">輕觸時移動圖片</string>
     <string name="rotation_reverse_portrait">顛倒直向</string>
     <string name="disabled_nav">停用</string>
+    <string name="wide_color_gamut">使用 Display P3 色彩空間</string>
     <!-- Tachiyomi Reader End-->
 </resources>
