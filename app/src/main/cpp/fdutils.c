@@ -39,5 +39,5 @@ JNIEXPORT void JNICALL
 Java_com_hippo_Native_unmapDirectByteBuffer(JNIEnv *env, jclass clazz, jobject buffer) {
     void *addr = (*env)->GetDirectBufferAddress(env, buffer);
     size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
-    if (munmap(addr, size)) LOGE("munmap addr:%p, size%d failed!", addr, size);
+    if (munmap(addr, size)) LOGE("munmap addr:%p, size%zu failed!", addr, size);
 }
