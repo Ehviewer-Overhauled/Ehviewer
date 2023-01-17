@@ -32,7 +32,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.math.min
 
-class Image private constructor(source: Source, private val byteBuffer: ByteBuffer? = null) {
+class Image private constructor(source: Source, private var releaseCall: (() -> Unit)? = null) {
     var mObtainedDrawable: Drawable?
 
     init {
@@ -46,8 +46,10 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
                     ).coerceAtLeast(1)
                 )
             }
-        if (mObtainedDrawable is BitmapDrawable)
-            byteBuffer?.let { UriArchiveAccessor.releaseByteBuffer(it) }
+        if (mObtainedDrawable is BitmapDrawable) {
+            releaseCall?.invoke()
+            releaseCall = null
+        }
     }
 
     val width: Int
@@ -59,7 +61,8 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
     fun recycle() {
         (mObtainedDrawable as? Animatable)?.run {
             stop()
-            byteBuffer?.let { UriArchiveAccessor.releaseByteBuffer(it) }
+            releaseCall?.invoke()
+            releaseCall = null
         }
         (mObtainedDrawable as? BitmapDrawable)?.run { bitmap.recycle() }
         mObtainedDrawable?.callback = null
@@ -93,7 +96,24 @@ class Image private constructor(source: Source, private val byteBuffer: ByteBuff
         @JvmStatic
         fun decode(buffer: ByteBuffer): Image {
             val src = ImageDecoder.createSource(buffer)
-            return Image(src, buffer)
+            return Image(src) {
+                UriArchiveAccessor.releaseByteBuffer(buffer)
+            }
         }
+
+        @Throws(DecodeException::class)
+        @JvmStatic
+        fun decode(src: ByteBufferSource): Image {
+            val directBuffer = src.getByteBuffer()
+            check(directBuffer.isDirect)
+            return Image(ImageDecoder.createSource(directBuffer)) {
+                src.close()
+            }
+        }
+    }
+
+    interface ByteBufferSource : AutoCloseable {
+        // A read-write direct bytebuffer, it may in native heap or file mapping
+        fun getByteBuffer(): ByteBuffer
     }
 }
