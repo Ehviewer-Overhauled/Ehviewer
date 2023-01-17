@@ -73,7 +73,7 @@ class ProgressScene : BaseScene(), View.OnClickListener {
                         context
                     )
                 )
-            request.enqueue(this)
+            request.enqueue()
             return true
         }
         return false
