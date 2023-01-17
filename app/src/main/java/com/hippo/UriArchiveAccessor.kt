@@ -19,6 +19,7 @@ package com.hippo
 
 import android.content.Context
 import android.net.Uri
+import com.hippo.image.Image
 import java.nio.ByteBuffer
 
 class UriArchiveAccessor(ctx: Context, uri: Uri) {
@@ -28,7 +29,7 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
     }
 
     private external fun openArchive(fd: Int, size: Long): Int
-    external fun extractToByteBuffer(index: Int): ByteBuffer?
+    private external fun extractToByteBuffer(index: Int): ByteBuffer?
     external fun extractToFd(index: Int, fd: Int)
     external fun getFilename(index: Int): String
     external fun needPassword(): Boolean
@@ -39,8 +40,23 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
         pfd.close()
     }
 
+    fun getImageSource(index: Int): Image.ByteBufferSource? {
+        val buffer = extractToByteBuffer(index)
+        buffer ?: return null
+        check(buffer.isDirect)
+        return object : Image.ByteBufferSource {
+            override fun getByteBuffer(): ByteBuffer {
+                return buffer
+            }
+
+            override fun close() {
+                releaseByteBuffer(buffer)
+            }
+        }
+    }
+
     companion object {
         @JvmStatic
-        external fun releaseByteBuffer(buffer: ByteBuffer)
+        private external fun releaseByteBuffer(buffer: ByteBuffer)
     }
 }

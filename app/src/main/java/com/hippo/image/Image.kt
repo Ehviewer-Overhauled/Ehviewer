@@ -25,7 +25,6 @@ import android.graphics.ImageDecoder.Source
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.EhApplication
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -92,23 +91,18 @@ class Image private constructor(source: Source, private var releaseCall: (() -> 
             return Image(src)
         }
 
-        @Throws(DecodeException::class)
         @JvmStatic
-        fun decode(buffer: ByteBuffer): Image {
-            val src = ImageDecoder.createSource(buffer)
-            return Image(src) {
-                UriArchiveAccessor.releaseByteBuffer(buffer)
-            }
-        }
-
-        @Throws(DecodeException::class)
-        @JvmStatic
-        fun decode(src: ByteBufferSource): Image {
+        fun decode(src: ByteBufferSource): Image? {
             val directBuffer = src.getByteBuffer()
             check(directBuffer.isDirect)
-            return Image(ImageDecoder.createSource(directBuffer)) {
+            return runCatching {
+                Image(ImageDecoder.createSource(directBuffer)) {
+                    src.close()
+                }
+            }.onFailure {
                 src.close()
-            }
+                it.printStackTrace()
+            }.getOrNull()
         }
     }
 

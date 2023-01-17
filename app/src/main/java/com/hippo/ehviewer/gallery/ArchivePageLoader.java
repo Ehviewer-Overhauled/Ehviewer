@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.gallery;
 
 import android.content.Context;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Process;
@@ -38,7 +37,6 @@ import com.hippo.yorozuya.thread.PriorityThread;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +54,7 @@ public class ArchivePageLoader extends PageLoader2 {
     public static PVLock pv = new PVLock(0);
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
-    private final LinkedHashMap<Integer, ByteBuffer> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Image.ByteBufferSource> streams = new LinkedHashMap<>();
     private final Thread[] decodeThread = new Thread[]{
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
@@ -305,10 +303,10 @@ public class ArchivePageLoader extends PageLoader2 {
                     }
                 }
 
-                ByteBuffer buffer = archiveAccessor.extractToByteBuffer(index);
+                Image.ByteBufferSource src = archiveAccessor.getImageSource(index);
 
                 synchronized (streams) {
-                    streams.put(index, buffer);
+                    streams.put(index, src);
                     streams.notify();
                 }
             }
@@ -320,7 +318,7 @@ public class ArchivePageLoader extends PageLoader2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                ByteBuffer buffer;
+                Image.ByteBufferSource src;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -331,21 +329,16 @@ public class ArchivePageLoader extends PageLoader2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, ByteBuffer>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, ByteBuffer> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Image.ByteBufferSource>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Image.ByteBufferSource> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
-                    buffer = entry.getValue();
+                    src = entry.getValue();
                 }
 
                 Image image = null;
-                if (buffer != null) {
-                    try {
-                        image = Image.decode(buffer.asReadOnlyBuffer());
-                    } catch (ImageDecoder.DecodeException e) {
-                        UriArchiveAccessor.releaseByteBuffer(buffer);
-                        e.printStackTrace();
-                    }
+                if (src != null) {
+                    image = Image.decode(src);
                 }
                 if (image != null) {
                     notifyPageSucceed(index, image);
