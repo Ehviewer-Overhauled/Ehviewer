@@ -19,16 +19,13 @@ package com.hippo.image
 
 import android.graphics.ColorSpace
 import android.graphics.ImageDecoder
-import android.graphics.ImageDecoder.DecodeException
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.hippo.ehviewer.EhApplication
-import java.io.FileInputStream
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 import kotlin.math.min
 
 class Image private constructor(source: Source, private var releaseCall: (() -> Unit)? = null) {
@@ -78,18 +75,6 @@ class Image private constructor(source: Source, private var releaseCall: (() -> 
                     .get()
             ) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB
         )
-
-        @Throws(DecodeException::class)
-        @JvmStatic
-        fun decode(stream: FileInputStream): Image {
-            val src = ImageDecoder.createSource(
-                stream.channel.map(
-                    FileChannel.MapMode.READ_ONLY, 0,
-                    stream.available().toLong()
-                )
-            )
-            return Image(src)
-        }
 
         @JvmStatic
         fun decode(src: ByteBufferSource): Image? {

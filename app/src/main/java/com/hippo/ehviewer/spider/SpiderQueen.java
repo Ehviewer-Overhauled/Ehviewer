@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.spider;
 
 import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.text.TextUtils;
@@ -1623,8 +1622,8 @@ public final class SpiderQueen implements Runnable {
                     continue;
                 }
 
-                InputStreamPipe pipe = mSpiderDen.openInputStreamPipe(index);
-                if (pipe == null) {
+                Image.ByteBufferSource src = mSpiderDen.getImageSource(index);
+                if (src == null) {
                     resetDecodeIndex();
                     // Can't find the file, it might be removed from cache,
                     // Reset it state and request it
@@ -1633,35 +1632,11 @@ public final class SpiderQueen implements Runnable {
                     continue;
                 }
 
-                Image image = null;
+                Image image = Image.decode(src);
                 String error = null;
-                InputStream is;
 
-                try {
-                    is = pipe.open();
-                } catch (IOException e) {
-                    // Can't open pipe
-                    error = GetText.getString(R.string.error_reading_failed);
-                    is = null;
-                    pipe.close();
-                    pipe.release();
-                }
-
-                if (is != null) {
-                    try {
-                        image = Image.decode(((FileInputStream) is));
-                    } catch (ImageDecoder.DecodeException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (image == null) {
-                        error = GetText.getString(R.string.error_decoding_failed);
-                    }
+                if (image == null) {
+                    error = GetText.getString(R.string.error_decoding_failed);
                 }
 
                 // Notify

@@ -21,16 +21,20 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.Native;
+import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
 import com.hippo.ehviewer.client.EhUtils;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.gallery.PageLoader2;
+import com.hippo.image.Image;
 import com.hippo.io.UniFileInputStreamPipe;
 import com.hippo.io.UniFileOutputStreamPipe;
 import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
+import com.hippo.unifile.RawFile;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.FileUtils;
 import com.hippo.yorozuya.IOUtils;
@@ -43,6 +47,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Locale;
 
 import coil.disk.DiskCache;
@@ -261,6 +268,7 @@ public final class SpiderDen {
         }
         return new OutputStreamPipe() {
             private OutputStream os = null;
+
             @Override
             public void release() {
                 editor.commit();
@@ -382,4 +390,94 @@ public final class SpiderDen {
         }
     }
 
+    @Nullable
+    public Image.ByteBufferSource getImageSource(int index) {
+        if (mMode == SpiderQueen.MODE_READ) {
+            String key = EhCacheKeyFactory.getImageKey(mGid, index);
+            if (sCache != null) {
+                var snapshot = sCache.get(key);
+                if (snapshot != null) {
+                    try {
+                        var file = new RandomAccessFile(snapshot.getData().toFile(), "rw");
+                        var chan = file.getChannel();
+                        var map = chan.map(FileChannel.MapMode.PRIVATE, 0, file.length());
+                        return new Image.ByteBufferSource() {
+                            @NonNull
+                            @Override
+                            public ByteBuffer getByteBuffer() {
+                                return map;
+                            }
+
+                            @Override
+                            public void close() throws Exception {
+                                chan.close();
+                                file.close();
+                                snapshot.close();
+                            }
+                        };
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        UniFile dir = getDownloadDir();
+        if (dir == null) {
+            return null;
+        }
+        UniFile file = findImageFile(dir, index);
+        if (file != null && mMode == SpiderQueen.MODE_DOWNLOAD) {
+            if (copyFromCacheToDownloadDir(index)) {
+                file = findImageFile(dir, index);
+            }
+        }
+        if (file instanceof RawFile rawFile) {
+            try {
+                var file2 = new RandomAccessFile(rawFile.mFile, "rw");
+                var chan = file2.getChannel();
+                var map = chan.map(FileChannel.MapMode.PRIVATE, 0, file2.length());
+                return new Image.ByteBufferSource() {
+                    @NonNull
+                    @Override
+                    public ByteBuffer getByteBuffer() {
+                        return map;
+                    }
+
+                    @Override
+                    public void close() throws Exception {
+                        chan.close();
+                        file2.close();
+                    }
+                };
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        if (file != null) {
+            try {
+                var pfd = EhApplication.getApplication().getContentResolver().openFileDescriptor(file.getUri(), "rw");
+                var map = Native.mapFd(pfd.getFd(), pfd.getStatSize());
+                if (map != null) {
+                    return new Image.ByteBufferSource() {
+                        @NonNull
+                        @Override
+                        public ByteBuffer getByteBuffer() {
+                            return map;
+                        }
+
+                        @Override
+                        public void close() throws Exception {
+                            Native.unmapDirectByteBuffer(map);
+                            pfd.close();
+                        }
+                    };
+                } else {
+                    pfd.close();
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }
