@@ -124,6 +124,7 @@ public class EhUtils {
         EhApplication.getEhCookieStore().signOut();
         Settings.putAvatar(null);
         Settings.putDisplayName(null);
+        Settings.putGallerySite(EhUrl.SITE_E);
         Settings.putNeedSignIn(true);
     }
 
