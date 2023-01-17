@@ -584,7 +584,6 @@ public final class SpiderQueen implements Runnable {
         OutputStream os = null;
         try {
             os = file.openOutputStream();
-            pipe.obtain();
             IOUtils.copy(pipe.open(), os);
             return true;
         } catch (IOException e) {
@@ -610,8 +609,6 @@ public final class SpiderQueen implements Runnable {
 
         OutputStream os = null;
         try {
-            pipe.obtain();
-
             // Get dst file
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -650,8 +647,6 @@ public final class SpiderQueen implements Runnable {
         }
 
         try {
-            pipe.obtain();
-
             // Get dst file
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -1288,7 +1283,6 @@ public final class SpiderQueen implements Runnable {
 
                         long contentLength = responseBody.contentLength();
                         is = responseBody.byteStream();
-                        osPipe.obtain();
                         OutputStream os = osPipe.open();
 
                         final byte[] data = new byte[1024 * 4];
@@ -1340,7 +1334,6 @@ public final class SpiderQueen implements Runnable {
                         }
 
                         // Check plain txt
-                        isPipe.obtain();
                         InputStream inputStream = new BufferedInputStream(isPipe.open());
                         boolean isPlainTxt = true;
                         int j = 0;
@@ -1644,7 +1637,6 @@ public final class SpiderQueen implements Runnable {
                 String error = null;
                 InputStream is;
 
-                pipe.obtain();
                 try {
                     is = pipe.open();
                 } catch (IOException e) {

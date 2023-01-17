@@ -260,23 +260,23 @@ public final class SpiderDen {
             e.printStackTrace();
         }
         return new OutputStreamPipe() {
-            @Override
-            public void obtain() {
-            }
-
+            private OutputStream os = null;
             @Override
             public void release() {
+                editor.commit();
             }
 
             @NonNull
             @Override
             public OutputStream open() throws IOException {
-                return new FileOutputStream(editor.getData().toFile());
+                if (os != null) IOUtils.closeQuietly(os);
+                os = new FileOutputStream(editor.getData().toFile());
+                return os;
             }
 
             @Override
             public void close() {
-                editor.commit();
+                if (os != null) IOUtils.closeQuietly(os);
             }
         };
     }
@@ -326,25 +326,24 @@ public final class SpiderDen {
         var snapshot = sCache.get(key);
         if (snapshot == null) return null;
         return new InputStreamPipe() {
-            @Override
-            public void obtain() {
-
-            }
+            private InputStream is = null;
 
             @Override
             public void release() {
-
+                snapshot.close();
             }
 
             @NonNull
             @Override
             public InputStream open() throws IOException {
-                return new FileInputStream(snapshot.getData().toFile());
+                if (is != null) IOUtils.closeQuietly(is);
+                is = new FileInputStream(snapshot.getData().toFile());
+                return is;
             }
 
             @Override
             public void close() {
-                snapshot.close();
+                if (is != null) IOUtils.closeQuietly(is);
             }
         };
     }

@@ -35,11 +35,6 @@ public class UniFileOutputStreamPipe implements OutputStreamPipe {
     }
 
     @Override
-    public void obtain() {
-        // Empty
-    }
-
-    @Override
     public void release() {
         // Empty
     }

@@ -50,8 +50,6 @@ public final class BitmapUtils {
     public static Bitmap decodeStream(@NonNull InputStreamPipe isp, int maxWidth, int maxHeight,
                                       int pixels, boolean checkMemory, boolean justCalc, int[] sampleSize) {
         try {
-            isp.obtain();
-
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(isp.open(), null, options);

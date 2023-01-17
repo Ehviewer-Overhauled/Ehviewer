@@ -21,32 +21,12 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * A pipe to open {@code InputStream}
- */
 public interface InputStreamPipe {
 
-    /**
-     * Obtain the {@code InputStreamPipe}.
-     * Call it before opening {@code InputStream}.
-     */
-    void obtain();
-
-    /**
-     * Release the {@code InputStreamPipe}.
-     */
     void release();
 
-    /**
-     * Open {@code InputStream}
-     *
-     * @return the {@code InputStream}
-     */
     @NonNull
     InputStream open() throws IOException;
 
-    /**
-     * Close the {@code InputStream} opened before.
-     */
     void close();
 }
