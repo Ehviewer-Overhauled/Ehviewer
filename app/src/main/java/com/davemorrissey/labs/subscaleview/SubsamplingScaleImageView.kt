@@ -476,10 +476,8 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
 
     private fun setGestureDetector(context: Context) {
         detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            @Suppress("SENSELESS_COMPARISON")
             override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                // The e1 can be null, that's weird and cause crash
-                if (panEnabled && isReady && vTranslate != null && e1 != null && e2 != null && (abs(e1.x - e2.x) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || abs(velocityY) > 500) && !isZooming) {
+                if (panEnabled && isReady && vTranslate != null && (abs(e1.x - e2.x) > 50 || abs(e1.y - e2.y) > 50) && (abs(velocityX) > 500 || abs(velocityY) > 500) && !isZooming) {
                     val vTranslateEnd = PointF(vTranslate!!.x + velocityX * 0.25F, vTranslate!!.y + velocityY * 0.25F)
                     val sCenterXEnd = (width / 2 - vTranslateEnd.x) / scale
                     val sCenterYEnd = (height / 2 - vTranslateEnd.y) / scale
@@ -607,12 +605,16 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
             return true
         }
         // Detect flings, taps and double taps
-        if (!isQuickScaling && detector?.onTouchEvent(event) != false) {
-            isZooming = false
-            isPanning = false
-            maxTouchCount = 0
-            return true
+        // May throw NPE
+        runCatching {
+            if (!isQuickScaling && detector?.onTouchEvent(event) != false) {
+                isZooming = false
+                isPanning = false
+                maxTouchCount = 0
+                return true
+            }
         }
+
         if (vTranslateStart == null) {
             vTranslateStart = PointF(0F, 0F)
         }
