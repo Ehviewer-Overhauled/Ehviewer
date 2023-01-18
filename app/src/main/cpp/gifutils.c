@@ -28,6 +28,7 @@ Java_com_hippo_image_Image_rewriteGifSource(JNIEnv *env, jclass clazz, jobject b
     size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
     if (size < 7 || !isGif(addr)) return;
     for (size_t i = 0; i < size - 8; i++) {
+        // TODO: Optimize this hex find with SIMD?
         if (addr[i] == FRAME_DELAY_START_MARKER[3] && addr[i + 1] == FRAME_DELAY_START_MARKER[2] &&
             addr[i + 2] == FRAME_DELAY_START_MARKER[1] &&
             addr[i + 3] == FRAME_DELAY_START_MARKER[0]) {
