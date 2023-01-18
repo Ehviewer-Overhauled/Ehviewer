@@ -1244,7 +1244,6 @@ public final class SpiderQueen implements Runnable {
                 }
 
                 // Download image
-                InputStream is = null;
                 try {
                     if (DEBUG_LOG) {
                         Log.d(TAG, "Start download image " + index);
@@ -1281,11 +1280,10 @@ public final class SpiderQueen implements Runnable {
                         }
 
                         long contentLength = responseBody.contentLength();
-                        is = responseBody.byteStream();
                         long receivedSize = 0;
                         OutputStream os = osPipe.open();
                         if (os instanceof FileOutputStream fileOutputStream) {
-                            try (var channel = fileOutputStream.getChannel(); var source = responseBody.source(); response) {
+                            try (var channel = fileOutputStream.getChannel(); var source = responseBody.source(); responseBody; response) {
                                 while (!mStoped) {
                                     // Is 40k a good size ?
                                     long bytesRead = channel.transferFrom(source, receivedSize, 40960);
@@ -1301,22 +1299,23 @@ public final class SpiderQueen implements Runnable {
                             }
                         } else {
                             final byte[] data = new byte[1024 * 4];
-                            while (!mStoped) {
-                                int bytesRead = is.read(data);
-                                if (bytesRead == -1) {
-                                    response.close();
-                                    break;
+                            try (var is = responseBody.byteStream(); responseBody; response) {
+                                while (!mStoped) {
+                                    int bytesRead = is.read(data);
+                                    if (bytesRead == -1) {
+                                        break;
+                                    }
+                                    os.write(data, 0, bytesRead);
+                                    receivedSize += bytesRead;
+                                    // Update page percent
+                                    if (contentLength > 0) {
+                                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                                    }
+                                    // Notify listener
+                                    notifyPageDownload(index, contentLength, receivedSize, bytesRead);
                                 }
-                                os.write(data, 0, bytesRead);
-                                receivedSize += bytesRead;
-                                // Update page percent
-                                if (contentLength > 0) {
-                                    mPagePercentMap.put(index, (float) receivedSize / contentLength);
-                                }
-                                // Notify listener
-                                notifyPageDownload(index, contentLength, receivedSize, bytesRead);
+                                os.flush();
                             }
-                            os.flush();
                         }
 
                         // check download size
@@ -1401,8 +1400,6 @@ public final class SpiderQueen implements Runnable {
                     error = GetText.getString(R.string.error_socket);
                     forceHtml = true;
                 } finally {
-                    IOUtils.closeQuietly(is);
-
                     if (DEBUG_LOG) {
                         Log.d(TAG, "End download image " + index);
                     }
