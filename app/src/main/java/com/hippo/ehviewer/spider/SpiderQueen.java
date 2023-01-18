@@ -1285,18 +1285,19 @@ public final class SpiderQueen implements Runnable {
                         long receivedSize = 0;
                         OutputStream os = osPipe.open();
                         if (os instanceof FileOutputStream fileOutputStream) {
-                            while (!mStoped) {
-                                // Is 40k a good size ?
-                                long bytesRead = fileOutputStream.getChannel().transferFrom(responseBody.source(), receivedSize, 40960);
-                                if (bytesRead == 0) {
-                                    response.close();
-                                    break;
+                            try (var channel = fileOutputStream.getChannel(); var source = responseBody.source(); response) {
+                                while (!mStoped) {
+                                    // Is 40k a good size ?
+                                    long bytesRead = channel.transferFrom(source, receivedSize, 40960);
+                                    if (bytesRead == 0) {
+                                        break;
+                                    }
+                                    receivedSize += bytesRead;
+                                    if (contentLength > 0) {
+                                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                                    }
+                                    notifyPageDownload(index, contentLength, receivedSize, (int) bytesRead);
                                 }
-                                receivedSize += bytesRead;
-                                if (contentLength > 0) {
-                                    mPagePercentMap.put(index, (float) receivedSize / contentLength);
-                                }
-                                notifyPageDownload(index, contentLength, receivedSize, (int) bytesRead);
                             }
                         } else {
                             final byte[] data = new byte[1024 * 4];
