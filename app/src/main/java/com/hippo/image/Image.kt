@@ -29,36 +29,30 @@ import java.nio.ByteBuffer
 import kotlin.math.min
 
 class Image private constructor(source: Source, private var src: ByteBufferSource?) {
-    var mObtainedDrawable: Drawable?
-
-    init {
-        mObtainedDrawable =
-            ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, _: Source ->
-                decoder.setTargetColorSpace(colorSpace)
-                decoder.setTargetSampleSize(
-                    min(
-                        info.size.width / (2 * screenWidth),
-                        info.size.height / (2 * screenHeight)
-                    ).coerceAtLeast(1)
-                )
+    var mObtainedDrawable: Drawable? =
+        ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, _: Source ->
+            decoder.setTargetColorSpace(colorSpace)
+            decoder.setTargetSampleSize(
+                min(
+                    info.size.width / (2 * screenWidth),
+                    info.size.height / (2 * screenHeight)
+                ).coerceAtLeast(1)
+            )
+        }.also {
+            (it as? BitmapDrawable)?.run {
+                src?.close()
+                src = null
             }
-        if (mObtainedDrawable is BitmapDrawable) {
-            src?.close()
-            src = null
         }
-    }
+        private set
 
-    val width: Int
-        get() = mObtainedDrawable?.intrinsicWidth ?: 0
-    val height: Int
-        get() = mObtainedDrawable?.intrinsicHeight ?: 0
+    val size: Int
+        get() = mObtainedDrawable!!.run { intrinsicHeight * intrinsicWidth * 4 * if (this is Animatable) 4 else 1 }
 
     @Synchronized
     fun recycle() {
-        (mObtainedDrawable as? Animatable)?.run {
-            stop()
-        }
-        (mObtainedDrawable as? BitmapDrawable)?.run { bitmap.recycle() }
+        (mObtainedDrawable as? Animatable)?.stop()
+        (mObtainedDrawable as? BitmapDrawable)?.bitmap?.recycle()
         mObtainedDrawable?.callback = null
         mObtainedDrawable = null
         src?.close()
