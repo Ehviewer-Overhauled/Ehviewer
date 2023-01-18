@@ -28,7 +28,7 @@ import com.hippo.ehviewer.EhApplication
 import java.nio.ByteBuffer
 import kotlin.math.min
 
-class Image private constructor(source: Source, private var releaseCall: (() -> Unit)? = null) {
+class Image private constructor(source: Source, private var src: ByteBufferSource?) {
     var mObtainedDrawable: Drawable?
 
     init {
@@ -43,8 +43,8 @@ class Image private constructor(source: Source, private var releaseCall: (() -> 
                 )
             }
         if (mObtainedDrawable is BitmapDrawable) {
-            releaseCall?.invoke()
-            releaseCall = null
+            src?.close()
+            src = null
         }
     }
 
@@ -57,12 +57,12 @@ class Image private constructor(source: Source, private var releaseCall: (() -> 
     fun recycle() {
         (mObtainedDrawable as? Animatable)?.run {
             stop()
-            releaseCall?.invoke()
-            releaseCall = null
         }
         (mObtainedDrawable as? BitmapDrawable)?.run { bitmap.recycle() }
         mObtainedDrawable?.callback = null
         mObtainedDrawable = null
+        src?.close()
+        src = null
     }
 
     companion object {
@@ -82,9 +82,7 @@ class Image private constructor(source: Source, private var releaseCall: (() -> 
             check(directBuffer.isDirect)
             rewriteGifSource(directBuffer)
             return runCatching {
-                Image(ImageDecoder.createSource(directBuffer)) {
-                    src.close()
-                }
+                Image(ImageDecoder.createSource(directBuffer), src)
             }.onFailure {
                 src.close()
                 it.printStackTrace()
