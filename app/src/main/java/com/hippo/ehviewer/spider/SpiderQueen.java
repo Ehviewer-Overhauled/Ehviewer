@@ -1282,27 +1282,41 @@ public final class SpiderQueen implements Runnable {
 
                         long contentLength = responseBody.contentLength();
                         is = responseBody.byteStream();
-                        OutputStream os = osPipe.open();
-
-                        final byte[] data = new byte[1024 * 4];
                         long receivedSize = 0;
-
-                        while (!mStoped) {
-                            int bytesRead = is.read(data);
-                            if (bytesRead == -1) {
-                                response.close();
-                                break;
+                        OutputStream os = osPipe.open();
+                        if (os instanceof FileOutputStream fileOutputStream) {
+                            while (!mStoped) {
+                                // Is 40k a good size ?
+                                long bytesRead = fileOutputStream.getChannel().transferFrom(responseBody.source(), receivedSize, 40960);
+                                if (bytesRead == 0) {
+                                    response.close();
+                                    break;
+                                }
+                                receivedSize += bytesRead;
+                                if (contentLength > 0) {
+                                    mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                                }
+                                notifyPageDownload(index, contentLength, receivedSize, (int) bytesRead);
                             }
-                            os.write(data, 0, bytesRead);
-                            receivedSize += bytesRead;
-                            // Update page percent
-                            if (contentLength > 0) {
-                                mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                        } else {
+                            final byte[] data = new byte[1024 * 4];
+                            while (!mStoped) {
+                                int bytesRead = is.read(data);
+                                if (bytesRead == -1) {
+                                    response.close();
+                                    break;
+                                }
+                                os.write(data, 0, bytesRead);
+                                receivedSize += bytesRead;
+                                // Update page percent
+                                if (contentLength > 0) {
+                                    mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                                }
+                                // Notify listener
+                                notifyPageDownload(index, contentLength, receivedSize, bytesRead);
                             }
-                            // Notify listener
-                            notifyPageDownload(index, contentLength, receivedSize, bytesRead);
+                            os.flush();
                         }
-                        os.flush();
 
                         // check download size
                         if (contentLength >= 0) {
