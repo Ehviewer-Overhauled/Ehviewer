@@ -16,8 +16,6 @@
 <!-- French translations by UShimamura -->
 <resources>
 
-    <string name="app_name">EhViewer</string>
-
     <!-- Category -->
 
     <string name="homepage">Page d\'acceuil</string>
