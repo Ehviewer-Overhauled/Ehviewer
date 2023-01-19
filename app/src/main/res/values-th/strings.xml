@@ -16,8 +16,6 @@
 
 <resources>
 
-    <string name="app_name">EhViewer</string>
-
     <!-- Theme -->
 
     <string name="homepage">หน้าหลัก</string>
