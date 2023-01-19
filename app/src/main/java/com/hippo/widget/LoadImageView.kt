@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import coil.imageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
+import coil.size.Size
 import com.hippo.drawable.PreciselyClipDrawable
 import com.hippo.ehviewer.R
 
@@ -134,7 +135,8 @@ open class LoadImageView @JvmOverloads constructor(
         clearRetry()
         task?.dispose()
         mRequest =
-            ImageRequest.Builder(context).data(url).memoryCacheKey(key).diskCacheKey(key).target(
+            ImageRequest.Builder(context).data(url).memoryCacheKey(key).diskCacheKey(key)
+                .size(Size.ORIGINAL).target(
                 { onWait() },
                 { onFailure() },
                 { onGetValue(it, isLoaded) }
