@@ -35,7 +35,6 @@ class AdvanceSearchTable @JvmOverloads constructor(
 ) : LinearLayout(context, attrs) {
     private var mSh: CheckBox
     private var mSto: CheckBox
-    private var mSr: CheckBox
     private var mMinRating: TextInputLayout
     private var mSp: CheckBox
     private var mSpf: EditText
@@ -53,8 +52,7 @@ class AdvanceSearchTable @JvmOverloads constructor(
         mSh = row0.getChildAt(0) as CheckBox
         mSto = row0.getChildAt(1) as CheckBox
         val row1 = getChildAt(1) as ViewGroup
-        mSr = row1.getChildAt(0) as CheckBox
-        mMinRating = row1.getChildAt(1) as TextInputLayout
+        mMinRating = row1.getChildAt(0) as TextInputLayout
         val row2 = getChildAt(2) as ViewGroup
         mSp = row2.getChildAt(0) as CheckBox
         mSpf = row2.getChildAt(1) as EditText
@@ -70,11 +68,6 @@ class AdvanceSearchTable @JvmOverloads constructor(
             )
             nextView?.requestFocus(FOCUS_DOWN)
             true
-        }
-
-        mMinRating.isEnabled = mSr.isChecked
-        mSr.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            mMinRating.isEnabled = isChecked
         }
 
         mSpt.isEnabled = mSp.isChecked
@@ -105,22 +98,17 @@ class AdvanceSearchTable @JvmOverloads constructor(
     var minRating: Int
         get() {
             val position = mArray.indexOf(mMinRating.editText!!.text.toString())
-            return if (mSr.isChecked && position >= 0) {
-                position + 2
+            return if (position > 0) {
+                position + 1
             } else {
                 -1
             }
         }
         set(minRating) {
-            if (minRating in 2..5) {
-                mSr.isChecked = true
-                (mMinRating.editText!! as AutoCompleteTextView).setText(
-                    mArray[minRating - 2],
-                    false
-                )
-            } else {
-                mSr.isChecked = false
-            }
+            (mMinRating.editText!! as AutoCompleteTextView).setText(
+                mArray[if (minRating in 2..5) minRating - 1 else 0],
+                false
+            )
         }
     var pageFrom: Int
         get() = if (mSp.isChecked) {

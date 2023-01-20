@@ -144,6 +144,7 @@
     <string name="go_to_hint">第 %1$d 页，共 %2$d 页</string>
 
     <!-- search_min_rating -->
+    <string name="unlimited">不限</string>
     <string name="star_2">2 星</string>
     <string name="star_3">3 星</string>
     <string name="star_4">4 星</string>
