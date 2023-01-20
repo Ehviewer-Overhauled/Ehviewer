@@ -103,8 +103,8 @@ class SearchLayout @JvmOverloads constructor(
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
             mChip.setOnLongClickListener {
                 if (mChip.isChecked) {
-                    for (i in 1 until mCategoryGroup.childCount + 1) {
-                        mCategoryGroup.check(i)
+                    for (i in 0 until mCategoryGroup.childCount) {
+                        (mCategoryGroup.getChildAt(i) as Chip).isChecked = true
                     }
                     mChip.isChecked = false
                 } else {
