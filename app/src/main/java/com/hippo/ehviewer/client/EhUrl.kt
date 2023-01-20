@@ -49,6 +49,8 @@ object EhUrl {
     const val ORIGIN_EX = REFERER_EX
     const val REFERER_E = "https://$DOMAIN_E"
     const val ORIGIN_E = REFERER_E
+    const val URL_PREFIX_THUMB_E = "https://ehgt.org/"
+    const val URL_PREFIX_THUMB_EX = "https://exhentai.org/t/"
 
     val host: String
         get() = when (Settings.getGallerySite()) {
@@ -160,5 +162,13 @@ object EhUrl {
 
     fun getTagDefinitionUrl(tag: String): String {
         return "https://ehwiki.org/wiki/" + tag.replace(' ', '_')
+    }
+
+    fun getThumbUrlPrefix(): String {
+        return when (Settings.getGallerySite()) {
+            SITE_E -> URL_PREFIX_THUMB_E
+            SITE_EX -> URL_PREFIX_THUMB_EX
+            else -> URL_PREFIX_THUMB_E
+        }
     }
 }

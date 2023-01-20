@@ -1029,8 +1029,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 return
             }
             val info = mList!![position]
-            if (info.thumb != null) {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), info.thumb!!)
+            info.thumb?.let {
+                holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), EhUtils.fixThumbUrl(it))
             }
             holder.title.text = EhUtils.getSuitableTitle(info)
             holder.uploader.text = info.uploader
