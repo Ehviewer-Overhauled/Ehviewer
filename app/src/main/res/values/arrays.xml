@@ -72,7 +72,8 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="search_min_rating">
+    <string-array name="search_min_rating" translatable="false">
+        <item>@string/unlimited</item>
         <item>@string/star_2</item>
         <item>@string/star_3</item>
         <item>@string/star_4</item>
