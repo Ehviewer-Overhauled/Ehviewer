@@ -131,6 +131,11 @@ object EhUtils {
         return title.ifEmpty { null }
     }
 
+    fun fixThumbUrl(url: String): String {
+        return EhUrl.getThumbUrlPrefix() +
+                url.removePrefix(EhUrl.URL_PREFIX_THUMB_E).removePrefix(EhUrl.URL_PREFIX_THUMB_EX)
+    }
+
     @JvmStatic
     fun handleThumbUrlResolution(url: String?): String? {
         if (null == url) {
