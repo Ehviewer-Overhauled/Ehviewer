@@ -50,7 +50,8 @@
     <com.hippo.widget.FabLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingRight="@dimen/corner_fab_margin"
+        android:elevation="6dp"
+        android:paddingEnd="@dimen/corner_fab_margin"
         android:paddingBottom="@dimen/corner_fab_margin"
         app:fitsSystemWindowsInsets="top|bottom">
 
