@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,11 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<resources>
-
+  --><resources>
     <string name="app_name" translatable="false">EhViewer</string>
-
     <string name="site_e" translatable="false">e-hentai</string>
     <string name="site_ex" translatable="false">exhentai</string>
-
     <!-- Theme -->
-
     <!-- Category -->
     <string name="doujinshi" translatable="false">DOUJINSHI</string>
     <string name="manga" translatable="false">MANGA</string>
@@ -34,7 +29,6 @@
     <string name="cosplay" translatable="false">COSPLAY</string>
     <string name="asian_porn" translatable="false">ASIAN PORN</string>
     <string name="misc" translatable="false">MISC</string>
-
     <string name="homepage">Homepage</string>
     <string name="subscription">Subscription</string>
     <string name="whats_hot">What\'s hot</string>
@@ -43,26 +37,20 @@
     <string name="downloads">Downloads</string>
     <string name="settings">Settings</string>
     <string name="stub" translatable="false">Stub</string>
-
     <string name="username">Username</string>
     <string name="password">Password</string>
-
     <string name="sign_in">Sign in</string>
     <string name="register">Register</string>
     <string name="sign_in_via_webview">Sign in via WebView</string>
     <string name="sign_in_via_cookies">Sign in via cookies</string>
     <string name="sign_in_first">Please sign in first</string>
-
     <string name="cookie_explain">A cookie is a small piece of data stored in web browser. Google it if you don\'t know what it is or how to get it.\n\nPlease enter special cookies to sign in.</string>
     <string name="text_is_empty">Text is empty</string>
     <string name="waring">Warning</string>
     <string name="wrong_cookie_warning">It seems that the cookies you entered are wrong. You\'d better check them.</string>
-
     <string name="invalid_download_location">It seems download location is not available. Please set it in Settings.</string>
-
     <string name="clipboard_gallery_url_snack_message">There is a gallery url in the clipboard</string>
     <string name="clipboard_gallery_url_snack_action">View</string>
-
     <string name="error_status_code_400" translatable="false">Bad Request</string>
     <string name="error_status_code_401" translatable="false">Unauthorized</string>
     <string name="error_status_code_402" translatable="false">Payment Required</string>
@@ -81,14 +69,12 @@
     <string name="error_status_code_415" translatable="false">Unsupported Media Type</string>
     <string name="error_status_code_416" translatable="false">Requested Range Not Satisfiable</string>
     <string name="error_status_code_417" translatable="false">Expectation Failed</string>
-
     <string name="error_status_code_500" translatable="false">Internal Server Error</string>
     <string name="error_status_code_501" translatable="false">Not Implemented</string>
     <string name="error_status_code_502" translatable="false">Bad Gateway</string>
     <string name="error_status_code_503" translatable="false">Service Unavailable</string>
     <string name="error_status_code_504" translatable="false">Gateway Timeout</string>
     <string name="error_status_code_505" translatable="false">HTTP Version Not Supported</string>
-
     <string name="error_bad_status_code">Bad status code: %d</string>
     <string name="error_timeout">Timeout</string>
     <string name="error_unknown_host">Unknown host</string>
@@ -110,35 +96,27 @@
     <string name="error_invalid_number">Invalid number</string>
     <string name="error_please_login_first">Please login first</string>
     <string name="error_empty_html">Empty page</string>
-
-    <string name="kokomade_tip">Settings->Eh->Gallery Site->e-hentai</string>
-
+    <string name="kokomade_tip">Settings-&gt;Eh-&gt;Gallery Site-&gt;e-hentai</string>
     <string name="app_waring">The content of this application is from the Internet. Some of it may do physical or mental harm to you. You have learnt the risks above and would like to undertake them. By continuing to use it, you agree to the above terms.</string>
     <string name="error_username_cannot_empty">Username cannot be an empty string</string>
     <string name="error_password_cannot_empty">Password cannot be an empty string</string>
     <string name="tourist_mode">Continue without signing in</string>
     <string name="sign_in_failed">Sign in failed</string>
-    <string name="sign_in_failed_tip">If this issue continues, try \"Sign in via WebView\" or \"Sign in via cookies\"</string>
+    <string name="sign_in_failed_tip">If this issue continues, try \"Sign in via WebView\" or \"Sign in via cookies\".</string>
     <string name="get_it">Got it</string>
-
     <!-- Select scene -->
     <string name="select_scene">Which gallery site do you want to visit?</string>
     <string name="select_scene_explain">e-hentai: available for anyone\nexhentai: available for who has signed in</string>
-
     <!-- Update -->
-
     <!-- Gallery List -->
     <string name="gallery_list_search_bar_hint_exhentai">Search ExHentai</string>
     <string name="gallery_list_search_bar_hint_e_hentai">Search E-Hentai</string>
     <string name="gallery_list_search_bar_open_gallery">Open the gallery</string>
     <string name="gallery_list_empty_hit">The World is Big and the panda sit alone</string>
-    <string name="gallery_list_empty_hit_subscription">Subscribe to tags in Settings->EH->My tags</string>
-
+    <string name="gallery_list_empty_hit_subscription">Subscribe to tags in Settings-&gt;EH-&gt;My tags</string>
     <string name="search">Search</string>
-
     <string name="keyword_search">Keyword search</string>
     <string name="image_search">Image search</string>
-
     <string name="search_normal">Normal Search</string>
     <string name="search_advance">Advance Options</string>
     <string name="search_image">Image Search</string>
@@ -147,9 +125,7 @@
     <string name="search_specify_uploader">Specify uploader</string>
     <string name="search_specify_tag">Specify tag</string>
     <string name="search_enable_advance">Enable advance options</string>
-
     <string name="search_tip">Normal search: Simply search.\n\nSubscription search: Search in subscriptions.\n\nSpecify uploader: Search for galleries uploaded by the specified uploader. All other options will be ignored.\n\nSpecify tag: Search for galleries that contain the specified tag. Only one tag accepted. Other options will be ignored.</string>
-
     <string name="search_sh">Only Show Expunged Galleries</string>
     <string name="search_sto">Only Show Galleries With Torrents</string>
     <string name="search_sr">Minimum Rating:</string>
@@ -158,22 +134,18 @@
     <string name="search_sp_err1">The page range maximum cannot be below 10</string>
     <string name="search_sp_err2">The page range must be at least 20</string>
     <!-- A placeholder for other languages -->
-    <string name="search_sp_suffix" />
+    <string name="search_sp_suffix"/>
     <string name="search_sf">Disable default filters for:</string>
     <string name="search_sfl">Language</string>
     <string name="search_sfu">Uploader</string>
     <string name="search_sft">Tags</string>
-
     <string name="select_image">Select image</string>
     <string name="search_uss">Use similarity scan</string>
     <string name="search_osc">Only search covers</string>
     <string name="select_image_first">Please select image first</string>
-
     <string name="add_to_favourites">Add to favourites</string>
     <string name="remove_from_favourites">Remove from favourites</string>
-
     <string name="delete_downloads">Delete downloads</string>
-
     <string name="quick_search">Quick search</string>
     <string name="quick_search_tip">Tap \"+\" to add Quick Search</string>
     <string name="add_quick_search_dialog_title">Add Quick Search</string>
@@ -186,16 +158,13 @@
     <string name="duplicate_name">This name is already in use.</string>
     <string name="save_progress">Save progress</string>
     <string name="delete_quick_search">Delete quick search \"%s\"?</string>
-
     <string name="go_to_hint">Page %1$d, total %2$d pages</string>
-
     <!-- search_min_rating -->
     <string name="unlimited">Unlimited</string>
     <string name="star_2">2 stars</string>
     <string name="star_3">3 stars</string>
     <string name="star_4">4 stars</string>
     <string name="star_5">5 stars</string>
-
     <!-- Gallery detail -->
     <string name="error_cannot_find_gallery">Couldn\'t find the gallery</string>
     <string name="download">Download</string>
@@ -239,7 +208,6 @@
     <string name="filter_added">Blocker added</string>
     <string name="newer_version_avaliable">There are newer versions of this gallery available.</string>
     <string name="newer_version_title">%1$s, added %2$s</string>
-
     <!-- Rating -->
     <string name="rating10">MASTERPIECE</string>
     <string name="rating9">AMAZING</string>
@@ -253,7 +221,6 @@
     <string name="rating1">UNBEARABLE</string>
     <string name="rating0">DISASTER</string>
     <string name="rating_none" translatable="false">(´_ゝ`)</string>
-
     <!-- Gallery Info -->
     <string name="gallery_info">Gallery Info</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -279,7 +246,6 @@
     <string name="key_rating">Rating</string>
     <string name="key_torrents">Torrents</string>
     <string name="key_torrent_url">Torrent Url</string>
-
     <!-- Gallery Comments -->
     <string name="gallery_comments">Gallery Comments</string>
     <string name="no_one_comments_gallery">No comment.</string>
@@ -303,11 +269,9 @@
     <string name="check_vote_status">View vote details</string>
     <string name="click_more_comments">Click to load more comments</string>
     <string name="last_edited">Last edited: %s</string>
-
     <!-- Gallery Previews -->
     <string name="gallery_previews">Gallery Previews</string>
     <string name="go_to">Go to</string>
-
     <!-- Download -->
     <string name="scene_download_title">Download - %s</string>
     <string name="no_download_info">Download items will be shown here</string>
@@ -344,7 +308,6 @@
     <string name="remember_download_label">Remember download label</string>
     <string name="default_download_label">Default download label</string>
     <string name="added_to_download_list">Added to download list</string>
-
     <!-- Download label -->
     <string name="add">Add</string>
     <string name="new_label_title">New label</string>
@@ -353,12 +316,10 @@
     <string name="label_text_exist">Label exists</string>
     <string name="rename_label_title">Rename label</string>
     <string name="delete_label">Delete label \"%s\"?</string>
-
     <!-- History -->
     <string name="no_history">Viewed galleries will be shown here</string>
     <string name="clear_all">Clear all</string>
     <string name="clear_all_history">Clear all history?</string>
-
     <!-- Filter -->
     <string name="filter">Blockers</string>
     <string name="filter_title">Title</string>
@@ -373,21 +334,17 @@
     <string name="show_definition">Show definition</string>
     <string name="filter_text">Blocker text</string>
     <string name="filter_tip">This blocking system filters the result of EHentai website blocking system.\n\nTitle Blocker: exclude the gallery whose title contains the word.\n\nUploader Blocker: exclude the gallery which was uploaded by the uploader.\n\nTag Blocker: exclude the gallery which contain the tag, it takes more time to get gallery list.\n\nTag Namespace Blocker: exclude the gallery which contain the tag namespace, it takes more time to get gallery list.\n\nCommenter Blocker: exclude the comments posted by the commenter.\n\nComment Blocker: exclude the comments matching the regex.</string>
-
     <!-- Set Security -->
-
     <!-- UConfig Activity -->
     <string name="u_config">EHentai settings</string>
     <string name="apply">Apply</string>
     <string name="apply_tip">Tap the check mark to save the settings</string>
-
     <!-- My Tags Activity -->
     <string name="my_tags">My tags</string>
-
     <!-- Hosts Activity -->
     <string name="hosts">Custom hosts.txt</string>
     <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
+    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
     <string name="add_host">Add a host</string>
     <string name="add_host_add">Add</string>
     <string name="edit_host">Edit the host</string>
@@ -395,11 +352,9 @@
     <string name="edit_host_delete">Delete</string>
     <string name="invalid_host">Invalid host</string>
     <string name="invalid_ip">Invalid IP</string>
-
     <!-- Gallery Activity -->
     <string name="share_image">Share image</string>
     <string name="image_saved">Image saved to %s</string>
-
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">Sign out</string>
     <string name="settings_eh_sign_out_tip">You have signed out. Restart the application to sign in again</string>
@@ -434,10 +389,8 @@
     <string name="settings_eh_tag_translations_source_url">https://placeholder</string>
     <string name="settings_eh_filter">Blockers</string>
     <string name="settings_eh_filter_summary">Block gallery or comment by title, uploader, tags and commenter</string>
-
     <string name="settings_read_volume_page">Use volume key to turn pages</string>
     <string name="settings_read_reverse_volume">Reverse volume key</string>
-
     <string name="settings_download">Download</string>
     <string name="settings_download_download_location">Download location</string>
     <string name="settings_download_invalid_download_location">Invalid download location</string>
@@ -465,7 +418,6 @@
     <string name="settings_download_clean_redundancy_summary">Remove gallery images which are not in download list but in download location</string>
     <string name="settings_download_clean_redundancy_no_redundancy">No redundancy</string>
     <string name="settings_download_clean_redundancy_done">Redundancy cleaning completed, clean-up %d items totally</string>
-
     <string name="settings_advanced">Advanced</string>
     <string name="settings_advanced_save_parse_error_body">Save html content when parsing error</string>
     <string name="settings_advanced_save_parse_error_body_summary">Html content may be privacy-sensitive</string>
@@ -499,7 +451,6 @@
     <string name="settings_advanced_backup_favorite_nothing">Nothing to backup</string>
     <string name="settings_advanced_backup_favorite_success">Backup favorite list success</string>
     <string name="settings_advanced_backup_favorite_failed">Backup favorite list failed</string>
-
     <string name="settings_about">About</string>
     <string name="settings_about_declaration" translatable="false">EhViewer</string>
     <string name="settings_about_declaration_summary">EhViewer is not affiliated with E-Hentai.org in any way</string>
@@ -509,16 +460,13 @@
     <string name="settings_about_source">Source</string>
     <string name="settings_about_version">Build version</string>
     <string name="settings_about_check_for_updates">Check for updates</string>
-
     <string name="proxy_direct">Direct</string>
     <string name="proxy_system">System Proxy</string>
     <string name="proxy_host_or_ip">Host or IP</string>
     <string name="proxy_port">Port</string>
     <string name="proxy_invalid_port">Invalid port</string>
-
     <string name="cant_read_the_file">Can\'t read the file</string>
     <string name="db_version_too_high">Database version too high</string>
-
     <string name="app_language_system">System Language (Default)</string>
     <string name="app_language_de">Deutsch</string>
     <string name="app_language_en" translatable="false">English</string>
@@ -530,15 +478,10 @@
     <string name="app_language_zh_cn" translatable="false">中文（大陆）</string>
     <string name="app_language_zh_hk" translatable="false">中文（香港）</string>
     <string name="app_language_zh_tw" translatable="false">國文（臺灣）</string>
-
     <!-- ExcludedLanguagesScene -->
-
     <string name="please_wait">Pleas wait</string>
-
     <!-- License -->
-
     <!-- Dir Picker-->
-
     <!-- Favorites -->
     <string name="cloud_favorites">Cloud Favorites</string>
     <string name="local_favorites">Local Favorites</string>
@@ -552,12 +495,9 @@
     <string name="let_me_select">Let me select</string>
     <string name="collections">Collections</string>
     <string name="need_sign_in">Signing in is required</string>
-
     <!-- Progress Scene -->
     <string name="error_something_wrong_happened">Something wrong happened</string>
-
     <!-- Guide -->
-
     <!-- Readable Time -->
     <string name="from_the_future">From the future</string>
     <string name="just_now">Just now</string>
@@ -604,15 +544,12 @@
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_secure">Prevent screenshots</string>
     <string name="settings_privacy_secure_summary">Prevent the content of the app from being taken screenshots of or shown in the \"Recent Apps\" list.</string>
-
     <string name="download_service">Download Service</string>
     <string name="favorite_name">Favorite</string>
-
     <string name="black_dark_theme">Black dark theme</string>
     <string name="download_filter">Filter</string>
     <string name="download_all">All</string>
     <string name="download_start_all_reversed">Start all (reversed)</string>
-
     <string name="no_browser_installed">Just install a browser please.</string>
     <string name="toplist_alltime">All-Time</string>
     <string name="toplist_pastyear">Past Year</string>
@@ -641,21 +578,18 @@
     <string name="app_link_not_verified_message">For Android 12 and newer, you need to manually add link to verified links in order to open E-Hentai links in EhViewer.</string>
     <string name="app_link_not_verified_title">App links not verified</string>
     <string name="open_by_default">Open by default</string>
-
     <string name="settings_privacy_require_unlock">Require Unlock</string>
     <string name="settings_privacy_require_unlock_delay">Lock Delay</string>
     <string name="settings_privacy_require_unlock_delay_summary">No unlock is required when leaving App and returning within %s minute(s)</string>
     <string name="settings_privacy_require_unlock_delay_summary_immediately">Unlock is required whenever you return to this App</string>
     <string name="proxy_type_name">Proxy Type</string>
     <string name="filter_label">Blocker Type</string>
-
     <string name="archive_passwd">password</string>
     <string name="archive_need_passwd">Archive need password</string>
     <string name="passwd_wrong">Password Wrong</string>
     <string name="passwd_cannot_be_empty">Password can\'t be empty</string>
     <string name="list_tile_thumb_size">Thumb size in thumb mode</string>
     <string name="account_name">Account</string>
-
     <!-- Tachiyomi Reader Start-->
     <string name="action_settings">Settings</string>
     <string name="pref_rotation_type">Default rotation type</string>
@@ -743,7 +677,7 @@
     <string name="action_share">Share</string>
     <string name="action_copy">Copy</string>
     <string name="action_save">Save</string>
-    <string name="action_save_to">Save to&#8230;</string>
+    <string name="action_save_to">Save to…</string>
     <string name="wide_color_gamut">Use Display P3 color space</string>
     <!-- Tachiyomi Reader End-->
 </resources>
