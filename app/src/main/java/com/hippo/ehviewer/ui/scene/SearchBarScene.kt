@@ -53,8 +53,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             updateSuggestions()
         }
         binding.searchview.editText.setOnEditorActionListener { _, _, _ ->
-            binding.toolbar.text = binding.searchview.text
-            binding.searchview.hide()
             onApplySearch()
             true
         }
@@ -157,6 +155,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     fun onApplySearch() {
+        binding.toolbar.text = binding.searchview.text
+        binding.searchview.hide()
         val query = binding.toolbar.text.toString().trim()
         if (!mAllowEmptySearch && query.isEmpty()) {
             return

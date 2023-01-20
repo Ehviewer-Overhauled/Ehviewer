@@ -401,12 +401,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
         mActionFabDrawable = AddDeleteDrawable(context, colorID)
         binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
-        mSearchFab!!.setOnClickListener {
-            if (STATE_NORMAL != mState) {
-                onApplySearch()
-                hideSoftInput()
-            }
-        }
+        mSearchFab!!.setOnClickListener { onApplySearch() }
 
         // Update list url builder
         onUpdateUrlBuilder()
@@ -701,7 +696,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     override fun onSearchViewExpanded() {
         super.onSearchViewExpanded()
-        selectSearchFab(true)
+        if (mState == STATE_NORMAL) selectSearchFab(true)
     }
 
     override fun onSearchViewHidden() {
@@ -1279,11 +1274,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             return if (null != mHelper) mHelper!!.size() else 0
         }
 
-        public override fun onItemClick(view: View, position: Int) {
+        override fun onItemClick(view: View, position: Int) {
             this@GalleryListScene.onItemClick(position)
         }
 
-        public override fun onItemLongClick(view: View, position: Int): Boolean {
+        override fun onItemLongClick(view: View, position: Int): Boolean {
             return this@GalleryListScene.onItemLongClick(position)
         }
 
