@@ -82,7 +82,7 @@
     <string name="error_socket">Network error</string>
     <string name="error_unknown">Weird</string>
     <string name="error_cant_find_activity">Can\'t find the application</string>
-    <string name="error_cannot_parse_the_url">Can\'t parse the url</string>
+    <string name="error_cannot_parse_the_url">Can\'t parse the URL</string>
     <string name="error_decoding_failed">Decoding failed</string>
     <string name="error_reading_failed">Reading Failed</string>
     <string name="error_out_of_range">Out of range</string>
@@ -94,7 +94,7 @@
     <string name="error_cant_create_temp_file">Couldn\'t create temp file</string>
     <string name="error_cant_save_image">Can\'t save image</string>
     <string name="error_invalid_number">Invalid number</string>
-    <string name="error_please_login_first">Please login first</string>
+    <string name="error_please_login_first">Please log in first</string>
     <string name="error_empty_html">Empty page</string>
     <string name="kokomade_tip">Settings-&gt;Eh-&gt;Gallery Site-&gt;e-hentai</string>
     <string name="app_waring">The content of this application is from the Internet. Some of it may do physical or mental harm to you. You have learnt the risks above and would like to undertake them. By continuing to use it, you agree to the above terms.</string>
@@ -226,9 +226,9 @@
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="header_key">Key</string>
     <string name="header_value">Value</string>
-    <string name="key_gid">Gid</string>
+    <string name="key_gid">GID</string>
     <string name="key_token">Token</string>
-    <string name="key_url">Url</string>
+    <string name="key_url">URL</string>
     <string name="key_title">Title</string>
     <string name="key_title_jpn">Jpn Title</string>
     <string name="key_thumb">Thumb</string>
@@ -245,7 +245,7 @@
     <string name="key_rating_count">Rating count</string>
     <string name="key_rating">Rating</string>
     <string name="key_torrents">Torrents</string>
-    <string name="key_torrent_url">Torrent Url</string>
+    <string name="key_torrent_url">Torrent URL</string>
     <!-- Gallery Comments -->
     <string name="gallery_comments">Gallery Comments</string>
     <string name="no_one_comments_gallery">No comment.</string>
@@ -419,7 +419,7 @@
     <string name="settings_download_clean_redundancy_no_redundancy">No redundancy</string>
     <string name="settings_download_clean_redundancy_done">Redundancy cleaning completed, clean-up %d items totally</string>
     <string name="settings_advanced">Advanced</string>
-    <string name="settings_advanced_save_parse_error_body">Save html content when parsing error</string>
+    <string name="settings_advanced_save_parse_error_body">Save HTML content when parsing error</string>
     <string name="settings_advanced_save_parse_error_body_summary">Html content may be privacy-sensitive</string>
     <string name="settings_advanced_save_crash_log">Save crash log when app crashes</string>
     <string name="settings_advanced_save_crash_log_summary">Crash logs help developers fix bugs</string>
@@ -444,7 +444,7 @@
     <string name="settings_advanced_export_data_failed">Failed to export data</string>
     <string name="settings_advanced_import_data">Import data</string>
     <string name="settings_advanced_import_data_summary">Load data which were previously saved</string>
-    <string name="settings_advanced_import_data_successfully">Data imported successfully</string>
+    <string name="settings_advanced_import_data_successfully">Data imported</string>
     <string name="settings_advanced_backup_favorite">Backup favorite list</string>
     <string name="settings_advanced_backup_favorite_summary">Backup remote favorite list to local</string>
     <string name="settings_advanced_backup_favorite_start">Backing up favorite list %s</string>
@@ -480,7 +480,7 @@
     <string name="app_language_zh_tw" translatable="false">國文（臺灣）</string>
     <string name="app_language_nb_no" translatable="false">Norwegian Bokmål</string>
     <!-- ExcludedLanguagesScene -->
-    <string name="please_wait">Pleas wait</string>
+    <string name="please_wait">Please wait</string>
     <!-- License -->
     <!-- Dir Picker-->
     <!-- Favorites -->
@@ -639,7 +639,7 @@
     <string name="white_background">White</string>
     <string name="gray_background">Gray</string>
     <string name="black_background">Black</string>
-    <string name="automatic_background">Automatic</string>
+    <string name="automatic_background">Auto</string>
     <string name="l_nav">L shaped</string>
     <string name="kindlish_nav">Kindle-ish</string>
     <string name="edge_nav">Edge</string>
