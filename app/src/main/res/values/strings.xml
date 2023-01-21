@@ -468,7 +468,7 @@
     <string name="cant_read_the_file">Can\'t read the file</string>
     <string name="db_version_too_high">Database version too high</string>
     <string name="app_language_system">System Language (Default)</string>
-    <string name="app_language_de">Deutsch</string>
+    <string name="app_language_de" translatable="false">Deutsch</string>
     <string name="app_language_en" translatable="false">English</string>
     <string name="app_language_es" translatable="false">Español</string>
     <string name="app_language_fr" translatable="false">Français</string>
