@@ -183,7 +183,7 @@
     <string name="copied_to_clipboard">已复制到剪切板</string>
     <string name="header_key">键</string>
     <string name="header_value">值</string>
-    <string name="key_gid">Gid</string>
+    <string name="key_gid">GID</string>
     <string name="key_token">Token</string>
     <string name="key_url">链接</string>
     <string name="key_title">标题</string>
@@ -202,7 +202,7 @@
     <string name="key_rating_count">评价次数</string>
     <string name="key_rating">评分</string>
     <string name="key_torrents">种子个数</string>
-    <string name="key_torrent_url">种子</string>
+    <string name="key_torrent_url">种子链接</string>
     <!-- Gallery Comments -->
     <string name="gallery_comments">画廊评论</string>
     <string name="no_one_comments_gallery">暂时没有评论</string>
