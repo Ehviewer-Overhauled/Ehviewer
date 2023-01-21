@@ -210,7 +210,7 @@
         <item>zh-CN</item>
         <item>zh-HK</item>
         <item>zh-TW</item>
-        <item>nb-rNO</item>
+        <item>nb-NO</item>
     </string-array>
 
     <string-array name="tag_translation_metadata" tools:ignore="InconsistentArrays">
