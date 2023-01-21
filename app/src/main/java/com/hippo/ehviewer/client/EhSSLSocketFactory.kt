@@ -34,8 +34,8 @@ object EhSSLSocketFactory : SSLSocketFactory() {
     }
 
     override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket {
-        val address = s.inetAddress.hostAddress
-        val socket = sslSocketFactory.createSocket(s, address, port, autoClose) as SSLSocket
+        val address = EhDns.lookupFirst(host)
+        val socket = sslSocketFactory.createSocket(s, address ?: host, port, autoClose) as SSLSocket
         val sslSession = socket.session
         Log.d(
             "EhSSLSocketFactory",
