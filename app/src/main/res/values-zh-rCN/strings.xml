@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2016 Hippo Sevenerror_please_login_first
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,8 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
-<resources>
-
+  --><resources>
     <!-- Theme -->
-
     <string name="homepage">主页</string>
     <string name="subscription">订阅</string>
     <string name="whats_hot">热门</string>
@@ -25,26 +22,20 @@
     <string name="history">历史</string>
     <string name="downloads">下载</string>
     <string name="settings">设置</string>
-
     <string name="username">用户名</string>
     <string name="password">密码</string>
-
     <string name="sign_in">登录</string>
     <string name="register">注册</string>
     <string name="sign_in_via_webview">通过网页登录</string>
     <string name="sign_in_via_cookies">通过 Cookie 登录</string>
     <string name="sign_in_first">请先登录</string>
-
     <string name="cookie_explain">Cookie 是存储在浏览器里的一小块数据。如果您不清楚 Cookie 什么或者怎么获取 Cookie，最好搜索一下。\n\n请输入特定的 Cookie 来登录。</string>
     <string name="text_is_empty">文本为空</string>
     <string name="waring">警告</string>
     <string name="wrong_cookie_warning">看起来您输入的 Cookie 是错误的，最好检查一下。</string>
-
     <string name="invalid_download_location">似乎下载路径不可用。请到重新设置下载路径。</string>
-
     <string name="clipboard_gallery_url_snack_message">剪切板里有画廊链接</string>
     <string name="clipboard_gallery_url_snack_action">查看</string>
-
     <string name="error_bad_status_code">错误状态码：%d</string>
     <string name="error_timeout">超时</string>
     <string name="error_unknown_host">未知主机</string>
@@ -66,9 +57,7 @@
     <string name="error_invalid_number">非法数字</string>
     <string name="error_please_login_first">请先登陆</string>
     <string name="error_empty_html">页面内容为空</string>
-
-    <string name="kokomade_tip">设置->Eh->画廊站点->e-hentai</string>
-
+    <string name="kokomade_tip">设置-&gt;Eh-&gt;画廊站点-&gt;e-hentai</string>
     <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。\n\n未成年人应在监护人指导下使用本应用。\n\n继续使用即代表您同意上述条款。</string>
     <string name="error_username_cannot_empty">用户名不可为空</string>
     <string name="error_password_cannot_empty">密码不可为空</string>
@@ -76,25 +65,19 @@
     <string name="sign_in_failed">登录失败</string>
     <string name="sign_in_failed_tip">若持续出错，请尝试“通过网页登录”或“通过 Cookie 登录”。</string>
     <string name="get_it">知道了</string>
-
     <!-- Select scene -->
     <string name="select_scene">你想选择哪个画廊站点？</string>
     <string name="select_scene_explain">e-hentai：对任何人开放\nexhentai：仅对登录用户开放</string>
-
     <!-- Update -->
-
     <!-- Gallery List -->
     <string name="gallery_list_search_bar_hint_exhentai">搜索 ExHentai</string>
     <string name="gallery_list_search_bar_hint_e_hentai">搜索 E-Hentai</string>
     <string name="gallery_list_search_bar_open_gallery">打开画廊</string>
     <string name="gallery_list_empty_hit">什么都没有找到</string>
-    <string name="gallery_list_empty_hit_subscription">请至 设置->EH->我的标签 订阅标签</string>
-
+    <string name="gallery_list_empty_hit_subscription">请至 设置-&gt;EH-&gt;我的标签 订阅标签</string>
     <string name="search">搜索</string>
-
     <string name="keyword_search">关键字搜索</string>
     <string name="image_search">图片搜索</string>
-
     <string name="search_normal">普通搜索</string>
     <string name="search_advance">高级选项</string>
     <string name="search_image">图片搜索</string>
@@ -103,9 +86,7 @@
     <string name="search_specify_uploader">指定上传者</string>
     <string name="search_specify_tag">指定标签</string>
     <string name="search_enable_advance">启用高级选项</string>
-
     <string name="search_tip">一般搜索：就是搜索。\n\n订阅搜素：在订阅中搜索。\n\n指定上传者：列出该上传者上传的画廊。其他选项会被忽略。\n\n指定标签：列出含有该标签的画廊。其他选项会被忽略。</string>
-
     <string name="search_sh">仅显示被删除的画廊</string>
     <string name="search_sto">仅显示有种子的画廊</string>
     <string name="search_sr">最低评分：</string>
@@ -117,17 +98,13 @@
     <string name="search_sfl">语言</string>
     <string name="search_sfu">上传者</string>
     <string name="search_sft">标签</string>
-
     <string name="select_image">选择图片</string>
     <string name="search_uss">使用相似搜索</string>
     <string name="search_osc">只搜索封面</string>
     <string name="select_image_first">请先选择图片</string>
-
     <string name="add_to_favourites">收藏</string>
     <string name="remove_from_favourites">移除收藏</string>
-
     <string name="delete_downloads">删除下载</string>
-
     <string name="quick_search">快速搜索</string>
     <string name="quick_search_tip">点击“+”来添加快速搜索</string>
     <string name="add_quick_search_dialog_title">添加快速搜索</string>
@@ -140,16 +117,13 @@
     <string name="duplicate_name">已存在相同名称</string>
     <string name="save_progress">保存进度</string>
     <string name="delete_quick_search">删除快速搜索“%s”？</string>
-
     <string name="go_to_hint">第 %1$d 页，共 %2$d 页</string>
-
     <!-- search_min_rating -->
     <string name="unlimited">不限</string>
     <string name="star_2">2 星</string>
     <string name="star_3">3 星</string>
     <string name="star_4">4 星</string>
     <string name="star_5">5 星</string>
-
     <!-- Gallery detail -->
     <string name="error_cannot_find_gallery">找不到画廊</string>
     <string name="download">下载</string>
@@ -192,7 +166,6 @@
     <string name="filter_added">已添加屏蔽项</string>
     <string name="newer_version_avaliable">此画廊有新版本可用。</string>
     <string name="newer_version_title">%1$s, 添加于 %2$s</string>
-
     <!-- Rating -->
     <string name="rating10">根本把持不住</string>
     <string name="rating9">好极了</string>
@@ -205,7 +178,6 @@
     <string name="rating2">瞎眼</string>
     <string name="rating1">快要窒息了</string>
     <string name="rating0">…</string>
-
     <!-- Gallery Info -->
     <string name="gallery_info">画廊信息</string>
     <string name="copied_to_clipboard">已复制到剪切板</string>
@@ -231,7 +203,6 @@
     <string name="key_rating">评分</string>
     <string name="key_torrents">种子个数</string>
     <string name="key_torrent_url">种子</string>
-
     <!-- Gallery Comments -->
     <string name="gallery_comments">画廊评论</string>
     <string name="no_one_comments_gallery">暂时没有评论</string>
@@ -255,11 +226,9 @@
     <string name="check_vote_status">查看投票情况</string>
     <string name="click_more_comments">点击加载更多评论</string>
     <string name="last_edited">上次修改时间：%s</string>
-
     <!-- Gallery Previews -->
     <string name="gallery_previews">画廊预览</string>
     <string name="go_to">跳页</string>
-
     <!-- Download -->
     <string name="scene_download_title">下载 - %s</string>
     <string name="no_download_info">这里是下载项目</string>
@@ -296,7 +265,6 @@
     <string name="remember_download_label">记住下载标签</string>
     <string name="default_download_label">默认下载标签</string>
     <string name="added_to_download_list">已添加至下载列表</string>
-
     <!-- Download label -->
     <string name="add">添加</string>
     <string name="new_label_title">新标签</string>
@@ -305,12 +273,10 @@
     <string name="label_text_exist">标签已存在</string>
     <string name="rename_label_title">重命名标签</string>
     <string name="delete_label">删除标签“%s”？</string>
-
     <!-- History -->
     <string name="no_history">这里是阅读历史</string>
     <string name="clear_all">全部清除</string>
     <string name="clear_all_history">清除所有阅读历史？</string>
-
     <!-- Filter -->
     <string name="filter">屏蔽列表</string>
     <string name="filter_title">标题</string>
@@ -325,17 +291,13 @@
     <string name="show_definition">查看定义</string>
     <string name="filter_text">屏蔽项文本</string>
     <string name="filter_tip">该屏蔽系统会在 EHentai 网站屏蔽系统的基础上继续屏蔽画廊。\n\n标题屏蔽项：排除标题含有该关键字的画廊。\n\n上传者屏蔽项：排除该上传者上传的画廊。\n\n标签屏蔽项：排除包含该标签的画廊，这会使获取画廊列表花费更多时间。\n\n标签组屏蔽项：排除包含该标签组的画廊，这会使获取画廊列表花费更多时间。\n\n评论者屏蔽项：排除该评论者发布的评论。\n\n评论屏蔽项：排除匹配该正则表达式的评论。</string>
-
     <!-- Set Security -->
-
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 设置</string>
     <string name="apply">应用</string>
     <string name="apply_tip">点击右上角的对勾来保存设置</string>
-
     <!-- My Tags Activity -->
     <string name="my_tags">我的标签</string>
-
     <!-- Hosts Activity -->
     <string name="hosts">自定义 hosts.txt</string>
     <string name="hosts_host">Host</string>
@@ -347,11 +309,9 @@
     <string name="edit_host_delete">删除</string>
     <string name="invalid_host">无效的 host</string>
     <string name="invalid_ip">无效的 IP</string>
-
     <!-- Gallery Activity -->
     <string name="share_image">分享图片</string>
     <string name="image_saved">图片已保存至 %s</string>
-
     <!-- Settings -->
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">退出登录</string>
@@ -387,10 +347,8 @@
     <string name="settings_eh_tag_translations_source_url">https://github.com/EhTagTranslation/Editor/wiki</string>
     <string name="settings_eh_filter">屏蔽列表</string>
     <string name="settings_eh_filter_summary">根据标题、上传者、标签、评论者屏蔽画廊或评论</string>
-
     <string name="settings_read_volume_page">使用音量键翻页</string>
     <string name="settings_read_reverse_volume">翻转音量键</string>
-
     <string name="settings_download">下载</string>
     <string name="settings_download_download_location">下载路径</string>
     <string name="settings_download_invalid_download_location">无效的下载路径</string>
@@ -416,7 +374,6 @@
     <string name="settings_download_clean_redundancy_summary">清理下载目录中不在下载列表里的图片文件</string>
     <string name="settings_download_clean_redundancy_no_redundancy">未发现冗余</string>
     <string name="settings_download_clean_redundancy_done">完成冗余清理，共清理 %d 项</string>
-
     <string name="settings_advanced">高级</string>
     <string name="settings_advanced_save_parse_error_body">解析失败时保存页面内容</string>
     <string name="settings_advanced_save_parse_error_body_summary">页面内容可能含有隐私敏感信息</string>
@@ -448,7 +405,6 @@
     <string name="settings_advanced_backup_favorite_nothing">没有可以备份的收藏列表</string>
     <string name="settings_advanced_backup_favorite_success">备份收藏列表成功</string>
     <string name="settings_advanced_backup_favorite_failed">备份收藏列表失败</string>
-
     <string name="settings_about">关于</string>
     <string name="settings_about_declaration_summary">EhViewer 与 E-Hentai.org 无任何联系</string>
     <string name="settings_about_author">作者</string>
@@ -456,26 +412,18 @@
     <string name="settings_about_source">源码</string>
     <string name="settings_about_version">版本号</string>
     <string name="settings_about_check_for_updates">检查更新</string>
-
     <!-- ExcludedLanguagesScene -->
-
     <string name="please_wait">请稍候</string>
-
     <string name="proxy_direct">直接连接</string>
     <string name="proxy_system">系统代理</string>
     <string name="proxy_host_or_ip">主机或 IP</string>
     <string name="proxy_port">端口</string>
     <string name="proxy_invalid_port">无效的端口</string>
-
     <string name="cant_read_the_file">无法读取文件</string>
     <string name="db_version_too_high">数据库版本过高</string>
-
     <string name="app_language_system">系统语言（默认）</string>
-
     <!-- License -->
-
     <!-- Dir Picker-->
-
     <!-- Favorites -->
     <string name="cloud_favorites">云端收藏</string>
     <string name="local_favorites">本地收藏</string>
@@ -489,12 +437,9 @@
     <string name="let_me_select">让我选择</string>
     <string name="collections">收藏夹</string>
     <string name="need_sign_in">需要登录</string>
-
     <!-- Progress Scene -->
     <string name="error_something_wrong_happened">被玩坏了</string>
-
     <!-- Guide -->
-
     <!-- Readable Time -->
     <string name="from_the_future">来自未来</string>
     <string name="just_now">刚刚</string>
@@ -506,7 +451,6 @@
     </plurals>
     <string name="yesterday">昨天</string>
     <string name="some_days_ago">%d 天前</string>
-
     <plurals name="second">
         <item quantity="other">秒</item>
     </plurals>
@@ -535,17 +479,14 @@
     <string name="settings_privacy">隐私</string>
     <string name="settings_privacy_secure">不允许屏幕抓取</string>
     <string name="settings_privacy_secure_summary">启用后，将不能截取该应用的屏幕截图，同时，将不会在系统任务切换器中显示该应用的内容预览，重新加载应用以生效此更改</string>
-
     <string name="download_service">下载服务</string>
     <string name="favorite_name">收藏画廊</string>
-
     <string name="black_dark_theme">纯黑深色主题</string>
     <string name="download_filter">过滤</string>
     <string name="download_all">全部</string>
     <string name="download_start_all_reversed">全部开始（倒序）</string>
     <string name="settings_download_download_delay">下载延时</string>
     <string name="settings_download_download_delay_summary">每次下载延时 %s 毫秒</string>
-
     <string name="no_browser_installed">请安装一个浏览器。</string>
     <string name="toplist_alltime">从始至终</string>
     <string name="toplist_pastyear">过去一年</string>
@@ -576,28 +517,25 @@
     <string name="app_link_not_verified_message">对于 Android 12 及更新的版本，您需要手动添加链接到已验证链接才能在 EhViewer 中打开 E-Hentai 链接。</string>
     <string name="app_link_not_verified_title">应用链接未验证</string>
     <string name="open_by_default">默认打开</string>
-
     <string name="settings_privacy_require_unlock">需要解锁</string>
     <string name="settings_privacy_require_unlock_delay">锁定延迟</string>
     <string name="settings_privacy_require_unlock_delay_summary">离开应用并在 %s 分钟内返回时不需要解锁</string>
     <string name="settings_privacy_require_unlock_delay_summary_immediately">无论何时回到应用均要求解锁</string>
     <string name="proxy_type_name">代理类型</string>
     <string name="filter_label">屏蔽项类型</string>
-
     <string name="archive_passwd">归档文件密码</string>
     <string name="archive_need_passwd">归档文件需要密码</string>
     <string name="passwd_wrong">密码错误</string>
     <string name="passwd_cannot_be_empty">密码不能为空</string>
     <string name="list_tile_thumb_size">详情模式下缩略图大小</string>
     <string name="account_name">账户</string>
-
     <!-- Tachiyomi Reader Start-->
     <string name="action_settings">设置</string>
     <string name="action_retry">重试</string>
     <string name="action_share">分享</string>
     <string name="action_copy">复制</string>
     <string name="action_save">保存</string>
-    <string name="action_save_to">保存到&#8230;</string>
+    <string name="action_save_to">保存到…</string>
     <string name="pref_category_general">通用</string>
     <string name="pref_fullscreen">全屏</string>
     <string name="pref_page_transitions">页面过渡动画</string>
