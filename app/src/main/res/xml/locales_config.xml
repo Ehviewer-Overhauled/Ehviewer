@@ -26,4 +26,5 @@
     <locale android:name="zh-CN" />
     <locale android:name="zh-HK" />
     <locale android:name="zh-TW" />
+    <locale android:name="nb-NO" />
 </locale-config>

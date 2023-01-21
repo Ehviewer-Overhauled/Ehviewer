@@ -231,7 +231,6 @@ class AdvancedFragment : BasePreferenceFragment() {
         addPreferencesFromResource(R.xml.advanced_settings)
         val dumpLogcat = findPreference<Preference>(KEY_DUMP_LOGCAT)
         val appLanguage = findPreference<Preference>(KEY_APP_LANGUAGE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) appLanguage!!.isVisible = false
         val importData = findPreference<Preference>(KEY_IMPORT_DATA)
         val exportData = findPreference<Preference>(KEY_EXPORT_DATA)
         val backupFavorite = findPreference<Preference>(KEY_BACKUP_FAVORITE)
@@ -378,7 +377,7 @@ class AdvancedFragment : BasePreferenceFragment() {
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         val key = preference.key
-        if (KEY_APP_LANGUAGE == key && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        if (KEY_APP_LANGUAGE == key) {
             if ("system" == newValue) {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
             } else {
