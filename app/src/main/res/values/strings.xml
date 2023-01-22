@@ -436,6 +436,8 @@
     <string name="settings_advanced_built_in_hosts_summary">Apply the built-in host-to-IP mapping provided by the app.\nIt can be overridden by custom hosts.txt.</string>
     <string name="settings_advanced_domain_fronting_title">Domain fronting</string>
     <string name="settings_advanced_domain_fronting_summary">Bypass SNI blocking.</string>
+    <string name="settings_advanced_bypass_vpn_title">Bypass VPN</string>
+    <string name="settings_advanced_bypass_vpn_summary">Try to bypass VPN when domain fronting is enabled</string>
     <string name="settings_advanced_custom_hosts_title">Custom hosts.txt</string>
     <string name="settings_advanced_custom_hosts_summary">Map hostnames to IP addresses.\nIt can override built-in hosts.txt.</string>
     <string name="settings_advanced_export_data">Export data</string>

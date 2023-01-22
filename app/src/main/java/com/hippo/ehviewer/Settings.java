@@ -85,6 +85,7 @@ public class Settings {
     public static final int DEFAULT_READ_CACHE_SIZE = 320;
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts_2";
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
+    public static final String KEY_BYPASS_VPN = "bypass_vpn";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
     private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
     private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
@@ -179,6 +180,7 @@ public class Settings {
     private static final boolean DEFAULT_SAVE_CRASH_LOG = true;
     private static final boolean DEFAULT_BUILT_IN_HOSTS = false;
     private static final boolean DEFAULT_FRONTING = false;
+    private static final boolean DEFAULT_BYPASS_VPN = true;
     private static final String KEY_PROXY_TYPE = "proxy_type";
     private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM;
     private static final String KEY_PROXY_IP = "proxy_ip";
@@ -671,6 +673,10 @@ public class Settings {
 
     public static void putDF(boolean value) {
         putBoolean(KEY_DOMAIN_FRONTING, value);
+    }
+
+    public static boolean getBypassVPN() {
+        return getBoolean(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN);
     }
 
     public static int getProxyType() {
