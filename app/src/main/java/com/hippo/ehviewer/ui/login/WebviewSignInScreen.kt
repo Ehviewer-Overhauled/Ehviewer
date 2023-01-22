@@ -14,7 +14,6 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.login.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.widget.DialogWebChromeClient
 import okhttp3.Cookie
 import okhttp3.HttpUrl
@@ -69,9 +68,9 @@ fun WebviewSignInScreen(navController: NavController) {
                         EhCookieStore.newCookie(
                             cookie,
                             domain,
-                            true,
-                            true,
-                            true
+                            forcePersistent = true,
+                            forceLongLive = true,
+                            forceNotHostOnly = true
                         )
                     )
                 }

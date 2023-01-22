@@ -57,9 +57,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.login.LoginActivity.Companion.COOKIE_SIGN_IN_ROUTE_NAME
-import com.hippo.ehviewer.ui.login.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
-import com.hippo.ehviewer.ui.login.LoginActivity.Companion.WEBVIEW_SIGN_IN_ROUTE_NAME
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext

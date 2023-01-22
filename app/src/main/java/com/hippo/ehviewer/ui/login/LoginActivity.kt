@@ -43,11 +43,9 @@ class LoginActivity : EhActivity() {
         super.finish()
         ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
-
-    companion object {
-        const val SIGN_IN_ROUTE_NAME = "SignIn"
-        const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
-        const val COOKIE_SIGN_IN_ROUTE_NAME = "CookieSignIn"
-        const val SELECT_SITE_ROUTE_NAME = "SelectSite"
-    }
 }
+
+const val SIGN_IN_ROUTE_NAME = "SignIn"
+const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
+const val COOKIE_SIGN_IN_ROUTE_NAME = "CookieSignIn"
+const val SELECT_SITE_ROUTE_NAME = "SelectSite"
