@@ -58,6 +58,7 @@ import com.hippo.ehviewer.client.parser.GalleryListUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.ui.login.LoginActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene

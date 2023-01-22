@@ -1,19 +1,15 @@
-package com.hippo.ehviewer.ui
+package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
-import com.hippo.ehviewer.ui.compose.CookieSignInScene
-import com.hippo.ehviewer.ui.compose.SelectSiteScreen
-import com.hippo.ehviewer.ui.compose.SignInScreen
-import com.hippo.ehviewer.ui.compose.WebviewSignInScreen
+import com.hippo.ehviewer.ui.EhActivity
 
-class LoginActivity : ComponentActivity() {
+class LoginActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

@@ -34,7 +34,7 @@
         android:theme="@style/AppTheme"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="false"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize"/>

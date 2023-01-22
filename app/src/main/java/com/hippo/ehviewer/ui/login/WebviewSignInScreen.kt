@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.login
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -14,7 +14,7 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
+import com.hippo.ehviewer.ui.login.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.widget.DialogWebChromeClient
 import okhttp3.Cookie
 import okhttp3.HttpUrl

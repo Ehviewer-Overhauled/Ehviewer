@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -53,7 +53,7 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
+import com.hippo.ehviewer.ui.login.LoginActivity.Companion.SELECT_SITE_ROUTE_NAME
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext

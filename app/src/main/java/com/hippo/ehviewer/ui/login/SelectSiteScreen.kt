@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
