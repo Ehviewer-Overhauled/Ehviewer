@@ -291,7 +291,7 @@ public class Hosts {
         }
     }
 
-    private boolean contains(String host) {
+    public boolean contains(String host) {
         try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
             return cursor.moveToNext();
         }

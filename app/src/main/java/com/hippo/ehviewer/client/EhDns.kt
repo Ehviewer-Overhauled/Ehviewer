@@ -123,4 +123,8 @@ object EhDns : Dns {
         return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.getBuiltInHosts() }
         ?: Dns.SYSTEM.lookup(hostname)
     }
+
+    fun isInHost(hostname: String): Boolean {
+        return hosts.contains(hostname) || (builtInHosts.contains(hostname) && Settings.getBuiltInHosts())
+    }
 }
