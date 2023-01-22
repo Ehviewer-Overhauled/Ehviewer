@@ -43,8 +43,8 @@
         android:title="@string/settings_advanced_read_cache_size"
         app:entries="@array/read_cache_size_entries"
         app:entryValues="@array/read_cache_size_entry_values"
-        app:useSimpleSummaryProvider="true"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
 
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="system"
@@ -52,8 +52,8 @@
         android:title="@string/settings_advanced_app_language_title"
         app:entries="@array/app_language_entries"
         app:entryValues="@array/app_language_entry_values"
-        app:useSimpleSummaryProvider="true"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:useSimpleSummaryProvider="true" />
 
     <com.hippo.ehviewer.preference.ProxyPreference
         android:key="proxy"
@@ -78,6 +78,13 @@
         android:key="domain_fronting"
         android:summary="@string/settings_advanced_domain_fronting_summary"
         android:title="@string/settings_advanced_domain_fronting_title"
+        app:iconSpaceReserved="false" />
+
+    <rikka.material.preference.MaterialSwitchPreference
+        android:defaultValue="true"
+        android:key="bypass_vpn"
+        android:summary="@string/settings_advanced_bypass_vpn_summary"
+        android:title="@string/settings_advanced_bypass_vpn_title"
         app:iconSpaceReserved="false" />
 
     <Preference

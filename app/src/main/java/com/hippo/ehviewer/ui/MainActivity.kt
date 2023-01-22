@@ -24,15 +24,20 @@ import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.graphics.Bitmap
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.customview.widget.Openable
 import androidx.drawerlayout.widget.DrawerLayout
@@ -83,6 +88,8 @@ import java.io.OutputStream
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private lateinit var connectivityManager: ConnectivityManager
+    private val availableNetworks: MutableList<Network> = mutableListOf()
 
     private fun saveImageToTempFile(file: UniFile?): File? {
         file ?: return null
@@ -217,6 +224,10 @@ class MainActivity : EhActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        connectivityManager = getSystemService()!!
+        if (Settings.getDF() && Settings.getBypassVPN()) {
+            bypassVPN()
+        }
         if (EhUtils.needSignedIn())
             startActivity(Intent(this, LoginActivity::class.java))
         super.onCreate(savedInstanceState)
@@ -272,6 +283,19 @@ class MainActivity : EhActivity() {
                     } catch (ignored: PackageManager.NameNotFoundException) {
                     }
                 }
+            }
+        }
+    }
+
+    private fun bypassVPN() {
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        capabilities?.let {
+            if (it.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                val builder = NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                connectivityManager.registerNetworkCallback(builder.build(), mNetworkCallback)
             }
         }
     }
@@ -334,8 +358,7 @@ class MainActivity : EhActivity() {
     }
 
     private fun checkMeteredNetwork() {
-        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (cm.isActiveNetworkMetered) {
+        if (connectivityManager.isActiveNetworkMetered) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 Snackbar.make(
                     binding.drawView,
@@ -503,4 +526,25 @@ class MainActivity : EhActivity() {
             override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerStateChanged(newState: Int) {}
         }
+
+    private val mNetworkCallback = object : ConnectivityManager.NetworkCallback() {
+        private val TAG = "mNetworkCallback"
+
+        override fun onAvailable(network: Network) {
+            Log.d(TAG, "onAvailable: $network")
+            connectivityManager.bindProcessToNetwork(network)
+            availableNetworks.add(network)
+        }
+
+        override fun onLost(network: Network) {
+            Log.d(TAG, "onLost: $network")
+            val activeNetwork = availableNetworks.last()
+            availableNetworks.remove(network)
+            if (network == activeNetwork) {
+                connectivityManager.bindProcessToNetwork(
+                    availableNetworks.takeIf { it.isNotEmpty() }?.last()
+                )
+            }
+        }
+    }
 }
