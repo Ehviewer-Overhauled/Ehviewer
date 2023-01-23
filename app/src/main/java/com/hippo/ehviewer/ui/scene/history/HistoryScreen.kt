@@ -182,7 +182,7 @@ private fun InfoCard(info: GalleryInfo) {
                 AsyncImage(
                     model = info.thumb,
                     contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .width((listCardSize * 2).dp)
                         .height((listCardSize * 3).dp)
@@ -255,8 +255,7 @@ private fun InfoCard(info: GalleryInfo) {
 
 @Composable
 private fun ComposeSimpleRatingView(rating: Float) {
-    val r = (rating * 2).toInt()
-    check(r in 0..10)
+    val r = (rating * 2).toInt().coerceAtLeast(0).coerceAtMost(10)
     val fullStar = r.floorDiv(2)
     val halfStar = r % 2
     val outlineStar = 5 - fullStar - halfStar
