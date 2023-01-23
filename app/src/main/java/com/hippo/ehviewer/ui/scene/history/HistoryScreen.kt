@@ -1,8 +1,11 @@
 package com.hippo.ehviewer.ui.scene.history
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,7 +79,8 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
         }.flow.cachedIn(coroutineScope)
     }.collectAsLazyPagingItems()
 
-    var clearAllDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogStatus by remember { mutableStateOf(HistoryScreenDialogStatus.NONE) }
+    var selectedGalleryInfo by remember { mutableStateOf<GalleryInfo?>(null) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -92,7 +95,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { clearAllDialog = true }) {
+                    IconButton(onClick = { dialogStatus = HistoryScreenDialogStatus.CLEAR_ALL }) {
                         Icon(
                             painter = painterResource(id = R.drawable.v_clear_all_dark_x24),
                             contentDescription = ""
@@ -113,6 +116,10 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 it?.let {
                     InfoCard(
                         { hostFragment.navToDetail(it) },
+                        {
+                            selectedGalleryInfo = it
+                            dialogStatus = HistoryScreenDialogStatus.SELECT_ITEM
+                        },
                         info = it,
                     )
                 }
@@ -124,9 +131,9 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
         }
     }
 
-    if (clearAllDialog) {
+    if (dialogStatus == HistoryScreenDialogStatus.CLEAR_ALL) {
         AlertDialog(
-            onDismissRequest = { clearAllDialog = false },
+            onDismissRequest = { dialogStatus = HistoryScreenDialogStatus.NONE },
             title = {
                 Text(text = stringResource(id = R.string.clear_all))
             },
@@ -138,7 +145,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                     onClick = {
                         coroutineScope.launchIO {
                             EhDB.clearHistoryInfo()
-                            clearAllDialog = false
+                            dialogStatus = HistoryScreenDialogStatus.NONE
                         }
                     }
                 ) {
@@ -148,13 +155,49 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
             dismissButton = {
                 TextButton(
                     onClick = {
-                        clearAllDialog = false
+                        dialogStatus = HistoryScreenDialogStatus.NONE
                     }
                 ) {
                     Text(stringResource(id = android.R.string.cancel))
                 }
             }
         )
+    }
+
+    if (dialogStatus == HistoryScreenDialogStatus.SELECT_ITEM) {
+        selectedGalleryInfo?.let { info ->
+            AlertDialog(
+                onDismissRequest = { dialogStatus = HistoryScreenDialogStatus.NONE },
+                title = {
+                    Text(
+                        text = EhUtils.getSuitableTitle(info),
+                        maxLines = 2,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                text = {
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { hostFragment.navToDetail(info) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.v_book_open_x24),
+                                contentDescription = null,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            Text(
+                                text = stringResource(id = R.string.read),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+                },
+                confirmButton = {}
+            )
+        }
     }
 }
 
@@ -177,20 +220,25 @@ private fun NoHistory() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun InfoCard(
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     info: GalleryInfo,
 ) {
     OutlinedCard(
-        onClick = onClick,
         modifier = Modifier.padding(6.dp),
         border = remember { BorderStroke(1.dp, Color.Transparent) }
     ) {
         val listCardSize = remember { Settings.getListThumbSize().pxToDp }
         Row(
-            modifier = Modifier.height((listCardSize * 3).dp)
+            modifier = Modifier
+                .height((listCardSize * 3).dp)
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                ),
         ) {
             Card {
                 AsyncImage(
@@ -204,7 +252,7 @@ private fun InfoCard(
             }
             Column(Modifier.padding(8.dp, 4.dp)) {
                 Text(
-                    text = EhUtils.getSuitableTitle(info)!!,
+                    text = EhUtils.getSuitableTitle(info),
                     maxLines = 2,
                     modifier = Modifier.fillMaxWidth(),
                     overflow = TextOverflow.Ellipsis,
@@ -300,4 +348,10 @@ private fun ComposeSimpleRatingView(rating: Float) {
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.rating_interval)))
         }
     }
+}
+
+enum class HistoryScreenDialogStatus {
+    NONE,
+    CLEAR_ALL,
+    SELECT_ITEM
 }

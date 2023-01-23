@@ -109,12 +109,12 @@ object EhUtils {
     }
 
     @JvmStatic
-    fun getSuitableTitle(gi: GalleryInfo): String? {
+    fun getSuitableTitle(gi: GalleryInfo): String {
         return if (Settings.getShowJpnTitle()) {
             if (TextUtils.isEmpty(gi.titleJpn)) gi.title else gi.titleJpn
         } else {
             if (TextUtils.isEmpty(gi.title)) gi.titleJpn else gi.title
-        }
+        }.orEmpty()
     }
 
     fun extractTitle(fullTitle: String?): String? {
