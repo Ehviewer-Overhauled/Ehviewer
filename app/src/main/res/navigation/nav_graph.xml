@@ -62,7 +62,7 @@
         android:label="FavoritesScene" />
     <fragment
         android:id="@+id/nav_history"
-        android:name="com.hippo.ehviewer.ui.scene.HistoryScene"
+        android:name="com.hippo.ehviewer.ui.scene.HistoryComposeScreenFragmentBridge"
         android:label="HistoryScene" />
     <fragment
         android:id="@+id/nav_downloads"
