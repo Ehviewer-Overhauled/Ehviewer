@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -177,20 +178,55 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 },
                 text = {
                     Column {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { hostFragment.navToDetail(info) },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.v_book_open_x24),
-                                contentDescription = null,
-                                modifier = Modifier.padding(16.dp)
+                        DialogSelectorItem(
+                            onClick = {
+                                hostFragment.navToDetail(info)
+                                dialogStatus = HistoryScreenDialogStatus.NONE
+                            },
+                            icon = painterResource(id = R.drawable.v_book_open_x24),
+                            text = stringResource(id = R.string.read)
+                        )
+                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = HistoryScreenDialogStatus.NONE
+                                },
+                                icon = painterResource(id = R.drawable.v_delete_x24),
+                                text = stringResource(id = R.string.delete_downloads)
                             )
-                            Text(
-                                text = stringResource(id = R.string.read),
-                                style = MaterialTheme.typography.titleMedium
+                        } else {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = HistoryScreenDialogStatus.NONE
+                                },
+                                icon = painterResource(id = R.drawable.v_download_x24),
+                                text = stringResource(id = R.string.download)
+                            )
+                        }
+                        if (info.favoriteSlot == -2) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = HistoryScreenDialogStatus.NONE
+                                },
+                                icon = painterResource(id = R.drawable.v_heart_x24),
+                                text = stringResource(id = R.string.add_to_favourites)
+                            )
+                        } else {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = HistoryScreenDialogStatus.NONE
+                                },
+                                icon = painterResource(id = R.drawable.v_heart_broken_x24),
+                                text = stringResource(id = R.string.remove_from_favourites)
+                            )
+                        }
+                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = HistoryScreenDialogStatus.NONE
+                                },
+                                icon = painterResource(id = R.drawable.v_folder_move_x24),
+                                text = stringResource(id = R.string.download_move_dialog_title)
                             )
                         }
                     }
@@ -198,6 +234,30 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 confirmButton = {}
             )
         }
+    }
+}
+
+@Composable
+private fun DialogSelectorItem(
+    onClick: () -> Unit,
+    icon: Painter,
+    text: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = icon,
+            contentDescription = null,
+            modifier = Modifier.padding(16.dp)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }
 
