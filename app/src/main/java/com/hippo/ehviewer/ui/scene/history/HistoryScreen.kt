@@ -198,7 +198,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                     Column {
                         DialogSelectorItem(
                             onClick = {
-                                hostFragment.navToDetail(info)
+                                hostFragment.navToReader(info)
                                 dialogStatus = HistoryScreenDialogStatus.NONE
                             },
                             icon = painterResource(id = R.drawable.v_book_open_x24),
