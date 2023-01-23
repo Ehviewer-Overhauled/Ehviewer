@@ -37,12 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -55,7 +55,6 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.widget.SimpleRatingView
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
@@ -206,11 +205,7 @@ private fun InfoCard(info: GalleryInfo) {
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelLarge
                         )
-                        AndroidView(factory = { context ->
-                            SimpleRatingView(context).apply {
-                                rating = info.rating
-                            }
-                        })
+                        ComposeSimpleRatingView(rating = info.rating)
                         Text(
                             text = EhUtils.getCategory(info.category).uppercase(Locale.ROOT),
                             modifier = Modifier
@@ -254,6 +249,42 @@ private fun InfoCard(info: GalleryInfo) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ComposeSimpleRatingView(rating: Float) {
+    val r = (rating * 2).toInt()
+    check(r in 0..10)
+    val fullStar = r.floorDiv(2)
+    val halfStar = r % 2
+    val outlineStar = 5 - fullStar - halfStar
+    val colorYellow800 = Color(0xfff9a825)
+    Row {
+        repeat(fullStar) {
+            Icon(
+                painter = painterResource(id = R.drawable.v_star_x16),
+                contentDescription = null,
+                tint = colorYellow800
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.rating_interval)))
+        }
+        repeat(halfStar) {
+            Icon(
+                painter = painterResource(id = R.drawable.v_star_half_x16),
+                contentDescription = null,
+                tint = colorYellow800
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.rating_interval)))
+        }
+        repeat(outlineStar) {
+            Icon(
+                painter = painterResource(id = R.drawable.v_star_outline_x16),
+                contentDescription = null,
+                tint = colorYellow800
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.rating_interval)))
         }
     }
 }
