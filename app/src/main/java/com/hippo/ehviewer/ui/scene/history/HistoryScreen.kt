@@ -57,6 +57,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.widget.SimpleRatingView
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,17 +209,16 @@ private fun InfoCard(info: GalleryInfo) {
                             }
                         })
                         Text(
-                            text = EhUtils.getCategory(info.category),
+                            text = EhUtils.getCategory(info.category).uppercase(Locale.ROOT),
                             modifier = Modifier
-                                .padding(2.dp)
-                                .background(remember {
+                                .background(
                                     Color(
                                         EhUtils.getCategoryColor(
                                             info.category
                                         )
                                     )
-                                })
-                                .padding(vertical = 3.dp, horizontal = 3.dp),
+                                )
+                                .padding(vertical = 2.dp, horizontal = 8.dp),
                             color = Color.White,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelLarge
