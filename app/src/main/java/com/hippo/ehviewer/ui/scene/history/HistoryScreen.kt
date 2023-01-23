@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.scene.history
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -7,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,7 +128,20 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                         }
                     SwipeToDismiss(
                         state = dismissState,
-                        background = {},
+                        background = {
+                            val color by animateColorAsState(
+                                when (dismissState.targetValue) {
+                                    DismissValue.Default -> Color.Transparent
+                                    DismissValue.DismissedToEnd -> Color.Green
+                                    DismissValue.DismissedToStart -> Color.Red
+                                }
+                            )
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color)
+                            )
+                        },
                         dismissContent = {
                             InfoCard(
                                 { hostFragment.navToDetail(it) },
