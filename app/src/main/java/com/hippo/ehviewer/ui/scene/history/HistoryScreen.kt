@@ -118,14 +118,11 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 key = { item -> item.gid }
             ) { info ->
                 info?.let {
-                    val dismissState = rememberDismissState(
-                        confirmValueChange = {
-                            coroutineScope.launchIO {
-                                EhDB.deleteHistoryInfo(info)
-                            }
-                            true
+                    val dismissState = rememberDismissState()
+                    if (dismissState.isDismissed(DismissDirection.EndToStart))
+                        coroutineScope.launchIO {
+                            EhDB.deleteHistoryInfo(info)
                         }
-                    )
                     SwipeToDismiss(
                         state = dismissState,
                         background = {},
