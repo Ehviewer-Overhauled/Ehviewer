@@ -3,6 +3,7 @@ package com.hippo.ehviewer.ui.scene.history
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.ui.scene.HistoryComposeScreenFragmentBridge
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
@@ -63,7 +65,7 @@ val downloadManager = EhApplication.downloadManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(toggleDrawer: () -> Unit) {
+fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
     val coroutineScope = rememberCoroutineScope()
     val historyData = remember {
         Pager(
@@ -82,7 +84,7 @@ fun HistoryScreen(toggleDrawer: () -> Unit) {
                     Text(text = stringResource(id = R.string.history))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { toggleDrawer() }) {
+                    IconButton(onClick = { hostFragment.toggleNavigationDrawer() }) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = "")
                     }
                 },
@@ -105,7 +107,10 @@ fun HistoryScreen(toggleDrawer: () -> Unit) {
                 key = { item -> item.gid }
             ) {
                 it?.let {
-                    InfoCard(info = it)
+                    InfoCard(
+                        info = it,
+                        modifier = Modifier.clickable { hostFragment.navToDetail(it) }
+                    )
                 }
             }
         }
@@ -169,9 +174,12 @@ private fun NoHistory() {
 }
 
 @Composable
-private fun InfoCard(info: GalleryInfo) {
+private fun InfoCard(
+    info: GalleryInfo,
+    modifier: Modifier = Modifier
+) {
     OutlinedCard(
-        modifier = Modifier.padding(6.dp),
+        modifier = modifier.padding(6.dp),
         border = remember { BorderStroke(1.dp, Color.Transparent) }
     ) {
         val listCardSize = remember { Settings.getListThumbSize().pxToDp }
