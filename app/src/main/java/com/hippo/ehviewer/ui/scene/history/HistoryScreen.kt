@@ -49,6 +49,7 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -58,6 +59,8 @@ import com.hippo.ehviewer.widget.SimpleRatingView
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
+
+val downloadManager = EhApplication.downloadManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -227,7 +230,7 @@ private fun InfoCard(info: GalleryInfo) {
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.End) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (false) {
+                            if (remember { downloadManager.containDownloadInfo(info.gid) }) {
                                 Icon(
                                     painterResource(id = R.drawable.v_download_x16),
                                     contentDescription = null
