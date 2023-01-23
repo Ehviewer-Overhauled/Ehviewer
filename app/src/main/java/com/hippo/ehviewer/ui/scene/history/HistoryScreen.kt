@@ -3,7 +3,6 @@ package com.hippo.ehviewer.ui.scene.history
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -108,8 +107,8 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
             ) {
                 it?.let {
                     InfoCard(
+                        { hostFragment.navToDetail(it) },
                         info = it,
-                        modifier = Modifier.clickable { hostFragment.navToDetail(it) }
                     )
                 }
             }
@@ -173,13 +172,15 @@ private fun NoHistory() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InfoCard(
+    onClick: () -> Unit,
     info: GalleryInfo,
-    modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        modifier = modifier.padding(6.dp),
+        onClick = onClick,
+        modifier = Modifier.padding(6.dp),
         border = remember { BorderStroke(1.dp, Color.Transparent) }
     ) {
         val listCardSize = remember { Settings.getListThumbSize().pxToDp }
