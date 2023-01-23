@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhRequest
@@ -169,6 +170,7 @@ class ProgressScene : BaseScene(), View.OnClickListener {
         arg.putLong(GalleryDetailScene.KEY_GID, mGid)
         arg.putString(GalleryDetailScene.KEY_TOKEN, result)
         arg.putInt(GalleryDetailScene.KEY_PAGE, mPage)
+        findNavController().popBackStack()
         navigate(R.id.galleryDetailScene, arg)
     }
 
