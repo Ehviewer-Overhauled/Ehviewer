@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -65,6 +67,7 @@ val downloadManager = EhApplication.downloadManager
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
     val historyData = remember {
         Pager(
@@ -77,6 +80,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
     var clearAllDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
@@ -94,7 +98,8 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                             contentDescription = ""
                         )
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
     ) { paddingValues ->
