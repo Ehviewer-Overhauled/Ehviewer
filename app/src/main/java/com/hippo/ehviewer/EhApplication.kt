@@ -268,6 +268,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
             decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
             transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
+            crossfade(true)
         }.build()
     }
 

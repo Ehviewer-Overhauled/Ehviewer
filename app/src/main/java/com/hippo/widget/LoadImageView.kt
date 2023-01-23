@@ -135,7 +135,7 @@ open class LoadImageView @JvmOverloads constructor(
         clearRetry()
         task?.dispose()
         mRequest =
-            ImageRequest.Builder(context).data(url).memoryCacheKey(key).diskCacheKey(key)
+            ImageRequest.Builder(context).data(url).crossfade(false)
                 .size(Size.ORIGINAL).target(
                 { onWait() },
                 { onFailure() },

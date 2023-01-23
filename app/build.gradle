@@ -156,7 +156,7 @@ dependencies {
     implementation 'dev.rikka.rikkax.material:material-preference:2.0.0'
     // https://coil-kt.github.io/coil/changelog/
     // implementation 'io.coil-kt:coil:2.2.2'
-    implementation 'com.github.Ehviewer-Overhauled.coil:coil:d65881d'
+    implementation 'com.github.Ehviewer-Overhauled.coil:coil-compose:d65881d'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'org.jsoup:jsoup:1.15.3'
 }

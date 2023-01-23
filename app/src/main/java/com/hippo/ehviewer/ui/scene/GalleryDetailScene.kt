@@ -768,7 +768,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             return
         }
         try {
-            val path = imageLoader(context).diskCache!![EhCacheKeyFactory.getThumbKey(gid)]!!.data
+            val path = imageLoader(context).diskCache!![mGalleryInfo!!.thumb!!]!!.data
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
             lub.imagePath = path.toString()
