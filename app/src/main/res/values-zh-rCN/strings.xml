@@ -58,7 +58,7 @@
     <string name="error_please_login_first">请先登陆</string>
     <string name="error_empty_html">页面内容为空</string>
     <string name="kokomade_tip">设置-&gt;Eh-&gt;画廊站点-&gt;e-hentai</string>
-    <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。\n\n未成年人应在监护人指导下使用本应用。\n\n继续使用即代表您同意上述条款。</string>
+    <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。未成年人应在监护人指导下使用本应用。继续使用即代表您同意上述条款。</string>
     <string name="error_username_cannot_empty">用户名不可为空</string>
     <string name="error_password_cannot_empty">密码不可为空</string>
     <string name="tourist_mode">游客模式</string>
@@ -177,7 +177,7 @@
     <string name="rating3">糟糕</string>
     <string name="rating2">瞎眼</string>
     <string name="rating1">快要窒息了</string>
-    <string name="rating0">…</string>
+    <string name="rating0">扑街了</string>
     <!-- Gallery Info -->
     <string name="gallery_info">画廊信息</string>
     <string name="copied_to_clipboard">已复制到剪切板</string>
