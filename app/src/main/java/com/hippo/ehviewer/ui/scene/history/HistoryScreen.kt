@@ -4,13 +4,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -38,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,9 +47,9 @@ import androidx.paging.compose.items
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.scene.HistoryComposeScreenFragmentBridge
+import com.hippo.ehviewer.ui.widget.GalleryListLongClickDialog
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import eu.kanade.tachiyomi.util.lang.launchIO
 
@@ -190,97 +186,10 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
 
     if (dialogStatus == HistoryScreenDialogStatus.SELECT_ITEM) {
         selectedGalleryInfo?.let { info ->
-            AlertDialog(
-                onDismissRequest = { dialogStatus = HistoryScreenDialogStatus.NONE },
-                title = {
-                    Text(
-                        text = EhUtils.getSuitableTitle(info),
-                        maxLines = 2,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                text = {
-                    Column {
-                        DialogSelectorItem(
-                            onClick = {
-                                hostFragment.navToReader(info)
-                                dialogStatus = HistoryScreenDialogStatus.NONE
-                            },
-                            icon = painterResource(id = R.drawable.v_book_open_x24),
-                            text = stringResource(id = R.string.read)
-                        )
-                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
-                            DialogSelectorItem(
-                                onClick = {
-                                    dialogStatus = HistoryScreenDialogStatus.NONE
-                                },
-                                icon = painterResource(id = R.drawable.v_delete_x24),
-                                text = stringResource(id = R.string.delete_downloads)
-                            )
-                        } else {
-                            DialogSelectorItem(
-                                onClick = {
-                                    dialogStatus = HistoryScreenDialogStatus.NONE
-                                },
-                                icon = painterResource(id = R.drawable.v_download_x24),
-                                text = stringResource(id = R.string.download)
-                            )
-                        }
-                        if (info.favoriteSlot == -2) {
-                            DialogSelectorItem(
-                                onClick = {
-                                    dialogStatus = HistoryScreenDialogStatus.NONE
-                                },
-                                icon = painterResource(id = R.drawable.v_heart_x24),
-                                text = stringResource(id = R.string.add_to_favourites)
-                            )
-                        } else {
-                            DialogSelectorItem(
-                                onClick = {
-                                    dialogStatus = HistoryScreenDialogStatus.NONE
-                                },
-                                icon = painterResource(id = R.drawable.v_heart_broken_x24),
-                                text = stringResource(id = R.string.remove_from_favourites)
-                            )
-                        }
-                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
-                            DialogSelectorItem(
-                                onClick = {
-                                    dialogStatus = HistoryScreenDialogStatus.NONE
-                                },
-                                icon = painterResource(id = R.drawable.v_folder_move_x24),
-                                text = stringResource(id = R.string.download_move_dialog_title)
-                            )
-                        }
-                    }
-                },
-                confirmButton = {}
-            )
+            GalleryListLongClickDialog(info = info) {
+                dialogStatus = HistoryScreenDialogStatus.NONE
+            }
         }
-    }
-}
-
-@Composable
-private fun DialogSelectorItem(
-    onClick: () -> Unit,
-    icon: Painter,
-    text: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            modifier = Modifier.padding(16.dp)
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium
-        )
     }
 }
 

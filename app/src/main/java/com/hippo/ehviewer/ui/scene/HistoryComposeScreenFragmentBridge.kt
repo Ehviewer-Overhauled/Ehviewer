@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.scene
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.scene.history.HistoryScreen
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 
 class HistoryComposeScreenFragmentBridge : BaseScene() {
     override fun onCreateView(
@@ -40,13 +38,5 @@ class HistoryComposeScreenFragmentBridge : BaseScene() {
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
         navigate(R.id.galleryDetailScene, args)
-    }
-
-    @MainThread
-    fun navToReader(gi: GalleryInfo) {
-        val intent = Intent(activity, ReaderActivity::class.java)
-        intent.action = ReaderActivity.ACTION_EH
-        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
-        startActivity(intent)
     }
 }
