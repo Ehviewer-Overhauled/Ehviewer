@@ -58,7 +58,7 @@ jobs:
           cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk app/build/outputs/apk/release/fdroid/EhViewer-v$GITHUB_REF_NAME-armv7.apk
 
       - name: Push Apks
-        uses: cpina/github-action-push-to-another-repository@v1.5
+        uses: Ehviewer-Overhauled/github-action-push-to-another-repository@main
         env:
          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
@@ -68,5 +68,6 @@ jobs:
           user-name: 'github-actions[bot]'
           user-email: 'github-actions[bot]@users.noreply.github.com'
           target-branch: deploy
+          create-target-branch: true
           commit-message: Add apks from $GITHUB_REF
           target-directory: fdroid/tmp-apks
