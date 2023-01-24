@@ -91,7 +91,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
      ---------------*/
     private var mDownloadManager: DownloadManager? = null
     private var mLabel: String? = null
-    private var mList: MutableList<DownloadInfo>? = null
+    private var mList: List<DownloadInfo>? = null
 
     /*---------------
      View life cycle
@@ -115,8 +115,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         // Add "All" and "Default" label names
         mLabels.add(getString(R.string.download_all))
         mLabels.add(getString(R.string.default_download_label_name))
-        for ((_, label) in listLabel) {
-            mLabels.add(label!!)
+        listLabel.forEach {
+            mLabels.add(it.label!!)
         }
     }
 
@@ -179,11 +179,12 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             ?: Log.e(TAG, "Can't removeDownloadInfoListener")
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun updateForLabel() {
         if (null == mDownloadManager) {
             return
         }
-        var list: MutableList<DownloadInfo>?
+        var list: List<DownloadInfo>?
         if (mLabel == null) {
             list = mDownloadManager!!.allDownloadInfoList
         } else if (mLabel == getString(R.string.default_download_label_name)) {
@@ -195,15 +196,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 list = mDownloadManager!!.allDownloadInfoList
             }
         }
-        if (mType != -1) {
-            mList = ArrayList()
-            for (info in list) {
-                if (info.state == mType) {
-                    mList!!.add(info)
-                }
-            }
+        mList = if (mType != -1) {
+            list.filter { it.state == mType }
         } else {
-            mList = list
+            list
         }
         if (mAdapter != null) {
             mAdapter!!.notifyDataSetChanged()
@@ -391,7 +387,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             R.id.action_start_all_reversed -> {
                 val list = mList ?: return true
                 val gidList = LongList()
-                for (i in list.size - 1 downTo -1 + 1) {
+                for (i in list.size - 1 downTo 0) {
                     val info = list[i]
                     if (info.state != DownloadInfo.STATE_FINISH) {
                         gidList.add(info.gid)
@@ -410,7 +406,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
     fun updateView() {
         if (mViewTransition != null) {
-            if (mList == null || mList!!.size == 0) {
+            if (mList.isNullOrEmpty()) {
                 mViewTransition!!.showView(1)
             } else {
                 mViewTransition!!.showView(0)
@@ -552,9 +548,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 downloadInfoList = LinkedList()
             }
             val stateArray = recyclerView.checkedItemPositions
-            var i = 0
-            val n = stateArray.size()
-            while (i < n) {
+            for (i in 0 until stateArray.size()) {
                 if (stateArray.valueAt(i)) {
                     val info = list[stateArray.keyAt(i)]
                     if (collectDownloadInfo) {
@@ -564,7 +558,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                         gidList!!.add(info.gid)
                     }
                 }
-                i++
             }
             when (position) {
                 1 -> {
@@ -580,7 +573,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 2 -> {
                     // Stop
                     if (null != mDownloadManager) {
-                        mDownloadManager!!.stopRangeDownload(gidList)
+                        mDownloadManager!!.stopRangeDownload(gidList!!)
                     }
                     // Cancel check mode
                     recyclerView.outOfCustomChoiceMode()
@@ -595,7 +588,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                         Settings.getRemoveImageFiles()
                     )
                     val helper = DeleteRangeDialogHelper(
-                        downloadInfoList, gidList, builder
+                        downloadInfoList!!, gidList, builder
                     )
                     builder.setTitle(R.string.download_remove_dialog_title)
                         .setPositiveButton(android.R.string.ok, helper)
@@ -607,11 +600,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     val labelRawList = downloadManager.labelList
                     val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
                     labelList.add(getString(R.string.default_download_label_name))
-                    var i = 0
-                    val n = labelRawList.size
-                    while (i < n) {
-                        labelRawList[i].label?.let { labelList.add(it) }
-                        i++
+                    labelRawList.forEach {
+                        labelList.add(it.label!!)
                     }
                     val labels = labelList.toTypedArray()
                     val helper = MoveDialogHelper(labels, downloadInfoList!!)
@@ -644,12 +634,14 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onUpdateAll() {
         if (mAdapter != null) {
             mAdapter!!.notifyDataSetChanged()
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onReload() {
         if (mAdapter != null) {
             mAdapter!!.notifyDataSetChanged()
@@ -867,8 +859,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     }
 
     private inner class DeleteRangeDialogHelper(
-        private val mDownloadInfoList: List<DownloadInfo>?,
-        private val mGidList: LongList?, private val mBuilder: CheckBoxDialogBuilder
+        private val mDownloadInfoList: List<DownloadInfo>,
+        private val mGidList: LongList, private val mBuilder: CheckBoxDialogBuilder
     ) : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -889,7 +881,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             val checked = mBuilder.isChecked
             Settings.putRemoveImageFiles(checked)
             if (checked) {
-                val files = arrayOfNulls<UniFile>(mDownloadInfoList!!.size)
+                val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
                 for ((i, info) in mDownloadInfoList.withIndex()) {
                     // Put file
                     files[i] = SpiderDen.getGalleryDownloadDir(info.gid)
@@ -908,6 +900,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         private val mLabels: Array<String>,
         private val mDownloadInfoList: List<DownloadInfo>
     ) : DialogInterface.OnClickListener {
+        @SuppressLint("NotifyDataSetChanged")
         override fun onClick(dialog: DialogInterface, which: Int) {
             // Cancel check mode
             context ?: return
@@ -1095,6 +1088,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             button.setOnClickListener(this)
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onClick(v: View) {
             context ?: return
             val text = mBuilder.text
@@ -1225,16 +1219,19 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             if (fromPosition == toPosition) {
                 return false
             }
-            val allInfoList = mDownloadManager!!.allDownloadInfoList
-            val dbFromPosition = allInfoList.indexOf(mList!![fromPosition])
-            val dbToPosition = allInfoList.indexOf(mList!![toPosition])
             lifecycleScope.launchIO {
-                EhDB.moveDownloadInfo(dbFromPosition, dbToPosition)
-                val item = allInfoList.removeAt(dbFromPosition)
-                allInfoList.add(dbToPosition, item)
-                if (mLabel != null) {
-                    val item1 = mList!!.removeAt(fromPosition)
-                    mList!!.add(toPosition, item1)
+                when (mLabel) {
+                    null -> {
+                        mDownloadManager!!.moveDownload(fromPosition, toPosition)
+                    }
+
+                    getString(R.string.default_download_label_name) -> {
+                        mDownloadManager!!.moveDownload(null, fromPosition, toPosition)
+                    }
+
+                    else -> {
+                        mDownloadManager!!.moveDownload(mLabel, fromPosition, toPosition)
+                    }
                 }
                 withUIContext {
                     mAdapter!!.notifyItemMoved(fromPosition, toPosition)
