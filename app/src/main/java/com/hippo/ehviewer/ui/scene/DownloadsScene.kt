@@ -1220,6 +1220,19 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 return false
             }
             lifecycleScope.launchIO {
+                when (mLabel) {
+                    null -> {
+                        mDownloadManager!!.moveDownload(fromPosition, toPosition)
+                    }
+
+                    getString(R.string.default_download_label_name) -> {
+                        mDownloadManager!!.moveDownload(null, fromPosition, toPosition)
+                    }
+
+                    else -> {
+                        mDownloadManager!!.moveDownload(mLabel, fromPosition, toPosition)
+                    }
+                }
                 withUIContext {
                     mAdapter!!.notifyItemMoved(fromPosition, toPosition)
                 }

@@ -532,6 +532,37 @@ class DownloadManager : OnSpiderListener {
         ensureDownload()
     }
 
+    fun moveDownload(fromPosition: Int, toPosition: Int) {
+        if (fromPosition > toPosition) {
+            val time = mAllInfoList[toPosition].time
+            for (i in toPosition until fromPosition) {
+                mAllInfoList[i].time = mAllInfoList[i + 1].time
+            }
+            mAllInfoList[fromPosition].time = time
+            EhDB.updateDownloadInfo(mAllInfoList.slice(toPosition..fromPosition))
+        } else {
+            val time = mAllInfoList[fromPosition].time
+            for (i in fromPosition until toPosition) {
+                mAllInfoList[i].time = mAllInfoList[i + 1].time
+            }
+            mAllInfoList[toPosition].time = time
+            EhDB.updateDownloadInfo(mAllInfoList.slice(fromPosition..toPosition))
+        }
+        val label = mAllInfoList[fromPosition].label
+        mAllInfoList.sortByDateDescending()
+        val list = getInfoListForLabel(label)!!
+        list.sortByDateDescending()
+    }
+
+    fun moveDownload(label: String?, fromPosition: Int, toPosition: Int) {
+        val list = getInfoListForLabel(label)
+        list?.let {
+            val absFromPosition = mAllInfoList.indexOf(it[fromPosition])
+            val absToPosition = mAllInfoList.indexOf(it[toPosition])
+            moveDownload(absFromPosition, absToPosition)
+        }
+    }
+
     @SuppressLint("StaticFieldLeak")
     fun resetAllReadingProgress() {
         val list = LinkedList(mAllInfoList)
