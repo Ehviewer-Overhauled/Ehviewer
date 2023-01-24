@@ -140,7 +140,7 @@ dependencies {
     implementation 'com.github.tachiyomiorg:DirectionalViewPager:1.0.0' // Dead Dependency
     // https://github.com/google/accompanist/releases
     implementation "com.google.accompanist:accompanist-themeadapter-material3:0.28.0"
-    implementation 'com.google.android.material:material:1.8.0-rc01'
+    implementation 'com.google.android.material:material:1.8.0'
 
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation 'com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11'
