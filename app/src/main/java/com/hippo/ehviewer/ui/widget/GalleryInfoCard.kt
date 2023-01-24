@@ -43,9 +43,10 @@ fun ListInfoCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     info: GalleryInfo,
+    modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        modifier = Modifier.padding(6.dp),
+        modifier = modifier.padding(6.dp),
         border = remember { BorderStroke(1.dp, Color.Transparent) }
     ) {
         val listCardSize = remember { Settings.getListThumbSize().pxToDp }

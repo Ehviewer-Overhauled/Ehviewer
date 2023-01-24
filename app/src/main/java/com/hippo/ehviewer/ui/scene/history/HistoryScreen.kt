@@ -1,6 +1,7 @@
 package com.hippo.ehviewer.ui.scene.history
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,7 +59,7 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 
 val downloadManager = EhApplication.downloadManager
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -106,11 +107,16 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 key = { item -> item.gid }
             ) { info ->
                 info?.let {
-                    val dismissState = rememberDismissState()
-                    if (dismissState.isDismissed(DismissDirection.EndToStart))
-                        coroutineScope.launchIO {
-                            EhDB.deleteHistoryInfo(info)
+                    val dismissState = rememberDismissState(
+                        confirmValueChange = {
+                            if (it == DismissValue.DismissedToStart)
+                                coroutineScope.launchIO {
+                                    EhDB.deleteHistoryInfo(info)
+                                }
+                            true
                         }
+                    )
+
                     SwipeToDismiss(
                         state = dismissState,
                         background = {
@@ -135,6 +141,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                                     dialogStatus = HistoryScreenDialogStatus.SELECT_ITEM
                                 },
                                 info = it,
+                                modifier = Modifier.animateItemPlacement()
                             )
                         },
                         directions = setOf(DismissDirection.EndToStart)
