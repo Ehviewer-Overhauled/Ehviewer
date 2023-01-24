@@ -44,7 +44,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -52,8 +51,6 @@ import com.hippo.ehviewer.ui.scene.HistoryComposeScreenFragmentBridge
 import com.hippo.ehviewer.ui.widget.GalleryListLongClickDialog
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import eu.kanade.tachiyomi.util.lang.launchIO
-
-val downloadManager = EhApplication.downloadManager
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable

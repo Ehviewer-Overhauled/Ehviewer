@@ -35,7 +35,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
 
-val downloadManager = EhApplication.downloadManager
+private val downloadManager = EhApplication.downloadManager
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

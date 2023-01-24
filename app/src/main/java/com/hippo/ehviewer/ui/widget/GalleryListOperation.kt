@@ -23,10 +23,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+
+private val downloadManager = EhApplication.downloadManager
 
 @Composable
 private fun DialogSelectorItem(
@@ -86,11 +89,7 @@ fun GalleryListLongClickDialog(
                     icon = painterResource(id = R.drawable.v_book_open_x24),
                     text = stringResource(id = R.string.read)
                 )
-                if (remember {
-                        com.hippo.ehviewer.ui.scene.history.downloadManager.containDownloadInfo(
-                            info.gid
-                        )
-                    }) {
+                if (remember { downloadManager.containDownloadInfo(info.gid) }) {
                     DialogSelectorItem(
                         onClick = {
                             dialogStatus = DialogStatus.PRIMARY
@@ -124,11 +123,7 @@ fun GalleryListLongClickDialog(
                         text = stringResource(id = R.string.remove_from_favourites)
                     )
                 }
-                if (remember {
-                        com.hippo.ehviewer.ui.scene.history.downloadManager.containDownloadInfo(
-                            info.gid
-                        )
-                    }) {
+                if (remember { downloadManager.containDownloadInfo(info.gid) }) {
                     DialogSelectorItem(
                         onClick = {
                             dialogStatus = DialogStatus.PRIMARY
