@@ -91,6 +91,46 @@
             android:text="@string/settings_read_volume_page"
             android:textColor="?android:attr/textColorSecondary" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/volume_page_speed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txt_volume_page_fast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/settings_read_volume_page_fast"
+                app:layout_constraintBottom_toBottomOf="@id/slider_volume_page_interval"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/slider_volume_page_interval" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_volume_page_interval"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:stepSize="1.0"
+                android:valueFrom="0.0"
+                android:valueTo="9.0"
+                app:layout_constraintEnd_toStartOf="@id/txt_volume_page_slow"
+                app:layout_constraintStart_toEndOf="@id/txt_volume_page_fast"
+                app:layout_constraintTop_toTopOf="@id/volume_page_speed" />
+
+            <TextView
+                android:id="@+id/txt_volume_page_slow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/settings_read_volume_page_slow"
+                app:layout_constraintBottom_toBottomOf="@id/slider_volume_page_interval"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/slider_volume_page_interval" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/reserve_volume_page"
             android:layout_width="match_parent"

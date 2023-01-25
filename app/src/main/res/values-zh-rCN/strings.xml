@@ -348,6 +348,8 @@
     <string name="settings_eh_filter">屏蔽列表</string>
     <string name="settings_eh_filter_summary">根据标题、上传者、标签、评论者屏蔽画廊或评论</string>
     <string name="settings_read_volume_page">使用音量键翻页</string>
+    <string name="settings_read_volume_page_fast">快</string>
+    <string name="settings_read_volume_page_slow">慢</string>
     <string name="settings_read_reverse_volume">翻转音量键</string>
     <string name="settings_download">下载</string>
     <string name="settings_download_download_location">下载路径</string>
