@@ -86,16 +86,11 @@ fun ListInfoCard(
                             style = MaterialTheme.typography.labelLarge
                         )
                         SimpleRatingWidget(rating = info.rating)
+                        val categoryColor = remember { EhUtils.getCategoryColor(info.category) }
                         Text(
                             text = EhUtils.getCategory(info.category).uppercase(Locale.ROOT),
                             modifier = Modifier
-                                .background(
-                                    Color(
-                                        EhUtils.getCategoryColor(
-                                            info.category
-                                        )
-                                    )
-                                )
+                                .background(Color(categoryColor))
                                 .padding(vertical = 2.dp, horizontal = 8.dp),
                             color = Color.White,
                             textAlign = TextAlign.Center,
@@ -105,7 +100,8 @@ fun ListInfoCard(
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.End) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (remember { downloadManager.containDownloadInfo(info.gid) }) {
+                            // TODO: put this calculation in coroutines
+                            if (downloadManager.containDownloadInfo(info.gid)) {
                                 Icon(
                                     painterResource(id = R.drawable.v_download_x16),
                                     contentDescription = null
