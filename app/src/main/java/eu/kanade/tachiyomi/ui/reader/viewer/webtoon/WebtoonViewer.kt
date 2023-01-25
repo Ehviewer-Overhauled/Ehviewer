@@ -66,6 +66,8 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
 
     private val threshold: Int = 13
 
+    private var longPressed = false
+
     init {
         recycler.isVisible = false // Don't let the recycler layout yet
         recycler.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
@@ -214,19 +216,22 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      */
     override fun handleKeyEvent(event: KeyEvent): Boolean {
         val isUp = event.action == KeyEvent.ACTION_UP
+        val interval = config.volumeKeysInterval
+        val movePage = longPressed && (interval == 0 || event.repeatCount % (interval + 1) == 0)
+        longPressed = event.isLongPress || !isUp && longPressed
 
         when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
                 if (!config.volumeKeysEnabled || activity.menuVisible) {
                     return false
-                } else if (isUp) {
+                } else if (isUp != movePage) {
                     if (!config.volumeKeysInverted) scrollDown() else scrollUp()
                 }
             }
             KeyEvent.KEYCODE_VOLUME_UP -> {
                 if (!config.volumeKeysEnabled || activity.menuVisible) {
                     return false
-                } else if (isUp) {
+                } else if (isUp != movePage) {
                     if (!config.volumeKeysInverted) scrollUp() else scrollDown()
                 }
             }

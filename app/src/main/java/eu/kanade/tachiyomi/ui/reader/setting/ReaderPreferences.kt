@@ -92,6 +92,8 @@ class ReaderPreferences(private val preferenceStore: PreferenceStore) {
 
     fun readWithVolumeKeys() = preferenceStore.getBoolean("reader_volume_keys", false)
 
+    fun readWithVolumeKeysInterval() = preferenceStore.getInt("reader_volume_keys_interval", 0)
+
     fun readWithVolumeKeysInverted() = preferenceStore.getBoolean("reader_volume_keys_inverted", false)
 
     fun navigationModePager() = preferenceStore.getInt("reader_navigation_mode_pager", 0)

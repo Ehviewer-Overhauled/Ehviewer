@@ -390,6 +390,8 @@
     <string name="settings_eh_filter">Blockers</string>
     <string name="settings_eh_filter_summary">Block gallery or comment by title, uploader, tags and commenter</string>
     <string name="settings_read_volume_page">Use volume key to turn pages</string>
+    <string name="settings_read_volume_page_fast">Fast</string>
+    <string name="settings_read_volume_page_slow">Slow</string>
     <string name="settings_read_reverse_volume">Reverse volume key</string>
     <string name="settings_download">Download</string>
     <string name="settings_download_download_location">Download location</string>

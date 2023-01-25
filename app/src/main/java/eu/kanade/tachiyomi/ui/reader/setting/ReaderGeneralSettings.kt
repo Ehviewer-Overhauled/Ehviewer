@@ -51,7 +51,16 @@ class ReaderGeneralSettings @JvmOverloads constructor(context: Context, attrs: A
         binding.volumePage.bindToPreference(readerPreferences.readWithVolumeKeys())
         binding.reserveVolumePage.bindToPreference(readerPreferences.readWithVolumeKeysInverted())
         readerPreferences.readWithVolumeKeys().asHotFlow {
+            binding.volumePageSpeed.isVisible = it
             binding.reserveVolumePage.isVisible = it
         }.launchIn((context as ReaderActivity).lifecycleScope)
+
+        val volumePageInterval = readerPreferences.readWithVolumeKeysInterval().get()
+        binding.sliderVolumePageInterval.value = volumePageInterval.toFloat()
+        binding.sliderVolumePageInterval.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                readerPreferences.readWithVolumeKeysInterval().set(value.toInt())
+            }
+        }
     }
 }

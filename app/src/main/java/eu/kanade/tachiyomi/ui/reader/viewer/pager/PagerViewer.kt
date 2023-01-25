@@ -11,8 +11,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewpager.widget.ViewPager
 import com.hippo.ehviewer.R
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
@@ -69,6 +69,8 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
                 }
             }
         }
+
+    private var longPressed = false
 
     init {
         pager.isVisible = false // Don't layout the pager yet
@@ -304,19 +306,22 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
     override fun handleKeyEvent(event: KeyEvent): Boolean {
         val isUp = event.action == KeyEvent.ACTION_UP
         val ctrlPressed = event.metaState.and(KeyEvent.META_CTRL_ON) > 0
+        val interval = config.volumeKeysInterval
+        val movePage = longPressed && (interval == 0 || event.repeatCount % (interval + 1) == 0)
+        longPressed = event.isLongPress || !isUp && longPressed
 
         when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
                 if (!config.volumeKeysEnabled || activity.menuVisible) {
                     return false
-                } else if (isUp) {
+                } else if (isUp != movePage) {
                     if (!config.volumeKeysInverted) moveDown() else moveUp()
                 }
             }
             KeyEvent.KEYCODE_VOLUME_UP -> {
                 if (!config.volumeKeysEnabled || activity.menuVisible) {
                     return false
-                } else if (isUp) {
+                } else if (isUp != movePage) {
                     if (!config.volumeKeysInverted) moveUp() else moveDown()
                 }
             }

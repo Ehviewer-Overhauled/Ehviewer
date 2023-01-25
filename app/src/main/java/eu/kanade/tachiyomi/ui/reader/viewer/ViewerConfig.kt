@@ -22,6 +22,7 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
     var usePageTransitions = false
     var doubleTapAnimDuration = 500
     var volumeKeysEnabled = false
+    var volumeKeysInterval = 0
     var volumeKeysInverted = false
     var trueColor = false
     var alwaysShowChapterTransition = true
@@ -53,6 +54,9 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
 
         readerPreferences.readWithVolumeKeys()
             .register({ volumeKeysEnabled = it })
+
+        readerPreferences.readWithVolumeKeysInterval()
+            .register({ volumeKeysInterval = it })
 
         readerPreferences.readWithVolumeKeysInverted()
             .register({ volumeKeysInverted = it })
