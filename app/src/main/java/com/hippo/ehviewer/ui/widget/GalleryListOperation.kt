@@ -10,6 +10,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,95 +73,131 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
     val removeFromFavouriteSuccess = stringResource(id = R.string.remove_from_favorite_success)
     val removeFromFavouriteFailure = stringResource(id = R.string.remove_from_favorite_failure)
 
-    AlertDialog(
-        onDismissRequest = {
-            dialogStatus = DialogStatus.PRIMARY
-            onDismissRequest()
-        },
-        title = {
-            Text(
-                text = EhUtils.getSuitableTitle(info),
-                maxLines = 2,
-                style = MaterialTheme.typography.titleMedium
+    when (dialogStatus) {
+        DialogStatus.PRIMARY -> {
+            AlertDialog(
+                onDismissRequest = {
+                    dialogStatus = DialogStatus.PRIMARY
+                    onDismissRequest()
+                },
+                title = {
+                    Text(
+                        text = EhUtils.getSuitableTitle(info),
+                        maxLines = 2,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                text = {
+                    Column {
+                        DialogSelectorItem(
+                            onClick = {
+                                val intent = Intent(context, ReaderActivity::class.java)
+                                intent.action = ReaderActivity.ACTION_EH
+                                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
+                                startActivity(context, intent, null)
+                                onDismissRequest()
+                                dialogStatus = DialogStatus.PRIMARY
+                            },
+                            icon = painterResource(id = R.drawable.v_book_open_x24),
+                            text = stringResource(id = R.string.read)
+                        )
+                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = DialogStatus.CONFIRM_REMOVE_DOWNLOAD
+                                },
+                                icon = painterResource(id = R.drawable.v_delete_x24),
+                                text = stringResource(id = R.string.delete_downloads)
+                            )
+                        } else {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = DialogStatus.PRIMARY
+                                },
+                                icon = painterResource(id = R.drawable.v_download_x24),
+                                text = stringResource(id = R.string.download)
+                            )
+                        }
+                        if (info.favoriteSlot == -2) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = DialogStatus.PRIMARY
+                                },
+                                icon = painterResource(id = R.drawable.v_heart_x24),
+                                text = stringResource(id = R.string.add_to_favourites)
+                            )
+                        } else {
+                            DialogSelectorItem(
+                                onClick = {
+                                    onDismissRequest()
+                                    dialogStatus = DialogStatus.PRIMARY
+                                    launchIO {
+                                        runCatching {
+                                            EhDB.removeLocalFavorites(info.gid)
+                                            EhEngine.addFavorites(info.gid, info.token, -1, "")
+                                            info.favoriteSlot = -2
+                                            info.favoriteName = null
+                                            EhDB.putHistoryInfoNonRefresh(info)
+                                            showTip(removeFromFavouriteSuccess)
+                                        }.onFailure {
+                                            showTip(removeFromFavouriteFailure)
+                                        }
+                                    }
+                                },
+                                icon = painterResource(id = R.drawable.v_heart_broken_x24),
+                                text = stringResource(id = R.string.remove_from_favourites)
+                            )
+                        }
+                        if (remember { downloadManager.containDownloadInfo(info.gid) }) {
+                            DialogSelectorItem(
+                                onClick = {
+                                    dialogStatus = DialogStatus.PRIMARY
+                                },
+                                icon = painterResource(id = R.drawable.v_folder_move_x24),
+                                text = stringResource(id = R.string.download_move_dialog_title)
+                            )
+                        }
+                    }
+                },
+                confirmButton = {}
             )
-        },
-        text = {
-            Column {
-                DialogSelectorItem(
-                    onClick = {
-                        val intent = Intent(context, ReaderActivity::class.java)
-                        intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
-                        startActivity(context, intent, null)
-                        dialogStatus = DialogStatus.PRIMARY
+        }
+
+        DialogStatus.CONFIRM_REMOVE_DOWNLOAD -> {
+            AlertDialog(
+                onDismissRequest = {
+                    onDismissRequest()
+                    dialogStatus = DialogStatus.PRIMARY
+                },
+                title = {
+                    Text(text = stringResource(id = R.string.download_remove_dialog_title))
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.download_remove_dialog_message,
+                            info.title.orEmpty()
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
                         onDismissRequest()
-                    },
-                    icon = painterResource(id = R.drawable.v_book_open_x24),
-                    text = stringResource(id = R.string.read)
-                )
-                if (remember { downloadManager.containDownloadInfo(info.gid) }) {
-                    DialogSelectorItem(
-                        onClick = {
-                            dialogStatus = DialogStatus.PRIMARY
-                        },
-                        icon = painterResource(id = R.drawable.v_delete_x24),
-                        text = stringResource(id = R.string.delete_downloads)
-                    )
-                } else {
-                    DialogSelectorItem(
-                        onClick = {
-                            dialogStatus = DialogStatus.PRIMARY
-                        },
-                        icon = painterResource(id = R.drawable.v_download_x24),
-                        text = stringResource(id = R.string.download)
-                    )
+                        dialogStatus = DialogStatus.PRIMARY
+                        downloadManager.deleteDownload(info.gid)
+                    }) {
+                        Text(text = stringResource(id = android.R.string.ok))
+                    }
                 }
-                if (info.favoriteSlot == -2) {
-                    DialogSelectorItem(
-                        onClick = {
-                            dialogStatus = DialogStatus.PRIMARY
-                        },
-                        icon = painterResource(id = R.drawable.v_heart_x24),
-                        text = stringResource(id = R.string.add_to_favourites)
-                    )
-                } else {
-                    DialogSelectorItem(
-                        onClick = {
-                            onDismissRequest()
-                            dialogStatus = DialogStatus.PRIMARY
-                            launchIO {
-                                runCatching {
-                                    EhDB.removeLocalFavorites(info.gid)
-                                    EhEngine.addFavorites(info.gid, info.token, -1, "")
-                                    info.favoriteSlot = -2
-                                    info.favoriteName = null
-                                    EhDB.putHistoryInfoNonRefresh(info)
-                                    showTip(removeFromFavouriteSuccess)
-                                }.onFailure {
-                                    showTip(removeFromFavouriteFailure)
-                                }
-                            }
-                        },
-                        icon = painterResource(id = R.drawable.v_heart_broken_x24),
-                        text = stringResource(id = R.string.remove_from_favourites)
-                    )
-                }
-                if (remember { downloadManager.containDownloadInfo(info.gid) }) {
-                    DialogSelectorItem(
-                        onClick = {
-                            dialogStatus = DialogStatus.PRIMARY
-                        },
-                        icon = painterResource(id = R.drawable.v_folder_move_x24),
-                        text = stringResource(id = R.string.download_move_dialog_title)
-                    )
-                }
-            }
-        },
-        confirmButton = {}
-    )
+            )
+        }
+
+        DialogStatus.SELECT_FAVOURITE -> {}
+    }
 }
 
 private enum class DialogStatus {
     PRIMARY,
+    CONFIRM_REMOVE_DOWNLOAD,
     SELECT_FAVOURITE
 }
