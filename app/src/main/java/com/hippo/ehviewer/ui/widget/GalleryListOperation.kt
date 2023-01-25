@@ -70,6 +70,7 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
     val context = LocalContext.current
 
     val removeFromFavouriteSuccess = stringResource(id = R.string.remove_from_favorite_success)
+    val removeFromFavouriteFailure = stringResource(id = R.string.remove_from_favorite_failure)
 
     AlertDialog(
         onDismissRequest = {
@@ -135,6 +136,8 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
                                     info.favoriteName = null
                                     EhDB.putHistoryInfoNonRefresh(info)
                                     showTip(removeFromFavouriteSuccess)
+                                }.onFailure {
+                                    showTip(removeFromFavouriteFailure)
                                 }
                             }
                         },
