@@ -24,10 +24,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.util.lang.launchIO
+import kotlinx.coroutines.DelicateCoroutinesApi
 
 private val downloadManager = EhApplication.downloadManager
 
@@ -55,13 +59,17 @@ private fun DialogSelectorItem(
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
-fun GalleryListLongClickDialog(
-    info: GalleryInfo,
+fun <T : GalleryInfo> GalleryListLongClickDialog(
+    info: T,
     onDismissRequest: () -> Unit,
+    showTip: (String) -> Unit
 ) {
     var dialogStatus by remember { mutableStateOf(DialogStatus.PRIMARY) }
     val context = LocalContext.current
+
+    val removeFromFavouriteSuccess = stringResource(id = R.string.remove_from_favorite_success)
 
     AlertDialog(
         onDismissRequest = {
@@ -117,7 +125,18 @@ fun GalleryListLongClickDialog(
                 } else {
                     DialogSelectorItem(
                         onClick = {
+                            onDismissRequest()
                             dialogStatus = DialogStatus.PRIMARY
+                            launchIO {
+                                runCatching {
+                                    EhDB.removeLocalFavorites(info.gid)
+                                    EhEngine.addFavorites(info.gid, info.token, -1, "")
+                                    info.favoriteSlot = -2
+                                    info.favoriteName = null
+                                    EhDB.putHistoryInfoNonRefresh(info)
+                                    showTip(removeFromFavouriteSuccess)
+                                }
+                            }
                         },
                         icon = painterResource(id = R.drawable.v_heart_broken_x24),
                         text = stringResource(id = R.string.remove_from_favourites)

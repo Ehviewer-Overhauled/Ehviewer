@@ -343,6 +343,21 @@ public class EhDB {
         }
     }
 
+    public static synchronized void putHistoryInfoNonRefresh(GalleryInfo info) {
+        HistoryDao dao = db.historyDao();
+        var i = dao.load(info.getGid());
+        if (null != i) {
+            HistoryInfo historyInfo;
+            if (info instanceof HistoryInfo) {
+                historyInfo = (HistoryInfo) info;
+            } else {
+                historyInfo = new HistoryInfo(info);
+                historyInfo.time = i.time;
+            }
+            dao.update(historyInfo);
+        }
+    }
+
     public static synchronized void putHistoryInfo(List<HistoryInfo> historyInfoList) {
         HistoryDao dao = db.historyDao();
         for (HistoryInfo info : historyInfoList) {
