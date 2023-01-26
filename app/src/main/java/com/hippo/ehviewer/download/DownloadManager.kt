@@ -18,6 +18,7 @@ package com.hippo.ehviewer.download
 import android.annotation.SuppressLint
 import android.os.AsyncTask
 import android.util.Log
+import androidx.collection.LongSparseArray
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -35,7 +36,6 @@ import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.collect.LongList
 import com.hippo.yorozuya.collect.SparseIJArray
-import com.hippo.yorozuya.collect.SparseJLArray
 import java.io.IOException
 import java.util.LinkedList
 
@@ -44,7 +44,7 @@ class DownloadManager : OnSpiderListener {
     private val mAllInfoList: LinkedList<DownloadInfo>
 
     // All download info map
-    private val mAllInfoMap: SparseJLArray<DownloadInfo>
+    private val mAllInfoMap: LongSparseArray<DownloadInfo>
 
     // label and info list map, without default label info list
     private val mMap: MutableMap<String?, LinkedList<DownloadInfo>>
@@ -85,7 +85,7 @@ class DownloadManager : OnSpiderListener {
         mAllInfoList = LinkedList(allInfoList)
 
         // Create all info map
-        val allInfoMap = SparseJLArray<DownloadInfo>(allInfoList.size + 10)
+        val allInfoMap = LongSparseArray<DownloadInfo>(allInfoList.size + 10)
         mAllInfoMap = allInfoMap
         for (info in allInfoList) {
 
