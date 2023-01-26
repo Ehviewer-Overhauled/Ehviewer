@@ -357,7 +357,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
         BaseDialogBuilder(context)
             .setItems(menu.toTypedArray()) { _: DialogInterface?, which: Int ->
-                if (which < 0 || which >= menuId.size()) {
+                if (which < 0 || which >= menuId.size) {
                     return@setItems
                 }
                 val id = menuId[which]

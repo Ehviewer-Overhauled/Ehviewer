@@ -146,7 +146,7 @@ object CommonOperations {
                 toAdd.add(gi)
             }
         }
-        if (!toStart.isEmpty) {
+        if (!toStart.isEmpty()) {
             val intent = Intent(activity, DownloadService::class.java)
             intent.action = DownloadService.ACTION_START_RANGE
             intent.putExtra(DownloadService.KEY_GID_LIST, toStart)

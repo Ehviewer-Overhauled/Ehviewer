@@ -269,7 +269,7 @@ class DownloadManager : OnSpiderListener {
 
     fun startRangeDownload(gidList: LongList) {
         var update = false
-        for (i in 0 until gidList.size()) {
+        for (i in 0 until gidList.size) {
             val gid = gidList[i]
             val info = mAllInfoMap[gid]
             if (null == info) {
@@ -503,7 +503,7 @@ class DownloadManager : OnSpiderListener {
 
     fun deleteRangeDownload(gidList: LongList) {
         stopRangeDownloadInternal(gidList)
-        for (i in 0 until gidList.size()) {
+        for (i in 0 until gidList.size) {
             val gid = gidList[i]
             val info = mAllInfoMap[gid]
             if (null == info) {
@@ -652,8 +652,8 @@ class DownloadManager : OnSpiderListener {
     // Update mDownloadListener
     private fun stopRangeDownloadInternal(gidList: LongList) {
         // Two way
-        if (gidList.size() < mWaitList.size) {
-            for (i in 0 until gidList.size()) {
+        if (gidList.size < mWaitList.size) {
+            for (i in 0 until gidList.size) {
                 stopDownloadInternal(gidList[i])
             }
         } else {
