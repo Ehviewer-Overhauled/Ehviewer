@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import android.os.AsyncTask
 import android.util.Log
 import androidx.collection.LongSparseArray
+import androidx.collection.SparseArrayCompat
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -35,7 +36,6 @@ import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.collect.LongList
-import com.hippo.yorozuya.collect.SparseIJArray
 import java.io.IOException
 import java.util.LinkedList
 
@@ -1130,8 +1130,8 @@ class DownloadManager : OnSpiderListener {
     }
 
     internal inner class SpeedReminder : Runnable {
-        private val mContentLengthMap = SparseIJArray()
-        private val mReceivedSizeMap = SparseIJArray()
+        private val mContentLengthMap = SparseArrayCompat<Long>()
+        private val mReceivedSizeMap = SparseArrayCompat<Long>()
         private var mStop = true
         private var mBytesRead: Long = 0
         private var oldSpeed: Long = -1
