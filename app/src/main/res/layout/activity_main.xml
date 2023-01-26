@@ -20,14 +20,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
-    app:consumeSystemWindowsInsets="start|end"
-    app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end">
+    app:edgeToEdge="true">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/snackbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:fitsSystemWindowsInsets="start|end">
 
         <com.hippo.ehviewer.widget.AboveSnackerLayout
             android:id="@+id/absnacker"
@@ -48,6 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        app:fitsSystemWindowsInsets="start|end"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/nav_drawer_main" />
 
