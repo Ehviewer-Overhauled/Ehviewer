@@ -73,12 +73,6 @@ with Material Design 3 and Dynamic Color Support
 ![screenshot-01](https://github.com/Ehviewer-Overhauled/Art/blob/master/screenshot-01.png)
 ![screenshot-02](https://github.com/Ehviewer-Overhauled/Art/blob/master/screenshot-02.png)
 
-# Localization
-
-Thank you to each of the **Ehviewer Overhauled** translators, and if you would like to contribute, please submit a translation via [Weblate](https://hosted.weblate.org/engage/ehviewer-overhauled/).
-
-[<img src="https://hosted.weblate.org/widgets/ehviewer-overhauled/-/horizontal-auto.svg" alt="" />](https://hosted.weblate.org/engage/ehviewer-overhauled/)
-
 # Thanks
 
 Here is the libraries
