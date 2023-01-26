@@ -21,7 +21,9 @@
     android:id="@+id/snackbar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:edgeToEdge="true">
+    app:consumeSystemWindowsInsets="start|end"
+    app:edgeToEdge="true"
+    app:fitsSystemWindowsInsets="start|end">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
