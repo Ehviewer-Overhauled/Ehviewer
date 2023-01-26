@@ -378,7 +378,7 @@ class FilterFragment : BaseFragment() {
             }
             size = mTagNamespaceFilterList.size
             if (0 != size) {
-                if (index1 == 0) {
+                index1 -= if (index1 == 0) {
                     return tagNamespaceHeader
                 } else if (index1 <= size) {
                     return mTagNamespaceFilterList[index1 - 1]
