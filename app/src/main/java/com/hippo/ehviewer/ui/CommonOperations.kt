@@ -13,266 +13,258 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui
 
-package com.hippo.ehviewer.ui;
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.hippo.app.ListCheckBoxDialogBuilder
+import com.hippo.ehviewer.EhApplication.Companion.application
+import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.unifile.UniFile
+import com.hippo.yorozuya.IOUtils
+import com.hippo.yorozuya.collect.LongList
+import java.io.IOException
+import java.io.InputStream
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
+object CommonOperations {
+    private fun doAddToFavorites(
+        activity: Activity, galleryInfo: GalleryInfo,
+        slot: Int, listener: EhClient.Callback<Void?>
+    ) {
+        when (slot) {
+            -1 -> {
+                EhDB.putLocalFavorites(galleryInfo)
+                listener.onSuccess(null)
+            }
 
-import androidx.core.content.ContextCompat;
+            in 0..9 -> {
+                val request = EhRequest()
+                request.setMethod(EhClient.METHOD_ADD_FAVORITES)
+                request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "")
+                request.setCallback(listener)
+                request.enqueue(activity)
+            }
 
-import com.hippo.app.ListCheckBoxDialogBuilder;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhClient;
-import com.hippo.ehviewer.client.EhRequest;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.dao.DownloadLabel;
-import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.ehviewer.download.DownloadService;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-import com.hippo.unifile.UniFile;
-import com.hippo.yorozuya.IOUtils;
-import com.hippo.yorozuya.collect.LongList;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-public final class CommonOperations {
-
-    private static void doAddToFavorites(Activity activity, GalleryInfo galleryInfo,
-                                         int slot, EhClient.Callback<Void> listener) {
-        if (slot == -1) {
-            EhDB.putLocalFavorites(galleryInfo);
-            listener.onSuccess(null);
-        } else if (slot >= 0 && slot <= 9) {
-            EhClient client = EhClient.INSTANCE;
-            EhRequest request = new EhRequest();
-            request.setMethod(EhClient.METHOD_ADD_FAVORITES);
-            request.setArgs(galleryInfo.getGid(), galleryInfo.getToken(), slot, "");
-            request.setCallback(listener);
-            request.enqueue(activity);
-        } else {
-            listener.onFailure(new Exception()); // TODO Add text
-        }
-    }
-
-    public static void addToFavorites(final Activity activity, final GalleryInfo galleryInfo,
-                                      final EhClient.Callback<Void> listener) {
-        addToFavorites(activity, galleryInfo, listener, false);
-    }
-
-    public static void addToFavorites(final Activity activity, final GalleryInfo galleryInfo,
-                                      final EhClient.Callback<Void> listener, boolean select) {
-        int slot = Settings.getDefaultFavSlot();
-        String[] items = new String[11];
-        items[0] = activity.getString(R.string.local_favorites);
-        String[] favCat = Settings.getFavCat();
-        System.arraycopy(favCat, 0, items, 1, 10);
-        if (!select && slot >= -1 && slot <= 9) {
-            String newFavoriteName = slot >= 0 ? items[slot + 1] : null;
-            doAddToFavorites(activity, galleryInfo, slot, new DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot));
-        } else {
-            new ListCheckBoxDialogBuilder(activity, items,
-                    (builder, dialog, position) -> {
-                        int slot1 = position - 1;
-                        String newFavoriteName = (slot1 >= 0 && slot1 <= 9) ? items[slot1 + 1] : null;
-                        doAddToFavorites(activity, galleryInfo, slot1, new DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot1));
-                        if (builder.isChecked()) {
-                            Settings.putDefaultFavSlot(slot1);
-                        } else {
-                            Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT);
-                        }
-                    }, activity.getString(R.string.remember_favorite_collection), false)
-                    .setTitle(R.string.add_favorites_dialog_title)
-                    .setOnCancelListener(dialog -> listener.onCancel())
-                    .show();
-        }
-    }
-
-    public static void removeFromFavorites(Activity activity, GalleryInfo galleryInfo,
-                                           final EhClient.Callback<Void> listener) {
-        EhDB.removeLocalFavorites(galleryInfo.getGid());
-        EhClient client = EhClient.INSTANCE;
-        EhRequest request = new EhRequest();
-        request.setMethod(EhClient.METHOD_ADD_FAVORITES);
-        request.setArgs(galleryInfo.getGid(), galleryInfo.getToken(), -1, "");
-        request.setCallback(new DelegateFavoriteCallback(listener, galleryInfo, null, -2));
-        request.enqueue(activity);
-    }
-
-    public static void startDownload(final MainActivity activity, final GalleryInfo galleryInfo, boolean forceDefault) {
-        startDownload(activity, Collections.singletonList(galleryInfo), forceDefault);
-    }
-
-    public static void startDownload(final MainActivity activity, final List<GalleryInfo> galleryInfos, boolean forceDefault) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Objects.requireNonNull(EhApplication.getApplication().getTopActivity()).checkAndRequestNotificationPermission();
-        }
-        doStartDownload(activity, galleryInfos, forceDefault);
-    }
-
-    private static void doStartDownload(final MainActivity activity, final List<GalleryInfo> galleryInfos, boolean forceDefault) {
-        final DownloadManager dm = EhApplication.getDownloadManager();
-
-        LongList toStart = new LongList();
-        List<GalleryInfo> toAdd = new ArrayList<>();
-        for (GalleryInfo gi : galleryInfos) {
-            if (dm.containDownloadInfo(gi.getGid())) {
-                toStart.add(gi.getGid());
-            } else {
-                toAdd.add(gi);
+            else -> {
+                listener.onFailure(Exception()) // TODO Add text
             }
         }
+    }
 
-        if (!toStart.isEmpty()) {
-            Intent intent = new Intent(activity, DownloadService.class);
-            intent.setAction(DownloadService.ACTION_START_RANGE);
-            intent.putExtra(DownloadService.KEY_GID_LIST, toStart);
-            ContextCompat.startForegroundService(activity, intent);
+    @JvmOverloads
+    fun addToFavorites(
+        activity: Activity, galleryInfo: GalleryInfo,
+        listener: EhClient.Callback<Void?>, select: Boolean = false
+    ) {
+        val slot = Settings.getDefaultFavSlot()
+        val localFav = activity.getString(R.string.local_favorites)
+        val items = Settings.getFavCat().toMutableList().apply { add(0, localFav) }
+        if (!select && slot >= -1 && slot <= 9) {
+            val newFavoriteName = if (slot >= 0) items[slot + 1] else null
+            doAddToFavorites(
+                activity,
+                galleryInfo,
+                slot,
+                DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot)
+            )
+        } else {
+            ListCheckBoxDialogBuilder(
+                activity, items,
+                { builder: ListCheckBoxDialogBuilder?, _: AlertDialog?, position: Int ->
+                    val slot1 = position - 1
+                    val newFavoriteName = if (slot1 in 0..9) items[slot1 + 1] else null
+                    doAddToFavorites(
+                        activity,
+                        galleryInfo,
+                        slot1,
+                        DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot1)
+                    )
+                    if (builder?.isChecked == true) {
+                        Settings.putDefaultFavSlot(slot1)
+                    } else {
+                        Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT)
+                    }
+                }, activity.getString(R.string.remember_favorite_collection), false
+            )
+                .setTitle(R.string.add_favorites_dialog_title)
+                .setOnCancelListener { listener.onCancel() }
+                .show()
         }
+    }
 
+    fun removeFromFavorites(
+        activity: Activity?, galleryInfo: GalleryInfo,
+        listener: EhClient.Callback<Void?>
+    ) {
+        EhDB.removeLocalFavorites(galleryInfo.gid)
+        val request = EhRequest()
+        request.setMethod(EhClient.METHOD_ADD_FAVORITES)
+        request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "")
+        request.setCallback(DelegateFavoriteCallback(listener, galleryInfo, null, -2))
+        request.enqueue(activity!!)
+    }
+
+    fun startDownload(activity: MainActivity?, galleryInfo: GalleryInfo, forceDefault: Boolean) {
+        startDownload(activity!!, listOf(galleryInfo), forceDefault)
+    }
+
+    fun startDownload(
+        activity: MainActivity,
+        galleryInfos: List<GalleryInfo>,
+        forceDefault: Boolean
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            application.topActivity?.checkAndRequestNotificationPermission()
+        }
+        doStartDownload(activity, galleryInfos, forceDefault)
+    }
+
+    private fun doStartDownload(
+        activity: MainActivity,
+        galleryInfos: List<GalleryInfo>,
+        forceDefault: Boolean
+    ) {
+        val dm = downloadManager
+        val toStart = LongList()
+        val toAdd: MutableList<GalleryInfo> = ArrayList()
+        for (gi in galleryInfos) {
+            if (dm.containDownloadInfo(gi.gid)) {
+                toStart.add(gi.gid)
+            } else {
+                toAdd.add(gi)
+            }
+        }
+        if (!toStart.isEmpty) {
+            val intent = Intent(activity, DownloadService::class.java)
+            intent.action = DownloadService.ACTION_START_RANGE
+            intent.putExtra(DownloadService.KEY_GID_LIST, toStart)
+            ContextCompat.startForegroundService(activity, intent)
+        }
         if (toAdd.isEmpty()) {
-            activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
-            return;
+            activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT)
+            return
         }
-
-        boolean justStart = forceDefault;
-        String label = null;
+        var justStart = forceDefault
+        var label: String? = null
         // Get default download label
         if (!justStart && Settings.getHasDefaultDownloadLabel()) {
-            label = Settings.getDefaultDownloadLabel();
-            justStart = label == null || dm.containLabel(label);
+            label = Settings.getDefaultDownloadLabel()
+            justStart = label == null || dm.containLabel(label)
         }
         // If there is no other label, just use null label
-        if (!justStart && 0 == dm.getLabelList().size()) {
-            justStart = true;
-            label = null;
+        if (!justStart && dm.labelList.isEmpty()) {
+            justStart = true
+            label = null
         }
-
         if (justStart) {
             // Got default label
-            for (GalleryInfo gi : toAdd) {
-                Intent intent = new Intent(activity, DownloadService.class);
-                intent.setAction(DownloadService.ACTION_START);
-                intent.putExtra(DownloadService.KEY_LABEL, label);
-                intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
-                ContextCompat.startForegroundService(activity, intent);
+            for (gi in toAdd) {
+                val intent = Intent(activity, DownloadService::class.java)
+                intent.action = DownloadService.ACTION_START
+                intent.putExtra(DownloadService.KEY_LABEL, label)
+                intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi)
+                ContextCompat.startForegroundService(activity, intent)
             }
             // Notify
-            activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
+            activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT)
         } else {
             // Let use chose label
-            List<DownloadLabel> list = dm.getLabelList();
-            final String[] items = new String[list.size() + 1];
-            items[0] = activity.getString(R.string.default_download_label_name);
-            for (int i = 0, n = list.size(); i < n; i++) {
-                items[i + 1] = list.get(i).getLabel();
-            }
-
-            new ListCheckBoxDialogBuilder(activity, items,
-                    (builder, dialog, position) -> {
-                        String label1;
-                        if (position == 0) {
-                            label1 = null;
-                        } else {
-                            label1 = items[position];
-                            if (!dm.containLabel(label1)) {
-                                label1 = null;
-                            }
+            val list = dm.labelList
+            val items = mutableListOf<String>()
+            items.add(activity.getString(R.string.default_download_label_name))
+            items.addAll(list.mapNotNull { it.label })
+            ListCheckBoxDialogBuilder(
+                activity, items,
+                { builder: ListCheckBoxDialogBuilder?, _: AlertDialog?, position: Int ->
+                    var label1: String?
+                    if (position == 0) {
+                        label1 = null
+                    } else {
+                        label1 = items[position]
+                        if (!dm.containLabel(label1)) {
+                            label1 = null
                         }
-                        // Start download
-                        for (GalleryInfo gi : toAdd) {
-                            Intent intent = new Intent(activity, DownloadService.class);
-                            intent.setAction(DownloadService.ACTION_START);
-                            intent.putExtra(DownloadService.KEY_LABEL, label1);
-                            intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi);
-                            ContextCompat.startForegroundService(activity, intent);
-                        }
-                        // Save settings
-                        if (builder.isChecked()) {
-                            Settings.putHasDefaultDownloadLabel(true);
-                            Settings.putDefaultDownloadLabel(label1);
-                        } else {
-                            Settings.putHasDefaultDownloadLabel(false);
-                        }
-                        // Notify
-                        activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT);
-                    }, activity.getString(R.string.remember_download_label), false)
-                    .setTitle(R.string.download)
-                    .show();
+                    }
+                    // Start download
+                    for (gi in toAdd) {
+                        val intent = Intent(activity, DownloadService::class.java)
+                        intent.action = DownloadService.ACTION_START
+                        intent.putExtra(DownloadService.KEY_LABEL, label1)
+                        intent.putExtra(DownloadService.KEY_GALLERY_INFO, gi)
+                        ContextCompat.startForegroundService(activity, intent)
+                    }
+                    // Save settings
+                    if (builder?.isChecked == true) {
+                        Settings.putHasDefaultDownloadLabel(true)
+                        Settings.putDefaultDownloadLabel(label1)
+                    } else {
+                        Settings.putHasDefaultDownloadLabel(false)
+                    }
+                    // Notify
+                    activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT)
+                }, activity.getString(R.string.remember_download_label), false
+            )
+                .setTitle(R.string.download)
+                .show()
         }
     }
 
-    public static void ensureNoMediaFile(UniFile file) {
+    @JvmStatic
+    fun ensureNoMediaFile(file: UniFile?) {
         if (null == file) {
-            return;
+            return
         }
-
-        UniFile noMedia = file.createFile(".nomedia");
-        if (null == noMedia) {
-            return;
-        }
-
-        InputStream is = null;
+        val noMedia = file.createFile(".nomedia") ?: return
+        var `is`: InputStream? = null
         try {
-            is = noMedia.openInputStream();
-        } catch (IOException e) {
+            `is` = noMedia.openInputStream()
+        } catch (e: IOException) {
             // Ignore
         } finally {
-            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(`is`)
         }
     }
 
-    public static void removeNoMediaFile(UniFile file) {
+    @JvmStatic
+    fun removeNoMediaFile(file: UniFile?) {
         if (null == file) {
-            return;
+            return
         }
-
-        UniFile noMedia = file.subFile(".nomedia");
-        if (null != noMedia && noMedia.isFile()) {
-            noMedia.delete();
+        val noMedia = file.subFile(".nomedia")
+        if (null != noMedia && noMedia.isFile) {
+            noMedia.delete()
         }
     }
 
-    private static class DelegateFavoriteCallback implements EhClient.Callback<Void> {
-
-        private final EhClient.Callback<Void> delegate;
-        private final GalleryInfo info;
-        private final String newFavoriteName;
-        private final int slot;
-
-        DelegateFavoriteCallback(EhClient.Callback<Void> delegate, GalleryInfo info,
-                                 String newFavoriteName, int slot) {
-            this.delegate = delegate;
-            this.info = info;
-            this.newFavoriteName = newFavoriteName;
-            this.slot = slot;
+    private class DelegateFavoriteCallback(
+        private val delegate: EhClient.Callback<Void?>, private val info: GalleryInfo,
+        private val newFavoriteName: String?, private val slot: Int
+    ) : EhClient.Callback<Void?> {
+        override fun onSuccess(result: Void?) {
+            info.favoriteName = newFavoriteName
+            info.favoriteSlot = slot
+            delegate.onSuccess(result)
+            favouriteStatusRouter.modifyFavourites(info.gid, slot)
         }
 
-        @Override
-        public void onSuccess(Void result) {
-            info.setFavoriteName(newFavoriteName);
-            info.setFavoriteSlot(slot);
-            delegate.onSuccess(result);
-            EhApplication.getFavouriteStatusRouter().modifyFavourites(info.getGid(), slot);
+        override fun onFailure(e: Exception) {
+            delegate.onFailure(e)
         }
 
-        @Override
-        public void onFailure(Exception e) {
-            delegate.onFailure(e);
-        }
-
-        @Override
-        public void onCancel() {
-            delegate.onCancel();
+        override fun onCancel() {
+            delegate.onCancel()
         }
     }
 }

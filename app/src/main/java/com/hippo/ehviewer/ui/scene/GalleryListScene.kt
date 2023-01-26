@@ -1088,8 +1088,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private class AddToFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene, Void>(context) {
-        override fun onSuccess(result: Void) {
+        EhCallback<GalleryListScene, Void?>(context) {
+        override fun onSuccess(result: Void?) {
             showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
         }
 
@@ -1101,8 +1101,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private class RemoveFromFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene, Void>(context) {
-        override fun onSuccess(result: Void) {
+        EhCallback<GalleryListScene, Void?>(context) {
+        override fun onSuccess(result: Void?) {
             showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
         }
 

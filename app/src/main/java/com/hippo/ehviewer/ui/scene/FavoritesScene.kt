@@ -529,7 +529,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             4 -> { // Download
                 val activity: Activity? = mainActivity
                 if (activity != null) {
-                    CommonOperations.startDownload(mainActivity, mModifyGiList, false)
+                    CommonOperations.startDownload(mainActivity!!, mModifyGiList, false)
                 }
                 mModifyGiList.clear()
                 if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {

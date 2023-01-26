@@ -886,7 +886,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     if (containLocalFavorites || mGalleryDetail!!.isFavorited) {
                         mModifyingFavorites = true
                         CommonOperations.removeFromFavorites(
-                            activity, mGalleryDetail,
+                            activity, mGalleryDetail!!,
                             ModifyFavoritesListener(context, true)
                         )
                         remove = true
@@ -895,7 +895,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         if (!remove) {
                             mModifyingFavorites = true
                             CommonOperations.addToFavorites(
-                                activity, mGalleryDetail,
+                                activity, mGalleryDetail!!,
                                 ModifyFavoritesListener(context, false)
                             )
                         }
@@ -1132,7 +1132,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
                         mModifyingFavorites = true
                         CommonOperations.removeFromFavorites(
-                            activity, mGalleryDetail,
+                            activity, mGalleryDetail!!,
                             ModifyFavoritesListener(activity, true)
                         )
                         remove = true
@@ -1141,7 +1141,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         if (!remove) {
                             mModifyingFavorites = true
                             CommonOperations.addToFavorites(
-                                activity, mGalleryDetail,
+                                activity, mGalleryDetail!!,
                                 ModifyFavoritesListener(activity, false), true
                             )
                         }
