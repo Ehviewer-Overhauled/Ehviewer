@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat.startActivity
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -72,6 +74,34 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
 
     val removeFromFavouriteSuccess = stringResource(id = R.string.remove_from_favorite_success)
     val removeFromFavouriteFailure = stringResource(id = R.string.remove_from_favorite_failure)
+    val localFavName = stringResource(id = R.string.local_favorites)
+    val addToFavSuccess = stringResource(id = R.string.add_to_favorite_success)
+    val addToFavFailed = stringResource(id = R.string.add_to_favorite_failure)
+
+    suspend fun addToFav(slot: Int) {
+        val favNameList = Settings.getFavCat().toMutableList().apply { add(0, localFavName) }
+        runCatching {
+            if (slot == -1) {
+                EhDB.putLocalFavorites(info)
+            } else {
+                EhEngine.addFavorites(
+                    info.gid,
+                    info.token,
+                    slot,
+                    ""
+                )
+                info.favoriteSlot = slot
+                info.favoriteName = favNameList[slot + 1]
+                EhDB.putHistoryInfoNonRefresh(info)
+            }
+        }.onSuccess {
+            showTip(addToFavSuccess)
+        }.onFailure {
+            showTip(addToFavFailed)
+        }
+        onDismissRequest()
+        dialogStatus = DialogStatus.PRIMARY
+    }
 
     when (dialogStatus) {
         DialogStatus.PRIMARY -> {
@@ -121,7 +151,14 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
                         if (info.favoriteSlot == -2) {
                             DialogSelectorItem(
                                 onClick = {
-                                    dialogStatus = DialogStatus.PRIMARY
+                                    val defaultFav = Settings.getDefaultFavSlot()
+                                    if (defaultFav in -1..9) {
+                                        launchIO {
+                                            addToFav(defaultFav)
+                                        }
+                                    } else {
+                                        dialogStatus = DialogStatus.SELECT_FAVOURITE
+                                    }
                                 },
                                 icon = painterResource(id = R.drawable.v_heart_x24),
                                 text = stringResource(id = R.string.add_to_favourites)
@@ -192,8 +229,60 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
             )
         }
 
-        DialogStatus.SELECT_FAVOURITE -> {}
+        DialogStatus.SELECT_FAVOURITE -> {
+            SelectFavouriteDialog(
+                onFolderSelected = {
+                    launchIO {
+                        addToFav(it)
+                    }
+                },
+                onDismissRequest = {
+                    onDismissRequest()
+                    dialogStatus = DialogStatus.PRIMARY
+                }
+            )
+        }
     }
+}
+
+@Composable
+fun SelectFavouriteDialog(
+    onFolderSelected: (Int) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    var rememberFavSlot by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(checked = rememberFavSlot, onCheckedChange = { rememberFavSlot = it })
+                Text(text = stringResource(id = R.string.remember_favorite_collection))
+            }
+        },
+        title = { Text(text = stringResource(id = R.string.add_favorites_dialog_title)) },
+        text = {
+            val localFavName = stringResource(id = R.string.local_favorites)
+            Column {
+                remember {
+                    Settings.getFavCat().toMutableList().apply { add(0, localFavName) }
+                }.forEachIndexed { index, s ->
+                    TextButton(
+                        onClick = {
+                            onDismissRequest()
+                            Settings.putDefaultFavSlot(if (rememberFavSlot) index - 1 else Settings.INVALID_DEFAULT_FAV_SLOT)
+                            onFolderSelected(index - 1)
+                        },
+                        Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = s)
+                    }
+                }
+            }
+        }
+    )
 }
 
 private enum class DialogStatus {
