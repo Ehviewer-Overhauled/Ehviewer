@@ -128,6 +128,8 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                             )
                         },
                         dismissContent = {
+                            // TODO: item delete & add animation
+                            // Bug tracker: https://issuetracker.google.com/issues/150812265
                             ListInfoCard(
                                 { hostFragment.navToDetail(it) },
                                 {
