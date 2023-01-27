@@ -56,6 +56,7 @@ import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.math.ceil
+import com.hippo.ehviewer.Settings as AppSettings
 
 class AdvancedFragment : BasePreferenceFragment() {
     private var exportLauncher = registerForActivityResult<String, Uri>(
@@ -235,6 +236,8 @@ class AdvancedFragment : BasePreferenceFragment() {
         val exportData = findPreference<Preference>(KEY_EXPORT_DATA)
         val backupFavorite = findPreference<Preference>(KEY_BACKUP_FAVORITE)
         val openByDefault = findPreference<Preference>(KEY_OPEN_BY_DEFAULT)
+        val domainFronting = findPreference<Preference>(AppSettings.KEY_DOMAIN_FRONTING)
+        val bypassVPN = findPreference<Preference>(AppSettings.KEY_BYPASS_VPN)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             openByDefault!!.isVisible = false
         } else {
@@ -245,6 +248,11 @@ class AdvancedFragment : BasePreferenceFragment() {
         exportData!!.onPreferenceClickListener = this
         backupFavorite!!.onPreferenceClickListener = this
         appLanguage!!.onPreferenceChangeListener = this
+        bypassVPN!!.isVisible = AppSettings.getDF()
+        domainFronting!!.setOnPreferenceChangeListener { _, newValue ->
+            bypassVPN.isVisible = newValue as Boolean
+            true
+        }
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {
@@ -336,7 +344,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                         if (result.next != null) {
                             try {
                                 runBlocking {
-                                    delay(com.hippo.ehviewer.Settings.getDownloadDelay().toLong())
+                                    delay(AppSettings.getDownloadDelay().toLong())
                                 }
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
