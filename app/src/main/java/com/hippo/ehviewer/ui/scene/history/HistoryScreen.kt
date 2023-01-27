@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.hippo.ehviewer.EhDB
@@ -63,7 +62,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
             PagingConfig(20)
         ) {
             EhDB.getHistoryLazyList()
-        }.flow.cachedIn(coroutineScope)
+        }.flow
     }.collectAsLazyPagingItems()
 
     var dialogStatus by remember { mutableStateOf(HistoryScreenDialogStatus.NONE) }
