@@ -12,9 +12,8 @@ import kotlinx.serialization.encodeToByteArray
 import java.io.File
 import java.io.InputStream
 
-@Suppress("ArrayInDataClass")
 @Serializable
-data class SpiderInfo @JvmOverloads constructor(
+class SpiderInfo @JvmOverloads constructor(
     val gid: Long,
 
     val pages: Int,
