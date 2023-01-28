@@ -18,8 +18,8 @@ package com.hippo.ehviewer.download
 import android.annotation.SuppressLint
 import android.os.AsyncTask
 import android.util.Log
+import android.util.SparseLongArray
 import androidx.collection.LongSparseArray
-import androidx.collection.SparseArrayCompat
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -584,7 +584,7 @@ class DownloadManager : OnSpiderListener {
                     val spiderInfo = SpiderInfo.read(file) ?: continue
                     spiderInfo.startPage = 0
                     try {
-                        spiderInfo.write(file.openOutputStream())
+                        spiderInfo.write(file)
                     } catch (e: IOException) {
                         Log.e(TAG, "Can't write SpiderInfo", e)
                     }
@@ -1130,8 +1130,8 @@ class DownloadManager : OnSpiderListener {
     }
 
     internal inner class SpeedReminder : Runnable {
-        private val mContentLengthMap = SparseArrayCompat<Long>()
-        private val mReceivedSizeMap = SparseArrayCompat<Long>()
+        private val mContentLengthMap = SparseLongArray()
+        private val mReceivedSizeMap = SparseLongArray()
         private var mStop = true
         private var mBytesRead: Long = 0
         private var oldSpeed: Long = -1
