@@ -663,7 +663,7 @@ public final class SpiderQueen implements Runnable {
         SpiderInfo spiderInfo = readSpiderInfoFromLocal();
         if (spiderInfo != null) {
             mSpiderInfo.lazySet(spiderInfo);
-            return spiderInfo.startPage;
+            return spiderInfo.getStartPage();
         } else {
             return 0;
         }
@@ -672,7 +672,7 @@ public final class SpiderQueen implements Runnable {
     public void putStartPage(int page) {
         final SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo != null) {
-            spiderInfo.startPage = page;
+            spiderInfo.setStartPage(page);
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
@@ -694,8 +694,8 @@ public final class SpiderQueen implements Runnable {
         if (downloadDir != null) {
             UniFile file = downloadDir.findFile(SPIDER_INFO_FILENAME);
             spiderInfo = SpiderInfo.read(file);
-            if (spiderInfo != null && spiderInfo.gid == mGalleryInfo.getGid() &&
-                    spiderInfo.token.equals(mGalleryInfo.getToken())) {
+            if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
+                    spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
                 return spiderInfo;
             }
         }
@@ -705,8 +705,8 @@ public final class SpiderQueen implements Runnable {
         if (entry == null) return null;
         try (entry) {
             spiderInfo = SpiderInfo.read(entry.getData().toFile());
-            if (spiderInfo != null && spiderInfo.gid == mGalleryInfo.getGid() &&
-                    spiderInfo.token.equals(mGalleryInfo.getToken())) {
+            if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
+                    spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
                 return spiderInfo;
             }
         } catch (Throwable e) {
@@ -717,14 +717,14 @@ public final class SpiderQueen implements Runnable {
     }
 
     private void readPreviews(String body, int index, SpiderInfo spiderInfo) throws ParseException {
-        spiderInfo.previewPages = GalleryDetailParser.parsePreviewPages(body);
+        spiderInfo.setPreviewPages(GalleryDetailParser.parsePreviewPages(body));
         PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
 
         if (previewSet.size() > 0) {
             if (index == 0) {
-                spiderInfo.previewPerPage = previewSet.size();
+                spiderInfo.setPreviewPerPage(previewSet.size());
             } else {
-                spiderInfo.previewPerPage = previewSet.getPosition(0) / index;
+                spiderInfo.setPreviewPerPage(previewSet.getPosition(0) / index);
             }
         }
 
@@ -732,7 +732,7 @@ public final class SpiderQueen implements Runnable {
             GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
             if (result != null) {
                 synchronized (mPTokenLock) {
-                    spiderInfo.pTokenMap[result.page] = result.pToken;
+                    spiderInfo.getPTokenMap()[result.page] = result.pToken;
                 }
             }
         }
@@ -746,7 +746,7 @@ public final class SpiderQueen implements Runnable {
 
             var pages = GalleryDetailParser.parsePages(body);
             SpiderInfo spiderInfo = new SpiderInfo(mGalleryInfo.getGid(), pages);
-            spiderInfo.token = mGalleryInfo.getToken();
+            spiderInfo.setToken(mGalleryInfo.getToken());
             readPreviews(body, 0, spiderInfo);
             return spiderInfo;
         } catch (Throwable e) {
@@ -775,13 +775,13 @@ public final class SpiderQueen implements Runnable {
 
             for (int i = 0; i < list.size(); i++) {
                 synchronized (mPTokenLock) {
-                    spiderInfo.pTokenMap[i] = list.get(i);
+                    spiderInfo.getPTokenMap()[i] = list.get(i);
                 }
             }
 
             String pToken;
             synchronized (mPTokenLock) {
-                pToken = spiderInfo.pTokenMap[index];
+                pToken = spiderInfo.getPTokenMap()[index];
             }
             return pToken;
         } catch (Throwable e) {
@@ -798,13 +798,13 @@ public final class SpiderQueen implements Runnable {
 
         // Check previewIndex
         int previewIndex;
-        if (spiderInfo.previewPerPage >= 0) {
-            previewIndex = index / spiderInfo.previewPerPage;
+        if (spiderInfo.getPreviewPerPage() >= 0) {
+            previewIndex = index / spiderInfo.getPreviewPerPage();
         } else {
             previewIndex = 0;
         }
-        if (spiderInfo.previewPages > 0) {
-            previewIndex = Math.min(previewIndex, spiderInfo.previewPages - 1);
+        if (spiderInfo.getPreviewPages() > 0) {
+            previewIndex = Math.min(previewIndex, spiderInfo.getPreviewPages() - 1);
         }
 
         String url = EhUrl.getGalleryDetailUrl(
@@ -812,7 +812,7 @@ public final class SpiderQueen implements Runnable {
         String referer = EhUrl.getReferer();
         if (DEBUG_PTOKEN) {
             Log.d(TAG, "index " + index + ", previewIndex " + previewIndex +
-                    ", previewPerPage " + spiderInfo.previewPerPage + ", url " + url);
+                    ", previewPerPage " + spiderInfo.getPreviewPerPage() + ", url " + url);
         }
         Request request = new EhRequestBuilder(url, referer).build();
         try (Response response = mHttpClient.newCall(request).execute()) {
@@ -824,7 +824,7 @@ public final class SpiderQueen implements Runnable {
 
             String pToken;
             synchronized (mPTokenLock) {
-                pToken = spiderInfo.pTokenMap[index];
+                pToken = spiderInfo.getPTokenMap()[index];
             }
             return pToken;
         } catch (Throwable e) {
@@ -890,11 +890,11 @@ public final class SpiderQueen implements Runnable {
 
         // Setup page state
         synchronized (mPageStateLock) {
-            mPageStateArray = new int[spiderInfo.pages];
+            mPageStateArray = new int[spiderInfo.getPages()];
         }
 
         // Notify get pages
-        notifyGetPages(spiderInfo.pages);
+        notifyGetPages(spiderInfo.getPages());
 
         // Ensure worker
         tryToEnsureWorkers();
@@ -928,7 +928,7 @@ public final class SpiderQueen implements Runnable {
             // Check it in spider info
             String pToken;
             synchronized (mPTokenLock) {
-                pToken = spiderInfo.pTokenMap[index];
+                pToken = spiderInfo.getPTokenMap()[index];
             }
             if (pToken != null) {
                 // Get pToken from spider info, notify worker
@@ -953,7 +953,7 @@ public final class SpiderQueen implements Runnable {
             if (null == pToken) {
                 // If failed, set the pToken "failed"
                 synchronized (mPTokenLock) {
-                    spiderInfo.pTokenMap[index] = SpiderInfo.TOKEN_FAILED;
+                    spiderInfo.getPTokenMap()[index] = SpiderInfo.TOKEN_FAILED;
                 }
             }
 
@@ -1453,9 +1453,9 @@ public final class SpiderQueen implements Runnable {
             // Clear TOKEN_FAILED for force request
             if (force) {
                 synchronized (mPTokenLock) {
-                    String pToken = spiderInfo.pTokenMap[index];
+                    String pToken = spiderInfo.getPTokenMap()[index];
                     if (SpiderInfo.TOKEN_FAILED.equals(pToken)) {
-                        spiderInfo.pTokenMap[index] = null;
+                        spiderInfo.getPTokenMap()[index] = null;
                     }
                 }
             }
@@ -1464,7 +1464,7 @@ public final class SpiderQueen implements Runnable {
             // Get token
             while (!mStoped) {
                 synchronized (mPTokenLock) {
-                    pToken = spiderInfo.pTokenMap[index];
+                    pToken = spiderInfo.getPTokenMap()[index];
                 }
                 if (pToken == null) {
                     mRequestPTokenQueue.add(index);
@@ -1503,7 +1503,7 @@ public final class SpiderQueen implements Runnable {
             // Get token
             while (previousIndex >= 0 && !mStoped) {
                 synchronized (mPTokenLock) {
-                    previousPToken = spiderInfo.pTokenMap[previousIndex];
+                    previousPToken = spiderInfo.getPTokenMap()[previousIndex];
                 }
                 if (previousPToken == null) {
                     mRequestPTokenQueue.add(previousIndex);

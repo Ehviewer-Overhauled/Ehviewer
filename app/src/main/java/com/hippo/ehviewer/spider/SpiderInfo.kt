@@ -15,25 +15,18 @@ import java.io.InputStream
 @Suppress("ArrayInDataClass")
 @Serializable
 data class SpiderInfo @JvmOverloads constructor(
-    @JvmField
     val gid: Long,
 
-    @JvmField
     val pages: Int,
 
-    @JvmField
     val pTokenMap: Array<String?> = arrayOfNulls(pages),
 
-    @JvmField
     var startPage: Int = 0,
 
-    @JvmField
     var token: String? = null,
 
-    @JvmField
     var previewPages: Int = -1,
 
-    @JvmField
     var previewPerPage: Int = -1
 ) {
     fun write(file: UniFile) {
