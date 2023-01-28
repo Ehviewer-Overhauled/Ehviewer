@@ -22,7 +22,7 @@ data class SpiderInfo @JvmOverloads constructor(
     val pages: Int,
 
     @JvmField
-    var pTokenMap: Array<String?> = arrayOfNulls(pages),
+    val pTokenMap: Array<String?> = arrayOfNulls(pages),
 
     @JvmField
     var startPage: Int = 0,
