@@ -2,6 +2,9 @@
 
 package com.hippo.ehviewer.spider
 
+import coil.annotation.ExperimentalCoilApi
+import coil.disk.DiskCache
+import com.hippo.ehviewer.EhApplication
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.IOUtils
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -34,11 +37,39 @@ class SpiderInfo @JvmOverloads constructor(
         }
     }
 
-    fun write(file: File) {
-        file.writeBytes(Cbor.encodeToByteArray(this))
+    @OptIn(ExperimentalCoilApi::class)
+    fun saveToCache() {
+        val entry = spiderInfoCache.edit(gid.toString()) ?: return
+        runCatching {
+            entry.data.toFile().writeBytes(Cbor.encodeToByteArray(this))
+        }.onFailure {
+            it.printStackTrace()
+            entry.abort()
+        }.onSuccess {
+            entry.commit()
+        }
     }
 
     companion object {
+        private val spiderInfoCache by lazy {
+            DiskCache.Builder()
+                .directory(File(EhApplication.application.cacheDir, "spider_info_v2_1"))
+                .maxSizeBytes(20 * 1024 * 1024).build()
+        }
+
+        @JvmStatic
+        @OptIn(ExperimentalCoilApi::class)
+        fun readFromCache(gid: Long): SpiderInfo? {
+            val snapshot = spiderInfoCache[gid.toString()] ?: return null
+            return runCatching {
+                snapshot.use {
+                    return Cbor.decodeFromByteArray(it.data.toFile().readBytes())
+                }
+            }.onFailure {
+                it.printStackTrace()
+            }.getOrNull()
+        }
+
         @JvmStatic
         fun read(file: UniFile): SpiderInfo? {
             return runCatching {
@@ -48,12 +79,6 @@ class SpiderInfo @JvmOverloads constructor(
             }.getOrNull() ?: runCatching {
                 file.openInputStream().use { readV1(it) }
             }.getOrNull()
-        }
-
-        // This path is for diskcache only, no need to compatible with old data
-        @JvmStatic
-        fun read(file: File): SpiderInfo? {
-            return Cbor.decodeFromByteArray(file.readBytes())
         }
 
         private fun readV1(inputStream: InputStream): SpiderInfo {

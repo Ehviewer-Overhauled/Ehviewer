@@ -77,7 +77,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import coil.disk.DiskCache;
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -107,8 +106,6 @@ public final class SpiderQueen implements Runnable {
     private static final LongSparseArray<SpiderQueen> sQueenMap = new LongSparseArray<>();
     @NonNull
     private final OkHttpClient mHttpClient;
-    @NonNull
-    private final DiskCache mSpiderInfoCache;
     @NonNull
     private final GalleryInfo mGalleryInfo;
     @NonNull
@@ -155,7 +152,6 @@ public final class SpiderQueen implements Runnable {
 
     private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
         mHttpClient = EhApplication.getOkHttpClient();
-        mSpiderInfoCache = EhApplication.getSpiderInfoCache();
         mGalleryInfo = galleryInfo;
         mSpiderDen = new SpiderDen(mGalleryInfo);
 
@@ -703,18 +699,10 @@ public final class SpiderQueen implements Runnable {
         }
 
         // Read from cache
-        var entry = mSpiderInfoCache.get(Long.toString(mGalleryInfo.getGid()));
-        if (entry == null) return null;
-        try (entry) {
-            spiderInfo = SpiderInfo.read(entry.getData().toFile());
-            if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
-                    spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
-                return spiderInfo;
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        spiderInfo = SpiderInfo.readFromCache(mGalleryInfo.getGid());
+        if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() && spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
+            return spiderInfo;
         }
-
         return null;
     }
 
@@ -851,10 +839,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         // Write to cache
-        var editor = mSpiderInfoCache.edit(Long.toString(mGalleryInfo.getGid()));
-        if (editor == null) return;
-        spiderInfo.write(editor.getData().toFile());
-        editor.commit();
+        spiderInfo.saveToCache();
     }
 
     private void runInternal() {
