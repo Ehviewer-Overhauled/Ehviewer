@@ -872,7 +872,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     .show()
             }
         } else if (binding.content.header.info === v) {
-            assert(mGalleryDetail != null)
+            mGalleryDetail ?: return
             val galleryInfoBottomSheet = GalleryInfoBottomSheet(mGalleryDetail!!)
             galleryInfoBottomSheet.show(
                 requireActivity().supportFragmentManager,
