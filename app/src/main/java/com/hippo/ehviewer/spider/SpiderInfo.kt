@@ -18,7 +18,7 @@ class SpiderInfo @JvmOverloads constructor(
 
     val pages: Int,
 
-    val pTokenMap: Array<String?> = arrayOfNulls(pages),
+    val pTokenMap: MutableMap<Int, String> = hashMapOf(),
 
     var startPage: Int = 0,
 
@@ -75,7 +75,7 @@ class SpiderInfo @JvmOverloads constructor(
             val previewPages = readInt()
             val previewPerPage = readInt()
             val pages = read().toInt()
-            val pTokenMap = arrayOfNulls<String>(pages)
+            val pTokenMap = hashMapOf<Int, String>()
             val info = SpiderInfo(gid, pages, pTokenMap, 0, token, previewPages, previewPerPage)
             runCatching {
                 val line = read()

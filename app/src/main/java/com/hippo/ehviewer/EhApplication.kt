@@ -331,7 +331,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
         @JvmStatic
         val spiderInfoCache by lazy {
-            DiskCache.Builder().directory(File(application.cacheDir, "spider_info_v2"))
+            DiskCache.Builder().directory(File(application.cacheDir, "spider_info_v2_1"))
                 .maxSizeBytes(20 * 1024 * 1024).build()
         }
 
