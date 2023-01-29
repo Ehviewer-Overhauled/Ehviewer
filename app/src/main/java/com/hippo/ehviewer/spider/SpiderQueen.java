@@ -693,10 +693,12 @@ public final class SpiderQueen implements Runnable {
         UniFile downloadDir = mSpiderDen.getDownloadDir();
         if (downloadDir != null) {
             UniFile file = downloadDir.findFile(SPIDER_INFO_FILENAME);
-            spiderInfo = SpiderInfo.read(file);
-            if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
-                    spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
-                return spiderInfo;
+            if (file != null) {
+                spiderInfo = SpiderInfo.read(file);
+                if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
+                        spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
+                    return spiderInfo;
+                }
             }
         }
 
