@@ -1285,8 +1285,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private class DownloadArchiveListener(
         context: Context,
         private val mGalleryInfo: GalleryInfo?
-    ) : EhCallback<GalleryDetailScene?, String>(context) {
-        override fun onSuccess(result: String) {
+    ) : EhCallback<GalleryDetailScene?, String?>(context) {
+        override fun onSuccess(result: String?) {
             // TODO: Don't use buggy system download service
             val r = DownloadManager.Request(Uri.parse(result))
             val name =
