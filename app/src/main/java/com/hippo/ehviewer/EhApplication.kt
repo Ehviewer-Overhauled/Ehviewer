@@ -33,7 +33,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.disk.DiskCache
 import com.hippo.Native
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.client.EhCookieStore
@@ -47,7 +46,6 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.parser.EventPaneParser
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.util.BitmapUtils
@@ -107,7 +105,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
-        SpiderDen.initialize(this)
         BitmapUtils.initialize(this)
         EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
