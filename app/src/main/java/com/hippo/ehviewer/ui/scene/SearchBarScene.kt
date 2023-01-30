@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -170,24 +169,15 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     }
 
     private fun wrapTagKeyword(keyword: String): String {
-        var keyword = keyword
-        keyword = keyword.trim { it <= ' ' }
-
-        val index1 = keyword.indexOf(':')
-        if (index1 == -1 || index1 >= keyword.length - 1) {
-            // Can't find :, or : is the last char
-            return keyword
-        }
-        if (keyword[index1 + 1] == '"') {
-            // The char after : is ", the word must be quoted
-            return keyword
-        }
-        val index2 = keyword.indexOf(' ')
-        return if (index2 <= index1) {
-            // Can't find space, or space is before :
+        return if (keyword.endsWith(':')) {
             keyword
-        } else keyword.substring(0, index1 + 1) + "\"" + keyword.substring(index1 + 1) + "$\""
-
+        } else if (keyword.contains(' ')) {
+            val tag = keyword.substringAfter(':')
+            val prefix = keyword.dropLast(tag.length)
+            "$prefix\"$tag$\" "
+        } else {
+            "$keyword$ "
+        }
     }
 
     interface SuggestionProvider {
@@ -276,13 +266,11 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         override fun onClick() {
             val edittext = binding.searchview.editText
             edittext.let {
-                val text = it.text.toString()
-                var temp = wrapTagKeyword(mKeyword) + " "
-                if (text.contains(" ")) {
-                    temp = text.substring(0, text.lastIndexOf(" ")) + " " + temp
-                }
-                it.setText(temp)
-                it.setSelection(temp.length)
+                val keywords = it.text.toString().substringBeforeLast(' ', "")
+                val keyword = wrapTagKeyword(mKeyword)
+                val newKeywords = if (keywords.isNotEmpty()) "$keywords $keyword" else keyword
+                it.setText(newKeywords)
+                it.setSelection(newKeywords.length)
             }
         }
     }
@@ -340,18 +328,15 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
             mSearchDatabase.getSuggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
             EhTagDatabase.takeIf { it.isInitialized() }?.run {
-                if (!TextUtils.isEmpty(text) && !text.endsWith(" ")) {
-                    val s = text.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    if (s.isNotEmpty()) {
-                        val keyword = s[s.size - 1]
-                        val translate =
-                            Settings.getShowTagTranslations() && isTranslatable(requireContext())
-                        suggestFlow(keyword, translate, true).collect {
-                            emit(TagSuggestion(it.first, it.second))
-                        }
-                        suggestFlow(keyword, translate).collect {
-                            emit(TagSuggestion(it.first, it.second))
-                        }
+                if (text.isNotEmpty() && !text.endsWith(' ')) {
+                    val keyword = text.substringAfterLast(' ')
+                    val translate =
+                        Settings.getShowTagTranslations() && isTranslatable(requireContext())
+                    suggestFlow(keyword, translate, true).collect {
+                        emit(TagSuggestion(it.first, it.second))
+                    }
+                    suggestFlow(keyword, translate).collect {
+                        emit(TagSuggestion(it.first, it.second))
                     }
                 }
             }

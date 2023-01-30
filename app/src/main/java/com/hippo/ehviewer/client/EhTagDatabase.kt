@@ -43,35 +43,62 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
+private typealias TagGroup = Map<String, String>
+private typealias TagGroups = Map<String, TagGroup>
+
 object EhTagDatabase {
-    private lateinit var tags: JSONObject
-    private lateinit var tagList: ArrayList<Pair<String, String>>
+    private const val NAMESPACE_PREFIX = "n"
+    private lateinit var tagGroups: TagGroups
 
     fun isInitialized(): Boolean {
-        return this::tags.isInitialized && this::tagList.isInitialized
+        return this::tagGroups.isInitialized
     }
+
+    private fun JSONObject.toTagGroups(): TagGroups =
+        keys().asSequence().associateWith { getJSONObject(it).toTagGroup() }
+
+    private fun JSONObject.toTagGroup(): TagGroup =
+        keys().asSequence().associateWith { getString(it) }
 
     private fun updateData(source: BufferedSource) {
         try {
-            val tmpTags = JSONObject(source.readString(StandardCharsets.UTF_8))
-            val tmpTagList = arrayListOf<Pair<String, String>>()
-            tmpTags.keys().forEachRemaining { prefix: String ->
-                val values = tmpTags.optJSONObject(prefix)
-                values?.let {
-                    it.keys().forEachRemaining { tag: String ->
-                        tmpTagList.add(Pair("$prefix:$tag", values.optString(tag)))
-                    }
-                }
-            }
-            tags = tmpTags
-            tagList = tmpTagList
+            tagGroups = JSONObject(source.readString(StandardCharsets.UTF_8)).toTagGroups()
         } catch (e: JSONException) {
             e.printStackTrace()
         }
     }
 
-    fun getTranslation(prefix: String?, tag: String?): String? {
-        return tags.optJSONObject(prefix)?.optString(tag)?.trim()?.takeIf { it.isNotEmpty() }
+    fun getTranslation(prefix: String? = NAMESPACE_PREFIX, tag: String?): String? {
+        return tagGroups[prefix]?.get(tag)?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun internalSuggestFlow(
+        tags: Map<String, String>,
+        keyword: String,
+        translate: Boolean,
+        exactly: Boolean
+    ): Flow<Pair<String?, String>> = flow {
+        if (exactly) {
+            tags[keyword]?.let {
+                emit(Pair(it.takeIf { translate }, keyword))
+            }
+        } else {
+            if (translate) {
+                tags.forEach { (tag, hint) ->
+                    if (tag != keyword &&
+                        (tag.containsIgnoreSpace(keyword) || hint.containsIgnoreSpace(keyword))
+                    ) {
+                        emit(Pair(hint, tag))
+                    }
+                }
+            } else {
+                tags.keys.forEach { tag ->
+                    if (tag != keyword && tag.containsIgnoreSpace(keyword)) {
+                        emit(Pair(null, tag))
+                    }
+                }
+            }
+        }
     }
 
     /* Construct a cold flow for tag database suggestions */
@@ -80,32 +107,32 @@ object EhTagDatabase {
         translate: Boolean,
         exactly: Boolean = false
     ): Flow<Pair<String?, String>> = flow {
-        tagList.forEach {
-            val tag = it.first
-            val hint = if (translate) it.second else null
-            val index = tag.indexOf(':')
-            if (tag.substring(index + 1).trim() == keyword) {
-                if (exactly)
-                    emit(Pair(hint, tag))
-                return@forEach
+        val keywordPrefix = keyword.substringBefore(':')
+        val keywordTag = keyword.drop(keywordPrefix.length + 1)
+        val prefix = namespaceToPrefix(keywordPrefix) ?: keywordPrefix
+        val tags = tagGroups[prefix.takeIf { keywordTag.isNotEmpty() && it != NAMESPACE_PREFIX }]
+        tags?.let {
+            internalSuggestFlow(it, keywordTag, translate, exactly).collect { (hint, tag) ->
+                emit(Pair(hint, "$prefix:$tag"))
             }
-            if (exactly)
-                return@forEach
-            val keywordMatches: Boolean =
-                if (index == -1 || index >= tag.length - 1 || keyword.length > 2) {
-                    containsIgnoreSpace(tag, keyword)
-                } else {
-                    containsIgnoreSpace(tag.substring(index + 1), keyword)
+        } ?: tagGroups.forEach { (prefix, tags) ->
+            if (prefix != NAMESPACE_PREFIX) {
+                internalSuggestFlow(tags, keyword, translate, exactly).collect { (hint, tag) ->
+                    emit(Pair(hint, "$prefix:$tag"))
                 }
-            if (keywordMatches || containsIgnoreSpace(hint, keyword)) {
-                emit(Pair(hint, tag))
+            } else {
+                internalSuggestFlow(tags, keyword, translate, exactly).collect { (hint, tag) ->
+                    emit(Pair(hint, "$tag:"))
+                }
             }
         }
     }
 
-    private fun containsIgnoreSpace(text: String?, key: String): Boolean {
-        return text != null && text.replace(" ", "").contains(key.replace(" ", ""))
-    }
+    private fun String.removeSpace(): String = replace(" ", "")
+
+    private fun String.containsIgnoreSpace(other: String, ignoreCase: Boolean = true): Boolean =
+        removeSpace().contains(other.removeSpace(), ignoreCase)
+
 
     private val NAMESPACE_TO_PREFIX = HashMap<String, String>().also {
         it["artist"] = "a"

@@ -625,7 +625,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             binding.content.tags.tags.addView(ll)
             var readableTagName: String? = null
             if (ehTags != null && ehTags.isInitialized()) {
-                readableTagName = ehTags.getTranslation("n", tg.groupName)
+                readableTagName = ehTags.getTranslation(tag = tg.groupName)
             }
             val tgName = inflater.inflate(R.layout.item_gallery_tag, ll, false) as TextView
             ll.addView(tgName)
