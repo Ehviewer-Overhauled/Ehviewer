@@ -16,11 +16,9 @@
 
 package com.hippo.ehviewer.spider;
 
-import android.graphics.BitmapFactory;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -45,20 +43,15 @@ import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
 import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.image.Image;
-import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.OSUtils;
 import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.thread.PriorityThread;
 import com.hippo.yorozuya.thread.PriorityThreadFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -563,23 +556,7 @@ public final class SpiderQueen implements Runnable {
             return false;
         }
 
-        InputStreamPipe pipe = mSpiderDen.openInputStreamPipe(index);
-        if (null == pipe) {
-            return false;
-        }
-
-        OutputStream os = null;
-        try {
-            os = file.openOutputStream();
-            IOUtils.copy(pipe.open(), os);
-            return true;
-        } catch (IOException e) {
-            return false;
-        } finally {
-            pipe.close();
-            pipe.release();
-            IOUtils.closeQuietly(os);
-        }
+        return mSpiderDen.saveToUniFile(index, file);
     }
 
     @Nullable
@@ -589,35 +566,13 @@ public final class SpiderQueen implements Runnable {
             return null;
         }
 
-        InputStreamPipe pipe = mSpiderDen.openInputStreamPipe(index);
-        if (null == pipe) {
+        var ext = mSpiderDen.getExtension(index);
+        UniFile dst = dir.subFile(null != ext ? filename + "." + ext : filename);
+        if (null == dst) {
             return null;
         }
-
-        OutputStream os = null;
-        try {
-            // Get dst file
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(pipe.open(), null, options);
-            pipe.close();
-            String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(options.outMimeType);
-            UniFile dst = dir.subFile(null != extension ? filename + "." + extension : filename);
-            if (null == dst) {
-                return null;
-            }
-
-            // Copy
-            os = dst.openOutputStream();
-            IOUtils.copy(pipe.open(), os);
-            return dst;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            pipe.close();
-            pipe.release();
-            IOUtils.closeQuietly(os);
-        }
+        if (!mSpiderDen.saveToUniFile(index, dst)) return null;
+        return dst;
     }
 
 
@@ -628,25 +583,7 @@ public final class SpiderQueen implements Runnable {
             return null;
         }
 
-        InputStreamPipe pipe = mSpiderDen.openInputStreamPipe(index);
-        if (null == pipe) {
-            return null;
-        }
-
-        try {
-            // Get dst file
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(pipe.open(), null, options);
-            pipe.close();
-
-            return MimeTypeMap.getSingleton().getExtensionFromMimeType(options.outMimeType);
-        } catch (IOException e) {
-            return null;
-        } finally {
-            pipe.close();
-            pipe.release();
-        }
+        return mSpiderDen.getExtension(index);
     }
 
     // Mark as suspend fun when kotlinize, need IO
@@ -1248,45 +1185,10 @@ public final class SpiderQueen implements Runnable {
                         }
                     }
 
-                    InputStreamPipe isPipe = null;
-                    try {
-                        // Get InputStreamPipe
-                        isPipe = mSpiderDen.openInputStreamPipe(index);
-                        if (isPipe == null) {
-                            // Can't get pipe
-                            error = GetText.getString(R.string.error_reading_failed);
-                            break;
-                        }
-
-                        // Check plain txt
-                        InputStream inputStream = new BufferedInputStream(isPipe.open());
-                        boolean isPlainTxt = true;
-                        int j = 0;
-                        for (; ; ) {
-                            int b = inputStream.read();
-                            if (b == -1) {
-                                break;
-                            }
-                            // Skip first three bytes
-                            if (j < 3) {
-                                j++;
-                                continue;
-                            }
-                            if (b > 126) {
-                                isPlainTxt = false;
-                                break;
-                            }
-                        }
-                        if (isPlainTxt) {
-                            error = GetText.getString(R.string.error_reading_failed);
-                            forceHtml = true;
-                            continue;
-                        }
-                    } finally {
-                        if (isPipe != null) {
-                            isPipe.close();
-                            isPipe.release();
-                        }
+                    if (mSpiderDen.checkPlainText(index)) {
+                        error = GetText.getString(R.string.error_reading_failed);
+                        forceHtml = true;
+                        continue;
                     }
 
                     // Check Stopped

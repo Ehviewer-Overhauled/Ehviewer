@@ -27,24 +27,20 @@ import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.image.Image.ByteBufferSource
-import com.hippo.io.UniFileInputStreamPipe
-import com.hippo.streampipe.InputStreamPipe
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.Utilities
 import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.util.Locale
+import kotlin.io.path.readText
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -117,7 +113,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
                 (file.openOutputStream() as FileOutputStream).use { outputStream ->
                     outputStream.channel.use { outChannel ->
-                        FileInputStream(snapshot.data.toFile()).use { inputStream ->
+                        snapshot.data.toFile().inputStream().use { inputStream ->
                             inputStream.channel.use {
                                 outChannel.transferFrom(it, 0, it.size())
                             }
@@ -210,7 +206,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             var received: Long = 0
             runCatching {
                 editor.metadata.toFile().writeText(extension)
-                FileOutputStream(editor.data.toFile()).use { outputStream ->
+                editor.data.toFile().outputStream().use { outputStream ->
                     outputStream.channel.use { received = doSave(it) }
                 }
             }.onFailure {
@@ -226,59 +222,54 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return -1
     }
 
-    private fun openCacheInputStreamPipe(index: Int): InputStreamPipe? {
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
-        val snapshot = sCache[key] ?: return null
-        return object : InputStreamPipe {
-            private var `is`: InputStream? = null
-            override fun release() {
-                snapshot.close()
-            }
+    fun saveToUniFile(index: Int, file: UniFile): Boolean {
+        (file.openOutputStream() as FileOutputStream).use { outputStream ->
+            outputStream.channel.use { outChannel ->
+                val key = EhCacheKeyFactory.getImageKey(mGid, index)
 
-            @Throws(IOException::class)
-            override fun open(): InputStream {
-                if (`is` != null) IOUtils.closeQuietly(`is`)
-                `is` = FileInputStream(snapshot.data.toFile())
-                return `is`!!
-            }
-
-            override fun close() {
-                if (`is` != null) IOUtils.closeQuietly(`is`)
-            }
-        }
-    }
-
-    private fun openDownloadInputStreamPipe(index: Int): InputStreamPipe? {
-        val dir = downloadDir ?: return null
-        for (i in 0..1) {
-            val file = findImageFile(dir, index)
-            if (file != null) {
-                return UniFileInputStreamPipe(file)
-            } else if (!copyFromCacheToDownloadDir(index)) {
-                return null
-            }
-        }
-        return null
-    }
-
-    fun openInputStreamPipe(index: Int): InputStreamPipe? {
-        return when (mMode) {
-            SpiderQueen.MODE_READ -> {
-                var pipe = openCacheInputStreamPipe(index)
-                if (pipe == null) {
-                    pipe = openDownloadInputStreamPipe(index)
+                fun copy(inputStream: FileInputStream) {
+                    inputStream.channel.use {
+                        outChannel.transferFrom(it, 0, it.size())
+                    }
                 }
-                pipe
-            }
 
-            SpiderQueen.MODE_DOWNLOAD -> {
-                openDownloadInputStreamPipe(index)
-            }
+                // Read from diskCache first
+                sCache[key]?.use { snapshot ->
+                    runCatching {
+                        snapshot.data.toFile().inputStream().use { copy(it) }
+                    }.onSuccess {
+                        return true
+                    }.onFailure {
+                        it.printStackTrace()
+                        return false
+                    }
+                }
 
-            else -> {
-                null
+                downloadDir?.let { uniFile ->
+                    runCatching {
+                        findImageFile(uniFile, index)?.openInputStream()?.use {
+                            copy(it as FileInputStream)
+                        }
+                    }.onFailure {
+                        it.printStackTrace()
+                        return false
+                    }.onSuccess {
+                        return true
+                    }
+                }
+                return false
             }
         }
+    }
+
+    fun checkPlainText(index: Int): Boolean {
+        return false
+    }
+
+    fun getExtension(index: Int): String? {
+        val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        return sCache[key]?.use { it.metadata.toNioPath().readText() }
+            ?: downloadDir?.let { findImageFile(it, index) }?.name.let { FileUtils.getExtensionFromFilename(it) }
     }
 
     fun getImageSource(index: Int): ByteBufferSource? {
