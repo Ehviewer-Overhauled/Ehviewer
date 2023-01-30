@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -1220,6 +1221,7 @@ public final class SpiderQueen implements Runnable {
 
                     var body = response.body();
                     var received = mSpiderDen.saveFromBufferedSource(index, body , (contentLength, receivedSize, bytesRead) -> {
+                        if (mStoped) throw new CancellationException();
                         mPagePercentMap.put(index, (float) receivedSize / contentLength);
                         notifyPageDownload(index, contentLength, receivedSize, bytesRead);
                         return null;
