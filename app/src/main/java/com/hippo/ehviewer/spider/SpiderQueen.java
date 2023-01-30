@@ -652,6 +652,25 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+    // Mark as suspend fun when kotlinize, need IO
+    public static int getStartPage(long gid) {
+        var queen = sQueenMap.get(gid);
+        SpiderInfo spiderInfo = null;
+
+        // Fast Path: read existing queen
+        if (queen != null) {
+            spiderInfo = queen.mSpiderInfo.get();
+        }
+
+        // Slow path, read diskcache
+        if (spiderInfo == null) {
+            spiderInfo = SpiderInfo.readFromCache(gid);
+        }
+
+        if (spiderInfo == null) return 0;
+        return spiderInfo.getStartPage();
+    }
+
     public int getStartPage() {
         SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo == null) spiderInfo = readSpiderInfoFromLocal();

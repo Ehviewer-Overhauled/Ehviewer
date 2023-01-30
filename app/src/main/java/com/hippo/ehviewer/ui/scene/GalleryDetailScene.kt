@@ -86,9 +86,8 @@ import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.databinding.SceneGalleryDetailBinding
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
-import com.hippo.ehviewer.gallery.EhPageLoader
-import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.spider.SpiderDen
+import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
@@ -260,19 +259,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     override fun onResume() {
         super.onResume()
         _binding ?: return
-        val galleryProvider: PageLoader2 = EhPageLoader(mGalleryInfo)
-        galleryProvider.start()
-        viewLifecycleOwner.lifecycleScope.launchIO {
-            runCatching {
-                val startPage = galleryProvider.startPage
-                if (startPage != 0) {
-                    withUIContext {
-                        binding.content.header.read.text = getString(R.string.read_from, startPage + 1)
+        mGalleryInfo?.let {
+            viewLifecycleOwner.lifecycleScope.launchIO {
+                runCatching {
+                    val startPage = SpiderQueen.getStartPage(it.gid)
+                    if (startPage != 0) {
+                        withUIContext {
+                            binding.content.header.read.text =
+                                getString(R.string.read_from, startPage + 1)
+                        }
                     }
+                }.onFailure {
+                    it.printStackTrace()
                 }
-                galleryProvider.stop()
-            }.onFailure {
-                it.printStackTrace()
             }
         }
     }
