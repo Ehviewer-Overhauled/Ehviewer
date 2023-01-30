@@ -53,7 +53,22 @@ android {
         jvmTarget = '19'
         freeCompilerArgs += [
                 // https://kotlinlang.org/docs/compiler-reference.html#progressive
-                "-progressive"
+                "-progressive",
+
+                "-opt-in=coil.annotation.ExperimentalCoilApi",
+                "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
+                "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
+                "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+                "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlinx.coroutines.FlowPreview",
+                "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
+                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
         ]
     }
 
