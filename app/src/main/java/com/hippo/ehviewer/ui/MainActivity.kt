@@ -70,6 +70,7 @@ import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.scene.ProgressScene
+import com.hippo.image.Image
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
@@ -91,7 +92,7 @@ class MainActivity : EhActivity() {
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)
-        val bitmap = runCatching { ImageDecoder.decodeBitmap(src) }.getOrNull() ?: return null
+        val bitmap = runCatching { ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener) }.getOrNull() ?: return null
         val temp = AppConfig.createTempFile() ?: return null
         var os: OutputStream? = null
         return try {

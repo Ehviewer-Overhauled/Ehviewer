@@ -26,6 +26,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.R
 import java.nio.ByteBuffer
 import kotlin.math.min
 
@@ -38,10 +39,7 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
             }
             decoder.setTargetColorSpace(colorSpace)
             decoder.setTargetSampleSize(
-                min(
-                    info.size.width / (2 * screenWidth),
-                    info.size.height / (2 * screenHeight)
-                ).coerceAtLeast(1)
+                calculateSampleSize(info, 2 * screenHeight, 2 * screenWidth)
             )
         }.also {
             (it as? BitmapDrawable)?.run {
@@ -65,6 +63,23 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
     }
 
     companion object {
+        fun calculateSampleSize(info: ImageInfo, targetHeight: Int, targetWeight: Int): Int {
+            return min(
+                info.size.width / targetWeight,
+                info.size.height / targetHeight
+            ).coerceAtLeast(1)
+        }
+
+        private val imageSearchMaxSize =
+            EhApplication.application.resources.getDimensionPixelOffset(R.dimen.image_search_max_size)
+
+        @JvmStatic
+        val imageSearchDecoderSampleListener =
+            ImageDecoder.OnHeaderDecodedListener { decoder, info, _ ->
+                decoder.setTargetSampleSize(
+                    calculateSampleSize(info, imageSearchMaxSize, imageSearchMaxSize)
+                )
+            }
         val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
         val screenHeight = EhApplication.application.resources.displayMetrics.heightPixels
         val isWideColorGamut =

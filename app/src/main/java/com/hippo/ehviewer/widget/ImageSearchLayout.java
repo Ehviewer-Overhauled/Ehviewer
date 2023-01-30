@@ -37,6 +37,7 @@ import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
+import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ViewUtils;
@@ -121,8 +122,7 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
 
         try {
             var src = ImageDecoder.createSource(context.getContentResolver(), imageUri);
-            Bitmap bitmap = ImageDecoder.decodeBitmap(src, ((imageDecoder, imageInfo, source) -> {
-            }));
+            Bitmap bitmap = ImageDecoder.decodeBitmap(src, Image.getImageSearchDecoderSampleListener());
             if (null == bitmap) {
                 return;
             }
