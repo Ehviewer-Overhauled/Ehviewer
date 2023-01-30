@@ -19,11 +19,11 @@ package com.hippo.ehviewer.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.AbsSavedState;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,9 +37,7 @@ import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.io.UniFileInputStreamPipe;
 import com.hippo.unifile.UniFile;
-import com.hippo.util.BitmapUtils;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.ViewUtils;
 
@@ -47,6 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -121,8 +120,9 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         }
 
         try {
-            int maxSize = context.getResources().getDimensionPixelOffset(R.dimen.image_search_max_size);
-            Bitmap bitmap = BitmapUtils.decodeStream(new UniFileInputStreamPipe(file), maxSize, maxSize);
+            var src = ImageDecoder.createSource(context.getContentResolver(), imageUri);
+            Bitmap bitmap = ImageDecoder.decodeBitmap(src, ((imageDecoder, imageInfo, source) -> {
+            }));
             if (null == bitmap) {
                 return;
             }
@@ -145,8 +145,8 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
             } finally {
                 IOUtils.closeQuietly(os);
             }
-        } catch (OutOfMemoryError e) {
-            Log.e(TAG, "Out of memory");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
