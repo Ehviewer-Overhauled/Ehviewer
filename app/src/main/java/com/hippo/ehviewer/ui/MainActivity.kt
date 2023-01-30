@@ -23,6 +23,7 @@ import android.content.pm.PackageManager
 import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -69,9 +70,6 @@ import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.scene.ProgressScene
-import com.hippo.io.UniFileInputStreamPipe
-import com.hippo.unifile.UniFile
-import com.hippo.util.BitmapUtils
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getUrlFromClipboard
@@ -91,25 +89,9 @@ class MainActivity : EhActivity() {
     private lateinit var connectivityManager: ConnectivityManager
     private val availableNetworks: MutableList<Network> = mutableListOf()
 
-    private fun saveImageToTempFile(file: UniFile?): File? {
-        file ?: return null
-        var bitmap: Bitmap? = null
-        try {
-            bitmap = BitmapUtils.decodeStream(
-                UniFileInputStreamPipe(file),
-                -1,
-                -1,
-                500 * 500,
-                false,
-                false,
-                null
-            )
-        } catch (e: OutOfMemoryError) {
-            // Ignore
-        }
-        if (null == bitmap) {
-            return null
-        }
+    private fun saveImageToTempFile(uri: Uri): File? {
+        val src = ImageDecoder.createSource(contentResolver, uri)
+        val bitmap = runCatching { ImageDecoder.decodeBitmap(src) }.getOrNull() ?: return null
         val temp = AppConfig.createTempFile() ?: return null
         var os: OutputStream? = null
         return try {
@@ -200,8 +182,7 @@ class MainActivity : EhActivity() {
             } else if (type != null && type.startsWith("image/")) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
                 if (null != uri) {
-                    val file = UniFile.fromUri(this, uri)
-                    val temp = saveImageToTempFile(file)
+                    val temp = saveImageToTempFile(uri)
                     if (null != temp) {
                         val builder = ListUrlBuilder()
                         builder.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
