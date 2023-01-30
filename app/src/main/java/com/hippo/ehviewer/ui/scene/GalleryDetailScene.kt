@@ -260,15 +260,20 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     override fun onResume() {
         super.onResume()
         _binding ?: return
-        try {
-            val galleryProvider: PageLoader2 = EhPageLoader(mGalleryInfo)
-            galleryProvider.start()
-            val startPage = galleryProvider.startPage
-            if (startPage != 0) {
-                binding.content.header.read.text = getString(R.string.read_from, startPage + 1)
+        val galleryProvider: PageLoader2 = EhPageLoader(mGalleryInfo)
+        galleryProvider.start()
+        viewLifecycleOwner.lifecycleScope.launchIO {
+            runCatching {
+                val startPage = galleryProvider.startPage
+                if (startPage != 0) {
+                    withUIContext {
+                        binding.content.header.read.text = getString(R.string.read_from, startPage + 1)
+                    }
+                }
+                galleryProvider.stop()
+            }.onFailure {
+                it.printStackTrace()
             }
-            galleryProvider.stop()
-        } catch (ignore: Exception) {
         }
     }
 

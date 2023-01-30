@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.spider;
 
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
@@ -50,7 +49,6 @@ import com.hippo.streampipe.InputStreamPipe;
 import com.hippo.streampipe.OutputStreamPipe;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
-import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.yorozuya.IOUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.OSUtils;
@@ -357,7 +355,6 @@ public final class SpiderQueen implements Runnable {
         }
 
         updateMode();
-        writeSpiderInfoToLocal();
     }
 
     private void clearMode(@Mode int mode) {
@@ -656,26 +653,16 @@ public final class SpiderQueen implements Runnable {
     }
 
     public int getStartPage() {
-        SpiderInfo spiderInfo = readSpiderInfoFromLocal();
-        if (spiderInfo != null) {
-            mSpiderInfo.lazySet(spiderInfo);
-            return spiderInfo.getStartPage();
-        } else {
-            return 0;
-        }
+        SpiderInfo spiderInfo = mSpiderInfo.get();
+        if (spiderInfo == null) spiderInfo = readSpiderInfoFromLocal();
+        if (spiderInfo == null) return 0;
+        return spiderInfo.getStartPage();
     }
 
     public void putStartPage(int page) {
         final SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo != null) {
             spiderInfo.setStartPage(page);
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    writeSpiderInfoToLocal(spiderInfo);
-                    return null;
-                }
-            }.executeOnExecutor(IoThreadPoolExecutor.getInstance());
         }
     }
 
@@ -809,9 +796,6 @@ public final class SpiderQueen implements Runnable {
             String body = response.body().string();
             readPreviews(body, previewIndex, spiderInfo);
 
-            // Save to local
-            writeSpiderInfoToLocal(spiderInfo);
-
             String pToken;
             synchronized (mPTokenLock) {
                 pToken = spiderInfo.getPTokenMap().get(index);
@@ -823,23 +807,16 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void writeSpiderInfoToLocal() {
+    private synchronized void writeSpiderInfoToLocal() {
         var spiderInfo = mSpiderInfo.get();
         if (spiderInfo != null) {
-            writeSpiderInfoToLocal(spiderInfo);
+            UniFile downloadDir = mSpiderDen.getDownloadDir();
+            if (downloadDir != null) {
+                UniFile file = downloadDir.createFile(SPIDER_INFO_FILENAME);
+                spiderInfo.write(file);
+            }
+            spiderInfo.saveToCache();
         }
-    }
-
-    private synchronized void writeSpiderInfoToLocal(@NonNull SpiderInfo spiderInfo) {
-        // Write to download dir
-        UniFile downloadDir = mSpiderDen.getDownloadDir();
-        if (downloadDir != null) {
-            UniFile file = downloadDir.createFile(SPIDER_INFO_FILENAME);
-            spiderInfo.write(file);
-        }
-
-        // Write to cache
-        spiderInfo.saveToCache();
     }
 
     private void runInternal() {
@@ -860,20 +837,14 @@ public final class SpiderQueen implements Runnable {
         if (spiderInfo == null) {
             return;
         }
-        mSpiderInfo.lazySet(spiderInfo);
+        mSpiderInfo.set(spiderInfo);
 
         // Check Stopped
         if (mStoped) {
             return;
         }
 
-        // Write spider info to file
-        writeSpiderInfoToLocal(spiderInfo);
-
         // Check Stopped
-        if (mStoped) {
-            return;
-        }
 
         // Setup page state
         synchronized (mPageStateLock) {
@@ -949,6 +920,7 @@ public final class SpiderQueen implements Runnable {
                 mWorkerLock.notifyAll();
             }
         }
+        writeSpiderInfoToLocal();
     }
 
     @Override
