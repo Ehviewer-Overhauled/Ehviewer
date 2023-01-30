@@ -41,7 +41,6 @@ import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.Utilities
 import okio.buffer
 import okio.sink
-import okio.source
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -68,19 +67,18 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     private fun ensureDownloadDir(): Boolean {
-        if (mDownloadDir == null) {
-            val dirname =
-                FileUtils.sanitizeFilename(mGid.toString() + "-" + getSuitableTitle(mGalleryInfo))
-            EhDB.putDownloadDirname(mGid, dirname)
-            mDownloadDir = getGalleryDownloadDir(mGid)
-        }
-        return mDownloadDir != null && mDownloadDir!!.ensureDir()
+        mDownloadDir?.let { return it.ensureDir() }
+        val title = getSuitableTitle(mGalleryInfo)
+        val dirname = FileUtils.sanitizeFilename("$mGid-$title")
+        EhDB.putDownloadDirname(mGid, dirname)
+        mDownloadDir = getGalleryDownloadDir(mGid)
+        return mDownloadDir?.ensureDir() ?: false
     }
 
     val isReady: Boolean
         get() = when (mMode) {
             SpiderQueen.MODE_READ -> true
-            SpiderQueen.MODE_DOWNLOAD -> mDownloadDir != null && mDownloadDir!!.isDirectory
+            SpiderQueen.MODE_DOWNLOAD -> mDownloadDir?.isDirectory ?: false
             else -> false
         }
     val downloadDir: UniFile?
@@ -88,7 +86,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             if (mDownloadDir == null) {
                 mDownloadDir = getGalleryDownloadDir(mGid)
             }
-            return if (mDownloadDir != null && mDownloadDir!!.isDirectory) mDownloadDir else null
+            return mDownloadDir?.takeIf { it.isDirectory }
         }
 
     private fun containInCache(index: Int): Boolean {
@@ -118,30 +116,24 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
         val dir = downloadDir ?: return false
-        // Find image file in cache
         val key = EhCacheKeyFactory.getImageKey(mGid, index)
-        val snapshot = sCache[key] ?: return false
-        var os: OutputStream? = null
-        try {
-            snapshot.use {
-                FileInputStream(snapshot.data.toFile()).use { `is` ->
-                    snapshot.metadata.toFile().source().buffer().use { buf ->
-                        // Get extension
-                        val extension = fixExtension("." + buf.readUtf8Line())
-                        // Copy from cache to download dir
-                        val file = dir.createFile(generateImageFilename(index, extension))
-                            ?: return false
-                        os = file.openOutputStream()
-                        IOUtils.copy(`is`, os)
-                        return true
+        runCatching {
+            (sCache[key] ?: return false).use { snapshot ->
+                val extension = fixExtension("." + snapshot.metadata.toFile().readText())
+                val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
+                (file.openOutputStream() as FileOutputStream).use { outputStream ->
+                    outputStream.channel.use { outChannel ->
+                        FileInputStream(snapshot.data.toFile()).use { inputStream ->
+                            inputStream.channel.use {
+                                outChannel.transferFrom(it, 0, it.size())
+                            }
+                        }
                     }
                 }
             }
-        } catch (e: IOException) {
-            return false
-        } finally {
-            IOUtils.closeQuietly(os)
+            return true
         }
+        return false
     }
 
     fun contain(index: Int): Boolean {
@@ -182,9 +174,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     fun remove(index: Int): Boolean {
-        var result = removeFromCache(index)
-        result = result or removeFromDownloadDir(index)
-        return result
+        return removeFromCache(index) or removeFromDownloadDir(index)
     }
 
     private fun openCacheOutputStreamPipe(index: Int, extension: String): OutputStreamPipe? {
