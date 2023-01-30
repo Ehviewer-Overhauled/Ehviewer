@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalCoilApi::class)
-
 package com.hippo.ehviewer.spider
 
 import android.webkit.MimeTypeMap
-import coil.annotation.ExperimentalCoilApi
 import coil.disk.DiskCache
 import com.hippo.Native.mapFd
 import com.hippo.Native.unmapDirectByteBuffer
