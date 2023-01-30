@@ -696,7 +696,7 @@ public final class SpiderQueen implements Runnable {
         if (downloadDir != null) {
             UniFile file = downloadDir.findFile(SPIDER_INFO_FILENAME);
             if (file != null) {
-                spiderInfo = SpiderInfo.read(file);
+                spiderInfo = SpiderInfo.readCompatFromUniFile(file);
                 if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
                         spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
                     return spiderInfo;

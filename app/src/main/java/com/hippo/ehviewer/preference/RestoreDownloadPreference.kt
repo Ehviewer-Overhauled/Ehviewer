@@ -32,10 +32,8 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.IOUtils
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
-import java.io.InputStream
 import java.util.Collections
 
 class RestoreDownloadPreference constructor(
@@ -54,7 +52,7 @@ class RestoreDownloadPreference constructor(
             }
             val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
             return try {
-                val spiderInfo = SpiderInfo.read(siFile) ?: return null
+                val spiderInfo = SpiderInfo.readCompatFromUniFile(siFile) ?: return null
                 val gid = spiderInfo.gid
                 val dirname = file.name
                 if (mManager.containDownloadInfo(gid)) {

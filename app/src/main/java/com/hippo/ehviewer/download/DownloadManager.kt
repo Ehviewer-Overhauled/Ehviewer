@@ -581,7 +581,7 @@ class DownloadManager : OnSpiderListener {
                     galleryInfo.rating = downloadInfo.rating
                     val downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.gid) ?: continue
                     val file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: continue
-                    val spiderInfo = SpiderInfo.read(file) ?: continue
+                    val spiderInfo = SpiderInfo.readCompatFromUniFile(file) ?: continue
                     spiderInfo.startPage = 0
                     try {
                         spiderInfo.write(file)
