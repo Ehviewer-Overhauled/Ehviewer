@@ -48,7 +48,6 @@ import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.util.BitmapUtils
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
@@ -105,7 +104,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
-        BitmapUtils.initialize(this)
         EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
         launchIO {
