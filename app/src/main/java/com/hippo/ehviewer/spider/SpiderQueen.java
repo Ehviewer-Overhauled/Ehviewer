@@ -46,7 +46,6 @@ import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.image.Image;
 import com.hippo.streampipe.InputStreamPipe;
-import com.hippo.streampipe.OutputStreamPipe;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.IOUtils;
@@ -57,7 +56,6 @@ import com.hippo.yorozuya.thread.PriorityThread;
 import com.hippo.yorozuya.thread.PriorityThreadFactory;
 
 import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,11 +75,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import okhttp3.Call;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public final class SpiderQueen implements Runnable {
 
@@ -1213,7 +1209,6 @@ public final class SpiderQueen implements Runnable {
 
                     Call call = mHttpClient.newCall(new EhRequestBuilder(targetImageUrl, referer).build());
                     Response response = call.execute();
-                    ResponseBody responseBody = response.body();
 
                     if (response.code() >= 400) {
                         // Maybe 404
@@ -1223,78 +1218,31 @@ public final class SpiderQueen implements Runnable {
                         continue;
                     }
 
-                    // Get extension
-                    String extension = null;
-                    MediaType mediaType = responseBody.contentType();
-                    if (mediaType != null) {
-                        extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mediaType.toString());
+                    var body = response.body();
+                    var received = mSpiderDen.saveFromBufferedSource(index, body , (contentLength, receivedSize, bytesRead) -> {
+                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
+                        notifyPageDownload(index, contentLength, receivedSize, bytesRead);
+                        return null;
+                    });
+                    var contentLength = body.contentLength();
+                    body.close();
+                    response.close();
+
+                    if (received == -1) {
+                        error = GetText.getString(R.string.error_write_failed);
+                        response.close();
+                        break;
                     }
 
-                    OutputStreamPipe osPipe = null;
-                    try {
-                        // Get out put pipe
-                        osPipe = mSpiderDen.openOutputStreamPipe(index, extension);
-                        if (osPipe == null) {
-                            // Can't get pipe
-                            error = GetText.getString(R.string.error_write_failed);
-                            response.close();
-                            break;
-                        }
-
-                        long contentLength = responseBody.contentLength();
-                        long receivedSize = 0;
-                        OutputStream os = osPipe.open();
-                        if (os instanceof FileOutputStream fileOutputStream) {
-                            try (var channel = fileOutputStream.getChannel(); var source = responseBody.source(); responseBody; response) {
-                                while (!mStoped) {
-                                    // Is 40k a good size ?
-                                    long bytesRead = channel.transferFrom(source, receivedSize, 40960);
-                                    if (bytesRead == 0) {
-                                        break;
-                                    }
-                                    receivedSize += bytesRead;
-                                    if (contentLength > 0) {
-                                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
-                                    }
-                                    notifyPageDownload(index, contentLength, receivedSize, (int) bytesRead);
-                                }
-                            }
-                        } else {
-                            final byte[] data = new byte[1024 * 4];
-                            try (var is = responseBody.byteStream(); responseBody; response) {
-                                while (!mStoped) {
-                                    int bytesRead = is.read(data);
-                                    if (bytesRead == -1) {
-                                        break;
-                                    }
-                                    os.write(data, 0, bytesRead);
-                                    receivedSize += bytesRead;
-                                    // Update page percent
-                                    if (contentLength > 0) {
-                                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
-                                    }
-                                    // Notify listener
-                                    notifyPageDownload(index, contentLength, receivedSize, bytesRead);
-                                }
-                                os.flush();
-                            }
-                        }
-
-                        // check download size
-                        if (contentLength >= 0) {
-                            if (receivedSize < contentLength) {
-                                Log.e(TAG, "Can't download all of image data");
-                                error = "Incomplete";
-                                forceHtml = true;
-                                continue;
-                            } else if (receivedSize > contentLength) {
-                                Log.w(TAG, "Received data is more than contentLength");
-                            }
-                        }
-                    } finally {
-                        if (osPipe != null) {
-                            osPipe.close();
-                            osPipe.release();
+                    // check download size
+                    if (contentLength >= 0) {
+                        if (received < contentLength) {
+                            Log.e(TAG, "Can't download all of image data");
+                            error = "Incomplete";
+                            forceHtml = true;
+                            continue;
+                        } else if (received > contentLength) {
+                            Log.w(TAG, "Received data is more than contentLength");
                         }
                     }
 

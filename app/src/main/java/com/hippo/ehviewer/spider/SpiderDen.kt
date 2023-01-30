@@ -17,6 +17,7 @@
 
 package com.hippo.ehviewer.spider
 
+import android.webkit.MimeTypeMap
 import coil.annotation.ExperimentalCoilApi
 import coil.disk.DiskCache
 import com.hippo.Native.mapFd
@@ -30,23 +31,19 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.image.Image.ByteBufferSource
 import com.hippo.io.UniFileInputStreamPipe
-import com.hippo.io.UniFileOutputStreamPipe
 import com.hippo.streampipe.InputStreamPipe
-import com.hippo.streampipe.OutputStreamPipe
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.Utilities
-import okio.buffer
-import okio.sink
+import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.io.OutputStream
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
@@ -177,63 +174,59 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return removeFromCache(index) or removeFromDownloadDir(index)
     }
 
-    private fun openCacheOutputStreamPipe(index: Int, extension: String): OutputStreamPipe? {
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
-        val editor = sCache.edit(key) ?: return null
-        try {
-            editor.metadata.toFile().sink().buffer().use { sink -> sink.writeUtf8(extension) }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return object : OutputStreamPipe {
-            private var os: OutputStream? = null
-            override fun release() {
-                editor.commit()
-            }
-
-            @Throws(IOException::class)
-            override fun open(): OutputStream {
-                if (os != null) IOUtils.closeQuietly(os)
-                os = FileOutputStream(editor.data.toFile())
-                return os!!
-            }
-
-            override fun close() {
-                if (os != null) IOUtils.closeQuietly(os)
-            }
-        }
-    }
-
-    /**
-     * @param extension without dot
-     */
-    private fun openDownloadOutputStreamPipe(index: Int, extension: String): OutputStreamPipe? {
-        var extension = extension
+    private fun findDownloadFileForIndex(index: Int, extension: String): UniFile? {
         val dir = downloadDir ?: return null
-        extension = fixExtension(".$extension")
-        val file = dir.createFile(generateImageFilename(index, extension))
-        return file?.let { UniFileOutputStreamPipe(it) }
+        val ext = fixExtension(".$extension")
+        return dir.createFile(generateImageFilename(index, ext))
     }
 
-    fun openOutputStreamPipe(index: Int, extension: String): OutputStreamPipe? {
-        return when (mMode) {
-            SpiderQueen.MODE_READ -> {
-                // Return the download pipe is the gallery has been downloaded
-                var pipe = openDownloadOutputStreamPipe(index, extension)
-                if (pipe == null) {
-                    pipe = openCacheOutputStreamPipe(index, extension)
+    // TODO: Support cancellation after spiderqueen coroutinize
+    fun saveFromBufferedSource(index: Int, body: ResponseBody, notifyProgress: (Long, Long, Int) -> Unit): Long {
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(body.contentType().toString()) ?: "jpg"
+
+        fun doSave(outChannel: FileChannel): Long {
+            var receivedSize: Long = 0
+            body.source().use { source ->
+                while (true) {
+                    val bytesRead = outChannel.transferFrom(source, receivedSize, TRANSFER_BLOCK)
+                    receivedSize += bytesRead
+                    notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
+                    if (bytesRead.toInt() == 0) break
                 }
-                pipe
             }
+            return receivedSize
+        }
 
-            SpiderQueen.MODE_DOWNLOAD -> {
-                openDownloadOutputStreamPipe(index, extension)
+        findDownloadFileForIndex(index, extension)?.runCatching {
+            openOutputStream().use { outputStream ->
+                (outputStream as FileOutputStream).channel.use { return doSave(it) }
             }
+        }?.onFailure {
+            it.printStackTrace()
+            return -1
+        }
 
-            else -> {
-                null
+        // Read Mode, allow save to cache
+        if (mMode == SpiderQueen.MODE_READ) {
+            val key = EhCacheKeyFactory.getImageKey(mGid, index)
+            val editor = sCache.edit(key) ?: return -1
+            var received: Long = 0
+            runCatching {
+                editor.metadata.toFile().writeText(extension)
+                FileOutputStream(editor.data.toFile()).use { outputStream ->
+                    outputStream.channel.use { received = doSave(it) }
+                }
+            }.onFailure {
+                editor.abort()
+                it.printStackTrace()
+                return -1
+            }.onSuccess {
+                editor.commit()
+                return received
             }
         }
+
+        return -1
     }
 
     private fun openCacheInputStreamPipe(index: Int): InputStreamPipe? {
@@ -371,6 +364,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     companion object {
+        private const val TRANSFER_BLOCK: Long = 40960
+
         // We use data to store image file, and metadata for image type
         private val sCache by lazy {
             DiskCache.Builder().directory(File(application.cacheDir, "gallery_image"))
