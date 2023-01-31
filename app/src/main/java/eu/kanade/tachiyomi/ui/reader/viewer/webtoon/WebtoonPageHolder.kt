@@ -55,7 +55,7 @@ class WebtoonPageHolder(
      * The default height when image not available.
      */
     private val defaultHeight
-        get() = viewer.recycler.width * 3 / 2
+        get() = (viewer.recycler.width * 1.4125).toInt()
 
     /**
      * Page of a chapter.
