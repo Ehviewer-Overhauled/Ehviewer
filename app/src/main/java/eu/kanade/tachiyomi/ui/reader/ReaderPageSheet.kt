@@ -23,6 +23,7 @@ class ReaderPageSheet(
         binding.copy.setOnClickListener { copy() }
         binding.save.setOnClickListener { save() }
         binding.saveTo.setOnClickListener { saveTo() }
+        binding.refresh.setOnClickListener { refresh() }
 
         return binding.root
     }
@@ -56,6 +57,11 @@ class ReaderPageSheet(
      */
     private fun saveTo() {
         activity.saveImageTo(page.index)
+        dismiss()
+    }
+
+    private fun refresh() {
+        activity.mGalleryProvider?.retryPage(page)
         dismiss()
     }
 }
