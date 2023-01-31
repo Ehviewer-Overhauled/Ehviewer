@@ -13,19 +13,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
+// import androidx.compose.material3.DismissDirection
+// import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismiss
+// import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDismissState
+// import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +100,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                 key = { item -> item.gid }
             ) { info ->
                 info?.let {
+                    /*
                     val dismissState = rememberDismissState(
                         confirmValueChange = {
                             if (it == DismissValue.DismissedToStart)
@@ -141,6 +142,8 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
                         },
                         directions = setOf(DismissDirection.EndToStart)
                     )
+
+                     */
                 }
             }
         }
