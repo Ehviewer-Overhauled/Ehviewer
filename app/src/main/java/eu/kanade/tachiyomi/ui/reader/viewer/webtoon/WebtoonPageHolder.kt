@@ -10,7 +10,6 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.hippo.ehviewer.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
@@ -53,10 +52,10 @@ class WebtoonPageHolder(
     private var errorLayout: ReaderErrorBinding? = null
 
     /**
-     * Getter to retrieve the height of the recycler view.
+     * The default height when image not available.
      */
-    private val parentHeight
-        get() = viewer.recycler.height
+    private val defaultHeight
+        get() = viewer.recycler.width * 3 / 2
 
     /**
      * Page of a chapter.
@@ -234,12 +233,11 @@ class WebtoonPageHolder(
      */
     private fun createProgressIndicator(): ReaderProgressIndicator {
         progressContainer = FrameLayout(context)
-        frame.addView(progressContainer, MATCH_PARENT, parentHeight)
+        frame.addView(progressContainer, MATCH_PARENT, defaultHeight)
 
         val progress = ReaderProgressIndicator(context).apply {
             updateLayoutParams<FrameLayout.LayoutParams> {
-                gravity = Gravity.CENTER_HORIZONTAL
-                updateMargins(top = parentHeight / 4)
+                gravity = Gravity.CENTER
             }
         }
         progressContainer.addView(progress)
@@ -252,7 +250,7 @@ class WebtoonPageHolder(
     private fun initErrorLayout(): ReaderErrorBinding {
         if (errorLayout == null) {
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), frame, true)
-            errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, (parentHeight * 0.8).toInt())
+            errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, defaultHeight)
             errorLayout?.actionRetry?.setOnClickListener {
                 viewer.activity.mGalleryProvider?.retryPage(page!!)
             }
