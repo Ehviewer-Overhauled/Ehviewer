@@ -6,6 +6,7 @@
     native <methods>;
 }
 
+# https://issuetracker.google.com/issues/190382641
 -keepclassmembers class kotlin.SafePublicationLazyImpl {
     java.lang.Object _value;
 }
