@@ -76,6 +76,7 @@ import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getParcelableCompat
+import com.hippo.util.getParcelableExtraCompat
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
@@ -223,7 +224,7 @@ class ReaderActivity : EhActivity() {
         mAction = intent.action
         mFilename = intent.getStringExtra(KEY_FILENAME)
         mUri = intent.data
-        mGalleryInfo = intent.getParcelableExtra(KEY_GALLERY_INFO)
+        mGalleryInfo = intent.getParcelableExtraCompat(KEY_GALLERY_INFO)
         mPage = intent.getIntExtra(KEY_PAGE, -1)
         buildProvider()
     }

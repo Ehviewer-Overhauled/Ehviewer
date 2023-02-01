@@ -73,6 +73,7 @@ import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.image.Image
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
+import com.hippo.util.getParcelableExtraCompat
 import com.hippo.util.getUrlFromClipboard
 import com.hippo.yorozuya.IOUtils
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -181,7 +182,7 @@ class MainActivity : EhActivity() {
                 )
                 return true
             } else if (type != null && type.startsWith("image/")) {
-                val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                val uri = intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)
                 if (null != uri) {
                     val temp = saveImageToTempFile(uri)
                     if (null != temp) {
