@@ -58,10 +58,8 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
-import java.io.File
 import java.net.Proxy
 import java.security.KeyStore
 import java.util.Arrays
@@ -286,7 +284,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val okHttpClient by lazy {
             val builder = OkHttpClient.Builder()
                 .cookieJar(ehCookieStore)
-                .cache(Cache(File(application.cacheDir, "http_cache"), 50L * 1024L * 1024L))
                 .dns(EhDns)
                 .proxySelector(ehProxySelector)
 
