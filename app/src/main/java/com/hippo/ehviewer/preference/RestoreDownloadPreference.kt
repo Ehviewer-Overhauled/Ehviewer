@@ -27,8 +27,8 @@ import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.ehviewer.spider.SpiderInfo
 import com.hippo.ehviewer.spider.SpiderQueen
+import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
@@ -52,7 +52,7 @@ class RestoreDownloadPreference constructor(
             }
             val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
             return try {
-                val spiderInfo = SpiderInfo.readCompatFromUniFile(siFile) ?: return null
+                val spiderInfo = readCompatFromUniFile(siFile) ?: return null
                 val gid = spiderInfo.gid
                 val dirname = file.name
                 if (mManager.containDownloadInfo(gid)) {

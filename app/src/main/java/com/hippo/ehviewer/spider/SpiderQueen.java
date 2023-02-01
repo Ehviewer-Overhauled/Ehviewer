@@ -598,7 +598,7 @@ public final class SpiderQueen implements Runnable {
 
         // Slow path, read diskcache
         if (spiderInfo == null) {
-            spiderInfo = SpiderInfo.readFromCache(gid);
+            spiderInfo = SpiderInfoUtilsKt.readFromCache(gid);
         }
 
         if (spiderInfo == null) return 0;
@@ -630,7 +630,7 @@ public final class SpiderQueen implements Runnable {
         if (downloadDir != null) {
             UniFile file = downloadDir.findFile(SPIDER_INFO_FILENAME);
             if (file != null) {
-                spiderInfo = SpiderInfo.readCompatFromUniFile(file);
+                spiderInfo = SpiderInfoUtilsKt.readCompatFromUniFile(file);
                 if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
                         spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
                     return spiderInfo;
@@ -639,7 +639,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         // Read from cache
-        spiderInfo = SpiderInfo.readFromCache(mGalleryInfo.getGid());
+        spiderInfo = SpiderInfoUtilsKt.readFromCache(mGalleryInfo.getGid());
         if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() && spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
             return spiderInfo;
         }
@@ -766,9 +766,9 @@ public final class SpiderQueen implements Runnable {
             UniFile downloadDir = mSpiderDen.getDownloadDir();
             if (downloadDir != null) {
                 UniFile file = downloadDir.createFile(SPIDER_INFO_FILENAME);
-                spiderInfo.write(file);
+                SpiderInfoUtilsKt.write(spiderInfo, file);
             }
-            spiderInfo.saveToCache();
+            SpiderInfoUtilsKt.saveToCache(spiderInfo);
         }
     }
 
@@ -864,7 +864,7 @@ public final class SpiderQueen implements Runnable {
             if (null == pToken) {
                 // If failed, set the pToken "failed"
                 synchronized (mPTokenLock) {
-                    spiderInfo.getPTokenMap().put(index, SpiderInfo.TOKEN_FAILED);
+                    spiderInfo.getPTokenMap().put(index, SpiderInfoUtilsKt.TOKEN_FAILED);
                 }
             }
 
@@ -1284,7 +1284,7 @@ public final class SpiderQueen implements Runnable {
             if (force) {
                 synchronized (mPTokenLock) {
                     String pToken = spiderInfo.getPTokenMap().get(index);
-                    if (SpiderInfo.TOKEN_FAILED.equals(pToken)) {
+                    if (SpiderInfoUtilsKt.TOKEN_FAILED.equals(pToken)) {
                         spiderInfo.getPTokenMap().remove(index);
                     }
                 }
@@ -1360,7 +1360,7 @@ public final class SpiderQueen implements Runnable {
                 }
             }
 
-            if (SpiderInfo.TOKEN_FAILED.equals(pToken)) {
+            if (SpiderInfoUtilsKt.TOKEN_FAILED.equals(pToken)) {
                 // Get token failed
                 updatePageState(index, STATE_FAILED, GetText.getString(R.string.error_get_ptoken_error));
                 return true;

@@ -26,9 +26,10 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
 import com.hippo.ehviewer.spider.SpiderDen
-import com.hippo.ehviewer.spider.SpiderInfo
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
+import com.hippo.ehviewer.spider.readCompatFromUniFile
+import com.hippo.ehviewer.spider.write
 import com.hippo.image.Image
 import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.yorozuya.ConcurrentPool
@@ -581,7 +582,7 @@ class DownloadManager : OnSpiderListener {
                     galleryInfo.rating = downloadInfo.rating
                     val downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.gid) ?: continue
                     val file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: continue
-                    val spiderInfo = SpiderInfo.readCompatFromUniFile(file) ?: continue
+                    val spiderInfo = readCompatFromUniFile(file) ?: continue
                     spiderInfo.startPage = 0
                     try {
                         spiderInfo.write(file)
