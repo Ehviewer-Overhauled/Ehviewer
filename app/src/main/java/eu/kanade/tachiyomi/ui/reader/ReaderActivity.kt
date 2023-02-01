@@ -541,9 +541,9 @@ class ReaderActivity : EhActivity() {
             dialog!!.show()
             if (dialog!!.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
                 dialog!!.getButton(AlertDialog.BUTTON_POSITIVE)
-                    .setOnClickListener { v -> this@ReaderActivity.onProvidePasswd() }
+                    .setOnClickListener { this@ReaderActivity.onProvidePasswd() }
             }
-            dialog!!.setOnCancelListener { v -> finish() }
+            dialog!!.setOnCancelListener { finish() }
         }
     }
 
