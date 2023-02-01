@@ -631,7 +631,6 @@ public class GalleryDetailParser {
             return largePreviewSet;
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            e.printStackTrace();
             throw new ParseException("Can't parse large preview", body);
         }
     }
