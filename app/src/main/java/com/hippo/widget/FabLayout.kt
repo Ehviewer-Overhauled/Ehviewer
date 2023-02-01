@@ -27,6 +27,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.ehviewer.R
+import com.hippo.util.getParcelableCompat
 import com.hippo.yorozuya.AnimationUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 
@@ -401,7 +402,7 @@ class FabLayout @JvmOverloads constructor(
 
     override fun onRestoreInstanceState(state: Parcelable) {
         if (state is Bundle) {
-            super.onRestoreInstanceState(state.getParcelable(STATE_KEY_SUPER))
+            super.onRestoreInstanceState(state.getParcelableCompat(STATE_KEY_SUPER))
             setAutoCancel(state.getBoolean(STATE_KEY_AUTO_CANCEL))
             setExpanded(state.getBoolean(STATE_KEY_EXPANDED), false)
         }

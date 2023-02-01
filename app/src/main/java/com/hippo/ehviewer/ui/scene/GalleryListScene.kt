@@ -92,6 +92,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
+import com.hippo.util.getParcelableCompat
 import com.hippo.view.BringOutTransition
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -235,7 +236,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private fun onRestore(savedInstanceState: Bundle) {
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
-        mUrlBuilder = savedInstanceState.getParcelable(KEY_LIST_URL_BUILDER)!!
+        mUrlBuilder = savedInstanceState.getParcelableCompat(KEY_LIST_URL_BUILDER)!!
         mState = savedInstanceState.getInt(KEY_STATE)
     }
 

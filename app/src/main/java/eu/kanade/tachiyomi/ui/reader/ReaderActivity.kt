@@ -75,6 +75,7 @@ import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
+import com.hippo.util.getParcelableCompat
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
@@ -230,8 +231,8 @@ class ReaderActivity : EhActivity() {
     private fun onRestore(savedInstanceState: Bundle) {
         mAction = savedInstanceState.getString(KEY_ACTION)
         mFilename = savedInstanceState.getString(KEY_FILENAME)
-        mUri = savedInstanceState.getParcelable(KEY_URI)
-        mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO)
+        mUri = savedInstanceState.getParcelableCompat(KEY_URI)
+        mGalleryInfo = savedInstanceState.getParcelableCompat(KEY_GALLERY_INFO)
         mPage = savedInstanceState.getInt(KEY_PAGE, -1)
         mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX)
         buildProvider()

@@ -72,6 +72,7 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.util.TextUrl
 import com.hippo.util.addTextToClipboard
+import com.hippo.util.getParcelableCompat
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
 import com.hippo.widget.LinkifyTextView
@@ -116,7 +117,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (args == null) {
             return
         }
-        mGalleryDetail = args.getParcelable(KEY_GALLERY_DETAIL)
+        mGalleryDetail = args.getParcelableCompat(KEY_GALLERY_DETAIL)
         mShowAllComments =
             mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
     }
@@ -126,7 +127,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mGalleryDetail = savedInstanceState.getParcelable(KEY_GALLERY_DETAIL)
+        mGalleryDetail = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
         mShowAllComments =
             mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
     }

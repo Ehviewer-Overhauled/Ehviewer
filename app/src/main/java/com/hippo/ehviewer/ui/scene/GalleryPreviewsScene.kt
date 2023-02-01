@@ -43,6 +43,7 @@ import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
+import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
@@ -71,12 +72,12 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     private fun onInit() {
         val args = arguments ?: return
-        mGalleryInfo = args.getParcelable(KEY_GALLERY_INFO)
+        mGalleryInfo = args.getParcelableCompat(KEY_GALLERY_INFO)
         mNextPage = args.getBoolean(KEY_NEXT_PAGE)
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO)
+        mGalleryInfo = savedInstanceState.getParcelableCompat(KEY_GALLERY_INFO)
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
     }
 

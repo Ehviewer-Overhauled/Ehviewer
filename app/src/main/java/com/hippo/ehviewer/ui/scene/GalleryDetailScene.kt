@@ -99,6 +99,7 @@ import com.hippo.util.AppHelper
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.util.addTextToClipboard
+import com.hippo.util.getParcelableCompat
 import com.hippo.view.ViewTransition
 import com.hippo.widget.AutoWrapLayout
 import com.hippo.widget.LoadImageView
@@ -176,7 +177,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         val action = args?.getString(KEY_ACTION) ?: return
         mAction = action
         if (ACTION_GALLERY_INFO == action) {
-            mGalleryInfo = args.getParcelable(KEY_GALLERY_INFO)
+            mGalleryInfo = args.getParcelableCompat(KEY_GALLERY_INFO)
             // Add history
             mGalleryInfo?.let { lifecycleScope.launchIO { EhDB.putHistoryInfo(it) } }
         } else if (ACTION_GID_TOKEN == action) {
@@ -282,10 +283,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private fun onRestore(savedInstanceState: Bundle) {
         mAction = savedInstanceState.getString(KEY_ACTION)
-        mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO)
+        mGalleryInfo = savedInstanceState.getParcelableCompat(KEY_GALLERY_INFO)
         mGid = savedInstanceState.getLong(KEY_GID)
         mToken = savedInstanceState.getString(KEY_TOKEN)
-        mGalleryDetail = savedInstanceState.getParcelable(KEY_GALLERY_DETAIL)
+        mGalleryDetail = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
         mRequestId = savedInstanceState.getInt(KEY_REQUEST_ID)
     }
 

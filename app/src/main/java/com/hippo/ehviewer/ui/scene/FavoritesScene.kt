@@ -58,6 +58,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
+import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ContentLayout
 import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
@@ -149,7 +150,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mUrlBuilder = savedInstanceState.getParcelable(KEY_URL_BUILDER)
+        mUrlBuilder = savedInstanceState.getParcelableCompat(KEY_URL_BUILDER)
         if (mUrlBuilder == null) {
             mUrlBuilder = FavListUrlBuilder()
         }
