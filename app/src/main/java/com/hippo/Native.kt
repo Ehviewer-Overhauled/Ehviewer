@@ -23,6 +23,7 @@ import java.nio.ByteBuffer
 object Native {
     fun initialize() {
         System.loadLibrary("ehviewer")
+        System.loadLibrary("ehviewer_kotlin_native")
     }
 
     @JvmStatic
