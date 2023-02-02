@@ -9,7 +9,7 @@ plugins {
 
 val jniLibDir = File(project.buildDir, arrayOf("generated", "jniLibs").joinToString(File.separator))
 
-val sharedLib_name_prefix = "ehviewer-kotlin-native"
+val sharedLib_name_prefix = "ehviewer_kotlin_native"
 
 kotlin {
     android()
