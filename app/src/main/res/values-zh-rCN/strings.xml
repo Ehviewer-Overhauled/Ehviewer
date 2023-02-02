@@ -480,7 +480,7 @@
     <string name="archive_original">原始档案</string>
     <string name="archive_resample">重采样档案</string>
     <string name="download_archive_failure_no_hath">下载压缩包需要 H@H 客户端</string>
-    <string name="current_funds">资金：%s GP，%d Credits</string>
+    <string name="current_funds">资金：%1$s GP，%2$d Credits</string>
     <string name="insufficient_funds">余额不足</string>
     <string name="settings_privacy">隐私</string>
     <string name="settings_privacy_secure">不允许屏幕抓取</string>

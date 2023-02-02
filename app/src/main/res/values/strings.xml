@@ -550,7 +550,7 @@
     <string name="archive_original">Original archive</string>
     <string name="archive_resample">Resample archive</string>
     <string name="download_archive_failure_no_hath">Need H@H client for archive download</string>
-    <string name="current_funds">Funds: %s GP, %d Credits</string>
+    <string name="current_funds">Funds: %1$s GP, %2$d Credits</string>
     <string name="insufficient_funds">Insufficient Funds</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_secure">Prevent screenshots</string>

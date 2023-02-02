@@ -529,7 +529,7 @@
     <string name="archive_original">原始檔案</string>
     <string name="archive_resample">重新採樣檔案</string>
     <string name="download_archive_failure_no_hath">下載壓縮檔需要 H@H 客戶端</string>
-    <string name="current_funds">資金：%s GP，%d Credits</string>
+    <string name="current_funds">資金：%1$s GP，%2$d Credits</string>
     <string name="insufficient_funds">餘額不足</string>
     <string name="settings_privacy">隱私</string>
     <string name="settings_privacy_secure">不允許螢幕擷取</string>

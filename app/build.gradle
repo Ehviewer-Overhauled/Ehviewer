@@ -35,7 +35,7 @@ android {
         targetSdkVersion 33
         versionCode 180031
         versionName "1.8.5.3"
-        resConfigs 'zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th', 'nb-rNO'
+        resourceConfigurations += ['zh', 'zh-rCN', 'zh-rHK', 'zh-rTW', 'es', 'ja', 'ko', 'fr', 'de', 'th', 'nb-rNO']
     }
 
     externalNativeBuild {
