@@ -71,8 +71,9 @@
                 android:background="@null"
                 android:gravity="left|center_vertical"
                 android:inputType="textMultiLine"
-                android:maxHeight="112dp"
+                android:maxHeight="168dp"
                 android:minHeight="56dp"
+                android:textSize="16sp"
                 android:padding="@dimen/keyline_margin"
                 android:textColor="?colorOnPrimaryContainer" />
 
