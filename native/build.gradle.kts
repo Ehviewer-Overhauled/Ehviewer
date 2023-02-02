@@ -76,4 +76,5 @@ android {
 
 repositories {
     mavenCentral()
+    google()
 }
