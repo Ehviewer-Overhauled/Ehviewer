@@ -33,7 +33,8 @@ object ArchiveParser {
         Regex("You must have a H@H client assigned to your account to use this feature\\.")
 
     fun parse(body: String): Result? {
-        val paramOr = PATTERN_HATH_FORM.find(body)?.groupValues?.get(1) ?: return null
+        val m = PATTERN_HATH_FORM.find(body) ?: return null
+        val paramOr = m.groupValues[1]
         val archiveList = ArrayList<Archive>()
         Jsoup.parse(body).select("#db>div>div").forEach { element ->
             if (element.childrenSize() > 0 && !element.attr("style").contains("color:#CCCCCC")) {
@@ -92,5 +93,5 @@ object ArchiveParser {
 
     class Funds(var fundsGP: Int, var fundsC: Int)
 
-    class Result(val paramOr: String, val archiveList: List<Archive>, var funds: Funds?)
+    class Result(val paramOr: String?, val archiveList: List<Archive>, var funds: Funds?)
 }
