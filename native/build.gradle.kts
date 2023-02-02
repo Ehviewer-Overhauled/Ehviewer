@@ -73,3 +73,7 @@ android {
     }
     namespace = "moe.tarsin.ehviewer"
 }
+
+repositories {
+    mavenCentral()
+}

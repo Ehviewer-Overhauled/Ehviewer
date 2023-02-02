@@ -189,3 +189,11 @@ configurations.all {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
 }
+
+repositories {
+    google()
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+    maven { url "https://jitpack.io" }
+    maven { url "https://androidx.dev/storage/compose-compiler/repository/" }
+}
