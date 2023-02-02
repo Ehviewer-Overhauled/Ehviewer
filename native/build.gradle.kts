@@ -68,6 +68,10 @@ android {
     compileSdk = 33
     buildToolsVersion = "33.0.1"
 
+    defaultConfig {
+        minSdk = 28
+    }
+
     sourceSets {
         getByName("debug").jniLibs.srcDirs("$jniLibDir/Debug")
         getByName("release").jniLibs.srcDirs("$jniLibDir/Release")
