@@ -474,7 +474,14 @@ public class GalleryDetailParser {
             // user
             comment.user = c3.child(0).text();
             // comment
-            comment.comment = JsoupUtils.getElementByClass(element, "c6").html();
+            Element c6 = JsoupUtils.getElementByClass(element, "c6");
+            // fix underline support
+            for (Element e : c6.children()) {
+                if ("span".equals(e.tagName()) && "text-decoration:underline;".equals(e.attr("style"))) {
+                    e.tagName("u");
+                }
+            }
+            comment.comment = c6.html();
             // filter comment
             if (!comment.uploader) {
                 EhFilter sEhFilter = EhFilter.INSTANCE;
