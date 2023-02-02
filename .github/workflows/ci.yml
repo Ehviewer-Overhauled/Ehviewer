@@ -26,6 +26,7 @@ jobs:
       - name: Setup Kotlin Compiler
         uses: fwilhe2/setup-kotlin@main
         with:
+          version: 1.8.0
           install-native: true
 
       - name: Install NDK
