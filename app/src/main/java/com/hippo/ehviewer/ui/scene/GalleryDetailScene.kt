@@ -1460,9 +1460,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 mListView!!.visibility = View.GONE
                 mErrorText!!.setText(R.string.no_archives)
             } else {
-                val nameArray = data.stream().map { archive: ArchiveParser.Archive ->
-                    archive.format { id: Int ->
-                        resources.getString(id)
+                val nameArray = data.stream().map {
+                    it.run {
+                        if (isHAtH) {
+                            val costStr =
+                                if (cost == "Free") resources.getString(R.string.archive_free) else cost
+                            "[H@H] $name [$size] [$costStr]"
+                        } else {
+                            val nameStr =
+                                resources.getString(if (res == "org") R.string.archive_original else R.string.archive_resample)
+                            val costStr =
+                                if (cost == "Free!") resources.getString(R.string.archive_free) else cost
+                            "$nameStr [$size] [$costStr]"
+                        }
                     }
                 }.toArray()
                 mProgressView!!.visibility = View.GONE
