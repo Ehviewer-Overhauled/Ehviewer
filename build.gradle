@@ -5,6 +5,14 @@ plugins {
     id 'com.google.devtools.ksp' version '1.8.0-1.0.9' apply false
 }
 
+repositories {
+    google()
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+    maven { url "https://jitpack.io" }
+    maven { url "https://androidx.dev/storage/compose-compiler/repository/" }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
