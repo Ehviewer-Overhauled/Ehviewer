@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.konan.target.KonanTarget.*
 
 plugins {
@@ -72,6 +73,10 @@ android {
         getByName("release").jniLibs.srcDirs("$jniLibDir/Release")
     }
     namespace = "moe.tarsin.ehviewer"
+}
+
+tasks.withType(KotlinNativeLink::class.java) {
+    outputs.cacheIf { false }
 }
 
 repositories {
