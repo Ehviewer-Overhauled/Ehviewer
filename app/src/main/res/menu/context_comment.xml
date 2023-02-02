@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_bold"
+        android:title="@string/format_bold"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_italic"
+        android:title="@string/format_italic"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_underline"
+        android:title="@string/format_underline"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_strikethrough"
+        android:title="@string/format_strikethrough"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_url"
+        android:title="@string/format_url"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_clear"
+        android:title="@string/format_plain"
+        app:showAsAction="ifRoom" />
+
+</menu>

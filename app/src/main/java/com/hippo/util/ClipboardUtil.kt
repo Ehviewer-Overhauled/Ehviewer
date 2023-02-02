@@ -43,7 +43,7 @@ infix fun Context.tellClipboardWithToast(text: String?) {
 }
 
 @JvmOverloads
-fun Context.addTextToClipboard(text: String?, isSensitive: Boolean, useToast: Boolean = false) {
+fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToast: Boolean = false) {
     getClipboardManager().apply {
         setPrimaryClip(ClipData.newPlainText(null, text).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive)

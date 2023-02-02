@@ -28,15 +28,9 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
-import android.text.style.URLSpan
+import android.text.style.*
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewGroup
+import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -50,7 +44,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputLayout
 import com.hippo.app.BaseDialogBuilder
+import com.hippo.app.EditTextDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.UrlOpener
@@ -68,11 +64,8 @@ import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
-import com.hippo.util.ExceptionUtils
-import com.hippo.util.ReadableTime
-import com.hippo.util.TextUrl
-import com.hippo.util.addTextToClipboard
-import com.hippo.util.getParcelableCompat
+import com.hippo.util.*
+import com.hippo.util.BBCode.toBBCode
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
 import com.hippo.widget.LinkifyTextView
@@ -186,12 +179,88 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             itemAnimator.supportsChangeAnimations = false
         }
         mSendImage!!.setOnClickListener(this)
+        mEditText!!.customSelectionActionModeCallback = object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                requireActivity().menuInflater.inflate(R.menu.context_comment, menu)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return true
+            }
+
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                item?.let {
+                    val text = mEditText!!.editableText
+                    val start = mEditText!!.selectionStart
+                    val end = mEditText!!.selectionEnd
+                    when (item.itemId) {
+                        R.id.action_bold -> text.setSpan(StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        R.id.action_italic -> text.setSpan(StyleSpan(Typeface.ITALIC), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        R.id.action_underline -> text.setSpan(UnderlineSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        R.id.action_strikethrough -> text.setSpan(StrikethroughSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        R.id.action_url -> {
+                            val oldSpans = text.getSpans(start, end, URLSpan::class.java)
+                            var oldUrl = "https://"
+                            oldSpans?.forEach {
+                                if (it is URLSpan && !TextUtils.isEmpty(it.url)) {
+                                    oldUrl = it.url
+                                }
+                            }
+                            val builder = EditTextDialogBuilder(
+                                    context, oldUrl, getString(R.string.format_url)
+                            )
+                            builder.setTitle(getString(R.string.format_url))
+                            builder.setPositiveButton(android.R.string.ok, null)
+                            val dialog = builder.show()
+                            val button: View? = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                            button?.setOnClickListener(View.OnClickListener {
+                                val url = builder.text.trim()
+                                if (TextUtils.isEmpty(url)) {
+                                    builder.setError(getString(R.string.text_is_empty))
+                                    return@OnClickListener
+                                } else {
+                                    builder.setError(null)
+                                }
+                                text.clearSpan(start, end, true)
+                                text.setSpan(URLSpan(url), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                dialog.dismiss()
+                            })
+                        }
+                        R.id.action_clear -> {
+                            text.clearSpan(start, end, false)
+                        }
+                        else -> {}
+                    }
+                    mode?.finish()
+                }
+                return true
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {
+            }
+        }
         mFab!!.setOnClickListener(this)
         addAboveSnackView(mEditPanel)
         addAboveSnackView(mFabLayout)
         mViewTransition = ViewTransition(mRecyclerView, tip)
         updateView(false)
         return view
+    }
+
+    fun Spannable.clearSpan(start: Int, end: Int, url: Boolean) {
+        val spans = this.getSpans(start, end, if (url) URLSpan::class.java else CharacterStyle::class.java)
+        spans?.forEach {
+            val spanStart = this.getSpanStart(it)
+            val spanEnd = this.getSpanEnd(it)
+            this.removeSpan(it)
+            if (spanStart < start) {
+                this.setSpan(it, spanStart, start, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            if (spanEnd > end) {
+                this.setSpan(it, end, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -325,7 +394,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         builder.setView(rv).show()
     }
 
-    private fun showCommentDialog(position: Int) {
+    private fun showCommentDialog(position: Int, text: CharSequence) {
         val context = context
         if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null || position >= mGalleryDetail!!.comments!!.comments!!.size || position < 0) {
             return
@@ -363,7 +432,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 }
                 val id = menuId[which]
                 if (id == R.id.copy) {
-                    requireActivity().addTextToClipboard(comment.comment, false)
+                    requireActivity().addTextToClipboard(text, false)
                 } else if (id == R.id.block_commenter) {
                     showFilterCommenterDialog(comment.user, position)
                 } else if (id == R.id.vote_up) {
@@ -373,7 +442,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 } else if (id == R.id.check_vote_status) {
                     showVoteStatusDialog(context, comment.voteState)
                 } else if (id == R.id.edit_comment) {
-                    prepareEditComment(comment.id)
+                    prepareEditComment(comment.id, text)
                     if (!mInAnimation && mEditPanel != null && mEditPanel!!.visibility != View.VISIBLE) {
                         showEditPanel(true)
                     }
@@ -390,7 +459,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             if (span is URLSpan) {
                 UrlOpener.openUrl(activity, span.url, true, mGalleryDetail)
             } else {
-                showCommentDialog(position)
+                showCommentDialog(position, holder.sp)
             }
         } else if (holder is MoreCommentHolder && !mRefreshingComments && mAdapter != null) {
             mRefreshingComments = true
@@ -427,8 +496,9 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
     }
 
-    private fun prepareEditComment(commentId: Long) {
+    private fun prepareEditComment(commentId: Long, text: CharSequence) {
         mCommentId = commentId
+        mEditText?.setText(text)
         if (mSendImage != null) {
             mSendImage!!.setImageDrawable(mPencilDrawable)
         }
@@ -572,7 +642,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             }
         } else if (mSendImage === v) {
             if (!mInAnimation) {
-                val comment = mEditText!!.text.toString()
+                val comment = mEditText!!.text.toBBCode()
                 if (TextUtils.isEmpty(comment)) {
                     // Comment is empty
                     return
@@ -762,13 +832,14 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         private val user: TextView = itemView.findViewById(R.id.user)
         private val time: TextView = itemView.findViewById(R.id.time)
         val comment: LinkifyTextView = itemView.findViewById(R.id.comment)
+        lateinit var sp: CharSequence
 
         private fun generateComment(
             context: Context,
             textView: ObservedTextView,
             comment: GalleryComment
         ): CharSequence {
-            val sp = Html.fromHtml(
+            sp = Html.fromHtml(
                 comment.comment,
                 Html.FROM_HTML_MODE_LEGACY,
                 URLImageGetter(textView),

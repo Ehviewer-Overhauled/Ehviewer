@@ -269,6 +269,12 @@
     <string name="check_vote_status">View vote details</string>
     <string name="click_more_comments">Click to load more comments</string>
     <string name="last_edited">Last edited: %s</string>
+    <string name="format_bold"><b>Bold</b></string>
+    <string name="format_italic"><i>Italic</i></string>
+    <string name="format_underline"><u>Underline</u></string>
+    <string name="format_strikethrough"><s>Strikethrough</s></string>
+    <string name="format_url">URL</string>
+    <string name="format_plain">Plain text</string>
     <!-- Gallery Previews -->
     <string name="gallery_previews">Gallery Previews</string>
     <string name="go_to">Go to</string>
