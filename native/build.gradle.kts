@@ -18,6 +18,8 @@ kotlin {
     val nativeConfigure: KotlinNativeTarget.() -> Unit = {
         binaries {
             sharedLib(sharedLib_name_prefix) {
+                freeCompilerArgs = mutableListOf("-Xallocator=std")
+
                 linkTask.doLast {
                     copy {
                         from(outputFile)
