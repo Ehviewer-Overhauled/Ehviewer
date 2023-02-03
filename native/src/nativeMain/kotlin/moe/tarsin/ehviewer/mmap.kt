@@ -33,5 +33,5 @@ fun unmapFd(env: CPointer<JNIEnvVar>, clazz: jclass, buffer: jobject) {
     val addr = env.getDirectBufferAddress(buffer)
     val size = env.getDirectBufferCapacity(buffer)
     val result = munmap(addr, size.tosize_t())
-    if (result != 0) Warn("mmap call with addr:${addr} size:${size} failed!, errno:${errno}")
+    if (result != 0) Warn("munmap call with addr:${addr} size:${size} failed!, errno:${errno}")
 }
