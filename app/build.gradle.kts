@@ -25,6 +25,9 @@ android {
         storePassword = "000000"
         keyAlias = "key0"
         keyPassword = "000000"
+
+        enableV3Signing = true
+        enableV4Signing = true
     }
 
     defaultConfig {
