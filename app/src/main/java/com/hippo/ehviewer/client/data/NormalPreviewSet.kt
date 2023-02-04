@@ -17,9 +17,7 @@ package com.hippo.ehviewer.client.data
 
 import com.hippo.widget.LoadImageView
 import com.hippo.yorozuya.collect.IntList
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 class NormalPreviewSet(
     private var mPositionList: IntList = IntList(),
     private var mImageKeyList: ArrayList<String> = ArrayList(),

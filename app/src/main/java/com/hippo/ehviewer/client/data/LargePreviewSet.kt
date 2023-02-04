@@ -18,9 +18,7 @@ package com.hippo.ehviewer.client.data
 import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.widget.LoadImageView
 import com.hippo.yorozuya.collect.IntList
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 class LargePreviewSet(
     private val mPositionList: IntList = IntList(),
     private val mImageUrlList: ArrayList<String> = ArrayList(),

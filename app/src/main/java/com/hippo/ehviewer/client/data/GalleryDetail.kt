@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client.data
 
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -70,6 +71,7 @@ class GalleryDetail(
     @JvmField
     var previewPages: Int = 0,
 
+    @IgnoredOnParcel
     @JvmField
     var previewSet: PreviewSet? = null,
 ) : AbstractGalleryInfo by galleryInfo, GalleryInfo

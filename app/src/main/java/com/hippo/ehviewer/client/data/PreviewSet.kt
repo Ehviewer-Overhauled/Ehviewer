@@ -15,10 +15,9 @@
  */
 package com.hippo.ehviewer.client.data
 
-import android.os.Parcelable
 import com.hippo.widget.LoadImageView
 
-abstract class PreviewSet : Parcelable {
+abstract class PreviewSet {
     abstract fun size(): Int
     abstract fun getPosition(index: Int): Int
     abstract fun getPageUrlAt(index: Int): String
