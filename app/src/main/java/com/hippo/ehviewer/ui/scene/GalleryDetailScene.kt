@@ -46,6 +46,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
@@ -515,7 +516,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     (thumb as LoadImageView).load(gi.thumb!!)
                     setTitle(EhUtils.getSuitableTitle(gi))
                     uploader.text = gi.uploader
-                    uploader.alpha = if (gi.disowned) .5f else 1f
+                    if (gi.disowned) {
+                        uploader.run {
+                            setTextColor(ColorUtils.setAlphaComponent(currentTextColor, 128))
+                        }
+                    }
                     category.text = EhUtils.getCategory(gi.category)
                     category.setTextColor(EhUtils.getCategoryColor(gi.category))
                     updateDownloadText()
@@ -571,7 +576,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             (thumb as LoadImageView).load(gd.thumb!!, true)
             setTitle(EhUtils.getSuitableTitle(gd))
             uploader.text = gd.uploader
-            uploader.alpha = if (gd.disowned) .5f else 1f
+            if (gd.disowned) {
+                uploader.run {
+                    setTextColor(ColorUtils.setAlphaComponent(currentTextColor, 128))
+                }
+            }
             category.text = EhUtils.getCategory(gd.category)
             category.setTextColor(EhUtils.getCategoryColor(gd.category))
         }
