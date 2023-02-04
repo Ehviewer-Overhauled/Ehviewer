@@ -128,7 +128,7 @@ open class LoadImageView @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun load(key: String, url: String, isLoaded: Boolean = false) {
+    fun load(url: String, isLoaded: Boolean = false) {
         if ((mRequest?.data as? String?) == url)
             return
         mFailed = false

@@ -55,7 +55,6 @@ import com.hippo.ehviewer.EhApplication.Companion.downloadManager
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.download.DownloadManager
@@ -1023,7 +1022,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             }
             val info = mList!![position]
             info.thumb?.let {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(info.gid), EhUtils.fixThumbUrl(it))
+                holder.thumb.load(EhUtils.fixThumbUrl(it))
             }
             holder.title.text = EhUtils.getSuitableTitle(info)
             holder.uploader.text = info.uploader

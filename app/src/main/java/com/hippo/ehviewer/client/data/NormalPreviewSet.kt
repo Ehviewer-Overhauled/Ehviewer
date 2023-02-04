@@ -20,7 +20,6 @@ import com.hippo.yorozuya.collect.IntList
 
 class NormalPreviewSet(
     private var mPositionList: IntList = IntList(),
-    private var mImageKeyList: ArrayList<String> = ArrayList(),
     private var mImageUrlList: ArrayList<String> = ArrayList(),
     private var mOffsetXList: IntList = IntList(),
     private var mOffsetYList: IntList = IntList(),
@@ -29,21 +28,11 @@ class NormalPreviewSet(
     private var mPageUrlList: ArrayList<String> = ArrayList()
 ) : PreviewSet() {
 
-    private fun getImageKey(imageUrl: String): String {
-        val index = imageUrl.indexOf('/')
-        return if (index >= 0) {
-            imageUrl.substring(index + 1)
-        } else {
-            imageUrl
-        }
-    }
-
     fun addItem(
         position: Int, imageUrl: String, xOffset: Int, yOffset: Int, width: Int,
         height: Int, pageUrl: String
     ) {
         mPositionList.add(position)
-        mImageKeyList.add(getImageKey(imageUrl))
         mImageUrlList.add(imageUrl)
         mOffsetXList.add(xOffset)
         mOffsetYList.add(yOffset)
@@ -67,7 +56,6 @@ class NormalPreviewSet(
     override fun getGalleryPreview(gid: Long, index: Int): GalleryPreview {
         val galleryPreview = GalleryPreview()
         galleryPreview.position = mPositionList[index]
-        galleryPreview.imageKey = mImageKeyList[index]
         galleryPreview.imageUrl = mImageUrlList[index]
         galleryPreview.pageUrl = mPageUrlList[index]
         galleryPreview.offsetX = mOffsetXList[index]
@@ -82,6 +70,6 @@ class NormalPreviewSet(
             mOffsetXList[index], mOffsetYList[index],
             mClipWidthList[index], mClipHeightList[index]
         )
-        view.load(mImageKeyList[index], mImageUrlList[index])
+        view.load(mImageUrlList[index])
     }
 }

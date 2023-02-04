@@ -62,7 +62,6 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
-import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.client.EhRequest
@@ -512,7 +511,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mGalleryInfo?.let { gi ->
             if (mAction == ACTION_GALLERY_INFO) {
                 binding.content.header.run {
-                    (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                    (thumb as LoadImageView).load(gi.thumb!!)
                     setTitle(EhUtils.getSuitableTitle(gi))
                     uploader.text = gi.uploader
                     uploader.alpha = if (gi.disowned) .5f else 1f
@@ -568,7 +567,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         _binding ?: return
         val resources = resources
         binding.content.header.run {
-            (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb!!, true)
+            (thumb as LoadImageView).load(gd.thumb!!, true)
             setTitle(EhUtils.getSuitableTitle(gd))
             uploader.text = gd.uploader
             uploader.isEnabled = !gd.disowned

@@ -13,28 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client
 
-package com.hippo.ehviewer.client;
-
-public class EhCacheKeyFactory {
-
-    public static String getThumbKey(long gid) {
-        return "preview:large:" + gid + ":" + 0; // "thumb:" + gid;
-    }
-
-    public static String getNormalPreviewKey(long gid, int index) {
-        return "preview:normal:" + gid + ":" + index;
-    }
-
-    public static String getLargePreviewKey(long gid, int index) {
-        return "preview:large:" + gid + ":" + index;
-    }
-
-    public static String getLargePreviewSetKey(long gid, int index) {
-        return "large_preview_set:" + gid + ":" + index;
-    }
-
-    public static String getImageKey(long gid, int index) {
-        return "image:" + gid + ":" + index;
+object EhCacheKeyFactory {
+    fun getImageKey(gid: Long, index: Int): String {
+        return "image:$gid:$index"
     }
 }

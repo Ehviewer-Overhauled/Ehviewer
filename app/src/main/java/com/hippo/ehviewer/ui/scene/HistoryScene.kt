@@ -38,7 +38,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.*
-import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
@@ -397,7 +396,7 @@ class HistoryScene : BaseToolbarScene() {
             val gi: GalleryInfo? = getItem(position)
             gi ?: return
             gi.thumb?.let {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), EhUtils.fixThumbUrl(it))
+                holder.thumb.load(EhUtils.fixThumbUrl(it))
             }
             holder.title.text = EhUtils.getSuitableTitle(gi)
             holder.uploader.text = gi.uploader

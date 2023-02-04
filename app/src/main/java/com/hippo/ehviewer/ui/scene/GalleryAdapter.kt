@@ -29,7 +29,6 @@ import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.EhApplication.Companion.downloadManager
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.LocalFavoriteInfo
@@ -175,7 +174,7 @@ internal abstract class GalleryAdapter(
         }
         when (mType) {
             TYPE_LIST -> {
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                holder.thumb.load(gi.thumb!!)
                 holder.title!!.text = EhUtils.getSuitableTitle(gi)
                 holder.uploader!!.text = gi.uploader
                 holder.uploader.alpha = if (gi.disowned) .5f else 1f
@@ -209,7 +208,7 @@ internal abstract class GalleryAdapter(
 
             TYPE_GRID -> {
                 (holder.thumb as TileThumb).setThumbSize(gi.thumbWidth, gi.thumbHeight)
-                holder.thumb.load(EhCacheKeyFactory.getThumbKey(gi.gid), gi.thumb!!)
+                holder.thumb.load(gi.thumb!!)
                 val category: View = holder.category
                 var drawable = category.background
                 val color = EhUtils.getCategoryColor(gi.category)
