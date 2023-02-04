@@ -3,8 +3,8 @@
   English
   </a>
   <span> | </span>
-  <strong>简体中文<strong>
-  <span> | <span>
+  <strong>简体中文</strong>
+  <span> | </span>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/blob/1.8.x.x/docs/README/zh-tw.md">
   正體中文
   </a>
@@ -66,7 +66,7 @@
 
 # 下载
 
-<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="https://github.com/Ehviewer-Overhauled/Art/blob/master/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Git it on F-Droid" src="https://github.com/Ehviewer-Overhauled/Art/blob/master/get-it-on-fdroid.svg" width="200px"/></a>
+<a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases"><img alt="Get it on GitHub" src="https://github.com/Ehviewer-Overhauled/Art/blob/master/get-it-on-github.svg" width="200px"/></a> <a href="https://github.com/Ehviewer-Overhauled/fdroid-repo"><img alt="Get it on F-Droid" src="https://github.com/Ehviewer-Overhauled/Art/blob/master/get-it-on-fdroid.svg" width="200px"/></a>
 
 # 截图
 
