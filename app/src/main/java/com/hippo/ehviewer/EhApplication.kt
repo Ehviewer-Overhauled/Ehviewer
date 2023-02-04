@@ -56,7 +56,8 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.cookies.HttpCookies
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -282,6 +283,25 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
+        private val trustManager by lazy {
+            try {
+                val trustManagerFactory = TrustManagerFactory.getInstance(
+                    TrustManagerFactory.getDefaultAlgorithm()
+                )
+                trustManagerFactory.init(null as KeyStore?)
+                val trustManagers = trustManagerFactory.trustManagers
+                check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+                    "Unexpected default trust managers:" + Arrays.toString(
+                        trustManagers
+                    )
+                }
+                trustManagers[0] as X509TrustManager
+            } catch (e: Exception) {
+                e.printStackTrace()
+                EhX509TrustManager
+            }
+        }
+
         @JvmStatic
         val okHttpClient by lazy {
             val builder = OkHttpClient.Builder()
@@ -290,24 +310,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 .proxySelector(ehProxySelector)
 
             if (Settings.getDF()) {
-                var trustManager: X509TrustManager
-                try {
-                    val trustManagerFactory = TrustManagerFactory.getInstance(
-                        TrustManagerFactory.getDefaultAlgorithm()
-                    )
-                    trustManagerFactory.init(null as KeyStore?)
-                    val trustManagers = trustManagerFactory.trustManagers
-                    check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-                        "Unexpected default trust managers:" + Arrays.toString(
-                            trustManagers
-                        )
-                    }
-                    trustManager = trustManagers[0] as X509TrustManager
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    trustManager = EhX509TrustManager
-                }
-
                 builder.sslSocketFactory(EhSSLSocketFactory, trustManager)
                 builder.proxy(Proxy.NO_PROXY)
             }
@@ -315,9 +317,15 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
 
         val ktorClient by lazy {
-            HttpClient(OkHttp) {
+            HttpClient(CIO) {
                 engine {
-                    preconfigured = okHttpClient
+                    https {
+                        serverName = "0.0.0.0".takeIf { Settings.getDF() }
+                        trustManager = EhX509TrustManager
+                    }
+                }
+                install(HttpCookies) {
+                    storage = EhCookieStore
                 }
             }
         }

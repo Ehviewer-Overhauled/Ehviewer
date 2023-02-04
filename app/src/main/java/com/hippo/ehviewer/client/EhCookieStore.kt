@@ -18,14 +18,21 @@ package com.hippo.ehviewer.client
 import com.hippo.ehviewer.EhApplication
 import com.hippo.network.CookieDatabase
 import com.hippo.network.CookieSet
+import io.ktor.client.plugins.cookies.CookiesStorage
+import io.ktor.http.Url
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.Collections
 import java.util.regex.Pattern
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
-object EhCookieStore : CookieJar {
+typealias KtorCookie = io.ktor.http.Cookie
+
+object EhCookieStore : CookieJar, CookiesStorage {
     private val db: CookieDatabase = CookieDatabase(EhApplication.application, "okhttp3-cookie.db")
     private val map: MutableMap<String, CookieSet> = db.allCookies
 
@@ -176,9 +183,19 @@ object EhCookieStore : CookieJar {
         db.clear()
     }
 
-    @Synchronized
-    fun close() {
-        db.close()
+    override suspend fun addCookie(requestUrl: Url, cookie: io.ktor.http.Cookie) {}
+
+    // This should never be closed
+    override fun close() {}
+
+    private val okhttpCookieToKtorCookieMap = hashMapOf<Cookie, KtorCookie>()
+    override suspend fun get(requestUrl: Url): List<io.ktor.http.Cookie> {
+        return loadForRequest(requestUrl.toString().toHttpUrl()).map {
+            okhttpCookieToKtorCookieMap[it] ?: KtorCookie(
+                it.name,
+                it.value
+            ).apply { okhttpCookieToKtorCookieMap[it] = this }
+        }
     }
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
