@@ -17,7 +17,6 @@
 package com.hippo.ehviewer.spider;
 
 import android.os.Process;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.IntDef;
@@ -30,40 +29,29 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
 import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.client.EhEngine;
 import com.hippo.ehviewer.client.EhRequestBuilder;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.PreviewSet;
-import com.hippo.ehviewer.client.exception.Image509Exception;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.ehviewer.client.parser.GalleryDetailParser;
 import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
-import com.hippo.ehviewer.client.parser.GalleryPageApiParser;
-import com.hippo.ehviewer.client.parser.GalleryPageParser;
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.OSUtils;
-import com.hippo.yorozuya.StringUtils;
 import com.hippo.yorozuya.thread.PriorityThread;
-import com.hippo.yorozuya.thread.PriorityThreadFactory;
 
-import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -92,52 +80,40 @@ public final class SpiderQueen implements Runnable {
             "/509s.gif"
     };
     private static final LongSparseArray<SpiderQueen> sQueenMap = new LongSparseArray<>();
+    public static String PTOKEN_FAILED_MESSAGE = GetText.getString(R.string.error_get_ptoken_error);
+    public static String ERROR_509 = GetText.getString(R.string.error_509);
+    public static String NETWORK_ERROR = GetText.getString(R.string.error_socket);
+    @NonNull
+    public final SpiderDen mSpiderDen;
+    public final AtomicReference<SpiderInfo> mSpiderInfo = new AtomicReference<>();
+    // Store page download percent
+    public final ConcurrentHashMap<Integer, Float> mPagePercentMap = new ConcurrentHashMap<>();
     @NonNull
     private final OkHttpClient mHttpClient;
     @NonNull
     private final GalleryInfo mGalleryInfo;
-    @NonNull
-    private final SpiderDen mSpiderDen;
     private final Object mQueenLock = new Object();
     private final Thread[] mDecodeThreadArray = new Thread[DECODE_THREAD_NUM];
     private final int[] mDecodeIndexArray = new int[DECODE_THREAD_NUM];
     private final Queue<Integer> mDecodeRequestQueue = new LinkedList<>();
-    private final Object mWorkerLock = new Object();
-    private final Object mPTokenLock = new Object();
-    private final AtomicReference<SpiderInfo> mSpiderInfo = new AtomicReference<>();
     private final Queue<Integer> mRequestPTokenQueue = new ConcurrentLinkedQueue<>();
     private final Object mPageStateLock = new Object();
-    // Store request page. The index may be invalid
-    private final Queue<Integer> mRequestPageQueue = new LinkedList<>();
-    // Store preload page. The index may be invalid
-    private final Queue<Integer> mRequestPageQueue2 = new LinkedList<>();
-    // Store force request page. The index may be invalid
-    private final Queue<Integer> mForceRequestPageQueue = new LinkedList<>();
     private final AtomicInteger mDownloadedPages = new AtomicInteger(0);
     private final AtomicInteger mFinishedPages = new AtomicInteger(0);
     private final Object showKeyLock = new Object();
     // Store page error
     private final ConcurrentHashMap<Integer, String> mPageErrorMap = new ConcurrentHashMap<>();
-    // Store page download percent
-    private final ConcurrentHashMap<Integer, Float> mPagePercentMap = new ConcurrentHashMap<>();
     private final List<OnSpiderListener> mSpiderListeners = new ArrayList<>();
-    private final int mWorkerMaxCount;
     private final int mPreloadNumber;
-    private final int mDownloadDelay;
-    private final AtomicReference<String> showKey = new AtomicReference<>();
+    public volatile int[] mPageStateArray;
     private int mReadReference = 0;
     private int mDownloadReference = 0;
     // It mQueenThread is null, failed or stopped
     @Nullable
     private volatile Thread mQueenThread;
-    private ThreadPoolExecutor mWorkerPoolExecutor;
-    private int mWorkerCount;
-
     private SpiderQueenWorker mWorkerScope;
-    private volatile int[] mPageStateArray;
     // For download, when it go to mPageStateArray.size(), done
     private volatile int mDownloadPage = -1;
-
     private boolean mStoped = false;
 
     private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
@@ -145,19 +121,13 @@ public final class SpiderQueen implements Runnable {
         mGalleryInfo = galleryInfo;
         mSpiderDen = new SpiderDen(mGalleryInfo);
 
-        mWorkerMaxCount = MathUtils.clamp(Settings.getMultiThreadDownload(), 1, 10);
         mPreloadNumber = MathUtils.clamp(Settings.getPreloadImage(), 0, 100);
 
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {
             mDecodeIndexArray[i] = -1;
         }
 
-        mWorkerScope = new SpiderQueenWorker();
-
-        mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
-                0, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
-                new PriorityThreadFactory(SpiderWorker.class.getSimpleName(), Process.THREAD_PRIORITY_BACKGROUND));
-        mDownloadDelay = Settings.getDownloadDelay();
+        mWorkerScope = new SpiderQueenWorker(this);
     }
 
     @UiThread
@@ -201,6 +171,25 @@ public final class SpiderQueen implements Runnable {
         return false;
     }
 
+    // Mark as suspend fun when kotlinize, need IO
+    public static int getStartPage(long gid) {
+        var queen = sQueenMap.get(gid);
+        SpiderInfo spiderInfo = null;
+
+        // Fast Path: read existing queen
+        if (queen != null) {
+            spiderInfo = queen.mSpiderInfo.get();
+        }
+
+        // Slow path, read diskcache
+        if (spiderInfo == null) {
+            spiderInfo = SpiderInfoUtilsKt.readFromCache(gid);
+        }
+
+        if (spiderInfo == null) return 0;
+        return spiderInfo.getStartPage();
+    }
+
     public void addOnSpiderListener(OnSpiderListener listener) {
         synchronized (mSpiderListeners) {
             mSpiderListeners.add(listener);
@@ -221,7 +210,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void notifyGet509(int index) {
+    public void notifyGet509(int index) {
         synchronized (mSpiderListeners) {
             for (OnSpiderListener listener : mSpiderListeners) {
                 listener.onGet509(index);
@@ -229,7 +218,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void notifyPageDownload(int index, long contentLength, long receivedSize, int bytesRead) {
+    public void notifyPageDownload(int index, long contentLength, long receivedSize, int bytesRead) {
         synchronized (mSpiderListeners) {
             for (OnSpiderListener listener : mSpiderListeners) {
                 listener.onPageDownload(index, contentLength, receivedSize, bytesRead);
@@ -307,15 +296,13 @@ public final class SpiderQueen implements Runnable {
 
         // Update download page
         boolean intoDownloadMode = false;
-        synchronized (mRequestPageQueue) {
-            if (mode == MODE_DOWNLOAD) {
-                if (mDownloadPage < 0) {
-                    mDownloadPage = 0;
-                    intoDownloadMode = true;
-                }
-            } else {
-                mDownloadPage = -1;
+        if (mode == MODE_DOWNLOAD) {
+            if (mDownloadPage < 0) {
+                mDownloadPage = 0;
+                intoDownloadMode = true;
             }
+        } else {
+            mDownloadPage = -1;
         }
 
         if (intoDownloadMode && mPageStateArray != null) {
@@ -333,8 +320,6 @@ public final class SpiderQueen implements Runnable {
                 mPageErrorMap.clear();
                 mPagePercentMap.clear();
             }
-            // Ensure download workers
-            ensureWorkers();
         }
     }
 
@@ -379,9 +364,6 @@ public final class SpiderQueen implements Runnable {
         synchronized (mDecodeRequestQueue) {
             mDecodeRequestQueue.notifyAll();
         }
-        synchronized (mWorkerLock) {
-            mWorkerLock.notifyAll();
-        }
 
         CoroutineScopeKt.cancel(mWorkerScope, null);
         mWorkerScope = null;
@@ -423,31 +405,12 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void tryToEnsureWorkers() {
-        boolean startWorkers = false;
-        synchronized (mRequestPageQueue) {
-            if (mPageStateArray != null &&
-                    (!mForceRequestPageQueue.isEmpty() ||
-                            !mRequestPageQueue.isEmpty() ||
-                            !mRequestPageQueue2.isEmpty() ||
-                            mDownloadPage >= 0 && mDownloadPage < mPageStateArray.length)) {
-                startWorkers = true;
-            }
-        }
-
-        if (startWorkers) {
-            ensureWorkers();
-        }
-    }
-
     public void cancelRequest(int index) {
         if (mQueenThread == null) {
             return;
         }
 
-        synchronized (mRequestPageQueue) {
-            mRequestPageQueue.remove(index);
-        }
+        mWorkerScope.removeRequested(index);
         synchronized (mDecodeRequestQueue) {
             mDecodeRequestQueue.remove(index);
         }
@@ -458,11 +421,8 @@ public final class SpiderQueen implements Runnable {
             return;
         }
 
-        synchronized (mRequestPageQueue) {
-            pages.removeAll(mRequestPageQueue);
-            pages.removeAll(mRequestPageQueue2);
-            pages.removeAll(mDecodeRequestQueue);
-            mRequestPageQueue2.addAll(pages);
+        for (int i : pages) {
+            mWorkerScope.launchIndexed(i);
         }
     }
 
@@ -487,32 +447,9 @@ public final class SpiderQueen implements Runnable {
             state = STATE_NONE;
         }
 
-        // Add to request
-        synchronized (mRequestPageQueue) {
-            if (state == STATE_NONE) {
-                if (force) {
-                    mForceRequestPageQueue.add(index);
-                } else {
-                    mRequestPageQueue.add(index);
-                }
-            }
-
-            // Add next some pages to request queue
-            if (addNeighbor) {
-                mRequestPageQueue2.clear();
-                int[] pageStateArray = mPageStateArray;
-                int size;
-                if (pageStateArray != null) {
-                    size = pageStateArray.length;
-                } else {
-                    size = Integer.MAX_VALUE;
-                }
-                for (int i = index + 1, n = index + 1 + mPreloadNumber; i < n && i < size; i++) {
-                    if (STATE_NONE == getPageState(i)) {
-                        mRequestPageQueue2.add(i);
-                    }
-                }
-            }
+        mWorkerScope.launchIndexed(index, force);
+        for (int i = index + 1, n = index + 1 + mPreloadNumber; i < n && i < mPageStateArray.length; i++) {
+            mWorkerScope.launchIndexed(i);
         }
 
         Object result;
@@ -539,22 +476,7 @@ public final class SpiderQueen implements Runnable {
             default -> throw new IllegalStateException("Unexpected value: " + state);
         }
 
-        tryToEnsureWorkers();
-
         return result;
-    }
-
-    private void ensureWorkers() {
-        synchronized (mWorkerLock) {
-            if (null == mWorkerPoolExecutor) {
-                Log.e(TAG, "Try to start worker after stopped");
-                return;
-            }
-
-            for (; mWorkerCount < mWorkerMaxCount; mWorkerCount++) {
-                mWorkerPoolExecutor.execute(new SpiderWorker());
-            }
-        }
     }
 
     public boolean save(int index, @NonNull UniFile file) {
@@ -582,7 +504,6 @@ public final class SpiderQueen implements Runnable {
         return dst;
     }
 
-
     @Nullable
     public String getExtension(int index) {
         int state = getPageState(index);
@@ -591,25 +512,6 @@ public final class SpiderQueen implements Runnable {
         }
 
         return mSpiderDen.getExtension(index);
-    }
-
-    // Mark as suspend fun when kotlinize, need IO
-    public static int getStartPage(long gid) {
-        var queen = sQueenMap.get(gid);
-        SpiderInfo spiderInfo = null;
-
-        // Fast Path: read existing queen
-        if (queen != null) {
-            spiderInfo = queen.mSpiderInfo.get();
-        }
-
-        // Slow path, read diskcache
-        if (spiderInfo == null) {
-            spiderInfo = SpiderInfoUtilsKt.readFromCache(gid);
-        }
-
-        if (spiderInfo == null) return 0;
-        return spiderInfo.getStartPage();
     }
 
     public int getStartPage() {
@@ -668,9 +570,7 @@ public final class SpiderQueen implements Runnable {
         for (int i = 0, n = previewSet.size(); i < n; i++) {
             GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
             if (result != null) {
-                synchronized (mPTokenLock) {
-                    spiderInfo.getPTokenMap().put(result.page, result.pToken);
-                }
+                spiderInfo.getPTokenMap().put(result.page, result.pToken);
             }
         }
     }
@@ -692,7 +592,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private String getPTokenFromMultiPageViewer(int index) {
+    public String getPTokenFromMultiPageViewer(int index) {
         SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo == null) {
             return null;
@@ -711,23 +611,17 @@ public final class SpiderQueen implements Runnable {
             ArrayList<String> list = GalleryMultiPageViewerPTokenParser.parse(body);
 
             for (int i = 0; i < list.size(); i++) {
-                synchronized (mPTokenLock) {
-                    spiderInfo.getPTokenMap().put(i, list.get(i));
-                }
+                spiderInfo.getPTokenMap().put(i, list.get(i));
             }
 
-            String pToken;
-            synchronized (mPTokenLock) {
-                pToken = spiderInfo.getPTokenMap().get(index);
-            }
-            return pToken;
+            return spiderInfo.getPTokenMap().get(index);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             return null;
         }
     }
 
-    private String getPTokenFromInternet(int index) {
+    public String getPTokenFromInternet(int index) {
         SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo == null) {
             return null;
@@ -756,11 +650,7 @@ public final class SpiderQueen implements Runnable {
             String body = response.body().string();
             readPreviews(body, previewIndex, spiderInfo);
 
-            String pToken;
-            synchronized (mPTokenLock) {
-                pToken = spiderInfo.getPTokenMap().get(index);
-            }
-            return pToken;
+            return spiderInfo.getPTokenMap().get(index);
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
             return null;
@@ -804,8 +694,6 @@ public final class SpiderQueen implements Runnable {
             return;
         }
 
-        // Check Stopped
-
         // Setup page state
         synchronized (mPageStateLock) {
             mPageStateArray = new int[spiderInfo.getPages()];
@@ -813,9 +701,6 @@ public final class SpiderQueen implements Runnable {
 
         // Notify get pages
         notifyGetPages(spiderInfo.getPages());
-
-        // Ensure worker
-        tryToEnsureWorkers();
 
         // Start decoder
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {
@@ -825,61 +710,14 @@ public final class SpiderQueen implements Runnable {
             decoderThread.start();
         }
 
-        // handle pToken request
-        while (!mStoped) {
-            Integer index = mRequestPTokenQueue.poll();
-
-            if (index == null) {
-                // No request index, wait here
-                synchronized (mQueenLock) {
-                    if (mStoped) break;
-                    try {
-                        mQueenLock.wait();
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                    if (mStoped) break;
-                }
-                continue;
-            }
-
-            // Check it in spider info
-            String pToken;
-            synchronized (mPTokenLock) {
-                pToken = spiderInfo.getPTokenMap().get(index);
-            }
-            if (pToken != null) {
-                // Get pToken from spider info, notify worker
-                synchronized (mWorkerLock) {
-                    mWorkerLock.notifyAll();
-                }
-                continue;
-            }
-
-            // Get pToken from internet
-            pToken = getPTokenFromInternet(index);
-            if (null == pToken) {
-                // Preview size may changed, so try to get pToken twice
-                pToken = getPTokenFromInternet(index);
-            }
-
-            if (null == pToken) {
-                // Multi-page viewer enabled maybe
-                pToken = getPTokenFromMultiPageViewer(index);
-            }
-
-            if (null == pToken) {
-                // If failed, set the pToken "failed"
-                synchronized (mPTokenLock) {
-                    spiderInfo.getPTokenMap().put(index, SpiderInfoUtilsKt.TOKEN_FAILED);
-                }
-            }
-
-            // Notify worker
-            synchronized (mWorkerLock) {
-                mWorkerLock.notifyAll();
+        // Wait finish
+        synchronized (mQueenLock) {
+            try {
+                mQueenLock.wait();
+            } catch (InterruptedException ignored) {
             }
         }
+
         writeSpiderInfoToLocal();
     }
 
@@ -894,11 +732,6 @@ public final class SpiderQueen implements Runnable {
         // Set mQueenThread null
         mQueenThread = null;
 
-        // Stop all workers
-        synchronized (mWorkerLock) {
-            mWorkerPoolExecutor.shutdown();
-            mWorkerPoolExecutor = null;
-        }
         notifyFinish();
 
         if (DEBUG_LOG) {
@@ -906,7 +739,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void updatePageState(int index, @State int state) {
+    public void updatePageState(int index, @State int state) {
         updatePageState(index, state, null);
     }
 
@@ -914,7 +747,7 @@ public final class SpiderQueen implements Runnable {
         return state == STATE_FINISHED || state == STATE_FAILED;
     }
 
-    private void updatePageState(int index, @State int state, String error) {
+    public void updatePageState(int index, @State int state, String error) {
         int oldState;
         synchronized (mPageStateLock) {
             oldState = mPageStateArray[index];
@@ -964,7 +797,6 @@ public final class SpiderQueen implements Runnable {
     @Retention(RetentionPolicy.SOURCE)
     public @interface State {
     }
-
     public interface OnSpiderListener {
 
         void onGetPages(int pages);
@@ -988,403 +820,6 @@ public final class SpiderQueen implements Runnable {
         void onGetImageSuccess(int index, Image image);
 
         void onGetImageFailure(int index, String error);
-    }
-
-    private class SpiderWorker implements Runnable {
-
-        private final long mGid;
-
-        public SpiderWorker() {
-            mGid = mGalleryInfo.getGid();
-        }
-
-        private String getPageUrl(long gid, int index, String pToken,
-                                  String oldPageUrl, String skipHathKey) {
-            String pageUrl = oldPageUrl != null ? oldPageUrl : EhUrl.getPageUrl(gid, index, pToken);
-            // Add skipHathKey
-            if (skipHathKey != null) {
-                if (pageUrl.contains("?")) {
-                    pageUrl += "&nl=" + skipHathKey;
-                } else {
-                    pageUrl += "?nl=" + skipHathKey;
-                }
-            }
-            return pageUrl;
-        }
-
-        private GalleryPageParser.Result fetchPageResultFromHtml(int index, String pageUrl) throws Throwable {
-            GalleryPageParser.Result result = EhEngine.getGalleryPage(pageUrl, mGalleryInfo.getGid(), mGalleryInfo.getToken());
-            if (StringUtils.endsWith(result.imageUrl, URL_509_SUFFIX_ARRAY)) {
-                // Get 509
-                // Notify listeners
-                notifyGet509(index);
-                throw new Image509Exception();
-            }
-
-            return result;
-        }
-
-        private GalleryPageApiParser.Result fetchPageResultFromApi(long gid, int index, String pToken, String showKey, String previousPToken) throws Throwable {
-            GalleryPageApiParser.Result result = EhEngine.getGalleryPageApi(gid, index, pToken, showKey, previousPToken);
-            if (StringUtils.endsWith(result.imageUrl, URL_509_SUFFIX_ARRAY)) {
-                // Get 509
-                // Notify listeners
-                notifyGet509(index);
-                throw new Image509Exception();
-            }
-
-            return result;
-        }
-
-        // false for stop
-        private boolean downloadImage(long gid, int index, String pToken, String previousPToken) {
-            String skipHathKey = null;
-            List<String> skipHathKeys = new ArrayList<>(5);
-            String originImageUrl = null;
-            String pageUrl = null;
-            String error = null;
-            boolean forceHtml = false;
-            boolean leakSkipHathKey = false;
-
-            for (int i = 0; i < 2; i++) {
-                String imageUrl = null;
-                String localShowKey;
-
-                // Check show key
-                synchronized (showKeyLock) {
-                    localShowKey = showKey.get();
-                    if (localShowKey == null || forceHtml) {
-                        if (leakSkipHathKey) {
-                            break;
-                        }
-
-                        // Try to get show key
-                        pageUrl = getPageUrl(gid, index, pToken, pageUrl, skipHathKey);
-                        try {
-                            GalleryPageParser.Result result = fetchPageResultFromHtml(index, pageUrl);
-                            imageUrl = result.imageUrl;
-                            skipHathKey = result.skipHathKey;
-                            originImageUrl = result.originImageUrl;
-                            localShowKey = result.showKey;
-
-                            if (!TextUtils.isEmpty(skipHathKey)) {
-                                if (skipHathKeys.contains(skipHathKey)) {
-                                    // Duplicate skip hath key
-                                    leakSkipHathKey = true;
-                                } else {
-                                    skipHathKeys.add(skipHathKey);
-                                }
-                            } else {
-                                leakSkipHathKey = true;
-                            }
-
-                            showKey.lazySet(result.showKey);
-                        } catch (Image509Exception e) {
-                            error = GetText.getString(R.string.error_509);
-                            break;
-                        } catch (Throwable e) {
-                            ExceptionUtils.throwIfFatal(e);
-                            error = ExceptionUtils.getReadableString(e);
-                            break;
-                        }
-
-                        // Check Stopped
-                        if (mStoped) {
-                            error = "Interrupted";
-                            break;
-                        }
-                    }
-                }
-
-                if (imageUrl == null) {
-                    if (localShowKey == null) {
-                        error = "ShowKey error";
-                        break;
-                    }
-
-                    try {
-                        GalleryPageApiParser.Result result = fetchPageResultFromApi(gid, index, pToken, localShowKey, previousPToken);
-                        imageUrl = result.imageUrl;
-                        skipHathKey = result.skipHathKey;
-                        originImageUrl = result.originImageUrl;
-                    } catch (Image509Exception e) {
-                        error = GetText.getString(R.string.error_509);
-                        break;
-                    } catch (Throwable e) {
-                        if (e instanceof ParseException && "Key mismatch".equals(e.getMessage())) {
-                            // Show key is wrong, enter a new loop to get the new show key
-                            showKey.compareAndSet(localShowKey, null);
-                            continue;
-                        } else {
-                            ExceptionUtils.throwIfFatal(e);
-                            error = ExceptionUtils.getReadableString(e);
-                            break;
-                        }
-                    }
-
-                    // Check Stopped
-                    if (mStoped) {
-                        error = "Interrupted";
-                        break;
-                    }
-                }
-
-                String targetImageUrl;
-                String referer;
-                if (Settings.getDownloadOriginImage() && !TextUtils.isEmpty(originImageUrl)) {
-                    targetImageUrl = originImageUrl;
-                    referer = EhUrl.getPageUrl(gid, index, pToken);
-                } else {
-                    targetImageUrl = imageUrl;
-                    referer = null;
-                }
-                if (targetImageUrl == null) {
-                    error = "TargetImageUrl error";
-                    break;
-                }
-                if (DEBUG_LOG) {
-                    Log.d(TAG, targetImageUrl);
-                }
-
-                // Download image
-                try {
-                    if (DEBUG_LOG) {
-                        Log.d(TAG, "Start download image " + index);
-                    }
-
-                    var success = mSpiderDen.makeHttpCallAndSaveImage(index, targetImageUrl, referer, (contentLength, receivedSize, bytesRead) -> {
-                        if (mStoped) throw new CancellationException();
-                        mPagePercentMap.put(index, (float) receivedSize / contentLength);
-                        notifyPageDownload(index, contentLength, receivedSize, bytesRead);
-                        return null;
-                    });
-
-                    // Check Stopped
-                    if (mStoped) {
-                        error = "Interrupted";
-                        break;
-                    }
-
-                    if (!success) {
-                        Log.e(TAG, "Can't download all of image data");
-                        error = "Incomplete";
-                        forceHtml = true;
-                        continue;
-                    }
-
-                    if (mSpiderDen.checkPlainText(index)) {
-                        error = GetText.getString(R.string.error_reading_failed);
-                        forceHtml = true;
-                        continue;
-                    }
-
-                    // Check Stopped
-                    if (mStoped) {
-                        error = "Interrupted";
-                        break;
-                    }
-
-                    if (DEBUG_LOG) {
-                        Log.d(TAG, "Download image succeed " + index);
-                    }
-
-                    // Download finished
-                    updatePageState(index, STATE_FINISHED);
-                    try {
-                        Thread.sleep(mDownloadDelay);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    error = GetText.getString(R.string.error_socket);
-                    forceHtml = true;
-                } finally {
-                    if (DEBUG_LOG) {
-                        Log.d(TAG, "End download image " + index);
-                    }
-                }
-            }
-
-            // Remove download failed image
-            mSpiderDen.remove(index);
-
-            updatePageState(index, STATE_FAILED, error);
-            return !mStoped;
-        }
-
-        // false for stop
-        private boolean runInternal() {
-            SpiderInfo spiderInfo = mSpiderInfo.get();
-            if (spiderInfo == null) {
-                return false;
-            }
-
-            int size = mPageStateArray.length;
-
-            // Get request index
-            int index;
-            // From force request
-            boolean force = false;
-            synchronized (mRequestPageQueue) {
-                if (!mForceRequestPageQueue.isEmpty()) {
-                    index = mForceRequestPageQueue.remove();
-                    force = true;
-                } else if (!mRequestPageQueue.isEmpty()) {
-                    index = mRequestPageQueue.remove();
-                } else if (!mRequestPageQueue2.isEmpty()) {
-                    index = mRequestPageQueue2.remove();
-                } else if (mDownloadPage >= 0 && mDownloadPage < size) {
-                    index = mDownloadPage;
-                    mDownloadPage++;
-                } else {
-                    // No index any more, stop
-                    return false;
-                }
-
-                // Check out of range
-                if (index < 0 || index >= size) {
-                    // Invalid index
-                    return true;
-                }
-            }
-
-            synchronized (mPageStateLock) {
-                // Check the page state
-                int state = mPageStateArray[index];
-                if (state == STATE_DOWNLOADING || (!force && (state == STATE_FINISHED || state == STATE_FAILED))) {
-                    return true;
-                }
-
-                // Set state downloading
-                updatePageState(index, STATE_DOWNLOADING);
-            }
-
-            // Check exist for not force request
-            if (!force && mSpiderDen.contain(index)) {
-                updatePageState(index, STATE_FINISHED);
-                return true;
-            }
-
-            // Clear TOKEN_FAILED for force request
-            if (force) {
-                synchronized (mPTokenLock) {
-                    String pToken = spiderInfo.getPTokenMap().get(index);
-                    if (SpiderInfoUtilsKt.TOKEN_FAILED.equals(pToken)) {
-                        spiderInfo.getPTokenMap().remove(index);
-                    }
-                }
-            }
-
-            String pToken = null;
-            // Get token
-            while (!mStoped) {
-                synchronized (mPTokenLock) {
-                    pToken = spiderInfo.getPTokenMap().get(index);
-                }
-                if (pToken == null) {
-                    mRequestPTokenQueue.add(index);
-                    // Notify Queen
-                    synchronized (mQueenLock) {
-                        mQueenLock.notify();
-                    }
-                    // Wait
-                    synchronized (mWorkerLock) {
-                        if (mStoped) break;
-                        try {
-                            mWorkerLock.wait();
-                        } catch (InterruptedException e) {
-                            // Interrupted
-                            if (DEBUG_LOG) {
-                                Log.d(TAG, Thread.currentThread().getName() + " Interrupted");
-                            }
-                            break;
-                        }
-                        if (mStoped) break;
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            if (pToken == null) {
-                // Interrupted
-                // Get token failed
-                updatePageState(index, STATE_FAILED, "Interrupted");
-                return false;
-            }
-
-            String previousPToken = null;
-            int previousIndex = index - 1;
-            // Get token
-            while (previousIndex >= 0 && !mStoped) {
-                synchronized (mPTokenLock) {
-                    previousPToken = spiderInfo.getPTokenMap().get(previousIndex);
-                }
-                if (previousPToken == null) {
-                    mRequestPTokenQueue.add(previousIndex);
-                    // Notify Queen
-                    synchronized (mQueenLock) {
-                        mQueenLock.notify();
-                    }
-                    // Wait
-                    synchronized (mWorkerLock) {
-                        if (mStoped) break;
-                        try {
-                            mWorkerLock.wait();
-                        } catch (InterruptedException e) {
-                            // Interrupted
-                            if (DEBUG_LOG) {
-                                Log.d(TAG, Thread.currentThread().getName() + " Interrupted");
-                            }
-                            break;
-                        }
-                        if (mStoped) break;
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            if (SpiderInfoUtilsKt.TOKEN_FAILED.equals(pToken)) {
-                // Get token failed
-                updatePageState(index, STATE_FAILED, GetText.getString(R.string.error_get_ptoken_error));
-                return true;
-            }
-
-            // Get image url
-            return downloadImage(mGid, index, pToken, previousPToken);
-        }
-
-        @Override
-        @SuppressWarnings("StatementWithEmptyBody")
-        public void run() {
-            if (DEBUG_LOG) {
-                Log.i(TAG, Thread.currentThread().getName() + ": start");
-            }
-
-            while (mSpiderDen.isReady() && !mStoped && runInternal()) ;
-
-            boolean finish;
-            // Clear in spider worker array
-            synchronized (mWorkerLock) {
-                mWorkerCount--;
-                if (mWorkerCount < 0) {
-                    Log.e(TAG, "WTF, mWorkerCount < 0, not thread safe or something wrong");
-                    mWorkerCount = 0;
-                }
-                finish = mWorkerCount == 0;
-            }
-
-            if (finish) {
-                notifyFinish();
-            }
-
-            if (DEBUG_LOG) {
-                Log.i(TAG, Thread.currentThread().getName() + ": end");
-            }
-        }
     }
 
     private class SpiderDecoder implements Runnable {

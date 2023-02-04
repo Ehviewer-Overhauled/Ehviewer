@@ -40,9 +40,6 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.contentLength
 import io.ktor.http.contentType
 import io.ktor.utils.io.jvm.nio.copyTo
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -139,7 +136,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return false
     }
 
-    fun contain(index: Int): Boolean {
+    operator fun contains(index: Int): Boolean {
         return when (mMode) {
             SpiderQueen.MODE_READ -> {
                 containInCache(index) || containInDownloadDir(index)
@@ -187,20 +184,22 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     @Throws(IOException::class)
-    fun makeHttpCallAndSaveImage(index: Int, url: String, referer: String?, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
-        return runBlocking {
-            client.prepareGet(url) {
-                var state: Long = 0
-                referer(referer)
-                onDownload { bytesSentTotal, contentLength ->
-                    runCatching { notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt()) }
-                        .onFailure { currentCoroutineContext().cancel() }
-                    state = bytesSentTotal
-                }
-            }.execute {
-                if (it.status.value >= 400) return@execute false
-                saveFromHttpResponse(index, it)
+    suspend fun makeHttpCallAndSaveImage(
+        index: Int,
+        url: String,
+        referer: String?,
+        notifyProgress: (Long, Long, Int) -> Unit
+    ): Boolean {
+        return client.prepareGet(url) {
+            var state: Long = 0
+            referer(referer)
+            onDownload { bytesSentTotal, contentLength ->
+                notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt())
+                state = bytesSentTotal
             }
+        }.execute {
+            if (it.status.value >= 400) return@execute false
+            saveFromHttpResponse(index, it)
         }
     }
 
