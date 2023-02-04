@@ -80,22 +80,6 @@ object EhUtils {
         return CATEGORY_VALUES.getOrDefault(type, CATEGORY_VALUES[UNKNOWN])!![0]
     }
 
-    fun getCategoryColorNullable(category: Int): Int? {
-        return when (category) {
-            EhConfig.DOUJINSHI -> BG_COLOR_DOUJINSHI
-            EhConfig.MANGA -> BG_COLOR_MANGA
-            EhConfig.ARTIST_CG -> BG_COLOR_ARTIST_CG
-            EhConfig.GAME_CG -> BG_COLOR_GAME_CG
-            EhConfig.WESTERN -> BG_COLOR_WESTERN
-            EhConfig.NON_H -> BG_COLOR_NON_H
-            EhConfig.IMAGE_SET -> BG_COLOR_IMAGE_SET
-            EhConfig.COSPLAY -> BG_COLOR_COSPLAY
-            EhConfig.ASIAN_PORN -> BG_COLOR_ASIAN_PORN
-            EhConfig.MISC -> BG_COLOR_MISC
-            else -> null
-        }?.toInt()
-    }
-
     fun getCategoryColor(category: Int): Int {
         return when (category) {
             EhConfig.DOUJINSHI -> BG_COLOR_DOUJINSHI

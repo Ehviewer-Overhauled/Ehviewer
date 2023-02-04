@@ -573,7 +573,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             uploader.text = gd.uploader
             uploader.alpha = if (gd.disowned) .5f else 1f
             category.text = EhUtils.getCategory(gd.category)
-            EhUtils.getCategoryColorNullable(gd.category)?.let { category.setTextColor(it) }
+            category.setTextColor(EhUtils.getCategoryColor(gd.category))
         }
         updateDownloadText()
         binding.content.header.run {
