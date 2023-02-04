@@ -41,6 +41,7 @@ import io.ktor.http.contentLength
 import io.ktor.http.contentType
 import io.ktor.utils.io.jvm.nio.copyTo
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
@@ -193,7 +194,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 referer(referer)
                 onDownload { bytesSentTotal, contentLength ->
                     runCatching { notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt()) }
-                        .onFailure { cancel() }
+                        .onFailure { currentCoroutineContext().cancel() }
                     state = bytesSentTotal
                 }
             }.execute {
