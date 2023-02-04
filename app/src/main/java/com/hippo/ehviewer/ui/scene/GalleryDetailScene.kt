@@ -263,10 +263,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             viewLifecycleOwner.lifecycleScope.launchIO {
                 runCatching {
                     val startPage = SpiderQueen.getStartPage(it.gid)
-                    if (startPage != 0) {
-                        withUIContext {
-                            binding.content.header.read.text =
-                                getString(R.string.read_from, startPage + 1)
+                    withUIContext {
+                        binding.content.header.read.text = if (startPage == 0) {
+                            getString(R.string.read)
+                        } else {
+                            getString(R.string.read_from, startPage + 1)
                         }
                     }
                 }.onFailure {
@@ -783,7 +784,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
-    fun navigateToPreview(nextPage: Boolean = false) {
+    private fun navigateToPreview(nextPage: Boolean = false) {
         mGalleryDetail?.let {
             val args = Bundle()
             args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, it)
@@ -1630,7 +1631,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     Environment.DIRECTORY_DOWNLOADS,
                     FileUtils.sanitizeFilename("$name.torrent")
                 )
-                r.allowScanningByMediaScanner()
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 r.addRequestHeader("Cookie", ehCookieStore.getCookieHeader(url.toHttpUrl()))
                 val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
