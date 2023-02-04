@@ -283,13 +283,6 @@ data class ListUrlBuilder(
                 if (this.category != EhUtils.NONE) {
                     ub.addQuery("f_cats", category.inv() and EhConfig.ALL_CATEGORY)
                 }
-                // Search key
-                mKeyword?.run {
-                    val keyword = trim { it <= ' ' }
-                    if (keyword.isNotEmpty()) {
-                        ub.addQuery("f_search", encodeUTF8(this))
-                    }
-                }
                 mSHash?.let {
                     ub.addQuery("f_shash", it)
                 }
@@ -301,6 +294,19 @@ data class ListUrlBuilder(
                 }
                 mNext?.let {
                     ub.addQuery("next", it)
+                }
+                // Search key 
+                // the settings of ub:UrlBuilder may be overwritten by following Advance search
+                StringUtils.split(mKeyword, '|')?.forEachIndexed { idx, keyword ->
+                    val keyword = keyword.trim { it <= ' ' }
+                    when (idx) {
+                        0 -> keyword.takeIf { it.isNotEmpty() }?.let { ub.addQuery("f_search", encodeUTF8(it)) }
+                        else -> keyword.indexOf(':').takeIf { it >= 0 }?.run {
+                            val key = keyword.substring(0, this).trim { it <= ' ' }
+                            val value = keyword.substring(this + 1).trim { it <= ' ' }
+                            ub.addQuery(key, encodeUTF8(value))
+                        }
+                    }
                 }
                 // Advance search
                 if (advanceSearch != -1) {
