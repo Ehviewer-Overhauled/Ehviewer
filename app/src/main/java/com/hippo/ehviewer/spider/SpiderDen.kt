@@ -15,16 +15,17 @@
  */
 package com.hippo.ehviewer.spider
 
-import android.webkit.MimeTypeMap
 import coil.disk.DiskCache
 import com.hippo.Native.mapFd
 import com.hippo.Native.unmapDirectByteBuffer
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.image.Image.ByteBufferSource
 import com.hippo.unifile.RawFile
@@ -32,15 +33,26 @@ import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.Utilities
-import okhttp3.ResponseBody
+import io.ktor.client.plugins.onDownload
+import io.ktor.client.request.prepareGet
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.contentLength
+import io.ktor.http.contentType
+import io.ktor.utils.io.jvm.nio.copyTo
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.util.Locale
 import kotlin.io.path.readText
+
+private val client = EhApplication.ktorClient
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -173,36 +185,45 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return dir.createFile(generateImageFilename(index, ext))
     }
 
-    // TODO: Support cancellation after spiderqueen coroutinize
-    fun saveFromBufferedSource(index: Int, body: ResponseBody, notifyProgress: (Long, Long, Int) -> Unit): Long {
-        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(body.contentType().toString()) ?: "jpg"
-
-        fun doSave(outChannel: FileChannel): Long {
-            var receivedSize: Long = 0
-            body.source().use { source ->
-                while (true) {
-                    val bytesRead = outChannel.transferFrom(source, receivedSize, TRANSFER_BLOCK)
-                    receivedSize += bytesRead
-                    notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
-                    if (bytesRead.toInt() == 0) break
+    @Throws(IOException::class)
+    fun makeHttpCallAndSaveImage(index: Int, url: String, referer: String?, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
+        return runBlocking {
+            client.prepareGet(url) {
+                var state: Long = 0
+                referer(referer)
+                onDownload { bytesSentTotal, contentLength ->
+                    runCatching { notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt()) }
+                        .onFailure { cancel() }
+                    state = bytesSentTotal
                 }
+            }.execute {
+                if (it.status.value >= 400) return@execute false
+                saveFromHttpResponse(index, it)
             }
-            return receivedSize
+        }
+    }
+
+    private suspend fun saveFromHttpResponse(index: Int, body: HttpResponse): Boolean {
+        val extension = body.contentType()?.contentSubtype ?: "jpg"
+        val length = body.contentLength() ?: return false
+
+        suspend fun doSave(outChannel: FileChannel): Long {
+            return body.bodyAsChannel().copyTo(outChannel)
         }
 
         findDownloadFileForIndex(index, extension)?.runCatching {
             openOutputStream().use { outputStream ->
-                (outputStream as FileOutputStream).channel.use { return doSave(it) }
+                (outputStream as FileOutputStream).channel.use { return doSave(it) == length }
             }
         }?.onFailure {
             it.printStackTrace()
-            return -1
+            return false
         }
 
         // Read Mode, allow save to cache
         if (mMode == SpiderQueen.MODE_READ) {
             val key = EhCacheKeyFactory.getImageKey(mGid, index)
-            val editor = sCache.edit(key) ?: return -1
+            val editor = sCache.edit(key) ?: return false
             var received: Long = 0
             runCatching {
                 editor.metadata.toFile().writeText(extension)
@@ -212,14 +233,14 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             }.onFailure {
                 editor.abort()
                 it.printStackTrace()
-                return -1
+                return false
             }.onSuccess {
                 editor.commit()
-                return received
+                return received == length
             }
         }
 
-        return -1
+        return false
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {

@@ -68,7 +68,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -1039,7 +1038,7 @@ public final class SpiderQueen implements Runnable {
             boolean forceHtml = false;
             boolean leakSkipHathKey = false;
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 2; i++) {
                 String imageUrl = null;
                 String localShowKey;
 
@@ -1145,44 +1144,24 @@ public final class SpiderQueen implements Runnable {
                         Log.d(TAG, "Start download image " + index);
                     }
 
-                    Call call = mHttpClient.newCall(new EhRequestBuilder(targetImageUrl, referer).build());
-                    Response response = call.execute();
-
-                    if (response.code() >= 400) {
-                        // Maybe 404
-                        response.close();
-                        error = "Bad code: " + response.code();
-                        forceHtml = true;
-                        continue;
-                    }
-
-                    var body = response.body();
-                    var received = mSpiderDen.saveFromBufferedSource(index, body , (contentLength, receivedSize, bytesRead) -> {
+                    var success = mSpiderDen.makeHttpCallAndSaveImage(index, targetImageUrl, referer, (contentLength, receivedSize, bytesRead) -> {
                         if (mStoped) throw new CancellationException();
                         mPagePercentMap.put(index, (float) receivedSize / contentLength);
                         notifyPageDownload(index, contentLength, receivedSize, bytesRead);
                         return null;
                     });
-                    var contentLength = body.contentLength();
-                    body.close();
-                    response.close();
 
-                    if (received == -1) {
-                        error = GetText.getString(R.string.error_write_failed);
-                        response.close();
+                    // Check Stopped
+                    if (mStoped) {
+                        error = "Interrupted";
                         break;
                     }
 
-                    // check download size
-                    if (contentLength >= 0) {
-                        if (received < contentLength) {
-                            Log.e(TAG, "Can't download all of image data");
-                            error = "Incomplete";
-                            forceHtml = true;
-                            continue;
-                        } else if (received > contentLength) {
-                            Log.w(TAG, "Received data is more than contentLength");
-                        }
+                    if (!success) {
+                        Log.e(TAG, "Can't download all of image data");
+                        error = "Incomplete";
+                        forceHtml = true;
+                        continue;
                     }
 
                     if (mSpiderDen.checkPlainText(index)) {
