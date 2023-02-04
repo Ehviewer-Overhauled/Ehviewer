@@ -68,6 +68,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
+import kotlinx.coroutines.CoroutineScopeKt;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -131,6 +132,8 @@ public final class SpiderQueen implements Runnable {
     private volatile Thread mQueenThread;
     private ThreadPoolExecutor mWorkerPoolExecutor;
     private int mWorkerCount;
+
+    private SpiderQueenWorker mWorkerScope;
     private volatile int[] mPageStateArray;
     // For download, when it go to mPageStateArray.size(), done
     private volatile int mDownloadPage = -1;
@@ -148,6 +151,8 @@ public final class SpiderQueen implements Runnable {
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {
             mDecodeIndexArray[i] = -1;
         }
+
+        mWorkerScope = new SpiderQueenWorker();
 
         mWorkerPoolExecutor = new ThreadPoolExecutor(mWorkerMaxCount, mWorkerMaxCount,
                 0, TimeUnit.SECONDS, new LinkedBlockingDeque<>(),
@@ -377,6 +382,9 @@ public final class SpiderQueen implements Runnable {
         synchronized (mWorkerLock) {
             mWorkerLock.notifyAll();
         }
+
+        CoroutineScopeKt.cancel(mWorkerScope, null);
+        mWorkerScope = null;
     }
 
     public int size() {
