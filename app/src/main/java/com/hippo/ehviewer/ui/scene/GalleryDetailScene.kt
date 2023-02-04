@@ -571,7 +571,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             (thumb as LoadImageView).load(EhCacheKeyFactory.getThumbKey(gd.gid), gd.thumb!!, true)
             setTitle(EhUtils.getSuitableTitle(gd))
             uploader.text = gd.uploader
-            uploader.alpha = if (gd.disowned) .5f else 1f
+            uploader.isEnabled = !gd.disowned
             category.text = EhUtils.getCategory(gd.category)
             EhUtils.getCategoryColorNullable(gd.category)?.let { category.setTextColor(it) }
         }
