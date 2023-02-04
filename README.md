@@ -85,6 +85,7 @@ Here is the libraries
 - [material-design-icons](https://github.com/google/material-design-icons)
 - [jsoup](https://github.com/jhy/jsoup)
 - [okhttp](https://github.com/square/okhttp)
+- [Ktor](https://ktor.io/)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [libarchive](http://www.libarchive.org/)
 - [XZ Utils](https://tukaani.org/xz/)
