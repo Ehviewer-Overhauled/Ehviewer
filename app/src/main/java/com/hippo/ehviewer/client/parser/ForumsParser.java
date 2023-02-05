@@ -17,7 +17,7 @@
 package com.hippo.ehviewer.client.parser;
 
 import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.exception.ParseException;
+import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.util.ExceptionUtils;
 
 import org.jsoup.Jsoup;
@@ -26,7 +26,7 @@ import org.jsoup.nodes.Element;
 
 public class ForumsParser {
 
-    public static String parse(String body) throws ParseException {
+    public static String parse(String body) throws EhException {
         try {
             Document d = Jsoup.parse(body, EhUrl.URL_FORUMS);
             Element userlinks = d.getElementById("userlinks");
@@ -34,7 +34,7 @@ public class ForumsParser {
             return child.attr("href");
         } catch (Throwable e) {
             ExceptionUtils.throwIfFatal(e);
-            throw new ParseException("Parse forums error", body);
+            throw new EhException("Not logged in");
         }
     }
 }
