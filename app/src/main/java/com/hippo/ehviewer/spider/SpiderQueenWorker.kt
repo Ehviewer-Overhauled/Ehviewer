@@ -42,198 +42,221 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO.limitedParallelism(maxParallelismSize) + SupervisorJob()
 
-    fun removeRequested(index: Int) {
-        mJobMap[index]?.cancel()
+    fun cancel(index: Int) {
+        synchronized(mJobMap) {
+            mJobMap.remove(index)?.cancel()
+        }
+    }
+
+    fun updateRAList(list: List<Int>) {
+        synchronized(mJobMap) {
+            sequence {
+                mJobMap.forEach { (i, job) ->
+                    if (i !in list) {
+                        job.cancel()
+                    }
+                    if (!job.isActive) yield(i)
+                }
+            }.toSet().forEach { mJobMap.remove(it) }
+            list.forEach {
+                if (mJobMap[it]?.isActive != true)
+                    launch(it)
+            }
+        }
     }
 
     @JvmOverloads
-    @Synchronized
-    fun launchIndexed(index: Int, force: Boolean = false) {
+    fun launch(index: Int, force: Boolean = false) {
         check(index in 0 until size)
         val state = queen.mPageStateArray[index]
-        val currentJob = mJobMap[index]
         if (!force && state == STATE_FINISHED) return
-        if (force) currentJob?.cancel()
-        if (currentJob?.isActive != true) {
-            mJobMap[index] = launch {
-                fun getPToken(index: Int): String? {
-                    if (index !in 0 until size) return null
-                    return spiderInfo.pTokenMap[index].takeIf { it != TOKEN_FAILED }
-                        ?: queen.getPTokenFromInternet(index)
-                        ?: queen.getPTokenFromInternet(index)
-                        ?: queen.getPTokenFromMultiPageViewer(index)
-                }
-                queen.updatePageState(index, SpiderQueen.STATE_DOWNLOADING)
-                if (!force && index in spiderDen) {
-                    queen.updatePageState(index, STATE_FINISHED)
-                    return@launch
-                }
-                if (force) {
-                    synchronized(pTokenLock) {
-                        val pToken = spiderInfo.pTokenMap[index]
-                        if (pToken == TOKEN_FAILED) spiderInfo.pTokenMap.remove(index)
-                    }
-                }
-                var pToken: String?
-                var previousPToken: String?
 
-                currentCoroutineContext().ensureActive()
-                synchronized(pTokenLock) {
-                    pToken = getPToken(index)
-                    if (pToken == null) {
-                        spiderInfo.pTokenMap[index] = TOKEN_FAILED
-                        queen.updatePageState(index, STATE_FAILED, PTOKEN_FAILED_MESSAGE)
-                        return@launch
-                    }
-                    previousPToken = getPToken(index - 1)
-                }
-
-                var skipHathKey: String? = null
-                val skipHathKeys = mutableListOf<String>()
-                var originImageUrl: String? = null
-                val pageUrl: String? = null
-                var error: String? = null
-                var forceHtml = false
-                var leakSkipHathKey = false
-                repeat(3) {
-                    var imageUrl: String? = null
-                    var localShowKey: String?
-
-                    currentCoroutineContext().ensureActive()
-                    synchronized(showKeyLock) {
-                        localShowKey = showKey
-                        if (localShowKey == null || forceHtml) {
-                            if (leakSkipHathKey) return@repeat
-                            val pageUrl1 =
-                                getPageUrl(spiderInfo.gid, index, pToken!!, pageUrl, skipHathKey)
-                            runCatching {
-                                fetchPageResultFromHtml(index, pageUrl1)
-                            }.onSuccess {
-                                imageUrl = it.imageUrl
-                                skipHathKey = it.skipHathKey
-                                originImageUrl = it.originImageUrl
-                                localShowKey = it.showKey
-
-                                if (!skipHathKey.isNullOrBlank()) {
-                                    if (skipHathKeys.contains(skipHathKey)) {
-                                        // Duplicate skip hath key
-                                        leakSkipHathKey = true
-                                    } else {
-                                        skipHathKeys.add(skipHathKey!!)
-                                    }
-                                } else {
-                                    leakSkipHathKey = true
-                                }
-
-                                showKey = it.showKey
-                            }.onFailure {
-                                if (it is Image509Exception) {
-                                    error = ERROR_509
-                                    return@repeat
-                                }
-                                if (it is ParseException && "Key mismatch" == it.message) {
-                                    // Show key is wrong, enter a new loop to get the new show key
-                                    if (showKey == localShowKey) showKey = null
-                                    return@repeat
-                                } else {
-                                    error = ExceptionUtils.getReadableString(it)
-                                    return@repeat
-                                }
-                            }
-                        }
-                    }
-
-                    currentCoroutineContext().ensureActive()
-                    if (imageUrl == null) {
-                        if (localShowKey == null) {
-                            error = "ShowKey error"
-                            return@repeat
-                        }
-                        runCatching {
-                            fetchPageResultFromApi(
-                                spiderInfo.gid,
-                                index,
-                                pToken,
-                                localShowKey,
-                                previousPToken
-                            )
-                        }.onFailure {
-                            if (it is Image509Exception) {
-                                error = ERROR_509
-                                return@repeat
-                            }
-                            if (it is ParseException && "Key mismatch" == it.message) {
-                                // Show key is wrong, enter a new loop to get the new show key
-                                if (showKey == localShowKey) showKey = null
-                                return@repeat
-                            } else {
-                                error = ExceptionUtils.getReadableString(it)
-                                return@repeat
-                            }
-                        }.onSuccess {
-                            imageUrl = it.imageUrl
-                            skipHathKey = it.skipHathKey
-                            originImageUrl = it.originImageUrl
-                        }
-                    }
-
-                    val targetImageUrl: String?
-                    val referer: String?
-
-                    if (Settings.getDownloadOriginImage() && !originImageUrl.isNullOrBlank()) {
-                        targetImageUrl = originImageUrl
-                        referer = getPageUrl(spiderInfo.gid, index, pToken!!)
-                    } else {
-                        targetImageUrl = imageUrl
-                        referer = null
-                    }
-                    if (targetImageUrl == null) {
-                        error = "TargetImageUrl error"
-                        return@repeat
-                    }
-                    Log.d(DEBUG_TAG, targetImageUrl)
-
-                    currentCoroutineContext().ensureActive()
-                    runCatching {
-                        Log.d(DEBUG_TAG, "Start download image $index")
-                        val success: Boolean = spiderDen.makeHttpCallAndSaveImage(
-                            index,
-                            targetImageUrl,
-                            referer
-                        ) { contentLength: Long, receivedSize: Long, bytesRead: Int ->
-                            queen.mPagePercentMap[index] = receivedSize.toFloat() / contentLength
-                            queen.notifyPageDownload(index, contentLength, receivedSize, bytesRead)
-                        }
-
-                        if (!success) {
-                            Log.e(DEBUG_TAG, "Can't download all of image data")
-                            error = "Incomplete"
-                            forceHtml = true
-                            return@repeat
-                        }
-
-                        if (spiderDen.checkPlainText(index)) {
-                            error = ""
-                            forceHtml = true
-                            return@repeat
-                        }
-
-                        Log.d(DEBUG_TAG, "Download image succeed $index")
-
-                        queen.updatePageState(index, STATE_FINISHED)
-                        delay(mDownloadDelay.toLong())
-                        return@launch
-                    }.onFailure {
-                        if (it is CancellationException) throw it
-                        it.printStackTrace()
-                        error = NETWORK_ERROR
-                    }
-                    Log.d(DEBUG_TAG, "End download image $index")
-                }
-                spiderDen.remove(index)
-                queen.updatePageState(index, STATE_FAILED, error)
+        synchronized(mJobMap) {
+            val currentJob = mJobMap[index]
+            if (force) currentJob?.cancel()
+            if (currentJob?.isActive != true) {
+                mJobMap[index] = launch { doInJob(index, force) }
             }
         }
+    }
+
+    private suspend fun doInJob(index: Int, force: Boolean) {
+        fun getPToken(index: Int): String? {
+            if (index !in 0 until size) return null
+            return spiderInfo.pTokenMap[index].takeIf { it != TOKEN_FAILED }
+                ?: queen.getPTokenFromInternet(index)
+                ?: queen.getPTokenFromInternet(index)
+                ?: queen.getPTokenFromMultiPageViewer(index)
+        }
+        queen.updatePageState(index, SpiderQueen.STATE_DOWNLOADING)
+        if (!force && index in spiderDen) {
+            queen.updatePageState(index, STATE_FINISHED)
+            return
+        }
+        if (force) {
+            synchronized(pTokenLock) {
+                val pToken = spiderInfo.pTokenMap[index]
+                if (pToken == TOKEN_FAILED) spiderInfo.pTokenMap.remove(index)
+            }
+        }
+        var pToken: String?
+        var previousPToken: String?
+
+        currentCoroutineContext().ensureActive()
+        synchronized(pTokenLock) {
+            pToken = getPToken(index)
+            if (pToken == null) {
+                spiderInfo.pTokenMap[index] = TOKEN_FAILED
+                queen.updatePageState(index, STATE_FAILED, PTOKEN_FAILED_MESSAGE)
+                return
+            }
+            previousPToken = getPToken(index - 1)
+        }
+
+        var skipHathKey: String? = null
+        val skipHathKeys = mutableListOf<String>()
+        var originImageUrl: String? = null
+        val pageUrl: String? = null
+        var error: String? = null
+        var forceHtml = false
+        var leakSkipHathKey = false
+        repeat(3) {
+            var imageUrl: String? = null
+            var localShowKey: String?
+
+            currentCoroutineContext().ensureActive()
+            synchronized(showKeyLock) {
+                localShowKey = showKey
+                if (localShowKey == null || forceHtml) {
+                    if (leakSkipHathKey) return@repeat
+                    val pageUrl1 =
+                        getPageUrl(spiderInfo.gid, index, pToken!!, pageUrl, skipHathKey)
+                    runCatching {
+                        fetchPageResultFromHtml(index, pageUrl1)
+                    }.onSuccess {
+                        imageUrl = it.imageUrl
+                        skipHathKey = it.skipHathKey
+                        originImageUrl = it.originImageUrl
+                        localShowKey = it.showKey
+
+                        if (!skipHathKey.isNullOrBlank()) {
+                            if (skipHathKeys.contains(skipHathKey)) {
+                                // Duplicate skip hath key
+                                leakSkipHathKey = true
+                            } else {
+                                skipHathKeys.add(skipHathKey!!)
+                            }
+                        } else {
+                            leakSkipHathKey = true
+                        }
+
+                        showKey = it.showKey
+                    }.onFailure {
+                        if (it is Image509Exception) {
+                            error = ERROR_509
+                            return@repeat
+                        }
+                        if (it is ParseException && "Key mismatch" == it.message) {
+                            // Show key is wrong, enter a new loop to get the new show key
+                            if (showKey == localShowKey) showKey = null
+                            return@repeat
+                        } else {
+                            error = ExceptionUtils.getReadableString(it)
+                            return@repeat
+                        }
+                    }
+                }
+            }
+
+            currentCoroutineContext().ensureActive()
+            if (imageUrl == null) {
+                if (localShowKey == null) {
+                    error = "ShowKey error"
+                    return@repeat
+                }
+                runCatching {
+                    fetchPageResultFromApi(
+                        spiderInfo.gid,
+                        index,
+                        pToken,
+                        localShowKey,
+                        previousPToken
+                    )
+                }.onFailure {
+                    if (it is Image509Exception) {
+                        error = ERROR_509
+                        return@repeat
+                    }
+                    if (it is ParseException && "Key mismatch" == it.message) {
+                        // Show key is wrong, enter a new loop to get the new show key
+                        if (showKey == localShowKey) showKey = null
+                        return@repeat
+                    } else {
+                        error = ExceptionUtils.getReadableString(it)
+                        return@repeat
+                    }
+                }.onSuccess {
+                    imageUrl = it.imageUrl
+                    skipHathKey = it.skipHathKey
+                    originImageUrl = it.originImageUrl
+                }
+            }
+
+            val targetImageUrl: String?
+            val referer: String?
+
+            if (Settings.getDownloadOriginImage() && !originImageUrl.isNullOrBlank()) {
+                targetImageUrl = originImageUrl
+                referer = getPageUrl(spiderInfo.gid, index, pToken!!)
+            } else {
+                targetImageUrl = imageUrl
+                referer = null
+            }
+            if (targetImageUrl == null) {
+                error = "TargetImageUrl error"
+                return@repeat
+            }
+            Log.d(DEBUG_TAG, targetImageUrl)
+
+            currentCoroutineContext().ensureActive()
+            runCatching {
+                Log.d(DEBUG_TAG, "Start download image $index")
+                val success: Boolean = spiderDen.makeHttpCallAndSaveImage(
+                    index,
+                    targetImageUrl,
+                    referer
+                ) { contentLength: Long, receivedSize: Long, bytesRead: Int ->
+                    queen.mPagePercentMap[index] = receivedSize.toFloat() / contentLength
+                    queen.notifyPageDownload(index, contentLength, receivedSize, bytesRead)
+                }
+
+                if (!success) {
+                    Log.e(DEBUG_TAG, "Can't download all of image data")
+                    error = "Incomplete"
+                    forceHtml = true
+                    return@repeat
+                }
+
+                if (spiderDen.checkPlainText(index)) {
+                    error = ""
+                    forceHtml = true
+                    return@repeat
+                }
+
+                Log.d(DEBUG_TAG, "Download image succeed $index")
+
+                queen.updatePageState(index, STATE_FINISHED)
+                delay(mDownloadDelay.toLong())
+                return
+            }.onFailure {
+                if (it is CancellationException) throw it
+                it.printStackTrace()
+                error = NETWORK_ERROR
+            }
+            Log.d(DEBUG_TAG, "End download image $index")
+        }
+        spiderDen.remove(index)
+        queen.updatePageState(index, STATE_FAILED, error)
     }
 
     private fun getPageUrl(

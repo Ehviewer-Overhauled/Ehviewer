@@ -28,7 +28,6 @@ import androidx.collection.LongSparseArray;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
 import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhRequestBuilder;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.client.data.GalleryInfo;
@@ -40,7 +39,6 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.MathUtils;
 import com.hippo.yorozuya.OSUtils;
 import com.hippo.yorozuya.thread.PriorityThread;
 
@@ -100,11 +98,9 @@ public final class SpiderQueen implements Runnable {
     private final Object mPageStateLock = new Object();
     private final AtomicInteger mDownloadedPages = new AtomicInteger(0);
     private final AtomicInteger mFinishedPages = new AtomicInteger(0);
-    private final Object showKeyLock = new Object();
     // Store page error
     private final ConcurrentHashMap<Integer, String> mPageErrorMap = new ConcurrentHashMap<>();
     private final List<OnSpiderListener> mSpiderListeners = new ArrayList<>();
-    private final int mPreloadNumber;
     public volatile int[] mPageStateArray;
     private int mReadReference = 0;
     private int mDownloadReference = 0;
@@ -120,8 +116,6 @@ public final class SpiderQueen implements Runnable {
         mHttpClient = EhApplication.getOkHttpClient();
         mGalleryInfo = galleryInfo;
         mSpiderDen = new SpiderDen(mGalleryInfo);
-
-        mPreloadNumber = MathUtils.clamp(Settings.getPreloadImage(), 0, 100);
 
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {
             mDecodeIndexArray[i] = -1;
@@ -388,11 +382,11 @@ public final class SpiderQueen implements Runnable {
     }
 
     public Object forceRequest(int index) {
-        return request(index, true, true, false);
+        return request(index, true, true);
     }
 
-    public Object request(int index, boolean addNeighbor) {
-        return request(index, true, false, addNeighbor);
+    public Object request(int index) {
+        return request(index, true, false);
     }
 
     private int getPageState(int index) {
@@ -410,7 +404,7 @@ public final class SpiderQueen implements Runnable {
             return;
         }
 
-        mWorkerScope.removeRequested(index);
+        mWorkerScope.cancel(index);
         synchronized (mDecodeRequestQueue) {
             mDecodeRequestQueue.remove(index);
         }
@@ -421,9 +415,7 @@ public final class SpiderQueen implements Runnable {
             return;
         }
 
-        for (int i : pages) {
-            mWorkerScope.launchIndexed(i);
-        }
+        mWorkerScope.updateRAList(pages);
     }
 
     /**
@@ -431,7 +423,7 @@ public final class SpiderQueen implements Runnable {
      * Float for download percent<br>
      * null for wait
      */
-    private Object request(int index, boolean ignoreError, boolean force, boolean addNeighbor) {
+    private Object request(int index, boolean ignoreError, boolean force) {
         if (mQueenThread == null) {
             return null;
         }
@@ -447,10 +439,7 @@ public final class SpiderQueen implements Runnable {
             state = STATE_NONE;
         }
 
-        mWorkerScope.launchIndexed(index, force);
-        for (int i = index + 1, n = index + 1 + mPreloadNumber; i < n && i < mPageStateArray.length; i++) {
-            mWorkerScope.launchIndexed(i);
-        }
+        mWorkerScope.launch(index, force);
 
         Object result;
 
@@ -797,6 +786,7 @@ public final class SpiderQueen implements Runnable {
     @Retention(RetentionPolicy.SOURCE)
     public @interface State {
     }
+
     public interface OnSpiderListener {
 
         void onGetPages(int pages);
@@ -873,7 +863,7 @@ public final class SpiderQueen implements Runnable {
                     // Can't find the file, it might be removed from cache,
                     // Reset it state and request it
                     updatePageState(index, STATE_NONE, null);
-                    request(index, false, false, false);
+                    request(index, false, false);
                     continue;
                 }
 
