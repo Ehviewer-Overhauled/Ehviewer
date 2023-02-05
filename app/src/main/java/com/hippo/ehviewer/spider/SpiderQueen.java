@@ -242,7 +242,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private void notifyFinish() {
+    private void notifyAllPageDownloaded() {
         int size = -1;
         int[] temp = mPageStateArray;
         if (temp != null) {
@@ -715,8 +715,6 @@ public final class SpiderQueen implements Runnable {
         // Set mQueenThread null
         mQueenThread = null;
 
-        notifyFinish();
-
         if (DEBUG_LOG) {
             Log.i(TAG, Thread.currentThread().getName() + ": end");
         }
@@ -769,6 +767,8 @@ public final class SpiderQueen implements Runnable {
         } else if (state == STATE_FINISHED) {
             notifyPageSuccess(index);
         }
+
+        if (mFinishedPages.get() == size()) notifyAllPageDownloaded();
     }
 
     @IntDef({MODE_READ, MODE_DOWNLOAD})
