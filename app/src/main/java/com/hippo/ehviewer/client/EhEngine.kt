@@ -85,7 +85,7 @@ object EhEngine {
         }
 
         // Check sad panda(without panda)
-        if (headers != null && "text/html; charset=UTF-8" == headers["Content-Type"] && "0" == headers["Content-Length"]) {
+        if (headers != null && "text/html; charset=UTF-8" == headers["Content-Type"] && "0" == headers["Content-Length"] && EhUtils.isExHentai) {
             throw EhException("Sad Panda\n(without panda)")
         }
 
@@ -99,6 +99,9 @@ object EhEngine {
                 throw EhException(error)
             }
         }
+        if (code >= 400) {
+            throw StatusCodeException(code)
+        }
         if (e is ParseException) {
             if (body != null && !body.contains("<")) {
                 throw EhException(body)
@@ -110,9 +113,6 @@ object EhEngine {
                 }
                 throw EhException(GetText.getString(R.string.error_parse_error))
             }
-        }
-        if (code >= 400) {
-            throw StatusCodeException(code)
         }
     }
 

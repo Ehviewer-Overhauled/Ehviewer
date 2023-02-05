@@ -1492,7 +1492,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 if (funds != null) {
                     var fundsGP = funds.fundsGP.toString()
                     // Ex GP numbers are rounded down to the nearest thousand
-                    if (Settings.getGallerySite() == EhUrl.SITE_EX) {
+                    if (EhUtils.isExHentai) {
                         fundsGP += "+"
                     }
                     mDialog!!.setTitle(getString(R.string.current_funds, fundsGP, funds.fundsC))
