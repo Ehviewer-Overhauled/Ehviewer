@@ -106,6 +106,7 @@ public final class SpiderQueen implements Runnable {
     @Nullable
     private volatile Thread mQueenThread;
     private SpiderQueenWorker mWorkerScope;
+    private SpiderQueenDecoder mDecoderScope;
     private boolean mStoped = false;
 
     private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
@@ -118,6 +119,7 @@ public final class SpiderQueen implements Runnable {
         }
 
         mWorkerScope = new SpiderQueenWorker(this);
+        mDecoderScope = new SpiderQueenDecoder(this);
     }
 
     @UiThread
@@ -353,6 +355,8 @@ public final class SpiderQueen implements Runnable {
 
         CoroutineScopeKt.cancel(mWorkerScope, null);
         mWorkerScope = null;
+        CoroutineScopeKt.cancel(mDecoderScope, null);
+        mDecoderScope = null;
     }
 
     public int size() {
