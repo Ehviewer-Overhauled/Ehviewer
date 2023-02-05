@@ -103,10 +103,10 @@ object EhEngine {
             throw StatusCodeException(code)
         }
         if (e is ParseException) {
-            if (body != null && !body.contains("<")) {
-                throw EhException(body)
-            } else if (TextUtils.isEmpty(body)) {
+            if (TextUtils.isEmpty(body)) {
                 throw EhException(GetText.getString(R.string.error_empty_html))
+            } else if (body != null && !body.contains("<")) {
+                throw EhException(body)
             } else {
                 if (Settings.getSaveParseErrorBody()) {
                     AppConfig.saveParseErrorBody(e as ParseException?)
