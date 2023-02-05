@@ -66,6 +66,9 @@ object EhUtils {
     )
     private val CATEGORY_STRINGS = CATEGORY_VALUES.entries.map { (k, v) -> v to k }
 
+    val isExHentai: Boolean
+        get() = Settings.getGallerySite() == EhUrl.SITE_EX
+
     @JvmStatic
     fun getCategory(type: String?): Int {
         for (entry in CATEGORY_STRINGS) {
