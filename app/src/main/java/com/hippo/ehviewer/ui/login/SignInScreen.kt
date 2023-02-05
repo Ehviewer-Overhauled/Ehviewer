@@ -53,19 +53,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import rikka.core.util.ContextUtils.requireActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(navController: NavController) {
+fun SignInScreen(navController: NavController, postLogin: suspend () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var isProgressIndicatorVisible by rememberSaveable { mutableStateOf(false) }
@@ -110,6 +112,9 @@ fun SignInScreen(navController: NavController) {
                     showErrorDialog = true
                 }
             }.onSuccess {
+                withNonCancellableContext {
+                    postLogin()
+                }
                 withUIContext {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
@@ -248,7 +253,10 @@ fun SignInScreen(navController: NavController) {
             }
 
             TextButton(
-                onClick = { navController.navigate(SELECT_SITE_ROUTE_NAME) },
+                onClick = {
+                    Settings.putSelectSite(false)
+                    navController.navigate(SELECT_SITE_ROUTE_NAME)
+                },
             ) {
                 Text(
                     text = buildAnnotatedString {
