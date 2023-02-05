@@ -166,7 +166,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             val filename = generateImageFilename(index, PageLoader2.SUPPORT_IMAGE_EXTENSIONS[i])
             val file = dir.subFile(filename)
             if (file != null) {
-                result = result or file.delete()
+                result = result or runCatching { file.delete() }.getOrDefault(false)
             }
             i++
         }
