@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,17 +32,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
-import eu.kanade.tachiyomi.util.lang.launchIO
-import kotlinx.coroutines.GlobalScope
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 @Composable
 fun SelectSiteScreen(finish: () -> Unit) {
-    var site by remember { mutableStateOf(EhApplication.ehCookieStore.hasSignedIn()) } // false for e, true for ex
+    val coroutineScope = rememberCoroutineScope()
+    var siteEx by remember { mutableStateOf(true) }
 
     Column(
         Modifier
@@ -70,8 +70,8 @@ fun SelectSiteScreen(finish: () -> Unit) {
         ) {
             Box(
                 modifier = Modifier
-                    .background(if (!site) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
-                    .clickable { site = false }
+                    .background(if (!siteEx) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
+                    .clickable { siteEx = false }
                     .size(100.dp, 40.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -89,8 +89,8 @@ fun SelectSiteScreen(finish: () -> Unit) {
 
             Box(
                 modifier = Modifier
-                    .background(if (site) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
-                    .clickable { site = true }
+                    .background(if (siteEx) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
+                    .clickable { siteEx = true }
                     .size(100.dp, 40.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -116,28 +116,20 @@ fun SelectSiteScreen(finish: () -> Unit) {
         ) {
             Button(onClick = {
                 Settings.putSelectSite(false)
-                Settings.putNeedSignIn(false)
-                if (!site)
+                if (!siteEx) {
                     Settings.putGallerySite(EhUrl.SITE_E)
-                else
-                    Settings.putGallerySite(EhUrl.SITE_EX)
-                GlobalScope.launchIO {
-                    getProfile()
+                    coroutineScope.launchNonCancellable {
+                        runCatching {
+                            EhEngine.getUConfig()
+                        }.onFailure {
+                            it.printStackTrace()
+                        }
+                    }
                 }
                 finish()
             }, Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = android.R.string.ok))
             }
         }
-    }
-}
-
-suspend fun getProfile() {
-    runCatching {
-        EhEngine.getProfile().run {
-            Settings.putDisplayName(displayName)
-            Settings.putAvatar(avatar)
-        }
-        EhEngine.getUConfig()
     }
 }

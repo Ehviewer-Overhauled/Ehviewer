@@ -7,6 +7,7 @@ import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
@@ -15,14 +16,16 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.widget.DialogWebChromeClient
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebviewSignInScreen(navController: NavController) {
+fun WebviewSignInScreen(navController: NavController, postLogin: suspend () -> Unit) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     AndroidView(factory = {
         EhUtils.signOut()
 
@@ -96,6 +99,9 @@ fun WebviewSignInScreen(navController: NavController) {
                     }
                     if (getId && getHash) {
                         present = true
+                        coroutineScope.launchNonCancellable {
+                            postLogin()
+                        }
                         navController.navigate(SELECT_SITE_ROUTE_NAME)
                     }
                 }

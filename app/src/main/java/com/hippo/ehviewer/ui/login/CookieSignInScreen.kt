@@ -55,6 +55,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CookieSignInScene(navController: NavController) {
+fun CookieSignInScene(navController: NavController, postLogin: suspend () -> Unit) {
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -122,6 +123,9 @@ fun CookieSignInScene(navController: NavController) {
             runCatching {
                 EhEngine.getProfile()
             }.onSuccess {
+                withNonCancellableContext {
+                    postLogin()
+                }
                 withUIContext {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
