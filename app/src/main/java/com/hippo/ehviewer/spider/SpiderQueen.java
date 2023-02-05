@@ -49,7 +49,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -94,7 +93,6 @@ public final class SpiderQueen implements Runnable {
     private final Thread[] mDecodeThreadArray = new Thread[DECODE_THREAD_NUM];
     private final int[] mDecodeIndexArray = new int[DECODE_THREAD_NUM];
     private final Queue<Integer> mDecodeRequestQueue = new LinkedList<>();
-    private final Queue<Integer> mRequestPTokenQueue = new ConcurrentLinkedQueue<>();
     private final Object mPageStateLock = new Object();
     private final AtomicInteger mDownloadedPages = new AtomicInteger(0);
     private final AtomicInteger mFinishedPages = new AtomicInteger(0);
@@ -108,8 +106,6 @@ public final class SpiderQueen implements Runnable {
     @Nullable
     private volatile Thread mQueenThread;
     private SpiderQueenWorker mWorkerScope;
-    // For download, when it go to mPageStateArray.size(), done
-    private volatile int mDownloadPage = -1;
     private boolean mStoped = false;
 
     private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
@@ -278,6 +274,8 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+    private boolean shouldIntoDownload = false;
+
     private void updateMode() {
         int mode;
         if (mDownloadReference > 0) {
@@ -289,15 +287,7 @@ public final class SpiderQueen implements Runnable {
         mSpiderDen.setMode(mode);
 
         // Update download page
-        boolean intoDownloadMode = false;
-        if (mode == MODE_DOWNLOAD) {
-            if (mDownloadPage < 0) {
-                mDownloadPage = 0;
-                intoDownloadMode = true;
-            }
-        } else {
-            mDownloadPage = -1;
-        }
+        boolean intoDownloadMode = mode == MODE_DOWNLOAD;
 
         if (intoDownloadMode && mPageStateArray != null) {
             // Clear download state
@@ -314,6 +304,8 @@ public final class SpiderQueen implements Runnable {
                 mPageErrorMap.clear();
                 mPagePercentMap.clear();
             }
+        } else if (intoDownloadMode && mPageStateArray == null) {
+            shouldIntoDownload = true;
         }
     }
 
@@ -690,6 +682,8 @@ public final class SpiderQueen implements Runnable {
 
         // Notify get pages
         notifyGetPages(spiderInfo.getPages());
+
+        if (shouldIntoDownload) mWorkerScope.enterDownloadMode();
 
         // Start decoder
         for (int i = 0; i < DECODE_THREAD_NUM; i++) {

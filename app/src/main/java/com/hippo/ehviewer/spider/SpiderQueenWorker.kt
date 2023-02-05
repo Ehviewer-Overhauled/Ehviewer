@@ -37,6 +37,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private var showKey: String? = null
     private val showKeyLock = Any()
     private val mDownloadDelay = Settings.getDownloadDelay()
+    private var isDownloadMode = false
     private val size
         get() = queen.size()
     override val coroutineContext: CoroutineContext
@@ -48,7 +49,15 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         }
     }
 
+    @Synchronized
+    fun enterDownloadMode() {
+        if (isDownloadMode) return
+        updateRAList((0 until size).toList())
+        isDownloadMode = true
+    }
+
     fun updateRAList(list: List<Int>) {
+        if (isDownloadMode) return
         synchronized(mJobMap) {
             sequence {
                 mJobMap.forEach { (i, job) ->
@@ -67,6 +76,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
 
     @JvmOverloads
     fun launch(index: Int, force: Boolean = false) {
+        if (isDownloadMode) return
         check(index in 0 until size)
         val state = queen.mPageStateArray[index]
         if (!force && state == STATE_FINISHED) return
