@@ -46,7 +46,7 @@ abstract class PageLoader {
 
         // val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).toMutableList().removeAll(mImageCache.snapshot().keys)
         // Should we refresh our LruCache ?
-        val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).mapNotNull { it.takeIf { mImageCache[it] == null } }
+        val pagesAbsent = ((index - 5).coerceAtLeast(0) until (mPreloads + index).coerceAtMost(size())).mapNotNull { it.takeIf { mImageCache[it] == null } }
         preloadPages(pagesAbsent)
     }
 
