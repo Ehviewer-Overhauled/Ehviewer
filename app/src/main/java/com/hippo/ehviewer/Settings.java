@@ -675,7 +675,7 @@ public class Settings {
         putBoolean(KEY_DOMAIN_FRONTING, value);
     }
 
-    public static boolean getBypassVPN() {
+    public static boolean getBypassVpn() {
         return getBoolean(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN);
     }
 
