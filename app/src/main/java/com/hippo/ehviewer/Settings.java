@@ -182,7 +182,7 @@ public class Settings {
     private static final boolean DEFAULT_FRONTING = false;
     private static final boolean DEFAULT_BYPASS_VPN = true;
     private static final String KEY_PROXY_TYPE = "proxy_type";
-    private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM;
+    private static final int DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_DIRECT;
     private static final String KEY_PROXY_IP = "proxy_ip";
     private static final String DEFAULT_PROXY_IP = null;
     private static final String KEY_PROXY_PORT = "proxy_port";
@@ -679,8 +679,12 @@ public class Settings {
         return getBoolean(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN);
     }
 
-    public static int getProxyType() {
+    private static int getProxyTypeInternal() {
         return getInt(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE);
+    }
+
+    public static int getProxyType() {
+        return getProxyTypeInternal() == EhProxySelector.TYPE_HTTP ? EhProxySelector.TYPE_HTTP : DEFAULT_PROXY_TYPE;
     }
 
     public static void putProxyType(int value) {

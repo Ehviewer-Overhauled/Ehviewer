@@ -322,8 +322,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             HttpClient(CIO) {
                 engine {
                     proxy = when (Settings.getProxyType()) {
-                        EhProxySelector.TYPE_DIRECT -> Proxy.NO_PROXY
-                        EhProxySelector.TYPE_SYSTEM -> null
                         EhProxySelector.TYPE_HTTP -> {
                             val ip = Settings.getProxyIp()
                             val port = Settings.getProxyPort()
@@ -332,7 +330,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                             Proxy(Proxy.Type.HTTP, socketAddress)
                         }
 
-                        // CIO does not support Socks proxy yet
+                        // CIO does not support non-HTTP proxy yet
                         else -> null
                     }
                     https {

@@ -31,7 +31,6 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.network.InetValidator
 import com.hippo.preference.DialogPreference
-import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ViewUtils
 
 class ProxyPreference @JvmOverloads constructor(
@@ -50,8 +49,14 @@ class ProxyPreference @JvmOverloads constructor(
         updateSummary(Settings.getProxyType(), Settings.getProxyIp(), Settings.getProxyPort())
     }
 
+    private fun getProxyType(index: Int): Int =
+        if (index == 1) EhProxySelector.TYPE_HTTP else EhProxySelector.TYPE_DIRECT
+
+    private fun getProxyTypeIndex(type: Int): Int =
+        if (type == EhProxySelector.TYPE_HTTP) 1 else 0
+
     private fun getProxyTypeText(type: Int): String {
-        return mArray[MathUtils.clamp(type, 0, mArray.size - 1)]
+        return mArray[getProxyTypeIndex(type)]
     }
 
     private fun updateSummary(type: Int, ip: String?, port: Int) {
@@ -59,7 +64,7 @@ class ProxyPreference @JvmOverloads constructor(
         if ((type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS)
             && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))
         ) {
-            type1 = EhProxySelector.TYPE_SYSTEM
+            type1 = EhProxySelector.TYPE_DIRECT
         }
         summary = if (type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS) {
             val context = context
@@ -94,13 +99,7 @@ class ProxyPreference @JvmOverloads constructor(
         mPortInputLayout = ViewUtils.`$$`(dialog, R.id.port_input_layout) as TextInputLayout
         mPort = ViewUtils.`$$`(dialog, R.id.port) as EditText
         val type = Settings.getProxyType()
-        (mType!!.editText as AutoCompleteTextView).setText(
-            array[MathUtils.clamp(
-                type,
-                0,
-                array.size
-            )], false
-        )
+        (mType!!.editText as AutoCompleteTextView).setText(array[getProxyTypeIndex(type)], false)
         mIp!!.setText(Settings.getProxyIp())
         val portString: String?
         val port = Settings.getProxyPort()
@@ -127,7 +126,7 @@ class ProxyPreference @JvmOverloads constructor(
         if (null == dialog || null == mType || null == mIpInputLayout || null == mIp || null == mPortInputLayout || null == mPort) {
             return
         }
-        val type = mArray.indexOf(mType!!.editText!!.text.toString())
+        val type = getProxyType(mArray.indexOf(mType!!.editText!!.text.toString()))
         val ip = mIp!!.text.toString().trim { it <= ' ' }
         if (ip.isEmpty()) {
             if (type == EhProxySelector.TYPE_HTTP || type == EhProxySelector.TYPE_SOCKS) {
