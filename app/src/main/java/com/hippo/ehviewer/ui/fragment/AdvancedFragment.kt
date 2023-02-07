@@ -237,7 +237,7 @@ class AdvancedFragment : BasePreferenceFragment() {
         val backupFavorite = findPreference<Preference>(KEY_BACKUP_FAVORITE)
         val openByDefault = findPreference<Preference>(KEY_OPEN_BY_DEFAULT)
         val domainFronting = findPreference<Preference>(AppSettings.KEY_DOMAIN_FRONTING)
-        val bypassVPN = findPreference<Preference>(AppSettings.KEY_BYPASS_VPN)
+        val bypassVpn = findPreference<Preference>(AppSettings.KEY_BYPASS_VPN)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             openByDefault!!.isVisible = false
         } else {
@@ -248,9 +248,9 @@ class AdvancedFragment : BasePreferenceFragment() {
         exportData!!.onPreferenceClickListener = this
         backupFavorite!!.onPreferenceClickListener = this
         appLanguage!!.onPreferenceChangeListener = this
-        bypassVPN!!.isVisible = AppSettings.getDF()
+        bypassVpn!!.isVisible = AppSettings.getDF()
         domainFronting!!.setOnPreferenceChangeListener { _, newValue ->
-            bypassVPN.isVisible = newValue as Boolean
+            bypassVpn.isVisible = newValue as Boolean
             true
         }
     }

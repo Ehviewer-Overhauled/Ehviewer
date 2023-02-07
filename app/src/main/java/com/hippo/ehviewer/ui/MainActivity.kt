@@ -208,8 +208,8 @@ class MainActivity : EhActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         connectivityManager = getSystemService()!!
-        if (Settings.getDF() && Settings.getBypassVPN()) {
-            bypassVPN()
+        if (Settings.getDF() && Settings.getBypassVpn()) {
+            bypassVpn()
         }
         if (EhUtils.needSignedIn())
             startActivity(Intent(this, LoginActivity::class.java))
@@ -270,7 +270,7 @@ class MainActivity : EhActivity() {
         }
     }
 
-    private fun bypassVPN() {
+    private fun bypassVpn() {
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)
         capabilities?.let {
