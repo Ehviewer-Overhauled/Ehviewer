@@ -89,9 +89,9 @@ fun WebviewSignInScreen() {
                     var getId = false
                     var getHash = false
                     for (cookie in cookies) {
-                        if (EhCookieStore.KEY_IPD_MEMBER_ID == cookie.name) {
+                        if (EhCookieStore.KEY_IPB_MEMBER_ID == cookie.name) {
                             getId = true
-                        } else if (EhCookieStore.KEY_IPD_PASS_HASH == cookie.name) {
+                        } else if (EhCookieStore.KEY_IPB_PASS_HASH == cookie.name) {
                             getHash = true
                         }
                         addCookie(EhUrl.DOMAIN_EX, cookie)

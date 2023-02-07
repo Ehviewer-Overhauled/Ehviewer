@@ -53,15 +53,15 @@ class AccountPreference @JvmOverloads constructor(
         while (i < n) {
             val cookie = cookies[i]
             when (cookie.name) {
-                EhCookieStore.KEY_IPD_MEMBER_ID -> ipbMemberId = cookie.value
-                EhCookieStore.KEY_IPD_PASS_HASH -> ipbPassHash = cookie.value
+                EhCookieStore.KEY_IPB_MEMBER_ID -> ipbMemberId = cookie.value
+                EhCookieStore.KEY_IPB_PASS_HASH -> ipbPassHash = cookie.value
                 EhCookieStore.KEY_IGNEOUS -> igneous = cookie.value
             }
             i++
         }
         if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
-            message = (EhCookieStore.KEY_IPD_MEMBER_ID + ": " + ipbMemberId + "<br>"
-                    + EhCookieStore.KEY_IPD_PASS_HASH + ": " + ipbPassHash + "<br>"
+            message = (EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>"
+                    + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>"
                     + EhCookieStore.KEY_IGNEOUS + ": " + igneous)
             setDialogMessage(
                 Html.fromHtml(

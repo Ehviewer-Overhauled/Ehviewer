@@ -61,7 +61,6 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -152,14 +151,8 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         if (!Settings.getRequestNews()) {
             return
         }
-        val store = ehCookieStore
-        val eh = EhUrl.HOST_E.toHttpUrl()
 
-        if (store.contains(eh, EhCookieStore.KEY_IPD_MEMBER_ID) || store.contains(
-                eh,
-                EhCookieStore.KEY_IPD_PASS_HASH
-            )
-        ) {
+        if (ehCookieStore.hasSignedIn()) {
             val referer = EhUrl.REFERER_E
             val request = EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build()
             val call = okHttpClient.newCall(request)
