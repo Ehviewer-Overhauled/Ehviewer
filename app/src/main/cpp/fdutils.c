@@ -9,6 +9,8 @@
 
 #include "ehviewer.h"
 
+// TODO: Replace it with AFileDescriptor_getFd when minsdk 31
+// https://developer.android.com/ndk/reference/group/file-descriptor
 JNIEXPORT jint JNICALL
 Java_com_hippo_Native_getFd(JNIEnv *env, jclass clazz, jobject fileDescriptor) {
     jint fd = -1;

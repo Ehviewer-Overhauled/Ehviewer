@@ -1021,7 +1021,7 @@ object EhEngine {
 
     @JvmStatic
     @Throws(Throwable::class)
-    fun getGalleryPage(
+    suspend fun getGalleryPage(
         url: String?,
         gid: Long,
         token: String?
@@ -1035,7 +1035,7 @@ object EhEngine {
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
@@ -1050,7 +1050,7 @@ object EhEngine {
 
     @JvmStatic
     @Throws(Throwable::class)
-    fun getGalleryPageApi(
+    suspend fun getGalleryPageApi(
         gid: Long,
         index: Int,
         pToken: String?,
@@ -1080,7 +1080,7 @@ object EhEngine {
         var headers: Headers? = null
         var code = -1
         try {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 code = response.code
                 headers = response.headers
                 body = response.body.string()

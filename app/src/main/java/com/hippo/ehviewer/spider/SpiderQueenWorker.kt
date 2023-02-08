@@ -5,10 +5,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine.getGalleryPage
 import com.hippo.ehviewer.client.EhEngine.getGalleryPageApi
 import com.hippo.ehviewer.client.EhUrl.getPageUrl
-import com.hippo.ehviewer.client.exception.Image509Exception
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.client.parser.GalleryPageApiParser
-import com.hippo.ehviewer.client.parser.GalleryPageParser
 import com.hippo.ehviewer.spider.SpiderQueen.ERROR_509
 import com.hippo.ehviewer.spider.SpiderQueen.NETWORK_ERROR
 import com.hippo.ehviewer.spider.SpiderQueen.PTOKEN_FAILED_MESSAGE
@@ -20,12 +17,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.CoroutineContext
 
@@ -34,18 +30,19 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         get() = queen.mSpiderDen
     private val spiderInfo by lazy { queen.mSpiderInfo.get() }
     private val mJobMap = hashMapOf<Int, Job>()
-    private val mSemaphore = Semaphore(Settings.getMultiThreadDownload().coerceIn(1, 10))
-    private val pTokenLock = Any()
+    private val mSemaphore = Semaphore(Settings.getMultiThreadDownload())
+    private val pTokenLock = Mutex()
     private var showKey: String? = null
-    private val showKeyLock = Any()
+    private val showKeyLock = Mutex()
     private val mDownloadDelay = Settings.getDownloadDelay()
     private var isDownloadMode = false
     private val size
         get() = queen.size()
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + SupervisorJob()
+        get() = Dispatchers.IO + Job() // No SupervisorJob here since uncaught exception would cause semaphore leak
 
     fun cancel(index: Int) {
+        if (isDownloadMode) return
         synchronized(mJobMap) {
             mJobMap.remove(index)?.cancel()
         }
@@ -106,25 +103,24 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         }
         queen.updatePageState(index, SpiderQueen.STATE_DOWNLOADING)
         if (!force && index in spiderDen) {
-            queen.updatePageState(index, STATE_FINISHED)
-            return
+            return queen.updatePageState(index, STATE_FINISHED)
         }
         if (force) {
-            synchronized(pTokenLock) {
+            pTokenLock.withLock {
                 val pToken = spiderInfo.pTokenMap[index]
                 if (pToken == TOKEN_FAILED) spiderInfo.pTokenMap.remove(index)
             }
         }
-        var pToken: String?
-        var previousPToken: String?
+        val previousPToken: String?
+        val pToken: String
 
-        currentCoroutineContext().ensureActive()
-        synchronized(pTokenLock) {
-            pToken = getPToken(index)
-            if (pToken == null) {
+        pTokenLock.withLock {
+            pToken = getPToken(index) ?: return queen.updatePageState(
+                index,
+                STATE_FAILED,
+                PTOKEN_FAILED_MESSAGE
+            ).also {
                 spiderInfo.pTokenMap[index] = TOKEN_FAILED
-                queen.updatePageState(index, STATE_FAILED, PTOKEN_FAILED_MESSAGE)
-                return
             }
             previousPToken = getPToken(index - 1)
         }
@@ -132,7 +128,6 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         var skipHathKey: String? = null
         val skipHathKeys = mutableListOf<String>()
         var originImageUrl: String? = null
-        val pageUrl: String? = null
         var error: String? = null
         var forceHtml = false
         var leakSkipHathKey = false
@@ -140,23 +135,36 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             var imageUrl: String? = null
             var localShowKey: String?
 
-            currentCoroutineContext().ensureActive()
-            synchronized(showKeyLock) {
+            showKeyLock.withLock {
                 localShowKey = showKey
                 if (localShowKey == null || forceHtml) {
                     if (leakSkipHathKey) return@repeat
-                    val pageUrl1 =
-                        getPageUrl(spiderInfo.gid, index, pToken!!, pageUrl, skipHathKey)
+                    var pageUrl = getPageUrl(spiderInfo.gid, index, pToken)
+                    // Add skipHathKey
+                    if (skipHathKey != null) {
+                        pageUrl += if ("?" in pageUrl) {
+                            "&nl=$skipHathKey"
+                        } else {
+                            "?nl=$skipHathKey"
+                        }
+                    }
                     runCatching {
-                        fetchPageResultFromHtml(index, pageUrl1)
-                    }.onSuccess {
-                        imageUrl = it.imageUrl
-                        skipHathKey = it.skipHathKey
-                        originImageUrl = it.originImageUrl
-                        localShowKey = it.showKey
+                        getGalleryPage(pageUrl, spiderInfo.gid, spiderInfo.token).also {
+                            if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                                // Get 509
+                                queen.notifyGet509(index)
+                                error = ERROR_509
+                                return@repeat
+                            }
+                        }
+                    }.onSuccess { result ->
+                        imageUrl = result.imageUrl
+                        skipHathKey = result.skipHathKey.takeIf { it.isNotBlank() }
+                        originImageUrl = result.originImageUrl
+                        localShowKey = result.showKey
 
-                        if (!skipHathKey.isNullOrBlank()) {
-                            if (skipHathKeys.contains(skipHathKey)) {
+                        if (skipHathKey != null) {
+                            if (skipHathKey in skipHathKeys) {
                                 // Duplicate skip hath key
                                 leakSkipHathKey = true
                             } else {
@@ -166,12 +174,8 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                             leakSkipHathKey = true
                         }
 
-                        showKey = it.showKey
+                        showKey = result.showKey
                     }.onFailure {
-                        if (it is Image509Exception) {
-                            error = ERROR_509
-                            return@repeat
-                        }
                         if (it is ParseException && "Key mismatch" == it.message) {
                             // Show key is wrong, enter a new loop to get the new show key
                             if (showKey == localShowKey) showKey = null
@@ -184,33 +188,34 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 }
             }
 
-            currentCoroutineContext().ensureActive()
             if (imageUrl == null) {
                 if (localShowKey == null) {
                     error = "ShowKey error"
                     return@repeat
                 }
                 runCatching {
-                    fetchPageResultFromApi(
+                    getGalleryPageApi(
                         spiderInfo.gid,
                         index,
                         pToken,
                         localShowKey,
                         previousPToken
-                    )
-                }.onFailure {
-                    if (it is Image509Exception) {
-                        error = ERROR_509
-                        return@repeat
+                    ).also {
+                        if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                            // Get 509
+                            queen.notifyGet509(index)
+                            error = ERROR_509
+                            return@repeat
+                        }
                     }
+                }.onFailure {
                     if (it is ParseException && "Key mismatch" == it.message) {
                         // Show key is wrong, enter a new loop to get the new show key
                         if (showKey == localShowKey) showKey = null
-                        return@repeat
                     } else {
                         error = ExceptionUtils.getReadableString(it)
-                        return@repeat
                     }
+                    return@repeat
                 }.onSuccess {
                     imageUrl = it.imageUrl
                     skipHathKey = it.skipHathKey
@@ -223,7 +228,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
 
             if (Settings.getDownloadOriginImage() && !originImageUrl.isNullOrBlank()) {
                 targetImageUrl = originImageUrl
-                referer = getPageUrl(spiderInfo.gid, index, pToken!!)
+                referer = getPageUrl(spiderInfo.gid, index, pToken)
             } else {
                 targetImageUrl = imageUrl
                 referer = null
@@ -234,7 +239,6 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }
             Log.d(DEBUG_TAG, targetImageUrl)
 
-            currentCoroutineContext().ensureActive()
             runCatching {
                 Log.d(DEBUG_TAG, "Start download image $index")
                 val success: Boolean = spiderDen.makeHttpCallAndSaveImage(
@@ -275,56 +279,12 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         queen.updatePageState(index, STATE_FAILED, error)
     }
 
-    private fun getPageUrl(
-        gid: Long, index: Int, pToken: String,
-        oldPageUrl: String?, skipHathKey: String?
-    ): String {
-        var pageUrl = oldPageUrl ?: getPageUrl(gid, index, pToken)
-        // Add skipHathKey
-        if (skipHathKey != null) {
-            pageUrl += if (pageUrl.contains("?")) {
-                "&nl=$skipHathKey"
-            } else {
-                "?nl=$skipHathKey"
-            }
-        }
-        return pageUrl
+    companion object {
+        private val URL_509_SUFFIX_ARRAY = arrayOf(
+            "/509.gif",
+            "/509s.gif"
+        )
+
+        private const val DEBUG_TAG = "SpiderQueenWorker"
     }
-
-    @Throws(Throwable::class)
-    private fun fetchPageResultFromHtml(index: Int, pageUrl: String): GalleryPageParser.Result {
-        val result = getGalleryPage(pageUrl, spiderInfo.gid, spiderInfo.token)
-        if (StringUtils.endsWith(result.imageUrl, URL_509_SUFFIX_ARRAY)) {
-            // Get 509
-            // Notify listeners
-            queen.notifyGet509(index)
-            throw Image509Exception()
-        }
-        return result
-    }
-
-    @Throws(Throwable::class)
-    private fun fetchPageResultFromApi(
-        gid: Long,
-        index: Int,
-        pToken: String?,
-        showKey: String?,
-        previousPToken: String?
-    ): GalleryPageApiParser.Result {
-        val result = getGalleryPageApi(gid, index, pToken, showKey, previousPToken)
-        if (StringUtils.endsWith(result.imageUrl, URL_509_SUFFIX_ARRAY)) {
-            // Get 509
-            // Notify listeners
-            queen.notifyGet509(index)
-            throw Image509Exception()
-        }
-        return result
-    }
-
-    private val URL_509_SUFFIX_ARRAY = arrayOf(
-        "/509.gif",
-        "/509s.gif"
-    )
-
-    private val DEBUG_TAG = "SpiderQueenWorker"
 }
