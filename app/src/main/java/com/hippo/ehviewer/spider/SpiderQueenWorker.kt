@@ -25,6 +25,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.CoroutineContext
 
 class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
@@ -32,7 +34,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         get() = queen.mSpiderDen
     private val spiderInfo by lazy { queen.mSpiderInfo.get() }
     private val mJobMap = hashMapOf<Int, Job>()
-    private val maxParallelismSize = Settings.getMultiThreadDownload().coerceIn(1, 10)
+    private val mSemaphore = Semaphore(Settings.getMultiThreadDownload().coerceIn(1, 10))
     private val pTokenLock = Any()
     private var showKey: String? = null
     private val showKeyLock = Any()
@@ -41,7 +43,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val size
         get() = queen.size()
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO.limitedParallelism(maxParallelismSize) + SupervisorJob()
+        get() = Dispatchers.IO + SupervisorJob()
 
     fun cancel(index: Int) {
         synchronized(mJobMap) {
@@ -85,7 +87,11 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             val currentJob = mJobMap[index]
             if (force) currentJob?.cancel()
             if (currentJob?.isActive != true) {
-                mJobMap[index] = launch { doInJob(index, force) }
+                mJobMap[index] = launch {
+                    mSemaphore.withPermit {
+                        doInJob(index, force)
+                    }
+                }
             }
         }
     }
