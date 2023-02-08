@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,7 +64,6 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import rikka.core.util.ContextUtils.requireActivity
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()

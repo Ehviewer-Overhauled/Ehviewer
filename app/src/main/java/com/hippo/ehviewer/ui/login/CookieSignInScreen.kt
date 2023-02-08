@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -62,7 +61,6 @@ import kotlinx.coroutines.launch
 import okhttp3.Cookie
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CookieSignInScene(navController: NavController) {
     val clipboardManager = LocalClipboardManager.current
