@@ -23,7 +23,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebviewSignInScreen(navController: NavController, postLogin: suspend () -> Unit) {
+fun WebviewSignInScreen(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     AndroidView(factory = {

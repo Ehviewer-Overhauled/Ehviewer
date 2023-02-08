@@ -67,7 +67,7 @@ import rikka.core.util.ContextUtils.requireActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(navController: NavController, postLogin: suspend () -> Unit) {
+fun SignInScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var isProgressIndicatorVisible by rememberSaveable { mutableStateOf(false) }

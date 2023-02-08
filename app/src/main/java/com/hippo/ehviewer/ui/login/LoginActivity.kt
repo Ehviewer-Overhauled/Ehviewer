@@ -25,21 +25,15 @@ class LoginActivity : EhActivity() {
 
                 NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
                     composable(SIGN_IN_ROUTE_NAME) {
-                        SignInScreen(navController) {
-                            postLogin()
-                        }
+                        SignInScreen(navController)
                     }
 
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
-                        WebviewSignInScreen(navController) {
-                            postLogin()
-                        }
+                        WebviewSignInScreen(navController)
                     }
 
                     composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-                        CookieSignInScene(navController) {
-                            postLogin()
-                        }
+                        CookieSignInScene(navController)
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {
@@ -64,28 +58,28 @@ class LoginActivity : EhActivity() {
         Settings.putNeedSignIn(false)
         ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
+}
 
-    private suspend fun postLogin() {
-        runCatching {
-            EhEngine.getProfile().run {
-                Settings.putDisplayName(displayName)
-                Settings.putAvatar(avatar)
-            }
-        }.onFailure {
-            it.printStackTrace()
+suspend fun postLogin() {
+    runCatching {
+        EhEngine.getProfile().run {
+            Settings.putDisplayName(displayName)
+            Settings.putAvatar(avatar)
         }
+    }.onFailure {
+        it.printStackTrace()
+    }
 
+    runCatching {
+        Settings.putGallerySite(EhUrl.SITE_EX)
+        EhEngine.getUConfig()
+    }.onFailure {
+        Settings.putSelectSite(false)
+        Settings.putGallerySite(EhUrl.SITE_E)
         runCatching {
-            Settings.putGallerySite(EhUrl.SITE_EX)
             EhEngine.getUConfig()
         }.onFailure {
-            Settings.putSelectSite(false)
-            Settings.putGallerySite(EhUrl.SITE_E)
-            runCatching {
-                EhEngine.getUConfig()
-            }.onFailure {
-                it.printStackTrace()
-            }
+            it.printStackTrace()
         }
     }
 }

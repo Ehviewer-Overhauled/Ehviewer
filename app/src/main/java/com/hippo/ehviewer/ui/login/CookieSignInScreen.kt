@@ -64,7 +64,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CookieSignInScene(navController: NavController, postLogin: suspend () -> Unit) {
+fun CookieSignInScene(navController: NavController) {
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
