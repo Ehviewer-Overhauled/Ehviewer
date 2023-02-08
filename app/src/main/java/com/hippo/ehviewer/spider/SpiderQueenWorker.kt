@@ -13,7 +13,6 @@ import com.hippo.ehviewer.spider.SpiderQueen.STATE_FAILED
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_FINISHED
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.StringUtils
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,6 +22,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
+import moe.tarsin.coroutines.runCatchingCancellationTransparent
 import kotlin.coroutines.CoroutineContext
 
 class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
@@ -148,7 +148,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                             "?nl=$skipHathKey"
                         }
                     }
-                    runCatching {
+                    runCatchingCancellationTransparent {
                         getGalleryPage(pageUrl, spiderInfo.gid, spiderInfo.token).also {
                             if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
                                 // Get 509
@@ -193,7 +193,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                     error = "ShowKey error"
                     return@repeat
                 }
-                runCatching {
+                runCatchingCancellationTransparent {
                     getGalleryPageApi(
                         spiderInfo.gid,
                         index,
@@ -239,7 +239,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }
             Log.d(DEBUG_TAG, targetImageUrl)
 
-            runCatching {
+            runCatchingCancellationTransparent {
                 Log.d(DEBUG_TAG, "Start download image $index")
                 val success: Boolean = spiderDen.makeHttpCallAndSaveImage(
                     index,
@@ -269,7 +269,6 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 delay(mDownloadDelay.toLong())
                 return
             }.onFailure {
-                if (it is CancellationException) throw it
                 it.printStackTrace()
                 error = NETWORK_ERROR
             }
