@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.login
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,7 +41,8 @@ import com.hippo.ehviewer.client.EhUrl
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 @Composable
-fun SelectSiteScreen(finish: () -> Unit) {
+fun SelectSiteScreen() {
+    val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
     var siteEx by remember { mutableStateOf(true) }
 
@@ -126,7 +129,7 @@ fun SelectSiteScreen(finish: () -> Unit) {
                         }
                     }
                 }
-                finish()
+                activity.finish()
             }, Modifier.fillMaxWidth()) {
                 Text(text = stringResource(id = android.R.string.ok))
             }

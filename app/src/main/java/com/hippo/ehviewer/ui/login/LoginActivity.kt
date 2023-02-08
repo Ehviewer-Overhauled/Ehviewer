@@ -39,9 +39,7 @@ class LoginActivity : EhActivity() {
                     composable(SELECT_SITE_ROUTE_NAME) {
                         val selectSite by remember { mutableStateOf(Settings.getSelectSite()) }
                         if (selectSite) {
-                            SelectSiteScreen {
-                                finish()
-                            }
+                            SelectSiteScreen()
                         } else {
                             SideEffect {
                                 finish()
