@@ -253,6 +253,7 @@ fun SignInScreen() {
             TextButton(
                 onClick = {
                     Settings.putSelectSite(false)
+                    Settings.putGallerySite(EhUrl.SITE_E)
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 },
             ) {
