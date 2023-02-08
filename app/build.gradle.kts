@@ -48,6 +48,7 @@ android {
                 "fr",
                 "de",
                 "th",
+                "tr",
                 "nb-rNO"
             )
         )
