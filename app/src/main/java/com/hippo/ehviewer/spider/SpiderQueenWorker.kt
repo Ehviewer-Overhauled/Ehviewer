@@ -39,7 +39,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val size
         get() = queen.size()
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + Job() // No SupervisorJob here since uncaught exception would cause semaphore leak
+        get() = Dispatchers.IO + Job()
 
     fun cancel(index: Int) {
         if (isDownloadMode) return
