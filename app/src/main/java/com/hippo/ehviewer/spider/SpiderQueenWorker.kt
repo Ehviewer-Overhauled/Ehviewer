@@ -22,7 +22,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
-import moe.tarsin.coroutines.runCatchingCancellationTransparent
+import moe.tarsin.coroutines.runSuspendCatching
 import kotlin.coroutines.CoroutineContext
 
 class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
@@ -148,7 +148,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                             "?nl=$skipHathKey"
                         }
                     }
-                    runCatchingCancellationTransparent {
+                    runSuspendCatching {
                         getGalleryPage(pageUrl, spiderInfo.gid, spiderInfo.token).also {
                             if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
                                 // Get 509
@@ -193,7 +193,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                     error = "ShowKey error"
                     return@repeat
                 }
-                runCatchingCancellationTransparent {
+                runSuspendCatching {
                     getGalleryPageApi(
                         spiderInfo.gid,
                         index,
@@ -239,7 +239,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }
             Log.d(DEBUG_TAG, targetImageUrl)
 
-            runCatchingCancellationTransparent {
+            runSuspendCatching {
                 Log.d(DEBUG_TAG, "Start download image $index")
                 val success: Boolean = spiderDen.makeHttpCallAndSaveImage(
                     index,
