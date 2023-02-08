@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
@@ -23,7 +22,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebviewSignInScreen(navController: NavController) {
+fun WebviewSignInScreen() {
+    val navController = LocalNavController.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     AndroidView(factory = {

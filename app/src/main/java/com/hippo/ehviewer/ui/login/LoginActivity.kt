@@ -2,11 +2,14 @@ package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.ActivityNavigator
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,26 +26,28 @@ class LoginActivity : EhActivity() {
             Mdc3Theme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
-                    composable(SIGN_IN_ROUTE_NAME) {
-                        SignInScreen(navController)
-                    }
+                CompositionLocalProvider(LocalNavController provides navController) {
+                    NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
+                        composable(SIGN_IN_ROUTE_NAME) {
+                            SignInScreen()
+                        }
 
-                    composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
-                        WebviewSignInScreen(navController)
-                    }
+                        composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
+                            WebviewSignInScreen()
+                        }
 
-                    composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-                        CookieSignInScene(navController)
-                    }
+                        composable(COOKIE_SIGN_IN_ROUTE_NAME) {
+                            CookieSignInScene()
+                        }
 
-                    composable(SELECT_SITE_ROUTE_NAME) {
-                        val selectSite by remember { mutableStateOf(Settings.getSelectSite()) }
-                        if (selectSite) {
-                            SelectSiteScreen()
-                        } else {
-                            SideEffect {
-                                finish()
+                        composable(SELECT_SITE_ROUTE_NAME) {
+                            val selectSite by remember { mutableStateOf(Settings.getSelectSite()) }
+                            if (selectSite) {
+                                SelectSiteScreen()
+                            } else {
+                                SideEffect {
+                                    finish()
+                                }
                             }
                         }
                     }
@@ -81,6 +86,8 @@ suspend fun postLogin() {
         }
     }
 }
+
+val LocalNavController = compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
 
 const val SIGN_IN_ROUTE_NAME = "SignIn"
 const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"

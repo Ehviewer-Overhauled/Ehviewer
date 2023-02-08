@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhCookieStore
@@ -62,7 +61,8 @@ import okhttp3.Cookie
 import java.util.Locale
 
 @Composable
-fun CookieSignInScene(navController: NavController) {
+fun CookieSignInScene() {
+    val navController = LocalNavController.current
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }

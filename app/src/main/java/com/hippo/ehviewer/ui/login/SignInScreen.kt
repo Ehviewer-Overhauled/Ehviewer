@@ -50,7 +50,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
@@ -65,7 +64,8 @@ import kotlinx.coroutines.Job
 import rikka.core.util.ContextUtils.requireActivity
 
 @Composable
-fun SignInScreen(navController: NavController) {
+fun SignInScreen() {
+    val navController = LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var isProgressIndicatorVisible by rememberSaveable { mutableStateOf(false) }
