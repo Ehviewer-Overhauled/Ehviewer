@@ -36,6 +36,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
@@ -93,7 +94,9 @@ class MainActivity : EhActivity() {
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)
-        val bitmap = runCatching { ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener) }.getOrNull() ?: return null
+        val bitmap = runCatching {
+            ImageDecoder.decodeBitmap(src, Image.imageSearchDecoderSampleListener)
+        }.getOrNull() ?: return null
         val temp = AppConfig.createTempFile() ?: return null
         var os: OutputStream? = null
         return try {
@@ -206,19 +209,7 @@ class MainActivity : EhActivity() {
         return false
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        connectivityManager = getSystemService()!!
-        if (Settings.getDF() && Settings.getBypassVpn()) {
-            bypassVpn()
-        }
-        if (EhUtils.needSignedIn())
-            startActivity(Intent(this, LoginActivity::class.java))
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        navController = navHostFragment.navController
+    private fun setNavGraph() {
         navController.apply {
             graph = navInflater.inflate(R.navigation.nav_graph).apply {
                 when (Settings.getLaunchPageGalleryListSceneAction()) {
@@ -228,6 +219,26 @@ class MainActivity : EhActivity() {
                     GalleryListScene.ACTION_TOP_LIST -> setStartDestination(R.id.nav_toplist)
                 }
             }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        connectivityManager = getSystemService()!!
+        if (Settings.getDF() && Settings.getBypassVpn()) {
+            bypassVpn()
+        }
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        navController = navHostFragment.navController
+        if (EhUtils.needSignedIn()) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                setNavGraph()
+            }.launch(Intent(this, LoginActivity::class.java))
+        } else {
+            setNavGraph()
         }
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
