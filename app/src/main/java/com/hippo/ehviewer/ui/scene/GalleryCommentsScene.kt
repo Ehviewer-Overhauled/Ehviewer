@@ -898,15 +898,17 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
 
         fun bind(value: GalleryComment) {
-            user.text = if (value.uploader) getString(
-                R.string.comment_user_uploader,
-                value.user
-            ) else value.user
+            user.text = value.user?.let {
+                if (value.uploader) getString(R.string.comment_user_uploader, it) else it
+            }
             user.setOnClickListener {
-                val lub = ListUrlBuilder()
-                lub.mode = ListUrlBuilder.MODE_UPLOADER
-                lub.keyword = value.user
-                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                value.user?.let {
+                    val lub = ListUrlBuilder().apply {
+                        mode = ListUrlBuilder.MODE_UPLOADER
+                        keyword = it
+                    }
+                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                }
             }
             time.text = ReadableTime.getTimeAgo(value.time)
             comment.text = generateComment(comment.context, comment, value)

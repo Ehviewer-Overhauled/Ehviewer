@@ -79,6 +79,7 @@ object GalleryDetailParser {
     private const val OFFENSIVE_STRING =
         "<p>(And if you choose to ignore this warning, you lose all rights to complain about it in the future.)</p>"
     private const val PINING_STRING = "<p>This gallery is pining for the fjords.</p>"
+
     @Throws(EhException::class)
     fun parse(body: String): GalleryDetail {
         if (body.contains(OFFENSIVE_STRING)) {
@@ -429,10 +430,14 @@ object GalleryDetailParser {
             // time
             val c3 = JsoupUtils.getElementByClass(element, "c3")
             var temp = c3!!.ownText()
-            temp = temp.substring("Posted on ".length, temp.length - " by:".length)
+            if (temp.endsWith(':')) {
+                temp = temp.substring("Posted on ".length, temp.length - " by:".length)
+                // user
+                comment.user = c3.child(0).text()
+            } else {
+                temp = temp.substring("Posted on ".length)
+            }
             comment.time = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(temp)).toEpochMilli()
-            // user
-            comment.user = c3.child(0).text()
             // comment
             val c6 = JsoupUtils.getElementByClass(element, "c6")
             // fix underline support
