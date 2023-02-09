@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client.data
 
+import com.hippo.ehviewer.client.data.GalleryInfo.Companion.S_LANGS
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -74,4 +75,30 @@ class GalleryDetail(
     @IgnoredOnParcel
     @JvmField
     var previewSet: PreviewSet? = null,
-) : AbstractGalleryInfo by galleryInfo, GalleryInfo
+) : AbstractGalleryInfo by galleryInfo, GalleryInfo {
+    override fun generateSLang() {
+        val index = LANGUAGES.indexOf(language)
+        if (index != -1) {
+            simpleLanguage = S_LANGS[index]
+        }
+    }
+
+    companion object {
+        private val LANGUAGES = arrayOf(
+            "English",
+            "Chinese",
+            "Spanish",
+            "Korean",
+            "Russian",
+            "French",
+            "Portuguese",
+            "Thai",
+            "German",
+            "Italian",
+            "Vietnamese",
+            "Polish",
+            "Hungarian",
+            "Dutch"
+        )
+    }
+}
