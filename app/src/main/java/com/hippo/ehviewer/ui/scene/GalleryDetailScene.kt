@@ -78,6 +78,7 @@ import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import com.hippo.ehviewer.client.parser.ArchiveParser
+import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
@@ -149,7 +150,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
-    private var mCurrentFunds: ArchiveParser.Funds? = null
+    private var mCurrentFunds: HomeParser.Funds? = null
 
     @State
     private var mState = STATE_INIT
@@ -1459,7 +1460,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             }
         }
 
-        private fun bind(data: List<ArchiveParser.Archive>?, funds: ArchiveParser.Funds?) {
+        private fun bind(data: List<ArchiveParser.Archive>?, funds: HomeParser.Funds?) {
             if (null == mDialog || null == mProgressView || null == mErrorText || null == mListView) {
                 return
             }
@@ -1511,11 +1512,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     val cost = ParserUtils.parseInt(
                         mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"), 0
                     )
-                    if (cost <= mCurrentFunds!!.fundsGP) {
-                        mCurrentFunds!!.fundsGP -= cost
-                    } else if (cost <= mCurrentFunds!!.fundsC) {
-                        mCurrentFunds!!.fundsC -= cost
-                    } else {
+                    if (cost > maxOf(mCurrentFunds!!.fundsGP, mCurrentFunds!!.fundsC)) {
                         showTip(R.string.insufficient_funds, LENGTH_SHORT)
                         return
                     }

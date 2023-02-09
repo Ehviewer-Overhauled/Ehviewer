@@ -41,6 +41,7 @@ import com.hippo.ehviewer.client.parser.GalleryNotAvailableParser
 import com.hippo.ehviewer.client.parser.GalleryPageApiParser
 import com.hippo.ehviewer.client.parser.GalleryPageParser
 import com.hippo.ehviewer.client.parser.GalleryTokenApiParser
+import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ProfileParser
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.SignInParser
@@ -760,7 +761,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getFunds(): ArchiveParser.Funds? {
+    suspend fun getFunds(): HomeParser.Funds {
         val url = EhUrl.URL_FUNDS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, null).build()
@@ -773,7 +774,7 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                return ArchiveParser.parseFunds(body!!)
+                return HomeParser.parseFunds(body!!)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
