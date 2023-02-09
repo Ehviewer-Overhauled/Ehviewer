@@ -51,6 +51,8 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.network.StatusCodeException
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.AssertUtils
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import okhttp3.FormBody
 import okhttp3.Headers
@@ -775,6 +777,68 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 return HomeParser.parseFunds(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            transformException(code, headers, body, e)
+            throw e
+        }
+    }
+
+    @Throws(Throwable::class)
+    private suspend fun getImageLimitsInternal(): HomeParser.Limits {
+        val url = EhUrl.URL_HOME
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, null).build()
+        val call = okHttpClient.newCall(request)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.executeAsync().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return HomeParser.parse(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            transformException(code, headers, body, e)
+            throw e
+        }
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getImageLimits(): HomeParser.Result = coroutineScope {
+        val limitsDeferred = async {
+            getImageLimitsInternal()
+        }
+        val fundsDeferred = async {
+            getFunds()
+        }
+        HomeParser.Result(limitsDeferred.await(), fundsDeferred.await())
+    }
+
+    @Throws(Throwable::class)
+    suspend fun resetImageLimits(): HomeParser.Limits? {
+        val builder = FormBody.Builder()
+            .add("act", "limits")
+            .add("reset", "Reset Limit")
+        val url = EhUrl.URL_HOME
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, null)
+            .post(builder.build())
+            .build()
+        val call = okHttpClient.newCall(request)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.executeAsync().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return HomeParser.parseResetLimits(body!!)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)

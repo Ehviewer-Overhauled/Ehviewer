@@ -25,6 +25,7 @@ import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -33,6 +34,7 @@ class EhFragment : BasePreferenceFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.eh_settings)
         val account = findPreference<Preference>(Settings.KEY_ACCOUNT)
+        val imageLimits = findPreference<Preference>(Settings.KEY_IMAGE_LIMITS)
         val theme = findPreference<Preference>(Settings.KEY_THEME)
         val blackDarkTheme = findPreference<Preference>(Settings.KEY_BLACK_DARK_THEME)
         val gallerySite = findPreference<Preference>(Settings.KEY_GALLERY_SITE)
@@ -58,6 +60,9 @@ class EhFragment : BasePreferenceFragment() {
         if (!EhTagDatabase.isTranslatable(requireActivity())) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
+        }
+        if (!EhCookieStore.hasSignedIn()) {
+            preferenceScreen.removePreference(imageLimits!!)
         }
     }
 

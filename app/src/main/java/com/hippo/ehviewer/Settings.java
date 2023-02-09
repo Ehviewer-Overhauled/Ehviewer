@@ -45,6 +45,7 @@ public class Settings {
     public static final String KEY_THEME = "theme";
 
     public static final String KEY_ACCOUNT = "account";
+    public static final String KEY_IMAGE_LIMITS = "image_limits";
     public static final String KEY_BLACK_DARK_THEME = "black_dark_theme";
     public static final int THEME_SYSTEM = -1;
     public static final String KEY_GALLERY_SITE = "gallery_site";
