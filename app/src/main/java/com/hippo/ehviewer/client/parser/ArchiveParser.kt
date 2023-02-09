@@ -23,8 +23,6 @@ object ArchiveParser {
         Regex("<strong>(.*)</strong>.*<a href=\"([^\"]*)\">Click Here To Start Downloading</a>")
     private val PATTERN_CURRENT_FUNDS =
         Regex("<p>([\\d,]+) GP \\[[^]]*] &nbsp; ([\\d,]+) Credits \\[[^]]*]</p>")
-    private val PATTERN_FUNDS =
-        Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
     private val PATTERN_HATH_FORM =
         Regex("<form id=\"hathdl_form\" action=\"[^\"]*?or=([^=\"]*?)\" method=\"post\">")
     private val PATTERN_HATH_ARCHIVE =
@@ -61,7 +59,7 @@ object ArchiveParser {
         PATTERN_CURRENT_FUNDS.find(body)?.groupValues?.run {
             val fundsGP = ParserUtils.parseInt(get(1), 0)
             val fundsC = ParserUtils.parseInt(get(2), 0)
-            val funds = Funds(fundsGP, fundsC)
+            val funds = HomeParser.Funds(fundsGP, fundsC)
             result.funds = funds
         }
         return result
@@ -75,14 +73,6 @@ object ArchiveParser {
         // TODO: Check more errors
     }
 
-    fun parseFunds(body: String): Funds? {
-        return PATTERN_FUNDS.find(body)?.groupValues?.run {
-            val fundsC = ParserUtils.parseInt(get(1), 0)
-            val fundsGP = ParserUtils.parseInt(get(2), 0) * 1000
-            return Funds(fundsGP, fundsC)
-        }
-    }
-
     class Archive(
         val res: String,
         val name: String,
@@ -91,7 +81,5 @@ object ArchiveParser {
         val isHAtH: Boolean
     )
 
-    class Funds(var fundsGP: Int, var fundsC: Int)
-
-    class Result(val paramOr: String?, val archiveList: List<Archive>, var funds: Funds?)
+    class Result(val paramOr: String?, val archiveList: List<Archive>, var funds: HomeParser.Funds?)
 }
