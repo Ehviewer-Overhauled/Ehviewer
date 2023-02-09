@@ -323,7 +323,7 @@ object EhEngine {
                 if (html != null) {
                     application.showEventPane(html)
                 }
-                return GalleryDetailParser.parse(body)
+                return GalleryDetailParser.parse(body!!)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
@@ -348,8 +348,8 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 return Pair.create(
-                    GalleryDetailParser.parsePreviewSet(body),
-                    GalleryDetailParser.parsePreviewPages(body)
+                    GalleryDetailParser.parsePreviewSet(body!!),
+                    GalleryDetailParser.parsePreviewPages(body!!)
                 )
             }
         } catch (e: Throwable) {
