@@ -25,17 +25,31 @@ import android.os.Bundle
 import android.os.Looper
 import android.text.Html
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
-import android.text.style.*
+import android.text.style.CharacterStyle
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
+import android.text.style.URLSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
-import android.view.*
+import android.view.ActionMode
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.core.text.getSpans
+import androidx.core.text.inSpans
+import androidx.core.text.set
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -44,7 +58,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputLayout
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
@@ -64,8 +77,12 @@ import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
-import com.hippo.util.*
 import com.hippo.util.BBCode.toBBCode
+import com.hippo.util.ExceptionUtils
+import com.hippo.util.ReadableTime
+import com.hippo.util.TextUrl
+import com.hippo.util.addTextToClipboard
+import com.hippo.util.getParcelableCompat
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
 import com.hippo.widget.LinkifyTextView
@@ -195,20 +212,24 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                     val start = mEditText!!.selectionStart
                     val end = mEditText!!.selectionEnd
                     when (item.itemId) {
-                        R.id.action_bold -> text.setSpan(StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        R.id.action_italic -> text.setSpan(StyleSpan(Typeface.ITALIC), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        R.id.action_underline -> text.setSpan(UnderlineSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        R.id.action_strikethrough -> text.setSpan(StrikethroughSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        R.id.action_bold -> text[start, end] = StyleSpan(Typeface.BOLD)
+
+                        R.id.action_italic -> text[start, end] = StyleSpan(Typeface.ITALIC)
+
+                        R.id.action_underline -> text[start, end] = UnderlineSpan()
+
+                        R.id.action_strikethrough -> text[start, end] = StrikethroughSpan()
+
                         R.id.action_url -> {
-                            val oldSpans = text.getSpans(start, end, URLSpan::class.java)
+                            val oldSpans = text.getSpans<URLSpan>(start, end)
                             var oldUrl = "https://"
-                            oldSpans?.forEach {
-                                if (it is URLSpan && !TextUtils.isEmpty(it.url)) {
+                            oldSpans.forEach {
+                                if (!TextUtils.isEmpty(it.url)) {
                                     oldUrl = it.url
                                 }
                             }
                             val builder = EditTextDialogBuilder(
-                                    context, oldUrl, getString(R.string.format_url)
+                                context, oldUrl, getString(R.string.format_url)
                             )
                             builder.setTitle(getString(R.string.format_url))
                             builder.setPositiveButton(android.R.string.ok, null)
@@ -223,13 +244,15 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                                     builder.setError(null)
                                 }
                                 text.clearSpan(start, end, true)
-                                text.setSpan(URLSpan(url), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                text[start, end] = URLSpan(url)
                                 dialog.dismiss()
                             })
                         }
+
                         R.id.action_clear -> {
                             text.clearSpan(start, end, false)
                         }
+
                         else -> {}
                     }
                     mode?.finish()
@@ -249,16 +272,16 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     fun Spannable.clearSpan(start: Int, end: Int, url: Boolean) {
-        val spans = this.getSpans(start, end, if (url) URLSpan::class.java else CharacterStyle::class.java)
-        spans?.forEach {
-            val spanStart = this.getSpanStart(it)
-            val spanEnd = this.getSpanEnd(it)
-            this.removeSpan(it)
+        val spans = if (url) getSpans<URLSpan>(start, end) else getSpans<CharacterStyle>(start, end)
+        spans.forEach {
+            val spanStart = getSpanStart(it)
+            val spanEnd = getSpanEnd(it)
+            removeSpan(it)
             if (spanStart < start) {
-                this.setSpan(it, spanStart, start, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                this[spanStart, start] = it
             }
             if (spanEnd > end) {
-                this.setSpan(it, end, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                this[end, spanEnd] = it
             }
         }
     }
@@ -849,50 +872,26 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             if (0L != comment.id && 0 != comment.score) {
                 val score = comment.score
                 val scoreString = if (score > 0) "+$score" else score.toString()
-                val ss = SpannableString(scoreString)
-                ss.setSpan(
+                ssb.append("  ").inSpans(
                     RelativeSizeSpan(0.8f),
-                    0,
-                    scoreString.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ss.setSpan(
                     StyleSpan(Typeface.BOLD),
-                    0,
-                    scoreString.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ss.setSpan(
-                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
-                    0,
-                    scoreString.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ssb.append("  ").append(ss)
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary))
+                ) {
+                    append(scoreString)
+                }
             }
             if (comment.lastEdited != 0L) {
                 val str = context.getString(
                     R.string.last_edited,
                     ReadableTime.getTimeAgo(comment.lastEdited)
                 )
-                val ss = SpannableString(str)
-                ss.setSpan(
+                ssb.append("\n\n").inSpans(
                     RelativeSizeSpan(0.8f),
-                    0,
-                    str.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ss.setSpan(
                     StyleSpan(Typeface.BOLD),
-                    0,
-                    str.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ss.setSpan(
-                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
-                    0, str.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                ssb.append("\n\n").append(ss)
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary))
+                ) {
+                    append(str)
+                }
             }
             return TextUrl.handleTextUrl(ssb)
         }
