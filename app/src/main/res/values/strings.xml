@@ -553,6 +553,11 @@
     <string name="download_archive_failure_no_hath">Need H@H client for archive download</string>
     <string name="current_funds">Funds: %1$s GP, %2$d Credits</string>
     <string name="insufficient_funds">Insufficient Funds</string>
+    <string name="image_limits">Image Limits</string>
+    <string name="image_limits_summary">Current Image Limits and Funds</string>
+    <string name="current_limits">Current: %1$s\nReset Cost: %2$s</string>
+    <string name="reset_limits_succeed">Image limit was successfully reset</string>
+    <string name="reset">Reset</string>
     <string name="settings_privacy">Privacy</string>
     <string name="settings_privacy_secure">Prevent screenshots</string>
     <string name="settings_privacy_secure_summary">Prevent the content of the app from being taken screenshots of or shown in the \"Recent Apps\" list.</string>
