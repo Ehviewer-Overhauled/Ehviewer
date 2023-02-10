@@ -40,13 +40,13 @@
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
 
-    <com.hippo.ehviewer.preference.SignInRequiredPreference
+    <Preference
         android:key="uconfig"
         android:summary="@string/settings_u_config_summary"
         android:title="@string/settings_u_config"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.preference.SignInRequiredPreference
+    <Preference
         android:key="mytags"
         android:summary="@string/settings_my_tags_summary"
         android:title="@string/settings_my_tags"

@@ -20,6 +20,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication
@@ -28,13 +29,12 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
-import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 class EhFragment : BasePreferenceFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.eh_settings)
         val account = findPreference<Preference>(Settings.KEY_ACCOUNT)
-        val imageLimits = findPreference<Preference>(Settings.KEY_IMAGE_LIMITS)
         val theme = findPreference<Preference>(Settings.KEY_THEME)
         val blackDarkTheme = findPreference<Preference>(Settings.KEY_BLACK_DARK_THEME)
         val gallerySite = findPreference<Preference>(Settings.KEY_GALLERY_SITE)
@@ -44,7 +44,7 @@ class EhFragment : BasePreferenceFragment() {
         val thumbSize = findPreference<Preference>(Settings.KEY_THUMB_SIZE)
         val thumbResolution = findPreference<Preference>(Settings.KEY_THUMB_RESOLUTION)
         val showTagTranslations = findPreference<Preference>(Settings.KEY_SHOW_TAG_TRANSLATIONS)
-        val tagTranslationsSource = findPreference<Preference>("tag_translations_source")
+        val tagTranslationsSource = findPreference<Preference>(Settings.KEY_TAG_TRANSLATIONS_SOURCE)
         Settings.getDisplayName()?.let { account?.summary = it }
         theme!!.onPreferenceChangeListener = this
         gallerySite!!.onPreferenceChangeListener = this
@@ -62,7 +62,10 @@ class EhFragment : BasePreferenceFragment() {
             preferenceScreen.removePreference(tagTranslationsSource!!)
         }
         if (!EhCookieStore.hasSignedIn()) {
-            preferenceScreen.removePreference(imageLimits!!)
+            Settings.SIGN_IN_REQUIRED.forEach {
+                val preference = findPreference<Preference>(it)
+                preferenceScreen.removePreference(preference!!)
+            }
         }
     }
 
@@ -74,7 +77,13 @@ class EhFragment : BasePreferenceFragment() {
             return true
         } else if (Settings.KEY_GALLERY_SITE == key) {
             requireActivity().setResult(Activity.RESULT_OK)
-            launchIO { runCatching { EhEngine.getUConfig() } }
+            lifecycleScope.launchNonCancellable {
+                runCatching {
+                    EhEngine.getUConfig()
+                }.onFailure {
+                    it.printStackTrace()
+                }
+            }
             return true
         } else if (Settings.KEY_LIST_MODE == key) {
             requireActivity().setResult(Activity.RESULT_OK)
