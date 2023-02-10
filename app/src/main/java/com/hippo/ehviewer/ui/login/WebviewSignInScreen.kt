@@ -15,7 +15,9 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.widget.DialogWebChromeClient
-import eu.kanade.tachiyomi.util.lang.launchNonCancellable
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -99,10 +101,14 @@ fun WebviewSignInScreen() {
                     }
                     if (getId && getHash) {
                         present = true
-                        coroutineScope.launchNonCancellable {
-                            postLogin()
+                        coroutineScope.launchIO {
+                            withNonCancellableContext {
+                                postLogin()
+                            }
+                            withUIContext {
+                                navController.navigate(SELECT_SITE_ROUTE_NAME)
+                            }
                         }
-                        navController.navigate(SELECT_SITE_ROUTE_NAME)
                     }
                 }
             }

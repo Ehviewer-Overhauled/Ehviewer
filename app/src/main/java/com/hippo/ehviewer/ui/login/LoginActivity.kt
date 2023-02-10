@@ -18,6 +18,8 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.EhActivity
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class LoginActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,31 +65,37 @@ class LoginActivity : EhActivity() {
     }
 }
 
-suspend fun postLogin() {
-    runCatching {
-        EhEngine.getProfile().run {
-            Settings.putDisplayName(displayName)
-            Settings.putAvatar(avatar)
-        }
-    }.onFailure {
-        it.printStackTrace()
-    }
-
-    runCatching {
-        Settings.putGallerySite(EhUrl.SITE_EX)
-        EhEngine.getUConfig()
-    }.onFailure {
-        Settings.putSelectSite(false)
-        Settings.putGallerySite(EhUrl.SITE_E)
+suspend fun postLogin() = coroutineScope {
+    launch {
         runCatching {
-            EhEngine.getUConfig()
+            EhEngine.getProfile().run {
+                Settings.putDisplayName(displayName)
+                Settings.putAvatar(avatar)
+            }
         }.onFailure {
             it.printStackTrace()
         }
     }
+    launch {
+        runCatching {
+            Settings.putGallerySite(EhUrl.SITE_EX)
+            EhEngine.getUConfig()
+        }.onFailure {
+            Settings.putSelectSite(false)
+            Settings.putGallerySite(EhUrl.SITE_E)
+            launch {
+                runCatching {
+                    EhEngine.getUConfig()
+                }.onFailure {
+                    it.printStackTrace()
+                }
+            }
+        }
+    }.join()
 }
 
-val LocalNavController = compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
+val LocalNavController =
+    compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
 
 const val SIGN_IN_ROUTE_NAME = "SignIn"
 const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
