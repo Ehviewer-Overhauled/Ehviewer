@@ -895,8 +895,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getUConfig(): Void? {
-        val url = EhUrl.uConfigUrl
+    suspend fun getUConfig(url: String = EhUrl.uConfigUrl): Void? {
         Log.d(TAG, url)
         var request = EhRequestBuilder(url, null).build()
         var call = okHttpClient.newCall(request)

@@ -119,14 +119,17 @@ fun SelectSiteScreen() {
         ) {
             Button(onClick = {
                 Settings.putSelectSite(false)
-                if (!siteEx) {
-                    Settings.putGallerySite(EhUrl.SITE_E)
-                    coroutineScope.launchNonCancellable {
-                        runCatching {
+                coroutineScope.launchNonCancellable {
+                    runCatching {
+                        if (!siteEx) {
+                            Settings.putGallerySite(EhUrl.SITE_E)
                             EhEngine.getUConfig()
-                        }.onFailure {
-                            it.printStackTrace()
+                        } else {
+                            // Get cookies for image limits
+                            EhEngine.getUConfig(EhUrl.URL_UCONFIG_E)
                         }
+                    }.onFailure {
+                        it.printStackTrace()
                     }
                 }
                 activity.finish()
