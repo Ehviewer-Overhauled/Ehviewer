@@ -24,7 +24,6 @@ import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.LargePreviewSet
 import com.hippo.ehviewer.client.data.NormalPreviewSet
@@ -49,8 +48,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 object GalleryDetailParser {
     private val PATTERN_ERROR = Regex("<div class=\"d\">\n<p>([^<]+)</p>")
@@ -70,10 +67,10 @@ object GalleryDetailParser {
     private val PATTERN_NORMAL_PREVIEW =
         Regex("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"")
     private val PATTERN_LARGE_PREVIEW =
-        Pattern.compile("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"")
-    private val PATTERN_NEWER_DATE = Pattern.compile(", added (.+?)<br />")
+        Regex("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"")
+    private val PATTERN_NEWER_DATE = Regex(", added (.+?)<br />")
     private val PATTERN_FAVORITE_SLOT =
-        Pattern.compile("/fav.png\\); background-position:0px -(\\d+)px")
+        Regex("/fav.png\\); background-position:0px -(\\d+)px")
     private val EMPTY_GALLERY_TAG_GROUP_ARRAY = arrayOf<GalleryTagGroup>()
     private val EMPTY_GALLERY_COMMENT_ARRAY = GalleryCommentList(arrayOf(), false)
     private val WEB_COMMENT_DATE_FORMAT = DateTimeFormatter
@@ -124,7 +121,6 @@ object GalleryDetailParser {
         PATTERN_ARCHIVE.find(body)?.run {
             gd.archiveUrl = groupValues[1].trim().unescapeXml()
         }
-        var matcher: Matcher
         try {
             val gm = d.getElementsByClass("gm")[0]
             // Thumb url
@@ -208,9 +204,8 @@ object GalleryDetailParser {
                 } else {
                     gd.isFavorited = true
                     gd.favoriteName = StringUtils.trim(gdf.text())
-                    matcher = PATTERN_FAVORITE_SLOT.matcher(body)
-                    if (matcher.find()) {
-                        gd.favoriteSlot = (NumberUtils.parseIntSafely(matcher.group(1), 2) - 2) / 19
+                    PATTERN_FAVORITE_SLOT.find(body)?.run {
+                        gd.favoriteSlot = ((groupValues[1].toIntOrNull() ?: 2) - 2) / 19
                     }
                 }
             }
@@ -223,30 +218,19 @@ object GalleryDetailParser {
         }
 
         // newer version
-        try {
-            val gnd = d.getElementById("gnd")
-            if (gnd != null) {
-                matcher = PATTERN_NEWER_DATE.matcher(body)
-                val dates = ArrayList<String?>()
-                while (matcher.find()) {
-                    dates.add(matcher.group(1))
-                }
-                val elements = gnd.select("a")
-                for (i in elements.indices) {
-                    val element = elements[i]
-                    val gi: GalleryInfo = BaseGalleryInfo()
-                    val result = GalleryDetailUrlParser.parse(element.attr("href"))
-                    if (result != null) {
-                        gi.gid = result.gid
-                        gi.token = result.token
-                        gi.title = StringUtils.trim(element.text())
-                        gi.posted = dates[i]
-                        gd.newerVersions.add(gi)
-                    }
+        d.getElementById("gnd")?.run {
+            val dates = PATTERN_NEWER_DATE.findAll(body).map { it.groupValues[1] }.toList()
+            select("a").forEachIndexed { index, element ->
+                val gi = BaseGalleryInfo()
+                val result = GalleryDetailUrlParser.parse(element.attr("href"))
+                if (result != null) {
+                    gi.gid = result.gid
+                    gi.token = result.token
+                    gi.title = StringUtils.trim(element.text())
+                    gi.posted = dates[index]
+                    gd.newerVersions.add(gi)
                 }
             }
-        } catch (e: Throwable) {
-            e.printStackTrace()
         }
     }
 
@@ -546,15 +530,11 @@ object GalleryDetailParser {
      */
     @Throws(ParseException::class)
     private fun parseLargePreviewSet(body: String): LargePreviewSet {
-        val m = PATTERN_LARGE_PREVIEW.matcher(body)
         val largePreviewSet = LargePreviewSet()
-        while (m.find()) {
-            val index = ParserUtils.parseInt(m.group(2), 0) - 1
-            if (index < 0) {
-                continue
-            }
-            val imageUrl = ParserUtils.trim(m.group(3))
-            val pageUrl = ParserUtils.trim(m.group(1))
+        PATTERN_LARGE_PREVIEW.findAll(body).forEach {
+            val index = (it.groupValues[2].toIntOrNull() ?: return@forEach) - 1
+            val imageUrl = it.groupValues[3].trim()
+            val pageUrl = it.groupValues[1].trim()
             largePreviewSet.addItem(index, imageUrl, pageUrl)
         }
         if (largePreviewSet.size() == 0) {
