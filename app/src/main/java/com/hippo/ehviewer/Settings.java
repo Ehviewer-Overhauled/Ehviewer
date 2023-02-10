@@ -46,6 +46,8 @@ public class Settings {
 
     public static final String KEY_ACCOUNT = "account";
     public static final String KEY_IMAGE_LIMITS = "image_limits";
+    public static final String KEY_U_CONFIG = "uconfig";
+    public static final String KEY_MY_TAGS = "mytags";
     public static final String KEY_BLACK_DARK_THEME = "black_dark_theme";
     public static final int THEME_SYSTEM = -1;
     public static final String KEY_GALLERY_SITE = "gallery_site";
@@ -53,11 +55,24 @@ public class Settings {
     public static final String KEY_DETAIL_SIZE = "detail_size";
     public static final String KEY_THUMB_SIZE = "thumb_size_";
     public static final String KEY_THUMB_RESOLUTION = "thumb_resolution";
+    public static final String KEY_SHOW_JPN_TITLE = "show_jpn_title";
     public static final String KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations";
+    public static final String KEY_TAG_TRANSLATIONS_SOURCE = "tag_translations_source";
     public static final String KEY_DEFAULT_CATEGORIES = "default_categories";
     public static final int DEFAULT_DEFAULT_CATEGORIES = EhConfig.ALL_CATEGORY;
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
+    public static final String KEY_REQUEST_NEWS = "request_news";
+    public static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
+    public static final String[] SIGN_IN_REQUIRED = {
+            KEY_IMAGE_LIMITS,
+            KEY_GALLERY_SITE,
+            KEY_U_CONFIG,
+            KEY_MY_TAGS,
+            KEY_SHOW_JPN_TITLE,
+            KEY_REQUEST_NEWS,
+            KEY_HIDE_HV_EVENTS
+    };
     /********************
      ****** Privacy and Security
      ********************/
@@ -88,7 +103,6 @@ public class Settings {
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_BYPASS_VPN = "bypass_vpn";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
-    private static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
     private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
     private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
     private static final boolean DEFAULT_SHOW_COMMENTS = true;
@@ -111,7 +125,6 @@ public class Settings {
     private static final int DEFAULT_DETAIL_SIZE = 0;
     private static final int DEFAULT_THUMB_SIZE = 120;
     private static final int DEFAULT_THUMB_RESOLUTION = 0;
-    private static final String KEY_SHOW_JPN_TITLE = "show_jpn_title";
     private static final boolean DEFAULT_SHOW_JPN_TITLE = false;
     private static final String KEY_SHOW_GALLERY_PAGES = "show_gallery_pages";
     private static final boolean DEFAULT_SHOW_GALLERY_PAGES = false;
@@ -192,7 +205,6 @@ public class Settings {
     private static final int DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0;
     private static final String KEY_DOWNLOAD_DELAY = "download_delay";
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
-    private static final String KEY_REQUEST_NEWS = "request_news";
     private static final boolean DEFAULT_REQUEST_NEWS = true;
     private static final String KEY_ARCHIVE_PASSWDS = "archive_passwds";
     private static final String KEY_QS_SAVE_PROGRESS = "qs_save_progress";
