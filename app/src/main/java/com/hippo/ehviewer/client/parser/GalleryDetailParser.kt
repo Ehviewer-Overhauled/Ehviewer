@@ -37,6 +37,7 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.JsoupUtils
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.StringUtils
+import com.hippo.yorozuya.unescapeXml
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -48,25 +49,26 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object GalleryDetailParser {
-    private val PATTERN_ERROR = Pattern.compile("<div class=\"d\">\n<p>([^<]+)</p>")
-    private val PATTERN_DETAIL = Pattern.compile(
+    private val PATTERN_ERROR = Regex("<div class=\"d\">\n<p>([^<]+)</p>")
+    private val PATTERN_DETAIL = Regex(
         "var gid = (\\d+);.+?var token = \"([a-f0-9]+)\";.+?var apiuid = ([\\-\\d]+);.+?var apikey = \"([a-f0-9]+)\";",
-        Pattern.DOTALL
+        RegexOption.DOT_MATCHES_ALL
     )
     private val PATTERN_TORRENT =
-        Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download[^<]+(\\d+)[^<]+</a")
+        Regex("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download[^<]+(\\d+)[^<]+</a")
     private val PATTERN_ARCHIVE =
-        Pattern.compile("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Archive Download</a>")
-    private val PATTERN_COVER = Pattern.compile("width:(\\d+)px; height:(\\d+)px.+?url\\((.+?)\\)")
+        Regex("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Archive Download</a>")
+    private val PATTERN_COVER = Regex("width:(\\d+)px; height:(\\d+)px.+?url\\((.+?)\\)")
     private val PATTERN_PAGES =
-        Pattern.compile("<tr><td[^<>]*>Length:</td><td[^<>]*>([\\d,]+) pages</td></tr>")
+        Regex("<tr><td[^<>]*>Length:</td><td[^<>]*>([\\d,]+) pages</td></tr>")
     private val PATTERN_PREVIEW_PAGES =
-        Pattern.compile("<td[^>]+><a[^>]+>([\\d,]+)</a></td><td[^>]+>(?:<a[^>]+>)?&gt;(?:</a>)?</td>")
+        Regex("<td[^>]+><a[^>]+>([\\d,]+)</a></td><td[^>]+>(?:<a[^>]+>)?&gt;(?:</a>)?</td>")
     private val PATTERN_NORMAL_PREVIEW =
-        Pattern.compile("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"")
+        Regex("<div class=\"gdtm\"[^<>]*><div[^<>]*width:(\\d+)[^<>]*height:(\\d+)[^<>]*\\((.+?)\\)[^<>]*-(\\d+)px[^<>]*><a[^<>]*href=\"(.+?)\"[^<>]*><img alt=\"([\\d,]+)\"")
     private val PATTERN_LARGE_PREVIEW =
         Pattern.compile("<div class=\"gdtl\".+?<a href=\"(.+?)\"><img alt=\"([\\d,]+)\".+?src=\"(.+?)\"")
     private val PATTERN_NEWER_DATE = Pattern.compile(", added (.+?)<br />")
@@ -90,10 +92,7 @@ object GalleryDetailParser {
         }
 
         // Error info
-        val m = PATTERN_ERROR.matcher(body)
-        if (m.find()) {
-            throw EhException(m.group(1))
-        }
+        PATTERN_ERROR.find(body)?.run { throw EhException(groupValues[1]) }
         val galleryDetail = GalleryDetail()
         val document = Jsoup.parse(body)
         parseDetail(galleryDetail, document, body)
@@ -109,63 +108,34 @@ object GalleryDetailParser {
 
     @Throws(ParseException::class)
     private fun parseDetail(gd: GalleryDetail, d: Document, body: String) {
-        var matcher = PATTERN_DETAIL.matcher(body)
-        if (matcher.find()) {
-            gd.gid = NumberUtils.parseLongSafely(matcher.group(1), -1L)
-            gd.token = matcher.group(2)
-            gd.apiUid = NumberUtils.parseLongSafely(matcher.group(3), -1L)
-            gd.apiKey = matcher.group(4)
-        } else {
-            throw ParseException("Can't parse gallery detail", body)
-        }
+        PATTERN_DETAIL.find(body)?.apply {
+            gd.gid = groupValues[1].toLongOrNull() ?: -1L
+            gd.token = groupValues[2]
+            gd.apiUid = groupValues[3].toLongOrNull() ?: -1L
+            gd.apiKey = groupValues[4]
+        } ?: throw ParseException("Can't parse gallery detail", body)
         if (gd.gid == -1L) {
             throw ParseException("Can't parse gallery detail", body)
         }
-        matcher = PATTERN_TORRENT.matcher(body)
-        if (matcher.find()) {
-            gd.torrentUrl = StringUtils.unescapeXml(StringUtils.trim(matcher.group(1)))
-            gd.torrentCount = NumberUtils.parseIntSafely(matcher.group(2), 0)
-        } else {
-            gd.torrentCount = 0
-            gd.torrentUrl = ""
+        PATTERN_TORRENT.find(body)?.run {
+            gd.torrentUrl = groupValues[1].trim().unescapeXml()
+            gd.torrentCount = groupValues[2].toIntOrNull() ?: 0
         }
-        matcher = PATTERN_ARCHIVE.matcher(body)
-        if (matcher.find()) {
-            gd.archiveUrl = StringUtils.unescapeXml(StringUtils.trim(matcher.group(1)))
-        } else {
-            gd.archiveUrl = ""
+        PATTERN_ARCHIVE.find(body)?.run {
+            gd.archiveUrl = groupValues[1].trim().unescapeXml()
         }
+        var matcher: Matcher
         try {
-            val gm = JsoupUtils.getElementByClass(d, "gm")
-
+            val gm = d.getElementsByClass("gm")[0]
             // Thumb url
-            val gd1 = gm!!.getElementById("gd1")
-            try {
-                gd.thumb = parseCoverStyle(
-                    StringUtils.trim(
-                        gd1!!.child(0).attr("style")
-                    )
-                )
-            } catch (e: Throwable) {
-                ExceptionUtils.throwIfFatal(e)
-                gd.thumb = ""
+            gm.getElementById("gd1")?.child(0)?.attr("style")?.trim()?.let {
+                gd.thumb = PATTERN_COVER.find(it)?.run {
+                    handleThumbUrlResolution(groupValues[3])
+                }
             }
 
-            // Title
-            val gn = gm.getElementById("gn")
-            if (null != gn) {
-                gd.title = StringUtils.trim(gn.text())
-            } else {
-                gd.title = ""
-            }
-
-            // Jpn title
-            val gj = gm.getElementById("gj")
-            if (null != gj) {
-                gd.titleJpn = StringUtils.trim(gj.text())
-            } else {
-                gd.titleJpn = ""
-            }
+            gd.title = gm.getElementById("gn")?.text()?.trim()
+            gd.titleJpn = gm.getElementById("gj")?.text()?.trim()
 
             // Category
             val gdc = gm.getElementById("gdc")
@@ -277,16 +247,6 @@ object GalleryDetailParser {
             }
         } catch (e: Throwable) {
             e.printStackTrace()
-        }
-    }
-
-    // width:250px; height:356px; background:transparent url(https://exhentai.org/t/fe/1f/fe1fcfa9bf8fba2f03982eda0aa347cc9d6a6372-145921-1050-1492-jpg_250.jpg) 0 0 no-repeat
-    private fun parseCoverStyle(str: String): String? {
-        val matcher = PATTERN_COVER.matcher(str)
-        return if (matcher.find()) {
-            handleThumbUrlResolution(matcher.group(3))
-        } else {
-            ""
         }
     }
 
@@ -520,15 +480,8 @@ object GalleryDetailParser {
     @JvmStatic
     @Throws(ParseException::class)
     fun parsePreviewPages(body: String): Int {
-        val m = PATTERN_PREVIEW_PAGES.matcher(body)
-        var previewPages = -1
-        if (m.find()) {
-            previewPages = ParserUtils.parseInt(m.group(1), -1)
-        }
-        if (previewPages <= 0) {
-            throw ParseException("Parse preview page count error", body)
-        }
-        return previewPages
+        return PATTERN_PREVIEW_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
+            ?: throw ParseException("Parse preview page count error", body)
     }
 
     /**
@@ -537,15 +490,8 @@ object GalleryDetailParser {
     @JvmStatic
     @Throws(ParseException::class)
     fun parsePages(body: String): Int {
-        var pages = -1
-        val m = PATTERN_PAGES.matcher(body)
-        if (m.find()) {
-            pages = ParserUtils.parseInt(m.group(1), -1)
-        }
-        if (pages < 0) {
-            throw ParseException("Parse pages error", body)
-        }
-        return pages
+        return PATTERN_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
+            ?: throw ParseException("Parse pages error", body)
     }
 
     @Throws(ParseException::class)
@@ -622,25 +568,15 @@ object GalleryDetailParser {
      */
     @Throws(ParseException::class)
     private fun parseNormalPreviewSet(body: String): NormalPreviewSet {
-        val m = PATTERN_NORMAL_PREVIEW.matcher(body)
         val normalPreviewSet = NormalPreviewSet()
-        while (m.find()) {
-            val position = ParserUtils.parseInt(m.group(6), 0) - 1
-            if (position < 0) {
-                continue
-            }
-            val imageUrl = ParserUtils.trim(m.group(3))
-            val xOffset = ParserUtils.parseInt(m.group(4), 0)
+        PATTERN_NORMAL_PREVIEW.findAll(body).forEach {
+            val position = (it.groupValues[6].toIntOrNull() ?: return@forEach) - 1
+            val imageUrl = it.groupValues[3].trim()
+            val xOffset = it.groupValues[4].toIntOrNull() ?: 0
             val yOffset = 0
-            val width = ParserUtils.parseInt(m.group(1), 0)
-            if (width <= 0) {
-                continue
-            }
-            val height = ParserUtils.parseInt(m.group(2), 0)
-            if (height <= 0) {
-                continue
-            }
-            val pageUrl = ParserUtils.trim(m.group(5))
+            val width = it.groupValues[1].toIntOrNull() ?: return@forEach
+            val height = it.groupValues[2].toIntOrNull() ?: return@forEach
+            val pageUrl = it.groupValues[5].trim()
             normalPreviewSet.addItem(position, imageUrl, xOffset, yOffset, width, height, pageUrl)
         }
         if (normalPreviewSet.size() == 0) {
