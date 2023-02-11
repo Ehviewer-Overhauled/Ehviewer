@@ -648,12 +648,15 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            var j = 0
-            val z = tg.size()
-            while (j < z) {
+            tg.forEach {
                 val tag = inflater.inflate(R.layout.item_gallery_tag, awl, false) as TextView
                 awl.addView(tag)
-                val tagStr = tg.getTagAt(j)
+                val tagStr = if (it.startsWith('_')) {
+                    tag.alpha = 0.5f
+                    it.substring(1)
+                } else {
+                    it
+                }
                 var readableTag: String? = null
                 if (ehTags != null && ehTags.isInitialized()) {
                     readableTag = ehTags.getTranslation(prefix, tagStr)
@@ -663,7 +666,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 tag.setTag(R.id.tag, tg.groupName + ":" + tagStr)
                 tag.setOnClickListener(this)
                 tag.setOnLongClickListener(this)
-                j++
             }
         }
     }
@@ -1749,8 +1751,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 return null
             }
             for (tagGroup in tagGroups) {
-                if ("artist" == tagGroup.groupName && tagGroup.size() > 0) {
-                    return tagGroup.getTagAt(0)
+                if ("artist" == tagGroup.groupName && tagGroup.size > 0) {
+                    return tagGroup[0].removePrefix("_")
                 }
             }
             return null
