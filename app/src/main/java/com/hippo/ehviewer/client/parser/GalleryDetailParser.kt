@@ -292,9 +292,12 @@ object GalleryDetailParser {
                 if (index >= 0) {
                     tag = tag.substring(0, index).trim()
                 }
-                group.addTag(tag)
+                if (it.className() == "gtw") {
+                    tag = "_$tag"   // weak tag
+                }
+                group.add(tag)
             }
-            if (group.size() > 0) group else null
+            if (group.size > 0) group else null
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
             e.printStackTrace()
