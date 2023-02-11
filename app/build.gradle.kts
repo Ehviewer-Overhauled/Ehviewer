@@ -125,7 +125,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.1-dev-k1.8.10-c312d77f4cb"
+        kotlinCompilerExtensionVersion = "1.4.2"
     }
 
     namespace = "com.hippo.ehviewer"
