@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
@@ -21,11 +20,19 @@ class ImageLimitsPreference(context: Context, attrs: AttributeSet) :
     DialogPreference(context, attrs), View.OnClickListener {
     private val mActivity = context as SettingsActivity
     private val placeholder = context.getString(R.string.please_wait)
-    private lateinit var coroutineScope: LifecycleCoroutineScope
+    private val coroutineScope = mActivity.lifecycleScope
     private lateinit var resetButton: Button
     private lateinit var mDialog: AlertDialog
     private lateinit var mLimits: HomeParser.Limits
     private lateinit var mFunds: HomeParser.Funds
+
+    init {
+        coroutineScope.launchIO {
+            getImageLimits {
+                summary = "${mLimits.current} / ${mLimits.maximum}"
+            }
+        }
+    }
 
     override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
         super.onPrepareDialogBuilder(builder)
@@ -35,28 +42,42 @@ class ImageLimitsPreference(context: Context, attrs: AttributeSet) :
     override fun onDialogCreated(dialog: AlertDialog) {
         super.onDialogCreated(dialog)
         mDialog = dialog
-        coroutineScope = dialog.lifecycleScope
         resetButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
         resetButton.setOnClickListener(this)
         resetButton.isEnabled = false
-        coroutineScope.launchIO {
-            getImageLimits()
+        if (this::mLimits.isInitialized) {
+            bind()
+        } else {
+            coroutineScope.launchIO {
+                getImageLimits(true) {
+                    bind()
+                }
+            }
         }
     }
 
-    private suspend fun getImageLimits() {
+    override fun onDialogClosed(positiveResult: Boolean) {
+        super.onDialogClosed(positiveResult)
+        if (this::mLimits.isInitialized) {
+            summary = "${mLimits.current} / ${mLimits.maximum}"
+        }
+    }
+
+    private suspend fun getImageLimits(showError: Boolean = false, onSuccess: () -> Unit) {
         runCatching {
             EhEngine.getImageLimits()
         }.onFailure {
             it.printStackTrace()
-            withUIContext {
-                mDialog.setMessage(it.message)
+            if (showError) {
+                withUIContext {
+                    mDialog.setMessage(it.message)
+                }
             }
         }.onSuccess {
             mLimits = it.limits
             mFunds = it.funds
             withUIContext {
-                bind()
+                onSuccess()
             }
         }
     }
