@@ -554,7 +554,7 @@
     <string name="current_funds">Funds: %1$s GP, %2$d Credits</string>
     <string name="insufficient_funds">Insufficient Funds</string>
     <string name="image_limits">Image Limits</string>
-    <string name="image_limits_summary">Current Image Limits and Funds</string>
+    <string name="image_limits_summary">%1$d / %2$d (Click to refresh)</string>
     <string name="current_limits">Current: %1$s\nReset Cost: %2$s</string>
     <string name="reset_limits_succeed">Image limit was successfully reset</string>
     <string name="reset">Reset</string>

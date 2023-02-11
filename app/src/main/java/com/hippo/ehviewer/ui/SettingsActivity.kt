@@ -20,20 +20,38 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.ui.fragment.SettingsFragment
 import com.hippo.ehviewer.ui.scene.BaseScene
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 
 class SettingsActivity : EhActivity() {
     private var mFab: FloatingActionButton? = null
     private var mContentText: TextView? = null
     private var mAppbarLayout: AppBarLayout? = null
+    var mLimits: HomeParser.Limits? = null
+        private set
+    var mFunds: HomeParser.Funds? = null
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (EhCookieStore.hasSignedIn()) {
+            lifecycleScope.launchIO {
+                runCatching {
+                    getImageLimits()
+                }.exceptionOrNull()?.printStackTrace()
+            }
+        }
         setContentView(R.layout.activity_preference)
         setSupportActionBar(findViewById(R.id.toolbar))
         mContentText = findViewById(R.id.tip)
@@ -47,6 +65,20 @@ class SettingsActivity : EhActivity() {
                 .replace(R.id.fragment, SettingsFragment())
                 .commitAllowingStateLoss()
         }
+    }
+
+    suspend fun getImageLimits() = EhEngine.getImageLimits().run {
+        mLimits = limits
+        mFunds = funds
+    }
+
+    suspend fun resetImageLimits() {
+        mLimits =
+            EhEngine.resetImageLimits() ?: HomeParser.Limits(maximum = mLimits!!.maximum).also {
+                withUIContext {
+                    showTip(R.string.reset_limits_succeed, BaseScene.LENGTH_SHORT)
+                }
+            }
     }
 
     fun showTip(@StringRes id: Int, length: Int) {
