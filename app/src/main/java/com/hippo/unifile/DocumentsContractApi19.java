@@ -16,21 +16,16 @@
 
 package com.hippo.unifile;
 
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.DocumentsContract;
 import android.text.TextUtils;
-import android.util.Log;
 
-@TargetApi(Build.VERSION_CODES.KITKAT)
 final class DocumentsContractApi19 {
-    private static final String TAG = DocumentsContractApi19.class.getSimpleName();
 
     private DocumentsContractApi19() {
     }
@@ -118,8 +113,6 @@ final class DocumentsContractApi19 {
             return DocumentsContract.deleteDocument(context.getContentResolver(), self);
         } catch (Throwable e) {
             Utils.throwIfFatal(e);
-            // Maybe user ejects tf card
-            Log.e(TAG, "Failed to renameTo", e);
             return false;
         }
     }
@@ -134,7 +127,6 @@ final class DocumentsContractApi19 {
             return null != c && c.getCount() > 0;
         } catch (Throwable e) {
             Utils.throwIfFatal(e);
-            // Log.w(TAG, "Failed query: " + e);
             return false;
         } finally {
             Utils.closeQuietly(c);

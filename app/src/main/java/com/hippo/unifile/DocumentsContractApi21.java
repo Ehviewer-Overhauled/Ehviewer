@@ -16,21 +16,16 @@
 
 package com.hippo.unifile;
 
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.DocumentsContract;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 final class DocumentsContractApi21 {
-    private static final String TAG = DocumentsContractApi21.class.getSimpleName();
     private static final String PATH_DOCUMENT = "document";
     private static final String PATH_TREE = "tree";
 
@@ -44,8 +39,6 @@ final class DocumentsContractApi21 {
                     displayName);
         } catch (Throwable e) {
             Utils.throwIfFatal(e);
-            // Maybe user ejects tf card
-            Log.e(TAG, "Failed to createFile: " + self, e);
             return null;
         }
     }
@@ -92,12 +85,11 @@ final class DocumentsContractApi21 {
             }
         } catch (Throwable e) {
             Utils.throwIfFatal(e);
-            Log.e(TAG, "Failed listFiles: " + self, e);
         } finally {
             Utils.closeQuietly(c);
         }
 
-        return results.toArray(new Uri[results.size()]);
+        return results.toArray(new Uri[0]);
     }
 
     public static Uri renameTo(Context context, Uri self, String displayName) {
@@ -105,8 +97,6 @@ final class DocumentsContractApi21 {
             return DocumentsContract.renameDocument(context.getContentResolver(), self, displayName);
         } catch (Throwable e) {
             Utils.throwIfFatal(e);
-            // Maybe user ejects tf card
-            Log.e(TAG, "Failed to renameTo:" + self + ", " + displayName, e);
             return null;
         }
     }

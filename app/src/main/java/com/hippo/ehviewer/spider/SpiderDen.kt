@@ -32,7 +32,6 @@ import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
-import com.hippo.yorozuya.Utilities
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
@@ -103,15 +102,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
      * @param extension with dot
      */
     private fun fixExtension(extension: String): String {
-        return if (Utilities.contain(
-                PageLoader2.SUPPORT_IMAGE_EXTENSIONS,
-                extension
-            )
-        ) {
-            extension
-        } else {
-            PageLoader2.SUPPORT_IMAGE_EXTENSIONS[0]
-        }
+        return extension.takeIf { PageLoader2.SUPPORT_IMAGE_EXTENSIONS.contains(it) }
+            ?: PageLoader2.SUPPORT_IMAGE_EXTENSIONS[0]
     }
 
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
@@ -158,19 +150,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     private fun removeFromDownloadDir(index: Int): Boolean {
-        val dir = downloadDir ?: return false
-        var result = false
-        var i = 0
-        val n = PageLoader2.SUPPORT_IMAGE_EXTENSIONS.size
-        while (i < n) {
-            val filename = generateImageFilename(index, PageLoader2.SUPPORT_IMAGE_EXTENSIONS[i])
-            val file = dir.subFile(filename)
-            if (file != null) {
-                result = result or runCatching { file.delete() }.getOrDefault(false)
-            }
-            i++
-        }
-        return result
+        return downloadDir?.let { findImageFile(it, index)?.delete() } ?: false
     }
 
     fun remove(index: Int): Boolean {
@@ -290,7 +270,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     fun getExtension(index: Int): String? {
         val key = EhCacheKeyFactory.getImageKey(mGid, index)
         return sCache[key]?.use { it.metadata.toNioPath().readText() }
-            ?: downloadDir?.let { findImageFile(it, index) }?.name.let { FileUtils.getExtensionFromFilename(it) }
+            ?: downloadDir?.let { findImageFile(it, index) }
+                ?.name.let { FileUtils.getExtensionFromFilename(it) }
     }
 
     fun getImageSource(index: Int): ByteBufferSource? {
