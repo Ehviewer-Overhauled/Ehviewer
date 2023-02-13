@@ -23,22 +23,18 @@ import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCacheKeyFactory
+import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.image.Image.ByteBufferSource
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
-import io.ktor.client.plugins.onDownload
-import io.ktor.client.request.prepareGet
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.contentLength
-import io.ktor.http.contentType
-import io.ktor.utils.io.jvm.nio.copyTo
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import okhttp3.executeAsync
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -49,7 +45,7 @@ import java.nio.channels.FileChannel
 import java.util.Locale
 import kotlin.io.path.readText
 
-private val client = EhApplication.ktorClient
+private val client = EhApplication.okHttpClient
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -170,57 +166,58 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit
     ): Boolean {
-        return client.prepareGet(url) {
-            var state: Long = 0
-            referer(referer)
-            onDownload { bytesSentTotal, contentLength ->
-                notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt())
-                state = bytesSentTotal
-            }
-        }.execute {
-            if (it.status.value >= 400) return@execute false
-            saveFromHttpResponse(index, it)
-        }
-    }
+        val call = client.newCall(EhRequestBuilder(url, referer).build())
+        call.executeAsync().use { response ->
+            if (response.code >= 400) return false
+            val body = response.body
+            val extension = body.contentType()?.subtype ?: "jpg"
+            val length = body.contentLength()
 
-    private suspend fun saveFromHttpResponse(index: Int, body: HttpResponse): Boolean {
-        val extension = body.contentType()?.contentSubtype ?: "jpg"
-        val length = body.contentLength() ?: return false
-
-        suspend fun doSave(outChannel: FileChannel): Long {
-            return body.bodyAsChannel().copyTo(outChannel)
-        }
-
-        findDownloadFileForIndex(index, extension)?.runCatching {
-            openOutputStream().use { outputStream ->
-                (outputStream as FileOutputStream).channel.use { return doSave(it) == length }
-            }
-        }?.onFailure {
-            it.printStackTrace()
-            return false
-        }
-
-        // Read Mode, allow save to cache
-        if (mMode == SpiderQueen.MODE_READ) {
-            val key = EhCacheKeyFactory.getImageKey(mGid, index)
-            val editor = sCache.edit(key) ?: return false
-            var received: Long = 0
-            runCatching {
-                editor.metadata.toFile().writeText(extension)
-                editor.data.toFile().outputStream().use { outputStream ->
-                    outputStream.channel.use { received = doSave(it) }
+            suspend fun doSave(chan: FileChannel): Long {
+                var receivedSize: Long = 0
+                body.source().use { source ->
+                    while (true) {
+                        currentCoroutineContext().ensureActive()
+                        val bytesRead = chan.transferFrom(source, receivedSize, TRANSFER_BLOCK)
+                        receivedSize += bytesRead
+                        notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
+                        if (bytesRead.toInt() == 0) break
+                    }
                 }
-            }.onFailure {
-                editor.abort()
+                return receivedSize
+            }
+
+            findDownloadFileForIndex(index, extension)?.runCatching {
+                openOutputStream().use { outputStream ->
+                    (outputStream as FileOutputStream).channel.use { return doSave(it) == length }
+                }
+            }?.onFailure {
                 it.printStackTrace()
                 return false
-            }.onSuccess {
-                editor.commit()
-                return received == length
             }
-        }
 
-        return false
+            // Read Mode, allow save to cache
+            if (mMode == SpiderQueen.MODE_READ) {
+                val key = EhCacheKeyFactory.getImageKey(mGid, index)
+                val editor = sCache.edit(key) ?: return false
+                var received: Long = 0
+                runCatching {
+                    editor.metadata.toFile().writeText(extension)
+                    editor.data.toFile().outputStream().use { outputStream ->
+                        outputStream.channel.use { received = doSave(it) }
+                    }
+                }.onFailure {
+                    editor.abort()
+                    it.printStackTrace()
+                    return false
+                }.onSuccess {
+                    editor.commit()
+                    return received == length
+                }
+            }
+
+            return false
+        }
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {

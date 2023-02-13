@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.okhttp.ChromeRequestBuilder
-import io.ktor.http.HttpMessageBuilder
 
 class EhRequestBuilder @JvmOverloads constructor(
     url: String,
@@ -28,6 +27,3 @@ class EhRequestBuilder @JvmOverloads constructor(
         origin?.let { addHeader("Origin", it) }
     }
 }
-
-fun HttpMessageBuilder.referer(value: String?): Unit =
-    value?.let { headers.append("Referer", it) } ?: Unit

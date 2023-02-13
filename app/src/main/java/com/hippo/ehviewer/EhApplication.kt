@@ -55,8 +55,6 @@ import com.hippo.yorozuya.IntIdGenerator
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -305,14 +303,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 builder.proxy(Proxy.NO_PROXY)
             }
             builder.build()
-        }
-
-        val ktorClient by lazy {
-            HttpClient(OkHttp) {
-                engine {
-                    preconfigured = okHttpClient
-                }
-            }
         }
 
         @JvmStatic

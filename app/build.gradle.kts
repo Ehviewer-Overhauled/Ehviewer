@@ -192,7 +192,6 @@ dependencies {
     // implementation 'io.coil-kt:coil:2.2.2'
     implementation("com.github.Ehviewer-Overhauled.coil:coil-compose:53302f2")
 
-    implementation("io.ktor:ktor-client-okhttp:2.2.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0-RC")
     implementation("org.jsoup:jsoup:1.15.3")
