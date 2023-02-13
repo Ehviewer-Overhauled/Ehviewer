@@ -323,7 +323,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     companion object {
-        private const val TRANSFER_BLOCK: Long = 40960
+        private const val TRANSFER_BLOCK: Long = 8192
 
         // We use data to store image file, and metadata for image type
         private val sCache by lazy {
