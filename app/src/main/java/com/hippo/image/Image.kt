@@ -93,8 +93,6 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
         @JvmStatic
         fun decode(src: ByteBufferSource): Image? {
             val directBuffer = src.getByteBuffer()
-            check(directBuffer.isDirect)
-            rewriteGifSource(directBuffer)
             return runCatching {
                 Image(ImageDecoder.createSource(directBuffer), src)
             }.onFailure {
@@ -104,7 +102,7 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
         }
 
         @JvmStatic
-        private external fun rewriteGifSource(buffer: ByteBuffer)
+        external fun rewriteGifSource(buffer: ByteBuffer)
     }
 
     interface ByteBufferSource : AutoCloseable {

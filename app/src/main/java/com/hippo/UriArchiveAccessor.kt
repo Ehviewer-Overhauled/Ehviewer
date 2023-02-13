@@ -44,6 +44,7 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
         val buffer = extractToByteBuffer(index)
         buffer ?: return null
         check(buffer.isDirect)
+        Image.rewriteGifSource(buffer)
         return object : Image.ByteBufferSource {
             override fun getByteBuffer(): ByteBuffer {
                 return buffer
