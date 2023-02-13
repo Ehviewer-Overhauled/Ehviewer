@@ -8,4 +8,4 @@ pluginManagement {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "EhViewer"
-include(":app", ":native")
+include(":app")
