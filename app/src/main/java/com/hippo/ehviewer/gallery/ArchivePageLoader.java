@@ -54,7 +54,7 @@ public class ArchivePageLoader extends PageLoader2 {
     public static PVLock pv = new PVLock(0);
     private final UriArchiveAccessor archiveAccessor;
     private final Stack<Integer> requests = new Stack<>();
-    private final LinkedHashMap<Integer, Image.ByteBufferSource> streams = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, Image.CloseableSource> streams = new LinkedHashMap<>();
     private final Thread[] decodeThread = new Thread[]{
             new Thread(new DecodeTask()),
             new Thread(new DecodeTask()),
@@ -303,7 +303,7 @@ public class ArchivePageLoader extends PageLoader2 {
                     }
                 }
 
-                Image.ByteBufferSource src = archiveAccessor.getImageSource(index);
+                Image.CloseableSource src = archiveAccessor.getImageSource(index);
 
                 synchronized (streams) {
                     streams.put(index, src);
@@ -318,7 +318,7 @@ public class ArchivePageLoader extends PageLoader2 {
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 int index;
-                Image.ByteBufferSource src;
+                Image.CloseableSource src;
                 synchronized (streams) {
                     if (streams.isEmpty()) {
                         try {
@@ -329,8 +329,8 @@ public class ArchivePageLoader extends PageLoader2 {
                         continue;
                     }
 
-                    Iterator<Map.Entry<Integer, Image.ByteBufferSource>> iterator = streams.entrySet().iterator();
-                    Map.Entry<Integer, Image.ByteBufferSource> entry = iterator.next();
+                    Iterator<Map.Entry<Integer, Image.CloseableSource>> iterator = streams.entrySet().iterator();
+                    Map.Entry<Integer, Image.CloseableSource> entry = iterator.next();
                     iterator.remove();
                     index = entry.getKey();
                     src = entry.getValue();

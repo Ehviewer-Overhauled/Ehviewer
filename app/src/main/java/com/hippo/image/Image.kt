@@ -21,7 +21,7 @@ import android.graphics.ColorSpace
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
-import android.graphics.drawable.Animatable
+import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -30,9 +30,9 @@ import com.hippo.ehviewer.R
 import java.nio.ByteBuffer
 import kotlin.math.min
 
-class Image private constructor(source: Source, private var src: ByteBufferSource?) {
+class Image private constructor(private val src: CloseableSource) {
     var mObtainedDrawable: Drawable? =
-        ImageDecoder.decodeDrawable(source) { decoder: ImageDecoder, info: ImageInfo, _: Source ->
+        ImageDecoder.decodeDrawable(src.source) { decoder: ImageDecoder, info: ImageInfo, _: Source ->
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
                 // Allocating hardware bitmap may cause a crash on framework versions prior to Android Q
                 decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
@@ -43,23 +43,21 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
             )
         }.also {
             (it as? BitmapDrawable)?.run {
-                src?.close()
-                src = null
+                src.close()
             }
         }
         private set
 
     val size: Int
-        get() = mObtainedDrawable!!.run { intrinsicHeight * intrinsicWidth * 4 * if (this is Animatable) 4 else 1 }
+        get() = mObtainedDrawable!!.run { intrinsicHeight * intrinsicWidth * 4 * if (this is AnimatedImageDrawable) 4 else 1 }
 
     @Synchronized
     fun recycle() {
-        (mObtainedDrawable as? Animatable)?.stop()
+        (mObtainedDrawable as? AnimatedImageDrawable)?.stop()
         (mObtainedDrawable as? BitmapDrawable)?.bitmap?.recycle()
         mObtainedDrawable?.callback = null
         mObtainedDrawable = null
-        src?.close()
-        src = null
+        (mObtainedDrawable as? AnimatedImageDrawable)?.let { src.close() }
     }
 
     companion object {
@@ -91,10 +89,9 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
         )
 
         @JvmStatic
-        fun decode(src: ByteBufferSource): Image? {
-            val directBuffer = src.getByteBuffer()
+        fun decode(src: CloseableSource): Image? {
             return runCatching {
-                Image(ImageDecoder.createSource(directBuffer), src)
+                Image(src)
             }.onFailure {
                 src.close()
                 it.printStackTrace()
@@ -105,8 +102,7 @@ class Image private constructor(source: Source, private var src: ByteBufferSourc
         external fun rewriteGifSource(buffer: ByteBuffer)
     }
 
-    interface ByteBufferSource : AutoCloseable {
-        // A read-write direct bytebuffer, it may in native heap or file mapping
-        fun getByteBuffer(): ByteBuffer
+    interface CloseableSource : AutoCloseable {
+        val source: Source
     }
 }

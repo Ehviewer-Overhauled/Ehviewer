@@ -15,12 +15,11 @@
  */
 package com.hippo.ehviewer.spider
 
+import android.graphics.ImageDecoder
 import coil.decode.DecodeUtils
 import coil.decode.FrameDelayRewritingSource
 import coil.decode.isGif
 import coil.disk.DiskCache
-import com.hippo.Native.mapFd
-import com.hippo.Native.unmapDirectByteBuffer
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
@@ -30,7 +29,7 @@ import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.gallery.PageLoader2
-import com.hippo.image.Image.ByteBufferSource
+import com.hippo.image.Image.CloseableSource
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
@@ -43,13 +42,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.RandomAccessFile
-import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.util.Locale
 import kotlin.io.path.readText
 
 private val client = EhApplication.okHttpClient
+private val contentResolver = application.contentResolver
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -180,7 +178,9 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             suspend fun doSave(chan: FileChannel): Long {
                 var receivedSize: Long = 0
                 body.source().use { responseSource ->
-                    val source = if (DecodeUtils.isGif(responseSource)) FrameDelayRewritingSource(responseSource).buffer() else responseSource
+                    val source = if (DecodeUtils.isGif(responseSource)) FrameDelayRewritingSource(
+                        responseSource
+                    ).buffer() else responseSource
                     source.use {
                         while (true) {
                             currentCoroutineContext().ensureActive()
@@ -278,29 +278,19 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 ?.name.let { FileUtils.getExtensionFromFilename(it) }
     }
 
-    fun getImageSource(index: Int): ByteBufferSource? {
+    fun getImageSource(index: Int): CloseableSource? {
         if (mMode == SpiderQueen.MODE_READ) {
             val key = EhCacheKeyFactory.getImageKey(mGid, index)
             val snapshot: DiskCache.Snapshot? = sCache[key]
             if (snapshot != null) {
-                try {
-                    val file = RandomAccessFile(snapshot.data.toFile(), "rw")
-                    val chan = file.channel
-                    val map = chan.map(FileChannel.MapMode.PRIVATE, 0, file.length())
-                    return object : ByteBufferSource {
-                        override fun getByteBuffer(): ByteBuffer {
-                            return map
-                        }
+                val source = ImageDecoder.createSource(snapshot.data.toFile())
+                return object : CloseableSource {
+                    override val source: ImageDecoder.Source
+                        get() = source
 
-                        @Throws(Exception::class)
-                        override fun close() {
-                            chan.close()
-                            file.close()
-                            snapshot.close()
-                        }
+                    override fun close() {
+                        snapshot.close()
                     }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
                 }
             }
         }
@@ -312,46 +302,21 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             }
         }
         if (file is RawFile) {
-            try {
-                val file2 = RandomAccessFile(file.mFile, "rw")
-                val chan = file2.channel
-                val map = chan.map(FileChannel.MapMode.PRIVATE, 0, file2.length())
-                return object : ByteBufferSource {
-                    override fun getByteBuffer(): ByteBuffer {
-                        return map
-                    }
+            val source = ImageDecoder.createSource(file.mFile)
+            return object : CloseableSource {
+                override val source: ImageDecoder.Source
+                    get() = source
 
-                    @Throws(Exception::class)
-                    override fun close() {
-                        chan.close()
-                        file2.close()
-                    }
-                }
-            } catch (e: Throwable) {
-                e.printStackTrace()
+                override fun close() {}
             }
         }
         if (file != null) {
-            try {
-                val pfd = application.contentResolver.openFileDescriptor(file.uri, "rw")
-                val map = mapFd(pfd!!.fd, pfd.statSize)
-                if (map != null) {
-                    return object : ByteBufferSource {
-                        override fun getByteBuffer(): ByteBuffer {
-                            return map
-                        }
+            val source = ImageDecoder.createSource(contentResolver, file.uri)
+            return object : CloseableSource {
+                override val source: ImageDecoder.Source
+                    get() = source
 
-                        @Throws(Exception::class)
-                        override fun close() {
-                            unmapDirectByteBuffer(map)
-                            pfd.close()
-                        }
-                    }
-                } else {
-                    pfd.close()
-                }
-            } catch (e: Throwable) {
-                e.printStackTrace()
+                override fun close() {}
             }
         }
         return null

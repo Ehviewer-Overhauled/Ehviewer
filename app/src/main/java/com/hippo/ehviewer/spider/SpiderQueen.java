@@ -855,7 +855,7 @@ public final class SpiderQueen implements Runnable {
                     continue;
                 }
 
-                Image.ByteBufferSource src = mSpiderDen.getImageSource(index);
+                Image.CloseableSource src = mSpiderDen.getImageSource(index);
                 if (src == null) {
                     resetDecodeIndex();
                     // Can't find the file, it might be removed from cache,

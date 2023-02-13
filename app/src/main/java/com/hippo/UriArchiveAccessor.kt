@@ -18,6 +18,7 @@
 package com.hippo
 
 import android.content.Context
+import android.graphics.ImageDecoder
 import android.net.Uri
 import com.hippo.image.Image
 import java.nio.ByteBuffer
@@ -40,15 +41,15 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
         pfd.close()
     }
 
-    fun getImageSource(index: Int): Image.ByteBufferSource? {
+    fun getImageSource(index: Int): Image.CloseableSource? {
         val buffer = extractToByteBuffer(index)
         buffer ?: return null
         check(buffer.isDirect)
         Image.rewriteGifSource(buffer)
-        return object : Image.ByteBufferSource {
-            override fun getByteBuffer(): ByteBuffer {
-                return buffer
-            }
+        val source = ImageDecoder.createSource(buffer)
+        return object : Image.CloseableSource {
+            override val source: ImageDecoder.Source
+                get() = source
 
             override fun close() {
                 releaseByteBuffer(buffer)
