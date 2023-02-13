@@ -15,6 +15,9 @@
  */
 package com.hippo.ehviewer.spider
 
+import coil.decode.DecodeUtils
+import coil.decode.FrameDelayRewritingSource
+import coil.decode.isGif
 import coil.disk.DiskCache
 import com.hippo.Native.mapFd
 import com.hippo.Native.unmapDirectByteBuffer
@@ -35,6 +38,7 @@ import com.hippo.yorozuya.MathUtils
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import okhttp3.executeAsync
+import okio.buffer
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -175,13 +179,16 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
             suspend fun doSave(chan: FileChannel): Long {
                 var receivedSize: Long = 0
-                body.source().use { source ->
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val bytesRead = chan.transferFrom(source, receivedSize, TRANSFER_BLOCK)
-                        receivedSize += bytesRead
-                        notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
-                        if (bytesRead.toInt() == 0) break
+                body.source().use { responseSource ->
+                    val source = if (DecodeUtils.isGif(responseSource)) FrameDelayRewritingSource(responseSource).buffer() else responseSource
+                    source.use {
+                        while (true) {
+                            currentCoroutineContext().ensureActive()
+                            val bytesRead = chan.transferFrom(it, receivedSize, TRANSFER_BLOCK)
+                            receivedSize += bytesRead
+                            notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
+                            if (bytesRead.toInt() == 0) break
+                        }
                     }
                 }
                 return receivedSize
