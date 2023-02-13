@@ -62,8 +62,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
-import java.net.InetAddress
-import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.KeyStore
 import java.util.Arrays
@@ -314,20 +312,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val ktorClient by lazy {
             HttpClient(CIO) {
                 engine {
-                    proxy = when (Settings.getProxyType()) {
-                        EhProxySelector.TYPE_DIRECT -> Proxy.NO_PROXY
-                        EhProxySelector.TYPE_SYSTEM -> null
-                        EhProxySelector.TYPE_HTTP -> {
-                            val ip = Settings.getProxyIp()
-                            val port = Settings.getProxyPort()
-                            val iNetAddress = InetAddress.getByName(ip)
-                            val socketAddress = InetSocketAddress(iNetAddress, port)
-                            Proxy(Proxy.Type.HTTP, socketAddress)
-                        }
-
-                        // CIO does not support Socks proxy yet
-                        else -> null
-                    }
                     https {
                         serverName = "0.0.0.0".takeIf { Settings.getDF() }
                         trustManager = EhX509TrustManager
