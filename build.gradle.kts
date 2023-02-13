@@ -5,14 +5,6 @@ plugins {
     id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven("https://jcenter.bintray.com")
-    maven("https://jitpack.io")
-    maven("https://androidx.dev/storage/compose-compiler/repository/")
-}
-
 tasks.register("Delete", Delete::class) {
     delete(rootProject.buildDir)
 }

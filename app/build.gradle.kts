@@ -204,11 +204,3 @@ configurations.all {
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
-
-repositories {
-    google()
-    mavenCentral()
-    maven("https://jcenter.bintray.com")
-    maven("https://jitpack.io")
-    maven("https://androidx.dev/storage/compose-compiler/repository/")
-}
