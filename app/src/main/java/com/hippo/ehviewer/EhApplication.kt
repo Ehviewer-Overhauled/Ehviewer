@@ -332,7 +332,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                         serverName = "0.0.0.0".takeIf { Settings.getDF() }
                         trustManager = EhX509TrustManager
                     }
-                    pipelining = true
                 }
                 install(HttpCookies) {
                     storage = EhCookieStore
