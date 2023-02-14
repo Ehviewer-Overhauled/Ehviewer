@@ -33,7 +33,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val spiderDen
         get() = queen.mSpiderDen
     private val spiderInfo by lazy { queen.mSpiderInfo.get() }
-    private val mJobMap = hashMapOf<Int, Job>()
+    private val mFetcherJobMap = hashMapOf<Int, Job>()
     private val mSemaphore = Semaphore(Settings.getMultiThreadDownload())
     private val pTokenLock = Mutex()
     private var showKey: String? = null
@@ -48,8 +48,8 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     fun cancel(index: Int) {
         decoder.cancel(index)
         if (isDownloadMode) return
-        synchronized(mJobMap) {
-            mJobMap.remove(index)?.cancel()
+        synchronized(mFetcherJobMap) {
+            mFetcherJobMap.remove(index)?.cancel()
         }
     }
 
@@ -62,17 +62,17 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
 
     fun updateRAList(list: List<Int>) {
         if (isDownloadMode) return
-        synchronized(mJobMap) {
+        synchronized(mFetcherJobMap) {
             sequence {
-                mJobMap.forEach { (i, job) ->
+                mFetcherJobMap.forEach { (i, job) ->
                     if (i !in list) {
                         job.cancel()
                     }
                     if (!job.isActive) yield(i)
                 }
-            }.toSet().forEach { mJobMap.remove(it) }
+            }.toSet().forEach { mFetcherJobMap.remove(it) }
             list.forEach {
-                if (mJobMap[it]?.isActive != true)
+                if (mFetcherJobMap[it]?.isActive != true)
                     doLaunchDownloadJob(it, false)
             }
         }
@@ -81,11 +81,11 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private fun doLaunchDownloadJob(index: Int, force: Boolean) {
         val state = queen.mPageStateArray[index]
         if (!force && state == STATE_FINISHED) return
-        synchronized(mJobMap) {
-            val currentJob = mJobMap[index]
+        synchronized(mFetcherJobMap) {
+            val currentJob = mFetcherJobMap[index]
             if (force) currentJob?.cancel()
             if (currentJob?.isActive != true) {
-                mJobMap[index] = launch {
+                mFetcherJobMap[index] = launch {
                     mSemaphore.withPermit {
                         doInJob(index, force)
                     }
@@ -309,12 +309,11 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         }
 
         fun launch(index: Int) {
-            check(index in 0 until size)
             synchronized(mDecodeJobMap) {
                 val currentJob = mDecodeJobMap[index]
                 if (currentJob?.isActive != true) {
                     mDecodeJobMap[index] = launch {
-                        mJobMap[index]?.takeIf { it.isActive }?.join()
+                        mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
                         mSemaphore.withPermit {
                             doInJob(index)
                         }
@@ -326,6 +325,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         private suspend fun doInJob(index: Int) {
             val src = spiderDen.getImageSource(index) ?: return
 
+            currentCoroutineContext().ensureActive()
             val image = decode(src)
             runCatching {
                 currentCoroutineContext().ensureActive()
@@ -333,15 +333,12 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 image?.recycle()
                 throw it
             }
-            var error: String? = null
 
             if (image == null) {
-                error = DECODE_ERROR
+                queen.notifyGetImageFailure(index, DECODE_ERROR)
+            } else {
+                queen.notifyGetImageSuccess(index, image)
             }
-
-            // Notify
-            image?.let { queen.notifyGetImageSuccess(index, it) }
-                ?: queen.notifyGetImageFailure(index, error)
         }
     }
 }
