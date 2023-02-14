@@ -1148,10 +1148,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         return@setOnClickListener
                     }
                     val q = mQuickSearchList[holder.bindingAdapterPosition]
-                    mUrlBuilder.set(q)
-                    onUpdateUrlBuilder()
                     val i = q.name!!.lastIndexOf("@")
-                    mHelper!!.goTo(if (i != -1) q.name!!.substring(i + 1) else null, true)
+                    val goto = if (i != -1) q.name!!.substring(i + 1) else null
+                    val args = ListUrlBuilder().apply {
+                        set(q)
+                        setIndex(goto)
+                    }.toStartArgs()
+                    navigate(R.id.galleryListScene, args, true)
                     setState(STATE_NORMAL)
                     closeDrawer(GravityCompat.END)
                 }
