@@ -88,6 +88,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     fun launch(index: Int, force: Boolean = false) {
         check(index in 0 until size)
         if (!isDownloadMode) synchronized(mFetcherJobMap) { doLaunchDownloadJob(index, force) }
+        if (force) decoder.cancel(index)
         decoder.launch(index)
     }
 
