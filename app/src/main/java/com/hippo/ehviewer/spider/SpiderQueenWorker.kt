@@ -309,11 +309,8 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         }
 
         private suspend fun doInJob(index: Int) {
-            val src = spiderDen.getImageSource(index) ?: run {
-                delay(1000)
-                mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
-                spiderDen.getImageSource(index)
-            } ?: return
+            mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
+            val src = spiderDen.getImageSource(index) ?: return
             val image = mSemaphore.withPermit { decode(src) }
             runCatching {
                 currentCoroutineContext().ensureActive()
