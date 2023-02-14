@@ -112,7 +112,6 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             return queen.updatePageState(index, STATE_FINISHED)
         }
         if (force) {
-            spiderDen.remove(index)
             pTokenLock.withLock {
                 val pToken = spiderInfo.pTokenMap[index]
                 if (pToken == TOKEN_FAILED) spiderInfo.pTokenMap.remove(index)
