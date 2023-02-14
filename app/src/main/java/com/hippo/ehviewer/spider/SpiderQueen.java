@@ -262,7 +262,7 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    private boolean shouldIntoDownload = false;
+    private boolean mInDownloadMode = false;
 
     private void updateMode() {
         int mode;
@@ -277,7 +277,7 @@ public final class SpiderQueen implements Runnable {
         // Update download page
         boolean intoDownloadMode = mode == MODE_DOWNLOAD;
 
-        if (intoDownloadMode && mPageStateArray != null) {
+        if (intoDownloadMode && !mInDownloadMode && mPageStateArray != null) {
             // Clear download state
             synchronized (mPageStateLock) {
                 int[] temp = mPageStateArray;
@@ -292,9 +292,9 @@ public final class SpiderQueen implements Runnable {
                 mPageErrorMap.clear();
                 mPagePercentMap.clear();
             }
-        } else if (intoDownloadMode && mPageStateArray == null) {
-            shouldIntoDownload = true;
         }
+
+        mInDownloadMode = intoDownloadMode;
     }
 
     private void setMode(@Mode int mode) {
@@ -631,7 +631,7 @@ public final class SpiderQueen implements Runnable {
         // Notify get pages
         notifyGetPages(spiderInfo.getPages());
 
-        if (shouldIntoDownload) mWorkerScope.enterDownloadMode();
+        if (mInDownloadMode) mWorkerScope.enterDownloadMode();
 
         // Wait finish
         synchronized (mQueenLock) {
