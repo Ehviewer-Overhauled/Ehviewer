@@ -73,21 +73,15 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }.toSet().forEach { mJobMap.remove(it) }
             list.forEach {
                 if (mJobMap[it]?.isActive != true)
-                    launch(it, false, downloadOnly = true)
+                    doLaunchDownloadJob(it, false)
             }
         }
     }
 
-    @JvmOverloads
-    fun launch(index: Int, force: Boolean = false, downloadOnly: Boolean = false) {
-        check(index in 0 until size)
+    private fun doLaunchDownloadJob(index: Int, force: Boolean) {
         val state = queen.mPageStateArray[index]
-        if (!force && state == STATE_FINISHED) {
-            decoder.launch(index)
-            return
-        }
-
-        if (!downloadOnly) synchronized(mJobMap) {
+        if (!force && state == STATE_FINISHED) return
+        synchronized(mJobMap) {
             val currentJob = mJobMap[index]
             if (force) currentJob?.cancel()
             if (currentJob?.isActive != true) {
@@ -98,7 +92,12 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 }
             }
         }
+    }
 
+    @JvmOverloads
+    fun launch(index: Int, force: Boolean = false) {
+        check(index in 0 until size)
+        if (!isDownloadMode) doLaunchDownloadJob(index, force)
         decoder.launch(index)
     }
 

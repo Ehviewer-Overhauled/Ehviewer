@@ -183,11 +183,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     }
 
     @Override
-    public void onPageSuccess(int index, int finished, int downloaded, int total) {
-        if (mSpiderQueen != null) {
-            mSpiderQueen.request(index);
-        }
-    }
+    public void onPageSuccess(int index, int finished, int downloaded, int total) {}
 
     @Override
     public void onPageFailure(int index, String error, int finished, int downloaded, int total) {

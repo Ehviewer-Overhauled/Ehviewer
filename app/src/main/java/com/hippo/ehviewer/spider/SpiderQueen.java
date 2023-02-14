@@ -357,11 +357,11 @@ public final class SpiderQueen implements Runnable {
     }
 
     public Object forceRequest(int index) {
-        return request(index, true, true);
+        return request(index, true);
     }
 
     public Object request(int index) {
-        return request(index, true, false);
+        return request(index, false);
     }
 
     private int getPageState(int index) {
@@ -395,7 +395,7 @@ public final class SpiderQueen implements Runnable {
      * Float for download percent<br>
      * null for wait
      */
-    private Object request(int index, boolean ignoreError, boolean force) {
+    private Object request(int index, boolean force) {
         if (mQueenThread == null) {
             return null;
         }
@@ -404,8 +404,7 @@ public final class SpiderQueen implements Runnable {
         int state = getPageState(index);
 
         // Fix state for force
-        if ((force && (state == STATE_FINISHED || state == STATE_FAILED)) ||
-                (ignoreError && state == STATE_FAILED)) {
+        if ((force && (state == STATE_FINISHED || state == STATE_FAILED)) || (state == STATE_FAILED)) {
             // Update state to none at once
             updatePageState(index, STATE_NONE);
             state = STATE_NONE;
@@ -418,13 +417,6 @@ public final class SpiderQueen implements Runnable {
         switch (state) {
             case STATE_NONE, STATE_FINISHED -> result = null;
             case STATE_DOWNLOADING -> result = mPagePercentMap.get(index);
-            case STATE_FAILED -> {
-                String error = mPageErrorMap.get(index);
-                if (error == null) {
-                    error = GetText.getString(R.string.error_unknown);
-                }
-                result = error;
-            }
             default -> throw new IllegalStateException("Unexpected value: " + state);
         }
 
