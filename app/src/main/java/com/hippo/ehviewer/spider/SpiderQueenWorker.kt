@@ -45,12 +45,8 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + Job()
 
-    fun cancel(index: Int) {
+    fun cancelDecode(index: Int) {
         decoder.cancel(index)
-        if (isDownloadMode) return
-        synchronized(mFetcherJobMap) {
-            mFetcherJobMap.remove(index)?.cancel()
-        }
     }
 
     @Synchronized
@@ -60,9 +56,13 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         isDownloadMode = true
     }
 
-    fun updateRAList(list: List<Int>) {
+    fun updateRAList(list: List<Int>, cancelBounds: Pair<Int, Int> = 0 to Int.MAX_VALUE) {
         if (isDownloadMode) return
         synchronized(mFetcherJobMap) {
+            mFetcherJobMap.forEach { (i, job) ->
+                if (i < cancelBounds.first || i > cancelBounds.second)
+                    job.cancel()
+            }
             list.forEach {
                 if (mFetcherJobMap[it]?.isActive != true)
                     doLaunchDownloadJob(it, false)

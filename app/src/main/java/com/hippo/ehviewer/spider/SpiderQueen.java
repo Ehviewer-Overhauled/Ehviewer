@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
+import kotlin.Pair;
 import kotlinx.coroutines.CoroutineScopeKt;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -379,15 +380,15 @@ public final class SpiderQueen implements Runnable {
             return;
         }
 
-        mWorkerScope.cancel(index);
+        mWorkerScope.cancelDecode(index);
     }
 
-    public void preloadPages(@NonNull List<Integer> pages) {
+    public void preloadPages(@NonNull List<Integer> pages, @NonNull Pair<Integer, Integer> pair) {
         if (mQueenThread == null) {
             return;
         }
 
-        mWorkerScope.updateRAList(pages);
+        mWorkerScope.updateRAList(pages, pair);
     }
 
     private void request(int index, boolean force) {

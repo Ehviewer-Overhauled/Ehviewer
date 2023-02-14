@@ -46,6 +46,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
+import kotlin.Pair;
 
 public class ArchivePageLoader extends PageLoader2 {
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
@@ -187,7 +188,7 @@ public class ArchivePageLoader extends PageLoader2 {
     }
 
     @Override
-    protected void preloadPages(@NonNull List<Integer> pages) {
+    protected void preloadPages(@NonNull List<Integer> pages, @NonNull Pair<Integer, Integer> pair) {
 
     }
 

@@ -47,14 +47,14 @@ abstract class PageLoader {
         // val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).toMutableList().removeAll(mImageCache.snapshot().keys)
         // Should we refresh our LruCache ?
         val pagesAbsent = ((index - 5).coerceAtLeast(0) until (mPreloads + index).coerceAtMost(size())).mapNotNull { it.takeIf { mImageCache[it] == null } }
-        preloadPages(pagesAbsent)
+        preloadPages(pagesAbsent, (index - 10).coerceAtLeast(0) to (mPreloads + index + 10).coerceAtMost(size()))
     }
 
     fun retryPage(page: ReaderPage) {
         onForceRequest(mPages.indexOf(page))
     }
 
-    protected abstract fun preloadPages(pages: List<Int>)
+    protected abstract fun preloadPages(pages: List<Int>, pair: Pair<Int, Int>)
 
     protected abstract fun onRequest(index: Int)
 

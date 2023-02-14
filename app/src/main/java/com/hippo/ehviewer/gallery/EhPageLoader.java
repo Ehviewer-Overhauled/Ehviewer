@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
+import kotlin.Pair;
 
 public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderListener {
 
@@ -191,9 +192,9 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     }
 
     @Override
-    protected void preloadPages(@NonNull List<Integer> pages) {
+    protected void preloadPages(@NonNull List<Integer> pages, @NonNull Pair<Integer, Integer> pair) {
         if (mSpiderQueen != null) {
-            mSpiderQueen.preloadPages(pages);
+            mSpiderQueen.preloadPages(pages, pair);
         }
     }
 
