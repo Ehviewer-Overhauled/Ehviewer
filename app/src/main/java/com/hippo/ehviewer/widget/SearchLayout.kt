@@ -29,6 +29,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.IntDef
 import androidx.core.content.edit
+import androidx.core.view.forEach
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -103,8 +104,8 @@ class SearchLayout @JvmOverloads constructor(
             mChip.isChecked = NumberUtils.int2boolean(mPair.first and mCategoryStored)
             mChip.setOnLongClickListener {
                 if (mChip.isChecked) {
-                    for (i in 0 until mCategoryGroup.childCount) {
-                        (mCategoryGroup.getChildAt(i) as Chip).isChecked = true
+                    mCategoryGroup.forEach {
+                        (it as IdentifiedChip).isChecked = true
                     }
                     mChip.isChecked = false
                 } else {
@@ -115,10 +116,10 @@ class SearchLayout @JvmOverloads constructor(
             }
             mCategoryGroup.addView(mChip)
         }
-        mCategoryGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+        mCategoryGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             var mCategory = 0
             for (index in checkedIds) {
-                mCategory = mCategory or findViewById<IdentifiedChip>(index).idt
+                mCategory = mCategory or group.findViewById<IdentifiedChip>(index).idt
             }
             mSharePref.edit { putInt(SEARCH_CATEGORY_PREF, mCategory) }
         }
@@ -158,6 +159,14 @@ class SearchLayout @JvmOverloads constructor(
 
     fun setNormalSearchMode(id: Int) {
         mNormalSearchMode.check(id)
+    }
+
+    fun setCategory(category: Int) {
+        mCategoryGroup.forEach {
+            (it as IdentifiedChip).apply {
+                isChecked = idt and category != 0
+            }
+        }
     }
 
     override fun onSelectImage() {
@@ -245,7 +254,7 @@ class SearchLayout @JvmOverloads constructor(
         post { setSearchMode(tab.position) }
     }
 
-    fun setSearchMode(@SearchMode mode: Int) {
+    private fun setSearchMode(@SearchMode mode: Int) {
         val oldItemCount = mAdapter.itemCount
         mSearchMode = mode
         val newItemCount = mAdapter.itemCount

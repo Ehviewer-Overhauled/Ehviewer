@@ -164,7 +164,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             }
         }
     private var mHasFirstRefresh = false
-    private var mNavCheckedId = 0
     private val mDownloadManager: DownloadManager = downloadManager
 
     @SuppressLint("NotifyDataSetChanged")
@@ -211,8 +210,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             ACTION_SUBSCRIPTION -> ListUrlBuilder(MODE_SUBSCRIPTION)
             ACTION_WHATS_HOT -> ListUrlBuilder(MODE_WHATS_HOT)
             ACTION_TOP_LIST -> ListUrlBuilder(MODE_TOPLIST, mKeyword = "11")
-            ACTION_LIST_URL_BUILDER -> args?.getParcelable<ListUrlBuilder>(KEY_LIST_URL_BUILDER)
-                ?.copy() ?: ListUrlBuilder()
+            ACTION_LIST_URL_BUILDER ->
+                args?.getParcelableCompat<ListUrlBuilder>(KEY_LIST_URL_BUILDER)?.copy()
+                    ?: ListUrlBuilder()
 
             else -> throw IllegalStateException("Wrong KEY_ACTION:${args?.getString(KEY_ACTION)} when handle args!")
         }
@@ -324,8 +324,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.fabLayout.setSecondaryFabVisibilityAt(0, !isPopular)
         binding.fabLayout.setSecondaryFabVisibilityAt(2, !isPopular)
 
-        // Update normal search mode
+        // Update normal search mode and category
         binding.searchLayout.setNormalSearchMode(if (mode == MODE_SUBSCRIPTION) R.id.search_subscription_search else R.id.search_normal_search)
+        if (category != EhUtils.NONE) {
+            binding.searchLayout.setCategory(category)
+        }
 
         // Update search edit text
         if (!mIsTopList) {
