@@ -289,7 +289,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val decoder = Decoder()
 
     inner class Decoder {
-        private val mSemaphore = Semaphore(2)
+        private val mSemaphore = Semaphore(4)
         private val mDecodeJobMap = hashMapOf<Int, Job>()
 
         fun cancel(index: Int) {
