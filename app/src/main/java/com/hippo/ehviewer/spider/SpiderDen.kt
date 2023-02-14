@@ -333,6 +333,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 ).build()
         }
 
+        private val COMPAT_IMAGE_EXTENSIONS = PageLoader2.SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
+
         fun getGalleryDownloadDir(gid: Long): UniFile? {
             val dir = Settings.getDownloadLocation()
             // Read from DB
@@ -355,7 +357,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         }
 
         private fun findImageFile(dir: UniFile, index: Int): UniFile? {
-            for (extension in PageLoader2.SUPPORT_IMAGE_EXTENSIONS) {
+            for (extension in COMPAT_IMAGE_EXTENSIONS) {
                 val filename = generateImageFilename(index, extension)
                 val file = dir.findFile(filename)
                 if (file != null) {
