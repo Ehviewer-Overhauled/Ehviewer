@@ -81,14 +81,12 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private fun doLaunchDownloadJob(index: Int, force: Boolean) {
         val state = queen.mPageStateArray[index]
         if (!force && state == STATE_FINISHED) return
-        synchronized(mFetcherJobMap) {
-            val currentJob = mFetcherJobMap[index]
-            if (force) currentJob?.cancel()
-            if (currentJob?.isActive != true) {
-                mFetcherJobMap[index] = launch {
-                    mSemaphore.withPermit {
-                        doInJob(index, force)
-                    }
+        val currentJob = mFetcherJobMap[index]
+        if (force) currentJob?.cancel()
+        if (currentJob?.isActive != true) {
+            mFetcherJobMap[index] = launch {
+                mSemaphore.withPermit {
+                    doInJob(index, force)
                 }
             }
         }
@@ -97,7 +95,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     @JvmOverloads
     fun launch(index: Int, force: Boolean = false) {
         check(index in 0 until size)
-        if (!isDownloadMode) doLaunchDownloadJob(index, force)
+        if (!isDownloadMode) synchronized(mFetcherJobMap) { doLaunchDownloadJob(index, force) }
         decoder.launch(index)
     }
 
@@ -313,28 +311,25 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 val currentJob = mDecodeJobMap[index]
                 if (currentJob?.isActive != true) {
                     mDecodeJobMap[index] = launch {
-                        delay(100)
-                        mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
-                        mSemaphore.withPermit {
-                            doInJob(index)
-                        }
+                        doInJob(index)
                     }
                 }
             }
         }
 
         private suspend fun doInJob(index: Int) {
-            val src = spiderDen.getImageSource(index) ?: return
-
-            currentCoroutineContext().ensureActive()
-            val image = decode(src)
+            val src = spiderDen.getImageSource(index) ?: run {
+                delay(1000)
+                mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
+                spiderDen.getImageSource(index)
+            } ?: return
+            val image = mSemaphore.withPermit { decode(src) }
             runCatching {
                 currentCoroutineContext().ensureActive()
             }.onFailure {
                 image?.recycle()
                 throw it
             }
-
             if (image == null) {
                 queen.notifyGetImageFailure(index, DECODE_ERROR)
             } else {
