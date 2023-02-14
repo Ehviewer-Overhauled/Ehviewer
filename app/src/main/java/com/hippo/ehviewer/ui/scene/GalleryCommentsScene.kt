@@ -253,7 +253,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                             text.clearSpan(start, end, false)
                         }
 
-                        else -> {}
+                        else -> return false
                     }
                     mode?.finish()
                 }
