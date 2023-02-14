@@ -127,8 +127,8 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
             Object object = mSpiderQueen.request(index);
             if (object instanceof Float) {
                 notifyPagePercent(index, (Float) object);
-            } else if (object instanceof String) {
-                notifyPageFailed(index);
+            } else if (object instanceof String error) {
+                notifyPageFailed(index, error);
             } else if (object == null) {
                 notifyPageWait(index);
             }
@@ -141,8 +141,8 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
             Object object = mSpiderQueen.forceRequest(index);
             if (object instanceof Float) {
                 notifyPagePercent(index, (Float) object);
-            } else if (object instanceof String) {
-                notifyPageFailed(index);
+            } else if (object instanceof String error) {
+                notifyPageFailed(index, error);
             } else if (object == null) {
                 notifyPageWait(index);
             }
@@ -191,7 +191,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
 
     @Override
     public void onPageFailure(int index, String error, int finished, int downloaded, int total) {
-        notifyPageFailed(index);
+        notifyPageFailed(index, error);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
 
     @Override
     public void onGetImageFailure(int index, String error) {
-        notifyPageFailed(index);
+        notifyPageFailed(index, error);
     }
 
     @Override

@@ -205,6 +205,7 @@ class PagerPageHolder(
                 viewer.activity.mGalleryProvider?.retryPage(page)
             }
         }
+        page.errorMsg?.let { errorLayout!!.errorMessage.text = it }
         errorLayout?.root?.isVisible = true
         return errorLayout!!
     }

@@ -10,6 +10,8 @@ open class Page(val index: Int)  {
 
     var status = MutableStateFlow(State.QUEUE)
 
+    var errorMsg: String? = null
+
     private val _progressFlow = MutableStateFlow(0)
 
     val progressFlow = _progressFlow.asStateFlow()

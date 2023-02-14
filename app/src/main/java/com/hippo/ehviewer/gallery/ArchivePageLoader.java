@@ -293,7 +293,7 @@ public class ArchivePageLoader extends PageLoader2 {
 
                 // Check index valid
                 if (index < 0 || index >= size) {
-                    notifyPageFailed(index);
+                    notifyPageFailed(index, null);
                     continue;
                 }
 
@@ -343,7 +343,7 @@ public class ArchivePageLoader extends PageLoader2 {
                 if (image != null) {
                     notifyPageSucceed(index, image);
                 } else {
-                    notifyPageFailed(index);
+                    notifyPageFailed(index, null);
                 }
             }
         }

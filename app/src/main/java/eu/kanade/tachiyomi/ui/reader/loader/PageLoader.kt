@@ -89,7 +89,8 @@ abstract class PageLoader {
         mPages[index].status.value = Page.State.READY
     }
 
-    fun notifyPageFailed(index: Int) {
+    fun notifyPageFailed(index: Int, error: String?) {
+        mPages[index].errorMsg = error
         mPages[index].status.value = Page.State.ERROR
     }
 

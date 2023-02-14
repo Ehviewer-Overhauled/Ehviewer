@@ -255,6 +255,7 @@ class WebtoonPageHolder(
                 viewer.activity.mGalleryProvider?.retryPage(page!!)
             }
         }
+        page?.errorMsg?.let { errorLayout!!.errorMessage.text = it }
         return errorLayout!!
     }
 
