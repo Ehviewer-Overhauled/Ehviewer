@@ -9,7 +9,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavOptions
 
 fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boolean {
-    if (navController.currentDestination?.matchDestination(item.itemId) == true) return false
+    if (navController.currentDestination?.matchDestination(item.itemId) == true) return true
     val builder = NavOptions.Builder().setLaunchSingleTop(true)
     if (
         navController.currentDestination!!.parent!!.findNode(item.itemId)
