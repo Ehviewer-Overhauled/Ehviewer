@@ -6,17 +6,21 @@ import com.hippo.ehviewer.client.EhEngine.getGalleryPage
 import com.hippo.ehviewer.client.EhEngine.getGalleryPageApi
 import com.hippo.ehviewer.client.EhUrl.getPageUrl
 import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.spider.SpiderQueen.DECODE_ERROR
 import com.hippo.ehviewer.spider.SpiderQueen.ERROR_509
 import com.hippo.ehviewer.spider.SpiderQueen.NETWORK_ERROR
 import com.hippo.ehviewer.spider.SpiderQueen.PTOKEN_FAILED_MESSAGE
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_FAILED
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_FINISHED
+import com.hippo.image.Image.Companion.decode
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.StringUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
@@ -42,6 +46,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         get() = Dispatchers.IO + Job()
 
     fun cancel(index: Int) {
+        decoder.cancel(index)
         if (isDownloadMode) return
         synchronized(mJobMap) {
             mJobMap.remove(index)?.cancel()
@@ -68,19 +73,21 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }.toSet().forEach { mJobMap.remove(it) }
             list.forEach {
                 if (mJobMap[it]?.isActive != true)
-                    launch(it)
+                    launch(it, false, downloadOnly = true)
             }
         }
     }
 
     @JvmOverloads
-    fun launch(index: Int, force: Boolean = false) {
-        if (isDownloadMode) return
+    fun launch(index: Int, force: Boolean = false, downloadOnly: Boolean = false) {
         check(index in 0 until size)
         val state = queen.mPageStateArray[index]
-        if (!force && state == STATE_FINISHED) return
+        if (!force && state == STATE_FINISHED) {
+            decoder.launch(index)
+            return
+        }
 
-        synchronized(mJobMap) {
+        if (!downloadOnly) synchronized(mJobMap) {
             val currentJob = mJobMap[index]
             if (force) currentJob?.cancel()
             if (currentJob?.isActive != true) {
@@ -91,6 +98,8 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 }
             }
         }
+
+        decoder.launch(index)
     }
 
     private suspend fun doInJob(index: Int, force: Boolean) {
@@ -286,5 +295,56 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
         )
 
         private const val DEBUG_TAG = "SpiderQueenWorker"
+    }
+
+    private val decoder = Decoder()
+
+    inner class Decoder {
+        private val mSemaphore = Semaphore(2)
+        private val mDecodeJobMap = hashMapOf<Int, Job>()
+        private val size
+            get() = queen.size()
+
+        fun cancel(index: Int) {
+            synchronized(mDecodeJobMap) {
+                mDecodeJobMap.remove(index)?.cancel()
+            }
+        }
+
+        fun launch(index: Int) {
+            check(index in 0 until size)
+            synchronized(mDecodeJobMap) {
+                val currentJob = mDecodeJobMap[index]
+                if (currentJob?.isActive != true) {
+                    mDecodeJobMap[index] = launch {
+                        mJobMap[index]?.takeIf { it.isActive }?.join()
+                        mSemaphore.withPermit {
+                            doInJob(index)
+                        }
+                    }
+                }
+            }
+        }
+
+        private suspend fun doInJob(index: Int) {
+            val src = spiderDen.getImageSource(index) ?: return
+
+            val image = decode(src)
+            runCatching {
+                currentCoroutineContext().ensureActive()
+            }.onFailure {
+                image?.recycle()
+                throw it
+            }
+            var error: String? = null
+
+            if (image == null) {
+                error = DECODE_ERROR
+            }
+
+            // Notify
+            image?.let { queen.notifyGetImageSuccess(index, it) }
+                ?: queen.notifyGetImageFailure(index, error)
+        }
     }
 }
