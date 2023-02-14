@@ -41,7 +41,6 @@ import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.client.EhX509TrustManager
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.parser.EventPaneParser
 import com.hippo.ehviewer.dao.buildMainDB
@@ -61,7 +60,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import java.net.Proxy
 import java.security.KeyStore
-import java.util.Arrays
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -281,24 +279,12 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 .proxySelector(ehProxySelector)
 
             if (Settings.getDF()) {
-                var trustManager: X509TrustManager
-                try {
-                    val trustManagerFactory = TrustManagerFactory.getInstance(
-                        TrustManagerFactory.getDefaultAlgorithm()
-                    )
-                    trustManagerFactory.init(null as KeyStore?)
-                    val trustManagers = trustManagerFactory.trustManagers
-                    check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-                        "Unexpected default trust managers:" + Arrays.toString(
-                            trustManagers
-                        )
-                    }
-                    trustManager = trustManagers[0] as X509TrustManager
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    trustManager = EhX509TrustManager
-                }
+                val factory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
+                factory.init(null as KeyStore?)
+                val manager = factory.trustManagers!!
 
+                val trustManager = manager.filterIsInstance<X509TrustManager>().first()
                 builder.sslSocketFactory(EhSSLSocketFactory, trustManager)
                 builder.proxy(Proxy.NO_PROXY)
             }
