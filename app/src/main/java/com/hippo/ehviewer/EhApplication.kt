@@ -301,7 +301,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
 
         @JvmStatic
-        val downloadManager by lazy { DownloadManager() }
+        val downloadManager by lazy { DownloadManager }
 
         @JvmStatic
         val hosts by lazy { Hosts(application, "hosts.db") }

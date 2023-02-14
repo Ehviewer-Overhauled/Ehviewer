@@ -15,13 +15,11 @@
  */
 package com.hippo.ehviewer.download
 
-import android.annotation.SuppressLint
-import android.os.AsyncTask
 import android.util.Log
 import android.util.SparseLongArray
 import androidx.collection.LongSparseArray
+import androidx.collection.keyIterator
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
@@ -31,16 +29,18 @@ import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
 import com.hippo.image.Image
-import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.yorozuya.ConcurrentPool
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.collect.LongList
-import java.io.IOException
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.LinkedList
 
-class DownloadManager : OnSpiderListener {
+object DownloadManager : OnSpiderListener {
+    private val downloadManager = this
+
     // All download info list
     private val mAllInfoList: LinkedList<DownloadInfo>
 
@@ -564,35 +564,25 @@ class DownloadManager : OnSpiderListener {
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
-    fun resetAllReadingProgress() {
-        val list = LinkedList(mAllInfoList)
-        object : AsyncTask<Void?, Void?, Void?>() {
-            @Deprecated("Deprecated in Java")
-            override fun doInBackground(vararg voids: Void?): Void? {
-                val galleryInfo: GalleryInfo = BaseGalleryInfo()
-                for (downloadInfo in list) {
-                    galleryInfo.gid = downloadInfo.gid
-                    galleryInfo.token = downloadInfo.token
-                    galleryInfo.title = downloadInfo.title
-                    galleryInfo.thumb = downloadInfo.thumb
-                    galleryInfo.category = downloadInfo.category
-                    galleryInfo.posted = downloadInfo.posted
-                    galleryInfo.uploader = downloadInfo.uploader
-                    galleryInfo.rating = downloadInfo.rating
-                    val downloadDir = SpiderDen.getGalleryDownloadDir(galleryInfo.gid) ?: continue
-                    val file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: continue
-                    val spiderInfo = readCompatFromUniFile(file) ?: continue
-                    spiderInfo.startPage = 0
-                    try {
-                        spiderInfo.write(file)
-                    } catch (e: IOException) {
-                        Log.e(TAG, "Can't write SpiderInfo", e)
-                    }
+    suspend fun resetAllReadingProgress() = coroutineScope {
+        mAllInfoMap.keyIterator().forEach { gid ->
+            launch {
+                runCatching {
+                    resetReadingProgress(gid)
+                    Log.d(TAG, "Current thread: ${Thread.currentThread().name}")
+                }.onFailure {
+                    Log.e(TAG, "Can't write SpiderInfo", it)
                 }
-                return null
             }
-        }.executeOnExecutor(IoThreadPoolExecutor.getInstance())
+        }
+    }
+
+    private fun resetReadingProgress(gid: Long) {
+        val downloadDir = SpiderDen.getGalleryDownloadDir(gid) ?: return
+        val file = downloadDir.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return
+        val spiderInfo = readCompatFromUniFile(file) ?: return
+        spiderInfo.startPage = 0
+        spiderInfo.write(file)
     }
 
     // Update in DB
@@ -948,7 +938,7 @@ class DownloadManager : OnSpiderListener {
         fun onCancel(info: DownloadInfo)
     }
 
-    private inner class NotifyTask : Runnable {
+    private class NotifyTask : Runnable {
         private var mType = 0
         private var mPages = 0
         private var mIndex = 0
@@ -960,12 +950,12 @@ class DownloadManager : OnSpiderListener {
         private var mDownloaded = 0
         private var mTotal = 0
         fun setOnGetPagesData(pages: Int) {
-            mType = Companion.TYPE_ON_GET_PAGES
+            mType = TYPE_ON_GET_PAGES
             mPages = pages
         }
 
         fun setOnGet509Data(index: Int) {
-            mType = Companion.TYPE_ON_GET_509
+            mType = TYPE_ON_GET_509
             mIndex = index
         }
 
@@ -975,7 +965,7 @@ class DownloadManager : OnSpiderListener {
             receivedSize: Long,
             bytesRead: Int
         ) {
-            mType = Companion.TYPE_ON_PAGE_DOWNLOAD
+            mType = TYPE_ON_PAGE_DOWNLOAD
             mIndex = index
             mContentLength = contentLength
             mReceivedSize = receivedSize
@@ -983,7 +973,7 @@ class DownloadManager : OnSpiderListener {
         }
 
         fun setOnPageSuccessData(index: Int, finished: Int, downloaded: Int, total: Int) {
-            mType = Companion.TYPE_ON_PAGE_SUCCESS
+            mType = TYPE_ON_PAGE_SUCCESS
             mIndex = index
             mFinished = finished
             mDownloaded = downloaded
@@ -997,7 +987,7 @@ class DownloadManager : OnSpiderListener {
             downloaded: Int,
             total: Int
         ) {
-            mType = Companion.TYPE_ON_PAGE_FAILURE
+            mType = TYPE_ON_PAGE_FAILURE
             mIndex = index
             mError = error
             mFinished = finished
@@ -1006,7 +996,7 @@ class DownloadManager : OnSpiderListener {
         }
 
         fun setOnFinishDate(finished: Int, downloaded: Int, total: Int) {
-            mType = Companion.TYPE_ON_FINISH
+            mType = TYPE_ON_FINISH
             mFinished = finished
             mDownloaded = downloaded
             mTotal = total
@@ -1014,7 +1004,7 @@ class DownloadManager : OnSpiderListener {
 
         override fun run() {
             when (mType) {
-                Companion.TYPE_ON_GET_PAGES -> {
+                TYPE_ON_GET_PAGES -> {
                     val info = mCurrentTask
                     if (info == null) {
                         Log.e(TAG, "Current task is null, but it should not be")
@@ -1029,20 +1019,20 @@ class DownloadManager : OnSpiderListener {
                     }
                 }
 
-                Companion.TYPE_ON_GET_509 -> {
+                TYPE_ON_GET_509 -> {
                     if (mDownloadListener != null) {
                         mDownloadListener!!.onGet509()
                     }
                 }
 
-                Companion.TYPE_ON_PAGE_DOWNLOAD -> mSpeedReminder.onDownload(
+                TYPE_ON_PAGE_DOWNLOAD -> mSpeedReminder.onDownload(
                     mIndex,
                     mContentLength,
                     mReceivedSize,
                     mBytesRead
                 )
 
-                Companion.TYPE_ON_PAGE_SUCCESS -> {
+                TYPE_ON_PAGE_SUCCESS -> {
                     mSpeedReminder.onDone(mIndex)
                     val info = mCurrentTask
                     if (info == null) {
@@ -1063,7 +1053,7 @@ class DownloadManager : OnSpiderListener {
                     }
                 }
 
-                Companion.TYPE_ON_PAGE_FAILURE -> {
+                TYPE_ON_PAGE_FAILURE -> {
                     mSpeedReminder.onDone(mIndex)
                     val info = mCurrentTask
                     if (info == null) {
@@ -1081,7 +1071,7 @@ class DownloadManager : OnSpiderListener {
                     }
                 }
 
-                Companion.TYPE_ON_FINISH -> {
+                TYPE_ON_FINISH -> {
                     mSpeedReminder.onFinish()
                     // Download done
                     val info = mCurrentTask
@@ -1090,7 +1080,7 @@ class DownloadManager : OnSpiderListener {
                     mCurrentSpider = null
                     // Release spider
                     if (spider != null) {
-                        spider.removeOnSpiderListener(this@DownloadManager)
+                        spider.removeOnSpiderListener(downloadManager)
                         SpiderQueen.releaseSpiderQueen(spider, SpiderQueen.MODE_DOWNLOAD)
                     }
                     // Check null
@@ -1130,7 +1120,7 @@ class DownloadManager : OnSpiderListener {
         }
     }
 
-    internal inner class SpeedReminder : Runnable {
+    internal class SpeedReminder : Runnable {
         private val mContentLengthMap = SparseLongArray()
         private val mReceivedSizeMap = SparseLongArray()
         private var mStop = true
@@ -1219,17 +1209,15 @@ class DownloadManager : OnSpiderListener {
         }
     }
 
-    companion object {
-        private val TAG = DownloadManager::class.java.simpleName
-        private const val TYPE_ON_GET_PAGES = 0
-        private const val TYPE_ON_GET_509 = 1
-        private const val TYPE_ON_PAGE_DOWNLOAD = 2
-        private const val TYPE_ON_PAGE_SUCCESS = 3
-        private const val TYPE_ON_PAGE_FAILURE = 4
-        private const val TYPE_ON_FINISH = 5
+    private val TAG = DownloadManager::class.java.simpleName
+    private const val TYPE_ON_GET_PAGES = 0
+    private const val TYPE_ON_GET_509 = 1
+    private const val TYPE_ON_PAGE_DOWNLOAD = 2
+    private const val TYPE_ON_PAGE_SUCCESS = 3
+    private const val TYPE_ON_PAGE_FAILURE = 4
+    private const val TYPE_ON_FINISH = 5
 
-        fun MutableList<DownloadInfo>.sortByDateDescending() {
-            sortByDescending { it.time }
-        }
+    private fun MutableList<DownloadInfo>.sortByDateDescending() {
+        sortByDescending { it.time }
     }
 }

@@ -77,6 +77,7 @@ import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import rikka.core.res.resolveColor
@@ -377,7 +378,9 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                         if (mDownloadManager != null) {
-                            mDownloadManager!!.resetAllReadingProgress()
+                            lifecycleScope.launchNonCancellable {
+                                mDownloadManager!!.resetAllReadingProgress()
+                            }
                         }
                     }.show()
                 return true
