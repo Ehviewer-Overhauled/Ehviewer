@@ -356,12 +356,12 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
-    public Object forceRequest(int index) {
-        return request(index, true);
+    public void forceRequest(int index) {
+        request(index, true);
     }
 
-    public Object request(int index) {
-        return request(index, false);
+    public void request(int index) {
+        request(index, false);
     }
 
     private int getPageState(int index) {
@@ -390,14 +390,9 @@ public final class SpiderQueen implements Runnable {
         mWorkerScope.updateRAList(pages);
     }
 
-    /**
-     * @return String for error<br>
-     * Float for download percent<br>
-     * null for wait
-     */
-    private Object request(int index, boolean force) {
+    private void request(int index, boolean force) {
         if (mQueenThread == null) {
-            return null;
+            return;
         }
 
         // Get page state
@@ -407,20 +402,9 @@ public final class SpiderQueen implements Runnable {
         if ((force && (state == STATE_FINISHED || state == STATE_FAILED)) || (state == STATE_FAILED)) {
             // Update state to none at once
             updatePageState(index, STATE_NONE);
-            state = STATE_NONE;
         }
 
         mWorkerScope.launch(index, force);
-
-        Object result;
-
-        switch (state) {
-            case STATE_NONE, STATE_FINISHED -> result = null;
-            case STATE_DOWNLOADING -> result = mPagePercentMap.get(index);
-            default -> throw new IllegalStateException("Unexpected value: " + state);
-        }
-
-        return result;
     }
 
     public boolean save(int index, @NonNull UniFile file) {

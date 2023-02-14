@@ -124,28 +124,14 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     @Override
     protected void onRequest(int index) {
         if (mSpiderQueen != null) {
-            Object object = mSpiderQueen.request(index);
-            if (object instanceof Float) {
-                notifyPagePercent(index, (Float) object);
-            } else if (object instanceof String error) {
-                notifyPageFailed(index, error);
-            } else if (object == null) {
-                notifyPageWait(index);
-            }
+            mSpiderQueen.request(index);
         }
     }
 
     @Override
     protected void onForceRequest(int index) {
         if (mSpiderQueen != null) {
-            Object object = mSpiderQueen.forceRequest(index);
-            if (object instanceof Float) {
-                notifyPagePercent(index, (Float) object);
-            } else if (object instanceof String error) {
-                notifyPageFailed(index, error);
-            } else if (object == null) {
-                notifyPageWait(index);
-            }
+            mSpiderQueen.forceRequest(index);
         }
     }
 
