@@ -1,13 +1,11 @@
 package androidx.navigation.ui
 
-import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavOptions
 
 fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boolean {
@@ -26,13 +24,6 @@ fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boo
             .setExitAnim(com.hippo.ehviewer.R.anim.scene_open_exit)
             .setPopEnterAnim(com.hippo.ehviewer.R.anim.scene_close_enter)
             .setPopExitAnim(com.hippo.ehviewer.R.anim.scene_close_exit)
-    }
-    if (item.order and Menu.CATEGORY_SECONDARY == 0) {
-        builder.setPopUpTo(
-            navController.graph.findStartDestination().id,
-            inclusive = false,
-            saveState = false
-        )
     }
     val options = builder.build()
     return try {
