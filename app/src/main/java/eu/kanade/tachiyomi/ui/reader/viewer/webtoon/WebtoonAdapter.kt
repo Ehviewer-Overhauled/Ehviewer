@@ -84,7 +84,6 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
      * Recycles an existing view [holder] before adding it to the view pool.
      */
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        currentChapter?.cancelRequest(holder.bindingAdapterPosition)
         when (holder) {
             is WebtoonPageHolder -> holder.recycle()
         }

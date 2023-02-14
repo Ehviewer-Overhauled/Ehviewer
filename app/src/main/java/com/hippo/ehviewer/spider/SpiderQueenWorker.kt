@@ -63,14 +63,6 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     fun updateRAList(list: List<Int>) {
         if (isDownloadMode) return
         synchronized(mFetcherJobMap) {
-            sequence {
-                mFetcherJobMap.forEach { (i, job) ->
-                    if (i !in list) {
-                        job.cancel()
-                    }
-                    if (!job.isActive) yield(i)
-                }
-            }.toSet().forEach { mFetcherJobMap.remove(it) }
             list.forEach {
                 if (mFetcherJobMap[it]?.isActive != true)
                     doLaunchDownloadJob(it, false)
