@@ -51,6 +51,7 @@ abstract class PageLoader {
     }
 
     fun retryPage(page: ReaderPage) {
+        page.status.value = Page.State.QUEUE
         onForceRequest(mPages.indexOf(page))
     }
 
