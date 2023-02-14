@@ -313,6 +313,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 val currentJob = mDecodeJobMap[index]
                 if (currentJob?.isActive != true) {
                     mDecodeJobMap[index] = launch {
+                        delay(100)
                         mFetcherJobMap[index]?.takeIf { it.isActive }?.join()
                         mSemaphore.withPermit {
                             doInJob(index)
