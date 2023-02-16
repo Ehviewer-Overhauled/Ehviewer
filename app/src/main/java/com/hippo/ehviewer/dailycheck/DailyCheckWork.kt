@@ -55,17 +55,21 @@ class DailyCheckWork(val context: Context, workerParams: WorkerParameters) :
             return
         }
         val notificationManager = NotificationManagerCompat.from(context)
-        val chan =
-            NotificationChannelCompat.Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
-                .setName("a")
-                .build()
+        val chan = NotificationChannelCompat
+            .Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
+            .setName(CHANNEL_ID)
+            .build()
         notificationManager.createNotificationChannel(chan)
         val msg = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
             .setContentText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
             .setStyle(NotificationCompat.BigTextStyle())
             .build()
-        notificationManager.notify(1, msg)
+        runCatching {
+            notificationManager.notify(1, msg)
+        }.onFailure {
+            it.printStackTrace()
+        }
     }
 }
 
@@ -91,7 +95,7 @@ fun initializeDailyCheckWork(context: Context) {
     if (Settings.getRequestNews()) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             workName,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             getDailyCheckWorkRequest()
         )
     } else {
