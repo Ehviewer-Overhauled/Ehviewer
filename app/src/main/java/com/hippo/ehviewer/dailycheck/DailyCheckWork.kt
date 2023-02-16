@@ -80,10 +80,9 @@ val schedMinute
     get() = Settings.getInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, -1).takeUnless { it == -1 }
 
 private val whenToWork
-    get() = LocalDateTime.now().apply {
-        schedHour?.let { withHour(it) }
-        schedMinute?.let { withMinute(it) }
-    }
+    get() = LocalDateTime.now()
+        .run { withHour(schedHour ?: hour) }
+        .run { withMinute(schedMinute ?: minute) }
 
 private val initialDelay
     get() = Duration.between(LocalDateTime.now(), whenToWork)
