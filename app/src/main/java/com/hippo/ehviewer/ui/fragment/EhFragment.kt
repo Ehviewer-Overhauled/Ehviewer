@@ -84,8 +84,8 @@ class EhFragment : BasePreferenceFragment() {
                             Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
                             updateDailyCheckWork(requireContext())
                         }
-                        show(this@EhFragment.childFragmentManager, null)
                     }
+                    .show(childFragmentManager, null)
                 false
             }
         }
