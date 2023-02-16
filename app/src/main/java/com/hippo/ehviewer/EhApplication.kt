@@ -21,10 +21,6 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
-import android.text.Html
-import android.text.method.LinkMovementMethod
-import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
 import androidx.core.content.getSystemService
@@ -34,15 +30,12 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.hippo.Native
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
-import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
-import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.client.parser.EventPaneParser
+import com.hippo.ehviewer.dailycheck.initializeDailyCheckWork
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
@@ -101,6 +94,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         AppConfig.initialize(this)
         EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
+        initializeDailyCheckWork(this)
         launchIO {
             launchIO {
                 ehDatabase
@@ -110,9 +104,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
             launchIO {
                 cleanupDownload()
-            }
-            launchIO {
-                theDawnOfNewDay()
             }
         }
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
@@ -137,54 +128,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         } catch (t: Throwable) {
             t.printStackTrace()
             ExceptionUtils.throwIfFatal(t)
-        }
-    }
-
-    private fun theDawnOfNewDay() {
-        if (!Settings.getRequestNews()) {
-            return
-        }
-
-        if (ehCookieStore.hasSignedIn()) {
-            val referer = EhUrl.REFERER_E
-            val request = EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build()
-            val call = okHttpClient.newCall(request)
-            try {
-                call.execute().use { response ->
-                    val responseBody = response.body
-                    val body = responseBody.string()
-                    val html = EventPaneParser.parse(body)
-                    if (html != null) {
-                        showEventPane(html)
-                    }
-                }
-            } catch (e: Throwable) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun showEventPane(html: String) {
-        if (Settings.getHideHvEvents() && html.contains("You have encountered a monster!")) {
-            return
-        }
-        val activity = topActivity
-        activity?.runOnUiThread {
-            val dialog = BaseDialogBuilder(activity)
-                .setMessage(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
-                .setPositiveButton(android.R.string.ok, null)
-                .create()
-            dialog.setOnShowListener {
-                val messageView = dialog.findViewById<View>(android.R.id.message)
-                if (messageView is TextView) {
-                    messageView.movementMethod = LinkMovementMethod.getInstance()
-                }
-            }
-            try {
-                dialog.show()
-            } catch (t: Throwable) {
-                // ignore
-            }
         }
     }
 
