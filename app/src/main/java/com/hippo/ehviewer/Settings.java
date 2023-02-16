@@ -63,6 +63,9 @@ public class Settings {
     public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
     public static final String KEY_REQUEST_NEWS = "request_news";
+    public static final String KEY_REQUEST_NEWS_TIMER = "request_news_timer";
+    public static final String KEY_REQUEST_NEWS_TIMER_HOUR = "request_news_timer_hour";
+    public static final String KEY_REQUEST_NEWS_TIMER_MINUTE = "request_news_timer_minute";
     public static final String KEY_HIDE_HV_EVENTS = "hide_hv_events";
     public static final String[] SIGN_IN_REQUIRED = {
             KEY_IMAGE_LIMITS,

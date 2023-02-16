@@ -23,6 +23,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
+import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -68,6 +71,24 @@ class EhFragment : BasePreferenceFragment() {
                 preferenceScreen.removePreference(preference!!)
             }
         }
+
+        findPreference<Preference>(Settings.KEY_REQUEST_NEWS_TIMER)!!.apply {
+            setOnPreferenceClickListener {
+                MaterialTimePicker.Builder()
+                    .setTimeFormat(CLOCK_24H)
+                    .setInputMode(INPUT_MODE_CLOCK)
+                    .build()
+                    .apply {
+                        addOnPositiveButtonClickListener {
+                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, hour)
+                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
+                            updateDailyCheckWork(requireContext())
+                        }
+                        show(this@EhFragment.childFragmentManager, null)
+                    }
+                false
+            }
+        }
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
@@ -107,6 +128,8 @@ class EhFragment : BasePreferenceFragment() {
             }
             return true
         } else if (Settings.KEY_REQUEST_NEWS == key) {
+            updateDailyCheckWork(requireContext())
+        } else if (Settings.KEY_REQUEST_NEWS_TIMER == key) {
             updateDailyCheckWork(requireContext())
         }
         return true
