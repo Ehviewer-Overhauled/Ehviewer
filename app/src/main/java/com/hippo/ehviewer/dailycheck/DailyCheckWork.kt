@@ -21,7 +21,7 @@ import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.parser.EventPaneParser
 import java.time.Duration
-import java.time.Instant
+import java.time.LocalDateTime
 
 private val signedIn
     get() = EhApplication.ehCookieStore.hasSignedIn()
@@ -73,11 +73,20 @@ class DailyCheckWork(val context: Context, workerParams: WorkerParameters) :
     }
 }
 
+val schedHour
+    get() = Settings.getInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, -1).takeUnless { it == -1 }
+
+val schedMinute
+    get() = Settings.getInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, -1).takeUnless { it == -1 }
+
 private val whenToWork
-    get() = Instant.now().plusSeconds(10)
+    get() = LocalDateTime.now().apply {
+        schedHour?.let { withHour(it) }
+        schedMinute?.let { withMinute(it) }
+    }
 
 private val initialDelay
-    get() = Duration.between(Instant.now(), whenToWork)
+    get() = Duration.between(LocalDateTime.now(), whenToWork)
 
 private fun getDailyCheckWorkRequest(): PeriodicWorkRequest {
     val constraints = Constraints.Builder()

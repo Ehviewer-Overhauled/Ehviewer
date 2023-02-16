@@ -31,6 +31,8 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.dailycheck.schedHour
+import com.hippo.ehviewer.dailycheck.schedMinute
 import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
@@ -74,6 +76,10 @@ class EhFragment : BasePreferenceFragment() {
         findPreference<Preference>(Settings.KEY_REQUEST_NEWS_TIMER)!!.apply {
             setOnPreferenceClickListener {
                 MaterialTimePicker.Builder()
+                    .apply {
+                        schedHour?.let { setHour(it) }
+                        schedMinute?.let { setMinute(it) }
+                    }
                     .setTimeFormat(CLOCK_12H)
                     .build()
                     .apply {
