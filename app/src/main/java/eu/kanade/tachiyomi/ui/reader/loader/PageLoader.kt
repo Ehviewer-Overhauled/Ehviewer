@@ -61,8 +61,8 @@ abstract class PageLoader {
 
     protected abstract fun onForceRequest(index: Int)
 
-    fun cancelRequest(index: Int) {
-        onCancelRequest(index)
+    fun cancelRequest(page: ReaderPage) {
+        onCancelRequest(mPages.indexOf(page))
     }
 
     protected abstract fun onCancelRequest(index: Int)

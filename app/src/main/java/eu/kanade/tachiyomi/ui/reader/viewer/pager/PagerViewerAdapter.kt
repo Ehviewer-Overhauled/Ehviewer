@@ -62,7 +62,8 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
     }
 
     override fun destroyView(container: ViewGroup, position: Int, view: View) {
-        currentChapter?.cancelRequest(position)
+        val item = items[position]
+        currentChapter?.cancelRequest(item as ReaderPage)
     }
 
     /**
