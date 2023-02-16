@@ -29,6 +29,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 class EhFragment : BasePreferenceFragment() {
@@ -105,6 +106,8 @@ class EhFragment : BasePreferenceFragment() {
                 EhApplication.application.recreateAllActivity()
             }
             return true
+        } else if (Settings.KEY_REQUEST_NEWS == key) {
+            updateDailyCheckWork(requireContext())
         }
         return true
     }

@@ -35,7 +35,6 @@ import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.dailycheck.initializeDailyCheckWork
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
@@ -49,7 +48,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import java.net.Proxy
 import java.security.KeyStore
@@ -94,7 +92,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         AppConfig.initialize(this)
         EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
-        initializeDailyCheckWork(this)
         launchIO {
             launchIO {
                 ehDatabase
@@ -186,7 +183,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         locked = true
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this).apply {
             okHttpClient(okHttpClient)

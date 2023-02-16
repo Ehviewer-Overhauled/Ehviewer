@@ -91,7 +91,7 @@ private fun getDailyCheckWorkRequest(): PeriodicWorkRequest {
 
 private const val workName = "DailyCheckWork"
 
-fun initializeDailyCheckWork(context: Context) {
+fun updateDailyCheckWork(context: Context) {
     if (Settings.getRequestNews()) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             workName,

@@ -205,7 +205,7 @@ public class Settings {
     private static final int DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0;
     private static final String KEY_DOWNLOAD_DELAY = "download_delay";
     private static final int DEFAULT_DOWNLOAD_DELAY = 0;
-    private static final boolean DEFAULT_REQUEST_NEWS = true;
+    private static final boolean DEFAULT_REQUEST_NEWS = false;
     private static final String KEY_ARCHIVE_PASSWDS = "archive_passwds";
     private static final String KEY_QS_SAVE_PROGRESS = "qs_save_progress";
     private static final boolean DEFAULT_QS_SAVE_PROGRESS = true;
