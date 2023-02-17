@@ -114,10 +114,4 @@ abstract class PageLoader {
             private const val MIN_CACHE_SIZE = (128 * 1024 * 1024).toLong()
         }
     }
-
-    companion object {
-        const val STATE_WAIT = -1
-        const val STATE_ERROR = -2
-        const val STATE_READY = -3
-    }
 }

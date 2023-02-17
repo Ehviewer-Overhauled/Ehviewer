@@ -67,7 +67,7 @@ public class ArchivePageLoader extends PageLoader2 {
             new Thread(new DecodeTask())
     };
     private Thread archiveThread;
-    private volatile int size = PageLoader.STATE_WAIT;
+    private volatile int size = 0;
     private String error;
 
     public ArchivePageLoader(Context context, Uri uri) {
@@ -230,7 +230,6 @@ public class ArchivePageLoader extends PageLoader2 {
                 size = 0;
             }
             if (size <= 0) {
-                size = PageLoader.STATE_ERROR;
                 error = GetText.getString(R.string.error_reading_failed);
                 return;
             }
