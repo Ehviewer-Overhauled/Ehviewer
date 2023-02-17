@@ -77,8 +77,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     private var mReadReference = 0
     private var mDownloadReference = 0
 
-    private val mWorkerScope = SpiderQueenWorker()
-
     fun addOnSpiderListener(listener: OnSpiderListener) {
         synchronized(mSpiderListeners) { mSpiderListeners.add(listener) }
     }
@@ -530,7 +528,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + Job()
 
-    inner class SpiderQueenWorker {
+    private val mWorkerScope = object {
         private val mFetcherJobMap = hashMapOf<Int, Job>()
         private val mSemaphore = Semaphore(Settings.getMultiThreadDownload())
         private val pTokenLock = Mutex()
@@ -578,7 +576,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             }
         }
 
-        @JvmOverloads
         fun launch(index: Int, force: Boolean = false) {
             check(index in 0 until size)
             if (!isDownloadMode) synchronized(mFetcherJobMap) { doLaunchDownloadJob(index, force) }
@@ -772,9 +769,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             updatePageState(index, STATE_FAILED, error)
         }
 
-        private val decoder = Decoder()
-
-        inner class Decoder {
+        private val decoder = object {
             private val mSemaphore = Semaphore(4)
             private val mDecodeJobMap = hashMapOf<Int, Job>()
 
