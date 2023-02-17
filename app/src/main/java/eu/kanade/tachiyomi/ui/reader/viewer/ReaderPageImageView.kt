@@ -1,10 +1,7 @@
 package eu.kanade.tachiyomi.ui.reader.viewer
 
 import android.content.Context
-import android.graphics.PointF
-import android.graphics.RectF
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -16,20 +13,13 @@ import androidx.annotation.AttrRes
 import androidx.annotation.CallSuper
 import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.os.postDelayed
 import androidx.core.view.isVisible
 import coil.dispose
 import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.Companion.EASE_OUT_QUAD
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.Companion.SCALE_TYPE_CENTER_INSIDE
 import com.github.chrisbanes.photoview.PhotoView
-import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonSubsamplingImageView
 import eu.kanade.tachiyomi.util.system.animatorDurationScale
-import eu.kanade.tachiyomi.util.view.isVisibleOnScreen
 import java.io.InputStream
 import java.nio.ByteBuffer
 
@@ -84,204 +74,19 @@ open class ReaderPageImageView @JvmOverloads constructor(
         onViewClicked?.invoke()
     }
 
-    open fun onPageSelected(forward: Boolean) {
-        with(pageView as? SubsamplingScaleImageView) {
-            if (this == null) return
-            if (isReady) {
-                landscapeZoom(forward)
-            } else {
-                setOnImageEventListener(
-                    object : SubsamplingScaleImageView.DefaultOnImageEventListener() {
-                        override fun onReady() {
-                            setupZoom(config)
-                            landscapeZoom(forward)
-                            this@ReaderPageImageView.onImageLoaded()
-                        }
-
-                        override fun onImageLoadError(e: Exception) {
-                            onImageLoadError()
-                        }
-                    },
-                )
-            }
-        }
-    }
-
-    private fun SubsamplingScaleImageView.landscapeZoom(forward: Boolean) {
-        if (config != null && config!!.landscapeZoom && config!!.minimumScaleType == SCALE_TYPE_CENTER_INSIDE && sWidth > sHeight && scale == getMinScale()) {
-            handler?.postDelayed(500) {
-                val point = when (config!!.zoomStartPosition) {
-                    ZoomStartPosition.LEFT -> if (forward) PointF(0F, 0F) else PointF(sWidth.toFloat(), 0F)
-                    ZoomStartPosition.RIGHT -> if (forward) PointF(sWidth.toFloat(), 0F) else PointF(0F, 0F)
-                    ZoomStartPosition.CENTER -> center.also { it?.y = 0F }
-                }
-
-                val targetScale = height.toFloat() / sHeight.toFloat()
-                animateScaleAndCenter(targetScale, point)!!
-                    .withDuration(500)
-                    .withEasing(SubsamplingScaleImageView.EASE_IN_OUT_QUAD)
-                    .withInterruptible(true)
-                    .start()
-            }
-        }
-    }
+    open fun onPageSelected(forward: Boolean) {}
 
     fun setImage(drawable: Drawable, config: Config) {
         this.config = config
-        if (drawable is Animatable) {
-            prepareAnimatedImageView()
-            setAnimatedImage(drawable, config)
-        } else {
-            prepareNonAnimatedImageView()
-            setNonAnimatedImage(drawable, config)
-        }
-    }
-
-    fun setImage(inputStream: InputStream, isAnimated: Boolean, config: Config) {
-        this.config = config
-        if (isAnimated) {
-            prepareAnimatedImageView()
-            setAnimatedImage(inputStream, config)
-        } else {
-            prepareNonAnimatedImageView()
-            setNonAnimatedImage(inputStream, config)
-        }
+        prepareAnimatedImageView()
+        setAnimatedImage(drawable, config)
     }
 
     fun recycle() = pageView?.let {
         when (it) {
-            is SubsamplingScaleImageView -> it.recycle()
             is AppCompatImageView -> it.dispose()
         }
         it.isVisible = false
-    }
-
-    /**
-     * Check if the image can be panned to the left
-     */
-    fun canPanLeft(): Boolean = canPan { it.left }
-
-    /**
-     * Check if the image can be panned to the right
-     */
-    fun canPanRight(): Boolean = canPan { it.right }
-
-    /**
-     * Check whether the image can be panned.
-     * @param fn a function that returns the direction to check for
-     */
-    private fun canPan(fn: (RectF) -> Float): Boolean {
-        (pageView as? SubsamplingScaleImageView)?.let { view ->
-            RectF().let {
-                view.getPanRemaining(it)
-                return fn(it) > 1
-            }
-        }
-        return false
-    }
-
-    /**
-     * Pans the image to the left by a screen's width worth.
-     */
-    fun panLeft() {
-        pan { center, view -> center.also { it.x -= view.width / view.scale } }
-    }
-
-    /**
-     * Pans the image to the right by a screen's width worth.
-     */
-    fun panRight() {
-        pan { center, view -> center.also { it.x += view.width / view.scale } }
-    }
-
-    /**
-     * Pans the image.
-     * @param fn a function that computes the new center of the image
-     */
-    private fun pan(fn: (PointF, SubsamplingScaleImageView) -> PointF) {
-        (pageView as? SubsamplingScaleImageView)?.let { view ->
-
-            val target = fn(view.center ?: return, view)
-            view.animateCenter(target)!!
-                .withEasing(EASE_OUT_QUAD)
-                .withDuration(250)
-                .withInterruptible(true)
-                .start()
-        }
-    }
-
-    private fun prepareNonAnimatedImageView() {
-        if (pageView is SubsamplingScaleImageView) return
-        removeView(pageView)
-
-        pageView = if (isWebtoon) {
-            WebtoonSubsamplingImageView(context)
-        } else {
-            SubsamplingScaleImageView(context)
-        }.apply {
-            setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER)
-            setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_INSIDE)
-            setMinimumTileDpi(180)
-            setOnStateChangedListener(
-                object : SubsamplingScaleImageView.OnStateChangedListener {
-                    override fun onScaleChanged(newScale: Float, origin: Int) {
-                        this@ReaderPageImageView.onScaleChanged(newScale)
-                    }
-
-                    override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-                        // Not used
-                    }
-                },
-            )
-            setOnClickListener { this@ReaderPageImageView.onViewClicked() }
-        }
-        addView(pageView, MATCH_PARENT, MATCH_PARENT)
-    }
-
-    private fun SubsamplingScaleImageView.setupZoom(config: Config?) {
-        // 5x zoom
-        maxScale = scale * MAX_ZOOM_SCALE
-        setDoubleTapZoomScale(scale * 2)
-
-        when (config?.zoomStartPosition) {
-            ZoomStartPosition.LEFT -> setScaleAndCenter(scale, PointF(0F, 0F))
-            ZoomStartPosition.RIGHT -> setScaleAndCenter(scale, PointF(sWidth.toFloat(), 0F))
-            ZoomStartPosition.CENTER -> setScaleAndCenter(scale, center.also { it?.y = 0F })
-            null -> {}
-        }
-    }
-
-    private fun setNonAnimatedImage(
-        image: Any,
-        config: Config,
-    ) = (pageView as? SubsamplingScaleImageView)?.apply {
-        setDoubleTapZoomDuration(config.zoomDuration.getSystemScaledDuration())
-        setMinimumScaleType(config.minimumScaleType)
-        setMinimumDpi(1) // Just so that very small image will be fit for initial load
-        setCropBorders(config.cropBorders)
-        setOnImageEventListener(
-            object : SubsamplingScaleImageView.DefaultOnImageEventListener() {
-                override fun onReady() {
-                    setupZoom(config)
-                    if (isVisibleOnScreen()) landscapeZoom(true)
-                    this@ReaderPageImageView.onImageLoaded()
-                }
-
-                override fun onImageLoadError(e: Exception) {
-                    this@ReaderPageImageView.onImageLoadError()
-                }
-            },
-        )
-
-        when (image) {
-            is Drawable -> {
-                val bitmap = (image as BitmapDrawable).bitmap
-                setImage(ImageSource.cachedBitmap(bitmap))
-            }
-            is InputStream -> setImage(ImageSource.inputStream(image))
-            else -> throw IllegalArgumentException("Not implemented for class ${image::class.simpleName}")
-        }
-        isVisible = true
     }
 
     private fun prepareAnimatedImageView() {
@@ -365,7 +170,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
      */
     data class Config(
         val zoomDuration: Int,
-        val minimumScaleType: Int = SCALE_TYPE_CENTER_INSIDE,
+        val minimumScaleType: Int = 0,
         val cropBorders: Boolean = false,
         val zoomStartPosition: ZoomStartPosition = ZoomStartPosition.CENTER,
         val landscapeZoom: Boolean = false,
