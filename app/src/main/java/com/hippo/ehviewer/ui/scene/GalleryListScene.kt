@@ -546,9 +546,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val qsDrawerAdapter = QsDrawerAdapter(inflater)
         qsDrawerAdapter.setHasStableIds(true)
         drawerBinding.recyclerViewDrawer.adapter = qsDrawerAdapter
-        val itemTouchHelper = ItemTouchHelper(GalleryListQSItemTouchHelperCallback(qsDrawerAdapter))
-        itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
         if (!mIsTopList) {
+            val itemTouchHelper = ItemTouchHelper(GalleryListQSItemTouchHelperCallback(qsDrawerAdapter))
+            itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
             drawerBinding.tip.visibility = View.VISIBLE
             drawerBinding.recyclerViewDrawer.visibility = View.GONE
         }
