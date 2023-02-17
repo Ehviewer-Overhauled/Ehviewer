@@ -239,6 +239,11 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         notifyGetPages(mSpiderInfo.pages)
     }
 
+    suspend fun awaitStartPage(): Int {
+        prepareJob.join()
+        return mSpiderInfo.startPage
+    }
+
     private fun stop() {
         launchNonCancellable { writeSpiderInfoToLocal() }
         cancel()
@@ -515,22 +520,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 queen.stop()
                 sQueenMap.remove(queen.galleryInfo.gid)
             }
-        }
-
-        fun getStartPage(gid: Long): Int {
-            val queen = sQueenMap[gid]
-            var spiderInfo: SpiderInfo? = null
-
-            // Fast Path: read existing queen
-            if (queen != null) {
-                spiderInfo = queen.mSpiderInfo
-            }
-
-            // Slow path, read diskcache
-            if (spiderInfo == null) {
-                spiderInfo = readFromCache(gid)
-            }
-            return spiderInfo?.startPage ?: 0
         }
     }
 
