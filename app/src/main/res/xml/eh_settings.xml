@@ -166,7 +166,7 @@
         app:iconSpaceReserved="false" />
 
     <rikka.material.preference.MaterialSwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="request_news"
         android:title="@string/settings_eh_request_news"
         app:iconSpaceReserved="false" />
@@ -178,7 +178,7 @@
         app:iconSpaceReserved="false" />
 
     <rikka.material.preference.MaterialSwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="hide_hv_events"
         android:title="@string/settings_eh_hide_hv_events"
         app:dependency="request_news"

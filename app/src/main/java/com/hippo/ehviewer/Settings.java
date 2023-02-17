@@ -106,7 +106,7 @@ public class Settings {
     public static final String KEY_DOMAIN_FRONTING = "domain_fronting";
     public static final String KEY_BYPASS_VPN = "bypass_vpn";
     public static final String KEY_LIST_THUMB_SIZE = "list_tile_size";
-    private static final boolean DEFAULT_HIDE_HV_EVENTS = true;
+    private static final boolean DEFAULT_HIDE_HV_EVENTS = false;
     private static final String KEY_SHOW_COMMENTS = "show_gallery_comments";
     private static final boolean DEFAULT_SHOW_COMMENTS = true;
     private static final String TAG = Settings.class.getSimpleName();
