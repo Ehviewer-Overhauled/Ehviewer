@@ -44,6 +44,7 @@
         <item name="materialCalendarTheme">@style/MaterialCalendarTheme</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="materialAlertDialogTheme">@style/MaterialAlertDialogTheme</item>
+        <item name="materialTimePickerTheme">@style/MaterialTimePickerTheme</item>
     </style>
 
     <style name="ThemeOverlay" />
@@ -81,6 +82,13 @@
     </style>
 
     <style name="MaterialCalendarTheme" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
+        <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">
+            20px
+        </item>
+    </style>
+
+    <style name="MaterialTimePickerTheme" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:windowBlurBehindEnabled" tools:targetApi="s">true</item>
         <item name="android:windowBlurBehindRadius" tools:ignore="PxUsage" tools:targetApi="s">
             20px

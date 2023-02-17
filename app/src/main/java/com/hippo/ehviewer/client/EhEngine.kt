@@ -20,7 +20,6 @@ import android.util.Log
 import android.util.Pair
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -31,7 +30,6 @@ import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.ArchiveParser
-import com.hippo.ehviewer.client.parser.EventPaneParser
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.client.parser.ForumsParser
 import com.hippo.ehviewer.client.parser.GalleryApiParser
@@ -322,10 +320,6 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                val html = EventPaneParser.parse(body)
-                if (html != null) {
-                    application.showEventPane(html)
-                }
                 return GalleryDetailParser.parse(body!!)
             }
         } catch (e: Throwable) {

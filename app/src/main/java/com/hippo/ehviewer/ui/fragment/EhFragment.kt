@@ -23,12 +23,17 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat.CLOCK_12H
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.dailycheck.schedHour
+import com.hippo.ehviewer.dailycheck.schedMinute
+import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 class EhFragment : BasePreferenceFragment() {
@@ -65,6 +70,27 @@ class EhFragment : BasePreferenceFragment() {
             Settings.SIGN_IN_REQUIRED.forEach {
                 val preference = findPreference<Preference>(it)
                 preferenceScreen.removePreference(preference!!)
+            }
+        }
+
+        findPreference<Preference>(Settings.KEY_REQUEST_NEWS_TIMER)!!.apply {
+            setOnPreferenceClickListener {
+                MaterialTimePicker.Builder()
+                    .apply {
+                        schedHour?.let { setHour(it) }
+                        schedMinute?.let { setMinute(it) }
+                    }
+                    .setTimeFormat(CLOCK_12H)
+                    .build()
+                    .apply {
+                        addOnPositiveButtonClickListener {
+                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, hour)
+                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
+                            updateDailyCheckWork(requireContext())
+                        }
+                    }
+                    .show(childFragmentManager, null)
+                false
             }
         }
     }
@@ -105,6 +131,10 @@ class EhFragment : BasePreferenceFragment() {
                 EhApplication.application.recreateAllActivity()
             }
             return true
+        } else if (Settings.KEY_REQUEST_NEWS == key) {
+            updateDailyCheckWork(requireContext())
+        } else if (Settings.KEY_REQUEST_NEWS_TIMER == key) {
+            updateDailyCheckWork(requireContext())
         }
         return true
     }

@@ -585,7 +585,7 @@
     <string name="settings_eh_metered_network_warning">Metered network warning</string>
     <string name="metered_network_warning">Connected to metered networks</string>
     <string name="read_from">Read page %d</string>
-    <string name="settings_eh_request_news">Request news page on start</string>
+    <string name="settings_eh_request_news">Timed request news page</string>
     <string name="settings_eh_hide_hv_events">Hide HV event Notifications</string>
     <string name="copy_trans">Copy translation</string>
     <string name="reset_download_location">Reset to default</string>
@@ -696,5 +696,6 @@
     <string name="action_save">Save</string>
     <string name="action_save_to">Save to…</string>
     <string name="wide_color_gamut">Use Display P3 color space</string>
+    <string name="settings_eh_request_news_timepicker">Set time to request news</string>
     <!-- Tachiyomi Reader End-->
 </resources>
