@@ -97,8 +97,8 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         mSpiderQueen.forceRequest(index)
     }
 
-    override suspend fun awaitReady() {
-        mSpiderQueen.awaitReady()
+    override suspend fun awaitReady(): Boolean {
+        return mSpiderQueen.awaitReady()
     }
 
     override fun onCancelRequest(index: Int) {

@@ -46,9 +46,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import kotlin.Pair;
-import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.intrinsics.CoroutineSingletons;
 
@@ -191,11 +189,11 @@ public class ArchivePageLoader extends PageLoader2 {
 
     }
 
-    private Continuation<? super Unit> continuation = null;
+    private Continuation<? super Boolean> continuation = null;
 
     @Nullable
     @Override
-    public Object awaitReady(@NonNull Continuation<? super Unit> $completion) {
+    public Object awaitReady(@NonNull Continuation<? super Boolean> $completion) {
         continuation = $completion;
         return CoroutineSingletons.COROUTINE_SUSPENDED;
     }

@@ -271,8 +271,7 @@ class ReaderActivity : EhActivity() {
         mGalleryProvider!!.start()
 
         lifecycleScope.launchUI {
-            mGalleryProvider!!.awaitReady()
-            setGallery()
+            if (mGalleryProvider!!.awaitReady()) setGallery()
         }
 
         config = ReaderConfig()
