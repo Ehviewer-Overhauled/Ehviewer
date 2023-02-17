@@ -32,6 +32,7 @@ import com.hippo.ehviewer.Settings;
 import com.hippo.image.Image;
 import com.hippo.unifile.UniFile;
 import com.hippo.yorozuya.FileUtils;
+import com.hippo.yorozuya.SimpleHandler;
 import com.hippo.yorozuya.thread.PVLock;
 import com.hippo.yorozuya.thread.PriorityThread;
 
@@ -49,6 +50,7 @@ import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import kotlin.Pair;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
+import kotlin.coroutines.intrinsics.CoroutineSingletons;
 
 public class ArchivePageLoader extends PageLoader2 {
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
@@ -189,10 +191,13 @@ public class ArchivePageLoader extends PageLoader2 {
 
     }
 
+    private Continuation<? super Unit> continuation = null;
+
     @Nullable
     @Override
     public Object awaitReady(@NonNull Continuation<? super Unit> $completion) {
-        return null;
+        continuation = $completion;
+        return CoroutineSingletons.COROUTINE_SUSPENDED;
     }
 
     private class ArchiveHostTask implements Runnable {
@@ -229,6 +234,8 @@ public class ArchivePageLoader extends PageLoader2 {
                 error = GetText.getString(R.string.error_reading_failed);
                 return;
             }
+            SimpleHandler.getInstance().post(() -> continuation.resumeWith(true));
+
 
             if (archiveAccessor.needPassword()) {
                 boolean need_request = true;
