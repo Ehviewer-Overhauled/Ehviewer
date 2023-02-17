@@ -14,14 +14,8 @@ import androidx.annotation.CallSuper
 import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
-import coil.dispose
-import coil.imageLoader
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.github.chrisbanes.photoview.PhotoView
 import eu.kanade.tachiyomi.util.system.animatorDurationScale
-import java.io.InputStream
-import java.nio.ByteBuffer
 
 /**
  * A wrapper view for showing page image.
@@ -83,9 +77,6 @@ open class ReaderPageImageView @JvmOverloads constructor(
     }
 
     fun recycle() = pageView?.let {
-        when (it) {
-            is AppCompatImageView -> it.dispose()
-        }
         it.isVisible = false
     }
 
@@ -135,30 +126,11 @@ open class ReaderPageImageView @JvmOverloads constructor(
         if (this is PhotoView) {
             setZoomTransitionDuration(config.zoomDuration.getSystemScaledDuration())
         }
-
-        val data = when (image) {
-            is Drawable -> image
-            is InputStream -> ByteBuffer.wrap(image.readBytes())
-            else -> throw IllegalArgumentException("Not implemented for class ${image::class.simpleName}")
-        }
-        val request = ImageRequest.Builder(context)
-            .data(data)
-            .memoryCachePolicy(CachePolicy.DISABLED)
-            .diskCachePolicy(CachePolicy.DISABLED)
-            .target(
-                onSuccess = { result ->
-                    setImageDrawable(result)
-                    (result as? Animatable)?.start()
-                    isVisible = true
-                    this@ReaderPageImageView.onImageLoaded()
-                },
-                onError = {
-                    this@ReaderPageImageView.onImageLoadError()
-                },
-            )
-            .crossfade(false)
-            .build()
-        context.imageLoader.enqueue(request)
+        check(image is Drawable)
+        setImageDrawable(image)
+        (image as? Animatable)?.start()
+        isVisible = true
+        onImageLoaded()
     }
 
     private fun Int.getSystemScaledDuration(): Int {
