@@ -376,15 +376,15 @@ object GalleryDetailParser {
             }
             // time
             val c3 = JsoupUtils.getElementByClass(element, "c3")
-            var temp = c3!!.ownText()
-            if (temp.endsWith(':')) {
-                temp = temp.substring("Posted on ".length, temp.length - " by:".length)
+            val temp = c3!!.ownText()
+            val time = if (temp.endsWith(':')) {
                 // user
                 comment.user = c3.child(0).text()
+                temp.substring("Posted on ".length, temp.length - " by:".length)
             } else {
-                temp = temp.substring("Posted on ".length)
+                temp.substring("Posted on ".length)
             }
-            comment.time = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(temp)).toEpochMilli()
+            comment.time = Instant.from(WEB_COMMENT_DATE_FORMAT.parse(time)).toEpochMilli()
             // comment
             val c6 = JsoupUtils.getElementByClass(element, "c6")
             // fix underline support
@@ -407,7 +407,7 @@ object GalleryDetailParser {
                 val e = c8.children().first()
                 if (e != null) {
                     comment.lastEdited =
-                        Instant.from(WEB_COMMENT_DATE_FORMAT.parse(temp)).toEpochMilli()
+                        Instant.from(WEB_COMMENT_DATE_FORMAT.parse(e.text())).toEpochMilli()
                 }
             }
             comment
