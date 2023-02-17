@@ -56,8 +56,8 @@ class Image private constructor(private val src: CloseableSource) {
         (mObtainedDrawable as? AnimatedImageDrawable)?.stop()
         (mObtainedDrawable as? BitmapDrawable)?.bitmap?.recycle()
         mObtainedDrawable?.callback = null
-        mObtainedDrawable = null
         (mObtainedDrawable as? AnimatedImageDrawable)?.let { src.close() }
+        mObtainedDrawable = null
     }
 
     companion object {
