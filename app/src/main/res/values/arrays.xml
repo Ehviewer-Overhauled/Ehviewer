@@ -250,15 +250,6 @@
         <item>@string/download_state_failed</item>
     </string-array>
 
-    <declare-styleable name="SubsamplingScaleImageView">
-        <attr name="src" format="reference" />
-        <attr name="assetName" format="string" />
-        <attr name="panEnabled" format="boolean" />
-        <attr name="zoomEnabled" format="boolean" />
-        <attr name="quickScaleEnabled" format="boolean" />
-        <attr name="tileBackgroundColor" format="color" />
-    </declare-styleable>
-
     <string-array name="viewers_selector">
         <item>@string/label_default</item>
         <item>@string/left_to_right_viewer</item>
