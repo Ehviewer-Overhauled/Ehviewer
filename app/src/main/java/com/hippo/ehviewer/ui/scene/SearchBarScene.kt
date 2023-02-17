@@ -127,6 +127,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     fun setSearchBarText(text: String?) {
         binding.toolbar.text = text
+        binding.searchview.setText(text)
     }
 
     fun setEditTextHint(hint: String?) {
@@ -166,18 +167,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     fun setAllowEmptySearch(allowEmptySearch: Boolean) {
         mAllowEmptySearch = allowEmptySearch
-    }
-
-    private fun wrapTagKeyword(keyword: String): String {
-        return if (keyword.endsWith(':')) {
-            keyword
-        } else if (keyword.contains(' ')) {
-            val tag = keyword.substringAfter(':')
-            val prefix = keyword.dropLast(tag.length)
-            "$prefix\"$tag$\" "
-        } else {
-            "$keyword$ "
-        }
     }
 
     interface SuggestionProvider {
@@ -268,7 +257,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             edittext.let {
                 val keywords = it.text.toString().substringBeforeLast(' ', "")
                 val keyword = wrapTagKeyword(mKeyword)
-                val newKeywords = if (keywords.isNotEmpty()) "$keywords $keyword" else keyword
+                val newKeywords = if (keywords.isNotEmpty()) "$keywords $keyword " else "$keyword "
                 it.setText(newKeywords)
                 it.setSelection(newKeywords.length)
             }
@@ -369,4 +358,16 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                     isEnabled = false
             }
         }
+}
+
+fun wrapTagKeyword(keyword: String): String {
+    return if (keyword.endsWith(':')) {
+        keyword
+    } else if (keyword.contains(' ')) {
+        val tag = keyword.substringAfter(':')
+        val prefix = keyword.dropLast(tag.length)
+        "$prefix\"$tag$\""
+    } else {
+        "$keyword$"
+    }
 }
