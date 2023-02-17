@@ -74,7 +74,9 @@ import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
+import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_NORMAL
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_SUBSCRIPTION
+import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TAG
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_TOPLIST
 import com.hippo.ehviewer.client.data.ListUrlBuilder.Companion.MODE_WHATS_HOT
 import com.hippo.ehviewer.client.exception.EhException
@@ -98,7 +100,6 @@ import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.yorozuya.AnimationUtils
-import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 import com.hippo.yorozuya.StringUtils
 import com.hippo.yorozuya.ViewUtils
@@ -288,25 +289,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         })
     }
 
-    private fun wrapTagKeyword(keyword: String?): String {
-        var keyword = keyword
-        keyword = keyword!!.trim { it <= ' ' }
-        val index1 = keyword.indexOf(':')
-        if (index1 == -1 || index1 >= keyword.length - 1) {
-            // Can't find :, or : is the last char
-            return keyword
-        }
-        if (keyword[index1 + 1] == '"') {
-            // The char after : is ", the word must be quoted
-            return keyword
-        }
-        val index2 = keyword.indexOf(' ')
-        return if (index2 <= index1) {
-            // Can't find space, or space is before :
-            keyword
-        } else keyword.substring(0, index1 + 1) + "\"" + keyword.substring(index1 + 1) + "$\""
-    }
-
     // Update search bar title, drawer checked item
     private fun onUpdateUrlBuilder() {
         _binding ?: return
@@ -332,8 +314,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
         // Update search edit text
         if (!mIsTopList) {
-            if (mode == ListUrlBuilder.MODE_TAG) {
-                keyword = wrapTagKeyword(keyword)
+            if (mode == MODE_TAG) {
+                keyword = wrapTagKeyword(keyword!!)
             }
             setSearchBarText(keyword)
         }
@@ -547,7 +529,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         qsDrawerAdapter.setHasStableIds(true)
         drawerBinding.recyclerViewDrawer.adapter = qsDrawerAdapter
         if (!mIsTopList) {
-            val itemTouchHelper = ItemTouchHelper(GalleryListQSItemTouchHelperCallback(qsDrawerAdapter))
+            val itemTouchHelper =
+                ItemTouchHelper(GalleryListQSItemTouchHelperCallback(qsDrawerAdapter))
             itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
             drawerBinding.tip.visibility = View.VISIBLE
             drawerBinding.recyclerViewDrawer.visibility = View.GONE
@@ -995,7 +978,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             val oldMode = mUrlBuilder.mode
             // If it's MODE_SUBSCRIPTION, keep it
             val newMode =
-                if (oldMode == MODE_SUBSCRIPTION) MODE_SUBSCRIPTION else ListUrlBuilder.MODE_NORMAL
+                if (oldMode == MODE_SUBSCRIPTION) MODE_SUBSCRIPTION else MODE_NORMAL
             mUrlBuilder.reset()
             mUrlBuilder.mode = newMode
             mUrlBuilder.keyword = query
@@ -1444,43 +1427,47 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         private const val STATE_SEARCH = 2
         private const val STATE_SEARCH_SHOW_LIST = 3
         private const val ANIMATE_TIME = 300L
-        private fun getSuitableTitleForUrlBuilder(
-            resources: Resources, urlBuilder: ListUrlBuilder, appName: Boolean
-        ): String? {
-            val keyword = urlBuilder.keyword
-            val category = urlBuilder.category
-            return if (ListUrlBuilder.MODE_NORMAL == urlBuilder.mode && EhUtils.NONE == category &&
-                TextUtils.isEmpty(keyword) && urlBuilder.advanceSearch == -1 && urlBuilder.minRating == -1 && urlBuilder.pageFrom == -1 && urlBuilder.pageTo == -1
-            ) {
-                resources.getString(if (appName) R.string.app_name else R.string.homepage)
-            } else if (MODE_SUBSCRIPTION == urlBuilder.mode && EhUtils.NONE == category &&
-                TextUtils.isEmpty(keyword) && urlBuilder.advanceSearch == -1 && urlBuilder.minRating == -1 && urlBuilder.pageFrom == -1 && urlBuilder.pageTo == -1
-            ) {
-                resources.getString(R.string.subscription)
-            } else if (MODE_WHATS_HOT == urlBuilder.mode) {
-                resources.getString(R.string.whats_hot)
-            } else if (MODE_TOPLIST == urlBuilder.mode) {
-                when (urlBuilder.keyword) {
-                    "11" -> resources.getString(R.string.toplist_alltime)
-                    "12" -> resources.getString(R.string.toplist_pastyear)
-                    "13" -> resources.getString(R.string.toplist_pastmonth)
-                    "15" -> resources.getString(R.string.toplist_yesterday)
-                    else -> null
-                }
-            } else if (!TextUtils.isEmpty(keyword)) {
-                keyword
-            } else if (MathUtils.hammingWeight(category) == 1) {
-                EhUtils.getCategory(category)
-            } else {
-                null
-            }
-        }
-
         fun ListUrlBuilder.toStartArgs(): Bundle {
             val args = Bundle()
             args.putString(KEY_ACTION, ACTION_LIST_URL_BUILDER)
             args.putParcelable(KEY_LIST_URL_BUILDER, this)
             return args
         }
+    }
+}
+
+private fun getSuitableTitleForUrlBuilder(
+    resources: Resources, urlBuilder: ListUrlBuilder, appName: Boolean
+): String? {
+    val keyword = urlBuilder.keyword
+    val category = urlBuilder.category
+    val mode = urlBuilder.mode
+    return if (mode == MODE_WHATS_HOT) {
+        resources.getString(R.string.whats_hot)
+    } else if (!keyword.isNullOrEmpty()) {
+        when (mode) {
+            MODE_TOPLIST -> {
+                when (keyword) {
+                    "11" -> resources.getString(R.string.toplist_alltime)
+                    "12" -> resources.getString(R.string.toplist_pastyear)
+                    "13" -> resources.getString(R.string.toplist_pastmonth)
+                    "15" -> resources.getString(R.string.toplist_yesterday)
+                    else -> null
+                }
+            }
+
+            MODE_TAG -> wrapTagKeyword(keyword)
+            else -> keyword
+        }
+    } else if (category == EhUtils.NONE && urlBuilder.advanceSearch == -1) {
+        when (mode) {
+            MODE_NORMAL -> resources.getString(if (appName) R.string.app_name else R.string.homepage)
+            MODE_SUBSCRIPTION -> resources.getString(R.string.subscription)
+            else -> null
+        }
+    } else if (category.countOneBits() == 1) {
+        EhUtils.getCategory(category)
+    } else {
+        null
     }
 }
