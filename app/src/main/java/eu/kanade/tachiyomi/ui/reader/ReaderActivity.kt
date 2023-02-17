@@ -80,7 +80,6 @@ import com.hippo.util.getParcelableExtraCompat
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
@@ -98,8 +97,6 @@ import eu.kanade.tachiyomi.util.view.popupMenu
 import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -197,10 +194,7 @@ class ReaderActivity : EhActivity() {
         }
 
         if (ACTION_EH == mAction) {
-            if (mGalleryInfo != null) {
-                mGalleryProvider =
-                    EhPageLoader(mGalleryInfo)
-            }
+            mGalleryInfo?.let { mGalleryProvider = EhPageLoader(it) }
         } else if (Intent.ACTION_VIEW == mAction) {
             if (mUri != null) {
                 try {
@@ -277,12 +271,8 @@ class ReaderActivity : EhActivity() {
         mGalleryProvider!!.start()
 
         lifecycleScope.launchUI {
-            mGalleryProvider!!.state.collect {
-                if (it == PageLoader.STATE_READY) {
-                    setGallery()
-                    currentCoroutineContext().cancel()
-                }
-            }
+            mGalleryProvider!!.awaitReady()
+            setGallery()
         }
 
         config = ReaderConfig()
@@ -292,7 +282,7 @@ class ReaderActivity : EhActivity() {
     fun setGallery() {
         // Get start page
         if (mCurrentIndex == 0) mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
-        mSize = mGalleryProvider!!.size()
+        mSize = mGalleryProvider!!.size
         val viewerMode = ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()

@@ -47,6 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
 import kotlin.Pair;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 
 public class ArchivePageLoader extends PageLoader2 {
     private static final AtomicInteger sIdGenerator = new AtomicInteger();
@@ -107,7 +109,7 @@ public class ArchivePageLoader extends PageLoader2 {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return size;
     }
 
@@ -138,11 +140,6 @@ public class ArchivePageLoader extends PageLoader2 {
         synchronized (requests) {
             requests.remove(Integer.valueOf(index));
         }
-    }
-
-    @Override
-    public String getError() {
-        return error;
     }
 
     @NonNull
@@ -192,6 +189,12 @@ public class ArchivePageLoader extends PageLoader2 {
 
     }
 
+    @Nullable
+    @Override
+    public Object awaitReady(@NonNull Continuation<? super Unit> $completion) {
+        return null;
+    }
+
     private class ArchiveHostTask implements Runnable {
         public final Thread[] archiveThreads = new Thread[]{
                 new Thread(new ArchiveTask()),
@@ -224,11 +227,8 @@ public class ArchivePageLoader extends PageLoader2 {
             if (size <= 0) {
                 size = PageLoader.STATE_ERROR;
                 error = GetText.getString(R.string.error_reading_failed);
-                notifyDataChanged();
                 return;
             }
-            // Update size and notify changed
-            notifyDataChanged();
 
             if (archiveAccessor.needPassword()) {
                 boolean need_request = true;

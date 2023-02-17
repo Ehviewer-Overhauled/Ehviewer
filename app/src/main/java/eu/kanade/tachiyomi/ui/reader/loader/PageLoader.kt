@@ -7,21 +7,18 @@ import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
-import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class PageLoader {
 
     private val mImageCache = ImageCache()
     val mPages by lazy {
-        check(size() > 0)
-        (0 until size()).map { ReaderPage(it) }
+        check(size > 0)
+        (0 until size).map { ReaderPage(it) }
     }
 
     private val mPreloads = MathUtils.clamp(com.hippo.ehviewer.Settings.getPreloadImage(), 0, 100)
 
-    var state = MutableStateFlow(STATE_WAIT)
-
-    abstract val error: String
+    abstract suspend fun awaitReady()
 
     abstract fun start()
 
@@ -34,7 +31,7 @@ abstract class PageLoader {
         mImageCache.evictAll()
     }
 
-    abstract fun size(): Int
+    abstract val size: Int
 
     fun request(page: ReaderPage) {
         val index = mPages.indexOf(page)
@@ -46,8 +43,13 @@ abstract class PageLoader {
 
         // val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).toMutableList().removeAll(mImageCache.snapshot().keys)
         // Should we refresh our LruCache ?
-        val pagesAbsent = ((index - 5).coerceAtLeast(0) until (mPreloads + index).coerceAtMost(size())).mapNotNull { it.takeIf { mImageCache[it] == null } }
-        preloadPages(pagesAbsent, (index - 10).coerceAtLeast(0) to (mPreloads + index + 10).coerceAtMost(size()))
+        val pagesAbsent =
+            ((index - 5).coerceAtLeast(0) until (mPreloads + index).coerceAtMost(size)).mapNotNull { it.takeIf { mImageCache[it] == null } }
+        preloadPages(
+            pagesAbsent, (index - 10).coerceAtLeast(0) to (mPreloads + index + 10).coerceAtMost(
+                size
+            )
+        )
     }
 
     fun retryPage(page: ReaderPage) {
@@ -66,13 +68,6 @@ abstract class PageLoader {
     }
 
     protected abstract fun onCancelRequest(index: Int)
-
-    fun notifyDataChanged() {
-        if (size() == STATE_ERROR)
-            state.value = STATE_ERROR
-        else
-            state.compareAndSet(STATE_WAIT, STATE_READY)
-    }
 
     fun notifyPageWait(index: Int) {
         mPages[index].status.value = Page.State.QUEUE
@@ -95,7 +90,13 @@ abstract class PageLoader {
         mPages[index].status.value = Page.State.ERROR
     }
 
-    private class ImageCache : LruCache<Int, Image>(MathUtils.clamp(OSUtils.getTotalMemory() / 16, MIN_CACHE_SIZE, MAX_CACHE_SIZE).toInt()) {
+    private class ImageCache : LruCache<Int, Image>(
+        MathUtils.clamp(
+            OSUtils.getTotalMemory() / 16,
+            MIN_CACHE_SIZE,
+            MAX_CACHE_SIZE
+        ).toInt()
+    ) {
         fun add(key: Int, value: Image) {
             put(key, value)
         }

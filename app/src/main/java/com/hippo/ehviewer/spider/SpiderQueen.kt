@@ -168,9 +168,12 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private var downloadMode = false
+    private val isReady
+        get() = this::mSpiderInfo.isInitialized && this::mPageStateArray.isInitialized
 
     @Synchronized
     private fun updateMode() {
+        if (!isReady) return
         val mode: Int = if (mDownloadReference > 0) {
             MODE_DOWNLOAD
         } else {
@@ -210,7 +213,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         }
         check(mDownloadReference <= 1) { "mDownloadReference can't more than 0" }
         launchIO {
-            awaitReady()
+            prepareJob.join()
             updateMode()
         }
     }
@@ -222,7 +225,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         }
         check(!(mReadReference < 0 || mDownloadReference < 0)) { "Mode reference < 0" }
         launchIO {
-            awaitReady()
+            prepareJob.join()
             updateMode()
         }
     }
@@ -232,15 +235,17 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     private suspend fun doPrepare() {
         mSpiderInfo = readSpiderInfoFromLocal() ?: readSpiderInfoFromInternet() ?: return
         mPageStateArray = IntArray(mSpiderInfo.pages)
+        notifyGetPages(mSpiderInfo.pages)
     }
 
-    private suspend fun awaitReady() {
+    suspend fun awaitReady(): Boolean {
         prepareJob.join()
-        notifyGetPages(mSpiderInfo.pages)
+        return isReady
     }
 
     suspend fun awaitStartPage(): Int {
         prepareJob.join()
+        if (!isReady) return 0
         return mSpiderInfo.startPage
     }
 
