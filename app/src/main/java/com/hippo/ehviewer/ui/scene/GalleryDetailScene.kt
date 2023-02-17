@@ -423,7 +423,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
-        spiderQueen = SpiderQueen.obtainSpiderQueen(galleryInfo!!, SpiderQueen.MODE_READ)
+        spiderQueen = galleryInfo?.let { SpiderQueen.obtainSpiderQueen(it, SpiderQueen.MODE_READ) }
         return binding.root
     }
 
