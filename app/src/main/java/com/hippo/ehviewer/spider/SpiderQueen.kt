@@ -13,736 +13,516 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.spider
 
-package com.hippo.ehviewer.spider;
+import androidx.annotation.IntDef
+import androidx.collection.LongSparseArray
+import androidx.collection.set
+import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
+import com.hippo.ehviewer.GetText
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhRequestBuilder
+import com.hippo.ehviewer.client.EhUrl.getGalleryDetailUrl
+import com.hippo.ehviewer.client.EhUrl.getGalleryMultiPageViewerUrl
+import com.hippo.ehviewer.client.EhUrl.referer
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
+import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
+import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewSet
+import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser
+import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
+import com.hippo.image.Image
+import com.hippo.unifile.UniFile
+import com.hippo.util.ExceptionUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import moe.tarsin.coroutines.runSuspendCatching
+import okhttp3.executeAsync
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.CoroutineContext
 
-import android.os.Process;
-import android.util.Log;
+class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineScope {
+    val mSpiderDen: SpiderDen = SpiderDen(galleryInfo)
+    lateinit var mSpiderInfo: SpiderInfo
+    val mPagePercentMap = ConcurrentHashMap<Int, Float>()
+    private val mPageStateLock = Any()
+    private val mDownloadedPages = AtomicInteger(0)
+    private val mFinishedPages = AtomicInteger(0)
+    private val mPageErrorMap = ConcurrentHashMap<Int, String>()
+    private val mSpiderListeners: MutableList<OnSpiderListener> = ArrayList()
 
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
-import androidx.collection.LongSparseArray;
+    @Volatile
+    lateinit var mPageStateArray: IntArray
+    private var mReadReference = 0
+    private var mDownloadReference = 0
 
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.client.EhRequestBuilder;
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.data.PreviewSet;
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.ehviewer.client.parser.GalleryDetailParser;
-import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser;
-import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-import com.hippo.image.Image;
-import com.hippo.unifile.UniFile;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.OSUtils;
-import com.hippo.yorozuya.thread.PriorityThread;
+    private val mWorkerScope = SpiderQueenWorker(this)
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
-import eu.kanade.tachiyomi.ui.reader.loader.PageLoader;
-import kotlin.Pair;
-import kotlinx.coroutines.CoroutineScopeKt;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-public final class SpiderQueen implements Runnable {
-
-    public static final int MODE_READ = 0;
-    public static final int MODE_DOWNLOAD = 1;
-    public static final int STATE_NONE = 0;
-    public static final int STATE_DOWNLOADING = 1;
-    public static final int STATE_FINISHED = 2;
-    public static final int STATE_FAILED = 3;
-    public static final String SPIDER_INFO_FILENAME = ".ehviewer";
-    private static final String TAG = SpiderQueen.class.getSimpleName();
-    private static final AtomicInteger sIdGenerator = new AtomicInteger();
-    private static final boolean DEBUG_LOG = true;
-    private static final boolean DEBUG_PTOKEN = true;
-    private static final LongSparseArray<SpiderQueen> sQueenMap = new LongSparseArray<>();
-    public static String PTOKEN_FAILED_MESSAGE = GetText.getString(R.string.error_get_ptoken_error);
-    public static String ERROR_509 = GetText.getString(R.string.error_509);
-    public static String NETWORK_ERROR = GetText.getString(R.string.error_socket);
-
-    public static String DECODE_ERROR = GetText.getString(R.string.error_decoding_failed);
-    @NonNull
-    public final SpiderDen mSpiderDen;
-    public final AtomicReference<SpiderInfo> mSpiderInfo = new AtomicReference<>();
-    // Store page download percent
-    public final ConcurrentHashMap<Integer, Float> mPagePercentMap = new ConcurrentHashMap<>();
-    @NonNull
-    private final OkHttpClient mHttpClient;
-    @NonNull
-    private final GalleryInfo mGalleryInfo;
-    private final Object mQueenLock = new Object();
-    private final Object mPageStateLock = new Object();
-    private final AtomicInteger mDownloadedPages = new AtomicInteger(0);
-    private final AtomicInteger mFinishedPages = new AtomicInteger(0);
-    // Store page error
-    private final ConcurrentHashMap<Integer, String> mPageErrorMap = new ConcurrentHashMap<>();
-    private final List<OnSpiderListener> mSpiderListeners = new ArrayList<>();
-    public volatile int[] mPageStateArray;
-    private int mReadReference = 0;
-    private int mDownloadReference = 0;
-    // It mQueenThread is null, failed or stopped
-    @Nullable
-    private volatile Thread mQueenThread;
-    private SpiderQueenWorker mWorkerScope;
-    private boolean mStoped = false;
-
-    private SpiderQueen(@NonNull GalleryInfo galleryInfo) {
-        mHttpClient = EhApplication.getOkHttpClient();
-        mGalleryInfo = galleryInfo;
-        mSpiderDen = new SpiderDen(mGalleryInfo);
-        mWorkerScope = new SpiderQueenWorker(this);
+    fun addOnSpiderListener(listener: OnSpiderListener) {
+        synchronized(mSpiderListeners) { mSpiderListeners.add(listener) }
     }
 
-    @UiThread
-    public static SpiderQueen obtainSpiderQueen(@NonNull GalleryInfo galleryInfo, @Mode int mode) {
-        OSUtils.checkMainLoop();
+    fun removeOnSpiderListener(listener: OnSpiderListener) {
+        synchronized(mSpiderListeners) { mSpiderListeners.remove(listener) }
+    }
 
-        SpiderQueen queen = sQueenMap.get(galleryInfo.getGid());
-        if (queen == null) {
-            queen = new SpiderQueen(galleryInfo);
-            sQueenMap.put(galleryInfo.getGid(), queen);
-            // Set mode
-            queen.setMode(mode);
-            queen.start();
+    private fun notifyGetPages(pages: Int) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onGetPages(pages)
+            }
+        }
+    }
+
+    fun notifyGet509(index: Int) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onGet509(index)
+            }
+        }
+    }
+
+    fun notifyPageDownload(index: Int, contentLength: Long, receivedSize: Long, bytesRead: Int) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onPageDownload(index, contentLength, receivedSize, bytesRead)
+            }
+        }
+    }
+
+    private fun notifyPageSuccess(index: Int) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onPageSuccess(
+                    index,
+                    mFinishedPages.get(),
+                    mDownloadedPages.get(),
+                    mPageStateArray.size
+                )
+            }
+        }
+    }
+
+    private fun notifyPageFailure(index: Int, error: String?) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onPageFailure(
+                    index,
+                    error,
+                    mFinishedPages.get(),
+                    mDownloadedPages.get(),
+                    mPageStateArray.size
+                )
+            }
+        }
+    }
+
+    private fun notifyAllPageDownloaded() {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onFinish(
+                    mFinishedPages.get(),
+                    mDownloadedPages.get(),
+                    mPageStateArray.size
+                )
+            }
+        }
+    }
+
+    fun notifyGetImageSuccess(index: Int, image: Image) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onGetImageSuccess(index, image)
+            }
+        }
+    }
+
+    fun notifyGetImageFailure(index: Int, error: String) {
+        synchronized(mSpiderListeners) {
+            for (listener in mSpiderListeners) {
+                listener.onGetImageFailure(index, error)
+            }
+        }
+    }
+
+    private var mInDownloadMode = false
+
+    @Synchronized
+    private fun updateMode() {
+        val mode: Int = if (mDownloadReference > 0) {
+            MODE_DOWNLOAD
         } else {
-            // Set mode
-            queen.setMode(mode);
+            MODE_READ
         }
-        return queen;
-    }
-
-    @UiThread
-    public static void releaseSpiderQueen(@NonNull SpiderQueen queen, @Mode int mode) {
-        OSUtils.checkMainLoop();
-
-        // Clear mode
-        queen.clearMode(mode);
-
-        if (queen.mReadReference == 0 && queen.mDownloadReference == 0) {
-            // Stop and remove if there is no reference
-            queen.stop();
-            sQueenMap.remove(queen.mGalleryInfo.getGid());
-        }
-    }
-
-    public static boolean contain(int[] array, int value) {
-        for (int v : array) {
-            if (v == value) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Mark as suspend fun when kotlinize, need IO
-    public static int getStartPage(long gid) {
-        var queen = sQueenMap.get(gid);
-        SpiderInfo spiderInfo = null;
-
-        // Fast Path: read existing queen
-        if (queen != null) {
-            spiderInfo = queen.mSpiderInfo.get();
-        }
-
-        // Slow path, read diskcache
-        if (spiderInfo == null) {
-            spiderInfo = SpiderInfoUtilsKt.readFromCache(gid);
-        }
-
-        if (spiderInfo == null) return 0;
-        return spiderInfo.getStartPage();
-    }
-
-    public void addOnSpiderListener(OnSpiderListener listener) {
-        synchronized (mSpiderListeners) {
-            mSpiderListeners.add(listener);
-        }
-    }
-
-    public void removeOnSpiderListener(OnSpiderListener listener) {
-        synchronized (mSpiderListeners) {
-            mSpiderListeners.remove(listener);
-        }
-    }
-
-    private void notifyGetPages(int pages) {
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onGetPages(pages);
-            }
-        }
-    }
-
-    public void notifyGet509(int index) {
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onGet509(index);
-            }
-        }
-    }
-
-    public void notifyPageDownload(int index, long contentLength, long receivedSize, int bytesRead) {
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onPageDownload(index, contentLength, receivedSize, bytesRead);
-            }
-        }
-    }
-
-    private void notifyPageSuccess(int index) {
-        int size = -1;
-        int[] temp = mPageStateArray;
-        if (temp != null) {
-            size = temp.length;
-        }
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onPageSuccess(index, mFinishedPages.get(), mDownloadedPages.get(), size);
-            }
-        }
-    }
-
-    private void notifyPageFailure(int index, String error) {
-        int size = -1;
-        int[] temp = mPageStateArray;
-        if (temp != null) {
-            size = temp.length;
-        }
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onPageFailure(index, error, mFinishedPages.get(), mDownloadedPages.get(), size);
-            }
-        }
-    }
-
-    private void notifyAllPageDownloaded() {
-        int size = -1;
-        int[] temp = mPageStateArray;
-        if (temp != null) {
-            size = temp.length;
-        }
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onFinish(mFinishedPages.get(), mDownloadedPages.get(), size);
-            }
-        }
-    }
-
-    public void notifyGetImageSuccess(int index, Image image) {
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onGetImageSuccess(index, image);
-            }
-        }
-    }
-
-    public void notifyGetImageFailure(int index, String error) {
-        if (error == null) {
-            error = GetText.getString(R.string.error_unknown);
-        }
-        synchronized (mSpiderListeners) {
-            for (OnSpiderListener listener : mSpiderListeners) {
-                listener.onGetImageFailure(index, error);
-            }
-        }
-    }
-
-    private boolean mInDownloadMode = false;
-
-    private void updateMode() {
-        int mode;
-        if (mDownloadReference > 0) {
-            mode = MODE_DOWNLOAD;
-        } else {
-            mode = MODE_READ;
-        }
-
-        mSpiderDen.setMode(mode);
+        mSpiderDen.setMode(mode)
 
         // Update download page
-        boolean intoDownloadMode = mode == MODE_DOWNLOAD;
-
-        if (intoDownloadMode && !mInDownloadMode && mPageStateArray != null) {
+        val intoDownloadMode = mode == MODE_DOWNLOAD
+        if (intoDownloadMode && !mInDownloadMode) {
             // Clear download state
-            synchronized (mPageStateLock) {
-                int[] temp = mPageStateArray;
-                for (int i = 0, n = temp.length; i < n; i++) {
-                    int oldState = temp[i];
+            synchronized(mPageStateLock) {
+                val temp: IntArray = mPageStateArray
+                var i = 0
+                val n = temp.size
+                while (i < n) {
+                    val oldState = temp[i]
                     if (STATE_DOWNLOADING != oldState) {
-                        temp[i] = STATE_NONE;
+                        temp[i] = STATE_NONE
                     }
+                    i++
                 }
-                mDownloadedPages.lazySet(0);
-                mFinishedPages.lazySet(0);
-                mPageErrorMap.clear();
-                mPagePercentMap.clear();
+                mDownloadedPages.lazySet(0)
+                mFinishedPages.lazySet(0)
+                mPageErrorMap.clear()
+                mPagePercentMap.clear()
             }
+            mWorkerScope.enterDownloadMode()
         }
-
-        mInDownloadMode = intoDownloadMode;
+        mInDownloadMode = intoDownloadMode
     }
 
-    private void setMode(@Mode int mode) {
-        switch (mode) {
-            case MODE_READ -> mReadReference++;
-            case MODE_DOWNLOAD -> mDownloadReference++;
+    private fun setMode(@Mode mode: Int) {
+        when (mode) {
+            MODE_READ -> mReadReference++
+            MODE_DOWNLOAD -> mDownloadReference++
         }
-
-        if (mDownloadReference > 1) {
-            throw new IllegalStateException("mDownloadReference can't more than 0");
-        }
-
-        updateMode();
-    }
-
-    private void clearMode(@Mode int mode) {
-        switch (mode) {
-            case MODE_READ -> mReadReference--;
-            case MODE_DOWNLOAD -> mDownloadReference--;
-        }
-
-        if (mReadReference < 0 || mDownloadReference < 0) {
-            throw new IllegalStateException("Mode reference < 0");
-        }
-
-        updateMode();
-    }
-
-    private void start() {
-        Thread queenThread = new PriorityThread(this, TAG + '-' + sIdGenerator.incrementAndGet(),
-                Process.THREAD_PRIORITY_BACKGROUND);
-        mQueenThread = queenThread;
-        queenThread.start();
-    }
-
-    private void stop() {
-        mStoped = true;
-        synchronized (mQueenLock) {
-            mQueenLock.notifyAll();
-        }
-        CoroutineScopeKt.cancel(mWorkerScope, null);
-        mWorkerScope = null;
-    }
-
-    public int size() {
-        if (mQueenThread == null) {
-            return PageLoader.STATE_ERROR;
-        } else if (mPageStateArray == null) {
-            return PageLoader.STATE_WAIT;
-        } else {
-            return mPageStateArray.length;
+        check(mDownloadReference <= 1) { "mDownloadReference can't more than 0" }
+        launchIO {
+            awaitReady()
+            updateMode()
         }
     }
 
-    public String getError() {
-        if (mQueenThread == null) {
-            return "Error";
-        } else {
-            return null;
+    private fun clearMode(@Mode mode: Int) {
+        when (mode) {
+            MODE_READ -> mReadReference--
+            MODE_DOWNLOAD -> mDownloadReference--
+        }
+        check(!(mReadReference < 0 || mDownloadReference < 0)) { "Mode reference < 0" }
+        launchIO {
+            awaitReady()
+            updateMode()
         }
     }
 
-    public void forceRequest(int index) {
-        request(index, true);
+    private var prepareJob = launchIO { doPrepare() }
+
+    private suspend fun doPrepare() {
+        mSpiderInfo = readSpiderInfoFromLocal() ?: readSpiderInfoFromInternet() ?: return
+        mPageStateArray = IntArray(mSpiderInfo.pages)
     }
 
-    public void request(int index) {
-        request(index, false);
+    suspend fun awaitReady() {
+        prepareJob.join()
+        notifyGetPages(mSpiderInfo.pages)
     }
 
-    private int getPageState(int index) {
-        synchronized (mPageStateLock) {
-            if (mPageStateArray != null && index >= 0 && index < mPageStateArray.length) {
-                return mPageStateArray[index];
+    private fun stop() {
+        launchNonCancellable { writeSpiderInfoToLocal() }
+        cancel()
+    }
+
+    val size
+        get() = mPageStateArray.size
+
+    val error: String?
+        get() = null
+
+    fun forceRequest(index: Int) {
+        request(index, true)
+    }
+
+    fun request(index: Int) {
+        request(index, false)
+    }
+
+    private fun getPageState(index: Int): Int {
+        synchronized(mPageStateLock) {
+            return if (index >= 0 && index < mPageStateArray.size) {
+                mPageStateArray[index]
             } else {
-                return STATE_NONE;
+                STATE_NONE
             }
         }
     }
 
-    public void cancelRequest(int index) {
-        if (mQueenThread == null) {
-            return;
-        }
-
-        mWorkerScope.cancelDecode(index);
+    fun cancelRequest(index: Int) {
+        mWorkerScope.cancelDecode(index)
     }
 
-    public void preloadPages(@NonNull List<Integer> pages, @NonNull Pair<Integer, Integer> pair) {
-        if (mQueenThread == null) {
-            return;
-        }
-
-        mWorkerScope.updateRAList(pages, pair);
+    fun preloadPages(pages: List<Int>, pair: Pair<Int, Int>) {
+        mWorkerScope.updateRAList(pages, pair)
     }
 
-    private void request(int index, boolean force) {
-        if (mQueenThread == null) {
-            return;
-        }
-
+    private fun request(index: Int, force: Boolean) {
         // Get page state
-        int state = getPageState(index);
+        val state = getPageState(index)
 
         // Fix state for force
-        if ((force && (state == STATE_FINISHED || state == STATE_FAILED)) || (state == STATE_FAILED)) {
+        if (force && (state == STATE_FINISHED || state == STATE_FAILED) || state == STATE_FAILED) {
             // Update state to none at once
-            updatePageState(index, STATE_NONE);
+            updatePageState(index, STATE_NONE)
         }
-
-        mWorkerScope.launch(index, force);
+        mWorkerScope.launch(index, force)
     }
 
-    public boolean save(int index, @NonNull UniFile file) {
-        int state = getPageState(index);
+    fun save(index: Int, file: UniFile): Boolean {
+        val state = getPageState(index)
+        return if (STATE_FINISHED != state) {
+            false
+        } else mSpiderDen.saveToUniFile(index, file)
+    }
+
+    fun save(index: Int, dir: UniFile, filename: String): UniFile? {
+        val state = getPageState(index)
         if (STATE_FINISHED != state) {
-            return false;
+            return null
         }
-
-        return mSpiderDen.saveToUniFile(index, file);
+        val ext = mSpiderDen.getExtension(index)
+        val dst = dir.subFile(if (null != ext) "$filename.$ext" else filename) ?: return null
+        return if (!mSpiderDen.saveToUniFile(index, dst)) null else dst
     }
 
-    @Nullable
-    public UniFile save(int index, @NonNull UniFile dir, @NonNull String filename) {
-        int state = getPageState(index);
-        if (STATE_FINISHED != state) {
-            return null;
-        }
-
-        var ext = mSpiderDen.getExtension(index);
-        UniFile dst = dir.subFile(null != ext ? filename + "." + ext : filename);
-        if (null == dst) {
-            return null;
-        }
-        if (!mSpiderDen.saveToUniFile(index, dst)) return null;
-        return dst;
+    fun getExtension(index: Int): String? {
+        val state = getPageState(index)
+        return if (STATE_FINISHED != state) {
+            null
+        } else mSpiderDen.getExtension(index)
     }
 
-    @Nullable
-    public String getExtension(int index) {
-        int state = getPageState(index);
-        if (STATE_FINISHED != state) {
-            return null;
-        }
+    val startPage: Int
+        get() = mSpiderInfo.startPage
 
-        return mSpiderDen.getExtension(index);
+    fun putStartPage(page: Int) {
+        mSpiderInfo.startPage = page
     }
 
-    public int getStartPage() {
-        SpiderInfo spiderInfo = mSpiderInfo.get();
-        if (spiderInfo == null) spiderInfo = readSpiderInfoFromLocal();
-        if (spiderInfo == null) return 0;
-        return spiderInfo.getStartPage();
-    }
-
-    public void putStartPage(int page) {
-        final SpiderInfo spiderInfo = mSpiderInfo.get();
-        if (spiderInfo != null) {
-            spiderInfo.setStartPage(page);
-        }
-    }
-
-    private synchronized SpiderInfo readSpiderInfoFromLocal() {
-        SpiderInfo spiderInfo = mSpiderInfo.get();
-        if (spiderInfo != null) {
-            return spiderInfo;
-        }
-
-        // Read from download dir
-        UniFile downloadDir = mSpiderDen.getDownloadDir();
-        if (downloadDir != null) {
-            UniFile file = downloadDir.findFile(SPIDER_INFO_FILENAME);
-            if (file != null) {
-                spiderInfo = SpiderInfoUtilsKt.readCompatFromUniFile(file);
-                if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() &&
-                        spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
-                    return spiderInfo;
+    private fun readSpiderInfoFromLocal(): SpiderInfo? {
+        return mSpiderDen.downloadDir?.run {
+            findFile(SPIDER_INFO_FILENAME)?.let { file ->
+                readCompatFromUniFile(file)?.takeIf {
+                    it.gid == galleryInfo.gid && it.token == galleryInfo.token
                 }
             }
         }
-
-        // Read from cache
-        spiderInfo = SpiderInfoUtilsKt.readFromCache(mGalleryInfo.getGid());
-        if (spiderInfo != null && spiderInfo.getGid() == mGalleryInfo.getGid() && spiderInfo.getToken().equals(mGalleryInfo.getToken())) {
-            return spiderInfo;
-        }
-        return null;
+            ?: readFromCache(galleryInfo.gid)?.takeIf { it.gid == galleryInfo.gid && it.token == galleryInfo.token }
     }
 
-    private void readPreviews(String body, int index, SpiderInfo spiderInfo) throws ParseException {
-        spiderInfo.setPreviewPages(GalleryDetailParser.parsePreviewPages(body));
-        PreviewSet previewSet = GalleryDetailParser.parsePreviewSet(body);
-
+    @Throws(ParseException::class)
+    private fun readPreviews(body: String, index: Int, spiderInfo: SpiderInfo) {
+        spiderInfo.previewPages = parsePreviewPages(body)
+        val previewSet = parsePreviewSet(body)
         if (previewSet.size() > 0) {
             if (index == 0) {
-                spiderInfo.setPreviewPerPage(previewSet.size());
+                spiderInfo.previewPerPage = previewSet.size()
             } else {
-                spiderInfo.setPreviewPerPage(previewSet.getPosition(0) / index);
+                spiderInfo.previewPerPage = previewSet.getPosition(0) / index
             }
         }
-
-        for (int i = 0, n = previewSet.size(); i < n; i++) {
-            GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i));
+        var i = 0
+        val n = previewSet.size()
+        while (i < n) {
+            val result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i))
             if (result != null) {
-                spiderInfo.getPTokenMap().put(result.page, result.pToken);
+                spiderInfo.pTokenMap[result.page] = result.pToken
             }
+            i++
         }
     }
 
-    private SpiderInfo readSpiderInfoFromInternet() {
-        Request request = new EhRequestBuilder(EhUrl.getGalleryDetailUrl(
-                mGalleryInfo.getGid(), mGalleryInfo.getToken(), 0, false), EhUrl.getReferer()).build();
-        try (Response response = mHttpClient.newCall(request).execute()) {
-            String body = response.body().string();
-
-            var pages = GalleryDetailParser.parsePages(body);
-            SpiderInfo spiderInfo = new SpiderInfo(mGalleryInfo.getGid(), pages);
-            spiderInfo.setToken(mGalleryInfo.getToken());
-            readPreviews(body, 0, spiderInfo);
-            return spiderInfo;
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            return null;
-        }
-    }
-
-    public String getPTokenFromMultiPageViewer(int index) {
-        SpiderInfo spiderInfo = mSpiderInfo.get();
-        if (spiderInfo == null) {
-            return null;
-        }
-
-        String url = EhUrl.getGalleryMultiPageViewerUrl(
-                mGalleryInfo.getGid(), mGalleryInfo.getToken());
-        if (DEBUG_PTOKEN) {
-            Log.d(TAG, "getPTokenFromMultiPageViewer index " + index + ", url " + url);
-        }
-        String referer = EhUrl.getReferer();
-        Request request = new EhRequestBuilder(url, referer).build();
-        try (Response response = mHttpClient.newCall(request).execute()) {
-            String body = response.body().string();
-
-            ArrayList<String> list = GalleryMultiPageViewerPTokenParser.parse(body);
-
-            for (int i = 0; i < list.size(); i++) {
-                spiderInfo.getPTokenMap().put(i, list.get(i));
+    private suspend fun readSpiderInfoFromInternet(): SpiderInfo? {
+        val request = EhRequestBuilder(
+            getGalleryDetailUrl(
+                galleryInfo.gid, galleryInfo.token, 0, false
+            ), referer
+        ).build()
+        return runSuspendCatching {
+            okHttpClient.newCall(request).executeAsync().use { response ->
+                val body = response.body.string()
+                val pages = parsePages(body)
+                val spiderInfo = SpiderInfo(galleryInfo.gid, pages)
+                spiderInfo.token = galleryInfo.token
+                readPreviews(body, 0, spiderInfo)
+                spiderInfo
             }
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrNull()
+    }
 
-            return spiderInfo.getPTokenMap().get(index);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            return null;
+    fun getPTokenFromMultiPageViewer(index: Int): String? {
+        val spiderInfo = mSpiderInfo
+        val url = getGalleryMultiPageViewerUrl(
+            galleryInfo.gid, galleryInfo.token!!
+        )
+        val referer = referer
+        val request = EhRequestBuilder(url, referer).build()
+        try {
+            okHttpClient.newCall(request).execute().use { response ->
+                val body = response.body.string()
+                val list = GalleryMultiPageViewerPTokenParser.parse(body)
+                for (i in list.indices) {
+                    spiderInfo.pTokenMap[i] = list[i]
+                }
+                return spiderInfo.pTokenMap[index]
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            return null
         }
     }
 
-    public String getPTokenFromInternet(int index) {
-        SpiderInfo spiderInfo = mSpiderInfo.get();
-        if (spiderInfo == null) {
-            return null;
-        }
+    fun getPTokenFromInternet(index: Int): String? {
+        val spiderInfo = mSpiderInfo
 
         // Check previewIndex
-        int previewIndex;
-        if (spiderInfo.getPreviewPerPage() >= 0) {
-            previewIndex = index / spiderInfo.getPreviewPerPage();
+        var previewIndex: Int
+        previewIndex = if (spiderInfo.previewPerPage >= 0) {
+            index / spiderInfo.previewPerPage
         } else {
-            previewIndex = 0;
+            0
         }
-        if (spiderInfo.getPreviewPages() > 0) {
-            previewIndex = Math.min(previewIndex, spiderInfo.getPreviewPages() - 1);
+        if (spiderInfo.previewPages > 0) {
+            previewIndex = previewIndex.coerceAtMost(spiderInfo.previewPages - 1)
         }
-
-        String url = EhUrl.getGalleryDetailUrl(
-                mGalleryInfo.getGid(), mGalleryInfo.getToken(), previewIndex, false);
-        String referer = EhUrl.getReferer();
-        if (DEBUG_PTOKEN) {
-            Log.d(TAG, "index " + index + ", previewIndex " + previewIndex +
-                    ", previewPerPage " + spiderInfo.getPreviewPerPage() + ", url " + url);
-        }
-        Request request = new EhRequestBuilder(url, referer).build();
-        try (Response response = mHttpClient.newCall(request).execute()) {
-            String body = response.body().string();
-            readPreviews(body, previewIndex, spiderInfo);
-
-            return spiderInfo.getPTokenMap().get(index);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            return null;
-        }
-    }
-
-    private synchronized void writeSpiderInfoToLocal() {
-        var spiderInfo = mSpiderInfo.get();
-        if (spiderInfo != null) {
-            UniFile downloadDir = mSpiderDen.getDownloadDir();
-            if (downloadDir != null) {
-                UniFile file = downloadDir.createFile(SPIDER_INFO_FILENAME);
-                SpiderInfoUtilsKt.write(spiderInfo, file);
+        val url = getGalleryDetailUrl(
+            galleryInfo.gid, galleryInfo.token, previewIndex, false
+        )
+        val referer = referer
+        val request = EhRequestBuilder(url, referer).build()
+        try {
+            okHttpClient.newCall(request).execute().use { response ->
+                val body = response.body.string()
+                readPreviews(body, previewIndex, spiderInfo)
+                return spiderInfo.pTokenMap[index]
             }
-            SpiderInfoUtilsKt.saveToCache(spiderInfo);
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            return null
         }
     }
 
-    private void runInternal() {
-        // Read spider info
-        SpiderInfo spiderInfo = readSpiderInfoFromLocal();
-
-        // Check Stopped
-        if (mStoped) {
-            return;
-        }
-
-        // Spider info from internet
-        if (spiderInfo == null) {
-            spiderInfo = readSpiderInfoFromInternet();
-        }
-
-        // Error! Can't get spiderInfo
-        if (spiderInfo == null) {
-            return;
-        }
-        mSpiderInfo.set(spiderInfo);
-
-        // Check Stopped
-        if (mStoped) {
-            return;
-        }
-
-        // Setup page state
-        synchronized (mPageStateLock) {
-            mPageStateArray = new int[spiderInfo.getPages()];
-        }
-
-        // Notify get pages
-        notifyGetPages(spiderInfo.getPages());
-
-        if (mInDownloadMode) mWorkerScope.enterDownloadMode();
-
-        // Wait finish
-        synchronized (mQueenLock) {
-            try {
-                mQueenLock.wait();
-            } catch (InterruptedException ignored) {
-            }
-        }
-
-        writeSpiderInfoToLocal();
+    @Synchronized
+    private fun writeSpiderInfoToLocal() {
+        mSpiderDen.downloadDir?.run { createFile(SPIDER_INFO_FILENAME).also { mSpiderInfo.write(it) } }
+        mSpiderInfo.saveToCache()
     }
 
-    @Override
-    public void run() {
-        if (DEBUG_LOG) {
-            Log.i(TAG, Thread.currentThread().getName() + ": start");
-        }
-
-        runInternal();
-
-        // Set mQueenThread null
-        mQueenThread = null;
-
-        if (DEBUG_LOG) {
-            Log.i(TAG, Thread.currentThread().getName() + ": end");
-        }
+    private fun isStateDone(state: Int): Boolean {
+        return state == STATE_FINISHED || state == STATE_FAILED
     }
 
-    public void updatePageState(int index, @State int state) {
-        updatePageState(index, state, null);
-    }
-
-    private boolean isStateDone(int state) {
-        return state == STATE_FINISHED || state == STATE_FAILED;
-    }
-
-    public void updatePageState(int index, @State int state, String error) {
-        int oldState;
-        synchronized (mPageStateLock) {
-            oldState = mPageStateArray[index];
-            mPageStateArray[index] = state;
-
+    @JvmOverloads
+    fun updatePageState(index: Int, @State state: Int, error: String? = null) {
+        var oldState: Int
+        synchronized(mPageStateLock) {
+            oldState = mPageStateArray[index]
+            mPageStateArray[index] = state
             if (!isStateDone(oldState) && isStateDone(state)) {
-                mDownloadedPages.incrementAndGet();
+                mDownloadedPages.incrementAndGet()
             } else if (isStateDone(oldState) && !isStateDone(state)) {
-                mDownloadedPages.decrementAndGet();
+                mDownloadedPages.decrementAndGet()
             }
             if (oldState != STATE_FINISHED && state == STATE_FINISHED) {
-                mFinishedPages.incrementAndGet();
+                mFinishedPages.incrementAndGet()
             } else if (oldState == STATE_FINISHED && state != STATE_FINISHED) {
-                mFinishedPages.decrementAndGet();
+                mFinishedPages.decrementAndGet()
             }
 
             // Clear
             if (state == STATE_DOWNLOADING) {
-                mPageErrorMap.remove(index);
+                mPageErrorMap.remove(index)
             } else if (state == STATE_FINISHED || state == STATE_FAILED) {
-                mPagePercentMap.remove(index);
+                mPagePercentMap.remove(index)
             }
 
             // Get default error
             if (state == STATE_FAILED) {
-                if (error == null) {
-                    error = GetText.getString(R.string.error_unknown);
-                }
-                mPageErrorMap.put(index, error);
+                mPageErrorMap[index] = error ?: GetText.getString(R.string.error_unknown)
             }
         }
 
         // Notify listeners
         if (state == STATE_FAILED) {
-            notifyPageFailure(index, error);
+            notifyPageFailure(index, error)
         } else if (state == STATE_FINISHED) {
-            notifyPageSuccess(index);
+            notifyPageSuccess(index)
+        }
+        if (mFinishedPages.get() == size) notifyAllPageDownloaded()
+    }
+
+    @IntDef(MODE_READ, MODE_DOWNLOAD)
+    @Retention
+    annotation class Mode
+
+    @IntDef(STATE_NONE, STATE_DOWNLOADING, STATE_FINISHED, STATE_FAILED)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class State
+    interface OnSpiderListener {
+        fun onGetPages(pages: Int)
+        fun onGet509(index: Int)
+        fun onPageDownload(index: Int, contentLength: Long, receivedSize: Long, bytesRead: Int)
+        fun onPageSuccess(index: Int, finished: Int, downloaded: Int, total: Int)
+        fun onPageFailure(index: Int, error: String?, finished: Int, downloaded: Int, total: Int)
+        fun onFinish(finished: Int, downloaded: Int, total: Int)
+        fun onGetImageSuccess(index: Int, image: Image?)
+        fun onGetImageFailure(index: Int, error: String?)
+    }
+
+    companion object {
+        const val MODE_READ = 0
+        const val MODE_DOWNLOAD = 1
+        const val STATE_NONE = 0
+        const val STATE_DOWNLOADING = 1
+        const val STATE_FINISHED = 2
+        const val STATE_FAILED = 3
+        const val SPIDER_INFO_FILENAME = ".ehviewer"
+        private val sQueenMap = LongSparseArray<SpiderQueen>()
+
+        @JvmStatic
+        fun obtainSpiderQueen(galleryInfo: GalleryInfo, @Mode mode: Int): SpiderQueen {
+            return sQueenMap[galleryInfo.gid]?.apply { setMode(mode) }
+                ?: SpiderQueen(galleryInfo).apply { setMode(mode) }
+                    .also { sQueenMap[galleryInfo.gid] = it }
         }
 
-        if (mFinishedPages.get() == size()) notifyAllPageDownloaded();
+        @JvmStatic
+        fun releaseSpiderQueen(queen: SpiderQueen, @Mode mode: Int) {
+            queen.clearMode(mode)
+            if (queen.mReadReference == 0 && queen.mDownloadReference == 0) {
+                queen.stop()
+                sQueenMap.remove(queen.galleryInfo.gid)
+            }
+        }
+
+        fun getStartPage(gid: Long): Int {
+            val queen = sQueenMap[gid]
+            var spiderInfo: SpiderInfo? = null
+
+            // Fast Path: read existing queen
+            if (queen != null) {
+                spiderInfo = queen.mSpiderInfo
+            }
+
+            // Slow path, read diskcache
+            if (spiderInfo == null) {
+                spiderInfo = readFromCache(gid)
+            }
+            return spiderInfo?.startPage ?: 0
+        }
     }
 
-    @IntDef({MODE_READ, MODE_DOWNLOAD})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Mode {
-    }
-
-    @IntDef({STATE_NONE, STATE_DOWNLOADING, STATE_FINISHED, STATE_FAILED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface State {
-    }
-
-    public interface OnSpiderListener {
-
-        void onGetPages(int pages);
-
-        void onGet509(int index);
-
-        /**
-         * @param contentLength -1 for unknown
-         */
-        void onPageDownload(int index, long contentLength, long receivedSize, int bytesRead);
-
-        void onPageSuccess(int index, int finished, int downloaded, int total);
-
-        void onPageFailure(int index, String error, int finished, int downloaded, int total);
-
-        /**
-         * All workers end
-         */
-        void onFinish(int finished, int downloaded, int total);
-
-        void onGetImageSuccess(int index, Image image);
-
-        void onGetImageFailure(int index, String error);
-    }
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + Job()
 }
+
+var PTOKEN_FAILED_MESSAGE = GetText.getString(R.string.error_get_ptoken_error)
+var ERROR_509 = GetText.getString(R.string.error_509)
+var NETWORK_ERROR = GetText.getString(R.string.error_socket)
+var DECODE_ERROR = GetText.getString(R.string.error_decoding_failed)

@@ -45,8 +45,6 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     public void start() {
         mSpiderQueen = SpiderQueen.obtainSpiderQueen(mGalleryInfo, SpiderQueen.MODE_READ);
         mSpiderQueen.addOnSpiderListener(this);
-        if (mSpiderQueen.size() > 0)
-            notifyDataChanged();
     }
 
     @Override
@@ -116,7 +114,7 @@ public class EhPageLoader extends PageLoader2 implements SpiderQueen.OnSpiderLis
     @Override
     public int size() {
         if (mSpiderQueen != null) {
-            return mSpiderQueen.size();
+            return mSpiderQueen.getSize();
         } else {
             return PageLoader.STATE_ERROR;
         }

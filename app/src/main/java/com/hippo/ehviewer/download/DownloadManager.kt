@@ -838,7 +838,7 @@ object DownloadManager : OnSpiderListener {
 
     override fun onPageFailure(
         index: Int,
-        error: String,
+        error: String?,
         finished: Int,
         downloaded: Int,
         total: Int
@@ -860,11 +860,11 @@ object DownloadManager : OnSpiderListener {
         SimpleHandler.getInstance().post(task)
     }
 
-    override fun onGetImageSuccess(index: Int, image: Image) {
+    override fun onGetImageSuccess(index: Int, image: Image?) {
         // Ignore
     }
 
-    override fun onGetImageFailure(index: Int, error: String) {
+    override fun onGetImageFailure(index: Int, error: String?) {
         // Ignore
     }
 

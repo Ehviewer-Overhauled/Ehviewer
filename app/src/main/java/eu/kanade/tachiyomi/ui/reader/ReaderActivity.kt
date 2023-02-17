@@ -276,11 +276,6 @@ class ReaderActivity : EhActivity() {
 
         mGalleryProvider!!.start()
 
-        // Get start page
-        if (savedInstanceState == null) {
-            mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
-        }
-
         lifecycleScope.launchUI {
             mGalleryProvider!!.state.collect {
                 if (it == PageLoader.STATE_READY) {
@@ -295,9 +290,10 @@ class ReaderActivity : EhActivity() {
     }
 
     fun setGallery() {
+        // Get start page
+        if (mCurrentIndex == 0) mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         mSize = mGalleryProvider!!.size()
-        val viewerMode =
-            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+        val viewerMode = ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)

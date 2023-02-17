@@ -6,17 +6,12 @@ import com.hippo.ehviewer.client.EhEngine.getGalleryPage
 import com.hippo.ehviewer.client.EhEngine.getGalleryPageApi
 import com.hippo.ehviewer.client.EhUrl.getPageUrl
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.spider.SpiderQueen.DECODE_ERROR
-import com.hippo.ehviewer.spider.SpiderQueen.ERROR_509
-import com.hippo.ehviewer.spider.SpiderQueen.NETWORK_ERROR
-import com.hippo.ehviewer.spider.SpiderQueen.PTOKEN_FAILED_MESSAGE
-import com.hippo.ehviewer.spider.SpiderQueen.STATE_FAILED
-import com.hippo.ehviewer.spider.SpiderQueen.STATE_FINISHED
+import com.hippo.ehviewer.spider.SpiderQueen.Companion.STATE_FAILED
+import com.hippo.ehviewer.spider.SpiderQueen.Companion.STATE_FINISHED
 import com.hippo.image.Image.Companion.decode
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.StringUtils
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -27,12 +22,12 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import moe.tarsin.coroutines.runSuspendCatching
-import kotlin.coroutines.CoroutineContext
 
-class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
+class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope by queen {
     private val spiderDen
         get() = queen.mSpiderDen
-    private val spiderInfo by lazy { queen.mSpiderInfo.get() }
+    private val spiderInfo
+        get() = queen.mSpiderInfo
     private val mFetcherJobMap = hashMapOf<Int, Job>()
     private val mSemaphore = Semaphore(Settings.getMultiThreadDownload())
     private val pTokenLock = Mutex()
@@ -41,9 +36,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val mDownloadDelay = Settings.getDownloadDelay()
     private var isDownloadMode = false
     private val size
-        get() = queen.size()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + Job()
+        get() = queen.size
 
     fun cancelDecode(index: Int) {
         decoder.cancel(index)
