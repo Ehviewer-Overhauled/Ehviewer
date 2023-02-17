@@ -113,7 +113,9 @@ import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import rikka.core.res.resolveColor
 import kotlin.math.roundToInt
@@ -264,7 +266,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mGalleryInfo?.let {
             viewLifecycleOwner.lifecycleScope.launchIO {
                 runCatching {
-                    val startPage = spiderQueen?.awaitStartPage() ?: 0
+                    val spiderQueen = SpiderQueen.obtainSpiderQueen(it, SpiderQueen.MODE_READ)
+                    val startPage = spiderQueen.awaitStartPage()
+                    launchNonCancellable {
+                        delay(30000)
+                        SpiderQueen.releaseSpiderQueen(spiderQueen, SpiderQueen.MODE_READ)
+                    }
                     withUIContext {
                         binding.content.header.read.text = if (startPage == 0) {
                             getString(R.string.read)
@@ -354,8 +361,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         return true
     }
 
-    private var spiderQueen: SpiderQueen? = null
-
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -423,14 +428,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
-        spiderQueen = SpiderQueen.obtainSpiderQueen(galleryInfo!!, SpiderQueen.MODE_READ)
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        spiderQueen?.let { SpiderQueen.releaseSpiderQueen(it, SpiderQueen.MODE_READ)  }
-        spiderQueen = null
         val context = context
         AssertUtils.assertNotNull(context)
         downloadManager.removeDownloadInfoListener(this)
