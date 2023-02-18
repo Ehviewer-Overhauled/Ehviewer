@@ -30,7 +30,7 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
 import com.hippo.unifile.UniFile;
-import com.hippo.yorozuya.AssertUtils;
+import com.hippo.yorozuya.AssertUtilsKt;
 import com.hippo.yorozuya.NumberUtils;
 
 import java.util.Locale;
@@ -565,7 +565,7 @@ public class Settings {
     }
 
     public static void putFavCat(String[] value) {
-        AssertUtils.assertEquals(10, value.length);
+        AssertUtilsKt.assertEquals(10, value.length);
         sSettingsPre.edit()
                 .putString(KEY_FAV_CAT_0, value[0])
                 .putString(KEY_FAV_CAT_1, value[1])
@@ -596,7 +596,7 @@ public class Settings {
     }
 
     public static void putFavCount(int[] count) {
-        AssertUtils.assertEquals(10, count.length);
+        AssertUtilsKt.assertEquals(10, count.length);
         sSettingsPre.edit()
                 .putInt(KEY_FAV_COUNT_0, count[0])
                 .putInt(KEY_FAV_COUNT_1, count[1])

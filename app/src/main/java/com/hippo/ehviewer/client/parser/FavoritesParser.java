@@ -23,7 +23,7 @@ import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.client.exception.ParseException;
 import com.hippo.util.ExceptionUtils;
 import com.hippo.util.JsoupUtils;
-import com.hippo.yorozuya.AssertUtils;
+import com.hippo.yorozuya.AssertUtilsKt;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -46,7 +46,7 @@ public class FavoritesParser {
             //noinspection ConstantConditions
             Elements fps = ido.getElementsByClass("fp");
             // Last one is "fp fps"
-            AssertUtils.assertEquals(11, fps.size());
+            AssertUtilsKt.assertEquals(11, fps.size());
 
             for (int i = 0; i < 10; i++) {
                 Element fp = fps.get(i);

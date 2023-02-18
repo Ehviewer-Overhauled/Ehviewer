@@ -28,7 +28,6 @@ import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.util.ExceptionUtils
 import com.hippo.view.ViewTransition
-import com.hippo.yorozuya.AssertUtils
 import com.hippo.yorozuya.ViewUtils
 
 /**
@@ -130,9 +129,7 @@ class ProgressScene : BaseScene(), View.OnClickListener {
         val view = inflater.inflate(R.layout.scene_progress, container, false)
         val progress = ViewUtils.`$$`(view, R.id.progress)
         mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        val context = context
-        AssertUtils.assertNotNull(context)
-        val drawable = ContextCompat.getDrawable(context!!, R.drawable.big_sad_pandroid)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_sad_pandroid)
         drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         mTip!!.setCompoundDrawables(null, drawable, null, null)
         mTip!!.setOnClickListener(this)

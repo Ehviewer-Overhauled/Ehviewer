@@ -48,7 +48,6 @@ import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.network.StatusCodeException
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.AssertUtils
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -560,7 +559,7 @@ object EhEngine {
         gidArray: LongArray,
         tokenArray: Array<String?>, dstCat: Int
     ): Void? {
-        AssertUtils.assertEquals(gidArray.size, tokenArray.size)
+        check(gidArray.size == tokenArray.size)
         var i = 0
         val n = gidArray.size
         while (i < n) {

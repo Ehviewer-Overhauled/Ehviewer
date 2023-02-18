@@ -70,7 +70,6 @@ import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.yorozuya.AssertUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.ViewUtils
@@ -152,8 +151,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val context = context
-        AssertUtils.assertNotNull(context)
         mDownloadManager = downloadManager
         mDownloadManager!!.addDownloadInfoListener(this)
         if (savedInstanceState == null) {
@@ -249,10 +246,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         container!!.addView(mFabLayout)
         mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
         mViewTransition = ViewTransition(content, mTip)
-        val context = context
-        AssertUtils.assertNotNull(content)
-        val resources = context!!.resources
-        val drawable = ContextCompat.getDrawable(context, R.drawable.big_download)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_download)
         drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         mTip!!.setCompoundDrawables(null, drawable, null, null)
         mAdapter = DownloadAdapter()
@@ -422,8 +416,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
-        val context = context
-        AssertUtils.assertNotNull(context)
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.download_labels)
         toolbar.inflateMenu(R.menu.drawer_download)
@@ -431,7 +423,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             val id = item.itemId
             if (id == R.id.action_add) {
                 val builder =
-                    EditTextDialogBuilder(context!!, null, getString(R.string.download_labels))
+                    EditTextDialogBuilder(requireContext(), null, getString(R.string.download_labels))
                 builder.setTitle(R.string.new_label_title)
                 builder.setPositiveButton(android.R.string.ok, null)
                 val dialog = builder.show()
@@ -449,7 +441,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     items[i + 2] = list[i].label
                     i++
                 }
-                BaseDialogBuilder(context!!)
+                BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_download_label)
                     .setItems(items) { _: DialogInterface?, which: Int ->
                         if (which == 0) {
@@ -994,7 +986,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         private val mListThumbHeight: Int
 
         init {
-            AssertUtils.assertNotNull(mInflater)
             @SuppressLint("InflateParams") val calculator =
                 mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
             ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)

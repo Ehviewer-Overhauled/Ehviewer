@@ -63,7 +63,6 @@ import com.hippo.widget.ContentLayout
 import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
-import com.hippo.yorozuya.AssertUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.ViewUtils
@@ -132,8 +131,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     private var mModifyAdd = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val context = context
-        AssertUtils.assertNotNull(context)
         mClient = EhClient
         mFavLocalCount = Settings.getFavLocalCount()
         mFavCountSum = Settings.getFavCloudCount()
@@ -186,7 +183,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         val view = inflater.inflate(R.layout.scene_favorites, container, false)
         val mContentLayout = view.findViewById<ContentLayout>(R.id.content_layout)
         val activity = mainActivity!!
-        AssertUtils.assertNotNull(activity)
         setOnApplySearch { query: String? ->
             onApplySearch(query)
         }
@@ -196,7 +192,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         mFabLayout = ViewUtils.`$$`(view, R.id.fab_layout) as FabLayout
         mFabLayout!!.addOnExpandListener(FabLayoutListener())
         (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
-        AssertUtils.assertNotNull(container)
         container!!.addView(mFabLayout)
         ViewCompat.setWindowInsetsAnimationCallback(
             view, WindowInsetsAnimationHelper(
@@ -204,9 +199,6 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 mFabLayout
             )
         )
-        val context = context
-        AssertUtils.assertNotNull(context)
-        val resources = context!!.resources
         val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
         mHelper = FavoritesHelper()
         mHelper!!.setEmptyString(resources.getString(R.string.gallery_list_empty_hit))
@@ -332,9 +324,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
-        val context = context
         val toolbar = ViewUtils.`$$`(view, R.id.toolbar) as Toolbar
-        AssertUtils.assertNotNull(context)
         toolbar.setTitle(R.string.collections)
         toolbar.inflateMenu(R.menu.drawer_favorites)
         toolbar.setOnMenuItemClickListener { item: MenuItem ->
@@ -345,7 +335,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 items[1] = getString(R.string.local_favorites)
                 val favCat = Settings.getFavCat()
                 System.arraycopy(favCat, 0, items, 2, 10)
-                BaseDialogBuilder(context!!)
+                BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_favorites_collection)
                     .setItems(items) { _: DialogInterface?, which: Int ->
                         Settings.putDefaultFavSlot(

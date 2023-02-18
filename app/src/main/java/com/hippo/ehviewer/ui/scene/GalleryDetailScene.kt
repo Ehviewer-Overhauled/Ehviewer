@@ -106,7 +106,6 @@ import com.hippo.widget.AutoWrapLayout
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.ObservedTextView
 import com.hippo.widget.SimpleGridAutoSpanLayout
-import com.hippo.yorozuya.AssertUtils
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
 import com.hippo.yorozuya.ViewUtils
@@ -363,8 +362,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         // Get download state
         val gid = gid
         mDownloadState = if (gid != -1L) {
-            val context = context
-            AssertUtils.assertNotNull(context)
             downloadManager.getDownloadState(gid)
         } else {
             DownloadInfo.STATE_INVALID
@@ -431,8 +428,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         super.onDestroyView()
         spiderQueen?.let { SpiderQueen.releaseSpiderQueen(it, SpiderQueen.MODE_READ)  }
         spiderQueen = null
-        val context = context
-        AssertUtils.assertNotNull(context)
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
@@ -441,8 +436,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     }
 
     private fun prepareData(): Boolean {
-        val context = context
-        AssertUtils.assertNotNull(context)
         if (mGalleryDetail != null) {
             return true
         }
@@ -456,7 +449,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         if (mGalleryDetail != null) {
             return true
         }
-        val application = context!!.applicationContext as EhApplication
+        val application = requireContext().applicationContext as EhApplication
         return if (application.containGlobalStuff(mRequestId)) {
             // request exist
             true
