@@ -74,6 +74,7 @@ public class Settings {
             KEY_MY_TAGS,
             KEY_SHOW_JPN_TITLE,
             KEY_REQUEST_NEWS,
+            KEY_REQUEST_NEWS_TIMER,
             KEY_HIDE_HV_EVENTS
     };
     /********************
