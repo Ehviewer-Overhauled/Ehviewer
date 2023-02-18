@@ -270,6 +270,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
             }.onFailure {
                 it.printStackTrace()
                 error = NETWORK_ERROR
+                forceHtml = true
             }
             Log.d(DEBUG_TAG, "End download image $index")
         }
