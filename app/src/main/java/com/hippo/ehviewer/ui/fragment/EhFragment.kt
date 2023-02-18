@@ -62,6 +62,7 @@ class EhFragment : BasePreferenceFragment() {
         thumbResolution!!.setSummaryProvider {
             getString(R.string.settings_eh_thumb_resolution_summary, (it as ListPreference).entry)
         }
+
         if (!EhTagDatabase.isTranslatable(requireActivity())) {
             preferenceScreen.removePreference(showTagTranslations)
             preferenceScreen.removePreference(tagTranslationsSource!!)
@@ -71,26 +72,26 @@ class EhFragment : BasePreferenceFragment() {
                 val preference = findPreference<Preference>(it)
                 preferenceScreen.removePreference(preference!!)
             }
-        }
-
-        findPreference<Preference>(Settings.KEY_REQUEST_NEWS_TIMER)!!.apply {
-            setOnPreferenceClickListener {
-                MaterialTimePicker.Builder()
-                    .apply {
-                        schedHour?.let { setHour(it) }
-                        schedMinute?.let { setMinute(it) }
-                    }
-                    .setTimeFormat(CLOCK_12H)
-                    .build()
-                    .apply {
-                        addOnPositiveButtonClickListener {
-                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, hour)
-                            Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
-                            updateDailyCheckWork(requireContext())
+        } else {
+            findPreference<Preference>(Settings.KEY_REQUEST_NEWS_TIMER)!!.apply {
+                setOnPreferenceClickListener {
+                    MaterialTimePicker.Builder()
+                        .apply {
+                            schedHour?.let { setHour(it) }
+                            schedMinute?.let { setMinute(it) }
                         }
-                    }
-                    .show(childFragmentManager, null)
-                false
+                        .setTimeFormat(CLOCK_12H)
+                        .build()
+                        .apply {
+                            addOnPositiveButtonClickListener {
+                                Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, hour)
+                                Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
+                                updateDailyCheckWork(requireContext())
+                            }
+                        }
+                        .show(childFragmentManager, null)
+                    false
+                }
             }
         }
     }
