@@ -34,7 +34,7 @@ android {
         applicationId = "moe.tarsin.ehviewer"
         minSdk = 28
         targetSdk = 33
-        versionCode = 180032
+        versionCode = 180033
         versionName = "1.8.7.0-alpha01"
         resourceConfigurations.addAll(
             listOf(
@@ -195,7 +195,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0-RC")
-    implementation("org.jsoup:jsoup:1.15.3")
+    implementation("org.jsoup:jsoup:1.15.4")
 }
 
 configurations.all {
