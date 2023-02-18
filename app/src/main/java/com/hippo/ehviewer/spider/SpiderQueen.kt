@@ -762,6 +762,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 }.onFailure {
                     it.printStackTrace()
                     error = NETWORK_ERROR
+                    forceHtml = true
                 }
                 Log.d(WORKER_DEBUG_TAG, "End download image $index")
             }
