@@ -105,7 +105,9 @@ import com.hippo.yorozuya.StringUtils
 import com.hippo.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.delay
 import rikka.core.res.resolveColor
 import java.io.File
 import java.time.LocalDateTime
@@ -216,6 +218,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     ?: ListUrlBuilder()
 
             else -> throw IllegalStateException("Wrong KEY_ACTION:${args?.getString(KEY_ACTION)} when handle args!")
+        }
+        val goto = args?.getString(KEY_GOTO)
+        goto?.let {
+            lifecycleScope.launchUI {
+                delay(100)
+                mHelper?.goTo(it, true)
+            }
         }
     }
 
@@ -1138,8 +1147,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     val goto = if (i != -1) q.name!!.substring(i + 1) else null
                     val args = ListUrlBuilder().apply {
                         set(q)
-                        setIndex(goto)
-                    }.toStartArgs()
+                    }.toStartArgs().apply { putString(KEY_GOTO, goto) }
                     navigate(R.id.galleryListScene, args, true)
                     setState(STATE_NORMAL)
                     closeDrawer(GravityCompat.END)
@@ -1414,6 +1422,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     companion object {
         const val KEY_ACTION = "action"
+        const val KEY_GOTO = "goto"
         const val ACTION_HOMEPAGE = "action_homepage"
         const val ACTION_SUBSCRIPTION = "action_subscription"
         const val ACTION_WHATS_HOT = "action_whats_hot"
