@@ -42,8 +42,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private var isDownloadMode = false
     private val size
         get() = queen.size()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + Job()
+    override val coroutineContext = Dispatchers.IO + Job()
 
     fun cancelDecode(index: Int) {
         decoder.cancel(index)
