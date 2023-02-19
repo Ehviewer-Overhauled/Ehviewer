@@ -36,6 +36,7 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.JsoupUtils
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.StringUtils
+import com.hippo.yorozuya.trimAnd
 import com.hippo.yorozuya.unescapeXml
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -336,7 +337,7 @@ object GalleryDetailParser {
             // Id
             val a = element.previousElementSibling()
             val name = a!!.attr("name")
-            comment.id = StringUtils.trim(name).substring(1).toInt().toLong()
+            comment.id = name trimAnd { substring(1).toInt().toLong() }
             // Editable, vote up and vote down
             val c4 = JsoupUtils.getElementByClass(element, "c4")
             if (null != c4) {
