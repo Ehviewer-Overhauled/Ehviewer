@@ -28,6 +28,8 @@ import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.coil.edit
+import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.image.Image.CloseableSource
 import com.hippo.unifile.RawFile
@@ -108,12 +110,12 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         val dir = downloadDir ?: return false
         val key = EhCacheKeyFactory.getImageKey(mGid, index)
         runCatching {
-            (sCache[key] ?: return false).use { snapshot ->
-                val extension = fixExtension("." + snapshot.metadata.toFile().readText())
+            sCache.read(key) {
+                val extension = fixExtension("." + metadata.toFile().readText())
                 val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
                 (file.openOutputStream() as FileOutputStream).use { outputStream ->
                     outputStream.channel.use { outChannel ->
-                        snapshot.data.toFile().inputStream().use { inputStream ->
+                        data.toFile().inputStream().use { inputStream ->
                             inputStream.channel.use {
                                 outChannel.transferFrom(it, 0, it.size())
                             }
@@ -121,7 +123,10 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                     }
                 }
             }
+        }.onSuccess {
             return true
+        }.onFailure {
+            it.printStackTrace()
         }
         return false
     }
@@ -206,19 +211,17 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             // Read Mode, allow save to cache
             if (mMode == SpiderQueen.MODE_READ) {
                 val key = EhCacheKeyFactory.getImageKey(mGid, index)
-                val editor = sCache.edit(key) ?: return false
                 var received: Long = 0
                 runCatching {
-                    editor.metadata.toFile().writeText(extension)
-                    editor.data.toFile().outputStream().use { outputStream ->
-                        outputStream.channel.use { received = doSave(it) }
+                    sCache.edit(key) {
+                        metadata.toFile().writeText(extension)
+                        data.toFile().outputStream().use { outputStream ->
+                            outputStream.channel.use { received = doSave(it) }
+                        }
                     }
                 }.onFailure {
-                    editor.abort()
                     it.printStackTrace()
-                    return false
                 }.onSuccess {
-                    editor.commit()
                     return received == length
                 }
             }
