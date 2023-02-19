@@ -233,13 +233,7 @@ class MainActivity : EhActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
-        if (EhUtils.needSignedIn()) {
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                setNavGraph()
-            }.launch(Intent(this, LoginActivity::class.java))
-        } else {
-            setNavGraph()
-        }
+        if (!EhUtils.needSignedIn()) setNavGraph()
         binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
 
@@ -371,7 +365,12 @@ class MainActivity : EhActivity() {
         }
     }
 
+    private val loginLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { setNavGraph() }
+
     override fun onResume() {
+        if (EhUtils.needSignedIn()) {
+            loginLauncher.launch(Intent(this, LoginActivity::class.java))
+        }
         super.onResume()
         lifecycleScope.launch {
             delay(100)
