@@ -89,8 +89,8 @@ import java.io.OutputStream
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var connectivityManager: ConnectivityManager
-    private val availableNetworks: MutableList<Network> = mutableListOf()
+    private val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
+    private val availableNetworks = mutableListOf<Network>()
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)
@@ -223,7 +223,6 @@ class MainActivity : EhActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        connectivityManager = getSystemService()!!
         if (Settings.getDF() && Settings.getBypassVpn()) {
             bypassVpn()
         }
@@ -365,10 +364,17 @@ class MainActivity : EhActivity() {
         }
     }
 
-    private val loginLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { setNavGraph() }
+    private val loginLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (availableNetworks.isNotEmpty()) {
+                connectivityManager.bindProcessToNetwork(availableNetworks.last())
+            }
+            setNavGraph()
+        }
 
     override fun onResume() {
         if (EhUtils.needSignedIn()) {
+            connectivityManager.bindProcessToNetwork(null)
             loginLauncher.launch(Intent(this, LoginActivity::class.java))
         }
         super.onResume()
