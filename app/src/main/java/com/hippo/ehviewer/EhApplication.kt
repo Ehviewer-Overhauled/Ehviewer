@@ -35,6 +35,7 @@ import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
@@ -186,6 +187,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this).apply {
             okHttpClient(okHttpClient)
+            components { add(MergeInterceptor) }
             allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
             // Coil spawns a new thread for every image load by default
             fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
