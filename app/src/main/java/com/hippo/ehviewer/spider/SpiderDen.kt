@@ -109,7 +109,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
         val dir = downloadDir ?: return false
         val key = EhCacheKeyFactory.getImageKey(mGid, index)
-        runCatching {
+        return runCatching {
             sCache.read(key) {
                 val extension = fixExtension("." + metadata.toFile().readText())
                 val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
@@ -123,12 +123,10 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                     }
                 }
             }
-        }.onSuccess {
-            return true
-        }.onFailure {
+        }.getOrElse {
             it.printStackTrace()
+            false
         }
-        return false
     }
 
     operator fun contains(index: Int): Boolean {
