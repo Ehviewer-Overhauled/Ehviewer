@@ -36,7 +36,7 @@
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
-            android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.MainActivity"
