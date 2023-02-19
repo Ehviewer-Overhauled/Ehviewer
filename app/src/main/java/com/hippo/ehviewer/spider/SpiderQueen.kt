@@ -59,9 +59,10 @@ import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.executeAsync
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.coroutines.CoroutineContext
 
 class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineScope {
+    override val coroutineContext = Dispatchers.IO + Job()
+
     @Volatile
     lateinit var mPageStateArray: IntArray
     lateinit var mSpiderInfo: SpiderInfo
@@ -524,9 +525,6 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             }
         }
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + Job()
 
     private val mWorkerScope = object {
         private val mFetcherJobMap = hashMapOf<Int, Job>()
