@@ -18,12 +18,10 @@ package com.hippo.ehviewer
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
-import androidx.core.content.getSystemService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -48,7 +46,6 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import java.net.Proxy
 import java.security.KeyStore
@@ -188,11 +185,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         return ImageLoader.Builder(this).apply {
             okHttpClient(okHttpClient)
             components { add(MergeInterceptor) }
-            allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
-            // Coil spawns a new thread for every image load by default
-            fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
-            decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
-            transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
             crossfade(true)
         }.build()
     }
