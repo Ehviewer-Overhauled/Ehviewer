@@ -22,44 +22,43 @@ object MergeInterceptor : Interceptor {
         val originRequest = chain.request
         val originListener = originRequest.listener
         val key = originRequest.data as String
-        var newRequest = originRequest
+        val newRequest = ImageRequest.Builder(originRequest).listener(
+            { originListener?.onStart(it) },
+            {
+                originListener?.onCancel(it)
+                notifyScope.launch {
+                    pendingContinuationMapLock.withLock {
+                        // Wake up a pending continuation to continue executing task
+                        val successor = pendingContinuationMap[key]?.removeFirstOrNull()?.apply { resume(Unit) }
+                        // If no successor, delete this entry from hashmap
+                        successor ?: pendingContinuationMap.remove(key)
+                    }
+                }
+            },
+            { request, result ->
+                originListener?.onError(request, result)
+                // Wake all pending continuations since this request is to be failed
+                notifyScope.launch {
+                    pendingContinuationMapLock.withLock {
+                        pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
+                    }
+                }
+            },
+            { request, result ->
+                originListener?.onSuccess(request, result)
+                // Wake all pending continuations shared with the same memory key since we have written it to memory cache
+                notifyScope.launch {
+                    pendingContinuationMapLock.withLock {
+                        pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
+                    }
+                }
+            }
+        ).build()
 
         pendingContinuationMapLock.lock()
         val existPendingContinuations = pendingContinuationMap[key]
         if (existPendingContinuations == null) {
             pendingContinuationMap[key] = mutableListOf()
-            newRequest = ImageRequest.Builder(originRequest).listener(
-                { originListener?.onStart(it) },
-                {
-                    originListener?.onCancel(it)
-                    notifyScope.launch {
-                        pendingContinuationMapLock.withLock {
-                            // Wake up a pending continuation to continue executing task
-                            val successor = pendingContinuationMap[key]?.removeFirstOrNull()?.apply { resume(Unit) }
-                            // If no successor, delete this entry from hashmap
-                            successor ?: pendingContinuationMap.remove(key)
-                        }
-                    }
-                },
-                { request, result ->
-                    originListener?.onError(request, result)
-                    // Wake all pending continuations since this request is to be failed
-                    notifyScope.launch {
-                        pendingContinuationMapLock.withLock {
-                            pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
-                        }
-                    }
-                },
-                { request, result ->
-                    originListener?.onSuccess(request, result)
-                    // Wake all pending continuations shared with the same memory key since we have written it to memory cache
-                    notifyScope.launch {
-                        pendingContinuationMapLock.withLock {
-                            pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
-                        }
-                    }
-                }
-            ).build()
             pendingContinuationMapLock.unlock()
         } else {
             existPendingContinuations.apply {
