@@ -91,7 +91,8 @@ object GalleryDetailParser {
         // Error info
         PATTERN_ERROR.find(body)?.run { throw EhException(groupValues[1]) }
         val galleryDetail = GalleryDetail()
-        val document = Jsoup.parse(body)
+        // Temporary workaround, see https://github.com/jhy/jsoup/issues/1850
+        val document = Jsoup.parse(body.replace("del>", "s>"))
         parseDetail(galleryDetail, document, body)
         galleryDetail.tags = parseTagGroups(document)
         galleryDetail.comments = parseComments(document)
