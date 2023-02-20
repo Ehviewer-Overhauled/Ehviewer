@@ -21,10 +21,15 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.IntDef
+import androidx.appcompat.content.res.AppCompatResources
 import coil.load
 import coil.size.Size
 import com.hippo.drawable.PreciselyClipDrawable
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
+
+private val application = EhApplication.application
+private val errorDrawable = AppCompatResources.getDrawable(application, R.drawable.image_failed)
 
 open class LoadImageView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -35,21 +40,21 @@ open class LoadImageView @JvmOverloads constructor(
     private var mClipWidth = Integer.MIN_VALUE
     private var mClipHeight = Integer.MIN_VALUE
     private var mUrl: String? = null
+    private val mRetryType =
+        context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0).run {
+            getInt(R.styleable.LoadImageView_retryType, 0).also { recycle() }
+        }
 
-    init {
-        val a = context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0)
-        setRetryType(a.getInt(R.styleable.LoadImageView_retryType, 0))
-        a.recycle()
-    }
-
-    private fun setRetryType(@RetryType retryType: Int) {
-        when (retryType) {
+    private fun setRetry(canRetry: Boolean) {
+        when (mRetryType) {
             RETRY_TYPE_CLICK -> {
-                setOnClickListener(this)
+                setOnClickListener(if (canRetry) this else null)
+                isClickable = canRetry
             }
 
             RETRY_TYPE_LONG_CLICK -> {
-                setOnLongClickListener(this)
+                setOnLongClickListener(if (canRetry) this else null)
+                isLongClickable = canRetry
             }
 
             RETRY_TYPE_NONE -> {}
@@ -75,6 +80,15 @@ open class LoadImageView @JvmOverloads constructor(
         load(url) {
             size(Size.ORIGINAL)
             if (!crossfade) crossfade(false)
+            listener(
+                { setRetry(false) },
+                { setRetry(true) },
+                { _, _ ->
+                    super.setImageDrawable(errorDrawable)
+                    setRetry(true)
+                },
+                { _, _ -> setRetry(false) }
+            )
         }
     }
 
@@ -86,7 +100,8 @@ open class LoadImageView @JvmOverloads constructor(
         var newDrawable = drawable
         if (newDrawable != null) {
             if (Integer.MIN_VALUE != mOffsetX) {
-                newDrawable = PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
+                newDrawable =
+                    PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
             }
             onPreSetImageDrawable(newDrawable, true)
         }
