@@ -73,9 +73,4 @@ public class FixedThumb extends LoadImageView {
 
         setScaleType(ScaleType.FIT_CENTER);
     }
-
-    @Override
-    public void onPreSetImageResource(int resId, boolean isTarget) {
-        setScaleType(ScaleType.FIT_CENTER);
-    }
 }
