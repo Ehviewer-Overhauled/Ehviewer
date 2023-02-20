@@ -115,7 +115,7 @@ open class LoadImageView @JvmOverloads constructor(
     override fun getDrawable(): Drawable? {
         var newDrawable = super.getDrawable()
         if (newDrawable is PreciselyClipDrawable) {
-            newDrawable = newDrawable.wrappedDrawable
+            newDrawable = newDrawable.drawable
         }
         return newDrawable
     }
