@@ -40,7 +40,6 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.StringUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.CoroutineScope
@@ -648,7 +647,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                         runSuspendCatching {
                             EhEngine.getGalleryPage(pageUrl, mSpiderInfo.gid, mSpiderInfo.token)
                                 .also {
-                                    if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                                    if (check509(it.imageUrl)) {
                                         // Get 509
                                         notifyGet509(index)
                                         error = ERROR_509
@@ -699,7 +698,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                             localShowKey,
                             previousPToken
                         ).also {
-                            if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                            if (check509(it.imageUrl)) {
                                 // Get 509
                                 notifyGet509(index)
                                 error = ERROR_509
@@ -822,8 +821,12 @@ private val PTOKEN_FAILED_MESSAGE = GetText.getString(R.string.error_get_ptoken_
 private val ERROR_509 = GetText.getString(R.string.error_509)
 private val NETWORK_ERROR = GetText.getString(R.string.error_socket)
 private val DECODE_ERROR = GetText.getString(R.string.error_decoding_failed)
-private val URL_509_SUFFIX_ARRAY = arrayOf(
-    "/509.gif",
-    "/509s.gif"
+private val URL_509_ARRAY = arrayOf(
+    "https://ehgt.org/g/509.gif",
+    "https://ehgt.org/g/509s.gif",
+    "https://exhentai.org/img/509.gif",
+    "https://exhentai.org/img/509s.gif"
 )
 private const val WORKER_DEBUG_TAG = "SpiderQueenWorker"
+
+private fun check509(url: String) = url in URL_509_ARRAY
