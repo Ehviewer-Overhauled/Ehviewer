@@ -20,12 +20,14 @@ package com.hippo
 import android.content.Context
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.util.Log
 import com.hippo.image.Image
 import java.nio.ByteBuffer
 
-class UriArchiveAccessor(ctx: Context, uri: Uri) {
+class UriArchiveAccessor(ctx: Context, private val uri: Uri) {
     val pfd by lazy { ctx.contentResolver.openFileDescriptor(uri, "r")!! }
     fun open(): Int {
+        Log.d(DEBUG_TAG, "Open archive $uri")
         return openArchive(pfd.fd, pfd.statSize)
     }
 
@@ -39,6 +41,7 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
     fun close() {
         closeArchive()
         pfd.close()
+        Log.d(DEBUG_TAG, "Close archive $uri successfully!")
     }
 
     fun getImageSource(index: Int): Image.CloseableSource? {
@@ -62,3 +65,5 @@ class UriArchiveAccessor(ctx: Context, uri: Uri) {
         private external fun releaseByteBuffer(buffer: ByteBuffer)
     }
 }
+
+private const val DEBUG_TAG = "UriArchiveAccessor"

@@ -23,7 +23,6 @@ import com.hippo.ehviewer.Settings
 import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
-import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +31,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -72,10 +70,7 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
 
     override fun stop() {
         cancel()
-        launchNonCancellable {
-            mJobMap.values.joinAll()
-            archiveAccessor.close()
-        }
+        archiveAccessor.close()
         super.stop()
     }
 
