@@ -39,9 +39,8 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         SimpleHandler.getInstance().postDelayed(ReleaseTask(mSpiderQueen), 3000)
     }
 
-    override fun getStartPage(): Int {
-        return mSpiderQueen.startPage
-    }
+    override val startPage
+        get() = mSpiderQueen.startPage
 
     override fun getImageFilename(index: Int): String {
         return String.format(

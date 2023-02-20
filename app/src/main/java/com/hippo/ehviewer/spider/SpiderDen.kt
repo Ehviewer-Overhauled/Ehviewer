@@ -31,6 +31,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.PageLoader2
+import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.image.Image.CloseableSource
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
@@ -103,8 +104,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
      * @param extension with dot
      */
     private fun fixExtension(extension: String): String {
-        return extension.takeIf { PageLoader2.SUPPORT_IMAGE_EXTENSIONS.contains(it) }
-            ?: PageLoader2.SUPPORT_IMAGE_EXTENSIONS[0]
+        return extension.takeIf { SUPPORT_IMAGE_EXTENSIONS.contains(it) }
+            ?: SUPPORT_IMAGE_EXTENSIONS[0]
     }
 
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
@@ -335,7 +336,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 ).build()
         }
 
-        private val COMPAT_IMAGE_EXTENSIONS = PageLoader2.SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
+        private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
 
         fun getGalleryDownloadDir(gid: Long): UniFile? {
             val dir = Settings.getDownloadLocation()
