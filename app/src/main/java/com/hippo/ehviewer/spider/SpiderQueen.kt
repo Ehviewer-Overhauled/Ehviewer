@@ -455,7 +455,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             // Clear
             if (state == STATE_DOWNLOADING) {
                 mPageErrorMap.remove(index)
-            } else if (state == STATE_FINISHED || state == STATE_FAILED) {
+            } else if (isStateDone(state)) {
                 mPagePercentMap.remove(index)
             }
 
@@ -471,7 +471,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         } else if (state == STATE_FINISHED) {
             notifyPageSuccess(index)
         }
-        if (mFinishedPages.get() == size) notifyAllPageDownloaded()
+        if (mDownloadedPages.get() == size) notifyAllPageDownloaded()
     }
 
     @IntDef(MODE_READ, MODE_DOWNLOAD)
