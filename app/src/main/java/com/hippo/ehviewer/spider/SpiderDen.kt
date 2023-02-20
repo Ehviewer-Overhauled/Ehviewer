@@ -38,6 +38,7 @@ import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.executeAsync
 import okio.buffer
 import java.io.File
@@ -197,7 +198,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 return receivedSize
             }
 
-            findDownloadFileForIndex(index, extension)?.runCatching {
+            findDownloadFileForIndex(index, extension)?.runSuspendCatching {
                 openOutputStream().use { outputStream ->
                     (outputStream as FileOutputStream).channel.use { return doSave(it) == length }
                 }
@@ -210,7 +211,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             if (mMode == SpiderQueen.MODE_READ) {
                 val key = EhCacheKeyFactory.getImageKey(mGid, index)
                 var received: Long = 0
-                runCatching {
+                runSuspendCatching {
                     sCache.edit(key) {
                         metadata.toFile().writeText(extension)
                         data.toFile().outputStream().use { outputStream ->
