@@ -15,7 +15,6 @@ import com.hippo.ehviewer.spider.SpiderQueen.STATE_FINISHED
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_DOWNLOADING
 import com.hippo.image.Image.Companion.decode
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.StringUtils
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -158,7 +157,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                     }
                     runSuspendCatching {
                         getGalleryPage(pageUrl, spiderInfo.gid, spiderInfo.token).also {
-                            if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                            if (check509(it.imageUrl)) {
                                 // Get 509
                                 queen.notifyGet509(index)
                                 error = ERROR_509
@@ -209,7 +208,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                         localShowKey,
                         previousPToken
                     ).also {
-                        if (StringUtils.endsWith(it.imageUrl, URL_509_SUFFIX_ARRAY)) {
+                        if (check509(it.imageUrl)) {
                             // Get 509
                             queen.notifyGet509(index)
                             error = ERROR_509
@@ -288,10 +287,13 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     }
 
     companion object {
-        private val URL_509_SUFFIX_ARRAY = arrayOf(
-            "/509.gif",
-            "/509s.gif"
+        private val URL_509_ARRAY = arrayOf(
+            "https://ehgt.org/g/509.gif",
+            "https://ehgt.org/g/509s.gif",
+            "https://exhentai.org/img/509.gif",
+            "https://exhentai.org/img/509s.gif"
         )
+        private fun check509(url: String) = url in URL_509_ARRAY
 
         private const val DEBUG_TAG = "SpiderQueenWorker"
     }
