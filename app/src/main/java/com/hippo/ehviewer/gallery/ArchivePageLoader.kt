@@ -78,7 +78,6 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
     private val mSemaphore = Semaphore(4)
 
     override fun onRequest(index: Int) {
-        notifyPageWait(index)
         synchronized(mJobMap) {
             val current = mJobMap[index]
             if (current?.isActive != true) {
