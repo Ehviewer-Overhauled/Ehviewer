@@ -573,9 +573,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     invokeOnCompletion {
                         if (getPageState(index) == STATE_DOWNLOADING) {
                             Log.d(WORKER_DEBUG_TAG, "Download image cancelled $index")
-                            launchNonCancellable {
-                                mSpiderDen.remove(index)
-                            }
+                            mSpiderDen.remove(index)
                         }
                     }
                 }
