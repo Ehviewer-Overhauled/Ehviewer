@@ -36,10 +36,12 @@ abstract class PageLoader {
     fun request(page: ReaderPage) {
         val index = mPages.indexOf(page)
         val image = mImageCache[index]
-        if (image != null)
+        if (image != null) {
             notifyPageSucceed(index, image)
-        else
+        } else {
+            page.status.value = Page.State.QUEUE
             onRequest(index)
+        }
 
         // val pagesAbsent = (index until (mPreloads + index).coerceAtMost(size())).toMutableList().removeAll(mImageCache.snapshot().keys)
         // Should we refresh our LruCache ?
