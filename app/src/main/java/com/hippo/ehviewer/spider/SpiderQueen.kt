@@ -241,7 +241,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private fun stop() {
-        launchNonCancellable { writeSpiderInfoToLocal() }
+        launchNonCancellable { runCatching { writeSpiderInfoToLocal() } }
         cancel()
     }
 
@@ -569,6 +569,15 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 mFetcherJobMap[index] = launch {
                     mSemaphore.withPermit {
                         doInJob(index, force)
+                    }
+                }.apply {
+                    invokeOnCompletion {
+                        if (getPageState(index) == STATE_DOWNLOADING) {
+                            Log.d(WORKER_DEBUG_TAG, "Download image cancelled $index")
+                            launchNonCancellable {
+                                mSpiderDen.remove(index)
+                            }
+                        }
                     }
                 }
             }
