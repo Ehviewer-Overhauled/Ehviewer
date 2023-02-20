@@ -40,7 +40,9 @@ open class LoadImageView @JvmOverloads constructor(
     private var mClipWidth = Integer.MIN_VALUE
     private var mClipHeight = Integer.MIN_VALUE
     private var mUrl: String? = null
-    private val mRetryType =
+
+    @RetryType
+    private val mRetryType: Int =
         context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0).run {
             getInt(R.styleable.LoadImageView_retryType, 0).also { recycle() }
         }
