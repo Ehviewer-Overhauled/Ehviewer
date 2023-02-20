@@ -572,7 +572,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         _binding ?: return
         val resources = resources
         binding.content.header.run {
-            (thumb as LoadImageView).load(gd.thumb!!, true)
+            (thumb as LoadImageView).load(gd.thumb!!, false)
             setTitle(EhUtils.getSuitableTitle(gd))
             uploader.text = gd.uploader
             if (gd.disowned) {
@@ -727,14 +727,14 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 for (i in 0 until previewSet.size()) {
                     val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
                     val image = view.findViewById<LoadImageView>(R.id.image)
-                    previewSet.load(image, gd.gid, i)
-                    image.setTag(R.id.index, i)
                     withUIContext {
                         gridLayout.addView(view)
+                        image.setTag(R.id.index, i)
                         image.setOnClickListener(this@GalleryDetailScene)
                         val text = view.findViewById<TextView>(R.id.text)
                         text.text = (previewSet.getPosition(i) + 1).toString()
                     }
+                    previewSet.load(image, gd.gid, i)
                 }
             }
         }

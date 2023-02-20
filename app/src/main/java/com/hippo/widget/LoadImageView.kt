@@ -17,15 +17,11 @@
 package com.hippo.widget
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.TransitionDrawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.IntDef
-import androidx.core.content.ContextCompat
-import coil.imageLoader
+import coil.load
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.size.Size
@@ -44,40 +40,11 @@ open class LoadImageView @JvmOverloads constructor(
     private var mRetryType: Int = 0
     private var mFailed: Boolean = false
     private var task: Disposable? = null
-    private val imageDrawable: Drawable?
-        get() {
-            var drawable = drawable
-            if (drawable is TransitionDrawable) {
-                if (drawable.numberOfLayers == 2) {
-                    drawable = drawable.getDrawable(1)
-                }
-            }
-            if (drawable is PreciselyClipDrawable) {
-                drawable = drawable.wrappedDrawable
-            }
-            return drawable
-        }
 
     init {
         val a = context.obtainStyledAttributes(attrs, R.styleable.LoadImageView, defStyleAttr, 0)
         setRetryType(a.getInt(R.styleable.LoadImageView_retryType, 0))
         a.recycle()
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        if (mFailed) onFailure()
-        else task?.run { if (isDisposed) reload() }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        task?.dispose()
-        clearDrawable()
-    }
-
-    private fun clearDrawable() {
-        setImageDrawable(null)
     }
 
     private fun clearRetry() {
@@ -127,63 +94,33 @@ open class LoadImageView @JvmOverloads constructor(
         mClipHeight = Integer.MIN_VALUE
     }
 
-    @JvmOverloads
-    fun load(url: String, isLoaded: Boolean = false) {
-        if ((mRequest?.data as? String?) == url)
-            return
-        mFailed = false
-        clearRetry()
-        task?.dispose()
-        mRequest =
-            ImageRequest.Builder(context).data(url).crossfade(false)
-                .size(Size.ORIGINAL).target(
-                { onWait() },
-                { onFailure() },
-                { onGetValue(it, isLoaded) }
-            ).build().also { load(it) }
-    }
-
-    fun load(request: ImageRequest) {
-        task = context.imageLoader.enqueue(request)
-    }
-
-    private fun reload() {
-        mRequest?.let { load(it) }
-    }
-
-
-    private fun onWait() {
-        mFailed = false
-        clearDrawable()
-    }
-
-    private fun onGetValue(drawable: Drawable, isLoaded: Boolean) {
-        var drawable = drawable
-        clearDrawable()
-
-        if (Integer.MIN_VALUE != mOffsetX) {
-            drawable = PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
+    fun load(url: String, crossfade: Boolean = true) {
+        load(url) {
+            size(Size.ORIGINAL)
+            if (!crossfade) crossfade(false)
         }
+    }
 
-        onPreSetImageDrawable(drawable, true)
-        if (isShown && !isLoaded) {
-            val layers = arrayOfNulls<Drawable>(2)
-            layers[0] = ColorDrawable(Color.TRANSPARENT)
-            layers[1] = drawable
-            val transitionDrawable = TransitionDrawable(layers)
-            setImageDrawable(transitionDrawable)
-            transitionDrawable.startTransition(300)
-        } else {
-            setImageDrawable(drawable)
+    override fun setImageDrawable(drawable: Drawable?) {
+        var newDrawable = drawable
+        if (newDrawable != null) {
+            if (Integer.MIN_VALUE != mOffsetX) {
+                newDrawable = PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
+            }
+            onPreSetImageDrawable(newDrawable, true)
         }
+        super.setImageDrawable(newDrawable)
+    }
+
+    override fun getDrawable(): Drawable? {
+        var newDrawable = super.getDrawable()
+        if (newDrawable is PreciselyClipDrawable) {
+            newDrawable = newDrawable.wrappedDrawable
+        }
+        return newDrawable
     }
 
     fun onFailure() {
-        mFailed = true
-        clearDrawable()
-        val drawable = ContextCompat.getDrawable(context, R.drawable.image_failed)
-        onPreSetImageDrawable(drawable, true)
-        setImageDrawable(drawable)
         when (mRetryType) {
             RETRY_TYPE_CLICK -> {
                 setOnClickListener(this)
@@ -200,11 +137,9 @@ open class LoadImageView @JvmOverloads constructor(
     }
 
     override fun onClick(v: View) {
-        reload()
     }
 
     override fun onLongClick(v: View): Boolean {
-        reload()
         return true
     }
 

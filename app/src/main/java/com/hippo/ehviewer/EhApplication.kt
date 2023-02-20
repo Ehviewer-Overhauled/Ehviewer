@@ -185,7 +185,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         return ImageLoader.Builder(this).apply {
             okHttpClient(okHttpClient)
             components { add(MergeInterceptor) }
-            crossfade(true)
+            crossfade(300)
         }.build()
     }
 
