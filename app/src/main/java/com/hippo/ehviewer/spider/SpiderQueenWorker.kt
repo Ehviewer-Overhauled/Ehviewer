@@ -12,9 +12,11 @@ import com.hippo.ehviewer.spider.SpiderQueen.NETWORK_ERROR
 import com.hippo.ehviewer.spider.SpiderQueen.PTOKEN_FAILED_MESSAGE
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_FAILED
 import com.hippo.ehviewer.spider.SpiderQueen.STATE_FINISHED
+import com.hippo.ehviewer.spider.SpiderQueen.STATE_DOWNLOADING
 import com.hippo.image.Image.Companion.decode
 import com.hippo.util.ExceptionUtils
 import com.hippo.yorozuya.StringUtils
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +29,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import moe.tarsin.coroutines.runSuspendCatching
-import kotlin.coroutines.CoroutineContext
 
 class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
     private val spiderDen
@@ -79,6 +80,15 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 mSemaphore.withPermit {
                     doInJob(index, force)
                 }
+            }.apply {
+                invokeOnCompletion {
+                    if (queen.getPageState(index) == STATE_DOWNLOADING) {
+                        Log.d(DEBUG_TAG, "Download image cancelled $index")
+                        launchNonCancellable {
+                            spiderDen.remove(index)
+                        }
+                    }
+                }
             }
         }
     }
@@ -99,7 +109,7 @@ class SpiderQueenWorker(private val queen: SpiderQueen) : CoroutineScope {
                 ?: queen.getPTokenFromInternet(index)
                 ?: queen.getPTokenFromMultiPageViewer(index)
         }
-        queen.updatePageState(index, SpiderQueen.STATE_DOWNLOADING)
+        queen.updatePageState(index, STATE_DOWNLOADING)
         if (!force && index in spiderDen) {
             return queen.updatePageState(index, STATE_FINISHED)
         }

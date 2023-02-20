@@ -365,7 +365,7 @@ public final class SpiderQueen implements Runnable {
         request(index, false);
     }
 
-    private int getPageState(int index) {
+    public int getPageState(int index) {
         synchronized (mPageStateLock) {
             if (mPageStateArray != null && index >= 0 && index < mPageStateArray.length) {
                 return mPageStateArray[index];
