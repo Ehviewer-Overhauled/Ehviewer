@@ -33,8 +33,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Message
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.HapticFeedbackConstants
@@ -88,6 +86,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.preference.toggle
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
@@ -97,16 +96,22 @@ import eu.kanade.tachiyomi.util.view.popupMenu
 import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -161,9 +166,9 @@ class ReaderActivity : EhActivity() {
     private var mSize: Int = 0
     private var mCurrentIndex: Int = 0
     private var mSavingPage = -1
-    private var builder: EditTextDialogBuilder? = null
+    private lateinit var builder: EditTextDialogBuilder
     private var dialogShown = false
-    private var dialog: AlertDialog? = null
+    private lateinit var dialog: AlertDialog
     private var requestStoragePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { result ->
@@ -207,8 +212,41 @@ class ReaderActivity : EhActivity() {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show()
                 }
 
-                mGalleryProvider =
-                    ArchivePageLoader(this, mUri)
+                val continuation: AtomicReference<Continuation<String>?> = AtomicReference(null)
+                mGalleryProvider = ArchivePageLoader(this, mUri!!,
+                    flow {
+                        if (!dialogShown) {
+                            withUIContext {
+                                dialogShown = true
+                                dialog.run {
+                                    show()
+                                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                                        val passwd = builder.text
+                                        if (passwd.isEmpty())
+                                            builder.setError(getString(R.string.passwd_cannot_be_empty))
+                                        else {
+                                            continuation.get()?.resume(passwd)
+                                        }
+                                    }
+                                    setOnCancelListener {
+                                        finish()
+                                    }
+                                }
+                            }
+                        }
+                        while (true) {
+                            currentCoroutineContext().ensureActive()
+                            val r = suspendCancellableCoroutine {
+                                continuation.set(it)
+                                it.invokeOnCancellation { dialog.dismiss() }
+                            }
+                            emit(r)
+                            withUIContext {
+                                builder.setError(getString(R.string.passwd_wrong))
+                            }
+                        }
+                    }
+                )
             }
         }
     }
@@ -258,15 +296,14 @@ class ReaderActivity : EhActivity() {
         binding = ReaderActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         builder = EditTextDialogBuilder(this, null, getString(R.string.archive_passwd))
-        builder!!.setTitle(getString(R.string.archive_need_passwd))
-        builder!!.setPositiveButton(getString(android.R.string.ok), null)
-        dialog = builder!!.create()
-        dialog!!.setCanceledOnTouchOutside(false)
+        builder.setTitle(getString(R.string.archive_need_passwd))
+        builder.setPositiveButton(getString(android.R.string.ok), null)
+        dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
         if (mGalleryProvider == null) {
             finish()
             return
         }
-        ArchivePageLoader.showPasswd = ShowPasswdDialogHandler(this)
 
         mGalleryProvider!!.start()
 
@@ -279,6 +316,9 @@ class ReaderActivity : EhActivity() {
     }
 
     fun setGallery() {
+        // TODO: Not well place to call it
+        dialog.dismiss()
+
         // Get start page
         if (mCurrentIndex == 0) mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         mSize = mGalleryProvider!!.size
@@ -517,56 +557,6 @@ class ReaderActivity : EhActivity() {
         val url = galleryDetailUrl
         if (url != null) {
             outContent.webUri = Uri.parse(url)
-        }
-    }
-
-    private fun showPasswdDialog() {
-        if (!dialogShown) {
-            dialogShown = true
-            dialog!!.show()
-            if (dialog!!.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
-                dialog!!.getButton(AlertDialog.BUTTON_POSITIVE)
-                    .setOnClickListener { this@ReaderActivity.onProvidePasswd() }
-            }
-            dialog!!.setOnCancelListener { finish() }
-        }
-    }
-
-    private fun onProvidePasswd() {
-        val passwd = builder!!.text
-        if (passwd.isEmpty())
-            builder!!.setError(getString(R.string.passwd_cannot_be_empty))
-        else {
-            ArchivePageLoader.passwd = passwd
-            ArchivePageLoader.pv.v()
-        }
-    }
-
-    private fun onPasswdWrong() {
-        builder!!.setError(getString(R.string.passwd_wrong))
-    }
-
-    private fun onPasswdCorrect() {
-        dialog!!.dismiss()
-    }
-
-    private class ShowPasswdDialogHandler(activity: ReaderActivity) : Handler() {
-        private val weakReference: WeakReference<ReaderActivity>
-
-        init {
-            this.weakReference = WeakReference(activity)
-        }
-
-        override fun handleMessage(msg: Message) {
-            val activity = weakReference.get()
-            super.handleMessage(msg)
-            if (null != activity) {
-                when (msg.what) {
-                    0 -> activity.showPasswdDialog()
-                    1 -> activity.onPasswdWrong()
-                    2 -> activity.onPasswdCorrect()
-                }
-            }
         }
     }
 
