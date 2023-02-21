@@ -22,7 +22,5 @@ abstract class EhDatabase : RoomDatabase() {
 }
 
 fun buildMainDB(context: Context): EhDatabase {
-    // TODO: Remove allowMainThreadQueries
-    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries()
-        .build()
+    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").build()
 }

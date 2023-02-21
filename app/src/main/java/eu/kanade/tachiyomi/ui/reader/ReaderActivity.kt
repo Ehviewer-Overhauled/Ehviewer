@@ -305,10 +305,15 @@ class ReaderActivity : EhActivity() {
             return
         }
 
-        mGalleryProvider!!.start()
-
-        lifecycleScope.launchUI {
-            if (mGalleryProvider!!.awaitReady()) setGallery()
+        mGalleryProvider.let {
+            if (it == null) {
+                finish()
+                return
+            }
+            lifecycleScope.launchIO {
+                it.start()
+                if (it.awaitReady()) withUIContext { setGallery() }
+            }
         }
 
         config = ReaderConfig()
