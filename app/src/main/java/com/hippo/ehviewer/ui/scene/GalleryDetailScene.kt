@@ -89,6 +89,7 @@ import com.hippo.ehviewer.databinding.SceneGalleryDetailBinding
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.spider.SpiderQueen
+import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
@@ -263,7 +264,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mGalleryInfo?.let {
             viewLifecycleOwner.lifecycleScope.launchIO {
                 runCatching {
-                    val startPage = spiderQueen?.awaitStartPage() ?: 0
+                    val queen = SpiderQueen.obtainSpiderQueen(it, MODE_READ)
+                    val startPage = queen.awaitStartPage()
+                    SpiderQueen.releaseSpiderQueen(queen, MODE_READ)
                     withUIContext {
                         binding.content.header.read.text = if (startPage == 0) {
                             getString(R.string.read)
@@ -353,8 +356,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         return true
     }
 
-    private var spiderQueen: SpiderQueen? = null
-
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -420,14 +421,11 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
-        spiderQueen = galleryInfo?.let { SpiderQueen.obtainSpiderQueen(it, SpiderQueen.MODE_READ) }
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        spiderQueen?.let { SpiderQueen.releaseSpiderQueen(it, SpiderQueen.MODE_READ)  }
-        spiderQueen = null
         downloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
