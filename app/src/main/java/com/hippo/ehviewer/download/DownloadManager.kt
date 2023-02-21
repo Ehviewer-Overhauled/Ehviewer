@@ -39,8 +39,6 @@ import kotlinx.coroutines.launch
 import java.util.LinkedList
 
 object DownloadManager : OnSpiderListener {
-    private val downloadManager = this
-
     // All download info list
     private val mAllInfoList: LinkedList<DownloadInfo>
 
@@ -1080,7 +1078,7 @@ object DownloadManager : OnSpiderListener {
                     mCurrentSpider = null
                     // Release spider
                     if (spider != null) {
-                        spider.removeOnSpiderListener(downloadManager)
+                        spider.removeOnSpiderListener(DownloadManager)
                         SpiderQueen.releaseSpiderQueen(spider, SpiderQueen.MODE_DOWNLOAD)
                     }
                     // Check null

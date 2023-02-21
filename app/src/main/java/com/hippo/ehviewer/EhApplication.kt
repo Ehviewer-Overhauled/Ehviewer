@@ -95,7 +95,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 ehDatabase
             }
             launchIO {
-                DownloadManager
+                DownloadManager.isIdle
             }
             launchIO {
                 cleanupDownload()
