@@ -13,106 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import android.content.Context
+import android.util.AttributeSet
+import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.GetText
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.unifile.UniFile
+import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-import android.content.Context;
-import android.util.AttributeSet;
+private val NO_REDUNDANCY =
+    GetText.getString(R.string.settings_download_clean_redundancy_no_redundancy)
+private val CLEAR_REDUNDANCY_DONE =
+    { cnt: Int -> GetText.getString(R.string.settings_download_clean_redundancy_done, cnt) }
+private val FINAL_CLEAR_REDUNDANCY_MSG =
+    { cnt: Int -> if (cnt == 0) NO_REDUNDANCY else CLEAR_REDUNDANCY_DONE(cnt) }
 
-import androidx.annotation.NonNull;
-
-import com.google.android.material.snackbar.Snackbar;
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.unifile.UniFile;
-import com.hippo.yorozuya.NumberUtils;
-
-public class CleanRedundancyPreference extends TaskPreference {
-
-    public CleanRedundancyPreference(Context context) {
-        super(context);
-    }
-
-    public CleanRedundancyPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public CleanRedundancyPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @NonNull
-    @Override
-    protected Task onCreateTask() {
-        return new ClearTask(getContext());
-    }
-
-    private static class ClearTask extends Task {
-
-        private final DownloadManager mManager;
-
-        public ClearTask(@NonNull Context context) {
-            super(context);
-            mManager = EhApplication.getDownloadManager();
+class CleanRedundancyPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : TaskPreference(context, attrs) {
+    private fun clearFile(file: UniFile): Boolean {
+        var name = file.name ?: return false
+        val index = name.indexOf('-')
+        if (index >= 0) {
+            name = name.substring(0, index)
         }
-
-        // True for cleared
-        private boolean clearFile(UniFile file) {
-            String name = file.getName();
-            if (name == null) {
-                return false;
-            }
-            int index = name.indexOf('-');
-            if (index >= 0) {
-                name = name.substring(0, index);
-            }
-            long gid = NumberUtils.parseLongSafely(name, -1L);
-            if (-1L == gid) {
-                return false;
-            }
-            if (mManager.containDownloadInfo(gid)) {
-                return false;
-            }
-            file.delete();
-            return true;
+        val gid = name.toLongOrNull() ?: return false
+        if (downloadManager.containDownloadInfo(gid)) {
+            return false
         }
+        file.delete()
+        return true
+    }
 
-        @Override
-        protected Object doInBackground(Void... params) {
-            UniFile dir = Settings.getDownloadLocation();
-            if (null == dir) {
-                return 0;
-            }
-            UniFile[] files = dir.listFiles();
-            if (null == files) {
-                return 0;
-            }
+    private fun doRealWork(): Int {
+        return Settings.getDownloadLocation()?.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
+    }
 
-            int count = 0;
-            for (UniFile f : files) {
-                if (clearFile(f)) {
-                    ++count;
-                }
+    override fun launchJob() {
+        if (singletonJob?.isActive == true) singletonJob?.invokeOnCompletion {
+            launchUI {
+                dialog.dismiss()
             }
-
-            return count;
         }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            int count;
-            if (o instanceof Integer) {
-                count = (Integer) o;
-            } else {
-                count = 0;
+        else singletonJob = launch {
+            val cnt = doRealWork()
+            withUIContext {
+                showTip(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
+                dialog.dismiss()
             }
-
-            showTip(0 == count ?
-                    mApplication.getString(R.string.settings_download_clean_redundancy_no_redundancy) :
-                    mApplication.getString(R.string.settings_download_clean_redundancy_done, count), Snackbar.LENGTH_SHORT);
-            super.onPostExecute(o);
         }
     }
 }
+
+private var singletonJob: Job? = null

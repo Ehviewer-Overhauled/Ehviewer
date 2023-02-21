@@ -15,145 +15,111 @@
  */
 package com.hippo.ehviewer.preference
 
-import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
-import androidx.preference.Preference
 import com.hippo.ehviewer.EhApplication.Companion.downloadManager
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
+import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.readCompatFromUniFile
-import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
-import com.hippo.util.ExceptionUtils
-import kotlinx.coroutines.runBlocking
-import java.io.IOException
-import java.util.Collections
+import eu.kanade.tachiyomi.util.lang.launchUI
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import moe.tarsin.coroutines.runSuspendCatching
 
-class RestoreDownloadPreference constructor(
-    context: Context, attrs: AttributeSet?
+private val RESTORE_NOT_FOUND = GetText.getString(R.string.settings_download_restore_not_found)
+private val RESTORE_FAILED = GetText.getString(R.string.settings_download_restore_failed)
+private val RESTORE_COUNT_MSG =
+    { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else GetText.getString(R.string.settings_download_restore_successfully, cnt) }
+
+class RestoreDownloadPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
 ) : TaskPreference(context, attrs) {
-    override fun onCreateTask(): Task {
-        return RestoreTask(context)
-    }
-
-    private class RestoreTask(context: Context) : Task(context) {
-        private val mManager: DownloadManager = downloadManager
-        private var restoreDirCount = 0
-        private fun getRestoreItem(file: UniFile?): RestoreItem? {
-            if (null == file || !file.isDirectory) {
+    private val mManager: DownloadManager = downloadManager
+    private var restoreDirCount = 0
+    private fun getRestoreItem(file: UniFile?): RestoreItem? {
+        if (null == file || !file.isDirectory) return null
+        val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
+        return runCatching {
+            val spiderInfo = readCompatFromUniFile(siFile) ?: return null
+            var gid = spiderInfo.gid
+            var dirname = file.name
+            if (mManager.containDownloadInfo(gid)) {
+                // Restore download dir to avoid redownload
+                val dbdirname = EhDB.getDownloadDirname(gid)
+                if (null == dbdirname || dirname != dbdirname) {
+                    EhDB.putDownloadDirname(gid, dirname)
+                    restoreDirCount++
+                }
                 return null
             }
-            val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
-            return try {
-                val spiderInfo = readCompatFromUniFile(siFile) ?: return null
-                val gid = spiderInfo.gid
-                val dirname = file.name
-                if (mManager.containDownloadInfo(gid)) {
-                    // Restore download dir to avoid redownload
-                    val dbdirname = EhDB.getDownloadDirname(gid)
-                    if (null == dbdirname || dirname != dbdirname) {
-                        EhDB.putDownloadDirname(gid, dirname)
-                        restoreDirCount++
-                    }
-                    return null
-                }
-                val token = spiderInfo.token
-                val restoreItem = RestoreItem()
-                restoreItem.gid = gid
-                restoreItem.token = token
-                restoreItem.dirname = dirname
-                restoreItem
-            } catch (e: IOException) {
-                null
+            RestoreItem().apply {
+                gid = spiderInfo.gid
+                token = spiderInfo.token
+                dirname = file.name
             }
-        }
+        }.getOrNull()
+    }
 
-        override fun doInBackground(vararg params: Void): Any? {
-            val dir = Settings.getDownloadLocation() ?: return null
-            val restoreItemList: MutableList<RestoreItem> = ArrayList()
-            val files = dir.listFiles() ?: return null
-            for (file in files) {
-                val restoreItem = getRestoreItem(file)
-                if (null != restoreItem) {
-                    restoreItemList.add(restoreItem)
-                }
-            }
-            return if (0 == restoreItemList.size) {
-                Collections.EMPTY_LIST
-            } else try {
-                runBlocking {
-                    fillGalleryListByApi(
-                        ArrayList(restoreItemList),
-                        EhUrl.referer
-                    )
-                }
-            } catch (e: Throwable) {
-                ExceptionUtils.throwIfFatal(e)
-                e.printStackTrace()
-                null
-            }
-        }
-
-        override fun onPostExecute(o: Any) {
-            if (o !is List<*>) {
-                mActivity.showTip(R.string.settings_download_restore_failed, BaseScene.LENGTH_SHORT)
-            } else {
-                val list = o as List<RestoreItem>
-                if (list.isEmpty()) {
-                    mActivity.showTip(
-                        if (restoreDirCount == 0)
-                            mActivity.getString(R.string.settings_download_restore_not_found)
-                        else
-                            mActivity.getString(
-                                R.string.settings_download_restore_successfully,
-                                restoreDirCount
-                            ),
-                        BaseScene.LENGTH_SHORT
-                    )
-                } else {
-                    var count = 0
-                    var i = 0
-                    val n = list.size
-                    while (i < n) {
-                        val item = list[i]
-                        // Avoid failed gallery info
-                        if (null != item.title) {
-                            // Put to download
-                            mManager.addDownload(item, null)
-                            // Put download dir to DB
-                            EhDB.putDownloadDirname(item.gid, item.dirname)
-                            count++
-                        }
-                        i++
-                    }
-                    showTip(
-                        mActivity.getString(
-                            R.string.settings_download_restore_successfully,
-                            count + restoreDirCount
-                        ),
-                        BaseScene.LENGTH_SHORT
-                    )
-                    val preference: Preference? = preference
-                    if (null != preference) {
-                        val context = preference.context
-                        if (context is Activity) {
-                            context.setResult(Activity.RESULT_OK)
-                        }
-                    }
-                }
-            }
-            super.onPostExecute(o)
-        }
+    private suspend fun doRealWork(): List<GalleryInfo>? {
+        val dir = Settings.getDownloadLocation() ?: return null
+        val files = dir.listFiles() ?: return null
+        val restoreItemList = files.mapNotNull { getRestoreItem(it) }
+        return runSuspendCatching {
+            fillGalleryListByApi(restoreItemList, EhUrl.referer)
+        }.getOrNull()
     }
 
     private class RestoreItem : BaseGalleryInfo() {
         var dirname: String? = null
     }
+
+    override fun launchJob() {
+        if (singletonJob?.isActive == true) singletonJob?.invokeOnCompletion {
+            launchUI {
+                dialog.dismiss()
+            }
+        }
+        else singletonJob = launch {
+            val result = doRealWork()
+            withUIContext {
+                if (result == null) {
+                    showTip(RESTORE_FAILED)
+                } else {
+                    if (result.isEmpty()) {
+                        showTip(RESTORE_COUNT_MSG(restoreDirCount))
+                    } else {
+                        var count = 0
+                        var i = 0
+                        val n = result.size
+                        while (i < n) {
+                            val item = result[i]
+                            // Avoid failed gallery info
+                            if (null != item.title) {
+                                // Put to download
+                                mManager.addDownload(item, null)
+                                // Put download dir to DB
+                                EhDB.putDownloadDirname(item.gid, (item as RestoreItem).dirname)
+                                count++
+                            }
+                            i++
+                        }
+                        showTip(RESTORE_COUNT_MSG(count + restoreDirCount))
+                    }
+                }
+                dialog.dismiss()
+            }
+        }
+    }
 }
+
+private var singletonJob: Job? = null

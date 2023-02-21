@@ -13,196 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.preference
 
-package com.hippo.ehviewer.preference;
+import android.content.Context
+import android.util.AttributeSet
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.snackbar.Snackbar
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.SettingsActivity
+import com.hippo.preference.DialogPreference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.AttributeSet;
-import android.widget.Toast;
-
-import androidx.annotation.CallSuper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.customview.view.AbsSavedState;
-
-import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.ui.SettingsActivity;
-import com.hippo.preference.DialogPreference;
-import com.hippo.util.IoThreadPoolExecutor;
-import com.hippo.yorozuya.IntIdGenerator;
-
-public abstract class TaskPreference extends DialogPreference {
-
-    private Task mTask;
-    private int mTaskId = IntIdGenerator.INVALID_ID;
-
-    public TaskPreference(Context context) {
-        super(context);
+abstract class TaskPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null
+) : DialogPreference(context, attrs), CoroutineScope {
+    override val coroutineContext = Dispatchers.IO + Job()
+    protected lateinit var dialog: AlertDialog
+    override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
+        builder.setTitle(null)
+        builder.setView(R.layout.preference_dialog_task)
+        builder.setCancelable(false)
     }
 
-    public TaskPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    abstract fun launchJob()
+
+    override fun onDialogCreated(dialog: AlertDialog) {
+        this.dialog = dialog
+        launchJob()
     }
 
-    public TaskPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        builder.setTitle(null);
-        builder.setView(R.layout.preference_dialog_task);
-        builder.setCancelable(false);
-    }
-
-    @Override
-    protected void onDialogCreated(AlertDialog dialog) {
-        if (null == mTask) {
-            mTask = onCreateTask();
-            mTask.setPreference(this);
-            mTaskId = ((EhApplication) getContext().getApplicationContext()).putGlobalStuff(mTask);
-            mTask.executeOnExecutor(IoThreadPoolExecutor.getInstance());
-        }
-    }
-
-    protected void onTaskEnd() {
-        // Dismiss dialog
-        Dialog dialog = getDialog();
-        try {
-            dialog.dismiss();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // Clear async
-        mTask = null;
-        mTaskId = IntIdGenerator.INVALID_ID;
-    }
-
-    @NonNull
-    protected abstract Task onCreateTask();
-
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        final Parcelable superState = super.onSaveInstanceState();
-        final SavedState myState = new SavedState(superState);
-        myState.asyncTaskId = mTaskId;
-        return myState;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        if (state == null || !state.getClass().equals(SavedState.class)) {
-            // Didn't save state for us in onSaveInstanceState
-            super.onRestoreInstanceState(state);
-            return;
-        }
-
-        SavedState myState = (SavedState) state;
-        mTaskId = myState.asyncTaskId;
-        if (IntIdGenerator.INVALID_ID != mTaskId) {
-            Object o = ((EhApplication) getContext().getApplicationContext()).getGlobalStuff(mTaskId);
-            if (o instanceof Task) {
-                mTask = (Task) o;
-                mTask.setPreference(this);
-            }
-        }
-        if (null == mTask) {
-            mTaskId = IntIdGenerator.INVALID_ID;
-        }
-
-        // TODO if not task, show not reopen dialog
-
-        super.onRestoreInstanceState(myState.getSuperState());
-    }
-
-    private static class SavedState extends AbsSavedState {
-        public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
-                    @Override
-                    public SavedState createFromParcel(Parcel in) {
-                        return new SavedState(in);
-                    }
-
-                    @Override
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
-        int asyncTaskId;
-
-        public SavedState(Parcel source) {
-            super(source, SavedState.class.getClassLoader());
-            asyncTaskId = source.readInt();
-        }
-
-        public SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeInt(asyncTaskId);
-        }
-    }
-
-    public abstract static class Task extends AsyncTask<Void, Void, Object> {
-
-        protected final EhApplication mApplication;
-        @SuppressLint("StaticFieldLeak")
-        protected final SettingsActivity mActivity;
-        @Nullable
-        private TaskPreference mPreference;
-
-        public Task(@NonNull Context context) {
-            mActivity = (SettingsActivity) context;
-            mApplication = (EhApplication) context.getApplicationContext();
-        }
-
-        public EhApplication getApplication() {
-            return mApplication;
-        }
-
-        @Nullable
-        public TaskPreference getPreference() {
-            return mPreference;
-        }
-
-        public void setPreference(@Nullable TaskPreference preference) {
-            mPreference = preference;
-        }
-
-        @CallSuper
-        @Override
-        protected void onPostExecute(Object o) {
-            mApplication.removeGlobalStuff(this);
-            if (null != mPreference) {
-                mPreference.onTaskEnd();
-            }
-        }
-
-        protected void showTip(@StringRes int id, int length) {
-            try {
-                mActivity.showTip(id, length);
-            } catch (Exception e) {
-                Toast.makeText(mApplication, id, length).show();
-            }
-        }
-
-        protected void showTip(CharSequence message, int length) {
-            try {
-                mActivity.showTip(message, length);
-            } catch (Exception e) {
-                Toast.makeText(mApplication, message, length).show();
-            }
-        }
+    protected fun showTip(msg: String) {
+        (context as SettingsActivity).showTip(
+            msg,
+            Snackbar.LENGTH_SHORT
+        )
     }
 }
