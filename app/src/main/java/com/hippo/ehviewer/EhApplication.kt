@@ -95,7 +95,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 ehDatabase
             }
             launchIO {
-                downloadManager
+                DownloadManager
             }
             launchIO {
                 cleanupDownload()
@@ -232,9 +232,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 }
             }
         }
-
-        @JvmStatic
-        val downloadManager by lazy { DownloadManager }
 
         @JvmStatic
         val hosts by lazy { Hosts(application, "hosts.db") }

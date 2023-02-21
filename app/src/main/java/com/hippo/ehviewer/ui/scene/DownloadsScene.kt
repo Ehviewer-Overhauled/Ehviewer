@@ -51,7 +51,7 @@ import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.easyrecyclerview.MarginItemDecoration
-import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings

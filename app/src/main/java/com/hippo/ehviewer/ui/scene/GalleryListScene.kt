@@ -62,7 +62,7 @@ import com.hippo.app.EditTextDialogBuilder
 import com.hippo.drawable.AddDeleteDrawable
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.FavouriteStatusRouter

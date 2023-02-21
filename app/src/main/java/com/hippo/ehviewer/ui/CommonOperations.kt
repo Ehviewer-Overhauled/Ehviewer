@@ -22,7 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.hippo.app.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.EhApplication.Companion.application
-import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R

@@ -30,7 +30,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -66,7 +65,7 @@ class DownloadService : Service(), DownloadManager.DownloadListener {
                 .setName(getString(R.string.download_service))
                 .build()
         )
-        mDownloadManager = EhApplication.downloadManager
+        mDownloadManager = DownloadManager
         mDownloadManager!!.setDownloadListener(this)
         ensureDownloadingBuilder()
         mDownloadingBuilder!!.setContentTitle(getString(R.string.download_service))

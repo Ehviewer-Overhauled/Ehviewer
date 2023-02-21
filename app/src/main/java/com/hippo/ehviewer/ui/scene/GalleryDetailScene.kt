@@ -56,7 +56,7 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
@@ -1193,7 +1193,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         if (null == context || -1L == gid) {
             return
         }
-        val downloadState = downloadManager.getDownloadState(gid)
+        val downloadState = com.hippo.ehviewer.download.DownloadManager.getDownloadState(gid)
         if (downloadState == mDownloadState) {
             return
         }

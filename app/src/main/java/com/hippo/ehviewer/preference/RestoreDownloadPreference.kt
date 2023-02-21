@@ -17,7 +17,7 @@ package com.hippo.ehviewer.preference
 
 import android.content.Context
 import android.util.AttributeSet
-import com.hippo.ehviewer.EhApplication.Companion.downloadManager
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R

@@ -27,15 +27,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.download.DownloadManager
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
 
-private val downloadManager = EhApplication.downloadManager
+private val downloadManager = DownloadManager
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
