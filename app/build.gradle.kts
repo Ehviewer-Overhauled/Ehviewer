@@ -3,12 +3,7 @@ plugins {
     kotlin("android")
     id("kotlin-parcelize")
     kotlin("plugin.serialization")
-    kotlin("plugin.atomicfu")
     id("com.google.devtools.ksp")
-}
-
-atomicfuCompilerPlugin {
-    isJvmIrTransformationEnabled = true
 }
 
 android {
@@ -197,7 +192,7 @@ dependencies {
     // https://coil-kt.github.io/coil/changelog/
     implementation("io.coil-kt:coil-compose:2.2.2")
 
-    compileOnly("org.jetbrains.kotlinx:atomicfu:0.20.0")
+    implementation("org.jetbrains.kotlinx:atomicfu:0.20.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0-RC")
     implementation("org.jsoup:jsoup:1.15.4")
