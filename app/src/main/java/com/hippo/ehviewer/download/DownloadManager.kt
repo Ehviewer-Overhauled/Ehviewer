@@ -37,7 +37,6 @@ import com.hippo.yorozuya.collect.LongList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.LinkedList
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 object DownloadManager : OnSpiderListener {
@@ -117,7 +116,6 @@ object DownloadManager : OnSpiderListener {
         mDownloadInfoListeners = ArrayList()
     }
 
-    @OptIn(ExperimentalContracts::class)
     private fun getInfoListForLabel(label: String?): LinkedList<DownloadInfo>? {
         contract {
             returns(null) implies (label != null)
