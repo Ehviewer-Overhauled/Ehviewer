@@ -415,7 +415,7 @@ class FilterFragment : BaseFragment() {
             mEhFilter.deleteFilter(filter)
         }
 
-        fun trigger(filter: Filter?) {
+        fun trigger(filter: Filter) {
             mEhFilter.triggerFilter(filter)
         }
     }

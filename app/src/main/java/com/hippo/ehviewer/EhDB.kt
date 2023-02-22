@@ -13,538 +13,555 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer
 
-package com.hippo.ehviewer;
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
+import androidx.paging.PagingSource
+import androidx.room.Room.databaseBuilder
+import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.dao.BasicDao
+import com.hippo.ehviewer.dao.DownloadDirname
+import com.hippo.ehviewer.dao.DownloadInfo
+import com.hippo.ehviewer.dao.DownloadLabel
+import com.hippo.ehviewer.dao.EhDatabase
+import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.dao.HistoryInfo
+import com.hippo.ehviewer.dao.LocalFavoriteInfo
+import com.hippo.ehviewer.dao.QuickSearch
+import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.util.ExceptionUtils
+import com.hippo.yorozuya.IOUtils
+import com.hippo.yorozuya.ObjectUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
+object EhDB {
+    private const val CUR_DB_VER = 4
+    private val db = ehDatabase
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.paging.PagingSource;
-import androidx.room.Room;
-
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.dao.BasicDao;
-import com.hippo.ehviewer.dao.DownloadDirname;
-import com.hippo.ehviewer.dao.DownloadDirnameDao;
-import com.hippo.ehviewer.dao.DownloadInfo;
-import com.hippo.ehviewer.dao.DownloadLabel;
-import com.hippo.ehviewer.dao.DownloadLabelDao;
-import com.hippo.ehviewer.dao.DownloadsDao;
-import com.hippo.ehviewer.dao.EhDatabase;
-import com.hippo.ehviewer.dao.Filter;
-import com.hippo.ehviewer.dao.HistoryDao;
-import com.hippo.ehviewer.dao.HistoryInfo;
-import com.hippo.ehviewer.dao.LocalFavoriteInfo;
-import com.hippo.ehviewer.dao.LocalFavoritesDao;
-import com.hippo.ehviewer.dao.QuickSearch;
-import com.hippo.ehviewer.dao.QuickSearchDao;
-import com.hippo.ehviewer.download.DownloadManager;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.yorozuya.IOUtils;
-import com.hippo.yorozuya.ObjectUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-public class EhDB {
-    private static final int CUR_DB_VER = 4;
-    private static final EhDatabase db = EhApplication.getEhDatabase();
-
-    public static synchronized List<DownloadInfo> getAllDownloadInfo() {
-        DownloadsDao dao = db.downloadsDao();
-        List<DownloadInfo> list = dao.list();
-        // Fix state
-        for (DownloadInfo info : list) {
-            if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
-                info.state = DownloadInfo.STATE_NONE;
+    // Fix state
+    @get:Synchronized
+    val allDownloadInfo: List<DownloadInfo>
+        get() {
+            val dao = db.downloadsDao()
+            val list = dao.list()
+            // Fix state
+            for (info in list) {
+                if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
+                    info.state = DownloadInfo.STATE_NONE
+                }
             }
+            return list
         }
-        return list;
-    }
 
-    public static synchronized void updateDownloadInfo(List<DownloadInfo> downloadInfos) {
-        DownloadsDao dao = db.downloadsDao();
-        dao.update(downloadInfos);
+    @Synchronized
+    fun updateDownloadInfo(downloadInfos: List<DownloadInfo>) {
+        val dao = db.downloadsDao()
+        dao.update(downloadInfos)
     }
 
     // Insert or update
-    public static synchronized void putDownloadInfo(DownloadInfo downloadInfo) {
-        DownloadsDao dao = db.downloadsDao();
-        if (null != dao.load(downloadInfo.getGid())) {
+    @Synchronized
+    fun putDownloadInfo(downloadInfo: DownloadInfo) {
+        val dao = db.downloadsDao()
+        if (null != dao.load(downloadInfo.gid)) {
             // Update
-            dao.update(downloadInfo);
+            dao.update(downloadInfo)
         } else {
             // Insert
-            dao.insert(downloadInfo);
+            dao.insert(downloadInfo)
         }
     }
 
-    public static synchronized void removeDownloadInfo(DownloadInfo downloadInfo) {
-        db.downloadsDao().delete(downloadInfo);
+    @Synchronized
+    fun removeDownloadInfo(downloadInfo: DownloadInfo) {
+        db.downloadsDao().delete(downloadInfo)
     }
 
-    @Nullable
-    public static synchronized String getDownloadDirname(long gid) {
-        DownloadDirnameDao dao = db.downloadDirnameDao();
-        DownloadDirname raw = dao.load(gid);
-        if (raw != null) {
-            return raw.getDirname();
-        } else {
-            return null;
-        }
+    @Synchronized
+    fun getDownloadDirname(gid: Long): String? {
+        val dao = db.downloadDirnameDao()
+        val raw = dao.load(gid)
+        return raw?.dirname
     }
 
     /**
      * Insert or update
      */
-    public static synchronized void putDownloadDirname(long gid, String dirname) {
-        DownloadDirnameDao dao = db.downloadDirnameDao();
-        DownloadDirname raw = dao.load(gid);
+    @Synchronized
+    fun putDownloadDirname(gid: Long, dirname: String?) {
+        val dao = db.downloadDirnameDao()
+        var raw = dao.load(gid)
         if (raw != null) { // Update
-            raw.setDirname(dirname);
-            dao.update(raw);
+            raw.dirname = dirname
+            dao.update(raw)
         } else { // Insert
-            raw = new DownloadDirname();
-            raw.setGid(gid);
-            raw.setDirname(dirname);
-            dao.insert(raw);
+            raw = DownloadDirname()
+            raw.gid = gid
+            raw.dirname = dirname
+            dao.insert(raw)
         }
     }
 
-    public static synchronized void removeDownloadDirname(long gid) {
-        DownloadDirnameDao dao = db.downloadDirnameDao();
-        dao.deleteByKey(gid);
+    @Synchronized
+    fun removeDownloadDirname(gid: Long) {
+        val dao = db.downloadDirnameDao()
+        dao.deleteByKey(gid)
     }
 
-    public static synchronized void clearDownloadDirname() {
-        DownloadDirnameDao dao = db.downloadDirnameDao();
-        dao.deleteAll();
+    @Synchronized
+    fun clearDownloadDirname() {
+        val dao = db.downloadDirnameDao()
+        dao.deleteAll()
     }
 
-    @NonNull
-    public static synchronized List<DownloadLabel> getAllDownloadLabelList() {
-        DownloadLabelDao dao = db.downloadLabelDao();
-        return dao.list();
+    @get:Synchronized
+    val allDownloadLabelList: List<DownloadLabel>
+        get() {
+            val dao = db.downloadLabelDao()
+            return dao.list()
+        }
+
+    @Synchronized
+    fun addDownloadLabel(label: String?): DownloadLabel {
+        val dao = db.downloadLabelDao()
+        val raw = DownloadLabel()
+        raw.label = label
+        raw.time = System.currentTimeMillis()
+        raw.id = dao.insert(raw)
+        return raw
     }
 
-    public static synchronized DownloadLabel addDownloadLabel(String label) {
-        DownloadLabelDao dao = db.downloadLabelDao();
-        DownloadLabel raw = new DownloadLabel();
-        raw.setLabel(label);
-        raw.setTime(System.currentTimeMillis());
-        raw.setId(dao.insert(raw));
-        return raw;
-    }
-
-    public static synchronized DownloadLabel addDownloadLabel(DownloadLabel raw) {
+    @Synchronized
+    fun addDownloadLabel(raw: DownloadLabel): DownloadLabel {
         // Reset id
-        raw.setId(null);
-        DownloadLabelDao dao = db.downloadLabelDao();
-        raw.setId(dao.insert(raw));
-        return raw;
+        raw.id = null
+        val dao = db.downloadLabelDao()
+        raw.id = dao.insert(raw)
+        return raw
     }
 
-    public static synchronized void updateDownloadLabel(DownloadLabel raw) {
-        DownloadLabelDao dao = db.downloadLabelDao();
-        dao.update(raw);
+    @Synchronized
+    fun updateDownloadLabel(raw: DownloadLabel?) {
+        val dao = db.downloadLabelDao()
+        dao.update(raw!!)
     }
 
-    public static synchronized void moveDownloadLabel(int fromPosition, int toPosition) {
+    @Synchronized
+    fun moveDownloadLabel(fromPosition: Int, toPosition: Int) {
         if (fromPosition == toPosition) {
-            return;
+            return
+        }
+        val reverse = fromPosition > toPosition
+        val offset = if (reverse) toPosition else fromPosition
+        val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
+        val dao = db.downloadLabelDao()
+        val list = dao.list(offset, limit)
+        val step = if (reverse) 1 else -1
+        val start = if (reverse) limit - 1 else 0
+        val end = if (reverse) 0 else limit - 1
+        val toTime = list[end].time
+        var i = end
+        while (if (reverse) i < start else i > start) {
+            list[i].time = list[i + step].time
+            i += step
+        }
+        list[start].time = toTime
+        dao.update(list)
+    }
+
+    @Synchronized
+    fun removeDownloadLabel(raw: DownloadLabel?) {
+        val dao = db.downloadLabelDao()
+        dao.delete(raw!!)
+    }
+
+    @get:Synchronized
+    val allLocalFavorites: List<GalleryInfo>
+        get() {
+            val dao = db.localFavoritesDao()
+            val list = dao.list()
+            return ArrayList<GalleryInfo>(list)
         }
 
-        boolean reverse = fromPosition > toPosition;
-        int offset = reverse ? toPosition : fromPosition;
-        int limit = reverse ? fromPosition - toPosition + 1 : toPosition - fromPosition + 1;
-
-        DownloadLabelDao dao = db.downloadLabelDao();
-        List<DownloadLabel> list = dao.list(offset, limit);
-
-        int step = reverse ? 1 : -1;
-        int start = reverse ? limit - 1 : 0;
-        int end = reverse ? 0 : limit - 1;
-        long toTime = list.get(end).getTime();
-        for (int i = end; reverse ? i < start : i > start; i += step) {
-            list.get(i).setTime(list.get(i + step).getTime());
-        }
-        list.get(start).setTime(toTime);
-
-        dao.update(list);
+    @Synchronized
+    fun searchLocalFavorites(query: String): List<GalleryInfo> {
+        val dao = db.localFavoritesDao()
+        val list = dao.list("%$query%")
+        return ArrayList<GalleryInfo>(list)
     }
 
-    public static synchronized void removeDownloadLabel(DownloadLabel raw) {
-        DownloadLabelDao dao = db.downloadLabelDao();
-        dao.delete(raw);
+    @Synchronized
+    fun removeLocalFavorites(gid: Long) {
+        db.localFavoritesDao().deleteByKey(gid)
     }
 
-    public static synchronized List<GalleryInfo> getAllLocalFavorites() {
-        LocalFavoritesDao dao = db.localFavoritesDao();
-        List<LocalFavoriteInfo> list = dao.list();
-        return new ArrayList<>(list);
-    }
-
-    public static synchronized List<GalleryInfo> searchLocalFavorites(String query) {
-        LocalFavoritesDao dao = db.localFavoritesDao();
-        List<LocalFavoriteInfo> list = dao.list("%" + query + "%");
-        return new ArrayList<>(list);
-    }
-
-    public static synchronized void removeLocalFavorites(long gid) {
-        db.localFavoritesDao().deleteByKey(gid);
-    }
-
-    public static synchronized void removeLocalFavorites(long[] gidArray) {
-        LocalFavoritesDao dao = db.localFavoritesDao();
-        for (long gid : gidArray) {
-            dao.deleteByKey(gid);
+    @Synchronized
+    fun removeLocalFavorites(gidArray: LongArray) {
+        val dao = db.localFavoritesDao()
+        for (gid in gidArray) {
+            dao.deleteByKey(gid)
         }
     }
 
-    public static synchronized boolean containLocalFavorites(long gid) {
-        LocalFavoritesDao dao = db.localFavoritesDao();
-        return null != dao.load(gid);
+    @JvmStatic
+    @Synchronized
+    fun containLocalFavorites(gid: Long): Boolean {
+        val dao = db.localFavoritesDao()
+        return null != dao.load(gid)
     }
 
-    public static synchronized void putLocalFavorites(GalleryInfo galleryInfo) {
-        LocalFavoritesDao dao = db.localFavoritesDao();
-        if (null == dao.load(galleryInfo.getGid())) {
-            LocalFavoriteInfo info;
-            if (galleryInfo instanceof LocalFavoriteInfo) {
-                info = (LocalFavoriteInfo) galleryInfo;
+    @Synchronized
+    fun putLocalFavorites(galleryInfo: GalleryInfo) {
+        val dao = db.localFavoritesDao()
+        if (null == dao.load(galleryInfo.gid)) {
+            val info: LocalFavoriteInfo
+            if (galleryInfo is LocalFavoriteInfo) {
+                info = galleryInfo
             } else {
-                info = new LocalFavoriteInfo(galleryInfo);
-                info.time = System.currentTimeMillis();
+                info = LocalFavoriteInfo(galleryInfo)
+                info.time = System.currentTimeMillis()
             }
-            dao.insert(info);
+            dao.insert(info)
         }
     }
 
-    public static synchronized void putLocalFavorites(List<GalleryInfo> galleryInfoList) {
-        for (GalleryInfo gi : galleryInfoList) {
-            putLocalFavorites(gi);
+    @Synchronized
+    fun putLocalFavorites(galleryInfoList: List<GalleryInfo>) {
+        for (gi in galleryInfoList) {
+            putLocalFavorites(gi)
         }
     }
 
-    public static synchronized List<QuickSearch> getAllQuickSearch() {
-        QuickSearchDao dao = db.quickSearchDao();
-        return dao.list();
+    @get:Synchronized
+    val allQuickSearch: List<QuickSearch>
+        get() {
+            val dao = db.quickSearchDao()
+            return dao.list()
+        }
+
+    @Synchronized
+    fun insertQuickSearch(quickSearch: QuickSearch) {
+        val dao = db.quickSearchDao()
+        quickSearch.id = null
+        quickSearch.time = System.currentTimeMillis()
+        quickSearch.id = dao.insert(quickSearch)
     }
 
-    public static synchronized void insertQuickSearch(QuickSearch quickSearch) {
-        QuickSearchDao dao = db.quickSearchDao();
-        quickSearch.setId(null);
-        quickSearch.setTime(System.currentTimeMillis());
-        quickSearch.setId(dao.insert(quickSearch));
-    }
-
-    public static synchronized void importQuickSearch(List<QuickSearch> quickSearchList) {
-        QuickSearchDao dao = db.quickSearchDao();
-        for (QuickSearch quickSearch : quickSearchList) {
-            dao.insert(quickSearch);
+    @Synchronized
+    fun importQuickSearch(quickSearchList: List<QuickSearch?>) {
+        val dao = db.quickSearchDao()
+        for (quickSearch in quickSearchList) {
+            dao.insert(quickSearch!!)
         }
     }
 
-    public static synchronized void deleteQuickSearch(QuickSearch quickSearch) {
-        QuickSearchDao dao = db.quickSearchDao();
-        dao.delete(quickSearch);
+    @Synchronized
+    fun deleteQuickSearch(quickSearch: QuickSearch?) {
+        val dao = db.quickSearchDao()
+        dao.delete(quickSearch)
     }
 
-    public static synchronized void moveQuickSearch(int fromPosition, int toPosition) {
+    @Synchronized
+    fun moveQuickSearch(fromPosition: Int, toPosition: Int) {
         if (fromPosition == toPosition) {
-            return;
+            return
         }
-
-        boolean reverse = fromPosition > toPosition;
-        int offset = reverse ? toPosition : fromPosition;
-        int limit = reverse ? fromPosition - toPosition + 1 : toPosition - fromPosition + 1;
-
-        QuickSearchDao dao = db.quickSearchDao();
-        List<QuickSearch> list = dao.list(offset, limit);
-
-        int step = reverse ? 1 : -1;
-        int start = reverse ? limit - 1 : 0;
-        int end = reverse ? 0 : limit - 1;
-        long toTime = list.get(end).getTime();
-        for (int i = end; reverse ? i < start : i > start; i += step) {
-            list.get(i).setTime(list.get(i + step).getTime());
+        val reverse = fromPosition > toPosition
+        val offset = if (reverse) toPosition else fromPosition
+        val limit = if (reverse) fromPosition - toPosition + 1 else toPosition - fromPosition + 1
+        val dao = db.quickSearchDao()
+        val list = dao.list(offset, limit)
+        val step = if (reverse) 1 else -1
+        val start = if (reverse) limit - 1 else 0
+        val end = if (reverse) 0 else limit - 1
+        val toTime = list[end].time
+        var i = end
+        while (if (reverse) i < start else i > start) {
+            list[i].time = list[i + step].time
+            i += step
         }
-        list.get(start).setTime(toTime);
-
-        dao.update(list);
+        list[start].time = toTime
+        dao.update(list)
     }
 
-    public static synchronized PagingSource<Integer, HistoryInfo> getHistoryLazyList() {
-        return db.historyDao().listLazy();
-    }
+    @get:Synchronized
+    val historyLazyList: PagingSource<Int, HistoryInfo>
+        get() = db.historyDao().listLazy()
 
-    public static synchronized void putHistoryInfo(GalleryInfo galleryInfo) {
-        HistoryDao dao = db.historyDao();
-        HistoryInfo info;
-        if (galleryInfo instanceof HistoryInfo) {
-            info = (HistoryInfo) galleryInfo;
+    @Synchronized
+    fun putHistoryInfo(galleryInfo: GalleryInfo?) {
+        val dao = db.historyDao()
+        val info: HistoryInfo = if (galleryInfo is HistoryInfo) {
+            galleryInfo
         } else {
-            info = new HistoryInfo(galleryInfo);
+            HistoryInfo(galleryInfo!!)
         }
-        info.time = System.currentTimeMillis();
-        if (null != dao.load(info.getGid())) {
-            dao.update(info);
+        info.time = System.currentTimeMillis()
+        if (null != dao.load(info.gid)) {
+            dao.update(info)
         } else {
-            dao.insert(info);
+            dao.insert(info)
         }
     }
 
-    public static synchronized void putHistoryInfoNonRefresh(GalleryInfo info) {
-        HistoryDao dao = db.historyDao();
-        var i = dao.load(info.getGid());
+    @Synchronized
+    fun putHistoryInfoNonRefresh(info: GalleryInfo) {
+        val dao = db.historyDao()
+        val i = dao.load(info.gid)
         if (null != i) {
-            HistoryInfo historyInfo;
-            if (info instanceof HistoryInfo) {
-                historyInfo = (HistoryInfo) info;
+            val historyInfo: HistoryInfo
+            if (info is HistoryInfo) {
+                historyInfo = info
             } else {
-                historyInfo = new HistoryInfo(info);
-                historyInfo.time = i.time;
+                historyInfo = HistoryInfo(info)
+                historyInfo.time = i.time
             }
-            dao.update(historyInfo);
+            dao.update(historyInfo)
         }
     }
 
-    public static synchronized void putHistoryInfo(List<HistoryInfo> historyInfoList) {
-        HistoryDao dao = db.historyDao();
-        for (HistoryInfo info : historyInfoList) {
-            if (null == dao.load(info.getGid())) {
-                dao.insert(info);
+    @Synchronized
+    fun putHistoryInfo(historyInfoList: List<HistoryInfo>) {
+        val dao = db.historyDao()
+        for (info in historyInfoList) {
+            if (null == dao.load(info.gid)) {
+                dao.insert(info)
             }
         }
     }
 
-    public static synchronized void deleteHistoryInfo(HistoryInfo info) {
-        HistoryDao dao = db.historyDao();
-        dao.delete(info);
+    @Synchronized
+    fun deleteHistoryInfo(info: HistoryInfo?) {
+        val dao = db.historyDao()
+        dao.delete(info!!)
     }
 
-    public static synchronized void clearHistoryInfo() {
-        HistoryDao dao = db.historyDao();
-        dao.deleteAll();
+    @Synchronized
+    fun clearHistoryInfo() {
+        val dao = db.historyDao()
+        dao.deleteAll()
     }
 
-    public static synchronized List<Filter> getAllFilter() {
-        return db.filterDao().list();
-    }
+    @get:Synchronized
+    val allFilter: List<Filter>
+        get() = db.filterDao().list()
 
-    public static synchronized boolean addFilter(Filter filter) {
-        Filter existFilter;
-        try {
-            existFilter = db.filterDao().load(filter.text, filter.mode);
-        } catch (Exception e) {
-            existFilter = null;
+    @Synchronized
+    fun addFilter(filter: Filter): Boolean {
+        val existFilter: Filter? = try {
+            db.filterDao().load(filter.text!!, filter.mode)
+        } catch (e: Exception) {
+            null
         }
-        if (existFilter == null) {
-            filter.setId(null);
-            filter.setId(db.filterDao().insert(filter));
-            return true;
+        return if (existFilter == null) {
+            filter.id = null
+            filter.id = db.filterDao().insert(filter)
+            true
         } else {
-            return false;
+            false
         }
     }
 
-    public static synchronized void deleteFilter(Filter filter) {
-        db.filterDao().delete(filter);
+    @Synchronized
+    fun deleteFilter(filter: Filter) {
+        db.filterDao().delete(filter)
     }
 
-    public static synchronized void triggerFilter(Filter filter) {
-        filter.enable = !filter.enable;
-        db.filterDao().update(filter);
+    @Synchronized
+    fun triggerFilter(filter: Filter) {
+        filter.enable = filter.enable?.not() ?: false
+        db.filterDao().update(filter)
     }
 
-    private static <T> void copyDao(BasicDao<T> from, BasicDao<T> to) {
-        List<T> list = from.list();
-        for (T item : list)
-            to.insert(item);
+    private fun <T> copyDao(from: BasicDao<T>, to: BasicDao<T>) {
+        val list = from.list()
+        for (item in list) to.insert(item)
     }
 
-    public static synchronized boolean exportDB(Context context, Uri uri) {
-        final String ehExportName = "eh.export.db";
+    @Synchronized
+    fun exportDB(context: Context, uri: Uri?): Boolean {
+        val ehExportName = "eh.export.db"
 
         // Delete old export db
-        context.deleteDatabase(ehExportName);
-        EhDatabase newDb = Room.databaseBuilder(context, EhDatabase.class, ehExportName).allowMainThreadQueries().build();
-
-        try {
+        context.deleteDatabase(ehExportName)
+        val newDb =
+            databaseBuilder(context, EhDatabase::class.java, ehExportName).allowMainThreadQueries()
+                .build()
+        return try {
             // Copy data to a export db
-            copyDao(db.downloadsDao(), newDb.downloadsDao());
-            copyDao(db.downloadLabelDao(), newDb.downloadLabelDao());
-            copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao());
-            copyDao(db.historyDao(), newDb.historyDao());
-            copyDao(db.quickSearchDao(), newDb.quickSearchDao());
-            copyDao(db.localFavoritesDao(), newDb.localFavoritesDao());
-            copyDao(db.filterDao(), newDb.filterDao());
+            copyDao(db.downloadsDao(), newDb.downloadsDao())
+            copyDao(db.downloadLabelDao(), newDb.downloadLabelDao())
+            copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao())
+            copyDao(db.historyDao(), newDb.historyDao())
+            copyDao(db.quickSearchDao(), newDb.quickSearchDao())
+            copyDao(db.localFavoritesDao(), newDb.localFavoritesDao())
+            copyDao(db.filterDao(), newDb.filterDao())
 
             // Close export db so we can copy it
-            if (newDb.isOpen()) {
-                newDb.close();
+            if (newDb.isOpen) {
+                newDb.close()
             }
 
             // Copy export db to data dir
-            File dbFile = context.getDatabasePath(ehExportName);
-            if (dbFile == null || !dbFile.isFile()) {
-                return false;
+            val dbFile = context.getDatabasePath(ehExportName)
+            if (dbFile == null || !dbFile.isFile) {
+                return false
             }
-            InputStream is = null;
-            OutputStream os = null;
+            var `is`: InputStream? = null
+            var os: OutputStream? = null
             try {
-                is = new FileInputStream(dbFile);
-                os = context.getContentResolver().openOutputStream(uri);
-                IOUtils.copy(is, os);
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
+                `is` = FileInputStream(dbFile)
+                os = context.contentResolver.openOutputStream(uri!!)
+                IOUtils.copy(`is`, os)
+                return true
+            } catch (e: IOException) {
+                e.printStackTrace()
             } finally {
-                IOUtils.closeQuietly(is);
-                IOUtils.closeQuietly(os);
+                IOUtils.closeQuietly(`is`)
+                IOUtils.closeQuietly(os)
             }
 
             // Delete failed file
-            return false;
+            false
         } finally {
-            context.deleteDatabase(ehExportName);
+            context.deleteDatabase(ehExportName)
         }
     }
 
     /**
      * @return error string, null for no error
      */
-    public static synchronized String importDB(Context context, Uri uri) {
-        try {
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+    @Synchronized
+    fun importDB(context: Context, uri: Uri?): String? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri!!)
 
             // Copy file to cache dir
-            File file = File.createTempFile("importDatabase", "");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            byte[] buff = new byte[1024];
-            int read;
+            val file = File.createTempFile("importDatabase", "")
+            val outputStream = FileOutputStream(file)
+            val buff = ByteArray(1024)
+            var read: Int
             if (inputStream != null) {
-                while ((read = inputStream.read(buff, 0, buff.length)) > 0) {
-                    outputStream.write(buff, 0, read);
+                while (inputStream.read(buff, 0, buff.size).also { read = it } > 0) {
+                    outputStream.write(buff, 0, read)
                 }
             } else {
-                return context.getString(R.string.cant_read_the_file);
+                return context.getString(R.string.cant_read_the_file)
             }
-            inputStream.close();
-            outputStream.close();
+            inputStream.close()
+            outputStream.close()
 
             // Check database version
-            SQLiteDatabase oldDB = SQLiteDatabase.openDatabase(
-                    file.getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            int newVersion = CUR_DB_VER;
-            int oldVersion = oldDB.getVersion();
+            val oldDB = SQLiteDatabase.openDatabase(
+                file.path, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS
+            )
+            val newVersion = CUR_DB_VER
+            val oldVersion = oldDB.version
             if (oldVersion < newVersion) {
-                return context.getString(R.string.db_version_too_low);
+                return context.getString(R.string.db_version_too_low)
             } else if (oldVersion > newVersion) {
-                return context.getString(R.string.db_version_too_high);
+                return context.getString(R.string.db_version_too_high)
             }
 
             // Crete temp room database from cache file
-            String tmpDBName = "tmp.db";
-            context.deleteDatabase(tmpDBName);
-            EhDatabase oldRoomDatabase = Room.databaseBuilder(context, EhDatabase.class, tmpDBName)
-                    .createFromFile(file).allowMainThreadQueries().build();
+            val tmpDBName = "tmp.db"
+            context.deleteDatabase(tmpDBName)
+            val oldRoomDatabase = databaseBuilder(context, EhDatabase::class.java, tmpDBName)
+                .createFromFile(file).allowMainThreadQueries().build()
 
             // Download label
-            DownloadManager manager = DownloadManager.INSTANCE;
+            val manager = DownloadManager
             try {
-                List<DownloadLabel> downloadLabelList = oldRoomDatabase.downloadLabelDao().list();
-                manager.addDownloadLabel(downloadLabelList);
-            } catch (Exception ignored) {
+                val downloadLabelList = oldRoomDatabase.downloadLabelDao().list()
+                manager.addDownloadLabel(downloadLabelList)
+            } catch (ignored: Exception) {
             }
 
             // Downloads
             try {
-                List<DownloadInfo> downloadInfoList = oldRoomDatabase.downloadsDao().list();
-                manager.addDownload(downloadInfoList, false);
-            } catch (Exception ignored) {
+                val downloadInfoList = oldRoomDatabase.downloadsDao().list()
+                manager.addDownload(downloadInfoList, false)
+            } catch (ignored: Exception) {
             }
 
             // Download dirname
             try {
-                List<DownloadDirname> downloadDirnameList = oldRoomDatabase.downloadDirnameDao().list();
-                for (DownloadDirname dirname : downloadDirnameList) {
-                    putDownloadDirname(dirname.getGid(), dirname.getDirname());
+                val downloadDirnameList = oldRoomDatabase.downloadDirnameDao().list()
+                for ((gid, dirname1) in downloadDirnameList) {
+                    putDownloadDirname(gid, dirname1)
                 }
-            } catch (Exception ignored) {
+            } catch (ignored: Exception) {
             }
 
             // History
             try {
-                List<HistoryInfo> historyInfoList = oldRoomDatabase.historyDao().list();
-                putHistoryInfo(historyInfoList);
-            } catch (Exception ignored) {
+                val historyInfoList = oldRoomDatabase.historyDao().list()
+                putHistoryInfo(historyInfoList)
+            } catch (ignored: Exception) {
             }
 
             // QuickSearch
             try {
-                List<QuickSearch> quickSearchList = oldRoomDatabase.quickSearchDao().list();
-                List<QuickSearch> currentQuickSearchList = db.quickSearchDao().list();
-                List<QuickSearch> importList = new ArrayList<>();
-                for (QuickSearch quickSearch : quickSearchList) {
-                    String name = quickSearch.getName();
-                    for (QuickSearch q : currentQuickSearchList) {
-                        if (ObjectUtils.equal(q.getName(), name)) {
+                val quickSearchList = oldRoomDatabase.quickSearchDao().list()
+                val currentQuickSearchList = db.quickSearchDao().list()
+                val importList: MutableList<QuickSearch?> = ArrayList()
+                for (quickSearch in quickSearchList) {
+                    var name = quickSearch.name
+                    for ((_, name1) in currentQuickSearchList) {
+                        if (ObjectUtils.equal(name1, name)) {
                             // The same name
-                            name = null;
-                            break;
+                            name = null
+                            break
                         }
                     }
                     if (null == name) {
-                        continue;
+                        continue
                     }
-                    importList.add(quickSearch);
+                    importList.add(quickSearch)
                 }
-                importQuickSearch(importList);
-            } catch (Exception ignored) {
+                importQuickSearch(importList)
+            } catch (ignored: Exception) {
             }
 
             // LocalFavorites
             try {
-                List<LocalFavoriteInfo> localFavoriteInfoList = oldRoomDatabase.localFavoritesDao().list();
-                for (LocalFavoriteInfo info : localFavoriteInfoList) {
-                    putLocalFavorites(info);
+                val localFavoriteInfoList = oldRoomDatabase.localFavoritesDao().list()
+                for (info in localFavoriteInfoList) {
+                    putLocalFavorites(info)
                 }
-            } catch (Exception ignored) {
+            } catch (ignored: Exception) {
             }
 
             // Filter
             try {
-                List<Filter> filterList = oldRoomDatabase.filterDao().list();
-                List<Filter> currentFilterList = db.filterDao().list();
-                for (Filter filter : filterList) {
+                val filterList = oldRoomDatabase.filterDao().list()
+                val currentFilterList = db.filterDao().list()
+                for (filter in filterList) {
                     if (!currentFilterList.contains(filter)) {
-                        addFilter(filter);
+                        addFilter(filter)
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (ignored: Exception) {
             }
 
             // Delete temp database
-            if (oldRoomDatabase.isOpen()) {
-                oldRoomDatabase.close();
+            if (oldRoomDatabase.isOpen) {
+                oldRoomDatabase.close()
             }
-            context.deleteDatabase(tmpDBName);
-
-            return null;
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
+            context.deleteDatabase(tmpDBName)
+            null
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
             // Ignore
-            return context.getString(R.string.cant_read_the_file);
+            context.getString(R.string.cant_read_the_file)
         }
     }
 }

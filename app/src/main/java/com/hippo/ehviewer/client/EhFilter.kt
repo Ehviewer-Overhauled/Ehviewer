@@ -39,7 +39,7 @@ object EhFilter {
     private val TAG = EhFilter::class.java.simpleName
 
     init {
-        val list = EhDB.getAllFilter()
+        val list = EhDB.allFilter
         var i = 0
         val n = list.size
         while (i < n) {
@@ -112,7 +112,7 @@ object EhFilter {
     }
 
     @Synchronized
-    fun triggerFilter(filter: Filter?) {
+    fun triggerFilter(filter: Filter) {
         EhDB.triggerFilter(filter)
     }
 

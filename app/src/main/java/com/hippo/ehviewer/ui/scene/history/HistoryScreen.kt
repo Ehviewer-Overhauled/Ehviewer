@@ -61,7 +61,7 @@ fun HistoryScreen(hostFragment: HistoryComposeScreenFragmentBridge) {
         Pager(
             PagingConfig(20)
         ) {
-            EhDB.getHistoryLazyList()
+            EhDB.historyLazyList
         }.flow
     }.collectAsLazyPagingItems()
 

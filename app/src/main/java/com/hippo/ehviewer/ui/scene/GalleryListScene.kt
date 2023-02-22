@@ -545,7 +545,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             drawerBinding.recyclerViewDrawer.visibility = View.GONE
         }
         lifecycleScope.launchIO {
-            mQuickSearchList = EhDB.getAllQuickSearch()
+            mQuickSearchList = EhDB.allQuickSearch.toMutableList()
             if (mQuickSearchList.isNotEmpty()) {
                 withUIContext {
                     drawerBinding.tip.visibility = View.GONE
