@@ -63,8 +63,8 @@ class PagerConfig(
         readerPreferences.zoomStart()
             .register({ zoomTypeFromPreference(it) }, { imagePropertyChangedListener?.invoke() })
 
-        readerPreferences.cropBorders()
-            .register({ imageCropBorders = it }, { imagePropertyChangedListener?.invoke() })
+        // readerPreferences.cropBorders()
+        //     .register({ imageCropBorders = it }, { imagePropertyChangedListener?.invoke() })
 
         readerPreferences.navigateToPan()
             .register({ navigateToPan = it })

@@ -87,7 +87,6 @@ import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import eu.kanade.tachiyomi.util.preference.toggle
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import eu.kanade.tachiyomi.util.system.isNightMode
@@ -716,12 +715,13 @@ class ReaderActivity : EhActivity() {
                     readerPreferences.defaultReadingMode().set(newReadingMode.flagValue)
                     setGallery()
 
-                    updateCropBordersShortcut()
+                    // updateCropBordersShortcut()
                 }
             }
         }
 
         // Crop borders
+        /*
         with(binding.actionCropBorders) {
             setTooltip(R.string.pref_crop_borders)
 
@@ -742,6 +742,7 @@ class ReaderActivity : EhActivity() {
                     .onEach { updateCropBordersShortcut() }
                     .launchIn(lifecycleScope)
             }
+         */
 
         // Rotation
         with(binding.actionRotation) {
@@ -782,6 +783,7 @@ class ReaderActivity : EhActivity() {
         binding.actionRotation.setImageResource(orientation.iconRes)
     }
 
+    /*
     private fun updateCropBordersShortcut() {
         val isPagerType = ReadingModeType.isPagerType(readerPreferences.defaultReadingMode().get())
         val enabled = if (isPagerType) {
@@ -798,6 +800,7 @@ class ReaderActivity : EhActivity() {
             },
         )
     }
+     */
 
 
     /**
