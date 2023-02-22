@@ -85,7 +85,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.preference.toggle
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
@@ -95,6 +94,7 @@ import eu.kanade.tachiyomi.util.view.copy
 import eu.kanade.tachiyomi.util.view.popupMenu
 import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -109,7 +109,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.math.abs
@@ -212,7 +211,7 @@ class ReaderActivity : EhActivity() {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show()
                 }
 
-                val continuation: AtomicReference<Continuation<String>?> = AtomicReference(null)
+                val continuation = atomic<StringResumeable?>(null)
                 mGalleryProvider = ArchivePageLoader(this, mUri!!,
                     flow {
                         if (!dialogShown) {
@@ -225,7 +224,7 @@ class ReaderActivity : EhActivity() {
                                         if (passwd.isEmpty())
                                             builder.setError(getString(R.string.passwd_cannot_be_empty))
                                         else {
-                                            continuation.get()?.resume(passwd)
+                                            continuation.getAndSet(null)?.resume(passwd)
                                         }
                                     }
                                     setOnCancelListener {
@@ -237,7 +236,7 @@ class ReaderActivity : EhActivity() {
                         while (true) {
                             currentCoroutineContext().ensureActive()
                             val r = suspendCancellableCoroutine {
-                                continuation.set(it)
+                                continuation.value = it
                                 it.invokeOnCancellation { dialog.dismiss() }
                             }
                             emit(r)
@@ -1147,3 +1146,5 @@ class ReaderActivity : EhActivity() {
         }
     }
 }
+
+typealias StringResumeable = Continuation<String>
