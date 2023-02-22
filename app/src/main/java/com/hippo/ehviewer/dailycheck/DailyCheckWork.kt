@@ -86,6 +86,7 @@ private val whenToWork
 
 private val initialDelay
     get() = Duration.between(LocalDateTime.now(), whenToWork)
+        .run { if (isNegative) plusDays(1) else this }
 
 private fun getDailyCheckWorkRequest(): PeriodicWorkRequest {
     val constraints = Constraints.Builder()
