@@ -13,8 +13,9 @@
 
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 
-# Ktor logger
--dontwarn org.slf4j.impl.StaticLoggerBinder
+-keepclasseswithmembernames class eu.kanade.tachiyomi.ui.reader.ReaderActivity {
+    ** continuation;
+}
 
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
