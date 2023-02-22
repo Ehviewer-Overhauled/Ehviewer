@@ -37,6 +37,8 @@ import com.hippo.yorozuya.collect.LongList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.LinkedList
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 object DownloadManager : OnSpiderListener {
     // All download info list
@@ -92,14 +94,20 @@ object DownloadManager : OnSpiderListener {
             allInfoMap.put(info.gid, info)
 
             // Add to each label list
-            var list = getInfoListForLabel(info.label)
-            if (list == null) {
-                // Can't find the label in label list
-                list = LinkedList()
-                map[info.label] = list
-                if (!containLabel(info.label)) {
+            val label = info.label
+
+            val list = getInfoListForLabel(label) ?: LinkedList<DownloadInfo>().also {
+                /* Contracts says if [getInfoListForLabel] return null, the param [label] is not null
+                 * [label] is local immutable
+                 * Why [label] is not smart casted to [String!] here ???
+                 *
+                 * TODO: Report it to kotlin compiler team
+                 */
+                label!!
+                map[info.label] = it
+                if (!containLabel(label)) {
                     // Add label to DB and list
-                    labels.add(EhDB.addDownloadLabel(info.label))
+                    labels.add(EhDB.addDownloadLabel(label))
                 }
             }
             list.add(info)
@@ -109,7 +117,11 @@ object DownloadManager : OnSpiderListener {
         mDownloadInfoListeners = ArrayList()
     }
 
+    @OptIn(ExperimentalContracts::class)
     private fun getInfoListForLabel(label: String?): LinkedList<DownloadInfo>? {
+        contract {
+            returns(null) implies (label != null)
+        }
         return if (label == null) {
             mDefaultInfoList
         } else {
@@ -342,7 +354,7 @@ object DownloadManager : OnSpiderListener {
                 mMap[info.label] = list
                 if (!containLabel(info.label)) {
                     // Add label to DB and list
-                    mLabelList.add(EhDB.addDownloadLabel(info.label))
+                    mLabelList.add(EhDB.addDownloadLabel(info.label!!))
                 }
             }
             list.add(info)

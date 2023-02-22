@@ -49,16 +49,10 @@ object EhDB {
     // Fix state
     @get:Synchronized
     val allDownloadInfo: List<DownloadInfo>
-        get() {
-            val dao = db.downloadsDao()
-            val list = dao.list()
-            // Fix state
-            for (info in list) {
-                if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
-                    info.state = DownloadInfo.STATE_NONE
-                }
+        get() = db.downloadsDao().list().onEach {
+            if (it.state == DownloadInfo.STATE_WAIT || it.state == DownloadInfo.STATE_DOWNLOAD) {
+                it.state = DownloadInfo.STATE_NONE
             }
-            return list
         }
 
     @Synchronized
@@ -67,16 +61,14 @@ object EhDB {
         dao.update(downloadInfos)
     }
 
-    // Insert or update
     @Synchronized
     fun putDownloadInfo(downloadInfo: DownloadInfo) {
-        val dao = db.downloadsDao()
-        if (null != dao.load(downloadInfo.gid)) {
-            // Update
-            dao.update(downloadInfo)
-        } else {
-            // Insert
-            dao.insert(downloadInfo)
+        db.downloadsDao().run {
+            if (load(downloadInfo.gid) != null) {
+                update(downloadInfo)
+            } else {
+                insert(downloadInfo)
+            }
         }
     }
 
@@ -92,20 +84,15 @@ object EhDB {
         return raw?.dirname
     }
 
-    /**
-     * Insert or update
-     */
     @Synchronized
     fun putDownloadDirname(gid: Long, dirname: String?) {
         val dao = db.downloadDirnameDao()
         var raw = dao.load(gid)
-        if (raw != null) { // Update
+        if (raw != null) {
             raw.dirname = dirname
             dao.update(raw)
-        } else { // Insert
-            raw = DownloadDirname()
-            raw.gid = gid
-            raw.dirname = dirname
+        } else {
+            raw = DownloadDirname(gid, dirname)
             dao.insert(raw)
         }
     }
@@ -124,13 +111,10 @@ object EhDB {
 
     @get:Synchronized
     val allDownloadLabelList: List<DownloadLabel>
-        get() {
-            val dao = db.downloadLabelDao()
-            return dao.list()
-        }
+        get() = db.downloadLabelDao().list()
 
     @Synchronized
-    fun addDownloadLabel(label: String?): DownloadLabel {
+    fun addDownloadLabel(label: String): DownloadLabel {
         val dao = db.downloadLabelDao()
         val raw = DownloadLabel()
         raw.label = label
