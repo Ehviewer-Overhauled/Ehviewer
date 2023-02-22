@@ -320,6 +320,7 @@ class ReaderActivity : EhActivity() {
     }
 
     fun setGallery() {
+        if (mGalleryProvider?.isReady != true) return
         // TODO: Not well place to call it
         dialog.dismiss()
 

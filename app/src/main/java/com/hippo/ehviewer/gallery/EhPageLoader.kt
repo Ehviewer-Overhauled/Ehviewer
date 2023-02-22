@@ -100,6 +100,9 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         return mSpiderQueen.awaitReady()
     }
 
+    override val isReady: Boolean
+        get() = mSpiderQueen.isReady
+
     override fun onCancelRequest(index: Int) {
         mSpiderQueen.cancelRequest(index)
     }

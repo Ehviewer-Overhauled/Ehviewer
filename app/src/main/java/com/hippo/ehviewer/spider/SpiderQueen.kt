@@ -166,7 +166,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private var downloadMode = false
-    private val isReady
+    val isReady
         get() = this::mSpiderInfo.isInitialized && this::mPageStateArray.isInitialized
 
     @Synchronized
