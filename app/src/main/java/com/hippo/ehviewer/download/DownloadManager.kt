@@ -101,6 +101,7 @@ object DownloadManager : OnSpiderListener {
                  * Why [label] is not smart casted to [String!] here ???
                  *
                  * TODO: Report it to kotlin compiler team
+                 *  https://youtrack.jetbrains.com/issue/KT-56869
                  */
                 label!!
                 map[info.label] = it
