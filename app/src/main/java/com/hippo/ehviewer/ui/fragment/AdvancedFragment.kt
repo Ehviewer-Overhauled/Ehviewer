@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.fragment
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -41,10 +40,11 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.util.ExceptionUtils
-import com.hippo.util.IoThreadPoolExecutor
 import com.hippo.util.LogCat
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.IOUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -79,10 +79,9 @@ class AdvancedFragment : BasePreferenceFragment() {
                     .setCancelable(false)
                     .setView(R.layout.preference_dialog_task)
                     .show()
-                IoThreadPoolExecutor.getInstance().execute {
+                lifecycleScope.launchIO {
                     val success = EhDB.exportDB(requireActivity(), uri)
-                    val activity: Activity? = activity
-                    activity?.runOnUiThread {
+                    withUIContext {
                         if (alertDialog.isShowing) {
                             alertDialog.dismiss()
                         }
@@ -204,10 +203,9 @@ class AdvancedFragment : BasePreferenceFragment() {
                     .setCancelable(false)
                     .setView(R.layout.preference_dialog_task)
                     .show()
-                IoThreadPoolExecutor.getInstance().execute {
+                lifecycleScope.launchIO {
                     val error = EhDB.importDB(requireActivity(), uri)
-                    val activity: Activity? = activity
-                    activity?.runOnUiThread {
+                    withUIContext {
                         if (alertDialog.isShowing) {
                             alertDialog.dismiss()
                         }
