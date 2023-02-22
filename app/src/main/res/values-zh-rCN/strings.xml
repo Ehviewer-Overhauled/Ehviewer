@@ -426,6 +426,7 @@
     <string name="proxy_port">端口</string>
     <string name="proxy_invalid_port">无效的端口</string>
     <string name="cant_read_the_file">无法读取文件</string>
+    <string name="db_version_too_low">数据库版本过低</string>
     <string name="db_version_too_high">数据库版本过高</string>
     <string name="app_language_system">系统语言（默认）</string>
     <!-- License -->

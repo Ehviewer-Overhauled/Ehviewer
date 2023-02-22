@@ -57,47 +57,7 @@ import java.util.List;
 
 public class EhDB {
     private static final int CUR_DB_VER = 4;
-
     private static final EhDatabase db = EhApplication.getEhDatabase();
-
-    private static void upgradeDB(SQLiteDatabase db, int oldVersion) {
-        switch (oldVersion) {
-            case 1: // 1 to 2, add FILTER
-                db.execSQL("CREATE TABLE IF NOT EXISTS \"FILTER\" (" + //
-                        "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                        "\"MODE\" INTEGER NOT NULL ," + // 1: mode
-                        "\"TEXT\" TEXT," + // 2: text
-                        "\"ENABLE\" INTEGER);"); // 3: enable
-            case 2: // 2 to 3, add ENABLE column to table FILTER
-                db.execSQL("CREATE TABLE " + "\"FILTER2\" (" +
-                        "\"_id\" INTEGER PRIMARY KEY ," +
-                        "\"MODE\" INTEGER NOT NULL ," +
-                        "\"TEXT\" TEXT," +
-                        "\"ENABLE\" INTEGER);");
-                db.execSQL("INSERT INTO \"FILTER2\" (" +
-                        "_id, MODE, TEXT, ENABLE)" +
-                        "SELECT _id, MODE, TEXT, 1 FROM FILTER;");
-                db.execSQL("DROP TABLE FILTER");
-                db.execSQL("ALTER TABLE FILTER2 RENAME TO FILTER");
-            case 3: // 3 to 4, add PAGE_FROM and PAGE_TO column to QUICK_SEARCH
-                db.execSQL("CREATE TABLE " + "\"QUICK_SEARCH2\" (" +
-                        "\"_id\" INTEGER PRIMARY KEY ," +
-                        "\"NAME\" TEXT," +
-                        "\"MODE\" INTEGER NOT NULL ," +
-                        "\"CATEGORY\" INTEGER NOT NULL ," +
-                        "\"KEYWORD\" TEXT," +
-                        "\"ADVANCE_SEARCH\" INTEGER NOT NULL ," +
-                        "\"MIN_RATING\" INTEGER NOT NULL ," +
-                        "\"PAGE_FROM\" INTEGER NOT NULL ," +
-                        "\"PAGE_TO\" INTEGER NOT NULL ," +
-                        "\"TIME\" INTEGER NOT NULL );");
-                db.execSQL("INSERT INTO \"QUICK_SEARCH2\" (" +
-                        "_id, NAME, MODE, CATEGORY, KEYWORD, ADVANCE_SEARCH, MIN_RATING, PAGE_FROM, PAGE_TO, TIME)" +
-                        "SELECT _id, NAME, MODE, CATEGORY, KEYWORD, ADVANCE_SEARCH, MIN_RATING, -1, -1, TIME FROM QUICK_SEARCH;");
-                db.execSQL("DROP TABLE QUICK_SEARCH");
-                db.execSQL("ALTER TABLE QUICK_SEARCH2 RENAME TO QUICK_SEARCH");
-        }
-    }
 
     public static synchronized List<DownloadInfo> getAllDownloadInfo() {
         DownloadsDao dao = db.downloadsDao();
@@ -488,8 +448,7 @@ public class EhDB {
             int newVersion = CUR_DB_VER;
             int oldVersion = oldDB.getVersion();
             if (oldVersion < newVersion) {
-                upgradeDB(oldDB, oldVersion);
-                oldDB.setVersion(newVersion);
+                return context.getString(R.string.db_version_too_low);
             } else if (oldVersion > newVersion) {
                 return context.getString(R.string.db_version_too_high);
             }
