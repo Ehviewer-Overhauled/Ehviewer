@@ -37,6 +37,7 @@
         android:entries="@array/webtoon_side_padding"
         app:title="@string/pref_webtoon_side_padding" />
 
+    <!--
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/crop_borders_webtoon"
         android:layout_width="match_parent"
@@ -45,6 +46,7 @@
         android:paddingVertical="16dp"
         android:text="@string/pref_crop_borders"
         android:textColor="?android:attr/textColorSecondary" />
+        -->
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/tapping_prefs_group"

@@ -125,12 +125,13 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/viewer"
                     android:padding="@dimen/screen_edge_margin"
-                    app:layout_constraintEnd_toStartOf="@id/action_crop_borders"
+                    app:layout_constraintEnd_toStartOf="@id/action_rotation"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_reader_default_24dp"
                     app:tint="?attr/colorOnSurface" />
 
+                <!--
                 <ImageButton
                     android:id="@+id/action_crop_borders"
                     android:layout_width="wrap_content"
@@ -143,6 +144,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_crop_24dp"
                     app:tint="?attr/colorOnSurface" />
+                    -->
 
                 <ImageButton
                     android:id="@+id/action_rotation"
@@ -152,7 +154,7 @@
                     android:contentDescription="@string/pref_rotation_type"
                     android:padding="@dimen/screen_edge_margin"
                     app:layout_constraintEnd_toStartOf="@id/action_settings"
-                    app:layout_constraintStart_toEndOf="@+id/action_crop_borders"
+                    app:layout_constraintStart_toEndOf="@+id/action_reading_mode"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_screen_rotation_24dp"
                     app:tint="?attr/colorOnSurface" />

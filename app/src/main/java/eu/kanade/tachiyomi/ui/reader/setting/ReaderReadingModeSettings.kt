@@ -100,7 +100,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         binding.pagerPrefsGroup.landscapeZoom.bindToPreference(readerPreferences.landscapeZoom())
 
         binding.pagerPrefsGroup.zoomStart.bindToPreference(readerPreferences.zoomStart(), 1)
-        binding.pagerPrefsGroup.cropBorders.bindToPreference(readerPreferences.cropBorders())
+        // binding.pagerPrefsGroup.cropBorders.bindToPreference(readerPreferences.cropBorders())
     }
 
     /**
@@ -119,7 +119,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         readerPreferences.navigationModeWebtoon()
             .asHotFlow { binding.webtoonPrefsGroup.tappingInverted.isVisible = it != 5 }
             .launchIn((context as ReaderActivity).lifecycleScope)
-        binding.webtoonPrefsGroup.cropBordersWebtoon.bindToPreference(readerPreferences.cropBordersWebtoon())
+        // binding.webtoonPrefsGroup.cropBordersWebtoon.bindToPreference(readerPreferences.cropBordersWebtoon())
         binding.webtoonPrefsGroup.webtoonSidePadding.bindToIntPreference(
             readerPreferences.webtoonSidePadding(),
             R.array.webtoon_side_padding_values

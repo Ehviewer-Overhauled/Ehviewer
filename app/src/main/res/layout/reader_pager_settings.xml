@@ -62,6 +62,7 @@
         android:entries="@array/zoom_start"
         app:title="@string/pref_zoom_start" />
 
+    <!--
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/crop_borders"
         android:layout_width="match_parent"
@@ -70,6 +71,7 @@
         android:paddingVertical="16dp"
         android:text="@string/pref_crop_borders"
         android:textColor="?android:attr/textColorSecondary" />
+        -->
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/tapping_prefs_group"
