@@ -225,7 +225,7 @@ class ReaderActivity : EhActivity() {
                                         if (passwd.isEmpty())
                                             builder.setError(getString(R.string.passwd_cannot_be_empty))
                                         else {
-                                            continuation.get()?.resume(passwd)
+                                            continuation.getAndSet(null)?.resume(passwd)
                                         }
                                     }
                                     setOnCancelListener {
