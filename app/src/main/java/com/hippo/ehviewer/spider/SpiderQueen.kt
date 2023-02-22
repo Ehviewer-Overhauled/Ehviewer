@@ -42,6 +42,7 @@ import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,7 +58,6 @@ import kotlinx.coroutines.sync.withPermit
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.executeAsync
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineScope {
     override val coroutineContext = Dispatchers.IO + Job()
@@ -69,8 +69,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     val mSpiderDen: SpiderDen = SpiderDen(galleryInfo)
     val mPagePercentMap = ConcurrentHashMap<Int, Float>()
     private val mPageStateLock = Any()
-    private val mDownloadedPages = AtomicInteger(0)
-    private val mFinishedPages = AtomicInteger(0)
+    private val mDownloadedPages = atomic(0)
+    private val mFinishedPages = atomic(0)
     private val mPageErrorMap = ConcurrentHashMap<Int, String>()
     private val mSpiderListeners: MutableList<OnSpiderListener> = ArrayList()
 
@@ -115,8 +115,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             mSpiderListeners.forEach {
                 it.onPageSuccess(
                     index,
-                    mFinishedPages.get(),
-                    mDownloadedPages.get(),
+                    mFinishedPages.value,
+                    mDownloadedPages.value,
                     mPageStateArray.size
                 )
             }
@@ -129,8 +129,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 it.onPageFailure(
                     index,
                     error,
-                    mFinishedPages.get(),
-                    mDownloadedPages.get(),
+                    mFinishedPages.value,
+                    mDownloadedPages.value,
                     mPageStateArray.size
                 )
             }
@@ -141,8 +141,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         synchronized(mSpiderListeners) {
             mSpiderListeners.forEach {
                 it.onFinish(
-                    mFinishedPages.get(),
-                    mDownloadedPages.get(),
+                    mFinishedPages.value,
+                    mDownloadedPages.value,
                     mPageStateArray.size
                 )
             }
@@ -471,7 +471,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         } else if (state == STATE_FINISHED) {
             notifyPageSuccess(index)
         }
-        if (mDownloadedPages.get() == size) notifyAllPageDownloaded()
+        if (mDownloadedPages.value == size) notifyAllPageDownloaded()
     }
 
     @IntDef(MODE_READ, MODE_DOWNLOAD)
