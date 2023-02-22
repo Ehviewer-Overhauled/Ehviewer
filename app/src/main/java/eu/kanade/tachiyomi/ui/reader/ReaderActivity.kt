@@ -192,6 +192,8 @@ class ReaderActivity : EhActivity() {
             return EhUrl.getGalleryDetailUrl(gid, token, 0, false)
         }
 
+    private val continuation = atomic<StringResumeable?>(null)
+
     private fun buildProvider() {
         if (mGalleryProvider != null) {
             return
@@ -211,7 +213,6 @@ class ReaderActivity : EhActivity() {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show()
                 }
 
-                val continuation = atomic<StringResumeable?>(null)
                 mGalleryProvider = ArchivePageLoader(this, mUri!!,
                     flow {
                         if (!dialogShown) {
