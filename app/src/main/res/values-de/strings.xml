@@ -288,8 +288,8 @@
     <string name="settings_download_media_scan">Medienscan erlauben</string>
     <string name="settings_download_media_scan_summary_on">Du solltest deine Galerie-Apps verstecken</string>
     <string name="settings_download_media_scan_summary_off">Meisten Galerie-Apps ignorieren die Bilder im Downloadpfad</string>
-    <string name="settings_download_multi_thread_download">Multi-Thread-Download</string>
-    <string name="settings_download_multi_thread_download_summary">Bis zu %s Bild(er)</string>
+    <string name="settings_download_concurrency">Multi-Thread-Download</string>
+    <string name="settings_download_concurrency_summary">Bis zu %s Bild(er)</string>
     <string name="settings_download_preload_image">Bilder vorabladen</string>
     <string name="settings_download_preload_image_summary">Die nächste %s Bilder vorabladen</string>
     <string name="settings_download_image_resolution">Auflösung der Bilder</string>

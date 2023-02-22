@@ -308,8 +308,8 @@
     <string name="settings_download_media_scan">Permitir escaneo de medios</string>
     <string name="settings_download_media_scan_summary_on">Las galerías de imágenes mostrarán los doujinshis/mangas descargados. ¡Cuidado con prestar tu móvil o tablet!</string>
     <string name="settings_download_media_scan_summary_off">Las de galería de imágenes no mostrarán los doujinshis/mangas descargados</string>
-    <string name="settings_download_multi_thread_download">Multi-hilos al descargar</string>
-    <string name="settings_download_multi_thread_download_summary">Máximo de %s imágenes</string>
+    <string name="settings_download_concurrency">Multi-hilos al descargar</string>
+    <string name="settings_download_concurrency_summary">Máximo de %s imágenes</string>
     <string name="settings_download_preload_image">Precargar imagen</string>
     <string name="settings_download_preload_image_summary">Precargar las siguientes %s imágenes</string>
     <string name="settings_download_image_resolution">Resolución de la imagen</string>

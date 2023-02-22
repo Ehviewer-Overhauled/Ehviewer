@@ -355,8 +355,8 @@
     <string name="settings_download_download_location">下载路径</string>
     <string name="settings_download_invalid_download_location">无效的下载路径</string>
     <string name="settings_download_cant_get_download_location">无法获取下载路径</string>
-    <string name="settings_download_multi_thread_download">下载线程数</string>
-    <string name="settings_download_multi_thread_download_summary">最多同时下载 %s 张图片</string>
+    <string name="settings_download_concurrency">并发下载数</string>
+    <string name="settings_download_concurrency_summary">最多同时下载 %s 张图片</string>
     <string name="settings_download_preload_image">预载图片</string>
     <string name="settings_download_preload_image_summary">向后预载 %s 张图片</string>
     <string name="settings_download_image_resolution">图片分辨率</string>

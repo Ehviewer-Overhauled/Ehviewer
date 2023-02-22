@@ -341,8 +341,8 @@
     <string name="settings_download_media_scan">การอนุญาตให้สแกนสื่อ</string>
     <string name="settings_download_media_scan_summary_on">โปรดซ่อนแอปแกลเลอรี่หรือแอปดูรูปในเครื่องของคุณจากคนอื่นด้วย</string>
     <string name="settings_download_media_scan_summary_off">แอปแกลเลอรี่ส่วนใหญ่จะข้ามการสแกนรูปภาพในแหล่งดาวน์โหลด</string>
-    <string name="settings_download_multi_thread_download">ดาวน์โหลดแบบหลายเธด</string>
-    <string name="settings_download_multi_thread_download_summary">โหลดถึง %s ภาพ</string>
+    <string name="settings_download_concurrency">ดาวน์โหลดแบบหลายเธด</string>
+    <string name="settings_download_concurrency_summary">โหลดถึง %s ภาพ</string>
     <string name="settings_download_preload_image">โหลดภาพล่วงหน้า</string>
     <string name="settings_download_preload_image_summary">โหลดภาพล่วงหน้าไป %s ภาพ</string>
     <string name="settings_download_image_resolution">ความละเอียดของภาพ</string>

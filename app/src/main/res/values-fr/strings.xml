@@ -346,8 +346,8 @@
     <string name="settings_download_media_scan">Permettre le scannage multimédia</string>
     <string name="settings_download_media_scan_summary_on">Ne montrez jamais vos applications galerie à personne</string>
     <string name="settings_download_media_scan_summary_off">La plupart d\'applications galerie ignorent les images dans le chemin de téléchargement</string>
-    <string name="settings_download_multi_thread_download">Téléchargement multi-thread</string>
-    <string name="settings_download_multi_thread_download_summary">Jusqu\'à %s image(s)</string>
+    <string name="settings_download_concurrency">Téléchargement multi-thread</string>
+    <string name="settings_download_concurrency_summary">Jusqu\'à %s image(s)</string>
     <string name="settings_download_preload_image">Charger les images d\'avance</string>
     <string name="settings_download_preload_image_summary">Charger les prochaine %s images</string>
     <string name="settings_download_image_resolution">Resolution d\'image</string>

@@ -343,8 +343,8 @@
     <string name="settings_download_download_location">ダウンロードパス</string>
     <string name="settings_download_invalid_download_location">無効なダウンロードパス</string>
     <string name="settings_download_cant_get_download_location">ダウンロードパスを取得できない</string>
-    <string name="settings_download_multi_thread_download">ダウンロードスレッド数</string>
-    <string name="settings_download_multi_thread_download_summary">同時に最大%s枚の画像をダウンロードできる</string>
+    <string name="settings_download_concurrency">ダウンロードスレッド数</string>
+    <string name="settings_download_concurrency_summary">同時に最大%s枚の画像をダウンロードできる</string>
     <string name="settings_download_preload_image">画像をプリロード</string>
     <string name="settings_download_preload_image_summary">%s枚の画像をプリロードします</string>
     <string name="settings_download_image_resolution">画像解像度</string>

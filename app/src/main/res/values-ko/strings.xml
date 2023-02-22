@@ -326,8 +326,8 @@
     <string name="settings_download_media_scan">미디어 스캔 허용</string>
     <string name="settings_download_media_scan_summary_on">다른 사람들에게 갤러리 앱을 들키지 마세요.</string>
     <string name="settings_download_media_scan_summary_off">대부분의 갤러리 앱에서 다운로드 경로에 있는 사진을 무시합니다.</string>
-    <string name="settings_download_multi_thread_download">다중 스레드 다운로드</string>
-    <string name="settings_download_multi_thread_download_summary">%s개 이미지까지</string>
+    <string name="settings_download_concurrency">다중 스레드 다운로드</string>
+    <string name="settings_download_concurrency_summary">%s개 이미지까지</string>
     <string name="settings_download_preload_image">이미지 미리 불러오기</string>
     <string name="settings_download_preload_image_summary">다음 %s개 이미지를 미리 불러옴</string>
     <string name="settings_download_image_resolution">이미지 해상도</string>

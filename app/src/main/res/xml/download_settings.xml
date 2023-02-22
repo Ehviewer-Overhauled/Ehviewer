@@ -33,8 +33,8 @@
     <rikka.preference.SimpleMenuPreference
         android:defaultValue="3"
         android:key="download_thread"
-        android:summary="@string/settings_download_multi_thread_download_summary"
-        android:title="@string/settings_download_multi_thread_download"
+        android:summary="@string/settings_download_concurrency_summary"
+        android:title="@string/settings_download_concurrency"
         app:entries="@array/multi_thread_download_entries"
         app:entryValues="@array/multi_thread_download_entry_values"
         app:iconSpaceReserved="false" />
