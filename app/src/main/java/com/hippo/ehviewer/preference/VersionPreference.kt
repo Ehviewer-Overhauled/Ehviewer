@@ -16,9 +16,9 @@
 package com.hippo.ehviewer.preference
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.AttributeSet
 import androidx.preference.Preference
+import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 
 class VersionPreference @JvmOverloads constructor(
@@ -26,13 +26,6 @@ class VersionPreference @JvmOverloads constructor(
 ) : Preference(context, attrs) {
     init {
         setTitle(R.string.settings_about_version)
-        @Suppress("DEPRECATION") val version: String = try {
-            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            pInfo.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            context.getString(R.string.error_unknown)
-        }
-        summary = version
+        summary = BuildConfig.VERSION_NAME
     }
 }
