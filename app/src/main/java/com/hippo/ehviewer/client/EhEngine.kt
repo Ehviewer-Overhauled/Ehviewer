@@ -30,6 +30,7 @@ import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.ArchiveParser
+import com.hippo.ehviewer.client.parser.EventPaneParser
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.client.parser.ForumsParser
 import com.hippo.ehviewer.client.parser.GalleryApiParser
@@ -832,6 +833,30 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 return HomeParser.parseResetLimits(body!!)
+            }
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            transformException(code, headers, body, e)
+            throw e
+        }
+    }
+
+    @Throws(Throwable::class)
+    suspend fun getNews(parse: Boolean): String? {
+        val url = EhUrl.URL_NEWS
+        val referer = EhUrl.REFERER_E
+        Log.d(TAG, url)
+        val request = EhRequestBuilder(url, referer).build()
+        val call = okHttpClient.newCall(request)
+        var body: String? = null
+        var headers: Headers? = null
+        var code = -1
+        try {
+            call.executeAsync().use { response ->
+                code = response.code
+                headers = response.headers
+                body = response.body.string()
+                return if (parse) EventPaneParser.parse(body!!) else null
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)

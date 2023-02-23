@@ -183,7 +183,10 @@ object EhCookieStore : CookieJar {
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
         for (cookie in cookies) {
-            addCookie(cookie)
+            // See https://github.com/Ehviewer-Overhauled/Ehviewer/issues/873
+            if (cookie.name != "__utmp") {
+                addCookie(cookie)
+            }
         }
     }
 

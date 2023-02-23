@@ -7,19 +7,18 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhRequestBuilder
-import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.client.parser.EventPaneParser
+import com.hippo.ehviewer.client.EhEngine
+import eu.kanade.tachiyomi.util.lang.withIOContext
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -29,24 +28,17 @@ private val signedIn
 private const val CHANNEL_ID = "DailyCheckNotification"
 
 class DailyCheckWork(val context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
-    override fun doWork(): Result {
+    CoroutineWorker(context, workerParams) {
+    override suspend fun doWork(): Result = withIOContext {
         runCatching {
             if (signedIn) {
-                val referer = EhUrl.REFERER_E
-                val request = EhRequestBuilder(EhUrl.HOST_E + "news.php", referer).build()
-                val call = EhApplication.okHttpClient.newCall(request)
-                call.execute().use { response ->
-                    val responseBody = response.body
-                    val body = responseBody.string()
-                    EventPaneParser.parse(body)?.let { showEventPane(it) }
-                }
+                EhEngine.getNews(true)?.let { showEventPane(it) }
             }
         }.onFailure {
             it.printStackTrace()
-            return Result.retry()
+            return@withIOContext Result.retry()
         }
-        return Result.success()
+        Result.success()
     }
 
     @SuppressLint("MissingPermission")
