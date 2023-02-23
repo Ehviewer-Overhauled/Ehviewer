@@ -252,7 +252,7 @@ class WebtoonPageHolder(
             errorLayout = ReaderErrorBinding.inflate(LayoutInflater.from(context), frame, true)
             errorLayout?.root?.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, defaultHeight)
             errorLayout?.actionRetry?.setOnClickListener {
-                viewer.activity.mGalleryProvider?.retryPage(page!!)
+                viewer.activity.mGalleryProvider?.retryPage(page!!.index)
             }
         }
         page?.errorMsg?.let { errorLayout!!.errorMessage.text = it }
