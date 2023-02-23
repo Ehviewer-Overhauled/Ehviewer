@@ -61,7 +61,7 @@ class ReaderPageSheet(
     }
 
     private fun refresh() {
-        activity.mGalleryProvider?.retryPage(page)
+        activity.mGalleryProvider?.retryPage(page.index)
         dismiss()
     }
 }

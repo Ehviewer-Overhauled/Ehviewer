@@ -9,17 +9,17 @@ import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.widget.ViewPagerAdapter
 
 /**
- * Pager adapter used by this [viewer] to where [ViewerChapters] updates are posted.
+ * Pager adapter used by this [viewer] to where [PageLoader] updates are posted.
  */
 class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
 
     /**
      * List of currently set items.
      */
-    var items: MutableList<Any> = mutableListOf()
+    var items: List<ReaderPage> = emptyList()
         private set
 
-    var currentChapter: PageLoader? = null
+    private var currentChapter: PageLoader? = null
 
     /**
      * Context that has been wrapped to use the correct theme values based on the
@@ -33,11 +33,11 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      * has R2L direction.
      */
     fun setChapters(chapters: PageLoader) {
-        items = chapters.mPages.toMutableList()
+        items = chapters.mPages
         currentChapter = chapters
 
         if (viewer is R2LPagerViewer) {
-            items.reverse()
+            items = items.asReversed()
         }
 
         notifyDataSetChanged()
@@ -54,16 +54,14 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      * Creates a new view for the item at the given [position].
      */
     override fun createView(container: ViewGroup, position: Int): View {
-        currentChapter?.request(items[position] as ReaderPage)
-        return when (val item = items[position]) {
-            is ReaderPage -> PagerPageHolder(readerThemedContext, viewer, item)
-            else -> throw NotImplementedError("Holder for ${item.javaClass} not implemented")
-        }
+        val item = items[position]
+        currentChapter?.request(item.index)
+        return PagerPageHolder(readerThemedContext, viewer, item)
     }
 
     override fun destroyView(container: ViewGroup, position: Int, view: View) {
         val item = items[position]
-        currentChapter?.cancelRequest(item as ReaderPage)
+        currentChapter?.cancelRequest(item.index)
     }
 
     /**

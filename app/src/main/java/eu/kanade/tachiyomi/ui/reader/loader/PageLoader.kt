@@ -34,13 +34,12 @@ abstract class PageLoader {
 
     abstract val size: Int
 
-    fun request(page: ReaderPage) {
-        val index = mPages.indexOf(page)
+    fun request(index: Int) {
         val image = mImageCache[index]
         if (image != null) {
             notifyPageSucceed(index, image)
         } else {
-            page.status.value = Page.State.QUEUE
+            notifyPageWait(index)
             onRequest(index)
         }
 
@@ -55,9 +54,9 @@ abstract class PageLoader {
         )
     }
 
-    fun retryPage(page: ReaderPage) {
-        page.status.value = Page.State.QUEUE
-        onForceRequest(mPages.indexOf(page))
+    fun retryPage(index: Int) {
+        notifyPageWait(index)
+        onForceRequest(index)
     }
 
     protected abstract fun preloadPages(pages: List<Int>, pair: Pair<Int, Int>)
@@ -66,8 +65,8 @@ abstract class PageLoader {
 
     protected abstract fun onForceRequest(index: Int)
 
-    fun cancelRequest(page: ReaderPage) {
-        onCancelRequest(mPages.indexOf(page))
+    fun cancelRequest(index: Int) {
+        onCancelRequest(index)
     }
 
     protected abstract fun onCancelRequest(index: Int)
