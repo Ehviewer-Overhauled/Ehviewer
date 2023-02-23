@@ -1914,20 +1914,20 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
         val scaleHeight = scale * sHeight
         when (panLimit) {
             PAN_LIMIT_CENTER -> {
-                vTarget.top = -(vTranslate!!.y - height / 2).coerceAtLeast(0F)
-                vTarget.left = -(vTranslate!!.x - width / 2).coerceAtLeast(0F)
+                vTarget.top = (-(vTranslate!!.y - height / 2)).coerceAtLeast(0F)
+                vTarget.left = (-(vTranslate!!.x - width / 2)).coerceAtLeast(0F)
                 vTarget.bottom = (vTranslate!!.y - (height / 2 - scaleHeight)).coerceAtLeast(0F)
                 vTarget.right = (vTranslate!!.x - (width / 2 - scaleWidth)).coerceAtLeast(0F)
             }
             PAN_LIMIT_OUTSIDE -> {
-                vTarget.top = -(vTranslate!!.y - height).coerceAtLeast(0F)
-                vTarget.left = -(vTranslate!!.x - width).coerceAtLeast(0F)
+                vTarget.top = (-(vTranslate!!.y - height)).coerceAtLeast(0F)
+                vTarget.left = (-(vTranslate!!.x - width)).coerceAtLeast(0F)
                 vTarget.bottom = (vTranslate!!.y + scaleHeight).coerceAtLeast(0F)
                 vTarget.right = (vTranslate!!.x + scaleWidth).coerceAtLeast(0F)
             }
             else -> {
-                vTarget.top = -vTranslate!!.y.coerceAtLeast(0F)
-                vTarget.left = -vTranslate!!.x.coerceAtLeast(0F)
+                vTarget.top = (-vTranslate!!.y).coerceAtLeast(0F)
+                vTarget.left = (-vTranslate!!.x).coerceAtLeast(0F)
                 vTarget.bottom = (scaleHeight + vTranslate!!.y - height).coerceAtLeast(0F)
                 vTarget.right = (scaleWidth + vTranslate!!.x - width).coerceAtLeast(0F)
             }
