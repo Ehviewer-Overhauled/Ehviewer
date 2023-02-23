@@ -388,6 +388,8 @@ object EhDB {
                 }
             }
             return true
+        }.onFailure {
+            it.printStackTrace()
         }
         return false
     }
