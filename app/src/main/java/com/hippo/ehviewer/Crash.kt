@@ -15,11 +15,8 @@
  */
 package com.hippo.ehviewer
 
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Debug
-import com.hippo.util.PackageUtils
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IOUtils
@@ -31,45 +28,32 @@ import java.io.PrintWriter
 import java.util.Arrays
 
 object Crash {
-    private fun avoidNull(str: String?): String {
-        return str ?: "null"
-    }
 
     @Throws(IOException::class)
-    private fun collectInfo(context: Context, fw: FileWriter) {
-        try {
-            val pm = context.packageManager
-            val pi = pm.getPackageInfo(context.packageName, PackageManager.GET_ACTIVITIES)
-            if (pi != null) {
-                val versionName = if (pi.versionName == null) "null" else pi.versionName
-                val versionCode = pi.versionCode.toString()
-                fw.write("======== PackageInfo ========\r\n")
-                fw.write("PackageName=")
-                fw.write(pi.packageName)
-                fw.write("\r\n")
-                fw.write("VersionName=")
-                fw.write(versionName)
-                fw.write("\r\n")
-                fw.write("VersionCode=")
-                fw.write(versionCode)
-                fw.write("\r\n")
-                val signature = PackageUtils.getSignature(context, pi.packageName)
-                fw.write("Signature=")
-                fw.write(signature ?: "null")
-                fw.write("\r\n")
-                fw.write("\r\n")
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            fw.write("======== PackageInfo ========\r\n")
-            fw.write("Can't get package information\r\n")
-            fw.write("\r\n")
-        }
+    private fun collectInfo(fw: FileWriter) {
+        fw.write("======== PackageInfo ========\r\n")
+        fw.write("PackageName=")
+        fw.write(BuildConfig.APPLICATION_ID)
+        fw.write("\r\n")
+        fw.write("VersionName=")
+        fw.write(BuildConfig.VERSION_NAME)
+        fw.write("\r\n")
+        fw.write("VersionCode=")
+        fw.write(BuildConfig.VERSION_CODE)
+        fw.write("\r\n")
+        fw.write("CommitSha=")
+        fw.write(BuildConfig.COMMIT_SHA)
+        fw.write("\r\n")
+        fw.write("BuildTime=")
+        fw.write(BuildConfig.BUILD_TIME)
+        fw.write("\r\n")
+        fw.write("\r\n")
 
         // Runtime
-        val topActivityClazzName = "null"
+        val topActivityClazzName = EhApplication.application.topActivity?.javaClass?.name
         fw.write("======== Runtime ========\r\n")
         fw.write("TopActivity=")
-        fw.write(avoidNull(topActivityClazzName))
+        fw.write(topActivityClazzName ?: "null")
         fw.write("\r\n")
         fw.write("\r\n")
         fw.write("\r\n")
@@ -134,7 +118,7 @@ object Crash {
         fw.write(Build.VERSION.RELEASE)
         fw.write("\r\n")
         fw.write("SDK=")
-        fw.write(Integer.toString(Build.VERSION.SDK_INT))
+        fw.write(Build.VERSION.SDK_INT.toString())
         fw.write("\r\n")
         fw.write("MEMORY=")
         fw.write(
@@ -163,7 +147,7 @@ object Crash {
         }
     }
 
-    fun saveCrashLog(context: Context, t: Throwable) {
+    fun saveCrashLog(t: Throwable) {
         val dir = AppConfig.getExternalCrashDir() ?: return
         val nowString = ReadableTime.getFilenamableTime(System.currentTimeMillis())
         val fileName = "crash-$nowString.log"
@@ -175,7 +159,7 @@ object Crash {
             fw.write(nowString)
             fw.write("\r\n")
             fw.write("\r\n")
-            collectInfo(context, fw)
+            collectInfo(fw)
             fw.write("======== CrashInfo ========\r\n")
             getThrowableInfo(t, fw)
             fw.write("\r\n")

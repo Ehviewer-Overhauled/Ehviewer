@@ -469,6 +469,7 @@
     <string name="settings_about_latest_release">Latest release</string>
     <string name="settings_about_source">Source</string>
     <string name="settings_about_version">Build version</string>
+    <string name="settings_about_build_time">Built at %s</string>
     <string name="settings_about_check_for_updates">Check for updates</string>
     <string name="proxy_direct">Direct</string>
     <string name="proxy_system">System Proxy</string>
