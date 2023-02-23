@@ -26,4 +26,7 @@ object Native {
 
     @JvmStatic
     external fun getFd(fd: FileDescriptor?): Int
+
+    @JvmStatic
+    external fun sendfile(from: Int, to: Int)
 }

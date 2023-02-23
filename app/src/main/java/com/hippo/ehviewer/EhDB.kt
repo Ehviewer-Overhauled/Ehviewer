@@ -18,8 +18,11 @@ package com.hippo.ehviewer
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.paging.PagingSource
 import androidx.room.Room.databaseBuilder
+import com.hippo.Native
 import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.BasicDao
@@ -33,14 +36,9 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.ObjectUtils
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 
 object EhDB {
     private const val CUR_DB_VER = 4
@@ -371,16 +369,11 @@ object EhDB {
     }
 
     @Synchronized
-    fun exportDB(context: Context, uri: Uri?): Boolean {
+    fun exportDB(context: Context, uri: Uri): Boolean {
         val ehExportName = "eh.export.db"
-
-        // Delete old export db
-        context.deleteDatabase(ehExportName)
-        val newDb =
-            databaseBuilder(context, EhDatabase::class.java, ehExportName).allowMainThreadQueries()
-                .build()
-        return try {
-            // Copy data to a export db
+        runCatching {
+            context.deleteDatabase(ehExportName)
+            val newDb = databaseBuilder(context, EhDatabase::class.java, ehExportName).build()
             copyDao(db.downloadsDao(), newDb.downloadsDao())
             copyDao(db.downloadLabelDao(), newDb.downloadLabelDao())
             copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao())
@@ -388,36 +381,15 @@ object EhDB {
             copyDao(db.quickSearchDao(), newDb.quickSearchDao())
             copyDao(db.localFavoritesDao(), newDb.localFavoritesDao())
             copyDao(db.filterDao(), newDb.filterDao())
-
-            // Close export db so we can copy it
-            if (newDb.isOpen) {
-                newDb.close()
-            }
-
-            // Copy export db to data dir
             val dbFile = context.getDatabasePath(ehExportName)
-            if (dbFile == null || !dbFile.isFile) {
-                return false
+            context.contentResolver.openFileDescriptor(uri, "rw")!!.use { toFd ->
+                ParcelFileDescriptor.open(dbFile, MODE_READ_ONLY).use { fromFd ->
+                    Native.sendfile(fromFd.fd, toFd.fd)
+                }
             }
-            var `is`: InputStream? = null
-            var os: OutputStream? = null
-            try {
-                `is` = FileInputStream(dbFile)
-                os = context.contentResolver.openOutputStream(uri!!)
-                IOUtils.copy(`is`, os)
-                return true
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                IOUtils.closeQuietly(`is`)
-                IOUtils.closeQuietly(os)
-            }
-
-            // Delete failed file
-            false
-        } finally {
-            context.deleteDatabase(ehExportName)
+            return true
         }
+        return false
     }
 
     /**

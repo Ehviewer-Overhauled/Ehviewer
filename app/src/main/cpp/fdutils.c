@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
 
 #include <android/log.h>
 #include <string.h>
@@ -24,4 +26,11 @@ Java_com_hippo_Native_getFd(JNIEnv *env, jclass clazz, jobject fileDescriptor) {
     }
 
     return fd;
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_Native_sendfile(JNIEnv *env, jclass clazz, jint from, jint to) {
+    struct stat st;
+    fstat(from, &st);
+    sendfile(to, from, 0, st.st_size);
 }
