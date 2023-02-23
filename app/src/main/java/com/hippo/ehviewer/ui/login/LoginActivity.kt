@@ -78,6 +78,10 @@ suspend fun postLogin() = coroutineScope {
     }
     launch {
         runCatching {
+            // For the `star` cookie
+            EhEngine.getNews(false)
+
+            // Sad panda check
             Settings.putGallerySite(EhUrl.SITE_EX)
             EhEngine.getUConfig()
         }.onFailure {
