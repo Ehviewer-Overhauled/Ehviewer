@@ -10,6 +10,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.hippo.ehviewer.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -199,7 +200,7 @@ class WebtoonPageHolder(
         frame.setImage(drawable,
             ReaderPageImageView.Config(
             zoomDuration = viewer.config.doubleTapAnimDuration,
-            minimumScaleType = 0,
+            minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
             cropBorders = viewer.config.imageCropBorders,
         ),)
     }
