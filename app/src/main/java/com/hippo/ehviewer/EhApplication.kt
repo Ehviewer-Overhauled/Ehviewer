@@ -76,7 +76,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
                 if (Settings.getSaveCrashLog()) {
-                    Crash.saveCrashLog(application, e)
+                    Crash.saveCrashLog(e)
                 }
             } catch (ignored: Throwable) {
             }

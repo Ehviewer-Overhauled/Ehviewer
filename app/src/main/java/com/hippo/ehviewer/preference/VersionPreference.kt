@@ -26,6 +26,7 @@ class VersionPreference @JvmOverloads constructor(
 ) : Preference(context, attrs) {
     init {
         setTitle(R.string.settings_about_version)
-        summary = BuildConfig.VERSION_NAME
+        summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.COMMIT_SHA})\n" +
+                context.getString(R.string.settings_about_build_time, BuildConfig.BUILD_TIME)
     }
 }

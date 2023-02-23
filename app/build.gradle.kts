@@ -1,3 +1,8 @@
+import java.io.ByteArrayOutputStream
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -30,6 +35,20 @@ android {
         enableV4Signing = true
     }
 
+    val commitSha by lazy {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine = "git rev-parse --short=7 HEAD".split(' ')
+            standardOutput = stdout
+        }
+        stdout.toString().trim()
+    }
+
+    val buildTime by lazy {
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(ZoneOffset.UTC)
+        formatter.format(Instant.now())
+    }
+
     defaultConfig {
         applicationId = "moe.tarsin.ehviewer"
         minSdk = 28
@@ -52,6 +71,8 @@ android {
                 "nb-rNO"
             )
         )
+        buildConfigField("String", "COMMIT_SHA", "\"$commitSha\"")
+        buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
     }
 
     externalNativeBuild {
@@ -74,7 +95,6 @@ android {
             "-opt-in=coil.annotation.ExperimentalCoilApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
