@@ -1,15 +1,8 @@
 package com.davemorrissey.labs.subscaleview
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.net.Uri
-import com.davemorrissey.labs.subscaleview.provider.AssetInputProvider
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
-import com.davemorrissey.labs.subscaleview.provider.OpenStreamProvider
-import com.davemorrissey.labs.subscaleview.provider.ResourceInputProvider
-import com.davemorrissey.labs.subscaleview.provider.UriInputProvider
-import java.io.InputStream
 
 /**
  * Helper class used to set the source and additional attributes from a variety of sources. Supports
@@ -84,38 +77,6 @@ class ImageSource {
 
     companion object {
         /**
-         * Create an instance from a resource. The correct resource for the device screen resolution will be used.
-         *
-         * @param resId resource ID.
-         * @return an [ImageSource] instance.
-         */
-        @JvmStatic
-        fun resource(context: Context, resId: Int): ImageSource {
-            return ImageSource(ResourceInputProvider(context, resId))
-        }
-
-        /**
-         * Create an instance from an asset name.
-         *
-         * @param assetName asset name.
-         * @return an [ImageSource] instance.
-         */
-        @JvmStatic
-        fun asset(context: Context, assetName: String): ImageSource {
-            return ImageSource(AssetInputProvider(context, assetName))
-        }
-
-        /**
-         * Create an instance from a URI.
-         *
-         * @param uri image URI.
-         * @return an [ImageSource] instance.
-         */
-        fun uri(context: Context, uri: Uri): ImageSource {
-            return ImageSource(UriInputProvider(context, uri))
-        }
-
-        /**
          * Create an instance from an input provider.
          *
          * @param provider input stream provider.
@@ -123,16 +84,6 @@ class ImageSource {
          */
         fun provider(provider: InputProvider): ImageSource {
             return ImageSource(provider)
-        }
-
-        /**
-         * Create an instance from an input stream.
-         *
-         * @param stream open input stream.
-         * @return an [ImageSource] instance.
-         */
-        fun inputStream(stream: InputStream): ImageSource {
-            return ImageSource(OpenStreamProvider(stream))
         }
 
         /**

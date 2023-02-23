@@ -4,10 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
-import kotlin.Throws
-import com.davemorrissey.labs.subscaleview.provider.InputProvider
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import java.lang.Exception
+import com.davemorrissey.labs.subscaleview.provider.InputProvider
 
 class ImageDecoder @JvmOverloads constructor(
     private val cropBorders: Boolean,

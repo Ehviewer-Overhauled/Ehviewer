@@ -19,12 +19,9 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.AnyThread
 import androidx.annotation.IntDef
-import com.davemorrissey.labs.subscaleview.ImageSource.Companion.asset
-import com.davemorrissey.labs.subscaleview.ImageSource.Companion.resource
 import com.davemorrissey.labs.subscaleview.decoder.Decoder
 import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
-import com.hippo.ehviewer.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -303,42 +300,6 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
         setMinimumDpi(160)
         setDoubleTapZoomDpi(160)
         setGestureDetector(context)
-
-        // Handle XML attributes
-        if (attr != null) {
-            val typedAttr = getContext().obtainStyledAttributes(attr, R.styleable.SubsamplingScaleImageView)
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_assetName)) {
-                val assetName = typedAttr.getString(R.styleable.SubsamplingScaleImageView_assetName)
-                if (assetName != null && assetName.isNotEmpty()) {
-                    setImage(asset(context, assetName))
-                }
-            }
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_src)) {
-                val resId = typedAttr.getResourceId(R.styleable.SubsamplingScaleImageView_src, 0)
-                if (resId > 0) {
-                    setImage(resource(context, resId))
-                }
-            }
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_panEnabled)) {
-                setPanEnabled(typedAttr.getBoolean(R.styleable.SubsamplingScaleImageView_panEnabled, true))
-            }
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_zoomEnabled)) {
-                isZoomEnabled = typedAttr.getBoolean(R.styleable.SubsamplingScaleImageView_zoomEnabled, true)
-            }
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_quickScaleEnabled)) {
-                isQuickScaleEnabled =
-                    typedAttr.getBoolean(R.styleable.SubsamplingScaleImageView_quickScaleEnabled, true)
-            }
-            if (typedAttr.hasValue(R.styleable.SubsamplingScaleImageView_tileBackgroundColor)) {
-                setTileBackgroundColor(
-                    typedAttr.getColor(
-                        R.styleable.SubsamplingScaleImageView_tileBackgroundColor,
-                        Color.argb(0, 0, 0, 0)
-                    )
-                )
-            }
-            typedAttr.recycle()
-        }
         quickScaleThreshold =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20F, context.resources.displayMetrics)
     }
