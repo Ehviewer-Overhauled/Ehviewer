@@ -102,8 +102,7 @@ open class LoadImageView @JvmOverloads constructor(
         var newDrawable = drawable
         if (newDrawable != null) {
             if (Integer.MIN_VALUE != mOffsetX) {
-                newDrawable =
-                    PreciselyClipDrawable(drawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
+                newDrawable = PreciselyClipDrawable(newDrawable, mOffsetX, mOffsetY, mClipWidth, mClipHeight)
             }
             onPreSetImageDrawable(newDrawable, true)
         }
