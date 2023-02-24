@@ -17,14 +17,12 @@
  * EhViewer. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <pthread.h>
 #include <sys/mman.h>
-#include <syscall.h>
 
 #include <jni.h>
 #include <android/log.h>
@@ -187,7 +185,6 @@ static int archive_alloc_ctx(archive_ctx **ctxptr) {
 }
 
 static int archive_skip_to_index(archive_ctx *ctx, int index) {
-    assert(!(ctx->next_index > index));
     while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK) {
         if (!filename_is_playable_file(archive_entry_pathname(ctx->entry)))
             continue;
@@ -339,13 +336,13 @@ Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz,
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     void *buffer = MEMPOOL_ADDR_BY_SORTED_IDX(index);
+    size_t size = entries[index].size;
     index = entries[index].index;
     archive_ctx *ctx = NULL;
     int ret;
     ret = archive_get_ctx(&ctx, index);
     if (ret)
         return 0;
-    long long size = archive_entry_size(ctx->entry);
     mlock(buffer, PAGE_ALIGN(size));
     ret = archive_read_data(ctx->arc, buffer, size);
     ctx->using = 0;
