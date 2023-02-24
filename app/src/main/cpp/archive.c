@@ -58,6 +58,7 @@ static size_t *mempoolofs = NULL;
 
 #define MEMPOOL_ADDR_BY_SORTED_IDX(x) (mempool + (index ? mempoolofs[index - 1] : 0))
 #define MEMPOOL_SIZE (mempoolofs[entryCount - 1])
+#define MEMPOOL_ENTITY_SIZE(x) PAGE_ALIGN(entries[x].size)
 
 #define PROT_RW (PROT_WRITE | PROT_READ)
 #define MAP_ANON_POOL (MAP_ANONYMOUS | MAP_NORESERVE | MAP_PRIVATE)
@@ -134,6 +135,25 @@ static bool archive_prealloc_mempool() {
     }
     return true;
 }
+
+
+// Mincore does not support anon mapping yet
+// Now that we use MADV_FREE, how can we detect whether pages is reclaimed?
+static bool is_mempool_pages_present_and_lock(int index) {
+    void *addr = MEMPOOL_ADDR_BY_SORTED_IDX(index);
+    size_t size = MEMPOOL_ENTITY_SIZE(index);
+    mlock(addr, size);
+#if 0
+    unsigned char vec[size / PAGE_SIZE];
+    unsigned char r = 1;
+    mincore(addr, size, vec);
+    for (int i = 0; i < size / PAGE_SIZE; ++i) r &= vec[i];
+    return r;
+#endif
+    return false;
+}
+
+#define MEMPOOL_IN_CORE_AND_LOCK(x) is_mempool_pages_present_and_lock(x)
 
 static long archive_list_all_entries(archive_ctx *ctx) {
     long count = 0;
@@ -335,24 +355,27 @@ JNIEXPORT jobject JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
-    void *buffer = MEMPOOL_ADDR_BY_SORTED_IDX(index);
+    void *addr = MEMPOOL_ADDR_BY_SORTED_IDX(index);
     size_t size = entries[index].size;
-    index = entries[index].index;
-    archive_ctx *ctx = NULL;
-    int ret;
-    ret = archive_get_ctx(&ctx, index);
-    if (ret)
-        return 0;
-    mlock(buffer, PAGE_ALIGN(size));
-    ret = archive_read_data(ctx->arc, buffer, size);
-    ctx->using = 0;
-    if (ret == size)
-        return (*env)->NewDirectByteBuffer(env, buffer, size);
-    if (ret != size)
-        LOGE("%s", "No enough data read, WTF?");
-    if (ret < 0)
-        LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-    free(buffer);
+    if (!MEMPOOL_IN_CORE_AND_LOCK(index)) {
+        index = entries[index].index;
+        archive_ctx *ctx = NULL;
+        int ret;
+        ret = archive_get_ctx(&ctx, index);
+        if (ret) return 0;
+        ret = archive_read_data(ctx->arc, addr, size);
+        ctx->using = 0;
+        if (ret == size)
+            return (*env)->NewDirectByteBuffer(env, addr, size);
+        if (ret != size)
+            LOGE("%s", "No enough data read, WTF?");
+        if (ret < 0)
+            LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
+        munlock(addr, size);
+        madvise(addr, size, MADV_FREE);
+    } else {
+        return (*env)->NewDirectByteBuffer(env, addr, size);
+    }
     return 0;
 }
 
