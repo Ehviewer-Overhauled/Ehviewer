@@ -42,3 +42,7 @@ infix fun ParcelFileDescriptor.receivefrom(fd: FileDescriptor) {
 infix fun ParcelFileDescriptor.copyTo(fd: FileDescriptor) {
     Native.sendfile(getFd(), fd.fd)
 }
+
+infix fun ParcelFileDescriptor.copyTo(fd: ParcelFileDescriptor) {
+    Native.sendfile(getFd(), fd.fd)
+}

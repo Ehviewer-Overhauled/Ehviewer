@@ -16,7 +16,6 @@
 package com.hippo.ehviewer
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
@@ -35,10 +34,6 @@ import com.hippo.ehviewer.dao.HistoryInfo
 import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.ObjectUtils
-import java.io.File
-import java.io.FileOutputStream
 
 object EhDB {
     private const val CUR_DB_VER = 4
@@ -398,128 +393,67 @@ object EhDB {
      * @return error string, null for no error
      */
     @Synchronized
-    fun importDB(context: Context, uri: Uri?): String? {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(uri!!)
-
-            // Copy file to cache dir
-            val file = File.createTempFile("importDatabase", "")
-            val outputStream = FileOutputStream(file)
-            val buff = ByteArray(1024)
-            var read: Int
-            if (inputStream != null) {
-                while (inputStream.read(buff, 0, buff.size).also { read = it } > 0) {
-                    outputStream.write(buff, 0, read)
-                }
-            } else {
-                return context.getString(R.string.cant_read_the_file)
-            }
-            inputStream.close()
-            outputStream.close()
-
-            // Check database version
-            val oldDB = SQLiteDatabase.openDatabase(
-                file.path, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS
-            )
-            val newVersion = CUR_DB_VER
-            val oldVersion = oldDB.version
-            if (oldVersion < newVersion) {
-                return context.getString(R.string.db_version_too_low)
-            } else if (oldVersion > newVersion) {
-                return context.getString(R.string.db_version_too_high)
-            }
-
-            // Crete temp room database from cache file
-            val tmpDBName = "tmp.db"
-            context.deleteDatabase(tmpDBName)
-            val oldRoomDatabase = databaseBuilder(context, EhDatabase::class.java, tmpDBName)
-                .createFromFile(file).allowMainThreadQueries().build()
+    fun importDB(context: Context, uri: Uri): String? {
+        runCatching {
+            val oldDB = databaseBuilder(context, EhDatabase::class.java, "tmp.db")
+                .createFromInputStream { context.contentResolver.openInputStream(uri) }.build()
 
             // Download label
             val manager = DownloadManager
-            try {
-                val downloadLabelList = oldRoomDatabase.downloadLabelDao().list()
+            runCatching {
+                val downloadLabelList = oldDB.downloadLabelDao().list()
                 manager.addDownloadLabel(downloadLabelList)
-            } catch (ignored: Exception) {
             }
 
             // Downloads
-            try {
-                val downloadInfoList = oldRoomDatabase.downloadsDao().list()
+            runCatching {
+                val downloadInfoList = oldDB.downloadsDao().list()
                 manager.addDownload(downloadInfoList, false)
-            } catch (ignored: Exception) {
             }
 
             // Download dirname
-            try {
-                val downloadDirnameList = oldRoomDatabase.downloadDirnameDao().list()
-                for ((gid, dirname1) in downloadDirnameList) {
-                    putDownloadDirname(gid, dirname1)
+            runCatching {
+                oldDB.downloadDirnameDao().list().forEach {
+                    putDownloadDirname(it.gid, it.dirname)
                 }
-            } catch (ignored: Exception) {
             }
 
             // History
-            try {
-                val historyInfoList = oldRoomDatabase.historyDao().list()
+            runCatching {
+                val historyInfoList = oldDB.historyDao().list()
                 putHistoryInfo(historyInfoList)
-            } catch (ignored: Exception) {
             }
 
             // QuickSearch
-            try {
-                val quickSearchList = oldRoomDatabase.quickSearchDao().list()
+            runCatching {
+                val quickSearchList = oldDB.quickSearchDao().list()
                 val currentQuickSearchList = db.quickSearchDao().list()
-                val importList: MutableList<QuickSearch?> = ArrayList()
-                for (quickSearch in quickSearchList) {
-                    var name = quickSearch.name
-                    for ((_, name1) in currentQuickSearchList) {
-                        if (ObjectUtils.equal(name1, name)) {
-                            // The same name
-                            name = null
-                            break
-                        }
-                    }
-                    if (null == name) {
-                        continue
-                    }
-                    importList.add(quickSearch)
+                val importList = quickSearchList.mapNotNull { newQS ->
+                    newQS.takeIf { currentQuickSearchList.find { it.name == newQS.name } == null }
                 }
                 importQuickSearch(importList)
-            } catch (ignored: Exception) {
             }
 
             // LocalFavorites
-            try {
-                val localFavoriteInfoList = oldRoomDatabase.localFavoritesDao().list()
-                for (info in localFavoriteInfoList) {
-                    putLocalFavorites(info)
+            runCatching {
+                oldDB.localFavoritesDao().list().forEach {
+                    putLocalFavorites(it)
                 }
-            } catch (ignored: Exception) {
             }
 
             // Filter
-            try {
-                val filterList = oldRoomDatabase.filterDao().list()
+            runCatching {
+                val filterList = oldDB.filterDao().list()
                 val currentFilterList = db.filterDao().list()
-                for (filter in filterList) {
-                    if (!currentFilterList.contains(filter)) {
-                        addFilter(filter)
-                    }
+                filterList.forEach {
+                    if (it !in currentFilterList) addFilter(it)
                 }
-            } catch (ignored: Exception) {
             }
-
-            // Delete temp database
-            if (oldRoomDatabase.isOpen) {
-                oldRoomDatabase.close()
-            }
-            context.deleteDatabase(tmpDBName)
-            null
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            // Ignore
-            context.getString(R.string.cant_read_the_file)
+            oldDB.close()
+        }.onFailure {
+            it.printStackTrace()
+            return context.getString(R.string.cant_read_the_file)
         }
+        return null
     }
 }
