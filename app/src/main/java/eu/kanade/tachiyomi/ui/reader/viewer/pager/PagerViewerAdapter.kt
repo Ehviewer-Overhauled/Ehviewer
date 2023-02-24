@@ -39,8 +39,6 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
         if (viewer is R2LPagerViewer) {
             items = items.asReversed()
         }
-
-        notifyDataSetChanged()
     }
 
     /**
@@ -60,7 +58,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
     }
 
     override fun destroyView(container: ViewGroup, position: Int, view: View) {
-        val item = items[position]
+        val item = (view as PagerPageHolder).item
         currentChapter?.cancelRequest(item.index)
     }
 
