@@ -32,6 +32,7 @@
 
 #define LOG_TAG "libarchive_wrapper"
 
+#include "natsort/strnatcmp.h"
 #include "ehviewer.h"
 
 typedef struct {
@@ -96,9 +97,7 @@ static inline int filename_is_playable_file(const char *name) {
 static inline int compare_entries(const void *a, const void *b) {
     const char *fa = ((entry *) a)->filename;
     const char *fb = ((entry *) b)->filename;
-    int a_len = (int) strlen(fa);
-    int b_len = (int) strlen(fb);
-    return a_len == b_len ? strcmp(fa, fb) : a_len - b_len;
+    return strnatcmp(fa, fb);
 }
 
 static long archive_map_entries_index(archive_ctx *ctx) {
