@@ -46,11 +46,23 @@ typedef struct {
 typedef struct {
     const char *filename;
     int index;
+    size_t size;
 } entry;
 
 pthread_mutex_t ctx_lock;
 static archive_ctx **ctx_pool;
 #define CTX_POOL_SIZE 20
+
+static void *mempool = NULL;
+static size_t *mempoolofs = NULL;
+
+#define PAGE_ALIGN(x) ((x + ~PAGE_MASK) & PAGE_MASK)
+
+#define MEMPOOL_ADDR_BY_SORTED_IDX(x) (mempool + (index ? mempoolofs[index - 1] : 0))
+#define MEMPOOL_SIZE (mempoolofs[entryCount - 1])
+
+#define PROT_RW (PROT_WRITE | PROT_READ)
+#define MAP_ANON_POOL (MAP_ANONYMOUS | MAP_NORESERVE | MAP_PRIVATE)
 
 static bool need_encrypt = false;
 static char *passwd = NULL;
@@ -99,6 +111,7 @@ static long archive_map_entries_index(archive_ctx *ctx) {
         if (filename_is_playable_file(name)) {
             entries[count].filename = strdup(name);
             entries[count].index = count;
+            entries[count].size = archive_entry_size(ctx->entry);
             count++;
         }
     }
@@ -106,6 +119,22 @@ static long archive_map_entries_index(archive_ctx *ctx) {
         LOGE("%s", archive_error_string(ctx->arc));
     qsort(entries, entryCount, sizeof(entry), compare_entries);
     return count;
+}
+
+static bool archive_prealloc_mempool() {
+    mempoolofs = calloc(entryCount, sizeof(size_t));
+    for (int i = 0; i < entryCount; ++i) {
+        if (!i)
+            mempoolofs[i] = PAGE_ALIGN(entries[i].size);
+        else
+            mempoolofs[i] = PAGE_ALIGN(entries[i].size) + mempoolofs[i - 1];
+    }
+    mempool = mmap(0, MEMPOOL_SIZE, PROT_RW, MAP_ANON_POOL, -1, 0);
+    if (mempool == MAP_FAILED) {
+        LOGE("%s%s", "mmap failed with error ", strerror(errno));
+        return false;
+    }
+    return true;
 }
 
 static long archive_list_all_entries(archive_ctx *ctx) {
@@ -255,7 +284,7 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
         LOGE("%s%s", "Archive open failed:", archive_error_string(ctx->arc));
     } else {
         entryCount = archive_list_all_entries(ctx);
-        LOGI("%s%ld%s", "Found ", r, " image entries in archive");
+        LOGI("%s%zu%s", "Found ", entryCount, " image entries in archive");
 
         // We must read through the file|vm then we can know whether it is encrypted
         int encryptRet = archive_read_has_encrypted_entries(ctx->arc);
@@ -292,6 +321,13 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
     } else {
         entries = calloc(entryCount, sizeof(entry));
         r = archive_map_entries_index(ctx);
+        if (!archive_prealloc_mempool()) {
+            r = 0;
+            for (int i = 0; i < entryCount; ++i) {
+                free((void *) entries[i].filename);
+            }
+            free(entries);
+        }
     }
 
     archive_release_ctx(ctx);
@@ -302,6 +338,7 @@ JNIEXPORT jobject JNICALL
 Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
+    void *buffer = MEMPOOL_ADDR_BY_SORTED_IDX(index);
     index = entries[index].index;
     archive_ctx *ctx = NULL;
     int ret;
@@ -309,12 +346,7 @@ Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz,
     if (ret)
         return 0;
     long long size = archive_entry_size(ctx->entry);
-    void *buffer = malloc(size);
-    if (!buffer) {
-        ctx->using = 0;
-        LOGE("Allocate buffer for decompression failed:ENOMEM");
-        return 0;
-    }
+    mlock(buffer, PAGE_ALIGN(size));
     ret = archive_read_data(ctx->arc, buffer, size);
     ctx->using = 0;
     if (ret == size)
@@ -339,6 +371,8 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
     passwd = NULL;
     need_encrypt = false;
     munmap(archiveAddr, archiveSize);
+    munmap(mempool, MEMPOOL_SIZE);
+    free(mempoolofs);
     for (int i = 0; i < entryCount; ++i) {
         free((void *) entries[i].filename);
     }
@@ -415,5 +449,8 @@ JNIEXPORT void JNICALL
 Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, jobject buffer) {
     EH_UNUSED(thiz);
     void *addr = (*env)->GetDirectBufferAddress(env, buffer);
-    free(addr);
+    size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
+    size = PAGE_ALIGN(size);
+    munlock(addr, size);
+    madvise(addr, size, MADV_FREE);
 }
