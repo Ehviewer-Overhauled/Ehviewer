@@ -15,6 +15,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.util.TypedValue
 import android.view.Display
 import android.view.View
@@ -255,7 +256,6 @@ fun Context.createReaderThemeContext(): Context {
     TODO()
 }
 
-fun logcat(block: () -> String) {
-    return
-    TODO()
+inline fun Any.logcat(priority: Int = Log.DEBUG, tag: String? = null, message: () -> String) {
+    Log.println(priority, tag ?: javaClass.simpleName, message())
 }
