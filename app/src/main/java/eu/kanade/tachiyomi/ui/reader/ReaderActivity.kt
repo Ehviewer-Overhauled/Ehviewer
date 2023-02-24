@@ -85,7 +85,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
@@ -162,7 +161,6 @@ class ReaderActivity : EhActivity() {
         }
     }
     var mGalleryProvider: PageLoader2? = null
-    private var mSize: Int = 0
     private var mCurrentIndex: Int = 0
     private var mSavingPage = -1
     private lateinit var builder: EditTextDialogBuilder
@@ -192,9 +190,9 @@ class ReaderActivity : EhActivity() {
             return EhUrl.getGalleryDetailUrl(gid, token, 0, false)
         }
 
-    private fun buildProvider() {
+    private fun buildProvider(replace: Boolean = false) {
         if (mGalleryProvider != null) {
-            return
+            if (replace) mGalleryProvider!!.stop() else return
         }
 
         if (ACTION_EH == mAction) {
@@ -250,13 +248,17 @@ class ReaderActivity : EhActivity() {
         }
     }
 
-    private fun onInit() {
-        val intent = intent ?: return
+    private fun handleIntent(intent: Intent?) {
+        intent ?: return
         mAction = intent.action
         mFilename = intent.getStringExtra(KEY_FILENAME)
         mUri = intent.data
         mGalleryInfo = intent.getParcelableExtraCompat(KEY_GALLERY_INFO)
         mPage = intent.getIntExtra(KEY_PAGE, -1)
+    }
+
+    private fun onInit() {
+        handleIntent(intent)
         buildProvider()
     }
 
@@ -268,6 +270,21 @@ class ReaderActivity : EhActivity() {
         mPage = savedInstanceState.getInt(KEY_PAGE, -1)
         mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX)
         buildProvider()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+        buildProvider(true)
+        mGalleryProvider?.let {
+            lifecycleScope.launchIO {
+                it.start()
+                if (it.awaitReady()) withUIContext {
+                    viewer?.setGalleryProvider(it)
+                    moveToPageIndex(0)
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -299,10 +316,6 @@ class ReaderActivity : EhActivity() {
         builder.setPositiveButton(getString(android.R.string.ok), null)
         dialog = builder.create()
         dialog.setCanceledOnTouchOutside(false)
-        if (mGalleryProvider == null) {
-            finish()
-            return
-        }
 
         mGalleryProvider.let {
             if (it == null) {
@@ -325,9 +338,10 @@ class ReaderActivity : EhActivity() {
         dialog.dismiss()
 
         // Get start page
-        if (mCurrentIndex == 0) mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
-        mSize = mGalleryProvider!!.size
-        val viewerMode = ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+        if (mCurrentIndex == 0)
+            mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
+        val viewerMode =
+            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
         viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)

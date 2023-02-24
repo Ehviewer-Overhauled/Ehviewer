@@ -155,6 +155,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      */
     override fun setGalleryProvider(provider: PageLoader) {
         adapter.setChapters(provider)
+        refreshAdapter(0)
 
         if (recycler.isGone) {
             logcat { "Recycler first layout" }
@@ -181,9 +182,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
         val item = adapter.items.getOrNull(position)
         if (item != null && currentPage != item) {
             currentPage = item
-            when (item) {
-                is ReaderPage -> onPageSelected(item)
-            }
+            onPageSelected(item)
         }
     }
 
@@ -265,8 +264,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      * Notifies adapter of changes around the current page to trigger a relayout in the recycler.
      * Used when an image configuration is changed.
      */
-    private fun refreshAdapter() {
-        val position = layoutManager.findLastEndVisibleItemPosition()
+    private fun refreshAdapter(position: Int = layoutManager.findLastEndVisibleItemPosition()) {
         val positionStart = maxOf(0, position - 3)
         val positionEnd = minOf(position + 3, adapter.itemCount - 1)
         adapter.refresh()

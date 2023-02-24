@@ -47,7 +47,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
     /**
      * Currently active item. It can be a chapter page or a chapter transition.
      */
-    private var currentPage: Any? = null
+    private var currentPage: ReaderPage? = null
 
     /**
      * Viewer chapters to set when the pager enters idle mode. Otherwise, if the view was settling
@@ -153,27 +153,14 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
             .firstOrNull { it.item == page }
 
     /**
-     * Called when a new page (either a [ReaderPage] or [ChapterTransition]) is marked as active
+     * Called when a new [ReaderPage] is marked as active
      */
     private fun onPageChange(position: Int) {
         val page = adapter.items.getOrNull(position)
         if (page != null && currentPage != page) {
-            val forward = when {
-                currentPage is ReaderPage && page is ReaderPage -> {
-                    // if both pages have the same number, it's a split page with an InsertPage
-                    if (page.number == (currentPage as ReaderPage).number) {
-                        // the InsertPage is always the second in the reading direction
-                        false
-                    } else {
-                        page.number > (currentPage as ReaderPage).number
-                    }
-                }
-                else -> true
-            }
+            val forward = page.number > (currentPage?.number ?: 0)
             currentPage = page
-            when (page) {
-                is ReaderPage -> onReaderPageSelected(page, forward)
-            }
+            onReaderPageSelected(page, forward)
         }
     }
 
@@ -206,6 +193,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
     private fun setChaptersInternal(chapters: PageLoader) {
         logcat { "setChaptersInternal" }
         adapter.setChapters(chapters)
+        refreshAdapter(0)
 
         // Layout the pager once a chapter is being set
         if (pager.isGone) {
@@ -251,7 +239,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      */
     protected open fun moveRight() {
         if (pager.currentItem != adapter.count - 1) {
-            val holder = (currentPage as? ReaderPage)?.let { getPageHolder(it) }
+            val holder = currentPage?.let { getPageHolder(it) }
             if (holder != null && config.navigateToPan && holder.canPanRight()) {
                 holder.panRight()
             } else {
@@ -265,7 +253,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      */
     protected open fun moveLeft() {
         if (pager.currentItem != 0) {
-            val holder = (currentPage as? ReaderPage)?.let { getPageHolder(it) }
+            val holder = currentPage?.let { getPageHolder(it) }
             if (holder != null && config.navigateToPan && holder.canPanLeft()) {
                 holder.panLeft()
             } else {
@@ -292,8 +280,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Resets the adapter in order to recreate all the views. Used when a image configuration is
      * changed.
      */
-    private fun refreshAdapter() {
-        val currentItem = pager.currentItem
+    private fun refreshAdapter(currentItem: Int = pager.currentItem) {
         adapter.refresh()
         pager.adapter = adapter
         pager.setCurrentItem(currentItem, false)
@@ -318,6 +305,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
                     if (!config.volumeKeysInverted) moveDown() else moveUp()
                 }
             }
+
             KeyEvent.KEYCODE_VOLUME_UP -> {
                 if (!config.volumeKeysEnabled || activity.menuVisible) {
                     return false
@@ -325,16 +313,19 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
                     if (!config.volumeKeysInverted) moveUp() else moveDown()
                 }
             }
+
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
                 if (isUp) {
                     if (ctrlPressed) moveToNext() else moveRight()
                 }
             }
+
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 if (isUp) {
                     if (ctrlPressed) moveToPrevious() else moveLeft()
                 }
             }
+
             KeyEvent.KEYCODE_DPAD_DOWN -> if (isUp) moveDown()
             KeyEvent.KEYCODE_DPAD_UP -> if (isUp) moveUp()
             KeyEvent.KEYCODE_PAGE_DOWN -> if (isUp) moveDown()
