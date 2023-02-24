@@ -152,6 +152,13 @@ static bool is_mempool_pages_present_and_lock(int index) {
 
 #define MEMPOOL_IN_CORE_AND_LOCK(x) is_mempool_pages_present_and_lock(x)
 
+static void mempool_release_pages(void *addr, size_t size) {
+    size = PAGE_ALIGN(size);
+    munlock(addr, size);
+    int ret = madvise(addr, size, MADV_FREE);
+    if (ret == -EINVAL) madvise(addr, size, MADV_DONTNEED);
+}
+
 static long archive_list_all_entries(archive_ctx *ctx) {
     long count = 0;
     while (archive_read_next_header(ctx->arc, &ctx->entry) == ARCHIVE_OK)
@@ -370,8 +377,7 @@ Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz,
             LOGE("%s", "No enough data read, WTF?");
         if (ret < 0)
             LOGE("%s%s", "Archive read failed:", archive_error_string(ctx->arc));
-        munlock(addr, size);
-        madvise(addr, size, MADV_FREE);
+        mempool_release_pages(addr, size);
     } else {
         return (*env)->NewDirectByteBuffer(env, addr, size);
     }
@@ -471,7 +477,5 @@ Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, j
     EH_UNUSED(thiz);
     void *addr = (*env)->GetDirectBufferAddress(env, buffer);
     size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
-    size = PAGE_ALIGN(size);
-    munlock(addr, size);
-    madvise(addr, size, MADV_FREE);
+    mempool_release_pages(addr, size);
 }
