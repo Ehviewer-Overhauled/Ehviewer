@@ -61,7 +61,7 @@ static size_t *mempoolofs = NULL;
 #define MEMPOOL_ENTITY_SIZE(x) PAGE_ALIGN(entries[x].size)
 
 #define PROT_RW (PROT_WRITE | PROT_READ)
-#define MAP_ANON_POOL (MAP_ANONYMOUS | MAP_NORESERVE | MAP_PRIVATE)
+#define MAP_ANON_POOL (MAP_ANONYMOUS | MAP_NORESERVE | MAP_PRIVATE | MAP_UNINITIALIZED)
 
 static bool need_encrypt = false;
 static char *passwd = NULL;
