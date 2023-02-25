@@ -11,13 +11,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import com.hippo.ehviewer.R
 
+private val colorYellow800 = Color(0xfff9a825)
+
 @Composable
 fun SimpleRatingWidget(rating: Float) {
-    val r = (rating * 2).toInt().coerceAtLeast(0).coerceAtMost(10)
+    val r = (rating * 2).toInt().coerceIn(0, 10)
     val fullStar = r.floorDiv(2)
     val halfStar = r % 2
     val outlineStar = 5 - fullStar - halfStar
-    val colorYellow800 = Color(0xfff9a825)
     Row {
         repeat(fullStar) {
             Icon(
