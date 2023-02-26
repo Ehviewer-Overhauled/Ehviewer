@@ -1,6 +1,3 @@
-[submodule "app/src/main/cpp/libarchive"]
-	path = app/src/main/cpp/libarchive
-	url = https://github.com/Ehviewer-Overhauled/libarchive
 [submodule "app/src/main/cpp/nettle/nettle"]
 	path = app/src/main/cpp/nettle/nettle
 	url = https://github.com/Ehviewer-Overhauled/nettle

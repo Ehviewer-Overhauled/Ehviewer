@@ -24,8 +24,6 @@ FetchContent_Declare(liblzma
         GIT_REPOSITORY  https://git.tukaani.org/xz.git
         GIT_TAG         v5.4.1
         PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-other-binarys.patch || true
-        BINARY_DIR      build
-        SUBBUILD_DIR    subbuild
         )
 
 FetchContent_MakeAvailable(liblzma)
@@ -55,10 +53,15 @@ SET(HAVE_LIBLZMADEC 1)
 # Configure libarchive link's static lib
 SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
 
-# Build libarchive
-add_subdirectory(libarchive)
+FetchContent_Declare(libarchive
+        GIT_REPOSITORY  https://github.com/libarchive/libarchive
+        GIT_TAG         v3.6.2
+        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-shared-lib.patch ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || true
+        )
+
+FetchContent_MakeAvailable(libarchive)
+include_directories(${libarchive_SOURCE_DIR}/libarchive)
 
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED archive.c fdutils.c gifutils.c natsort/strnatcmp.c)
-target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
 target_link_libraries(${PROJECT_NAME} archive_static log)
