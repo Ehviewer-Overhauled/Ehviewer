@@ -15,7 +15,8 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 object MergeInterceptor : Interceptor {
-    private val pendingContinuationMap: HashMap<String, MutableList<Continuation<Unit>>> = hashMapOf()
+    private val pendingContinuationMap: HashMap<String, MutableList<Continuation<Unit>>> =
+        hashMapOf()
     private val pendingContinuationMapLock = Mutex()
     private val notifyScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
@@ -23,18 +24,8 @@ object MergeInterceptor : Interceptor {
         val originListener = originRequest.listener
         val key = originRequest.data as String
         val newRequest = ImageRequest.Builder(originRequest).listener(
-            { originListener?.onStart(it) },
-            {
-                originListener?.onCancel(it)
-                notifyScope.launch {
-                    pendingContinuationMapLock.withLock {
-                        // Wake up a pending continuation to continue executing task
-                        val successor = pendingContinuationMap[key]?.removeFirstOrNull()?.apply { resume(Unit) }
-                        // If no successor, delete this entry from hashmap
-                        successor ?: pendingContinuationMap.remove(key)
-                    }
-                }
-            },
+            {},
+            {}, // Only original request's onStart and onCancel will get called
             { request, result ->
                 originListener?.onError(request, result)
                 // Wake all pending continuations since this request is to be failed
@@ -71,5 +62,17 @@ object MergeInterceptor : Interceptor {
         }
 
         return withContext(originRequest.interceptorDispatcher) { chain.proceed(newRequest) }
+    }
+
+    fun onCancel(key: String) {
+        notifyScope.launch {
+            pendingContinuationMapLock.withLock {
+                // Wake up a pending continuation to continue executing task
+                val successor =
+                    pendingContinuationMap[key]?.removeFirstOrNull()?.apply { resume(Unit) }
+                // If no successor, delete this entry from hashmap
+                successor ?: pendingContinuationMap.remove(key)
+            }
+        }
     }
 }
