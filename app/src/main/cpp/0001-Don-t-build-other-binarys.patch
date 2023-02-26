@@ -1,0 +1,34 @@
+From fc9fb0ea245259e346ab46c334f03b557fe63b6b Mon Sep 17 00:00:00 2001
+From: tarsin <yuanqingxiang233@163.com>
+Date: Tue, 22 Nov 2022 12:37:12 +0800
+Subject: [PATCH] Don't build other binarys
+
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 01c73cd..b461e68 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -592,7 +592,7 @@ check_symbol_exists(getopt_long getopt.h HAVE_GETOPT_LONG)
+ # xzdec
+ #############################################################################
+ 
+-if(HAVE_GETOPT_LONG)
++if(0)
+     add_executable(xzdec
+         src/common/sysdefs.h
+         src/common/tuklib_common.h
+@@ -630,7 +630,7 @@ endif()
+ # xz
+ #############################################################################
+ 
+-if(NOT MSVC AND HAVE_GETOPT_LONG)
++if(0)
+     add_executable(xz
+         src/common/mythread.h
+         src/common/sysdefs.h
+-- 
+2.39.2
+

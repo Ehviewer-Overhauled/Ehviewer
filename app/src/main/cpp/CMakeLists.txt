@@ -1,5 +1,6 @@
-project(ehviewer)
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.14)
+project(ehviewer C)
+include(FetchContent)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops -flto=thin \
@@ -15,6 +16,21 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
            -mllvm -polly-invariant-load-hoisting")
 endif (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+# Change the default path of fetch content to avoid downloading the same dependencies per architecture
+get_filename_component(deps "../_deps" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+set(FETCHCONTENT_BASE_DIR ${deps})
+
+FetchContent_Declare(liblzma
+        GIT_REPOSITORY  https://git.tukaani.org/xz.git
+        GIT_TAG         v5.4.1
+        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-other-binarys.patch || true
+        BINARY_DIR      build
+        SUBBUILD_DIR    subbuild
+        )
+
+FetchContent_MakeAvailable(liblzma)
+include_directories(${liblzma_SOURCE_DIR}/src/liblzma/api)
+
 # Build GNUTLS libnettle
 add_subdirectory(nettle)
 
@@ -29,11 +45,7 @@ set(HAVE_NETTLE_PBKDF2_H 1)
 set(HAVE_NETTLE_RIPEMD160_H 1)
 set(HAVE_NETTLE_SHA_H 1)
 
-# Build liblzma
-add_subdirectory(liblzma)
-
 # Configure lzma support for libarchive
-include_directories(liblzma/src/liblzma/api)
 SET(HAVE_LIBLZMA 1)
 SET(HAVE_LZMA_H 1)
 SET(HAVE_LZMA_STREAM_ENCODER_MT 1)
@@ -41,7 +53,7 @@ SET(HAVE_LZMADEC_H 1)
 SET(HAVE_LIBLZMADEC 1)
 
 # Configure libarchive link's static lib
-SET(LIBARCHIVE_CUSTOM_LIBS "liblzma" "nettle")
+SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
 
 # Build libarchive
 add_subdirectory(libarchive)
