@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.util.DebugLogger
 import com.hippo.Native
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
@@ -186,6 +187,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             okHttpClient(okHttpClient)
             components { add(MergeInterceptor) }
             crossfade(300)
+            if (BuildConfig.DEBUG) logger(DebugLogger())
         }.build()
     }
 
