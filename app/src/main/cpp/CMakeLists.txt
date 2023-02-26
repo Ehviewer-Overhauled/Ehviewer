@@ -1,7 +1,8 @@
 project(ehviewer)
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -funroll-loops -flto=thin \
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops -flto=thin \
            -mllvm -polly \
            -mllvm -polly-run-dce \
            -mllvm -polly-run-inliner \
@@ -12,6 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -fvisibility=hidden -fvisibility-inli
            -mllvm -polly-vectorizer=stripmine \
            -mllvm -polly-detect-profitability-min-per-loop-insts=40 \
            -mllvm -polly-invariant-load-hoisting")
+endif (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # Build GNUTLS libnettle
 add_subdirectory(nettle)
@@ -47,4 +49,4 @@ add_subdirectory(libarchive)
 # Build and link our app's native lib
 add_library(${PROJECT_NAME} SHARED archive.c fdutils.c gifutils.c natsort/strnatcmp.c)
 target_include_directories(${PROJECT_NAME} PUBLIC libarchive/libarchive)
-target_link_libraries(${PROJECT_NAME} archive_static log -Wl,--gc-sections)
+target_link_libraries(${PROJECT_NAME} archive_static log)
