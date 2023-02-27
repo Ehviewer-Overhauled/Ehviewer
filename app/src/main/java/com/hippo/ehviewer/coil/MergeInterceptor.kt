@@ -19,6 +19,7 @@ object MergeInterceptor : Interceptor {
     private val pendingContinuationMap: HashMap<String, MutableList<Continuation<Unit>>> = hashMapOf()
     private val pendingContinuationMapLock = Mutex()
     private val notifyScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val EMPTY_LIST = mutableListOf<Continuation<Unit>>()
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
         val originRequest = chain.request
         val originListener = originRequest.listener
@@ -49,10 +50,11 @@ object MergeInterceptor : Interceptor {
         pendingContinuationMapLock.lock()
         val existPendingContinuations = pendingContinuationMap[key]
         if (existPendingContinuations == null) {
-            pendingContinuationMap[key] = mutableListOf()
+            pendingContinuationMap[key] = EMPTY_LIST
             pendingContinuationMapLock.unlock()
         } else {
-            existPendingContinuations.apply {
+            if (existPendingContinuations === EMPTY_LIST) pendingContinuationMap[key] = mutableListOf()
+            pendingContinuationMap[key]!!.apply {
                 suspendCancellableCoroutine { continuation ->
                     add(continuation)
                     pendingContinuationMapLock.unlock()
