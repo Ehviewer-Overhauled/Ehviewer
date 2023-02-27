@@ -27,7 +27,6 @@ import coil.size.Size
 import com.hippo.drawable.PreciselyClipDrawable
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.coil.MergeInterceptor
 
 private val application = EhApplication.application
 private val errorDrawable = AppCompatResources.getDrawable(application, R.drawable.image_failed)
@@ -85,10 +84,7 @@ open class LoadImageView @JvmOverloads constructor(
             if (!crossfade) crossfade(false)
             listener(
                 { setRetry(false) },
-                {
-                    MergeInterceptor.onCancel(url)
-                    setRetry(true)
-                },
+                { setRetry(true) },
                 { _, _ ->
                     super.setImageDrawable(errorDrawable)
                     setRetry(true)
