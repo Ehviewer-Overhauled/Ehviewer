@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.widget
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -37,7 +36,6 @@ import java.util.Locale
 
 private val downloadManager = DownloadManager
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListInfoCard(
     onClick: () -> Unit,
@@ -128,4 +126,3 @@ fun ListInfoCard(
         }
     }
 }
-

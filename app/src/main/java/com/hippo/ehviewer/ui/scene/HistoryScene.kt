@@ -20,10 +20,13 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
+import android.util.AttributeSet
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +38,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.*
@@ -47,11 +51,9 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
-import com.hippo.ehviewer.widget.SimpleRatingView
+import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.view.ViewTransition
-import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -344,18 +346,30 @@ class HistoryScene : BaseToolbarScene() {
         override fun onCancel() {}
     }
 
-    private class HistoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val card: View = itemView.findViewById(R.id.card)
-        val thumb: LoadImageView = itemView.findViewById(R.id.thumb)
-        val title: TextView = itemView.findViewById(R.id.title)
-        val uploader: TextView = itemView.findViewById(R.id.uploader)
-        val rating: SimpleRatingView = itemView.findViewById(R.id.rating)
-        val category: TextView = itemView.findViewById(R.id.category)
-        val posted: TextView = itemView.findViewById(R.id.posted)
-        val simpleLanguage: TextView = itemView.findViewById(R.id.simple_language)
-        val pages: TextView = itemView.findViewById(R.id.pages)
-        val downloaded: ImageView = itemView.findViewById(R.id.downloaded)
-        val favourited: ImageView = itemView.findViewById(R.id.favourited)
+    private class ComposeHolder(val composeView: HistoryCardView) :
+        RecyclerView.ViewHolder(composeView)
+
+    private class HistoryCardView @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+    ) : AbstractComposeView(context, attrs, defStyle) {
+        var galleryInfo by mutableStateOf<GalleryInfo?>(null)
+        var onClick by mutableStateOf({})
+        var onLongClock by mutableStateOf({})
+
+        @Composable
+        override fun Content() {
+            Mdc3Theme {
+                galleryInfo?.let {
+                    ListInfoCard(
+                        onClick,
+                        onLongClock,
+                        it
+                    )
+                }
+            }
+        }
     }
 
     private inner class MoveDialogHelper(
@@ -371,59 +385,18 @@ class HistoryScene : BaseToolbarScene() {
     }
 
     private inner class HistoryAdapter(diffCallback: DiffUtil.ItemCallback<HistoryInfo>) :
-        PagingDataAdapter<HistoryInfo, HistoryHolder>(diffCallback) {
-        private val mInflater: LayoutInflater = layoutInflater
-        private val mListThumbWidth: Int
-        private val mListThumbHeight: Int
+        PagingDataAdapter<HistoryInfo, ComposeHolder>(diffCallback) {
 
-        init {
-            @SuppressLint("InflateParams") val calculator =
-                mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
-            ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
-            mListThumbHeight = calculator.measuredHeight
-            mListThumbWidth = mListThumbHeight * 2 / 3
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComposeHolder {
+            val view = HistoryCardView(requireContext())
+            return ComposeHolder(view)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
-            val holder = HistoryHolder(mInflater.inflate(R.layout.item_history, parent, false))
-            val lp = holder.thumb.layoutParams
-            lp.width = mListThumbWidth
-            lp.height = mListThumbHeight
-            holder.thumb.layoutParams = lp
-            return holder
-        }
-
-        override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
-            val gi: GalleryInfo? = getItem(position)
-            gi ?: return
-            gi.thumb?.let {
-                holder.thumb.load(EhUtils.fixThumbUrl(it))
-            }
-            holder.title.text = EhUtils.getSuitableTitle(gi)
-            holder.uploader.text = gi.uploader
-            holder.rating.rating = gi.rating
-            val category = holder.category
-            val newCategoryText = EhUtils.getCategory(gi.category)
-            if (!newCategoryText.contentEquals(category.text)) {
-                category.text = newCategoryText
-                category.setBackgroundColor(EhUtils.getCategoryColor(gi.category))
-            }
-            holder.posted.text = gi.posted
-            holder.pages.text = null
-            holder.pages.visibility = View.GONE
-            if (TextUtils.isEmpty(gi.simpleLanguage)) {
-                holder.simpleLanguage.text = null
-                holder.simpleLanguage.visibility = View.GONE
-            } else {
-                holder.simpleLanguage.text = gi.simpleLanguage
-                holder.simpleLanguage.visibility = View.VISIBLE
-            }
-            holder.downloaded.visibility =
-                if (mDownloadManager.containDownloadInfo(gi.gid)) View.VISIBLE else View.GONE
-            holder.favourited.visibility =
-                if (gi.favoriteSlot != -2) View.VISIBLE else View.GONE
-            holder.card.setOnClickListener { onItemClick(gi) }
-            holder.card.setOnLongClickListener { onItemLongClick(gi) }
+        override fun onBindViewHolder(holder: ComposeHolder, position: Int) {
+            val gi: GalleryInfo = getItem(position) ?: return
+            holder.composeView.galleryInfo = gi
+            holder.composeView.onClick = { onItemClick(gi) }
+            holder.composeView.onLongClock = { onItemLongClick(gi) }
         }
     }
 
