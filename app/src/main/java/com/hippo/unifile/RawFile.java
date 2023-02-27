@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class RawFile extends UniFile {
+class RawFile extends UniFile {
 
     private static final String TAG = RawFile.class.getSimpleName();
 

@@ -22,7 +22,6 @@ import coil.decode.DecodeUtils
 import coil.decode.FrameDelayRewritingSource
 import coil.decode.isGif
 import coil.disk.DiskCache
-import com.hippo.sendTo
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
@@ -35,7 +34,7 @@ import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.image.Image.CloseableSource
-import com.hippo.unifile.RawFile
+import com.hippo.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openInputStream
 import com.hippo.unifile.openOutputStream
@@ -48,14 +47,12 @@ import okhttp3.executeAsync
 import okio.buffer
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 import java.util.Locale
 import kotlin.io.path.readText
 
 private val client = EhApplication.okHttpClient
-private val contentResolver = application.contentResolver
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -231,7 +228,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
-        (file.openOutputStream() as FileOutputStream).use { outputStream ->
+        file.openOutputStream().use { outputStream ->
             outputStream.channel.use { outChannel ->
                 val key = EhCacheKeyFactory.getImageKey(mGid, index)
 
