@@ -23,6 +23,17 @@ import java.util.regex.Pattern
 
 object EhUtils {
     const val NONE = -1 // Use it for homepage
+    const val MISC = 0x1
+    const val DOUJINSHI = 0x2
+    const val MANGA = 0x4
+    const val ARTIST_CG = 0x8
+    const val GAME_CG = 0x10
+    const val IMAGE_SET = 0x20
+    const val COSPLAY = 0x40
+    const val ASIAN_PORN = 0x80
+    const val NON_H = 0x100
+    const val WESTERN = 0x200
+    const val ALL_CATEGORY = 0x3ff
     const val PRIVATE = 0x400
     const val UNKNOWN = 0x800
 
@@ -51,16 +62,16 @@ object EhUtils {
     )
 
     private val CATEGORY_VALUES = hashMapOf(
-        EhConfig.MISC to arrayOf("misc"),
-        EhConfig.DOUJINSHI to arrayOf("doujinshi"),
-        EhConfig.MANGA to arrayOf("manga"),
-        EhConfig.ARTIST_CG to arrayOf("artistcg", "Artist CG Sets", "Artist CG"),
-        EhConfig.GAME_CG to arrayOf("gamecg", "Game CG Sets", "Game CG"),
-        EhConfig.IMAGE_SET to arrayOf("imageset", "Image Sets", "Image Set"),
-        EhConfig.COSPLAY to arrayOf("cosplay"),
-        EhConfig.ASIAN_PORN to arrayOf("asianporn", "Asian Porn"),
-        EhConfig.NON_H to arrayOf("non-h"),
-        EhConfig.WESTERN to arrayOf("western"),
+        MISC to arrayOf("misc"),
+        DOUJINSHI to arrayOf("doujinshi"),
+        MANGA to arrayOf("manga"),
+        ARTIST_CG to arrayOf("artistcg", "Artist CG Sets", "Artist CG"),
+        GAME_CG to arrayOf("gamecg", "Game CG Sets", "Game CG"),
+        IMAGE_SET to arrayOf("imageset", "Image Sets", "Image Set"),
+        COSPLAY to arrayOf("cosplay"),
+        ASIAN_PORN to arrayOf("asianporn", "Asian Porn"),
+        NON_H to arrayOf("non-h"),
+        WESTERN to arrayOf("western"),
         PRIVATE to arrayOf("private"),
         UNKNOWN to arrayOf("unknown")
     )
@@ -85,16 +96,16 @@ object EhUtils {
 
     fun getCategoryColor(category: Int): Int {
         return when (category) {
-            EhConfig.DOUJINSHI -> BG_COLOR_DOUJINSHI
-            EhConfig.MANGA -> BG_COLOR_MANGA
-            EhConfig.ARTIST_CG -> BG_COLOR_ARTIST_CG
-            EhConfig.GAME_CG -> BG_COLOR_GAME_CG
-            EhConfig.WESTERN -> BG_COLOR_WESTERN
-            EhConfig.NON_H -> BG_COLOR_NON_H
-            EhConfig.IMAGE_SET -> BG_COLOR_IMAGE_SET
-            EhConfig.COSPLAY -> BG_COLOR_COSPLAY
-            EhConfig.ASIAN_PORN -> BG_COLOR_ASIAN_PORN
-            EhConfig.MISC -> BG_COLOR_MISC
+            DOUJINSHI -> BG_COLOR_DOUJINSHI
+            MANGA -> BG_COLOR_MANGA
+            ARTIST_CG -> BG_COLOR_ARTIST_CG
+            GAME_CG -> BG_COLOR_GAME_CG
+            WESTERN -> BG_COLOR_WESTERN
+            NON_H -> BG_COLOR_NON_H
+            IMAGE_SET -> BG_COLOR_IMAGE_SET
+            COSPLAY -> BG_COLOR_COSPLAY
+            ASIAN_PORN -> BG_COLOR_ASIAN_PORN
+            MISC -> BG_COLOR_MISC
             else -> BG_COLOR_UNKNOWN
         }.toInt()
     }

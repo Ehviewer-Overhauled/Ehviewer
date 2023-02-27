@@ -18,7 +18,6 @@ package com.hippo.ehviewer.client.data
 import android.os.Parcelable
 import android.text.TextUtils
 import androidx.annotation.IntDef
-import com.hippo.ehviewer.client.EhConfig
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.QuickSearch
@@ -161,48 +160,48 @@ data class ListUrlBuilder(
             val value = str.substring(index + 1)
             when (key) {
                 "f_cats" -> {
-                    val cats = NumberUtils.parseIntSafely(value, EhConfig.ALL_CATEGORY)
-                    category = category or (cats.inv() and EhConfig.ALL_CATEGORY)
+                    val cats = NumberUtils.parseIntSafely(value, EhUtils.ALL_CATEGORY)
+                    category = category or (cats.inv() and EhUtils.ALL_CATEGORY)
                 }
 
                 "f_doujinshi" -> if ("1" == value) {
-                    category = category or EhConfig.DOUJINSHI
+                    category = category or EhUtils.DOUJINSHI
                 }
 
                 "f_manga" -> if ("1" == value) {
-                    category = category or EhConfig.MANGA
+                    category = category or EhUtils.MANGA
                 }
 
                 "f_artistcg" -> if ("1" == value) {
-                    category = category or EhConfig.ARTIST_CG
+                    category = category or EhUtils.ARTIST_CG
                 }
 
                 "f_gamecg" -> if ("1" == value) {
-                    category = category or EhConfig.GAME_CG
+                    category = category or EhUtils.GAME_CG
                 }
 
                 "f_western" -> if ("1" == value) {
-                    category = category or EhConfig.WESTERN
+                    category = category or EhUtils.WESTERN
                 }
 
                 "f_non-h" -> if ("1" == value) {
-                    category = category or EhConfig.NON_H
+                    category = category or EhUtils.NON_H
                 }
 
                 "f_imageset" -> if ("1" == value) {
-                    category = category or EhConfig.IMAGE_SET
+                    category = category or EhUtils.IMAGE_SET
                 }
 
                 "f_cosplay" -> if ("1" == value) {
-                    category = category or EhConfig.COSPLAY
+                    category = category or EhUtils.COSPLAY
                 }
 
                 "f_asianporn" -> if ("1" == value) {
-                    category = category or EhConfig.ASIAN_PORN
+                    category = category or EhUtils.ASIAN_PORN
                 }
 
                 "f_misc" -> if ("1" == value) {
-                    category = category or EhConfig.MISC
+                    category = category or EhUtils.MISC
                 }
 
                 "f_search" -> try {
@@ -281,7 +280,7 @@ data class ListUrlBuilder(
                 }
                 val ub = UrlBuilder(url)
                 if (this.category != EhUtils.NONE) {
-                    ub.addQuery("f_cats", category.inv() and EhConfig.ALL_CATEGORY)
+                    ub.addQuery("f_cats", category.inv() and EhUtils.ALL_CATEGORY)
                 }
                 mSHash?.let {
                     ub.addQuery("f_shash", it)

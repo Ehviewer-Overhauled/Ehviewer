@@ -57,15 +57,6 @@
         app:entryValues="@array/preload_image_entry_values"
         app:iconSpaceReserved="false" />
 
-    <rikka.preference.SimpleMenuPreference
-        android:defaultValue="a"
-        android:key="image_size"
-        android:summary="@string/settings_download_image_resolution_summary"
-        android:title="@string/settings_download_image_resolution"
-        app:entries="@array/image_resolution_entries"
-        app:entryValues="@array/image_resolution_entry_values"
-        app:iconSpaceReserved="false" />
-
     <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="download_origin_image"
