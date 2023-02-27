@@ -17,7 +17,6 @@ package com.hippo.ehviewer.gallery
 
 import android.content.Context
 import android.net.Uri
-import com.hippo.Native.getFd
 import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.Settings
 import com.hippo.image.Image
@@ -138,16 +137,14 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
     }
 
     override fun save(index: Int, file: UniFile): Boolean {
-        val fd: Int
         val stream: FileOutputStream
         try {
             stream = file.openOutputStream() as FileOutputStream
-            fd = getFd(stream.fd)
         } catch (e: IOException) {
             e.printStackTrace()
             return false
         }
-        archiveAccessor.extractToFd(index, fd)
+        archiveAccessor.extractToFd(index, stream.fd)
         try {
             stream.close()
         } catch (e: IOException) {

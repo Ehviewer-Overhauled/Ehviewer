@@ -22,21 +22,9 @@ import android.system.Int64Ref
 import android.system.Os
 import java.io.FileDescriptor
 
-object Native {
-    fun initialize() {
-        System.loadLibrary("ehviewer")
-    }
-
-    @JvmStatic
-    external fun getFd(fd: FileDescriptor?): Int
-}
-
 private fun sendFileTotally(from: FileDescriptor, to: FileDescriptor) {
     Os.sendfile(to, from, Int64Ref(0), Long.MAX_VALUE)
 }
-
-val FileDescriptor.fd
-    get() = Native.getFd(this)
 
 infix fun ParcelFileDescriptor.sendTo(fd: FileDescriptor) {
     sendFileTotally(fileDescriptor, fd)

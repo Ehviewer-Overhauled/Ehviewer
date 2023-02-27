@@ -28,7 +28,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.util.DebugLogger
-import com.hippo.Native
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhSSLSocketFactory
@@ -84,7 +83,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             handler?.uncaughtException(t, e)
         }
         super<Application>.onCreate()
-        Native.initialize()
+        System.loadLibrary("ehviewer")
         GetText.initialize(this)
         Settings.initialize()
         ReadableTime.initialize(this)

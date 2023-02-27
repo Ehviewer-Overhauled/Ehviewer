@@ -22,6 +22,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
 import com.hippo.image.Image
+import java.io.FileDescriptor
 import java.nio.ByteBuffer
 
 class UriArchiveAccessor(ctx: Context, private val uri: Uri) {
@@ -33,7 +34,7 @@ class UriArchiveAccessor(ctx: Context, private val uri: Uri) {
 
     private external fun openArchive(fd: Int, size: Long): Int
     private external fun extractToByteBuffer(index: Int): ByteBuffer?
-    external fun extractToFd(index: Int, fd: Int)
+    external fun extractToFd(index: Int, fd: FileDescriptor)
     external fun getFilename(index: Int): String
     external fun needPassword(): Boolean
     external fun providePassword(str: String): Boolean
