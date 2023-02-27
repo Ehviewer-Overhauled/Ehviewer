@@ -68,9 +68,9 @@ object CommonOperations {
         activity: Activity, galleryInfo: GalleryInfo,
         listener: EhClient.Callback<Void?>, select: Boolean = false
     ) {
-        val slot = Settings.getDefaultFavSlot()
+        val slot = Settings.defaultFavSlot
         val localFav = activity.getString(R.string.local_favorites)
-        val items = Settings.getFavCat().toMutableList().apply { add(0, localFav) }
+        val items = Settings.favCat.toMutableList().apply { add(0, localFav) }
         if (!select && slot >= -1 && slot <= 9) {
             val newFavoriteName = if (slot >= 0) items[slot + 1] else null
             doAddToFavorites(
@@ -159,8 +159,8 @@ object CommonOperations {
         var justStart = forceDefault
         var label: String? = null
         // Get default download label
-        if (!justStart && Settings.getHasDefaultDownloadLabel()) {
-            label = Settings.getDefaultDownloadLabel()
+        if (!justStart && Settings.hasDefaultDownloadLabel) {
+            label = Settings.defaultDownloadLabel
             justStart = label == null || dm.containLabel(label)
         }
         // If there is no other label, just use null label

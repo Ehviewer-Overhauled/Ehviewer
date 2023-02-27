@@ -303,14 +303,14 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         private val sCache by lazy {
             DiskCache.Builder().directory(File(application.cacheDir, "gallery_image"))
                 .maxSizeBytes(
-                    MathUtils.clamp(Settings.getReadCacheSize(), 40, 1280).toLong() * 1024 * 1024
+                    MathUtils.clamp(Settings.readCacheSize, 40, 1280).toLong() * 1024 * 1024
                 ).build()
         }
 
         private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
 
         fun getGalleryDownloadDir(gid: Long): UniFile? {
-            val dir = Settings.getDownloadLocation()
+            val dir = Settings.downloadLocation
             // Read from DB
             var dirname = EhDB.getDownloadDirname(gid)
             return if (dir != null && dirname != null) {

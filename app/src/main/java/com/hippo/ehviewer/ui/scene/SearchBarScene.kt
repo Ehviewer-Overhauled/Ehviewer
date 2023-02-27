@@ -320,7 +320,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                 if (text.isNotEmpty() && !text.endsWith(' ')) {
                     val keyword = text.substringAfterLast(' ')
                     val translate =
-                        Settings.getShowTagTranslations() && isTranslatable(requireContext())
+                        Settings.showTagTranslations && isTranslatable(requireContext())
                     suggestFlow(keyword, translate, true).collect {
                         emit(TagSuggestion(it.first, it.second))
                     }

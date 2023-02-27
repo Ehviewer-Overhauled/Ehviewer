@@ -52,7 +52,7 @@ class CleanRedundancyPreference @JvmOverloads constructor(
     }
 
     private fun doRealWork(): Int {
-        return Settings.getDownloadLocation()?.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
+        return Settings.downloadLocation?.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
     }
 
     override fun launchJob() {

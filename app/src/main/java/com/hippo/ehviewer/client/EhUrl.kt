@@ -55,21 +55,21 @@ object EhUrl {
     const val URL_PREFIX_THUMB_EX = "https://exhentai.org/t/"
 
     val host: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> HOST_E
             SITE_EX -> HOST_EX
             else -> HOST_E
         }
 
     val favoritesUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_FAVORITES_E
             SITE_EX -> URL_FAVORITES_EX
             else -> URL_FAVORITES_E
         }
 
     val apiUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> API_E
             SITE_EX -> API_EX
             else -> API_E
@@ -77,14 +77,14 @@ object EhUrl {
 
     @JvmStatic
     val referer: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> REFERER_E
             SITE_EX -> REFERER_EX
             else -> REFERER_E
         }
 
     val origin: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> ORIGIN_E
             SITE_EX -> ORIGIN_EX
             else -> ORIGIN_E
@@ -92,7 +92,7 @@ object EhUrl {
 
     @JvmStatic
     val uConfigUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_UCONFIG_E
             SITE_EX -> URL_UCONFIG_EX
             else -> URL_UCONFIG_E
@@ -100,28 +100,28 @@ object EhUrl {
 
     @JvmStatic
     val myTagsUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_MY_TAGS_E
             SITE_EX -> URL_MY_TAGS_EX
             else -> URL_MY_TAGS_E
         }
 
     val popularUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_POPULAR_E
             SITE_EX -> URL_POPULAR_EX
             else -> URL_POPULAR_E
         }
 
     val imageSearchUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_IMAGE_SEARCH_E
             SITE_EX -> URL_IMAGE_SEARCH_EX
             else -> URL_IMAGE_SEARCH_E
         }
 
     val watchedUrl: String
-        get() = when (Settings.getGallerySite()) {
+        get() = when (Settings.gallerySite) {
             SITE_E -> URL_WATCHED_E
             SITE_EX -> URL_WATCHED_EX
             else -> URL_WATCHED_E
@@ -167,7 +167,7 @@ object EhUrl {
     }
 
     fun getThumbUrlPrefix(): String {
-        return when (Settings.getGallerySite()) {
+        return when (Settings.gallerySite) {
             SITE_E -> URL_PREFIX_THUMB_E
             SITE_EX -> URL_PREFIX_THUMB_EX
             else -> URL_PREFIX_THUMB_E

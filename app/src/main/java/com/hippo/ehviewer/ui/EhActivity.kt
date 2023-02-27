@@ -37,8 +37,7 @@ import rikka.layoutinflater.view.LayoutInflaterFactory
 abstract class EhActivity : AppCompatActivity() {
     @StyleRes
     fun getThemeStyleRes(): Int {
-        val isBlackDarkTheme = Settings.getBoolean("black_dark_theme", false)
-        return if (isBlackDarkTheme && isNightMode()) R.style.ThemeOverlay_Black else R.style.ThemeOverlay
+        return if (Settings.blackDarkTheme && isNightMode()) R.style.ThemeOverlay_Black else R.style.ThemeOverlay
     }
 
     override fun onApplyThemeResource(theme: Theme, resid: Int, first: Boolean) {
@@ -65,13 +64,13 @@ abstract class EhActivity : AppCompatActivity() {
     override fun onResume() {
         val lockedResumeTime = System.currentTimeMillis() / 1000
         val lockedDelayTime = lockedResumeTime - EhApplication.locked_last_leave_time
-        if (lockedDelayTime < Settings.getSecurityDelay() * 60) {
+        if (lockedDelayTime < Settings.securityDelay * 60) {
             EhApplication.locked = false
-        } else if (Settings.getSecurity() && isAuthenticationSupported() && EhApplication.locked) {
+        } else if (Settings.security && isAuthenticationSupported() && EhApplication.locked) {
             startActivity(Intent(this, SecurityActivity::class.java))
         }
         super.onResume()
-        window.setSecureScreen(Settings.getEnabledSecurity())
+        window.setSecureScreen(Settings.enabledSecurity)
     }
 
     private val requestPermissionLauncher =
@@ -84,7 +83,7 @@ abstract class EhActivity : AppCompatActivity() {
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         ) return
-        if (Settings.getNotificationRequired()) return
+        if (Settings.notificationRequired) return
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 }

@@ -49,7 +49,7 @@ fun ListInfoCard(
         modifier = modifier.padding(6.dp),
         border = remember { BorderStroke(1.dp, Color.Transparent) }
     ) {
-        val listCardSize = remember { Settings.getListThumbSize().pxToDp }
+        val listCardSize = remember { Settings.listThumbSize.pxToDp }
         Row(
             modifier = Modifier
                 .height((listCardSize * 3).dp)

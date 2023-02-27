@@ -96,9 +96,9 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
 
     private var mClient: EhClient? = null
 
-    private var mFavCatArray: Array<String>? = Settings.getFavCat()
+    private var mFavCatArray: Array<String>? = Settings.favCat
 
-    private var mFavCountArray: IntArray? = Settings.getFavCount()
+    private var mFavCountArray: IntArray? = Settings.favCount
 
     private var mUrlBuilder: FavListUrlBuilder? = null
     private val showNormalFabsRunnable = Runnable {
@@ -132,8 +132,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mClient = EhClient
-        mFavLocalCount = Settings.getFavLocalCount()
-        mFavCountSum = Settings.getFavCloudCount()
+        mFavLocalCount = Settings.favLocalCount
+        mFavCountSum = Settings.favCloudCount
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -143,7 +143,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
 
     private fun onInit() {
         mUrlBuilder = FavListUrlBuilder()
-        mUrlBuilder!!.favCat = Settings.getRecentFavCat()
+        mUrlBuilder!!.favCat = Settings.recentFavCat
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
@@ -205,7 +205,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         mContentLayout.setHelper(mHelper)
         mContentLayout.fastScroller.setOnDragHandlerListener(this)
         mContentLayout.setFitPaddingTop(paddingTopSB)
-        mAdapter = FavoritesAdapter(inflater, resources, mRecyclerView!!, Settings.getListMode())
+        mAdapter = FavoritesAdapter(inflater, resources, mRecyclerView!!, Settings.listMode)
         mRecyclerView!!.clipToPadding = false
         mRecyclerView!!.clipChildren = false
         mRecyclerView!!.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
@@ -333,7 +333,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 val items = arrayOfNulls<String>(12)
                 items[0] = getString(R.string.let_me_select)
                 items[1] = getString(R.string.local_favorites)
-                val favCat = Settings.getFavCat()
+                val favCat = Settings.favCat
                 System.arraycopy(favCat, 0, items, 2, 10)
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_favorites_collection)
@@ -548,7 +548,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 // First is local favorite, the other 10 is cloud favorite
                 val array = arrayOfNulls<String>(11)
                 array[0] = getString(R.string.local_favorites)
-                System.arraycopy(Settings.getFavCat(), 0, array, 1, 10)
+                System.arraycopy(Settings.favCat, 0, array, 1, 10)
                 BaseDialogBuilder(context)
                     .setTitle(R.string.move_favorites_dialog_title)
                     .setItems(array, helper)
@@ -620,7 +620,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     private fun onGetFavoritesSuccess(result: FavoritesParser.Result, taskId: Int) {
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             if (mFavCatArray != null) {
-                System.arraycopy(result.catArray, 0, mFavCatArray, 0, 10)
+                System.arraycopy(result.catArray, 0, mFavCatArray!!, 0, 10)
             }
             mFavCountArray = result.countArray
             if (mFavCountArray != null) {

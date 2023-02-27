@@ -79,7 +79,7 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
     val addToFavFailed = stringResource(id = R.string.add_to_favorite_failure)
 
     suspend fun addToFav(slot: Int) {
-        val favNameList = Settings.getFavCat().toMutableList().apply { add(0, localFavName) }
+        val favNameList = Settings.favCat.toMutableList().apply { add(0, localFavName) }
         runCatching {
             if (slot == -1) {
                 EhDB.putLocalFavorites(info)
@@ -151,7 +151,7 @@ fun <T : GalleryInfo> GalleryListLongClickDialog(
                         if (info.favoriteSlot == -2) {
                             DialogSelectorItem(
                                 onClick = {
-                                    val defaultFav = Settings.getDefaultFavSlot()
+                                    val defaultFav = Settings.defaultFavSlot
                                     if (defaultFav in -1..9) {
                                         launchIO {
                                             addToFav(defaultFav)
@@ -267,7 +267,7 @@ fun SelectFavouriteDialog(
             val localFavName = stringResource(id = R.string.local_favorites)
             Column {
                 remember {
-                    Settings.getFavCat().toMutableList().apply { add(0, localFavName) }
+                    Settings.favCat.toMutableList().apply { add(0, localFavName) }
                 }.forEachIndexed { index, s ->
                     TextButton(
                         onClick = {
