@@ -21,7 +21,6 @@ import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.paging.PagingSource
 import androidx.room.Room.databaseBuilder
-import com.hippo.Native
 import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.BasicDao
@@ -34,6 +33,7 @@ import com.hippo.ehviewer.dao.HistoryInfo
 import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.sendTo
 
 object EhDB {
     private const val CUR_DB_VER = 4
@@ -379,7 +379,7 @@ object EhDB {
             val dbFile = context.getDatabasePath(ehExportName)
             context.contentResolver.openFileDescriptor(uri, "rw")!!.use { toFd ->
                 ParcelFileDescriptor.open(dbFile, MODE_READ_ONLY).use { fromFd ->
-                    Native.sendfile(fromFd.fd, toFd.fd)
+                    fromFd sendTo toFd
                 }
             }
             return true

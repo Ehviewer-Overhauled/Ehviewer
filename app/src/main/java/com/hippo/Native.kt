@@ -18,6 +18,8 @@
 package com.hippo
 
 import android.os.ParcelFileDescriptor
+import android.system.Int64Ref
+import android.system.Os
 import java.io.FileDescriptor
 
 object Native {
@@ -27,22 +29,19 @@ object Native {
 
     @JvmStatic
     external fun getFd(fd: FileDescriptor?): Int
+}
 
-    @JvmStatic
-    external fun sendfile(from: Int, to: Int)
+private fun sendFileTotally(from: FileDescriptor, to: FileDescriptor) {
+    Os.sendfile(to, from, Int64Ref(0), Long.MAX_VALUE)
 }
 
 val FileDescriptor.fd
     get() = Native.getFd(this)
 
-infix fun ParcelFileDescriptor.receivefrom(fd: FileDescriptor) {
-    Native.sendfile(fd.fd, getFd())
+infix fun ParcelFileDescriptor.sendTo(fd: FileDescriptor) {
+    sendFileTotally(fileDescriptor, fd)
 }
 
-infix fun ParcelFileDescriptor.copyTo(fd: FileDescriptor) {
-    Native.sendfile(getFd(), fd.fd)
-}
-
-infix fun ParcelFileDescriptor.copyTo(fd: ParcelFileDescriptor) {
-    Native.sendfile(getFd(), fd.fd)
+infix fun ParcelFileDescriptor.sendTo(fd: ParcelFileDescriptor) {
+    sendFileTotally(fileDescriptor, fd.fileDescriptor)
 }

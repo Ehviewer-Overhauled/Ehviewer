@@ -22,7 +22,7 @@ import coil.decode.DecodeUtils
 import coil.decode.FrameDelayRewritingSource
 import coil.decode.isGif
 import coil.disk.DiskCache
-import com.hippo.copyTo
+import com.hippo.sendTo
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
@@ -119,7 +119,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
                 (file.openOutputStream() as FileOutputStream).use { outputStream ->
                     ParcelFileDescriptor.open(data.toFile(), MODE_READ_WRITE).use {
-                        it copyTo outputStream.fd
+                        it sendTo outputStream.fd
                     }
                 }
             }
