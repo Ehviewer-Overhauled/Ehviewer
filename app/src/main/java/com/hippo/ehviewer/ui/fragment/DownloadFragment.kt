@@ -13,141 +13,135 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.preference.Preference
+import com.hippo.app.BaseDialogBuilder
+import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.ui.CommonOperations.ensureNoMediaFile
+import com.hippo.ehviewer.ui.CommonOperations.removeNoMediaFile
+import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.unifile.UniFile
+import com.hippo.util.ExceptionUtils
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-import androidx.preference.Preference;
-
-import com.hippo.app.BaseDialogBuilder;
-import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.Settings;
-import com.hippo.ehviewer.ui.CommonOperations;
-import com.hippo.ehviewer.ui.scene.BaseScene;
-import com.hippo.unifile.UniFile;
-import com.hippo.util.ExceptionUtils;
-
-public class DownloadFragment extends BasePreferenceFragment {
-
-    public static final String KEY_DOWNLOAD_LOCATION = "download_location";
-
-    @Nullable
-    private Preference mDownloadLocation;
-
-    ActivityResultLauncher<Uri> pickImageDirLauncher = registerForActivityResult(
-            new ActivityResultContracts.OpenDocumentTree(),
-            treeUri -> {
-                if (treeUri != null) {
-                    requireActivity().getContentResolver().takePersistableUriPermission(
-                            treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    UniFile uniFile = UniFile.fromTreeUri(getActivity(), treeUri);
-                    if (uniFile != null) {
-                        Settings.putDownloadLocation(uniFile);
-                        onUpdateDownloadLocation();
-                    } else {
-                        showTip(R.string.settings_download_cant_get_download_location,
-                                BaseScene.LENGTH_SHORT);
-                    }
-                }
-            });
-
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.download_settings);
-
-        Preference mediaScan = findPreference(Settings.KEY_MEDIA_SCAN);
-        mDownloadLocation = findPreference(KEY_DOWNLOAD_LOCATION);
-
-        onUpdateDownloadLocation();
-
-        mediaScan.setOnPreferenceChangeListener(this);
-
-        if (mDownloadLocation != null) {
-            mDownloadLocation.setOnPreferenceClickListener(this);
+class DownloadFragment : BasePreferenceFragment() {
+    private var mDownloadLocation: Preference? = null
+    private var pickImageDirLauncher = registerForActivityResult<Uri?, Uri>(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { treeUri: Uri? ->
+        if (treeUri != null) {
+            requireActivity().contentResolver.takePersistableUriPermission(
+                treeUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            val uniFile = UniFile.fromTreeUri(activity, treeUri)
+            if (uniFile != null) {
+                Settings.putDownloadLocation(uniFile)
+                onUpdateDownloadLocation()
+            } else {
+                showTip(
+                    R.string.settings_download_cant_get_download_location,
+                    BaseScene.LENGTH_SHORT
+                )
+            }
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDownloadLocation = null;
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.download_settings)
+        val mediaScan = findPreference<Preference>(Settings.KEY_MEDIA_SCAN)
+        mDownloadLocation = findPreference(KEY_DOWNLOAD_LOCATION)
+        onUpdateDownloadLocation()
+        mediaScan!!.onPreferenceChangeListener = this
+        if (mDownloadLocation != null) {
+            mDownloadLocation!!.onPreferenceClickListener = this
+        }
     }
 
-    public void onUpdateDownloadLocation() {
-        UniFile file = Settings.getDownloadLocation();
+    override fun onDestroy() {
+        super.onDestroy()
+        mDownloadLocation = null
+    }
+
+    private fun onUpdateDownloadLocation() {
+        val file = Settings.getDownloadLocation()
         if (mDownloadLocation != null) {
             if (file != null) {
-                mDownloadLocation.setSummary(file.getUri().toString());
+                mDownloadLocation!!.summary = file.uri.toString()
             } else {
-                mDownloadLocation.setSummary(R.string.settings_download_invalid_download_location);
+                mDownloadLocation!!.setSummary(R.string.settings_download_invalid_download_location)
             }
         }
     }
 
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
-        String key = preference.getKey();
-        if (KEY_DOWNLOAD_LOCATION.equals(key)) {
-            UniFile file = Settings.getDownloadLocation();
-            if (file != null && !UniFile.isFileUri(Settings.getDownloadLocation().getUri())) {
-                new BaseDialogBuilder(requireContext())
-                        .setTitle(R.string.settings_download_download_location)
-                        .setMessage(file.getUri().toString())
-                        .setPositiveButton(R.string.pick_new_download_location, (dialogInterface, i) -> openDirPickerL())
-                        .setNeutralButton(R.string.reset_download_location, (dialogInterface, i) -> {
-                            UniFile uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir());
-                            if (uniFile != null) {
-                                Settings.putDownloadLocation(uniFile);
-                                onUpdateDownloadLocation();
-                            } else {
-                                showTip(R.string.settings_download_cant_get_download_location,
-                                        BaseScene.LENGTH_SHORT);
-                            }
-                        })
-                        .show();
+    override fun onPreferenceClick(preference: Preference): Boolean {
+        val key = preference.key
+        if (KEY_DOWNLOAD_LOCATION == key) {
+            val file = Settings.getDownloadLocation()
+            if (file != null && !UniFile.isFileUri(
+                    Settings.getDownloadLocation()!!.uri
+                )
+            ) {
+                BaseDialogBuilder(requireContext())
+                    .setTitle(R.string.settings_download_download_location)
+                    .setMessage(file.uri.toString())
+                    .setPositiveButton(R.string.pick_new_download_location) { _, _ -> openDirPickerL() }
+                    .setNeutralButton(R.string.reset_download_location) { _, _ ->
+                        val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
+                        if (uniFile != null) {
+                            Settings.putDownloadLocation(uniFile)
+                            onUpdateDownloadLocation()
+                        } else {
+                            showTip(
+                                R.string.settings_download_cant_get_download_location,
+                                BaseScene.LENGTH_SHORT
+                            )
+                        }
+                    }
+                    .show()
             } else {
-                openDirPickerL();
+                openDirPickerL()
             }
-            return true;
+            return true
         }
-        return false;
+        return false
     }
 
-    private void openDirPickerL() {
+    private fun openDirPickerL() {
         try {
-            pickImageDirLauncher.launch(null);
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT);
+            pickImageDirLauncher.launch(null)
+        } catch (e: Throwable) {
+            ExceptionUtils.throwIfFatal(e)
+            showTip(R.string.error_cant_find_activity, BaseScene.LENGTH_SHORT)
         }
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        String key = preference.getKey();
-        if (Settings.KEY_MEDIA_SCAN.equals(key)) {
-            if (newValue instanceof Boolean) {
-                UniFile downloadLocation = Settings.getDownloadLocation();
-                if ((Boolean) newValue) {
-                    CommonOperations.removeNoMediaFile(downloadLocation);
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        val key = preference.key
+        if (Settings.KEY_MEDIA_SCAN == key) {
+            if (newValue is Boolean) {
+                val downloadLocation = Settings.getDownloadLocation()
+                if (newValue) {
+                    removeNoMediaFile(downloadLocation)
                 } else {
-                    CommonOperations.ensureNoMediaFile(downloadLocation);
+                    ensureNoMediaFile(downloadLocation)
                 }
             }
-            return true;
+            return true
         }
-        return false;
+        return false
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings_download;
+    override val fragmentTitle: Int
+        get() = R.string.settings_download
+
+    companion object {
+        const val KEY_DOWNLOAD_LOCATION = "download_location"
     }
 }
