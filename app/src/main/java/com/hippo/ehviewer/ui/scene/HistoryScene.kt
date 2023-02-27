@@ -147,7 +147,7 @@ class HistoryScene : BaseToolbarScene() {
         val handlerDrawable = HandlerDrawable()
         handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
         binding.fastScroller.setHandlerDrawable(handlerDrawable)
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launchIO {
             historyData.collectLatest { value ->
                 mAdapter.submitData(
                     value
