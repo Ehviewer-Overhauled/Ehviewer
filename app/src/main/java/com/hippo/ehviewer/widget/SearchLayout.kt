@@ -42,7 +42,7 @@ import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.easyrecyclerview.SimpleHolder
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhConfig
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.widget.RadioGridGroup
@@ -94,7 +94,7 @@ class SearchLayout @JvmOverloads constructor(
         decoration.applyPaddings(this)
         // Create normal view
         mNormalView = mInflater.inflate(R.layout.search_normal, null)
-        val mCategoryStored = mSharePref.getInt(SEARCH_CATEGORY_PREF, EhConfig.ALL_CATEGORY)
+        val mCategoryStored = mSharePref.getInt(SEARCH_CATEGORY_PREF, EhUtils.ALL_CATEGORY)
         mCategoryGroup = mNormalView.findViewById(R.id.search_category_chipgroup)
         for (mPair in mCategoryTable) {
             val mChip = inflate(context, R.layout.filter_chip, null) as IdentifiedChip
@@ -362,16 +362,16 @@ class SearchLayout @JvmOverloads constructor(
             3, 2
         )
         private val mCategoryTable: ArrayList<Pair<Int, Int>> = arrayListOf(
-            Pair(EhConfig.DOUJINSHI, R.string.doujinshi),
-            Pair(EhConfig.MANGA, R.string.manga),
-            Pair(EhConfig.ARTIST_CG, R.string.artist_cg),
-            Pair(EhConfig.GAME_CG, R.string.game_cg),
-            Pair(EhConfig.WESTERN, R.string.western),
-            Pair(EhConfig.NON_H, R.string.non_h),
-            Pair(EhConfig.IMAGE_SET, R.string.image_set),
-            Pair(EhConfig.COSPLAY, R.string.cosplay),
-            Pair(EhConfig.ASIAN_PORN, R.string.asian_porn),
-            Pair(EhConfig.MISC, R.string.misc)
+            Pair(EhUtils.DOUJINSHI, R.string.doujinshi),
+            Pair(EhUtils.MANGA, R.string.manga),
+            Pair(EhUtils.ARTIST_CG, R.string.artist_cg),
+            Pair(EhUtils.GAME_CG, R.string.game_cg),
+            Pair(EhUtils.WESTERN, R.string.western),
+            Pair(EhUtils.NON_H, R.string.non_h),
+            Pair(EhUtils.IMAGE_SET, R.string.image_set),
+            Pair(EhUtils.COSPLAY, R.string.cosplay),
+            Pair(EhUtils.ASIAN_PORN, R.string.asian_porn),
+            Pair(EhUtils.MISC, R.string.misc)
         )
         private val SEARCH_ITEM_TYPE = arrayOf(
             intArrayOf(ITEM_TYPE_NORMAL, ITEM_TYPE_NORMAL_ADVANCE, ITEM_TYPE_ACTION), intArrayOf(

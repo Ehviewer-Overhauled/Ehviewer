@@ -63,13 +63,11 @@ public class DownloadFragment extends BasePreferenceFragment {
         addPreferencesFromResource(R.xml.download_settings);
 
         Preference mediaScan = findPreference(Settings.KEY_MEDIA_SCAN);
-        Preference imageResolution = findPreference(Settings.KEY_IMAGE_RESOLUTION);
         mDownloadLocation = findPreference(KEY_DOWNLOAD_LOCATION);
 
         onUpdateDownloadLocation();
 
         mediaScan.setOnPreferenceChangeListener(this);
-        imageResolution.setOnPreferenceChangeListener(this);
 
         if (mDownloadLocation != null) {
             mDownloadLocation.setOnPreferenceClickListener(this);
@@ -142,11 +140,6 @@ public class DownloadFragment extends BasePreferenceFragment {
                 } else {
                     CommonOperations.ensureNoMediaFile(downloadLocation);
                 }
-            }
-            return true;
-        } else if (Settings.KEY_IMAGE_RESOLUTION.equals(key)) {
-            if (newValue instanceof String) {
-                Settings.putImageResolution((String) newValue);
             }
             return true;
         }

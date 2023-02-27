@@ -25,7 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
-import com.hippo.ehviewer.client.EhConfig;
 import com.hippo.ehviewer.client.data.FavListUrlBuilder;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.ehviewer.ui.scene.GalleryListScene;
@@ -58,10 +57,6 @@ public class Settings {
     public static final String KEY_SHOW_JPN_TITLE = "show_jpn_title";
     public static final String KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations";
     public static final String KEY_TAG_TRANSLATIONS_SOURCE = "tag_translations_source";
-    public static final String KEY_DEFAULT_CATEGORIES = "default_categories";
-    public static final int DEFAULT_DEFAULT_CATEGORIES = EhConfig.ALL_CATEGORY;
-    public static final String KEY_EXCLUDED_TAG_NAMESPACES = "excluded_tag_namespaces";
-    public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";
     public static final String KEY_REQUEST_NEWS = "request_news";
     public static final String KEY_REQUEST_NEWS_TIMER = "request_news_timer";
     public static final String KEY_REQUEST_NEWS_TIMER_HOUR = "request_news_timer_hour";
@@ -92,8 +87,6 @@ public class Settings {
     public static final String KEY_DOWNLOAD_SAVE_QUERY = "image_query";
     public static final String KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment";
     public static final String KEY_MEDIA_SCAN = "media_scan";
-    public static final String KEY_IMAGE_RESOLUTION = "image_size";
-    public static final String DEFAULT_IMAGE_RESOLUTION = EhConfig.IMAGE_SIZE_AUTO;
     public static final int INVALID_DEFAULT_FAV_SLOT = -2;
     /********************
      ****** Advanced
@@ -133,8 +126,6 @@ public class Settings {
     private static final String KEY_SHOW_GALLERY_PAGES = "show_gallery_pages";
     private static final boolean DEFAULT_SHOW_GALLERY_PAGES = false;
     private static final boolean DEFAULT_SHOW_TAG_TRANSLATIONS = false;
-    private static final int DEFAULT_EXCLUDED_TAG_NAMESPACES = 0;
-    private static final String DEFAULT_EXCLUDED_LANGUAGES = null;
     private static final String KEY_METERED_NETWORK_WARNING = "cellular_network_warning";
     private static final boolean DEFAULT_METERED_NETWORK_WARNING = false;
     private static final String KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip";
@@ -216,11 +207,9 @@ public class Settings {
     public static boolean LIST_THUMB_SIZE_INITED = false;
     public static SharedPreferences sSettingsPre;
     private static int LIST_THUMB_SIZE = 40;
-    private static EhConfig sEhConfig;
 
     public static void initialize() {
         sSettingsPre = PreferenceManager.getDefaultSharedPreferences(EhApplication.getApplication());
-        sEhConfig = loadEhConfig();
         fixDefaultValue();
     }
 
@@ -239,16 +228,6 @@ public class Settings {
 
             }
         }
-    }
-
-    private static EhConfig loadEhConfig() {
-        EhConfig ehConfig = new EhConfig();
-        ehConfig.imageSize = getImageResolution();
-        ehConfig.excludedLanguages = getExcludedLanguages();
-        ehConfig.defaultCategories = getDefaultCategories();
-        ehConfig.excludedNamespaces = getExcludedTagNamespaces();
-        ehConfig.setDirty();
-        return ehConfig;
     }
 
     public static boolean getBoolean(String key, boolean defValue) {
@@ -337,10 +316,6 @@ public class Settings {
 
     public static void putRemoveImageFiles(boolean value) {
         putBoolean(KEY_REMOVE_IMAGE_FILES, value);
-    }
-
-    public static EhConfig getEhConfig() {
-        return sEhConfig;
     }
 
     public static boolean getNeedSignIn() {
@@ -440,18 +415,6 @@ public class Settings {
         putBoolean(KEY_SHOW_TAG_TRANSLATIONS, value);
     }
 
-    public static int getDefaultCategories() {
-        return getInt(KEY_DEFAULT_CATEGORIES, DEFAULT_DEFAULT_CATEGORIES);
-    }
-
-    public static int getExcludedTagNamespaces() {
-        return getInt(KEY_EXCLUDED_TAG_NAMESPACES, DEFAULT_EXCLUDED_TAG_NAMESPACES);
-    }
-
-    public static String getExcludedLanguages() {
-        return getString(KEY_EXCLUDED_LANGUAGES, DEFAULT_EXCLUDED_LANGUAGES);
-    }
-
     public static boolean getMeteredNetworkWarning() {
         return getBoolean(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING);
     }
@@ -534,16 +497,6 @@ public class Settings {
 
     public static int getPreloadImage() {
         return getIntFromStr(KEY_PRELOAD_IMAGE, DEFAULT_PRELOAD_IMAGE);
-    }
-
-    public static String getImageResolution() {
-        return getString(KEY_IMAGE_RESOLUTION, DEFAULT_IMAGE_RESOLUTION);
-    }
-
-    public static void putImageResolution(String value) {
-        sEhConfig.imageSize = value;
-        sEhConfig.setDirty();
-        putString(KEY_IMAGE_RESOLUTION, value);
     }
 
     public static boolean getDownloadOriginImage() {
