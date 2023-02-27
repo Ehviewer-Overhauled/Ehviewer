@@ -36,7 +36,6 @@ import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.image.Image.CloseableSource
 import com.hippo.sendTo
 import com.hippo.unifile.UniFile
-import com.hippo.unifile.openInputStream
 import com.hippo.unifile.openOutputStream
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
@@ -46,7 +45,6 @@ import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.executeAsync
 import okio.buffer
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 import java.util.Locale
@@ -228,32 +226,26 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
-        file.openOutputStream().use { outputStream ->
-            outputStream.channel.use { outChannel ->
-                val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        file.openFileDescriptor("w").use { toFd ->
+            val key = EhCacheKeyFactory.getImageKey(mGid, index)
 
-                fun copy(inputStream: FileInputStream) {
-                    inputStream.channel.use {
-                        outChannel.transferFrom(it, 0, it.size())
+            // Read from diskCache first
+            sCache[key]?.use { snapshot ->
+                runCatching {
+                    UniFile.fromFile(snapshot.data.toFile())!!.openFileDescriptor("r").use {
+                        it sendTo toFd
                     }
-                }
-
-                // Read from diskCache first
-                sCache[key]?.use { snapshot ->
-                    runCatching {
-                        snapshot.data.toFile().inputStream().use { copy(it) }
-                    }.onSuccess {
-                        return true
-                    }.onFailure {
-                        it.printStackTrace()
-                        return false
-                    }
+                }.onSuccess {
+                    return true
+                }.onFailure {
+                    it.printStackTrace()
+                    return false
                 }
 
                 downloadDir?.let { uniFile ->
                     runCatching {
-                        findImageFile(uniFile, index)?.openInputStream()?.use {
-                            copy(it)
+                        findImageFile(uniFile, index)?.openFileDescriptor("r")?.use {
+                            it sendTo toFd
                         }
                     }.onFailure {
                         it.printStackTrace()
@@ -262,9 +254,9 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                         return true
                     }
                 }
-                return false
             }
         }
+        return false
     }
 
     fun checkPlainText(index: Int): Boolean {
