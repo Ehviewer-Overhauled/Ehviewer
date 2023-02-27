@@ -95,6 +95,7 @@ object Settings {
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
+    private const val KEY_LAST_DAWN_DAY = "last_dawn_day"
     private const val DEFAULT_HIDE_HV_EVENTS = false
     private const val KEY_SHOW_COMMENTS = "show_gallery_comments"
     private const val DEFAULT_SHOW_COMMENTS = true
@@ -293,6 +294,9 @@ object Settings {
         sSettingsPre.edit().putString(key, value.toString()).apply()
     }
 
+    var lastDawnDay: Long
+        get() = sSettingsPre.getLong(KEY_LAST_DAWN_DAY, 0)
+        set(value) = sSettingsPre.edit().putLong(KEY_LAST_DAWN_DAY, value).apply()
     val displayName: String?
         get() = getString(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
 

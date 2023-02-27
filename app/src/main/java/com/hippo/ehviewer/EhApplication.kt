@@ -34,6 +34,7 @@ import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
+import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
@@ -99,6 +100,11 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
             launchIO {
                 cleanupDownload()
+            }
+            if (Settings.requestNews) {
+                launchIO {
+                    checkDawn()
+                }
             }
         }
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))

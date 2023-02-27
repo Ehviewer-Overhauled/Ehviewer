@@ -20,48 +20,22 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import eu.kanade.tachiyomi.util.lang.withIOContext
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 private val signedIn
     get() = EhApplication.ehCookieStore.hasSignedIn()
 
 private const val CHANNEL_ID = "DailyCheckNotification"
 
-class DailyCheckWork(val context: Context, workerParams: WorkerParameters) :
+class DailyCheckWork(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result = withIOContext {
-        runCatching {
-            if (signedIn) {
-                EhEngine.getNews(true)?.let { showEventPane(it) }
-            }
-        }.onFailure {
-            it.printStackTrace()
+        checkDawn().onFailure {
             return@withIOContext Result.retry()
         }
         Result.success()
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun showEventPane(html: String) {
-        if (Settings.hideHvEvents && html.contains("You have encountered a monster!")) {
-            return
-        }
-        val notificationManager = NotificationManagerCompat.from(context)
-        val chan = NotificationChannelCompat
-            .Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
-            .setName(CHANNEL_ID)
-            .build()
-        notificationManager.createNotificationChannel(chan)
-        val msg = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_monochrome)
-            .setContentText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
-            .setStyle(NotificationCompat.BigTextStyle())
-            .build()
-        runCatching {
-            notificationManager.notify(1, msg)
-        }.onFailure {
-            it.printStackTrace()
-        }
     }
 }
 
@@ -101,5 +75,44 @@ fun updateDailyCheckWork(context: Context) {
         )
     } else {
         WorkManager.getInstance(context).cancelUniqueWork(workName)
+    }
+}
+
+val today
+    get() = Instant.now().truncatedTo(ChronoUnit.DAYS).epochSecond
+
+suspend fun checkDawn() = runCatching {
+    if (signedIn && Settings.lastDawnDay != today) {
+        EhEngine.getNews(true)?.let {
+            Settings.lastDawnDay = today
+            showEventNotification(it)
+        }
+    }
+}.onFailure {
+    it.printStackTrace()
+}
+
+
+@SuppressLint("MissingPermission")
+fun showEventNotification(html: String) {
+    if (Settings.hideHvEvents && html.contains("You have encountered a monster!")) {
+        return
+    }
+    val context = EhApplication.application
+    val notificationManager = NotificationManagerCompat.from(context)
+    val chan = NotificationChannelCompat
+        .Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
+        .setName(CHANNEL_ID)
+        .build()
+    notificationManager.createNotificationChannel(chan)
+    val msg = NotificationCompat.Builder(context, CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_launcher_monochrome)
+        .setContentText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
+        .setStyle(NotificationCompat.BigTextStyle())
+        .build()
+    runCatching {
+        notificationManager.notify(1, msg)
+    }.onFailure {
+        it.printStackTrace()
     }
 }
