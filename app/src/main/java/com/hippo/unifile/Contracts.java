@@ -21,14 +21,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 
 import com.hippo.image.Image;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 final class Contracts {
     private Contracts() {
@@ -80,45 +79,12 @@ final class Contracts {
     }
 
     @NonNull
-    static OutputStream openOutputStream(Context context, Uri uri) throws IOException {
-        try {
-            OutputStream os = context.getContentResolver().openOutputStream(uri);
-            if (os == null) {
-                throw new IOException("Can't open OutputStream");
-            }
-            return os;
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            throw new IOException("Can't open OutputStream", e);
+    static ParcelFileDescriptor openFileDescriptor(Context context, Uri uri, String mode) throws IOException {
+        ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(uri, mode);
+        if (pfd == null) {
+            throw new IOException("Can't open ParcelFileDescriptor");
         }
-    }
-
-    @NonNull
-    static OutputStream openOutputStream(Context context, Uri uri, boolean append) throws IOException {
-        try {
-            OutputStream os = context.getContentResolver().openOutputStream(uri, append ? "wa" : "w");
-            if (os == null) {
-                throw new IOException("Can't open OutputStream");
-            }
-            return os;
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            throw new IOException("Can't open OutputStream", e);
-        }
-    }
-
-    @NonNull
-    static InputStream openInputStream(Context context, Uri uri) throws IOException {
-        try {
-            InputStream is = context.getContentResolver().openInputStream(uri);
-            if (is == null) {
-                throw new IOException("Can't open InputStream");
-            }
-            return is;
-        } catch (Throwable e) {
-            Utils.throwIfFatal(e);
-            throw new IOException("Can't open InputStream", e);
-        }
+        return pfd;
     }
 
     @NonNull

@@ -4,6 +4,8 @@ import coil.disk.DiskCache
 import com.hippo.compat.readLegacySpiderInfo
 import com.hippo.ehviewer.EhApplication
 import com.hippo.unifile.UniFile
+import com.hippo.unifile.openInputStream
+import com.hippo.unifile.openOutputStream
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray

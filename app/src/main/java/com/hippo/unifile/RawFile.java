@@ -18,6 +18,7 @@ package com.hippo.unifile;
 
 import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -26,10 +27,8 @@ import androidx.annotation.NonNull;
 import com.hippo.image.Image;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
@@ -227,7 +226,7 @@ public class RawFile extends UniFile {
                 results.add(new RawFile(this, file));
             }
         }
-        return results.toArray(new UniFile[results.size()]);
+        return results.toArray(new UniFile[0]);
     }
 
     @Override
@@ -247,24 +246,6 @@ public class RawFile extends UniFile {
         }
     }
 
-    @Override
-    @NonNull
-    public OutputStream openOutputStream() throws IOException {
-        return new FileOutputStream(mFile);
-    }
-
-    @Override
-    @NonNull
-    public OutputStream openOutputStream(boolean append) throws IOException {
-        return new FileOutputStream(mFile, append);
-    }
-
-    @Override
-    @NonNull
-    public InputStream openInputStream() throws IOException {
-        return new FileInputStream(mFile);
-    }
-
     @NonNull
     @Override
     public Image.CloseableSource getImageSource() {
@@ -281,5 +262,16 @@ public class RawFile extends UniFile {
 
             }
         };
+    }
+
+    @NonNull
+    @Override
+    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
+        var md = ParcelFileDescriptor.parseMode(mode);
+        var pfd = ParcelFileDescriptor.open(mFile, md);
+        if (pfd == null) {
+            throw new IOException("Can't open ParcelFileDescriptor");
+        }
+        return pfd;
     }
 }

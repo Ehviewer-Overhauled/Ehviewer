@@ -37,6 +37,8 @@ import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.image.Image.CloseableSource
 import com.hippo.unifile.RawFile
 import com.hippo.unifile.UniFile
+import com.hippo.unifile.openInputStream
+import com.hippo.unifile.openOutputStream
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
 import kotlinx.coroutines.currentCoroutineContext
@@ -117,9 +119,9 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             sCache.read(key) {
                 val extension = fixExtension("." + metadata.toFile().readText())
                 val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
-                (file.openOutputStream() as FileOutputStream).use { outputStream ->
+                file.openFileDescriptor("w").use { outFd ->
                     ParcelFileDescriptor.open(data.toFile(), MODE_READ_WRITE).use {
-                        it sendTo outputStream.fd
+                        it sendTo outFd
                     }
                 }
             }
@@ -199,7 +201,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
             findDownloadFileForIndex(index, extension)?.runSuspendCatching {
                 openOutputStream().use { outputStream ->
-                    (outputStream as FileOutputStream).channel.use { return doSave(it) == length }
+                    outputStream.channel.use { return doSave(it) == length }
                 }
             }?.onFailure {
                 it.printStackTrace()
@@ -254,7 +256,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 downloadDir?.let { uniFile ->
                     runCatching {
                         findImageFile(uniFile, index)?.openInputStream()?.use {
-                            copy(it as FileInputStream)
+                            copy(it)
                         }
                     }.onFailure {
                         it.printStackTrace()

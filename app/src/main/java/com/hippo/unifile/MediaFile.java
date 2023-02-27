@@ -18,14 +18,13 @@ package com.hippo.unifile;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 
 import com.hippo.image.Image;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 class MediaFile extends UniFile {
 
@@ -76,14 +75,7 @@ class MediaFile extends UniFile {
 
     @Override
     public boolean isFile() {
-        InputStream is;
-        try {
-            is = openInputStream();
-        } catch (IOException e) {
-            return false;
-        }
-        Utils.closeQuietly(is);
-        return true;
+        return DocumentsContractApi19.isFile(mContext, mUri);
     }
 
     @Override
@@ -103,13 +95,12 @@ class MediaFile extends UniFile {
 
     @Override
     public boolean canWrite() {
-        OutputStream os;
         try {
-            os = openOutputStream(true);
+            var fd = openFileDescriptor("w");
+            fd.close();
         } catch (IOException e) {
             return false;
         }
-        Utils.closeQuietly(os);
         return true;
     }
 
@@ -120,18 +111,7 @@ class MediaFile extends UniFile {
 
     @Override
     public boolean ensureFile() {
-        if (isFile()) {
-            return true;
-        } else {
-            OutputStream os;
-            try {
-                os = openOutputStream();
-            } catch (IOException e) {
-                return false;
-            }
-            Utils.closeQuietly(os);
-            return true;
-        }
+        return isFile();
     }
 
     @Override
@@ -171,25 +151,13 @@ class MediaFile extends UniFile {
 
     @NonNull
     @Override
-    public OutputStream openOutputStream() throws IOException {
-        return UriOutputStream.create(mContext, mUri, "w");
-    }
-
-    @NonNull
-    @Override
-    public OutputStream openOutputStream(boolean append) throws IOException {
-        return UriOutputStream.create(mContext, mUri, append ? "wa" : "w");
-    }
-
-    @NonNull
-    @Override
-    public InputStream openInputStream() throws IOException {
-        return Contracts.openInputStream(mContext, mUri);
-    }
-
-    @NonNull
-    @Override
     public Image.CloseableSource getImageSource() {
         return Contracts.getImageSource(mContext, mUri);
+    }
+
+    @NonNull
+    @Override
+    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
+        return Contracts.openFileDescriptor(mContext, mUri, mode);
     }
 }

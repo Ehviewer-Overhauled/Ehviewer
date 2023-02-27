@@ -18,11 +18,11 @@ package com.hippo.ehviewer.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.hippo.app.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.EhApplication.Companion.application
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
@@ -36,7 +36,7 @@ import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.collect.LongList
 import java.io.IOException
-import java.io.InputStream
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
     private fun doAddToFavorites(
@@ -227,9 +227,9 @@ object CommonOperations {
             return
         }
         val noMedia = file.createFile(".nomedia") ?: return
-        var `is`: InputStream? = null
+        var `is`: ParcelFileDescriptor? = null
         try {
-            `is` = noMedia.openInputStream()
+            `is` = noMedia.openFileDescriptor("r")
         } catch (e: IOException) {
             // Ignore
         } finally {

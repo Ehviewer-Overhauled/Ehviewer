@@ -17,6 +17,7 @@ package com.hippo.ehviewer.gallery
 
 import android.content.Context
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import com.hippo.UriArchiveAccessor
 import com.hippo.ehviewer.Settings
 import com.hippo.image.Image
@@ -35,7 +36,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
-import java.io.FileOutputStream
 import java.io.IOException
 
 class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : PageLoader2(),
@@ -137,16 +137,16 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
     }
 
     override fun save(index: Int, file: UniFile): Boolean {
-        val stream: FileOutputStream
+        val fd: ParcelFileDescriptor
         try {
-            stream = file.openOutputStream() as FileOutputStream
+            fd = file.openFileDescriptor("w")
         } catch (e: IOException) {
             e.printStackTrace()
             return false
         }
-        archiveAccessor.extractToFd(index, stream.fd)
+        archiveAccessor.extractToFd(index, fd.fileDescriptor)
         try {
-            stream.close()
+            fd.close()
         } catch (e: IOException) {
             e.printStackTrace()
             return false

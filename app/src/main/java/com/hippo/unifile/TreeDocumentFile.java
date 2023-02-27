@@ -18,6 +18,7 @@ package com.hippo.unifile;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -27,8 +28,6 @@ import androidx.annotation.NonNull;
 import com.hippo.image.Image;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 class TreeDocumentFile extends UniFile {
@@ -221,14 +220,13 @@ class TreeDocumentFile extends UniFile {
 
         final Uri[] result = DocumentsContractApi21.listFiles(mContext, mUri);
         final ArrayList<UniFile> results = new ArrayList<>();
-        for (int i = 0, n = result.length; i < n; i++) {
-            Uri uri = result[i];
+        for (Uri uri : result) {
             String name = getFilenameForUri(uri);
             if (filter.accept(this, name)) {
                 results.add(new TreeDocumentFile(this, mContext, uri, name));
             }
         }
-        return results.toArray(new UniFile[results.size()]);
+        return results.toArray(new UniFile[0]);
     }
 
     @Override
@@ -251,25 +249,13 @@ class TreeDocumentFile extends UniFile {
 
     @NonNull
     @Override
-    public OutputStream openOutputStream() throws IOException {
-        return Contracts.openOutputStream(mContext, mUri);
-    }
-
-    @NonNull
-    @Override
-    public OutputStream openOutputStream(boolean append) throws IOException {
-        return Contracts.openOutputStream(mContext, mUri, append);
-    }
-
-    @NonNull
-    @Override
-    public InputStream openInputStream() throws IOException {
-        return Contracts.openInputStream(mContext, mUri);
-    }
-
-    @NonNull
-    @Override
     public Image.CloseableSource getImageSource() {
         return Contracts.getImageSource(mContext, mUri);
+    }
+
+    @NonNull
+    @Override
+    public ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException {
+        return Contracts.openFileDescriptor(mContext, mUri, mode);
     }
 }
