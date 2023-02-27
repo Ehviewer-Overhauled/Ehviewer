@@ -47,6 +47,8 @@ import com.hippo.ehviewer.client.parser.SignInParser
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
+import com.hippo.ehviewer.dailycheck.showEventNotification
+import com.hippo.ehviewer.dailycheck.today
 import com.hippo.network.StatusCodeException
 import com.hippo.util.ExceptionUtils
 import kotlinx.coroutines.async
@@ -320,6 +322,10 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
+                EventPaneParser.parse(body!!)?.let {
+                    Settings.lastDawnDay = today
+                    showEventNotification(it)
+                }
                 return GalleryDetailParser.parse(body!!)
             }
         } catch (e: Throwable) {
