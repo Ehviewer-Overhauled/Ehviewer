@@ -648,7 +648,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 val tag = inflater.inflate(R.layout.item_gallery_tag, awl, false) as TextView
                 awl.addView(tag)
                 val tagStr = if (it.startsWith('_')) {
-                    tag.alpha = 0.5f
+                    val alpha = ColorUtils.setAlphaComponent(tag.currentTextColor, 128)
+                    tag.setTextColor(alpha)
                     it.substring(1)
                 } else {
                     it
