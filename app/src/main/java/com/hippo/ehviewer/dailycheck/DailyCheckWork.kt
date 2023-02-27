@@ -43,7 +43,7 @@ class DailyCheckWork(val context: Context, workerParams: WorkerParameters) :
 
     @SuppressLint("MissingPermission")
     private fun showEventPane(html: String) {
-        if (Settings.getHideHvEvents() && html.contains("You have encountered a monster!")) {
+        if (Settings.hideHvEvents && html.contains("You have encountered a monster!")) {
             return
         }
         val notificationManager = NotificationManagerCompat.from(context)
@@ -93,7 +93,7 @@ private fun getDailyCheckWorkRequest(): PeriodicWorkRequest {
 private const val workName = "DailyCheckWork"
 
 fun updateDailyCheckWork(context: Context) {
-    if (Settings.getRequestNews()) {
+    if (Settings.requestNews) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             workName,
             ExistingPeriodicWorkPolicy.UPDATE,

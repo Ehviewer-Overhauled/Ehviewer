@@ -70,7 +70,7 @@ class DownloadFragment : BasePreferenceFragment() {
     }
 
     private fun onUpdateDownloadLocation() {
-        val file = Settings.getDownloadLocation()
+        val file = Settings.downloadLocation
         if (mDownloadLocation != null) {
             if (file != null) {
                 mDownloadLocation!!.summary = file.uri.toString()
@@ -83,9 +83,9 @@ class DownloadFragment : BasePreferenceFragment() {
     override fun onPreferenceClick(preference: Preference): Boolean {
         val key = preference.key
         if (KEY_DOWNLOAD_LOCATION == key) {
-            val file = Settings.getDownloadLocation()
+            val file = Settings.downloadLocation
             if (file != null && !UniFile.isFileUri(
-                    Settings.getDownloadLocation()!!.uri
+                    Settings.downloadLocation!!.uri
                 )
             ) {
                 BaseDialogBuilder(requireContext())
@@ -126,7 +126,7 @@ class DownloadFragment : BasePreferenceFragment() {
         val key = preference.key
         if (Settings.KEY_MEDIA_SCAN == key) {
             if (newValue is Boolean) {
-                val downloadLocation = Settings.getDownloadLocation()
+                val downloadLocation = Settings.downloadLocation
                 if (newValue) {
                     removeNoMediaFile(downloadLocation)
                 } else {

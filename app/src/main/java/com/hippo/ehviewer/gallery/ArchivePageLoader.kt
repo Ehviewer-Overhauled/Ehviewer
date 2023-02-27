@@ -49,7 +49,7 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
         }
         archiveAccessor.run {
             if (needPassword()) {
-                Settings.getArchivePasswds()?.forEach {
+                Settings.archivePasswds?.forEach {
                     if (providePassword(it)) return@launch
                 }
                 passwdFlow.collect {

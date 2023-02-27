@@ -114,17 +114,17 @@ object EhDns : Dns {
         vararg ips: Pair<String, Boolean>
     ) {
         map[host] = ips.mapNotNull { pair ->
-            Hosts.toInetAddress(host, pair.first).takeUnless { Settings.getDF() && pair.second }
+            Hosts.toInetAddress(host, pair.first).takeUnless { Settings.dF && pair.second }
         }
     }
 
     @Throws(UnknownHostException::class)
     override fun lookup(hostname: String): List<InetAddress> {
-        return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.getBuiltInHosts() }
+        return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.builtInHosts }
         ?: Dns.SYSTEM.lookup(hostname)
     }
 
     fun isInHosts(hostname: String): Boolean {
-        return hosts.contains(hostname) || (builtInHosts.contains(hostname) && Settings.getBuiltInHosts())
+        return hosts.contains(hostname) || (builtInHosts.contains(hostname) && Settings.builtInHosts)
     }
 }

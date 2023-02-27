@@ -78,7 +78,7 @@ object EhUtils {
     private val CATEGORY_STRINGS = CATEGORY_VALUES.entries.map { (k, v) -> v to k }
 
     val isExHentai: Boolean
-        get() = Settings.getGallerySite() == EhUrl.SITE_EX
+        get() = Settings.gallerySite == EhUrl.SITE_EX
 
     @JvmStatic
     fun getCategory(type: String?): Int {
@@ -120,12 +120,12 @@ object EhUtils {
     }
 
     fun needSignedIn(): Boolean {
-        return Settings.getNeedSignIn() && !ehCookieStore.hasSignedIn()
+        return Settings.needSignIn && !ehCookieStore.hasSignedIn()
     }
 
     @JvmStatic
     fun getSuitableTitle(gi: GalleryInfo): String {
-        return if (Settings.getShowJpnTitle()) {
+        return if (Settings.showJpnTitle) {
             if (TextUtils.isEmpty(gi.titleJpn)) gi.title else gi.titleJpn
         } else {
             if (TextUtils.isEmpty(gi.title)) gi.titleJpn else gi.title
@@ -156,7 +156,7 @@ object EhUtils {
         if (null == url) {
             return null
         }
-        val resolution = when (Settings.getThumbResolution()) {
+        val resolution = when (Settings.thumbResolution) {
             0 -> return url
             1 -> "250"
             2 -> "300"

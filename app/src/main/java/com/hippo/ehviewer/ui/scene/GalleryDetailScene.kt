@@ -397,7 +397,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             it.searchCover.setOnClickListener(this)
         }
         binding.content.actions.newerVersion.setOnClickListener(this)
-        if (Settings.getShowComments()) {
+        if (Settings.showComments) {
             binding.content.comments.comments.setOnClickListener(this)
         } else {
             binding.content.comments.comments.visibility = View.GONE
@@ -618,7 +618,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         tagGroups ?: return
         val ehTags =
-            if (Settings.getShowTagTranslations() && isTranslatable(requireContext())) EhTagDatabase else null
+            if (Settings.showTagTranslations && isTranslatable(requireContext())) EhTagDatabase else null
         val colorTag = theme.resolveColor(R.attr.tagBackgroundColor)
         val colorName = theme.resolveColor(R.attr.tagGroupBackgroundColor)
         for (tg in tagGroups) {
@@ -719,7 +719,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             } else {
                 previewText.setText(R.string.more_previews)
             }
-            val columnWidth = Settings.getThumbSize()
+            val columnWidth = Settings.thumbSize
             gridLayout.setColumnSize(columnWidth)
             gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
             viewLifecycleOwner.lifecycleScope.launchIO {
@@ -839,7 +839,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         context,
                         getString(R.string.download_remove_dialog_message, galleryInfo.title),
                         getString(R.string.download_remove_dialog_check_text),
-                        Settings.getRemoveImageFiles()
+                        Settings.removeImageFiles
                     )
                     val helper = DeleteDialogHelper(
                         downloadManager, galleryInfo, builder

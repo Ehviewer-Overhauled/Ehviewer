@@ -75,7 +75,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
-                if (Settings.getSaveCrashLog()) {
+                if (Settings.saveCrashLog) {
                     Crash.saveCrashLog(e)
                 }
             } catch (ignored: Throwable) {
@@ -89,7 +89,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
         EhTagDatabase.update()
-        AppCompatDelegate.setDefaultNightMode(Settings.getTheme())
+        AppCompatDelegate.setDefaultNightMode(Settings.theme)
         launchIO {
             launchIO {
                 ehDatabase
@@ -106,8 +106,8 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
     private fun cleanupDownload() {
         try {
-            val downloadLocation = Settings.getDownloadLocation()
-            if (Settings.getMediaScan()) {
+            val downloadLocation = Settings.downloadLocation
+            if (Settings.mediaScan) {
                 CommonOperations.removeNoMediaFile(downloadLocation)
             } else {
                 CommonOperations.ensureNoMediaFile(downloadLocation)
@@ -212,7 +212,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 .dns(EhDns)
                 .proxySelector(ehProxySelector)
 
-            if (Settings.getDF()) {
+            if (Settings.dF) {
                 val factory =
                     TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
                 factory.init(null as KeyStore?)

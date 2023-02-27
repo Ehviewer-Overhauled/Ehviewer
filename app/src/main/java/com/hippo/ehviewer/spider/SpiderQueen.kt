@@ -527,11 +527,11 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
 
     private val mWorkerScope = object {
         private val mFetcherJobMap = hashMapOf<Int, Job>()
-        private val mSemaphore = Semaphore(Settings.getMultiThreadDownload())
+        private val mSemaphore = Semaphore(Settings.multiThreadDownload)
         private val pTokenLock = Mutex()
         private var showKey: String? = null
         private val showKeyLock = Mutex()
-        private val mDownloadDelay = Settings.getDownloadDelay()
+        private val mDownloadDelay = Settings.downloadDelay
         private var isDownloadMode = false
 
         fun cancelDecode(index: Int) {
@@ -721,7 +721,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 val targetImageUrl: String?
                 val referer: String?
 
-                if (Settings.getDownloadOriginImage() && !originImageUrl.isNullOrBlank()) {
+                if (Settings.downloadOriginImage && !originImageUrl.isNullOrBlank()) {
                     targetImageUrl = originImageUrl
                     referer = EhUrl.getPageUrl(mSpiderInfo.gid, index, pToken)
                 } else {

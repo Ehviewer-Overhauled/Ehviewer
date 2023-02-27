@@ -64,7 +64,7 @@ internal abstract class GalleryAdapter(
             when (type) {
                 TYPE_LIST -> {
                     val columnWidth =
-                        mResources.getDimensionPixelOffset(Settings.getDetailSizeResId())
+                        mResources.getDimensionPixelOffset(Settings.detailSizeResId)
                     mLayoutManager.setColumnSize(columnWidth)
                     mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
                     if (null != mGirdDecoration) {
@@ -86,7 +86,7 @@ internal abstract class GalleryAdapter(
                 }
 
                 TYPE_GRID -> {
-                    val columnWidth = Settings.getThumbSize()
+                    val columnWidth = Settings.thumbSize
                     mLayoutManager.setColumnSize(columnWidth)
                     mLayoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_SUITABLE_SIZE)
                     if (null != mListDecoration) {
@@ -186,7 +186,7 @@ internal abstract class GalleryAdapter(
                     category.setBackgroundColor(EhUtils.getCategoryColor(gi.category))
                 }
                 holder.posted!!.text = gi.posted
-                if (gi.pages == 0 || !Settings.getShowGalleryPages()) {
+                if (gi.pages == 0 || !Settings.showGalleryPages) {
                     holder.pages?.text = null
                     holder.pages!!.visibility = View.GONE
                 } else {

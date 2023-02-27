@@ -101,7 +101,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         setLiftOnScrollTargetView(binding.contentLayout)
         mAdapter = GalleryPreviewAdapter()
         binding.contentLayout.recyclerView.adapter = mAdapter
-        val columnWidth = Settings.getThumbSize()
+        val columnWidth = Settings.thumbSize
         val layoutManager =
             AutoGridLayoutManager(context, columnWidth, LayoutUtils.dp2pix(context, 16f))
         layoutManager.setStrategy(AutoGridLayoutManager.STRATEGY_SUITABLE_SIZE)

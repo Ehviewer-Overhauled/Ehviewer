@@ -212,7 +212,7 @@ class MainActivity : EhActivity() {
     private fun setNavGraph() {
         navController.apply {
             graph = navInflater.inflate(R.navigation.nav_graph).apply {
-                when (Settings.getLaunchPageGalleryListSceneAction()) {
+                when (Settings.launchPageGalleryListSceneAction) {
                     GalleryListScene.ACTION_HOMEPAGE -> setStartDestination(R.id.nav_homepage)
                     GalleryListScene.ACTION_SUBSCRIPTION -> setStartDestination(R.id.nav_subscription)
                     GalleryListScene.ACTION_WHATS_HOT -> setStartDestination(R.id.nav_whats_hot)
@@ -223,7 +223,7 @@ class MainActivity : EhActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (Settings.getDF() && Settings.getBypassVpn()) {
+        if (Settings.dF && Settings.bypassVpn) {
             bypassVpn()
         }
         super.onCreate(savedInstanceState)
@@ -260,11 +260,11 @@ class MainActivity : EhActivity() {
                 onNewIntent(intent)
             }
             checkDownloadLocation()
-            if (Settings.getMeteredNetworkWarning()) {
+            if (Settings.meteredNetworkWarning) {
                 checkMeteredNetwork()
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (!Settings.getAppLinkVerifyTip()) {
+                if (!Settings.appLinkVerifyTip) {
                     try {
                         checkAppLinkVerify()
                     } catch (ignored: PackageManager.NameNotFoundException) {
@@ -332,7 +332,7 @@ class MainActivity : EhActivity() {
     }
 
     private fun checkDownloadLocation() {
-        val uniFile = Settings.getDownloadLocation()
+        val uniFile = Settings.downloadLocation
         // null == uniFile for first start
         if (null == uniFile || uniFile.ensureDir()) {
             return
@@ -391,7 +391,7 @@ class MainActivity : EhActivity() {
     private suspend fun checkClipboardUrl() {
         val text = this.getClipboardManager().getUrlFromClipboard(this)
         val hashCode = text?.hashCode() ?: 0
-        if (text != null && hashCode != 0 && Settings.getClipboardTextHashCode() != hashCode) {
+        if (text != null && hashCode != 0 && Settings.clipboardTextHashCode != hashCode) {
             val result1 = GalleryDetailUrlParser.parse(text, false)
             var launch: (() -> Unit)? = null
             if (result1 != null) {

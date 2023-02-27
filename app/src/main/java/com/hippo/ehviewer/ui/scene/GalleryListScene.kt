@@ -364,7 +364,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.contentLayout.setFitPaddingTop(paddingTopSB)
         mAdapter = GalleryListAdapter(
             inflater, resources,
-            binding.contentLayout.recyclerView, Settings.getListMode()
+            binding.contentLayout.recyclerView, Settings.listMode
         )
         binding.contentLayout.recyclerView.clipToPadding = false
         binding.contentLayout.recyclerView.clipChildren = false
@@ -474,7 +474,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         builder.setTitle(R.string.add_quick_search_dialog_title)
         builder.setPositiveButton(android.R.string.ok, null)
         // TODO: It's ugly
-        val checked = booleanArrayOf(Settings.getQSSaveProgress())
+        val checked = booleanArrayOf(Settings.qSSaveProgress)
         val hint = arrayOf(getString(R.string.save_progress))
         builder.setMultiChoiceItems(
             hint,

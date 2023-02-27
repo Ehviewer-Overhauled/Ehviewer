@@ -50,7 +50,7 @@ class EhFragment : BasePreferenceFragment() {
         val thumbResolution = findPreference<Preference>(Settings.KEY_THUMB_RESOLUTION)
         val showTagTranslations = findPreference<Preference>(Settings.KEY_SHOW_TAG_TRANSLATIONS)
         val tagTranslationsSource = findPreference<Preference>(Settings.KEY_TAG_TRANSLATIONS_SOURCE)
-        Settings.getDisplayName()?.let { account?.summary = it }
+        Settings.displayName?.let { account?.summary = it }
         theme!!.onPreferenceChangeListener = this
         gallerySite!!.onPreferenceChangeListener = this
         listMode!!.onPreferenceChangeListener = this

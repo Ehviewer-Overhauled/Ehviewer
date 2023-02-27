@@ -16,7 +16,7 @@ abstract class PageLoader {
         (0 until size).map { ReaderPage(it) }
     }
 
-    private val mPreloads = MathUtils.clamp(com.hippo.ehviewer.Settings.getPreloadImage(), 0, 100)
+    private val mPreloads = MathUtils.clamp(com.hippo.ehviewer.Settings.preloadImage, 0, 100)
 
     abstract suspend fun awaitReady(): Boolean
     abstract val isReady: Boolean
