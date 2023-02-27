@@ -33,6 +33,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.ParcelFileDescriptor
+import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.HapticFeedbackConstants
@@ -71,12 +73,12 @@ import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.image.Image
+import com.hippo.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getParcelableCompat
 import com.hippo.util.getParcelableExtraCompat
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.IOUtils
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
@@ -103,10 +105,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -132,22 +131,18 @@ class ReaderActivity : EhActivity() {
         CreateDocument("todo/todo")
     ) { uri ->
         if (uri != null) {
-            val filepath =
-                AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
+            val filepath = AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
             val cachefile = File(filepath)
-            val resolver = contentResolver
             lifecycleScope.launchIO {
-                var `is`: InputStream? = null
-                var os: OutputStream? = null
                 try {
-                    `is` = FileInputStream(cachefile)
-                    os = resolver.openOutputStream(uri)
-                    IOUtils.copy(`is`, os)
+                    ParcelFileDescriptor.open(cachefile, MODE_READ_ONLY).use { from ->
+                        contentResolver.openFileDescriptor(uri, "w")!!.use {
+                            from sendTo it
+                        }
+                    }
                 } catch (e: IOException) {
                     e.printStackTrace()
                 } finally {
-                    IOUtils.closeQuietly(`is`)
-                    IOUtils.closeQuietly(os)
                     runOnUiThread {
                         Toast.makeText(
                             this@ReaderActivity,
@@ -567,7 +562,6 @@ class ReaderActivity : EhActivity() {
             ExceptionUtils.throwIfFatal(e)
             Toast.makeText(this, R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show()
         }
-
     }
 
     override fun onProvideAssistContent(outContent: AssistContent) {
