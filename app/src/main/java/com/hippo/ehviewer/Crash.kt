@@ -25,7 +25,16 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.io.PrintWriter
-import java.util.Arrays
+
+private fun joinIfStringArray(any: Any?): String {
+    return if (any is Array<*>) any.joinToString() else any.toString()
+}
+
+private fun collectClassStaticInfo(clazz: Class<*>): String {
+    return clazz.declaredFields.joinToString("\r\n") {
+        "${it.name}=${joinIfStringArray(it.get(null))}"
+    }
+}
 
 object Crash {
 
@@ -60,66 +69,8 @@ object Crash {
 
         // Device info
         fw.write("======== DeviceInfo ========\r\n")
-        fw.write("BOARD=")
-        fw.write(Build.BOARD)
-        fw.write("\r\n")
-        fw.write("BOOTLOADER=")
-        fw.write(Build.BOOTLOADER)
-        fw.write("\r\n")
-        fw.write("SUPPORTED_ABIS=")
-        fw.write(Arrays.toString(Build.SUPPORTED_ABIS))
-        fw.write("\r\n")
-        fw.write("DEVICE=")
-        fw.write(Build.DEVICE)
-        fw.write("\r\n")
-        fw.write("DISPLAY=")
-        fw.write(Build.DISPLAY)
-        fw.write("\r\n")
-        fw.write("FINGERPRINT=")
-        fw.write(Build.FINGERPRINT)
-        fw.write("\r\n")
-        fw.write("HARDWARE=")
-        fw.write(Build.HARDWARE)
-        fw.write("\r\n")
-        fw.write("HOST=")
-        fw.write(Build.HOST)
-        fw.write("\r\n")
-        fw.write("ID=")
-        fw.write(Build.ID)
-        fw.write("\r\n")
-        fw.write("MANUFACTURER=")
-        fw.write(Build.MANUFACTURER)
-        fw.write("\r\n")
-        fw.write("MODEL=")
-        fw.write(Build.MODEL)
-        fw.write("\r\n")
-        fw.write("PRODUCT=")
-        fw.write(Build.PRODUCT)
-        fw.write("\r\n")
-        fw.write("RADIO=")
-        fw.write(Build.getRadioVersion())
-        fw.write("\r\n")
-        fw.write("TAGS=")
-        fw.write(Build.TAGS)
-        fw.write("\r\n")
-        fw.write("TYPE=")
-        fw.write(Build.TYPE)
-        fw.write("\r\n")
-        fw.write("USER=")
-        fw.write(Build.USER)
-        fw.write("\r\n")
-        fw.write("CODENAME=")
-        fw.write(Build.VERSION.CODENAME)
-        fw.write("\r\n")
-        fw.write("INCREMENTAL=")
-        fw.write(Build.VERSION.INCREMENTAL)
-        fw.write("\r\n")
-        fw.write("RELEASE=")
-        fw.write(Build.VERSION.RELEASE)
-        fw.write("\r\n")
-        fw.write("SDK=")
-        fw.write(Build.VERSION.SDK_INT.toString())
-        fw.write("\r\n")
+        fw.write("${collectClassStaticInfo(Build::class.java)}\r\n")
+        fw.write("${collectClassStaticInfo(Build.VERSION::class.java)}\r\n")
         fw.write("MEMORY=")
         fw.write(
             FileUtils.humanReadableByteCount(OSUtils.getAppAllocatedMemory(), false)
