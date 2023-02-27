@@ -21,6 +21,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.hippo.image.Image;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -168,11 +170,7 @@ class SingleDocumentFile extends UniFile {
 
     @NonNull
     @Override
-    public UniRandomAccessFile createRandomAccessFile(String mode) throws IOException {
-        // Check file
-        if (!ensureFile()) {
-            throw new IOException("Can't make sure it is file");
-        }
-        return FileDescriptorRandomAccessFile.create(mContext, mUri, mode);
+    public Image.CloseableSource getImageSource() {
+        return Contracts.getImageSource(mContext, mUri);
     }
 }

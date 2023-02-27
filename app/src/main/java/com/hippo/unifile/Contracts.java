@@ -19,9 +19,12 @@ package com.hippo.unifile;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+
+import com.hippo.image.Image;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,5 +119,21 @@ final class Contracts {
             Utils.throwIfFatal(e);
             throw new IOException("Can't open InputStream", e);
         }
+    }
+
+    @NonNull
+    static Image.CloseableSource getImageSource(Context context, Uri uri) {
+        var source = ImageDecoder.createSource(context.getContentResolver(), uri);
+        return new Image.CloseableSource() {
+            @NonNull
+            @Override
+            public ImageDecoder.Source getSource() {
+                return source;
+            }
+
+            @Override
+            public void close() {
+            }
+        };
     }
 }

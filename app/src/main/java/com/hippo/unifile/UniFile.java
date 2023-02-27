@@ -25,6 +25,8 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hippo.image.Image;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -440,13 +442,7 @@ public abstract class UniFile {
     @NonNull
     public abstract InputStream openInputStream() throws IOException;
 
-    /**
-     * Get a random access stuff of the UniFile
-     *
-     * @param mode "r" or "rw"
-     * @return the random access stuff
-     * @throws IOException
-     */
+
     @NonNull
-    public abstract UniRandomAccessFile createRandomAccessFile(String mode) throws IOException;
+    public abstract Image.CloseableSource getImageSource();
 }

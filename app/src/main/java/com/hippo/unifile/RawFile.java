@@ -16,20 +16,21 @@
 
 package com.hippo.unifile;
 
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 
+import com.hippo.image.Image;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 public class RawFile extends UniFile {
@@ -264,9 +265,21 @@ public class RawFile extends UniFile {
         return new FileInputStream(mFile);
     }
 
-    @Override
     @NonNull
-    public UniRandomAccessFile createRandomAccessFile(String mode) throws FileNotFoundException {
-        return new RawRandomAccessFile(new RandomAccessFile(mFile, mode));
+    @Override
+    public Image.CloseableSource getImageSource() {
+        var src = ImageDecoder.createSource(mFile);
+        return new Image.CloseableSource() {
+            @NonNull
+            @Override
+            public ImageDecoder.Source getSource() {
+                return src;
+            }
+
+            @Override
+            public void close() {
+
+            }
+        };
     }
 }

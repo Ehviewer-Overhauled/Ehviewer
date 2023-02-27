@@ -21,6 +21,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.hippo.image.Image;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -187,7 +189,7 @@ class MediaFile extends UniFile {
 
     @NonNull
     @Override
-    public UniRandomAccessFile createRandomAccessFile(String mode) throws IOException {
-        return FileDescriptorRandomAccessFile.create(mContext, mUri, mode);
+    public Image.CloseableSource getImageSource() {
+        return Contracts.getImageSource(mContext, mUri);
     }
 }

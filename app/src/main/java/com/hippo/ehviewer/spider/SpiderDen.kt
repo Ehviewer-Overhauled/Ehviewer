@@ -302,25 +302,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 file = findImageFile(dir, index)
             }
         }
-        if (file is RawFile) {
-            val source = ImageDecoder.createSource(file.mFile)
-            return object : CloseableSource {
-                override val source: ImageDecoder.Source
-                    get() = source
-
-                override fun close() {}
-            }
-        }
-        if (file != null) {
-            val source = ImageDecoder.createSource(contentResolver, file.uri)
-            return object : CloseableSource {
-                override val source: ImageDecoder.Source
-                    get() = source
-
-                override fun close() {}
-            }
-        }
-        return null
+        return file?.imageSource
     }
 
     companion object {
