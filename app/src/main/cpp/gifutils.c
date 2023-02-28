@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <android/log.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 
 #define LOG_TAG "gifUtils"
 
@@ -22,10 +24,7 @@ static inline bool isGif(void *addr) {
     return !memcmp(addr, GIF_HEADER_87A, 6) || !memcmp(addr, GIF_HEADER_89A, 6);
 }
 
-JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_rewriteGifSource(JNIEnv *env, jclass clazz, jobject buffer) {
-    byte *addr = (*env)->GetDirectBufferAddress(env, buffer);
-    size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
+static void doRewrite(byte *addr, size_t size) {
     if (size < 7 || !isGif(addr)) return;
     for (size_t i = 0; i < size - 8; i++) {
         // TODO: Optimize this hex find with SIMD?
@@ -41,4 +40,22 @@ Java_com_hippo_image_Image_rewriteGifSource(JNIEnv *env, jclass clazz, jobject b
             end[2] = 0;
         }
     }
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_image_Image_rewriteGifSource(JNIEnv *env, jclass clazz, jobject buffer) {
+    byte *addr = (*env)->GetDirectBufferAddress(env, buffer);
+    size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
+    doRewrite(addr, size);
+}
+
+JNIEXPORT void JNICALL
+Java_com_hippo_image_Image_rewriteGifSource2(JNIEnv *env, jclass clazz, jint fd) {
+    struct stat64 st;
+    fstat64(fd, &st);
+    size_t size = st.st_size;
+    byte *addr = mmap64(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) return;
+    doRewrite(addr, size);
+    munmap(addr, size);
 }

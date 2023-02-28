@@ -100,6 +100,9 @@ class Image private constructor(private val src: CloseableSource) {
 
         @JvmStatic
         external fun rewriteGifSource(buffer: ByteBuffer)
+
+        @JvmStatic
+        external fun rewriteGifSource2(fd: Int)
     }
 
     interface CloseableSource : AutoCloseable {

@@ -18,39 +18,40 @@ package com.hippo.ehviewer.spider
 import android.graphics.ImageDecoder
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
-import coil.decode.DecodeUtils
-import coil.decode.FrameDelayRewritingSource
-import coil.decode.isGif
 import coil.disk.DiskCache
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCacheKeyFactory
-import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
+import com.hippo.image.Image
 import com.hippo.image.Image.CloseableSource
 import com.hippo.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.MathUtils
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import io.ktor.client.plugins.onDownload
+import io.ktor.client.request.prepareGet
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.ContentType
+import io.ktor.http.contentLength
+import io.ktor.http.contentType
+import io.ktor.utils.io.jvm.nio.copyTo
 import moe.tarsin.coroutines.runSuspendCatching
-import okhttp3.executeAsync
-import okio.buffer
 import java.io.File
 import java.io.IOException
-import java.nio.channels.FileChannel
 import java.util.Locale
 import kotlin.io.path.readText
 
-private val client = EhApplication.okHttpClient
+private val client = EhApplication.ktorClient
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid: Long = mGalleryInfo.gid
@@ -168,61 +169,62 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit
     ): Boolean {
-        val call = client.newCall(EhRequestBuilder(url, referer).build())
-        call.executeAsync().use { response ->
-            if (response.code >= 400) return false
-            val body = response.body
-            val extension = body.contentType()?.subtype ?: "jpg"
-            val length = body.contentLength()
-
-            suspend fun doSave(chan: FileChannel): Long {
-                var receivedSize: Long = 0
-                body.source().use { responseSource ->
-                    val source = if (DecodeUtils.isGif(responseSource)) FrameDelayRewritingSource(
-                        responseSource
-                    ).buffer() else responseSource
-                    source.use {
-                        while (true) {
-                            currentCoroutineContext().ensureActive()
-                            val bytesRead = chan.transferFrom(it, receivedSize, TRANSFER_BLOCK)
-                            receivedSize += bytesRead
-                            notifyProgress(body.contentLength(), receivedSize, bytesRead.toInt())
-                            if (bytesRead.toInt() == 0) break
-                        }
-                    }
-                }
-                return receivedSize
+        return client.prepareGet(url) {
+            var state: Long = 0
+            referer(referer)
+            onDownload { bytesSentTotal, contentLength ->
+                notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt())
+                state = bytesSentTotal
             }
+        }.execute {
+            if (it.status.value >= 400) return@execute false
+            saveFromHttpResponse(index, it)
+        }
+    }
 
-            findDownloadFileForIndex(index, extension)?.runSuspendCatching {
-                openOutputStream().use { outputStream ->
-                    outputStream.channel.use { return doSave(it) == length }
-                }
-            }?.onFailure {
-                it.printStackTrace()
-                return false
-            }
+    private suspend fun saveFromHttpResponse(index: Int, body: HttpResponse): Boolean {
+        val contentType = body.contentType()
+        val extension = contentType?.contentSubtype ?: "jpg"
+        val length = body.contentLength() ?: return false
 
-            // Read Mode, allow save to cache
-            if (mMode == SpiderQueen.MODE_READ) {
-                val key = EhCacheKeyFactory.getImageKey(mGid, index)
-                var received: Long = 0
-                runSuspendCatching {
-                    sCache.edit(key) {
-                        metadata.toFile().writeText(extension)
-                        data.toFile().outputStream().use { outputStream ->
-                            outputStream.channel.use { received = doSave(it) }
-                        }
-                    }
-                }.onFailure {
-                    it.printStackTrace()
-                }.onSuccess {
-                    return received == length
+        suspend fun doSave(outFile: UniFile): Long {
+            val ret: Long
+            outFile.openOutputStream().use { outputStream ->
+                outputStream.channel.use {
+                    ret = body.bodyAsChannel().copyTo(it)
                 }
             }
+            if (contentType == ContentType.Image.GIF)
+                outFile.openFileDescriptor("rw").use {
+                    Image.rewriteGifSource2(it.fd)
+                }
+            return ret
+        }
 
+        findDownloadFileForIndex(index, extension)?.runSuspendCatching {
+            return doSave(this) == length
+        }?.onFailure {
+            it.printStackTrace()
             return false
         }
+
+        // Read Mode, allow save to cache
+        if (mMode == SpiderQueen.MODE_READ) {
+            val key = EhCacheKeyFactory.getImageKey(mGid, index)
+            var received: Long = 0
+            runSuspendCatching {
+                sCache.edit(key) {
+                    metadata.toFile().writeText(extension)
+                    received = doSave(UniFile.fromFile(data.toFile())!!)
+                }
+            }.onFailure {
+                it.printStackTrace()
+            }.onSuccess {
+                return received == length
+            }
+        }
+
+        return false
     }
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
