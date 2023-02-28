@@ -144,7 +144,7 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
             e.printStackTrace()
             return false
         }
-        archiveAccessor.extractToFd(index, fd.fileDescriptor)
+        archiveAccessor.extractToFd(index, fd.fd)
         try {
             fd.close()
         } catch (e: IOException) {
