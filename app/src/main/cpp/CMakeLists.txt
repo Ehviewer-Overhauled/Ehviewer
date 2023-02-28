@@ -23,7 +23,7 @@ set(FETCHCONTENT_BASE_DIR ${deps})
 FetchContent_Declare(liblzma
         GIT_REPOSITORY  https://git.tukaani.org/xz.git
         GIT_TAG         v5.4.1
-        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-other-binarys.patch || true
+        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-other-binarys.patch || cd .
         )
 
 FetchContent_MakeAvailable(liblzma)
@@ -56,7 +56,7 @@ SET(LIBARCHIVE_CUSTOM_LIBS "nettle" "liblzma")
 FetchContent_Declare(libarchive
         GIT_REPOSITORY  https://github.com/libarchive/libarchive
         GIT_TAG         v3.6.2
-        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-shared-lib.patch ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || true
+        PATCH_COMMAND   git apply ${CMAKE_CURRENT_LIST_DIR}/0001-Don-t-build-shared-lib.patch ${CMAKE_CURRENT_LIST_DIR}/0002-Insert-link-libs.patch || cd .
         )
 
 FetchContent_MakeAvailable(libarchive)
