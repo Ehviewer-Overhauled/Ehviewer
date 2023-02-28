@@ -20,8 +20,12 @@ android {
         abi {
             isEnable = true
             reset()
-            include("arm64-v8a", "x86_64", "armeabi-v7a", "x86")
-            isUniversalApk = true
+            if (gradle.startParameter.taskNames.any { it.contains("Release") }) {
+                include("arm64-v8a", "x86_64", "armeabi-v7a", "x86")
+                isUniversalApk = true
+            } else {
+                include("arm64-v8a")
+            }
         }
     }
 
