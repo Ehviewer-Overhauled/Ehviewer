@@ -31,7 +31,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.Html
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -56,7 +55,6 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
@@ -117,6 +115,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import rikka.core.res.resolveColor
 import kotlin.math.roundToInt
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, DownloadInfoListener,
     OnLongClickListener {
@@ -812,26 +811,32 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             if (request()) {
                 adjustViewVisibility(STATE_REFRESH)
             }
-        } else {
-            val galleryDetail = mGalleryDetail ?: return
-            if (binding.content.header.uploader === v) {
-                val uploader = uploader
-                if (TextUtils.isEmpty(uploader) || disowned) {
+            return
+        }
+
+        val galleryDetail = mGalleryDetail ?: return
+        when (v) {
+            binding.content.header.uploader -> {
+                if (uploader.isNullOrEmpty() || disowned) {
                     return
                 }
                 val lub = ListUrlBuilder()
                 lub.mode = ListUrlBuilder.MODE_UPLOADER
                 lub.keyword = uploader
                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-            } else if (binding.content.header.category === v) {
-                val category = this.category
+            }
+
+            binding.content.header.category -> {
+                val category = category
                 if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
                     return
                 }
                 val lub = ListUrlBuilder()
                 lub.category = category
                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-            } else if (binding.content.header.download === v) {
+            }
+
+            binding.content.header.download -> {
                 if (downloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
                     CommonOperations.startDownload(activity, galleryDetail, false)
                 } else {
@@ -848,12 +853,16 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         .setPositiveButton(android.R.string.ok, helper)
                         .show()
                 }
-            } else if (binding.content.header.read === v) {
+            }
+
+            binding.content.header.read -> {
                 val intent = Intent(activity, ReaderActivity::class.java)
                 intent.action = ReaderActivity.ACTION_EH
                 intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
                 startActivity(intent)
-            } else if (binding.content.actions.newerVersion === v) {
+            }
+
+            binding.content.actions.newerVersion -> {
                 val titles = ArrayList<CharSequence>()
                 for (newerVersion in galleryDetail.newerVersions) {
                     titles.add(
@@ -874,13 +883,18 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         navigate(R.id.galleryDetailScene, args)
                     }
                     .show()
-            } else if (binding.content.header.info === v) {
+            }
+
+            binding.content.header.info -> {
                 val galleryInfoBottomSheet = GalleryInfoBottomSheet(galleryDetail)
                 galleryInfoBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     GalleryInfoBottomSheet.TAG
                 )
-            } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
+            }
+
+            binding.content.actions.heart,
+            binding.content.actions.heartOutline -> {
                 lifecycleScope.launchIO {
                     if (!mModifyingFavorites) {
                         var remove = false
@@ -906,17 +920,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         }
                     }
                 }
-            } else if (binding.content.actions.share === v) {
-                val url = galleryDetailUrl
-                if (url != null) {
-                    AppHelper.share(activity, url)
+            }
+
+            binding.content.actions.share -> {
+                galleryDetailUrl?.let {
+                    AppHelper.share(activity, it)
                 }
-            } else if (binding.content.actions.torrent === v) {
+            }
+
+            binding.content.actions.torrent -> {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
-                        requireActivity(),
+                        activity,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    )
-                    != PackageManager.PERMISSION_GRANTED
+                    ) != PackageManager.PERMISSION_GRANTED
                 ) {
                     requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 } else {
@@ -928,7 +944,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         .show()
                     helper.setDialog(dialog, galleryDetail.torrentUrl)
                 }
-            } else if (binding.content.actions.archive === v) {
+            }
+
+            binding.content.actions.archive -> {
                 if (galleryDetail.apiUid < 0) {
                     showTip(R.string.sign_in_first, LENGTH_LONG)
                     return
@@ -940,7 +958,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     .setOnDismissListener(helper)
                     .show()
                 helper.setDialog(dialog, galleryDetail.archiveUrl)
-            } else if (binding.content.actions.rate === v) {
+            }
+
+            binding.content.actions.rate -> {
                 if (galleryDetail.apiUid < 0) {
                     showTip(R.string.sign_in_first, LENGTH_LONG)
                     return
@@ -953,11 +973,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     .setPositiveButton(android.R.string.ok, helper)
                     .show()
                 helper.setDialog(dialog, galleryDetail.rating)
-            } else if (binding.content.actions.similar === v) {
+            }
+
+            binding.content.actions.similar -> {
                 showSimilarGalleryList()
-            } else if (binding.content.actions.searchCover === v) {
+            }
+
+            binding.content.actions.searchCover -> {
                 showCoverGalleryList()
-            } else if (binding.content.comments.comments === v) {
+            }
+
+            binding.content.comments.comments -> {
                 val args = Bundle()
                 args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
                 args.putString(GalleryCommentsScene.KEY_API_KEY, galleryDetail.apiKey)
@@ -966,7 +992,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, galleryDetail.comments)
                 args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, galleryDetail)
                 navigate(R.id.galleryCommentsScene, args)
-            } else {
+            }
+
+            else -> {
                 var o = v.getTag(R.id.tag)
                 if (o is String) {
                     val lub = ListUrlBuilder()
@@ -1106,7 +1134,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     override fun onLongClick(v: View): Boolean {
         val activity = mainActivity ?: return false
         if (binding.content.header.uploader === v) {
-            if (TextUtils.isEmpty(uploader) || disowned) {
+            if (uploader.isNullOrEmpty() || disowned) {
                 return false
             }
             showFilterUploaderDialog()
@@ -1259,7 +1287,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private class VoteTagListener(context: Context) :
         EhCallback<GalleryDetailScene?, VoteTagParser.Result>(context) {
         override fun onSuccess(result: VoteTagParser.Result) {
-            if (!TextUtils.isEmpty(result.error)) {
+            if (!result.error.isNullOrEmpty()) {
                 showTip(result.error, LENGTH_SHORT)
             } else {
                 showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
