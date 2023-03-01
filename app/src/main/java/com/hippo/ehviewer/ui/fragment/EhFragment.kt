@@ -18,13 +18,16 @@ package com.hippo.ehviewer.ui.fragment
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.format.DateFormat.is24HourFormat
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat.CLOCK_12H
+import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -80,7 +83,8 @@ class EhFragment : BasePreferenceFragment() {
                             schedHour?.let { setHour(it) }
                             schedMinute?.let { setMinute(it) }
                         }
-                        .setTimeFormat(CLOCK_12H)
+                        .setTimeFormat(if (is24HourFormat(requireContext())) CLOCK_24H else CLOCK_12H)
+                        .setInputMode(INPUT_MODE_CLOCK)
                         .build()
                         .apply {
                             addOnPositiveButtonClickListener {
