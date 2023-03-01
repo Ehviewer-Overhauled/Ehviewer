@@ -812,60 +812,50 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             if (request()) {
                 adjustViewVisibility(STATE_REFRESH)
             }
-        } else if (binding.content.header.uploader === v) {
-            val uploader = uploader
-            if (TextUtils.isEmpty(uploader) || disowned) {
-                return
-            }
-            val lub = ListUrlBuilder()
-            lub.mode = ListUrlBuilder.MODE_UPLOADER
-            lub.keyword = uploader
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-        } else if (binding.content.header.category === v) {
-            val category = this.category
-            if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
-                return
-            }
-            val lub = ListUrlBuilder()
-            lub.category = category
-            navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-        } else if (binding.content.header.download === v) {
-            val galleryInfo = galleryInfo
-            if (galleryInfo != null) {
-                if (downloadManager.getDownloadState(galleryInfo.gid) == DownloadInfo.STATE_INVALID) {
-                    CommonOperations.startDownload(activity, galleryInfo, false)
+        } else {
+            val galleryDetail = mGalleryDetail ?: return
+            if (binding.content.header.uploader === v) {
+                val uploader = uploader
+                if (TextUtils.isEmpty(uploader) || disowned) {
+                    return
+                }
+                val lub = ListUrlBuilder()
+                lub.mode = ListUrlBuilder.MODE_UPLOADER
+                lub.keyword = uploader
+                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            } else if (binding.content.header.category === v) {
+                val category = this.category
+                if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
+                    return
+                }
+                val lub = ListUrlBuilder()
+                lub.category = category
+                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+            } else if (binding.content.header.download === v) {
+                if (downloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
+                    CommonOperations.startDownload(activity, galleryDetail, false)
                 } else {
                     val builder = CheckBoxDialogBuilder(
                         context,
-                        getString(R.string.download_remove_dialog_message, galleryInfo.title),
+                        getString(R.string.download_remove_dialog_message, galleryDetail.title),
                         getString(R.string.download_remove_dialog_check_text),
                         Settings.removeImageFiles
                     )
                     val helper = DeleteDialogHelper(
-                        downloadManager, galleryInfo, builder
+                        downloadManager, galleryDetail, builder
                     )
                     builder.setTitle(R.string.download_remove_dialog_title)
                         .setPositiveButton(android.R.string.ok, helper)
                         .show()
                 }
-            }
-        } else if (binding.content.header.read === v) {
-            var galleryInfo: GalleryInfo? = null
-            if (mGalleryInfo != null) {
-                galleryInfo = mGalleryInfo
-            } else if (mGalleryDetail != null) {
-                galleryInfo = mGalleryDetail
-            }
-            if (galleryInfo != null) {
+            } else if (binding.content.header.read === v) {
                 val intent = Intent(activity, ReaderActivity::class.java)
                 intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo)
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
                 startActivity(intent)
-            }
-        } else if (binding.content.actions.newerVersion === v) {
-            if (mGalleryDetail != null) {
+            } else if (binding.content.actions.newerVersion === v) {
                 val titles = ArrayList<CharSequence>()
-                for (newerVersion in mGalleryDetail!!.newerVersions) {
+                for (newerVersion in galleryDetail.newerVersions) {
                     titles.add(
                         getString(
                             R.string.newer_version_title,
@@ -876,7 +866,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 }
                 BaseDialogBuilder(requireContext())
                     .setItems(titles.toTypedArray()) { _: DialogInterface?, which: Int ->
-                        val newerVersion = mGalleryDetail!!.newerVersions[which]
+                        val newerVersion = galleryDetail.newerVersions[which]
                         val args = Bundle()
                         args.putString(KEY_ACTION, ACTION_GID_TOKEN)
                         args.putLong(KEY_GID, newerVersion.gid)
@@ -884,47 +874,44 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         navigate(R.id.galleryDetailScene, args)
                     }
                     .show()
-            }
-        } else if (binding.content.header.info === v) {
-            mGalleryDetail ?: return
-            val galleryInfoBottomSheet = GalleryInfoBottomSheet(mGalleryDetail!!)
-            galleryInfoBottomSheet.show(
-                requireActivity().supportFragmentManager,
-                GalleryInfoBottomSheet.TAG
-            )
-        } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
-            lifecycleScope.launchIO {
-                if (mGalleryDetail != null && !mModifyingFavorites) {
-                    var remove = false
-                    val containLocalFavorites = EhDB.containLocalFavorites(mGalleryDetail!!.gid)
-                    if (containLocalFavorites || mGalleryDetail!!.isFavorited) {
-                        mModifyingFavorites = true
-                        CommonOperations.removeFromFavorites(
-                            activity, mGalleryDetail!!,
-                            ModifyFavoritesListener(context, true)
-                        )
-                        remove = true
-                    }
-                    withUIContext {
-                        if (!remove) {
+            } else if (binding.content.header.info === v) {
+                val galleryInfoBottomSheet = GalleryInfoBottomSheet(galleryDetail)
+                galleryInfoBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    GalleryInfoBottomSheet.TAG
+                )
+            } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
+                lifecycleScope.launchIO {
+                    if (!mModifyingFavorites) {
+                        var remove = false
+                        val containLocalFavorites = EhDB.containLocalFavorites(galleryDetail.gid)
+                        if (containLocalFavorites || galleryDetail.isFavorited) {
                             mModifyingFavorites = true
-                            CommonOperations.addToFavorites(
-                                activity, mGalleryDetail!!,
-                                ModifyFavoritesListener(context, false)
+                            CommonOperations.removeFromFavorites(
+                                activity, galleryDetail,
+                                ModifyFavoritesListener(context, true)
                             )
+                            remove = true
                         }
-                        // Update UI
-                        updateFavoriteDrawable()
+                        withUIContext {
+                            if (!remove) {
+                                mModifyingFavorites = true
+                                CommonOperations.addToFavorites(
+                                    activity, galleryDetail,
+                                    ModifyFavoritesListener(context, false)
+                                )
+                            }
+                            // Update UI
+                            updateFavoriteDrawable()
+                        }
                     }
                 }
-            }
-        } else if (binding.content.actions.share === v) {
-            val url = galleryDetailUrl
-            if (url != null) {
-                AppHelper.share(activity, url)
-            }
-        } else if (binding.content.actions.torrent === v) {
-            if (mGalleryDetail != null) {
+            } else if (binding.content.actions.share === v) {
+                val url = galleryDetailUrl
+                if (url != null) {
+                    AppHelper.share(activity, url)
+                }
+            } else if (binding.content.actions.torrent === v) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
                         requireActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -939,73 +926,63 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         .setView(R.layout.dialog_torrent_list)
                         .setOnDismissListener(helper)
                         .show()
-                    helper.setDialog(dialog, mGalleryDetail!!.torrentUrl)
+                    helper.setDialog(dialog, galleryDetail.torrentUrl)
                 }
-            }
-        } else if (binding.content.actions.archive === v) {
-            if (mGalleryDetail == null) {
-                return
-            }
-            if (mGalleryDetail!!.apiUid < 0) {
-                showTip(R.string.sign_in_first, LENGTH_LONG)
-                return
-            }
-            val helper = ArchiveListDialogHelper()
-            val dialog: Dialog = BaseDialogBuilder(context)
-                .setTitle(R.string.settings_download)
-                .setView(R.layout.dialog_archive_list)
-                .setOnDismissListener(helper)
-                .show()
-            helper.setDialog(dialog, mGalleryDetail!!.archiveUrl)
-        } else if (binding.content.actions.rate === v) {
-            if (mGalleryDetail == null) {
-                return
-            }
-            if (mGalleryDetail!!.apiUid < 0) {
-                showTip(R.string.sign_in_first, LENGTH_LONG)
-                return
-            }
-            val helper = RateDialogHelper()
-            val dialog: Dialog = BaseDialogBuilder(context)
-                .setTitle(R.string.rate)
-                .setView(R.layout.dialog_rate)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, helper)
-                .show()
-            helper.setDialog(dialog, mGalleryDetail!!.rating)
-        } else if (binding.content.actions.similar === v) {
-            showSimilarGalleryList()
-        } else if (binding.content.actions.searchCover === v) {
-            showCoverGalleryList()
-        } else if (binding.content.comments.comments === v) {
-            if (mGalleryDetail == null) {
-                return
-            }
-            val args = Bundle()
-            args.putLong(GalleryCommentsScene.KEY_API_UID, mGalleryDetail!!.apiUid)
-            args.putString(GalleryCommentsScene.KEY_API_KEY, mGalleryDetail!!.apiKey)
-            args.putLong(GalleryCommentsScene.KEY_GID, mGalleryDetail!!.gid)
-            args.putString(GalleryCommentsScene.KEY_TOKEN, mGalleryDetail!!.token)
-            args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, mGalleryDetail!!.comments)
-            args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, mGalleryDetail)
-            navigate(R.id.galleryCommentsScene, args)
-        } else {
-            var o = v.getTag(R.id.tag)
-            if (o is String) {
-                val lub = ListUrlBuilder()
-                lub.mode = ListUrlBuilder.MODE_TAG
-                lub.keyword = o
-                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                return
-            }
-            val galleryInfo = galleryInfo
-            o = v.getTag(R.id.index)
-            if (null != galleryInfo && o is Int) {
-                val intent = Intent(context, ReaderActivity::class.java)
-                intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo)
-                intent.putExtra(ReaderActivity.KEY_PAGE, o)
-                startActivity(intent)
+            } else if (binding.content.actions.archive === v) {
+                if (galleryDetail.apiUid < 0) {
+                    showTip(R.string.sign_in_first, LENGTH_LONG)
+                    return
+                }
+                val helper = ArchiveListDialogHelper()
+                val dialog: Dialog = BaseDialogBuilder(context)
+                    .setTitle(R.string.settings_download)
+                    .setView(R.layout.dialog_archive_list)
+                    .setOnDismissListener(helper)
+                    .show()
+                helper.setDialog(dialog, galleryDetail.archiveUrl)
+            } else if (binding.content.actions.rate === v) {
+                if (galleryDetail.apiUid < 0) {
+                    showTip(R.string.sign_in_first, LENGTH_LONG)
+                    return
+                }
+                val helper = RateDialogHelper()
+                val dialog: Dialog = BaseDialogBuilder(context)
+                    .setTitle(R.string.rate)
+                    .setView(R.layout.dialog_rate)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, helper)
+                    .show()
+                helper.setDialog(dialog, galleryDetail.rating)
+            } else if (binding.content.actions.similar === v) {
+                showSimilarGalleryList()
+            } else if (binding.content.actions.searchCover === v) {
+                showCoverGalleryList()
+            } else if (binding.content.comments.comments === v) {
+                val args = Bundle()
+                args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
+                args.putString(GalleryCommentsScene.KEY_API_KEY, galleryDetail.apiKey)
+                args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
+                args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
+                args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, galleryDetail.comments)
+                args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, galleryDetail)
+                navigate(R.id.galleryCommentsScene, args)
+            } else {
+                var o = v.getTag(R.id.tag)
+                if (o is String) {
+                    val lub = ListUrlBuilder()
+                    lub.mode = ListUrlBuilder.MODE_TAG
+                    lub.keyword = o
+                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                    return
+                }
+                o = v.getTag(R.id.index)
+                if (o is Int) {
+                    val intent = Intent(context, ReaderActivity::class.java)
+                    intent.action = ReaderActivity.ACTION_EH
+                    intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
+                    intent.putExtra(ReaderActivity.KEY_PAGE, o)
+                    startActivity(intent)
+                }
             }
         }
     }
