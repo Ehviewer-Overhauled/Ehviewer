@@ -1,5 +1,7 @@
 package com.hippo.ehviewer.ui.login
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,6 +80,10 @@ fun SignInScreen() {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
     var signInJob by remember { mutableStateOf<Job?>(null) }
+
+    BackHandler {
+        (context as Activity).moveTaskToBack(true)
+    }
 
     // Basic login request
     fun signIn() {

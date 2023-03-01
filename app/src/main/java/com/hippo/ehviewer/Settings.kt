@@ -111,7 +111,7 @@ object Settings {
     private const val KEY_SELECT_SITE = "select_site"
     private const val DEFAULT_SELECT_SITE = true
     private const val DEFAULT_THEME = THEME_SYSTEM
-    private const val DEFAULT_GALLERY_SITE = 1
+    private const val DEFAULT_GALLERY_SITE = 0
     private const val KEY_LAUNCH_PAGE = "launch_page"
     private const val DEFAULT_LAUNCH_PAGE = 0
     private const val DEFAULT_LIST_MODE = 0
