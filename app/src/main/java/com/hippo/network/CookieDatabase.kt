@@ -77,11 +77,9 @@ abstract class CookiesDatabase : RoomDatabase() {
 internal class CookieDatabase(context: Context, name: String) {
     private val cookiesList by lazy {
         val now = System.currentTimeMillis()
-        val statement = db.compileStatement("DELETE FROM OK_HTTP_3_COOKIE WHERE _id = ?;")
         db.cookiesDao().list().mapNotNull {
             it.takeUnless { !it.persistent || it.expiresAt <= now } ?: run {
-                statement.bindLong(1, it.id!!)
-                statement.executeUpdateDelete()
+                db.cookiesDao().delete(it)
                 null
             }
         }.toMutableList()
