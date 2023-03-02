@@ -1,0 +1,88 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "1b80cd29939b0f43934721f1289ba94d",
+    "entities": [
+      {
+        "tableName": "OK_HTTP_3_COOKIE",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`NAME` TEXT NOT NULL, `VALUE` TEXT NOT NULL, `EXPIRES_AT` INTEGER NOT NULL, `DOMAIN` TEXT NOT NULL, `PATH` TEXT NOT NULL, `SECURE` INTEGER NOT NULL, `HTTP_ONLY` INTEGER NOT NULL, `PERSISTENT` INTEGER NOT NULL, `HOST_ONLY` INTEGER NOT NULL, `_id` INTEGER, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "NAME",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "VALUE",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresAt",
+            "columnName": "EXPIRES_AT",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domain",
+            "columnName": "DOMAIN",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "PATH",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secure",
+            "columnName": "SECURE",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "httpOnly",
+            "columnName": "HTTP_ONLY",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "persistent",
+            "columnName": "PERSISTENT",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hostOnly",
+            "columnName": "HOST_ONLY",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1b80cd29939b0f43934721f1289ba94d')"
+    ]
+  }
+}

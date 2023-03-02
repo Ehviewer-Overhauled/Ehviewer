@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 typealias KtorCookie = io.ktor.http.Cookie
 
 object EhCookieStore : CookieJar, CookiesStorage {
-    private val db: CookieDatabase = CookieDatabase(EhApplication.application, "okhttp3-cookie-2.db")
+    private val db: CookieDatabase = CookieDatabase(EhApplication.application, "okhttp3-cookie.db")
     private val map: MutableMap<String, CookieSet> = db.allCookies
 
     fun signOut() {

@@ -16,6 +16,7 @@
 package com.hippo.network
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -69,7 +70,17 @@ interface CookiesDao {
     fun update(cookie: Cookie)
 }
 
-@Database(entities = [Cookie::class], version = 1, exportSchema = false)
+/* 1 -> 2 some nullability changes */
+@Database(
+    entities = [Cookie::class],
+    version = 2,
+    autoMigrations = [
+        AutoMigration(
+            from = 1,
+            to = 2
+        )
+    ]
+)
 abstract class CookiesDatabase : RoomDatabase() {
     abstract fun cookiesDao(): CookiesDao
 }
