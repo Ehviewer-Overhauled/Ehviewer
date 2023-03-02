@@ -114,10 +114,10 @@ fun CookieSignInScene() {
             ipbPassHashErrorState = false
         }
         focusManager.clearFocus()
-        storeCookie(ipbMemberId, ipbPassHash, igneous)
         isProgressIndicatorVisible = true
         signInJob = coroutineScope.launchIO {
             runCatching {
+                storeCookie(ipbMemberId, ipbPassHash, igneous)
                 EhEngine.getProfile()
             }.onSuccess {
                 withNonCancellableContext {

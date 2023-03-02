@@ -18,6 +18,7 @@ package com.hippo.ehviewer.client
 import com.hippo.ehviewer.EhApplication
 import com.hippo.network.CookieDatabase
 import com.hippo.network.CookieSet
+import eu.kanade.tachiyomi.util.lang.launchIO
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.http.Url
 import okhttp3.Cookie
@@ -179,7 +180,9 @@ object EhCookieStore : CookieJar, CookiesStorage {
     @Synchronized
     fun clear() {
         map.clear()
-        db.clear()
+        launchIO {
+            db.clear()
+        }
     }
 
     override suspend fun addCookie(requestUrl: Url, cookie: io.ktor.http.Cookie) {}
