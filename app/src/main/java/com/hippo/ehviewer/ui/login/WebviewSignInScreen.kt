@@ -96,13 +96,15 @@ fun WebviewSignInScreen() {
                         } else if (EhCookieStore.KEY_IPB_PASS_HASH == cookie.name) {
                             getHash = true
                         }
-                        addCookie(EhUrl.DOMAIN_EX, cookie)
-                        addCookie(EhUrl.DOMAIN_E, cookie)
                     }
                     if (getId && getHash) {
                         present = true
                         coroutineScope.launchIO {
                             withNonCancellableContext {
+                                cookies.forEach {
+                                    addCookie(EhUrl.DOMAIN_EX, it)
+                                    addCookie(EhUrl.DOMAIN_E, it)
+                                }
                                 postLogin()
                             }
                             withUIContext {
