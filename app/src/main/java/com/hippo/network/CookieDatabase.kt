@@ -75,33 +75,26 @@ abstract class CookiesDatabase : RoomDatabase() {
 }
 
 internal class CookieDatabase(context: Context, name: String) {
-    private val cookiesList = mutableListOf<Cookie>()
+    private val cookiesList by lazy {
+        val now = System.currentTimeMillis()
+        val statement = db.compileStatement("DELETE FROM OK_HTTP_3_COOKIE WHERE _id = ?;")
+        db.cookiesDao().list().mapNotNull {
+            it.takeUnless { !it.persistent || it.expiresAt <= now } ?: run {
+                statement.bindLong(1, it.id!!)
+                statement.executeUpdateDelete()
+                null
+            }
+        }.toMutableList()
+    }
     private val db = Room.databaseBuilder(context, CookiesDatabase::class.java, name).build()
 
     val allCookies by lazy {
-        val now = System.currentTimeMillis()
-        val map: MutableMap<String, CookieSet> = HashMap()
-        val toRemove: MutableList<Long> = ArrayList()
-        db.cookiesDao().list().forEach {
-            if (!it.persistent || it.expiresAt <= now) {
-                toRemove.add(it.id!!)
-            } else {
-                val okhttpCookie = it.toOkHttp3Cookie()
-                cookiesList.add(it)
+        hashMapOf<String, CookieSet>().also { map ->
+            cookiesList.map { it.toOkHttp3Cookie() }.forEach {
                 val set = map[it.domain] ?: CookieSet().apply { map[it.domain] = this }
-                set.add(okhttpCookie)
+                set.add(it)
             }
         }
-        if (toRemove.isNotEmpty()) {
-            val statement = db.compileStatement("DELETE FROM OK_HTTP_3_COOKIE WHERE _id = ?;")
-            db.runInTransaction {
-                toRemove.forEach {
-                    statement.bindLong(1, it)
-                    statement.executeUpdateDelete()
-                }
-            }
-        }
-        map
     }
 
     private fun findCookieWithOkHttpCookies(cookie: OkHttpCookie): Cookie? {
