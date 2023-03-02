@@ -75,7 +75,7 @@ abstract class CookiesDatabase : RoomDatabase() {
 }
 
 internal class CookieDatabase(context: Context, name: String) {
-    private val cookieIdMap: MutableMap<OkHttpCookie, Long> = HashMap()
+    private val cookiesList = mutableListOf<Cookie>()
     private val db = Room.databaseBuilder(context, CookiesDatabase::class.java, name).build()
 
     val allCookies by lazy {
@@ -87,7 +87,7 @@ internal class CookieDatabase(context: Context, name: String) {
                 toRemove.add(it.id!!)
             } else {
                 val okhttpCookie = it.toOkHttp3Cookie()
-                cookieIdMap[okhttpCookie] = it.id!!
+                cookiesList.add(it)
                 val set = map[it.domain] ?: CookieSet().apply { map[it.domain] = this }
                 set.add(okhttpCookie)
             }
@@ -104,26 +104,33 @@ internal class CookieDatabase(context: Context, name: String) {
         map
     }
 
+    private fun findCookieWithOkHttpCookies(cookie: OkHttpCookie): Cookie? {
+        return cookiesList.find { it.name == cookie.name && it.domain == cookie.domain && it.value == cookie.value }
+    }
+
     fun add(cookie: OkHttpCookie) {
-        db.cookiesDao().insert(cookie.toCookie()).apply { cookieIdMap[cookie] = this }
+        val c = cookie.toCookie()
+        c.id = db.cookiesDao().insert(c)
+        cookiesList.add(c)
     }
 
     fun update(from: OkHttpCookie, to: OkHttpCookie) {
-        val id = cookieIdMap[from] ?: return
-        db.cookiesDao().update(to.toCookie(id))
-        cookieIdMap.remove(from)
-        cookieIdMap[to] = id
+        val origin = findCookieWithOkHttpCookies(from) ?: return
+        val new = to.toCookie(origin.id)
+        cookiesList.remove(origin)
+        cookiesList.add(new)
+        db.cookiesDao().update(new)
     }
 
     fun remove(cookie: OkHttpCookie) {
-        val id = cookieIdMap[cookie] ?: return
-        db.cookiesDao().delete(cookie.toCookie(id))
-        cookieIdMap.remove(cookie)
+        val origin = findCookieWithOkHttpCookies(cookie) ?: return
+        db.cookiesDao().delete(origin)
+        cookiesList.remove(origin)
     }
 
     fun clear() {
         db.clearAllTables()
-        cookieIdMap.clear()
+        cookiesList.clear()
     }
 }
 
