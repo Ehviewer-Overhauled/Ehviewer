@@ -27,9 +27,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -45,7 +43,6 @@ import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
-import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.easyrecyclerview.MarginItemDecoration
@@ -54,8 +51,10 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.DownloadInfo
+import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDownloadBinding
 import com.hippo.ehviewer.databinding.ItemDrawerListBinding
+import com.hippo.ehviewer.databinding.SceneDownloadBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
@@ -93,13 +92,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     /*---------------
      View life cycle
      ---------------*/
-    private var mTip: TextView? = null
-    private var mFastScroller: FastScroller? = null
-    private var mRecyclerView: EasyRecyclerView? = null
+    private var _binding: SceneDownloadBinding? = null
+    private val binding get() = _binding!!
     private var mViewTransition: ViewTransition? = null
-    private var mFabLayout: FabLayout? = null
     private var mAdapter: DownloadAdapter? = null
-    private var mLayoutManager: AutoStaggeredGridLayoutManager? = null
     private var mInitPosition = -1
     private var mLabelAdapter: DownloadLabelAdapter? = null
     private lateinit var mLabels: MutableList<String>
@@ -135,8 +131,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 // Get position
                 if (null != mList) {
                     val position = mList!!.indexOf(info)
-                    if (position >= 0 && null != mRecyclerView) {
-                        mRecyclerView!!.scrollToPosition(position)
+                    if (position >= 0 && null != _binding) {
+                        binding.recyclerView.scrollToPosition(position)
                     } else {
                         mInitPosition = position
                     }
@@ -232,64 +228,57 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.scene_download, container, false)
-        val content = ViewUtils.`$$`(view, R.id.content)
-        mRecyclerView = ViewUtils.`$$`(content, R.id.recycler_view) as EasyRecyclerView
-        setLiftOnScrollTargetView(mRecyclerView)
-        mFastScroller = ViewUtils.`$$`(content, R.id.fast_scroller) as FastScroller
-        mFabLayout = ViewUtils.`$$`(view, R.id.fab_layout) as FabLayout
-
-        // Workaround
-        (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
-        container!!.addView(mFabLayout)
-        mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        mViewTransition = ViewTransition(content, mTip)
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_download)
-        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        mTip!!.setCompoundDrawables(null, drawable, null, null)
-        mAdapter = DownloadAdapter()
-        mAdapter!!.setHasStableIds(true)
-        mRecyclerView!!.adapter = mAdapter
-        mLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-        mLayoutManager!!.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
-        mLayoutManager!!.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
-        mRecyclerView!!.layoutManager = mLayoutManager
-        //mRecyclerView.setSelector(Ripple.generateRippleDrawable(context, !ResourcesKt.resolveColor(getTheme(), .getAttrBoolean(context, R.attr.isLightTheme), new ColorDrawable(Color.TRANSPARENT)));
-        //mRecyclerView.setDrawSelectorOnTop(true);
-        mRecyclerView!!.clipToPadding = false
-        mRecyclerView!!.clipChildren = false
-        //mRecyclerView.setOnItemClickListener(this);
-        //mRecyclerView.setOnItemLongClickListener(this);
-        mRecyclerView!!.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
-        mRecyclerView!!.setCustomCheckedListener(DownloadChoiceListener())
-        // Cancel change animation
-        val itemAnimator = mRecyclerView!!.itemAnimator
-        if (itemAnimator is SimpleItemAnimator) {
-            itemAnimator.supportsChangeAnimations = false
+        _binding = SceneDownloadBinding.inflate(inflater, container, false)
+        binding.run {
+            setLiftOnScrollTargetView(recyclerView)
+            // Workaround
+            (fabLayout.parent as ViewGroup).removeView(fabLayout)
+            container!!.addView(fabLayout)
+            mViewTransition = ViewTransition(content, tip)
+            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_download)
+            drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            tip.setCompoundDrawables(null, drawable, null, null)
+            mAdapter = DownloadAdapter()
+            mAdapter!!.setHasStableIds(true)
+            recyclerView.adapter = mAdapter
+            val layoutManager =
+                AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
+            layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
+            layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+            recyclerView.layoutManager = layoutManager
+            recyclerView.clipToPadding = false
+            recyclerView.clipChildren = false
+            recyclerView.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
+            recyclerView.setCustomCheckedListener(DownloadChoiceListener())
+            // Cancel change animation
+            val itemAnimator = recyclerView.itemAnimator
+            if (itemAnimator is SimpleItemAnimator) {
+                itemAnimator.supportsChangeAnimations = false
+            }
+            val interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
+            val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+            val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+            val decoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+            recyclerView.addItemDecoration(decoration)
+            if (mInitPosition >= 0) {
+                recyclerView.scrollToPosition(mInitPosition)
+                mInitPosition = -1
+            }
+            itemTouchHelper.attachToRecyclerView(recyclerView)
+            fastScroller.attachToRecyclerView(recyclerView)
+            val handlerDrawable = HandlerDrawable()
+            handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
+            fastScroller.setHandlerDrawable(handlerDrawable)
+            fastScroller.setOnDragHandlerListener(this@DownloadsScene)
+            fabLayout.addOnExpandListener(FabLayoutListener())
+            fabLayout.setExpanded(expanded = false, animation = false)
+            fabLayout.setHidePrimaryFab(true)
+            fabLayout.setAutoCancel(false)
+            fabLayout.setOnClickFabListener(this@DownloadsScene)
+            addAboveSnackView(fabLayout)
+            updateView()
         }
-        val interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
-        val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-        val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
-        val decoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
-        mRecyclerView!!.addItemDecoration(decoration)
-        if (mInitPosition >= 0) {
-            mRecyclerView!!.scrollToPosition(mInitPosition)
-            mInitPosition = -1
-        }
-        itemTouchHelper.attachToRecyclerView(mRecyclerView)
-        mFastScroller!!.attachToRecyclerView(mRecyclerView)
-        val handlerDrawable = HandlerDrawable()
-        handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
-        mFastScroller!!.setHandlerDrawable(handlerDrawable)
-        mFastScroller!!.setOnDragHandlerListener(this)
-        mFabLayout!!.addOnExpandListener(FabLayoutListener())
-        mFabLayout!!.setExpanded(expanded = false, animation = false)
-        mFabLayout!!.setHidePrimaryFab(true)
-        mFabLayout!!.setAutoCancel(false)
-        mFabLayout!!.setOnClickFabListener(this)
-        addAboveSnackView(mFabLayout)
-        updateView()
-        return view
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -300,19 +289,12 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (null != mRecyclerView) {
-            mRecyclerView!!.stopScroll()
-            mRecyclerView = null
-        }
-        if (null != mFabLayout) {
-            removeAboveSnackView(mFabLayout)
-            (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
-            mFabLayout = null
-        }
-        mRecyclerView = null
+        binding.recyclerView.stopScroll()
+        removeAboveSnackView(binding.fabLayout)
+        (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         mViewTransition = null
         mAdapter = null
-        mLayoutManager = null
+        _binding = null
     }
 
     override fun onNavigationClick() {
@@ -326,7 +308,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     override fun onMenuItemClick(item: MenuItem): Boolean {
         // Skip when in choice mode
         val activity: Activity? = mainActivity
-        if (null == activity || null == mRecyclerView || mRecyclerView!!.isInCustomChoice) {
+        if (null == activity || binding.recyclerView.isInCustomChoice) {
             return false
         }
         when (item.itemId) {
@@ -413,11 +395,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.download_labels)
-        toolbar.inflateMenu(R.menu.drawer_download)
-        toolbar.setOnMenuItemClickListener { item: MenuItem ->
+        val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
+        drawerBinding.toolbar.setTitle(R.string.download_labels)
+        drawerBinding.toolbar.inflateMenu(R.menu.drawer_download)
+        drawerBinding.toolbar.setOnMenuItemClickListener { item: MenuItem ->
             val id = item.itemId
             if (id == R.id.action_add) {
                 val builder = EditTextDialogBuilder(
@@ -463,13 +444,12 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
         initLabels()
         mLabelAdapter = DownloadLabelAdapter(inflater)
-        val recyclerView = view.findViewById<EasyRecyclerView>(R.id.recycler_view_drawer)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
         mLabelAdapter!!.setHasStableIds(true)
         val itemTouchHelper = ItemTouchHelper(DownloadLabelItemTouchHelperCallback())
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerView.adapter = mLabelAdapter
-        return view
+        itemTouchHelper.attachToRecyclerView(drawerBinding.recyclerViewDrawer)
+        drawerBinding.recyclerViewDrawer.adapter = mLabelAdapter
+        return drawerBinding.root
     }
 
     override fun onStartDragHandler() {
@@ -479,19 +459,15 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
     override fun onEndDragHandler() {
         // Restore right drawer
-        if (null != mRecyclerView && !mRecyclerView!!.isInCustomChoice) {
+        if (!binding.recyclerView.isInCustomChoice) {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
         }
     }
 
     fun onItemClick(position: Int): Boolean {
-        val activity: Activity? = mainActivity
-        val recyclerView = mRecyclerView
-        if (null == activity || null == recyclerView) {
-            return false
-        }
-        return if (recyclerView.isInCustomChoice) {
-            recyclerView.toggleItemChecked(position)
+        val activity = mainActivity ?: return false
+        return if (binding.recyclerView.isInCustomChoice) {
+            binding.recyclerView.toggleItemChecked(position)
             true
         } else {
             val list = mList ?: return false
@@ -507,29 +483,27 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
     }
 
     fun onItemLongClick(position: Int): Boolean {
-        val recyclerView = mRecyclerView ?: return false
-        if (!recyclerView.isInCustomChoice) {
-            recyclerView.intoCustomChoiceMode()
+        if (!binding.recyclerView.isInCustomChoice) {
+            binding.recyclerView.intoCustomChoiceMode()
         }
-        recyclerView.toggleItemChecked(position)
+        binding.recyclerView.toggleItemChecked(position)
         return true
     }
 
     override fun onClickPrimaryFab(view: FabLayout, fab: FloatingActionButton) {
-        if (mRecyclerView != null && mRecyclerView!!.isInCustomChoice) {
-            mRecyclerView!!.outOfCustomChoiceMode()
+        if (binding.recyclerView.isInCustomChoice) {
+            binding.recyclerView.outOfCustomChoiceMode()
         }
     }
 
     override fun onClickSecondaryFab(view: FabLayout, fab: FloatingActionButton, position: Int) {
         val context = context
         val activity: Activity? = mainActivity
-        val recyclerView = mRecyclerView
-        if (null == context || null == activity || null == recyclerView) {
+        if (null == context || null == activity) {
             return
         }
         if (0 == position) {
-            recyclerView.checkAll()
+            binding.recyclerView.checkAll()
         } else {
             val list = mList ?: return
             var gidList: LongList? = null
@@ -542,7 +516,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             if (collectDownloadInfo) {
                 downloadInfoList = LinkedList()
             }
-            val stateArray = recyclerView.checkedItemPositions
+            val stateArray = binding.recyclerView.checkedItemPositions
             for (i in 0 until stateArray.size()) {
                 if (stateArray.valueAt(i)) {
                     val info = list[stateArray.keyAt(i)]
@@ -562,7 +536,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     intent.putExtra(DownloadService.KEY_GID_LIST, gidList)
                     ContextCompat.startForegroundService(activity, intent)
                     // Cancel check mode
-                    recyclerView.outOfCustomChoiceMode()
+                    binding.recyclerView.outOfCustomChoiceMode()
                 }
 
                 2 -> {
@@ -571,7 +545,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                         mDownloadManager!!.stopRangeDownload(gidList!!)
                     }
                     // Cancel check mode
-                    recyclerView.outOfCustomChoiceMode()
+                    binding.recyclerView.outOfCustomChoiceMode()
                 }
 
                 3 -> {
@@ -773,9 +747,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             }
 
             // Cancel check mode
-            if (mRecyclerView != null) {
-                mRecyclerView!!.outOfCustomChoiceMode()
-            }
+            binding.recyclerView.outOfCustomChoiceMode()
 
             // Delete
             if (null != mDownloadManager) {
@@ -809,9 +781,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         override fun onClick(dialog: DialogInterface, which: Int) {
             // Cancel check mode
             context ?: return
-            if (null != mRecyclerView) {
-                mRecyclerView!!.outOfCustomChoiceMode()
-            }
+            binding.recyclerView.outOfCustomChoiceMode()
             val label: String? = if (which == 0) {
                 null
             } else {
@@ -845,8 +815,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         override fun onClick(v: View) {
             val context = context
             val activity: Activity? = mainActivity
-            val recyclerView = mRecyclerView
-            if (null == context || null == activity || null == recyclerView || recyclerView.isInCustomChoice) {
+            val recyclerView = this@DownloadsScene.binding.recyclerView
+            if (null == context || null == activity || recyclerView.isInCustomChoice) {
                 return
             }
             val list = mList ?: return
@@ -979,8 +949,8 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         private val mListThumbHeight: Int
 
         init {
-            @SuppressLint("InflateParams") val calculator =
-                mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
+            @SuppressLint("InflateParams")
+            val calculator = mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
             ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
             mListThumbHeight = calculator.measuredHeight
             mListThumbWidth = mListThumbHeight * 2 / 3
@@ -1017,24 +987,20 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
 
     private inner class FabLayoutListener : OnExpandListener {
         override fun onExpand(expanded: Boolean) {
-            if (!expanded && mRecyclerView != null && mRecyclerView!!.isInCustomChoice) mRecyclerView!!.outOfCustomChoiceMode()
+            if (!expanded && binding.recyclerView.isInCustomChoice) binding.recyclerView.outOfCustomChoiceMode()
         }
     }
 
     private inner class DownloadChoiceListener : CustomChoiceListener {
         override fun onIntoCustomChoice(view: EasyRecyclerView) {
-            if (mFabLayout != null) {
-                mFabLayout!!.isExpanded = true
-            }
+            binding.fabLayout.isExpanded = true
             // Lock drawer
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
         }
 
         override fun onOutOfCustomChoice(view: EasyRecyclerView) {
-            if (mFabLayout != null) {
-                mFabLayout!!.isExpanded = false
-            }
+            binding.fabLayout.isExpanded = false
             // Unlock drawer
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
             setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
