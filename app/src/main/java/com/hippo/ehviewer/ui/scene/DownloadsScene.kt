@@ -27,7 +27,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -56,6 +55,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.databinding.ItemDownloadBinding
+import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
@@ -675,23 +675,14 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         // TODO
     }
 
-    private class DownloadLabelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val label: TextView
-        val edit: ImageView
-        val option: ImageView
-
-        init {
-            label = ViewUtils.`$$`(itemView, R.id.tv_key) as TextView
-            edit = ViewUtils.`$$`(itemView, R.id.iv_edit) as ImageView
-            option = ViewUtils.`$$`(itemView, R.id.iv_option) as ImageView
-        }
-    }
+    private class DownloadLabelHolder(val binding: ItemDrawerListBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private inner class DownloadLabelAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<DownloadLabelHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadLabelHolder {
             val holder =
-                DownloadLabelHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
+                DownloadLabelHolder(ItemDrawerListBinding.inflate(mInflater, parent, false))
             holder.itemView.setOnClickListener {
                 val position = holder.bindingAdapterPosition
                 val label1: String? = if (position == 0) {
@@ -706,7 +697,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     closeDrawer(GravityCompat.END)
                 }
             }
-            holder.edit.setOnClickListener {
+            holder.binding.edit.setOnClickListener {
                 val context = context
                 val label = mLabels[holder.bindingAdapterPosition]
                 if (context != null) {
@@ -747,17 +738,19 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                     }
                 }
             }
-            if (list != null) {
-                holder.label.text = label + " [" + list.size + "]"
-            } else {
-                holder.label.text = label
-            }
-            if (position < LABEL_OFFSET) {
-                holder.edit.visibility = View.GONE
-                holder.option.visibility = View.GONE
-            } else {
-                holder.edit.visibility = View.VISIBLE
-                holder.option.visibility = View.VISIBLE
+            holder.binding.run {
+                if (list != null) {
+                    text.text = label + " [" + list.size + "]"
+                } else {
+                    text.text = label
+                }
+                if (position < LABEL_OFFSET) {
+                    edit.visibility = View.GONE
+                    option.visibility = View.GONE
+                } else {
+                    edit.visibility = View.VISIBLE
+                    option.visibility = View.VISIBLE
+                }
             }
         }
 

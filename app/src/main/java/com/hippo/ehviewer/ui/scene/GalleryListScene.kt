@@ -34,7 +34,6 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
@@ -86,6 +85,7 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
+import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
@@ -1113,15 +1113,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         override fun onCancel() {}
     }
 
-    private class QsDrawerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val key: TextView
-        val option: ImageView
-
-        init {
-            key = ViewUtils.`$$`(itemView, R.id.tv_key) as TextView
-            option = ViewUtils.`$$`(itemView, R.id.iv_option) as ImageView
-        }
-    }
+    private class QsDrawerHolder(val binding: ItemDrawerListBinding) : RecyclerView.ViewHolder(binding.root)
 
     private inner class MoveDialogHelper(
         private val mLabels: Array<String>,
@@ -1141,7 +1133,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private inner class QsDrawerAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<QsDrawerHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QsDrawerHolder {
-            val holder = QsDrawerHolder(mInflater.inflate(R.layout.item_drawer_list, parent, false))
+            val holder = QsDrawerHolder(ItemDrawerListBinding.inflate(mInflater, parent, false))
             if (!mIsTopList) {
                 holder.itemView.setOnClickListener {
                     if (null == mHelper) {
@@ -1174,17 +1166,19 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
 
         override fun onBindViewHolder(holder: QsDrawerHolder, position: Int) {
-            if (!mIsTopList) {
-                holder.key.text = mQuickSearchList[position].name
-            } else {
-                val toplists = intArrayOf(
-                    R.string.toplist_alltime,
-                    R.string.toplist_pastyear,
-                    R.string.toplist_pastmonth,
-                    R.string.toplist_yesterday
-                )
-                holder.key.text = getString(toplists[position])
-                holder.option.visibility = View.GONE
+            holder.binding.run {
+                if (!mIsTopList) {
+                    text.text = mQuickSearchList[position].name
+                } else {
+                    val toplists = intArrayOf(
+                        R.string.toplist_alltime,
+                        R.string.toplist_pastyear,
+                        R.string.toplist_pastmonth,
+                        R.string.toplist_yesterday
+                    )
+                    text.text = getString(toplists[position])
+                    option.visibility = View.GONE
+                }
             }
         }
 
