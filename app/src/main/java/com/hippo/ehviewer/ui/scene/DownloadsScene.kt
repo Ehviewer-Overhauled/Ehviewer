@@ -28,7 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -51,24 +50,22 @@ import com.hippo.easyrecyclerview.FastScroller
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.easyrecyclerview.MarginItemDecoration
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.DownloadInfo
+import com.hippo.ehviewer.databinding.ItemDownloadBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
-import com.hippo.ehviewer.widget.SimpleRatingView
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
-import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ObjectUtils
@@ -81,6 +78,7 @@ import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import rikka.core.res.resolveColor
 import java.util.LinkedList
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 @SuppressLint("RtlHardcoded")
 class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListener,
@@ -422,8 +420,11 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         toolbar.setOnMenuItemClickListener { item: MenuItem ->
             val id = item.itemId
             if (id == R.id.action_add) {
-                val builder =
-                    EditTextDialogBuilder(requireContext(), null, getString(R.string.download_labels))
+                val builder = EditTextDialogBuilder(
+                    requireContext(),
+                    null,
+                    getString(R.string.download_labels)
+                )
                 builder.setTitle(R.string.new_label_title)
                 builder.setPositiveButton(android.R.string.ok, null)
                 val dialog = builder.show()
@@ -674,89 +675,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         // TODO
     }
 
-    private fun bindForState(holder: DownloadHolder, info: DownloadInfo) {
-        val context = context ?: return
-        when (info.state) {
-            DownloadInfo.STATE_NONE -> bindState(
-                holder,
-                info,
-                context.getString(R.string.download_state_none)
-            )
-
-            DownloadInfo.STATE_WAIT -> bindState(
-                holder,
-                info,
-                context.getString(R.string.download_state_wait)
-            )
-
-            DownloadInfo.STATE_DOWNLOAD -> bindProgress(holder, info)
-            DownloadInfo.STATE_FAILED -> {
-                val text: String = if (info.legacy <= 0) {
-                    context.getString(R.string.download_state_failed)
-                } else {
-                    context.getString(R.string.download_state_failed_2, info.legacy)
-                }
-                bindState(holder, info, text)
-            }
-
-            DownloadInfo.STATE_FINISH -> bindState(
-                holder,
-                info,
-                context.getString(R.string.download_state_finish)
-            )
-        }
-    }
-
-    private fun bindState(holder: DownloadHolder, info: DownloadInfo, state: String) {
-        holder.uploader.visibility = View.VISIBLE
-        holder.rating.visibility = View.VISIBLE
-        holder.category.visibility = View.VISIBLE
-        holder.state.visibility = View.VISIBLE
-        holder.progressBar.visibility = View.GONE
-        holder.percent.visibility = View.GONE
-        holder.speed.visibility = View.GONE
-        if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
-            holder.start.visibility = View.GONE
-            holder.stop.visibility = View.VISIBLE
-        } else {
-            holder.start.visibility = View.VISIBLE
-            holder.stop.visibility = View.GONE
-        }
-        holder.state.text = state
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun bindProgress(holder: DownloadHolder, info: DownloadInfo) {
-        holder.uploader.visibility = View.GONE
-        holder.rating.visibility = View.GONE
-        holder.category.visibility = View.GONE
-        holder.state.visibility = View.GONE
-        holder.progressBar.visibility = View.VISIBLE
-        holder.percent.visibility = View.VISIBLE
-        holder.speed.visibility = View.VISIBLE
-        if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
-            holder.start.visibility = View.GONE
-            holder.stop.visibility = View.VISIBLE
-        } else {
-            holder.start.visibility = View.VISIBLE
-            holder.stop.visibility = View.GONE
-        }
-        if (info.total <= 0 || info.finished < 0) {
-            holder.percent.text = null
-            holder.progressBar.isIndeterminate = true
-        } else {
-            holder.percent.text = info.finished.toString() + "/" + info.total
-            holder.progressBar.isIndeterminate = false
-            holder.progressBar.max = info.total
-            holder.progressBar.progress = info.finished
-        }
-        var speed = info.speed
-        if (speed < 0) {
-            speed = 0
-        }
-        holder.speed.text = FileUtils.humanReadableByteCount(speed, false) + "/S"
-    }
-
     private class DownloadLabelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val label: TextView
         val edit: ImageView
@@ -913,37 +831,22 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
     }
 
-    private inner class DownloadHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
-        val thumb: LoadImageView
-        val title: TextView
-        val uploader: TextView
-        val rating: SimpleRatingView
-        val category: TextView
-        val start: View
-        val stop: View
-        val state: TextView
-        val progressBar: ProgressBar
-        val percent: TextView
-        val speed: TextView
+    private inner class DownloadHolder(
+        private val binding: ItemDownloadBinding,
+        thumbWidth: Int,
+        thumbHeight: Int
+    ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
-            thumb = itemView.findViewById(R.id.thumb)
-            title = itemView.findViewById(R.id.title)
-            uploader = itemView.findViewById(R.id.uploader)
-            rating = itemView.findViewById(R.id.rating)
-            category = itemView.findViewById(R.id.category)
-            start = itemView.findViewById(R.id.start)
-            stop = itemView.findViewById(R.id.stop)
-            state = itemView.findViewById(R.id.state)
-            progressBar = itemView.findViewById(R.id.progress_bar)
-            percent = itemView.findViewById(R.id.percent)
-            speed = itemView.findViewById(R.id.speed)
+            val lp = binding.thumb.layoutParams
+            lp.width = thumbWidth
+            lp.height = thumbHeight
+            binding.thumb.layoutParams = lp
 
             // TODO cancel on click listener when select items
-            thumb.setOnClickListener(this)
-            start.setOnClickListener(this)
-            stop.setOnClickListener(this)
+            binding.thumb.setOnClickListener(this)
+            binding.start.setOnClickListener(this)
+            binding.stop.setOnClickListener(this)
         }
 
         override fun onClick(v: View) {
@@ -959,7 +862,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             if (index < 0 || index >= size) {
                 return
             }
-            if (thumb === v) {
+            if (binding.thumb === v) {
                 val args = Bundle()
                 args.putString(
                     GalleryDetailScene.KEY_ACTION,
@@ -967,15 +870,112 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, list[index])
                 navigate(R.id.galleryDetailScene, args)
-            } else if (start === v) {
+            } else if (binding.start === v) {
                 val intent = Intent(activity, DownloadService::class.java)
                 intent.action = DownloadService.ACTION_START
                 intent.putExtra(DownloadService.KEY_GALLERY_INFO, list[index])
                 ContextCompat.startForegroundService(activity, intent)
-            } else if (stop === v) {
+            } else if (binding.stop === v) {
                 if (null != mDownloadManager) {
                     mDownloadManager!!.stopDownload(list[index].gid)
                 }
+            }
+        }
+
+        fun bind(info: DownloadInfo) {
+            info.thumb?.let {
+                binding.thumb.load(EhUtils.fixThumbUrl(it))
+            }
+            binding.title.text = EhUtils.getSuitableTitle(info)
+            binding.uploader.text = info.uploader
+            binding.rating.rating = info.rating
+            val category = binding.category
+            val newCategoryText = EhUtils.getCategory(info.category)
+            if (!newCategoryText.contentEquals(category.text)) {
+                category.text = newCategoryText
+                category.setBackgroundColor(EhUtils.getCategoryColor(info.category))
+            }
+            bindForState(info)
+        }
+
+        private fun bindForState(info: DownloadInfo) {
+            val context = context ?: return
+            when (info.state) {
+                DownloadInfo.STATE_NONE -> bindState(
+                    info,
+                    context.getString(R.string.download_state_none)
+                )
+
+                DownloadInfo.STATE_WAIT -> bindState(
+                    info,
+                    context.getString(R.string.download_state_wait)
+                )
+
+                DownloadInfo.STATE_DOWNLOAD -> bindProgress(info)
+                DownloadInfo.STATE_FAILED -> {
+                    val text: String = if (info.legacy <= 0) {
+                        context.getString(R.string.download_state_failed)
+                    } else {
+                        context.getString(R.string.download_state_failed_2, info.legacy)
+                    }
+                    bindState(info, text)
+                }
+
+                DownloadInfo.STATE_FINISH -> bindState(
+                    info,
+                    context.getString(R.string.download_state_finish)
+                )
+            }
+        }
+
+        private fun bindState(info: DownloadInfo, newState: String) {
+            binding.run {
+                uploader.visibility = View.VISIBLE
+                rating.visibility = View.VISIBLE
+                category.visibility = View.VISIBLE
+                state.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
+                percent.visibility = View.GONE
+                speed.visibility = View.GONE
+                if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
+                    start.visibility = View.GONE
+                    stop.visibility = View.VISIBLE
+                } else {
+                    start.visibility = View.VISIBLE
+                    stop.visibility = View.GONE
+                }
+                state.text = newState
+            }
+        }
+
+        @SuppressLint("SetTextI18n")
+        private fun bindProgress(info: DownloadInfo) {
+            binding.run {
+                uploader.visibility = View.GONE
+                rating.visibility = View.GONE
+                category.visibility = View.GONE
+                state.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+                percent.visibility = View.VISIBLE
+                speed.visibility = View.VISIBLE
+                if (info.state == DownloadInfo.STATE_WAIT || info.state == DownloadInfo.STATE_DOWNLOAD) {
+                    start.visibility = View.GONE
+                    stop.visibility = View.VISIBLE
+                } else {
+                    start.visibility = View.VISIBLE
+                    stop.visibility = View.GONE
+                }
+                if (info.total <= 0 || info.finished < 0) {
+                    percent.text = null
+                    progressBar.isIndeterminate = true
+                } else {
+                    percent.text = info.finished.toString() + "/" + info.total
+                    progressBar.isIndeterminate = false
+                    progressBar.max = info.total
+                    progressBar.progress = info.finished
+                }
+                speed.text =
+                    FileUtils.humanReadableByteCount(info.speed.coerceAtLeast(0), false) + "/S"
             }
         }
     }
@@ -1000,11 +1000,10 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadHolder {
-            val holder = DownloadHolder(mInflater.inflate(R.layout.item_download, parent, false))
-            val lp = holder.thumb.layoutParams
-            lp.width = mListThumbWidth
-            lp.height = mListThumbHeight
-            holder.thumb.layoutParams = lp
+            val holder = DownloadHolder(
+                ItemDownloadBinding.inflate(mInflater, parent, false),
+                mListThumbWidth, mListThumbHeight
+            )
             holder.itemView.setOnClickListener { onItemClick(holder.bindingAdapterPosition) }
             holder.itemView.setOnLongClickListener { onItemLongClick(holder.bindingAdapterPosition) }
             return holder
@@ -1015,19 +1014,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 return
             }
             val info = mList!![position]
-            info.thumb?.let {
-                holder.thumb.load(EhUtils.fixThumbUrl(it))
-            }
-            holder.title.text = EhUtils.getSuitableTitle(info)
-            holder.uploader.text = info.uploader
-            holder.rating.rating = info.rating
-            val category = holder.category
-            val newCategoryText = EhUtils.getCategory(info.category)
-            if (!newCategoryText.contentEquals(category.text)) {
-                category.text = newCategoryText
-                category.setBackgroundColor(EhUtils.getCategoryColor(info.category))
-            }
-            bindForState(holder, info)
+            holder.bind(info)
         }
 
         override fun getItemCount(): Int {
