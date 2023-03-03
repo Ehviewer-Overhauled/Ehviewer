@@ -16,9 +16,7 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Pair
@@ -26,10 +24,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.slider.Slider
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
@@ -40,13 +35,13 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.databinding.DialogGoToBinding
+import com.hippo.ehviewer.databinding.ItemGalleryPreviewBinding
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ContentLayout.ContentHelper
-import com.hippo.widget.LoadImageView
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.yorozuya.LayoutUtils
-import com.hippo.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import java.util.Locale
 
@@ -161,13 +156,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             }
             val pages = mHelper!!.pages
             if (pages > 1 && mHelper!!.canGoTo()) {
-                val helper = GoToDialogHelper(pages, mHelper!!.pageForTop)
-                val dialog = BaseDialogBuilder(context).setTitle(R.string.go_to)
-                    .setView(R.layout.dialog_go_to)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create()
-                dialog.show()
-                helper.setDialog(dialog)
+                showGoToDialog(context, pages, mHelper!!.pageForBottom)
             }
             return true
         }
@@ -201,15 +190,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         }
     }
 
-    private class GalleryPreviewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var image: LoadImageView
-        var text: TextView
-
-        init {
-            image = itemView.findViewById(R.id.image)
-            text = itemView.findViewById(R.id.text)
-        }
-    }
+    private class GalleryPreviewHolder(val binding: ItemGalleryPreviewBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private inner class GetPreviewListListener(
         context: Context,
@@ -232,13 +214,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         private val mInflater: LayoutInflater = layoutInflater
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryPreviewHolder {
-            return GalleryPreviewHolder(
-                mInflater.inflate(
-                    R.layout.item_gallery_preview,
-                    parent,
-                    false
-                )
-            )
+            return GalleryPreviewHolder(ItemGalleryPreviewBinding.inflate(mInflater, parent, false))
         }
 
         @SuppressLint("SetTextI18n")
@@ -246,8 +222,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             if (null != mHelper) {
                 val preview = mHelper!!.getDataAtEx(position)
                 if (preview != null) {
-                    preview.load(holder.image)
-                    holder.text.text = (preview.position + 1).toString()
+                    preview.load(holder.binding.image)
+                    holder.binding.text.text = (preview.position + 1).toString()
                 }
             }
             holder.itemView.setOnClickListener { onItemClick(position) }
@@ -302,43 +278,21 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         }
     }
 
-    private inner class GoToDialogHelper(private val mPages: Int, private val mCurrentPage: Int) :
-        View.OnClickListener, DialogInterface.OnDismissListener {
-        private var mSlider: Slider? = null
-        private var mDialog: Dialog? = null
-        fun setDialog(dialog: AlertDialog) {
-            mDialog = dialog
-            (ViewUtils.`$$`(dialog, R.id.start) as TextView).text =
-                String.format(Locale.US, "%d", 1)
-            (ViewUtils.`$$`(dialog, R.id.end) as TextView).text =
-                String.format(Locale.US, "%d", mPages)
-            mSlider = ViewUtils.`$$`(dialog, R.id.slider) as Slider
-            mSlider!!.valueTo = mPages.toFloat()
-            mSlider!!.value = (mCurrentPage + 1).toFloat()
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(this)
-            dialog.setOnDismissListener(this)
-        }
-
-        override fun onClick(v: View) {
-            if (null == mSlider) {
-                return
-            }
-            val page = (mSlider!!.value - 1).toInt()
-            if (page in 0 until mPages && mHelper != null) {
+    private fun showGoToDialog(context: Context, pages: Int, currentPage: Int) {
+        val dialogBinding = DialogGoToBinding.inflate(layoutInflater)
+        dialogBinding.start.text = String.format(Locale.US, "%d", 1)
+        dialogBinding.end.text = String.format(Locale.US, "%d", pages)
+        dialogBinding.slider.valueTo = pages.toFloat()
+        dialogBinding.slider.value = (currentPage + 1).toFloat()
+        val dialog = BaseDialogBuilder(context)
+            .setTitle(R.string.go_to)
+            .setView(dialogBinding.root)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val page = (dialogBinding.slider.value - 1).toInt()
                 mHelper!!.goTo(page)
-                if (mDialog != null) {
-                    mDialog!!.dismiss()
-                    mDialog = null
-                }
-            } else {
-                showTip(R.string.error_out_of_range, LENGTH_LONG)
             }
-        }
-
-        override fun onDismiss(dialog: DialogInterface) {
-            mDialog = null
-            mSlider = null
-        }
+            .create()
+        dialog.show()
     }
 
     companion object {
