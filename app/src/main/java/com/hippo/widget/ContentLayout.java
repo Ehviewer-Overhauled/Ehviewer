@@ -735,6 +735,10 @@ public class ContentLayout extends FrameLayout {
             return getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(mRecyclerView.getLayoutManager()));
         }
 
+        public int getPageForBottom() {
+            return getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(mRecyclerView.getLayoutManager()));
+        }
+
         public boolean canGoTo() {
             return isContentShowing();
         }
