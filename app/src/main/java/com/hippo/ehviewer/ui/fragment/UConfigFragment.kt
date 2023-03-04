@@ -35,6 +35,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhCookieStore.KEY_SETTINGS_PROFILE
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.databinding.ActivityWebviewBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
@@ -134,16 +135,13 @@ class UConfigFragment : BaseFragment() {
         val cookiesString = cookieManager.getCookie(url)
         if (!cookiesString.isNullOrEmpty()) {
             val store = ehCookieStore
-            val eUrl = EhUrl.HOST_E.toHttpUrl()
-            val exUrl = EhUrl.HOST_EX.toHttpUrl()
+            val hostUrl = EhUrl.host.toHttpUrl()
 
             lifecycleScope.launchIO {
-                // The cookies saved in the uconfig page should be shared between e and ex
+                store.deleteCookie(hostUrl, KEY_SETTINGS_PROFILE)
+                // The cookies saved in the uconfig page should not be shared between e and ex
                 for (header in cookiesString.split(";".toRegex()).dropLastWhile { it.isEmpty() }) {
-                    Cookie.parse(eUrl, header)?.let {
-                        store.addCookie(longLive(it))
-                    }
-                    Cookie.parse(exUrl, header)?.let {
+                    Cookie.parse(hostUrl, header)?.let {
                         store.addCookie(longLive(it))
                     }
                 }
