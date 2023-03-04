@@ -239,6 +239,11 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mAdapter?.type = Settings.listMode
+    }
+
     private fun onInit() {
         handleArgs(arguments)
     }
