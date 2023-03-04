@@ -47,6 +47,7 @@ object EhCookieStore : CookieJar, CookiesStorage {
     const val KEY_IPB_MEMBER_ID = "ipb_member_id"
     const val KEY_IPB_PASS_HASH = "ipb_pass_hash"
     const val KEY_IGNEOUS = "igneous"
+    const val KEY_SETTINGS_PROFILE = "sp"
     private const val KEY_CONTENT_WARNING = "nw"
     private const val CONTENT_WARNING_NOT_SHOW = "1"
     private val sTipsCookie: Cookie = Cookie.Builder()
@@ -84,6 +85,16 @@ object EhCookieStore : CookieJar, CookiesStorage {
             builder.httpOnly()
         }
         return builder.build()
+    }
+
+    fun deleteCookie(url: HttpUrl, name: String) {
+        val deletedCookie = Cookie.Builder()
+            .name(name)
+            .value("deleted")
+            .domain(url.host)
+            .expiresAt(0)
+            .build()
+        addCookie(deletedCookie)
     }
 
     @Synchronized
