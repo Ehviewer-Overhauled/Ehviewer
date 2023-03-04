@@ -20,7 +20,6 @@ import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import coil.disk.DiskCache
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCacheKeyFactory
@@ -36,7 +35,6 @@ import com.hippo.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.MathUtils
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
@@ -46,10 +44,10 @@ import io.ktor.http.contentLength
 import io.ktor.http.contentType
 import io.ktor.utils.io.jvm.nio.copyTo
 import moe.tarsin.coroutines.runSuspendCatching
-import java.io.File
 import java.io.IOException
 import java.util.Locale
 import kotlin.io.path.readText
+import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 
 private val client = EhApplication.ktorClient
 
@@ -299,16 +297,6 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     companion object {
-        private const val TRANSFER_BLOCK: Long = 8192
-
-        // We use data to store image file, and metadata for image type
-        private val sCache by lazy {
-            DiskCache.Builder().directory(File(application.cacheDir, "gallery_image"))
-                .maxSizeBytes(
-                    MathUtils.clamp(Settings.readCacheSize, 40, 1280).toLong() * 1024 * 1024
-                ).build()
-        }
-
         private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
 
         fun getGalleryDownloadDir(gid: Long): UniFile? {

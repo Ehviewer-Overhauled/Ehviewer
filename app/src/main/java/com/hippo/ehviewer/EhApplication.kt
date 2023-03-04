@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.disk.DiskCache
 import coil.util.DebugLogger
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
@@ -51,6 +52,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.cookies.HttpCookies
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.OkHttpClient
+import okio.Path.Companion.toOkioPath
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -197,6 +199,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         return ImageLoader.Builder(this).apply {
             okHttpClient(okHttpClient)
             components { add(MergeInterceptor) }
+            diskCache(imageCache)
             crossfade(300)
             if (BuildConfig.DEBUG) logger(DebugLogger())
         }.build()
@@ -304,5 +307,13 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
         @JvmStatic
         val ehDatabase by lazy { buildMainDB(application) }
+
+        // We use data to store image file, and metadata for image type
+        val imageCache by lazy {
+            DiskCache.Builder().apply {
+                directory(application.cacheDir.toOkioPath() / "img")
+                maxSizeBytes(Settings.readCacheSize.coerceIn(40, 1280).toLong() * 1024 * 1024)
+            }.build()
+        }
     }
 }
