@@ -32,12 +32,14 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.databinding.ActivityWebviewBinding
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.widget.DialogWebChromeClient
+import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import rikka.core.res.resolveColor
@@ -135,13 +137,15 @@ class UConfigFragment : BaseFragment() {
             val eUrl = EhUrl.HOST_E.toHttpUrl()
             val exUrl = EhUrl.HOST_EX.toHttpUrl()
 
-            // The cookies saved in the uconfig page should be shared between e and ex
-            for (header in cookiesString.split(";".toRegex()).dropLastWhile { it.isEmpty() }) {
-                Cookie.parse(eUrl, header)?.let {
-                    store.addCookie(longLive(it))
-                }
-                Cookie.parse(exUrl, header)?.let {
-                    store.addCookie(longLive(it))
+            lifecycleScope.launchIO {
+                // The cookies saved in the uconfig page should be shared between e and ex
+                for (header in cookiesString.split(";".toRegex()).dropLastWhile { it.isEmpty() }) {
+                    Cookie.parse(eUrl, header)?.let {
+                        store.addCookie(longLive(it))
+                    }
+                    Cookie.parse(exUrl, header)?.let {
+                        store.addCookie(longLive(it))
+                    }
                 }
             }
         }
