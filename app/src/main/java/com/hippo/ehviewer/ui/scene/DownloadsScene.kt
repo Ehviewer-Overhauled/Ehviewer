@@ -599,7 +599,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
         val index = mList!!.indexOf(info)
         if (index >= 0 && mAdapter != null) {
-            mAdapter!!.notifyItemChanged(index)
+            mAdapter!!.notifyItemChanged(index, PAYLOAD_STATE)
         }
     }
 
@@ -861,7 +861,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             bindForState(info)
         }
 
-        private fun bindForState(info: DownloadInfo) {
+        fun bindForState(info: DownloadInfo) {
             val context = context ?: return
             when (info.state) {
                 DownloadInfo.STATE_NONE -> bindState(
@@ -973,11 +973,23 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
 
         override fun onBindViewHolder(holder: DownloadHolder, position: Int) {
-            if (mList == null) {
-                return
+            mList?.let { holder.bind(it[position]) }
+        }
+
+        override fun onBindViewHolder(
+            holder: DownloadHolder,
+            position: Int,
+            payloads: MutableList<Any>
+        ) {
+            payloads.forEach { payload ->
+                when (payload) {
+                    PAYLOAD_STATE -> {
+                        mList?.let { holder.bindForState(it[position]) }
+                        return
+                    }
+                }
             }
-            val info = mList!![position]
-            holder.bind(info)
+            super.onBindViewHolder(holder, position, payloads)
         }
 
         override fun getItemCount(): Int {
@@ -1190,5 +1202,6 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         private val TAG = DownloadsScene::class.java.simpleName
         private const val KEY_LABEL = "label"
         private const val LABEL_OFFSET = 2
+        private const val PAYLOAD_STATE = 0
     }
 }
