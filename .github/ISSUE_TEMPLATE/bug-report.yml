@@ -18,7 +18,9 @@ body:
       label: 复现步骤 / Step to reproduce
       description: |
         请从全新安装应用开始，在此处写下复现的方式。请尽量附带录屏
+        如果不能稳定复现，请在下方上传应用日志
         Describe how to reproduce here with fresh installation, with screen recording if possible.
+        If you can't reproduce it consistently, please upload app logs below
       placeholder: |
         0. 重新安装应用 / Fresh install
         1.
@@ -56,6 +58,15 @@ body:
       required: true
 
   - type: textarea
+    id: log
+    attributes:
+      label: 应用日志 / App logs
+      description: 您可以通过设置-高级-导出日志来获得日志文件 / You can get logs file in Settings - Advanced - Dump logcat
+      placeholder: 06-15 17:44:53.704 23382 23382 E ...
+    validations:
+      required: false
+
+  - type: textarea
     id: more
     attributes:
       label: 备注 / Addition details
@@ -81,8 +92,8 @@ body:
     id: ci
     attributes:
       label: EhViewer CI 版本 / EhViewer CI Version
-      description: 直接将对应 GitHub Action CI 下载页面网址填入即可 / Simply drop GitHub Action CI download page url here
-      placeholder: https://github.com/Ehviewer-Overhauled/Ehviewer/actions/runs/XXXXXXXXXX
+      description: 位于设置 - 关于中的版本号后 / Next to the version code in Settings - About
+      placeholder: 26f05a0
     validations:
       required: true
 
