@@ -17,41 +17,33 @@ package com.hippo.drawable
 
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
-import coil.Coil.imageLoader
-import coil.request.Disposable
+import coil.imageLoader
 import coil.request.ImageRequest
+import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.widget.ObservedTextView
 
-class UnikeryDrawable(private val mTextView: ObservedTextView) : WrapDrawable(),
+class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) : WrapDrawable(),
     ObservedTextView.OnWindowAttachListener {
-    private var mUrl: String? = null
-    private var task: Disposable? = null
+    private val mImageRequest: ImageRequest
 
     init {
         mTextView.setOnWindowAttachListener(this)
+        mImageRequest = mTextView.context.imageRequest(url) {
+            target(onSuccess = { onGetValue(it) })
+        }
+        load()
     }
 
     override fun onAttachedToWindow() {
-        load(mUrl)
+        drawable ?: load()
     }
 
     override fun onDetachedFromWindow() {
-        if (task != null && !task!!.isDisposed) task!!.dispose()
         clearDrawable()
     }
 
-    fun load(url: String?) {
-        if (url != null) {
-            mUrl = url
-            val imageLoader = imageLoader(mTextView.context)
-            val request = ImageRequest.Builder(mTextView.context)
-                .data(url)
-                .memoryCacheKey(url)
-                .diskCacheKey(url)
-                .target(onSuccess = { onGetValue(it) })
-                .build()
-            task = imageLoader.enqueue(request)
-        }
+    fun load() {
+        mTextView.context.imageLoader.enqueue(mImageRequest)
     }
 
     private fun clearDrawable() {

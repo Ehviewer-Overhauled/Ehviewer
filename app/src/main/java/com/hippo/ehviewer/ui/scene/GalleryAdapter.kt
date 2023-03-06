@@ -26,9 +26,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.databinding.ItemGalleryGridBinding
 import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
@@ -154,9 +152,6 @@ internal abstract class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
         val gi = getDataAt(position) ?: return
-        if (gi is LocalFavoriteInfo) {
-            gi.thumb = EhUtils.fixThumbUrl(gi.thumb!!)
-        }
         holder.bind(gi)
     }
 

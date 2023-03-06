@@ -19,4 +19,8 @@ object EhCacheKeyFactory {
     fun getImageKey(gid: Long, index: Int): String {
         return "image:$gid:$index"
     }
+
+    fun getImageKey(url: String): String {
+        return url.removePrefix(EhUrl.URL_PREFIX_THUMB_E).removePrefix(EhUrl.URL_PREFIX_THUMB_EX)
+    }
 }

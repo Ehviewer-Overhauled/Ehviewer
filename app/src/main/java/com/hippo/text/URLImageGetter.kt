@@ -24,6 +24,6 @@ class URLImageGetter(
     private val mTextView: ObservedTextView,
 ) : ImageGetter {
     override fun getDrawable(source: String): Drawable {
-        return UnikeryDrawable(mTextView).apply { load(source) }
+        return UnikeryDrawable(mTextView, source)
     }
 }
