@@ -27,6 +27,7 @@ import coil.size.Size
 import com.hippo.drawable.PreciselyClipDrawable
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.coil.ehUrl
 
 private val application = EhApplication.application
 private val errorDrawable = AppCompatResources.getDrawable(application, R.drawable.image_failed)
@@ -91,6 +92,7 @@ open class LoadImageView @JvmOverloads constructor(
                 },
                 { _, _ -> setRetry(false) }
             )
+            ehUrl(url)
         }
     }
 

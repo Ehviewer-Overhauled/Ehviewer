@@ -90,7 +90,7 @@ object Settings {
     const val KEY_SECURITY = "require_unlock"
     const val KEY_SECURITY_DELAY = "require_unlock_delay"
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
-    const val DEFAULT_READ_CACHE_SIZE = 320
+    const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
     const val KEY_BYPASS_VPN = "bypass_vpn"

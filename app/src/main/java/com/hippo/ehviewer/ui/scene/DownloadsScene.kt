@@ -846,9 +846,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
         }
 
         fun bind(info: DownloadInfo) {
-            info.thumb?.let {
-                binding.thumb.load(EhUtils.fixThumbUrl(it))
-            }
+            info.thumb?.let { binding.thumb.load(it) }
             binding.title.text = EhUtils.getSuitableTitle(info)
             binding.uploader.text = info.uploader
             binding.rating.rating = info.rating
