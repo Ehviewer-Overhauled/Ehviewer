@@ -13,92 +13,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.drawable
 
-package com.hippo.drawable;
+import android.graphics.drawable.AnimatedImageDrawable
+import android.graphics.drawable.Drawable
+import coil.Coil.imageLoader
+import coil.request.Disposable
+import coil.request.ImageRequest
+import com.hippo.widget.ObservedTextView
 
-import android.graphics.drawable.AnimatedImageDrawable;
-import android.graphics.drawable.Drawable;
+class UnikeryDrawable(private val mTextView: ObservedTextView) : WrapDrawable(),
+    ObservedTextView.OnWindowAttachListener {
+    private var mUrl: String? = null
+    private var task: Disposable? = null
 
-import com.hippo.widget.ObservedTextView;
-
-import coil.Coil;
-import coil.request.Disposable;
-import coil.request.ImageRequest;
-
-public class UnikeryDrawable extends WrapDrawable implements ObservedTextView.OnWindowAttachListener {
-
-    private static final String TAG = UnikeryDrawable.class.getSimpleName();
-    private final ObservedTextView mTextView;
-    private String mUrl;
-    private Disposable task;
-
-    public UnikeryDrawable(ObservedTextView textView) {
-        mTextView = textView;
-        mTextView.setOnWindowAttachListener(this);
+    init {
+        mTextView.setOnWindowAttachListener(this)
     }
 
-    @Override
-    public void onAttachedToWindow() {
-        load(mUrl);
+    override fun onAttachedToWindow() {
+        load(mUrl)
     }
 
-    @Override
-    public void onDetachedFromWindow() {
-        if (task != null && !task.isDisposed())
-            task.dispose();
-        clearDrawable();
+    override fun onDetachedFromWindow() {
+        if (task != null && !task!!.isDisposed) task!!.dispose()
+        clearDrawable()
     }
 
-    public void load(String url) {
+    fun load(url: String?) {
         if (url != null) {
-            mUrl = url;
-            var imageLoader = Coil.imageLoader(mTextView.getContext());
-            var request = new ImageRequest.Builder(mTextView.getContext()).data(url).memoryCacheKey(url).diskCacheKey(url).target(
-                    drawable -> null,
-                    drawable -> null,
-                    drawable -> {
-                        onGetValue(drawable);
-                        return null;
-                    }
-            ).build();
-            task = imageLoader.enqueue(request);
+            mUrl = url
+            val imageLoader = imageLoader(mTextView.context)
+            val request = ImageRequest.Builder(mTextView.context)
+                .data(url)
+                .memoryCacheKey(url)
+                .diskCacheKey(url)
+                .target(onSuccess = { onGetValue(it) })
+                .build()
+            task = imageLoader.enqueue(request)
         }
     }
 
-    private void clearDrawable() {
-        setDrawable(null);
+    private fun clearDrawable() {
+        drawable = null
     }
 
-    @Override
-    public void setDrawable(Drawable drawable) {
+    override fun setDrawable(drawable: Drawable?) {
         // Remove old callback
-        Drawable oldDrawable = getDrawable();
+        val oldDrawable = getDrawable()
         if (oldDrawable != null) {
-            oldDrawable.setCallback(null);
+            oldDrawable.callback = null
         }
-
-        super.setDrawable(drawable);
-
+        super.setDrawable(drawable)
         if (drawable != null) {
-            drawable.setCallback(mTextView);
+            drawable.callback = mTextView
         }
-
-        updateBounds();
+        updateBounds()
         if (drawable != null) {
-            invalidateSelf();
+            invalidateSelf()
         }
     }
 
-    @Override
-    public void invalidateSelf() {
-        CharSequence cs = mTextView.getText();
-        mTextView.setText(cs);
+    override fun invalidateSelf() {
+        val cs = mTextView.text
+        mTextView.text = cs
     }
 
-    public void onGetValue(Drawable drawable) {
-        clearDrawable();
-        setDrawable(drawable);
-        if (drawable instanceof AnimatedImageDrawable animatedImageDrawable)
-            animatedImageDrawable.start();
+    private fun onGetValue(drawable: Drawable) {
+        clearDrawable()
+        setDrawable(drawable)
+        if (drawable is AnimatedImageDrawable) {
+            drawable.start()
+        }
     }
 }
