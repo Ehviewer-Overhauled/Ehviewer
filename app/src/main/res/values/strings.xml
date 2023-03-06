@@ -272,7 +272,7 @@
     <string name="format_bold"><b>Bold</b></string>
     <string name="format_italic"><i>Italic</i></string>
     <string name="format_underline"><u>Underline</u></string>
-    <string name="format_strikethrough"><s>Strikethrough</s></string>
+    <string name="format_strikethrough"><strike>Strikethrough</strike></string>
     <string name="format_url">URL</string>
     <string name="format_plain">Plain text</string>
     <!-- Gallery Previews -->
@@ -376,7 +376,7 @@
     <string name="settings_eh_list_mode">List mode</string>
     <string name="settings_eh_list_mode_detail">Detail</string>
     <string name="settings_eh_list_mode_thumb">Thumb</string>
-    <string name="settings_eh_detail_size">Detail size</string>
+    <string name="settings_eh_detail_size">Detail width</string>
     <string name="settings_eh_detail_size_long">Long</string>
     <string name="settings_eh_detail_size_short">Short</string>
     <string name="settings_eh_thumb_size">Thumb size</string>

@@ -226,6 +226,12 @@
     <string name="check_vote_status">查看投票情况</string>
     <string name="click_more_comments">点击加载更多评论</string>
     <string name="last_edited">上次修改时间：%s</string>
+    <string name="format_bold"><b>粗体</b></string>
+    <string name="format_italic"><i>斜体</i></string>
+    <string name="format_underline"><u>下划线</u></string>
+    <string name="format_strikethrough"><strike>删除线</strike></string>
+    <string name="format_url">链接</string>
+    <string name="format_plain">纯文本</string>
     <!-- Gallery Previews -->
     <string name="gallery_previews">画廊预览</string>
     <string name="go_to">跳页</string>
@@ -328,7 +334,7 @@
     <string name="settings_eh_list_mode">列表模式</string>
     <string name="settings_eh_list_mode_detail">详情</string>
     <string name="settings_eh_list_mode_thumb">缩略图</string>
-    <string name="settings_eh_detail_size">详情大小</string>
+    <string name="settings_eh_detail_size">详情宽度</string>
     <string name="settings_eh_detail_size_long">长</string>
     <string name="settings_eh_detail_size_short">短</string>
     <string name="settings_eh_thumb_size">缩略图大小</string>
