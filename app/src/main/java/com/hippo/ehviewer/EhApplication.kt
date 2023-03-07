@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.ComponentCallbacks2
@@ -48,17 +47,13 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.OkHttpClient
 import okio.Path.Companion.toOkioPath
 import java.io.File
-import java.net.InetAddress
-import java.net.InetSocketAddress
 import java.net.Proxy
 import java.security.KeyStore
-import java.security.cert.X509Certificate
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
@@ -264,48 +259,9 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
 
         val ktorClient by lazy {
-            HttpClient(CIO) {
+            HttpClient(OkHttp) {
                 engine {
-                    proxy = when (Settings.proxyType) {
-                        EhProxySelector.TYPE_DIRECT -> Proxy.NO_PROXY
-                        EhProxySelector.TYPE_SYSTEM -> null
-                        EhProxySelector.TYPE_HTTP -> {
-                            val ip = Settings.proxyIp
-                            val port = Settings.proxyPort
-                            val iNetAddress = InetAddress.getByName(ip)
-                            val socketAddress = InetSocketAddress(iNetAddress, port)
-                            Proxy(Proxy.Type.HTTP, socketAddress)
-                        }
-                        // CIO does not support Socks proxy yet
-                        else -> null
-                    }
-                    https {
-                        serverName = "0.0.0.0".takeIf { Settings.dF }
-                        trustManager = @SuppressLint("CustomX509TrustManager")
-                        object : X509TrustManager {
-                            @SuppressLint("TrustAllX509TrustManager")
-                            override fun checkClientTrusted(
-                                p0: Array<out X509Certificate>?,
-                                p1: String?
-                            ) {
-                            }
-
-                            @SuppressLint("TrustAllX509TrustManager")
-                            override fun checkServerTrusted(
-                                p0: Array<out X509Certificate>?,
-                                p1: String?
-                            ) {
-                            }
-
-                            override fun getAcceptedIssuers(): Array<X509Certificate?> {
-                                return arrayOfNulls(0)
-                            }
-                        }
-                    }
-                    pipelining = true
-                }
-                install(HttpCookies) {
-                    storage = EhCookieStore
+                    preconfigured = okHttpClient
                 }
             }
         }
