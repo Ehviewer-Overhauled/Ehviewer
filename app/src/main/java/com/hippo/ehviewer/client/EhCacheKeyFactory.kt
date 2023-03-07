@@ -23,7 +23,7 @@ object EhCacheKeyFactory {
         return "image:$gid:$index"
     }
 
-    fun getImageKey(url: String): String {
+    fun getPreviewThumbKey(url: String): String {
         return url.removePrefix(URL_PREFIX_THUMB_E)
             .removePrefix(URL_PREFIX_THUMB_EX)
             .removePrefix("t/")

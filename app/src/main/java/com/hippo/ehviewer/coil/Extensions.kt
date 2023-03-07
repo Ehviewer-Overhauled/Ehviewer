@@ -5,7 +5,7 @@ import coil.request.ImageRequest
 import com.hippo.ehviewer.client.EhCacheKeyFactory
 
 fun ImageRequest.Builder.ehUrl(url: String) = apply {
-    val key = EhCacheKeyFactory.getImageKey(url)
+    val key = EhCacheKeyFactory.getPreviewThumbKey(url)
     data(url)
     memoryCacheKey(key)
     diskCacheKey(key)
