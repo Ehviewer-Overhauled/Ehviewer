@@ -65,7 +65,7 @@
 
 EhViewer fork dedicated to lightweight and high-performance
 
-with Material Design 3 and Dynamic Color Support
+with [Material Design 3](https://m3.material.io/) and [Dynamic Color](https://m3.material.io/styles/color/dynamic-color/overview) Support
 
 # Download
 
