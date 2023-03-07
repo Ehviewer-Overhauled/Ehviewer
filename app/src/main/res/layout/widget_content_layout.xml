@@ -68,10 +68,10 @@
             android:id="@+id/fast_scroller"
             android:layout_width="30dp"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:paddingLeft="20dp"
+            android:layout_gravity="end"
+            android:paddingStart="20dp"
             android:paddingTop="8dp"
-            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
             android:paddingBottom="8dp" />
 
     </FrameLayout>
