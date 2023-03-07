@@ -21,7 +21,7 @@ import android.graphics.ColorSpace
 import android.graphics.ImageDecoder
 import android.graphics.ImageDecoder.ImageInfo
 import android.graphics.ImageDecoder.Source
-import android.graphics.drawable.AnimatedImageDrawable
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -42,21 +42,19 @@ class Image private constructor(private val src: CloseableSource) {
                 calculateSampleSize(info, 2 * screenHeight, 2 * screenWidth)
             )
         }.also {
-            (it as? BitmapDrawable)?.run {
-                src.close()
-            }
+            if (it !is Animatable) src.close()
         }
         private set
 
     val size: Int
-        get() = mObtainedDrawable!!.run { intrinsicHeight * intrinsicWidth * 4 * if (this is AnimatedImageDrawable) 4 else 1 }
+        get() = mObtainedDrawable!!.run { intrinsicHeight * intrinsicWidth * 4 * if (this is Animatable) 4 else 1 }
 
     @Synchronized
     fun recycle() {
-        (mObtainedDrawable as? AnimatedImageDrawable)?.stop()
+        (mObtainedDrawable as? Animatable)?.stop()
         (mObtainedDrawable as? BitmapDrawable)?.bitmap?.recycle()
         mObtainedDrawable?.callback = null
-        (mObtainedDrawable as? AnimatedImageDrawable)?.let { src.close() }
+        if (mObtainedDrawable is Animatable) src.close()
         mObtainedDrawable = null
     }
 
