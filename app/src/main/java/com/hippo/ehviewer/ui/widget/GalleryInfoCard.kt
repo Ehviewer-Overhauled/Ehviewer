@@ -21,17 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.download.DownloadManager
 import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
@@ -59,11 +56,8 @@ fun ListInfoCard(
                 ),
         ) {
             Card {
-                AsyncImage(
-                    model = info.thumb?.let {
-                        LocalContext.current.imageRequest(it)
-                    },
-                    contentDescription = "",
+                EhThumbAsyncImage(
+                    model = info.thumb,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .width((listCardSize * 2).dp)
