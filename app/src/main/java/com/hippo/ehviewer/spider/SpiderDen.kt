@@ -22,9 +22,9 @@ import coil.disk.DiskCache
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhCacheKeyFactory
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
@@ -89,7 +89,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         }
 
     private fun containInCache(index: Int): Boolean {
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        val key = getImageKey(mGid, index)
         return sCache[key]?.apply { close() } != null
     }
 
@@ -108,7 +108,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
         val dir = downloadDir ?: return false
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        val key = getImageKey(mGid, index)
         return runCatching {
             sCache.read(key) {
                 val extension = fixExtension("." + metadata.toFile().readText())
@@ -142,7 +142,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     private fun removeFromCache(index: Int): Boolean {
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        val key = getImageKey(mGid, index)
         return sCache.remove(key)
     }
 
@@ -208,7 +208,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
         // Read Mode, allow save to cache
         if (mMode == SpiderQueen.MODE_READ) {
-            val key = EhCacheKeyFactory.getImageKey(mGid, index)
+            val key = getImageKey(mGid, index)
             var received: Long = 0
             runSuspendCatching {
                 sCache.edit(key) {
@@ -227,7 +227,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     fun saveToUniFile(index: Int, file: UniFile): Boolean {
         file.openFileDescriptor("w").use { toFd ->
-            val key = EhCacheKeyFactory.getImageKey(mGid, index)
+            val key = getImageKey(mGid, index)
 
             // Read from diskCache first
             sCache[key]?.use { snapshot ->
@@ -264,7 +264,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     fun getExtension(index: Int): String? {
-        val key = EhCacheKeyFactory.getImageKey(mGid, index)
+        val key = getImageKey(mGid, index)
         return sCache[key]?.use { it.metadata.toNioPath().readText() }
             ?: downloadDir?.let { findImageFile(it, index) }
                 ?.name.let { FileUtils.getExtensionFromFilename(it) }
@@ -272,7 +272,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     fun getImageSource(index: Int): CloseableSource? {
         if (mMode == SpiderQueen.MODE_READ) {
-            val key = EhCacheKeyFactory.getImageKey(mGid, index)
+            val key = getImageKey(mGid, index)
             val snapshot: DiskCache.Snapshot? = sCache[key]
             if (snapshot != null) {
                 val source = ImageDecoder.createSource(snapshot.data.toFile())

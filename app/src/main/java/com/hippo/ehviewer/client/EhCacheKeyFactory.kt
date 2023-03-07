@@ -18,14 +18,12 @@ package com.hippo.ehviewer.client
 private const val URL_PREFIX_THUMB_E = "https://ehgt.org/"
 private const val URL_PREFIX_THUMB_EX = "https://exhentai.org/"
 
-object EhCacheKeyFactory {
-    fun getImageKey(gid: Long, index: Int): String {
-        return "image:$gid:$index"
-    }
+fun getImageKey(gid: Long, index: Int): String {
+    return "image:$gid:$index"
+}
 
-    fun getPreviewThumbKey(url: String): String {
-        return url.removePrefix(URL_PREFIX_THUMB_E)
-            .removePrefix(URL_PREFIX_THUMB_EX)
-            .removePrefix("t/")
-    }
+fun getPreviewThumbKey(url: String): String {
+    return url.removePrefix(URL_PREFIX_THUMB_E)
+        .removePrefix(URL_PREFIX_THUMB_EX)
+        .removePrefix("t/")
 }
