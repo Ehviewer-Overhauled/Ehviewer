@@ -50,7 +50,9 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.DelicateCoroutinesApi
+import okhttp3.Cache
 import okhttp3.OkHttpClient
+import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.net.Proxy
 import java.security.KeyStore
@@ -193,7 +195,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this).apply {
-            okHttpClient(okHttpClient)
+            okHttpClient(nonCacheOkHttpClient)
             components { add(MergeInterceptor) }
             diskCache(imageCache)
             crossfade(300)
@@ -213,8 +215,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
-        @JvmStatic
-        val okHttpClient by lazy {
+        val nonCacheOkHttpClient by lazy {
             val builder = OkHttpClient.Builder()
                 .cookieJar(EhCookieStore)
                 .dns(EhDns)
@@ -233,10 +234,21 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             builder.build()
         }
 
+        // Never use this okhttp client to download large blobs!!!
+        val okHttpClient by lazy {
+            nonCacheOkHttpClient.newBuilder().cache(
+                Cache(
+                    application.cacheDir.toOkioPath() / "http_cache",
+                    20L * 1024L * 1024L,
+                    FileSystem.SYSTEM
+                )
+            ).build()
+        }
+
         val ktorClient by lazy {
             HttpClient(OkHttp) {
                 engine {
-                    preconfigured = okHttpClient
+                    preconfigured = nonCacheOkHttpClient
                 }
             }
         }
