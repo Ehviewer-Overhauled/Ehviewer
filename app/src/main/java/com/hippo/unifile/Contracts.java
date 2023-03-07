@@ -25,8 +25,6 @@ import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 
-import com.hippo.image.Image;
-
 import java.io.IOException;
 
 final class Contracts {
@@ -88,18 +86,7 @@ final class Contracts {
     }
 
     @NonNull
-    static Image.CloseableSource getImageSource(Context context, Uri uri) {
-        var source = ImageDecoder.createSource(context.getContentResolver(), uri);
-        return new Image.CloseableSource() {
-            @NonNull
-            @Override
-            public ImageDecoder.Source getSource() {
-                return source;
-            }
-
-            @Override
-            public void close() {
-            }
-        };
+    static ImageDecoder.Source getImageSource(Context context, Uri uri) {
+        return ImageDecoder.createSource(context.getContentResolver(), uri);
     }
 }

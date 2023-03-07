@@ -24,8 +24,6 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 
-import com.hippo.image.Image;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -248,20 +246,8 @@ class RawFile extends UniFile {
 
     @NonNull
     @Override
-    public Image.CloseableSource getImageSource() {
-        var src = ImageDecoder.createSource(mFile);
-        return new Image.CloseableSource() {
-            @NonNull
-            @Override
-            public ImageDecoder.Source getSource() {
-                return src;
-            }
-
-            @Override
-            public void close() {
-
-            }
-        };
+    public ImageDecoder.Source getImageSource() {
+        return ImageDecoder.createSource(mFile);
     }
 
     @NonNull

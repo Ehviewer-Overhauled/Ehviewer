@@ -17,12 +17,11 @@
 package com.hippo.unifile;
 
 import android.content.Context;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
-
-import com.hippo.image.Image;
 
 import java.io.IOException;
 
@@ -140,7 +139,7 @@ class SingleDocumentFile extends UniFile {
 
     @NonNull
     @Override
-    public Image.CloseableSource getImageSource() {
+    public ImageDecoder.Source getImageSource() {
         return Contracts.getImageSource(mContext, mUri);
     }
 

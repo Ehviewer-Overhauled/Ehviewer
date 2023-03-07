@@ -293,7 +293,13 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                 file = findImageFile(dir, index)
             }
         }
-        return file?.imageSource
+        val source = file?.imageSource ?: return null
+        return object : CloseableSource {
+            override val source: ImageDecoder.Source
+                get() = source
+
+            override fun close() {}
+        }
     }
 
     companion object {

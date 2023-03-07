@@ -19,14 +19,13 @@ package com.hippo.unifile;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.hippo.image.Image;
 
 import java.io.File;
 import java.io.IOException;
@@ -414,7 +413,7 @@ public abstract class UniFile {
     public abstract boolean renameTo(String displayName);
 
     @NonNull
-    public abstract Image.CloseableSource getImageSource();
+    public abstract ImageDecoder.Source getImageSource();
 
     @NonNull
     public abstract ParcelFileDescriptor openFileDescriptor(@NonNull String mode) throws IOException;

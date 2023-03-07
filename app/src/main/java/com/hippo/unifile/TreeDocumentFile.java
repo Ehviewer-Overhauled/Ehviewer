@@ -17,6 +17,7 @@
 package com.hippo.unifile;
 
 import android.content.Context;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
@@ -24,8 +25,6 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
-
-import com.hippo.image.Image;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -249,7 +248,7 @@ class TreeDocumentFile extends UniFile {
 
     @NonNull
     @Override
-    public Image.CloseableSource getImageSource() {
+    public ImageDecoder.Source getImageSource() {
         return Contracts.getImageSource(mContext, mUri);
     }
 
