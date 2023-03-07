@@ -40,7 +40,6 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
@@ -185,22 +184,13 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         return true
     }
 
-    private fun onGetPreviewSetSuccess(result: Pair<PreviewSet, Int>, taskId: Int) {
+    private fun onGetPreviewListSuccess(result: Pair<List<GalleryPreview>, Int>, taskId: Int) {
         if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryInfo) {
-            val previewSet = result.first
-            val size = previewSet.size()
-            val list = ArrayList<GalleryPreview>(size)
-            for (i in 0 until size) {
-                list.add(previewSet.getGalleryPreview(mGalleryInfo!!.gid, i))
-            }
-            mHelper!!.onGetPageData(
-                taskId, result.second, 0, null, null,
-                list as List<GalleryPreview?>?
-            )
+            mHelper!!.onGetPageData(taskId, result.second, 0, null, null, result.first)
         }
     }
 
-    private fun onGetPreviewSetFailure(e: Exception, taskId: Int) {
+    private fun onGetPreviewListFailure(e: Exception, taskId: Int) {
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             mHelper!!.onGetException(taskId, e)
         }
@@ -216,18 +206,18 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         }
     }
 
-    private inner class GetPreviewSetListener(
+    private inner class GetPreviewListListener(
         context: Context,
         private val mTaskId: Int
-    ) : EhCallback<GalleryPreviewsScene, Pair<PreviewSet, Int>>(context) {
-        override fun onSuccess(result: Pair<PreviewSet, Int>) {
+    ) : EhCallback<GalleryPreviewsScene, Pair<List<GalleryPreview>, Int>>(context) {
+        override fun onSuccess(result: Pair<List<GalleryPreview>, Int>) {
             val scene = this@GalleryPreviewsScene
-            scene.onGetPreviewSetSuccess(result, mTaskId)
+            scene.onGetPreviewListSuccess(result, mTaskId)
         }
 
         override fun onFailure(e: Exception) {
             val scene = this@GalleryPreviewsScene
-            scene.onGetPreviewSetFailure(e, mTaskId)
+            scene.onGetPreviewListFailure(e, mTaskId)
         }
 
         override fun onCancel() {}
@@ -279,9 +269,9 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             val url =
                 EhUrl.getGalleryDetailUrl(mGalleryInfo!!.gid, mGalleryInfo!!.token, page, false)
             val request = EhRequest()
-            request.setMethod(EhClient.METHOD_GET_PREVIEW_SET)
+            request.setMethod(EhClient.METHOD_GET_PREVIEW_LIST)
             request.setCallback(
-                GetPreviewSetListener(
+                GetPreviewListListener(
                     context,
                     taskId
                 )

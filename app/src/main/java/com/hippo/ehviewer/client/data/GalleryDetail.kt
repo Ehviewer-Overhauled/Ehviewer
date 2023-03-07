@@ -21,60 +21,26 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class GalleryDetail(
-    @JvmField
     val galleryInfo: GalleryInfo = BaseGalleryInfo(),
-
-    @JvmField
     var apiUid: Long = -1L,
-
-    @JvmField
     var apiKey: String? = null,
-
-    @JvmField
     var torrentCount: Int = 0,
-
-    @JvmField
     var torrentUrl: String? = null,
-
-    @JvmField
     var archiveUrl: String? = null,
-
-    @JvmField
     var parent: String? = null,
-
-    @JvmField
     var newerVersions: ArrayList<GalleryInfo> = ArrayList(),
-
-    @JvmField
     var visible: String? = null,
-
-    @JvmField
     var language: String? = null,
-
-    @JvmField
     var size: String? = null,
-
-    @JvmField
     var favoriteCount: Int = 0,
-
-    @JvmField
     var isFavorited: Boolean = false,
-
-    @JvmField
     var ratingCount: Int = 0,
-
-    @JvmField
     var tags: Array<GalleryTagGroup>? = null,
-
-    @JvmField
     var comments: GalleryCommentList? = null,
-
-    @JvmField
     var previewPages: Int = 0,
 
     @IgnoredOnParcel
-    @JvmField
-    var previewSet: PreviewSet? = null,
+    var previewList: List<GalleryPreview> = emptyList(),
 ) : AbstractGalleryInfo by galleryInfo, GalleryInfo {
     override fun generateSLang() {
         val index = LANGUAGES.indexOf(language)
