@@ -41,7 +41,6 @@ import com.hippo.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -240,8 +239,11 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private fun stop() {
-        launchNonCancellable { runCatching { writeSpiderInfoToLocal() } }
-        cancel()
+        val queenScope = this
+        launchIO {
+            queenScope.cancel()
+            writeSpiderInfoToLocal()
+        }
     }
 
     val size
