@@ -38,7 +38,6 @@ import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
@@ -55,7 +54,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     private var _binding: SceneGalleryPreviewsBinding? = null
     private val binding
         get() = _binding!!
-    private var mGalleryInfo: GalleryInfo? = null
+    private var mGalleryDetail: GalleryDetail? = null
     private var mAdapter: GalleryPreviewAdapter? = null
     private var mHelper: GalleryPreviewHelper? = null
     private var mHasFirstRefresh = false
@@ -71,12 +70,12 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     private fun onInit() {
         val args = arguments ?: return
-        mGalleryInfo = args.getParcelableCompat(KEY_GALLERY_INFO)
+        mGalleryDetail = args.getParcelableCompat(KEY_GALLERY_DETAIL)
         mNextPage = args.getBoolean(KEY_NEXT_PAGE)
     }
 
     private fun onRestore(savedInstanceState: Bundle) {
-        mGalleryInfo = savedInstanceState.getParcelableCompat(KEY_GALLERY_INFO)
+        mGalleryDetail = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
         mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
     }
 
@@ -88,7 +87,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             mHasFirstRefresh
         }
         outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
-        outState.putParcelable(KEY_GALLERY_INFO, mGalleryInfo)
+        outState.putParcelable(KEY_GALLERY_DETAIL, mGalleryDetail)
     }
 
     override fun onCreateViewWithToolbar(
@@ -115,7 +114,14 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
             mHasFirstRefresh = true
-            mHelper?.firstRefresh()
+            mHelper!!.onGetPageData(
+                0,
+                mGalleryDetail!!.previewPages,
+                0,
+                null,
+                null,
+                mGalleryDetail!!.previewList
+            )
         }
         return binding.root
     }
@@ -136,11 +142,10 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         super.onViewCreated(view, savedInstanceState)
         setTitle(R.string.gallery_previews)
         setNavigationIcon(R.drawable.v_arrow_left_dark_x24)
-        if (mGalleryInfo != null) {
-            if ((mGalleryInfo as GalleryDetail).previewPages > 2) showMenu(R.menu.scene_gallery_previews)
+        if (mGalleryDetail != null) {
+            if (mGalleryDetail!!.previewPages > 2) showMenu(R.menu.scene_gallery_previews)
         }
         runCatching {
-            mHelper!!.mPages = (mGalleryInfo as GalleryDetail).previewPages
             if (mNextPage && mHelper!!.pages > 1) mHelper!!.goTo(1)
         }.onFailure {
             it.printStackTrace()
@@ -171,12 +176,12 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     fun onItemClick(position: Int): Boolean {
         val context = context
-        if (null != context && null != mHelper && null != mGalleryInfo) {
+        if (null != context && null != mHelper && null != mGalleryDetail) {
             val p = mHelper!!.getDataAtEx(position)
             if (p != null) {
                 val intent = Intent(context, ReaderActivity::class.java)
                 intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryInfo)
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryDetail)
                 intent.putExtra(ReaderActivity.KEY_PAGE, p.position)
                 startActivity(intent)
             }
@@ -185,7 +190,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     }
 
     private fun onGetPreviewListSuccess(result: Pair<List<GalleryPreview>, Int>, taskId: Int) {
-        if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryInfo) {
+        if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryDetail) {
             mHelper!!.onGetPageData(taskId, result.second, 0, null, null, result.first)
         }
     }
@@ -262,20 +267,15 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             isNext: Boolean
         ) {
             val activity = mainActivity
-            if (null == activity || null == mGalleryInfo) {
+            if (null == activity || null == mGalleryDetail) {
                 onGetException(taskId, EhException(getString(R.string.error_cannot_find_gallery)))
                 return
             }
             val url =
-                EhUrl.getGalleryDetailUrl(mGalleryInfo!!.gid, mGalleryInfo!!.token, page, false)
+                EhUrl.getGalleryDetailUrl(mGalleryDetail!!.gid, mGalleryDetail!!.token, page, false)
             val request = EhRequest()
             request.setMethod(EhClient.METHOD_GET_PREVIEW_LIST)
-            request.setCallback(
-                GetPreviewListListener(
-                    context,
-                    taskId
-                )
-            )
+            request.setCallback(GetPreviewListListener(context, taskId))
             request.setArgs(url)
             request.enqueue(this@GalleryPreviewsScene)
         }
@@ -342,7 +342,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     }
 
     companion object {
-        const val KEY_GALLERY_INFO = "gallery_info"
+        const val KEY_GALLERY_DETAIL = "gallery_detail"
         const val KEY_NEXT_PAGE = "next_page"
         private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
     }

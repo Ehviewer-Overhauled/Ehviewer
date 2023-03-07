@@ -227,7 +227,7 @@ public class ContentLayout extends FrameLayout {
         /**
          * The available page count.
          */
-        public int mPages;
+        private int mPages;
         private int mNextPage;
         private int mCurrentTaskId;
         private int mCurrentTaskType;

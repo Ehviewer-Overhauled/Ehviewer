@@ -795,7 +795,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private fun navigateToPreview(nextPage: Boolean = false) {
         mGalleryDetail?.let {
             val args = Bundle()
-            args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_INFO, it)
+            args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_DETAIL, it)
             args.putBoolean(GalleryPreviewsScene.KEY_NEXT_PAGE, nextPage)
             navigate(R.id.galleryPreviewsScene, args)
         }
