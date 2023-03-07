@@ -4,16 +4,9 @@ import okhttp3.ResponseBody
 import java.io.File
 
 fun ResponseBody.copyToFile(file: File) {
-    val os = file.outputStream()
-    val channel = os.channel
-    val source = source()
-    try {
-        channel.transferFrom(source, 0, Long.MAX_VALUE)
-    } catch (e: Throwable) {
-        throw e
-    } finally {
-        source.close()
-        channel.close()
-        os.close()
+    file.outputStream().use { os ->
+        source().use {
+            os.channel.transferFrom(it, 0, Long.MAX_VALUE)
+        }
     }
 }

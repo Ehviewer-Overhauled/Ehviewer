@@ -187,10 +187,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
         suspend fun doSave(outFile: UniFile): Long {
             val ret: Long
-            outFile.openOutputStream().use { outputStream ->
-                outputStream.channel.use {
-                    ret = body.bodyAsChannel().copyTo(it)
-                }
+            outFile.openOutputStream().use {
+                ret = body.bodyAsChannel().copyTo(it.channel)
             }
             if (contentType == ContentType.Image.GIF)
                 outFile.openFileDescriptor("rw").use {
