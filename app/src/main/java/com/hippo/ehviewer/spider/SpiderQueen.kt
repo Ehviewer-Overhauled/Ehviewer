@@ -242,7 +242,11 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val queenScope = this
         launchIO {
             queenScope.cancel()
-            writeSpiderInfoToLocal()
+            runCatching {
+                writeSpiderInfoToLocal()
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
     }
 
