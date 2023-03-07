@@ -37,6 +37,7 @@ import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.legacy.cleanObsoleteCache
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.util.ExceptionUtils
@@ -51,7 +52,6 @@ import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.OkHttpClient
 import okio.Path.Companion.toOkioPath
-import java.io.File
 import java.net.Proxy
 import java.security.KeyStore
 import javax.net.ssl.TrustManagerFactory
@@ -109,22 +109,9 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                     checkDawn()
                 }
             }
-            launchIO {
-                cleanObsoleteCache()
-            }
         }
+        cleanObsoleteCache(this)
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
-    }
-
-    // TODO: Remove this after a few releases
-    private fun cleanObsoleteCache() {
-        val dir = cacheDir
-        for (subdir in OBSOLETE_CACHE_DIRS) {
-            val file = File(dir, subdir)
-            if (file.exists()) {
-                file.deleteRecursively()
-            }
-        }
     }
 
     private fun cleanupDownload() {
@@ -218,15 +205,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         private const val KEY_GLOBAL_STUFF_NEXT_ID = "global_stuff_next_id"
         var locked = true
         var locked_last_leave_time: Long = 0
-
-        private val OBSOLETE_CACHE_DIRS = arrayOf(
-            "image",
-            "thumb",
-            "http_cache",
-            "image_cache",
-            "gallery_image",
-            "spider_info"
-        )
 
         @JvmStatic
         lateinit var application: EhApplication
