@@ -26,7 +26,7 @@
     <img src="https://www.codefactor.io/repository/github/Ehviewer-Overhauled/ehviewer/badge" alt="CodeFactor">
   </a>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases">
-    <img src="https://img.shields.io/github/downloads/Ehviewer-Overhauled/EhViewer/total.svg?style=flat-square" alt="Downloads">
+    <img src="https://img.shields.io/github/downloads/Ehviewer-Overhauled/EhViewer/total.svg" alt="Downloads">
   </a>
   <a href="https://github.com/Ehviewer-Overhauled/Ehviewer/releases">
     <img src="https://img.shields.io/github/v/release/Ehviewer-Overhauled/ehviewer?include_prereleases" alt="Release">
