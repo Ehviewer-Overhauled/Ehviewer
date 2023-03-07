@@ -246,6 +246,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
 
         val ktorClient by lazy {
+            if (Settings.dF) System.setProperty("jsse.enableSNIExtension", "false")
             HttpClient(Apache5)
         }
 
