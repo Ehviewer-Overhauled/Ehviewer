@@ -34,7 +34,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
-import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewSet
+import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewList
 import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.image.Image
@@ -339,22 +339,19 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     @Throws(ParseException::class)
     private fun readPreviews(body: String, index: Int, spiderInfo: SpiderInfo) {
         spiderInfo.previewPages = parsePreviewPages(body)
-        val previewSet = parsePreviewSet(body)
-        if (previewSet.size() > 0) {
+        val previewList = parsePreviewList(body)
+        if (previewList.isNotEmpty()) {
             if (index == 0) {
-                spiderInfo.previewPerPage = previewSet.size()
+                spiderInfo.previewPerPage = previewList.size
             } else {
-                spiderInfo.previewPerPage = previewSet.getPosition(0) / index
+                spiderInfo.previewPerPage = previewList[0].position / index
             }
         }
-        var i = 0
-        val n = previewSet.size()
-        while (i < n) {
-            val result = GalleryPageUrlParser.parse(previewSet.getPageUrlAt(i))
+        previewList.forEach {
+            val result = GalleryPageUrlParser.parse(it.pageUrl)
             if (result != null) {
                 spiderInfo.pTokenMap[result.page] = result.pToken
             }
-            i++
         }
     }
 

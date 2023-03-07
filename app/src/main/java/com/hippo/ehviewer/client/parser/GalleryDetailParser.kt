@@ -24,10 +24,8 @@ import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.GalleryTagGroup
-import com.hippo.ehviewer.client.data.LargePreviewSet
-import com.hippo.ehviewer.client.data.NormalPreviewSet
-import com.hippo.ehviewer.client.data.PreviewSet
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.OffensiveException
 import com.hippo.ehviewer.client.exception.ParseException
@@ -97,8 +95,8 @@ object GalleryDetailParser {
         parseDetail(galleryDetail, document, body)
         galleryDetail.tags = parseTagGroups(document)
         galleryDetail.comments = parseComments(document)
-        galleryDetail.previewPages = parsePreviewPages(document, body)
-        galleryDetail.previewSet = parsePreviewSet(document, body)
+        galleryDetail.previewPages = parsePreviewPages(body)
+        galleryDetail.previewList = parsePreviewList(body)
 
         // Generate simpleLanguage for local favorites
         galleryDetail.generateSLang()
@@ -448,25 +446,8 @@ object GalleryDetailParser {
     }
 
     /**
-     * Parse preview pages with html parser
-     */
-    @Throws(ParseException::class)
-    fun parsePreviewPages(document: Document, body: String?): Int {
-        return try {
-            val ptt = document.getElementsByClass("ptt").first()!!
-            val elements = ptt.child(0).child(0).children()
-            elements[elements.size - 2].text().toInt()
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            e.printStackTrace()
-            throw ParseException("Can't parse preview pages", body!!)
-        }
-    }
-
-    /**
      * Parse preview pages with regular expressions
      */
-    @JvmStatic
     @Throws(ParseException::class)
     fun parsePreviewPages(body: String): Int {
         return PATTERN_PREVIEW_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
@@ -476,7 +457,6 @@ object GalleryDetailParser {
     /**
      * Parse pages with regular expressions
      */
-    @JvmStatic
     @Throws(ParseException::class)
     fun parsePages(body: String): Int {
         return PATTERN_PAGES.find(body)?.groupValues?.get(1)?.toIntOrNull()
@@ -484,21 +464,11 @@ object GalleryDetailParser {
     }
 
     @Throws(ParseException::class)
-    fun parsePreviewSet(d: Document, body: String): PreviewSet {
+    fun parsePreviewList(body: String): List<GalleryPreview> {
         return try {
-            parseLargePreviewSet(d, body)
+            parseLargePreview(body)
         } catch (e: ParseException) {
-            parseNormalPreviewSet(body)
-        }
-    }
-
-    @JvmStatic
-    @Throws(ParseException::class)
-    fun parsePreviewSet(body: String): PreviewSet {
-        return try {
-            parseLargePreviewSet(body)
-        } catch (e: ParseException) {
-            parseNormalPreviewSet(body)
+            parseNormalPreview(body)
         }
     }
 
@@ -506,67 +476,37 @@ object GalleryDetailParser {
      * Parse large previews with regular expressions
      */
     @Throws(ParseException::class)
-    private fun parseLargePreviewSet(d: Document, body: String): LargePreviewSet {
-        return try {
-            val largePreviewSet = LargePreviewSet()
-            val gdt = d.getElementById("gdt")!!
-            val gdtls = gdt.getElementsByClass("gdtl")
-            val n = gdtls.size
-            if (n == 0) {
-                throw ParseException("Can't parse large preview", body)
-            }
-            for (i in 0 until n) {
-                var element = gdtls[i].child(0)
-                val pageUrl = element.attr("href")
-                element = element.child(0)
-                val imageUrl = element.attr("src")
-                val index = element.attr("alt").toInt() - 1
-                largePreviewSet.addItem(index, imageUrl, pageUrl)
-            }
-            largePreviewSet
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            throw ParseException("Can't parse large preview", body)
-        }
-    }
-
-    /**
-     * Parse large previews with regular expressions
-     */
-    @Throws(ParseException::class)
-    private fun parseLargePreviewSet(body: String): LargePreviewSet {
-        val largePreviewSet = LargePreviewSet()
-        PATTERN_LARGE_PREVIEW.findAll(body).forEach {
-            val index = (it.groupValues[2].toIntOrNull() ?: return@forEach) - 1
+    private fun parseLargePreview(body: String): List<GalleryPreview> {
+        val list = PATTERN_LARGE_PREVIEW.findAll(body).mapNotNull {
+            val index = (it.groupValues[2].toIntOrNull() ?: return@mapNotNull null) - 1
             val imageUrl = it.groupValues[3].trim()
             val pageUrl = it.groupValues[1].trim()
-            largePreviewSet.addItem(index, imageUrl, pageUrl)
-        }
-        if (largePreviewSet.size() == 0) {
+            GalleryPreview(imageUrl, pageUrl, index)
+        }.toList()
+        if (list.isEmpty()) {
             throw ParseException("Can't parse large preview", body)
         }
-        return largePreviewSet
+        return list
     }
 
     /**
      * Parse normal previews with regular expressions
      */
     @Throws(ParseException::class)
-    private fun parseNormalPreviewSet(body: String): NormalPreviewSet {
-        val normalPreviewSet = NormalPreviewSet()
-        PATTERN_NORMAL_PREVIEW.findAll(body).forEach {
-            val position = (it.groupValues[6].toIntOrNull() ?: return@forEach) - 1
+    private fun parseNormalPreview(body: String): List<GalleryPreview> {
+        val list = PATTERN_NORMAL_PREVIEW.findAll(body).mapNotNull {
+            val position = (it.groupValues[6].toIntOrNull() ?: return@mapNotNull null) - 1
             val imageUrl = it.groupValues[3].trim()
             val xOffset = it.groupValues[4].toIntOrNull() ?: 0
             val yOffset = 0
-            val width = it.groupValues[1].toIntOrNull() ?: return@forEach
-            val height = it.groupValues[2].toIntOrNull() ?: return@forEach
+            val width = it.groupValues[1].toIntOrNull() ?: return@mapNotNull null
+            val height = it.groupValues[2].toIntOrNull() ?: return@mapNotNull null
             val pageUrl = it.groupValues[5].trim()
-            normalPreviewSet.addItem(position, imageUrl, xOffset, yOffset, width, height, pageUrl)
-        }
-        if (normalPreviewSet.size() == 0) {
+            GalleryPreview(imageUrl, pageUrl, position, xOffset, yOffset, width, height)
+        }.toList()
+        if (list.isEmpty()) {
             throw ParseException("Can't parse normal preview", body)
         }
-        return normalPreviewSet
+        return list
     }
 }

@@ -26,7 +26,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.client.data.PreviewSet
+import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.ArchiveParser
@@ -336,7 +336,7 @@ object EhEngine {
     }
 
     @Throws(Throwable::class)
-    suspend fun getPreviewSet(url: String?): Pair<PreviewSet, Int> {
+    suspend fun getPreviewList(url: String?): Pair<List<GalleryPreview>, Int> {
         val referer = EhUrl.referer
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
@@ -351,7 +351,7 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 return Pair.create(
-                    GalleryDetailParser.parsePreviewSet(body!!),
+                    GalleryDetailParser.parsePreviewList(body!!),
                     GalleryDetailParser.parsePreviewPages(body!!)
                 )
             }

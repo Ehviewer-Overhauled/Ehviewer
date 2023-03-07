@@ -21,23 +21,16 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class GalleryPreview(
-    @JvmField
-    var imageUrl: String? = null,
-    @JvmField
-    var pageUrl: String? = null,
-    @JvmField
-    var position: Int = 0,
-    @JvmField
-    var offsetX: Int = Int.MIN_VALUE,
-    @JvmField
-    var offsetY: Int = Int.MIN_VALUE,
-    @JvmField
-    var clipWidth: Int = Int.MIN_VALUE,
-    @JvmField
-    var clipHeight: Int = Int.MIN_VALUE,
+    private val imageUrl: String,
+    val pageUrl: String,
+    val position: Int,
+    private val offsetX: Int = Int.MIN_VALUE,
+    private val offsetY: Int = Int.MIN_VALUE,
+    private val clipWidth: Int = Int.MIN_VALUE,
+    private val clipHeight: Int = Int.MIN_VALUE,
 ) : Parcelable {
     fun load(view: LoadImageView) {
         view.setClip(offsetX, offsetY, clipWidth, clipHeight)
-        view.load(imageUrl!!)
+        view.load(imageUrl)
     }
 }

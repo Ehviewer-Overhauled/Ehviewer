@@ -709,8 +709,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         _binding ?: return
         binding.content.previews.run {
             gridLayout.removeAllViews()
-            val previewSet = gd.previewSet
-            if (gd.previewPages <= 0 || previewSet == null || previewSet.size() == 0) {
+            val previewList = gd.previewList
+            if (gd.previewPages <= 0 || previewList.isEmpty()) {
                 previewText.setText(R.string.no_previews)
                 return
             } else if (gd.previewPages == 1) {
@@ -722,17 +722,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             gridLayout.setColumnSize(columnWidth)
             gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
             viewLifecycleOwner.lifecycleScope.launchIO {
-                for (i in 0 until previewSet.size()) {
+                previewList.forEach {
                     val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
                     val image = view.findViewById<LoadImageView>(R.id.image)
                     withUIContext {
                         gridLayout.addView(view)
-                        image.setTag(R.id.index, i)
+                        image.setTag(R.id.index, it.position)
                         image.setOnClickListener(this@GalleryDetailScene)
                         val text = view.findViewById<TextView>(R.id.text)
-                        text.text = (previewSet.getPosition(i) + 1).toString()
+                        text.text = (it.position + 1).toString()
                     }
-                    previewSet.load(image, gd.gid, i)
+                    it.load(image)
                 }
             }
         }

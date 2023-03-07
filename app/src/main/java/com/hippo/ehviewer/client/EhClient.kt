@@ -58,7 +58,7 @@ object EhClient {
                 params[0] as String?
             )
 
-            METHOD_GET_PREVIEW_SET -> EhEngine.getPreviewSet(
+            METHOD_GET_PREVIEW_LIST -> EhEngine.getPreviewList(
                 params[0] as String?
             )
 
@@ -165,7 +165,7 @@ object EhClient {
     const val METHOD_SIGN_IN = 0
     const val METHOD_GET_GALLERY_LIST = 1
     const val METHOD_GET_GALLERY_DETAIL = 3
-    const val METHOD_GET_PREVIEW_SET = 4
+    const val METHOD_GET_PREVIEW_LIST = 4
     const val METHOD_GET_RATE_GALLERY = 5
     const val METHOD_GET_COMMENT_GALLERY = 6
     const val METHOD_GET_GALLERY_TOKEN = 7
