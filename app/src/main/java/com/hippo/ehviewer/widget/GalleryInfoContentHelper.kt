@@ -68,7 +68,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         map.clear()
     }
 
-    override fun saveInstanceState(superState: Parcelable): Parcelable {
+    override fun saveInstanceState(superState: Parcelable?): Parcelable {
         val bundle = super.saveInstanceState(superState) as Bundle
 
         // TODO It's a bad design
@@ -78,7 +78,7 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         return bundle
     }
 
-    override fun restoreInstanceState(state: Parcelable): Parcelable {
+    override fun restoreInstanceState(state: Parcelable): Parcelable? {
         val bundle = state as Bundle
         val id = bundle.getInt(KEY_DATA_MAP, IntIdGenerator.INVALID_ID)
         if (id != IntIdGenerator.INVALID_ID) {

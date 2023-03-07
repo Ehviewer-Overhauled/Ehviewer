@@ -104,7 +104,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
         binding.contentLayout.recyclerView.addItemDecoration(decoration)
         mHelper = GalleryPreviewHelper()
-        binding.contentLayout.setHelper(mHelper)
+        binding.contentLayout.setHelper(mHelper!!)
 
         // Only refresh for the first time
         if (!mHasFirstRefresh) {
@@ -256,9 +256,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             request.enqueue(this@GalleryPreviewsScene)
         }
 
-        override fun getContext(): Context {
-            return this@GalleryPreviewsScene.requireContext()
-        }
+        override val context
+            get() = this@GalleryPreviewsScene.requireContext()
 
         @SuppressLint("NotifyDataSetChanged")
         override fun notifyDataSetChanged() {
