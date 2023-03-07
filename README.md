@@ -81,16 +81,17 @@ with Material Design 3 and Dynamic Color Support
 Here is the libraries
 
 - [AOSP & AndroidX](http://source.android.com/)
+- [Kotlin & KotlinX](https://kotlinlang.org/)
+- [Tachiyomi](https://tachiyomi.org/)
 - [Coil](https://coil-kt.github.io/coil/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
-- [GnuTLS](https://gnutls.org/)
 - [material-components-android](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [jsoup](https://github.com/jhy/jsoup)
-- [okhttp](https://github.com/square/okhttp)
+- [jsoup](https://jsoup.org/)
+- [okhttp](https://square.github.io/okhttp/)
+- [Ktor](https://ktor.io/)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [libarchive](http://www.libarchive.org/)
-- [XZ Utils](https://tukaani.org/xz/)
 
 
 # License
