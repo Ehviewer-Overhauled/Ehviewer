@@ -277,7 +277,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         // We use data to store image file, and metadata for image type
         val imageCache by lazy {
             DiskCache.Builder().apply {
-                directory(application.cacheDir.toOkioPath() / "img")
+                directory(application.cacheDir.toOkioPath() / "image_cache")
                 maxSizeBytes(Settings.readCacheSize.coerceIn(40, 1280).toLong() * 1024 * 1024)
             }.build()
         }

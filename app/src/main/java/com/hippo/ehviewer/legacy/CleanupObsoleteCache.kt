@@ -8,7 +8,6 @@ import java.io.File
 private val OBSOLETE_CACHE_DIRS = arrayOf(
     "image",
     "thumb",
-    "image_cache",
     "gallery_image",
     "spider_info"
 )
