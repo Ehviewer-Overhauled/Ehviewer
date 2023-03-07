@@ -18,7 +18,7 @@ fun requestOf(model: String?): ImageRequest {
 }
 
 @Composable
-fun EhThumbAsyncImage(
+fun EhAsyncThumb(
     model: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,

@@ -56,7 +56,7 @@ fun ListInfoCard(
                 ),
         ) {
             Card {
-                EhThumbAsyncImage(
+                EhAsyncThumb(
                     model = info.thumb,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
