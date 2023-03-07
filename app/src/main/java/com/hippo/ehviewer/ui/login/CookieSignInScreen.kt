@@ -90,7 +90,7 @@ fun CookieSignInScene() {
 
     fun storeCookie(id: String, hash: String, igneous: String) {
         EhUtils.signOut()
-        val store = EhApplication.ehCookieStore
+        val store = EhCookieStore
         store.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_E))
         store.addCookie(newCookie(EhCookieStore.KEY_IPB_MEMBER_ID, id, EhUrl.DOMAIN_EX))
         store.addCookie(newCookie(EhCookieStore.KEY_IPB_PASS_HASH, hash, EhUrl.DOMAIN_E))
@@ -127,7 +127,7 @@ fun CookieSignInScene() {
                     navController.navigate(SELECT_SITE_ROUTE_NAME)
                 }
             }.onFailure {
-                EhApplication.ehCookieStore.signOut()
+                EhCookieStore.signOut()
                 loginErrorException = it
                 showErrorDialog = true
                 isProgressIndicatorVisible = false

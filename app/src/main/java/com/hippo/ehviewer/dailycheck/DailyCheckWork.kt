@@ -17,6 +17,7 @@ import androidx.work.WorkerParameters
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import eu.kanade.tachiyomi.util.lang.withIOContext
 import java.time.Duration
@@ -25,7 +26,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 private val signedIn
-    get() = EhApplication.ehCookieStore.hasSignedIn()
+    get() = EhCookieStore.hasSignedIn()
 
 private const val CHANNEL_ID = "DailyCheckNotification"
 

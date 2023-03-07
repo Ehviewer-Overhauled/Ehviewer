@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.client
 
 import android.text.TextUtils
-import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import java.util.regex.Pattern
@@ -111,7 +110,7 @@ object EhUtils {
     }
 
     fun signOut() {
-        ehCookieStore.signOut()
+        EhCookieStore.signOut()
         Settings.putAvatar(null)
         Settings.putDisplayName(null)
         Settings.putGallerySite(EhUrl.SITE_E)
@@ -120,7 +119,7 @@ object EhUtils {
     }
 
     fun needSignedIn(): Boolean {
-        return Settings.needSignIn && !ehCookieStore.hasSignedIn()
+        return Settings.needSignIn && !EhCookieStore.hasSignedIn()
     }
 
     @JvmStatic

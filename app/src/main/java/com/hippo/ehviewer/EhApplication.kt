@@ -211,15 +211,12 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             private set
 
         @JvmStatic
-        val ehCookieStore by lazy { EhCookieStore }
-
-        @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
         @JvmStatic
         val okHttpClient by lazy {
             val builder = OkHttpClient.Builder()
-                .cookieJar(ehCookieStore)
+                .cookieJar(EhCookieStore)
                 .dns(EhDns)
                 .proxySelector(ehProxySelector)
 

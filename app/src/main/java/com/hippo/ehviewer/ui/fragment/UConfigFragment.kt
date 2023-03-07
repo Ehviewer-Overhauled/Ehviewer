@@ -33,8 +33,8 @@ import android.webkit.WebViewClient
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhCookieStore.KEY_SETTINGS_PROFILE
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.databinding.ActivityWebviewBinding
@@ -101,7 +101,7 @@ class UConfigFragment : BaseFragment() {
         cookieManager.removeSessionCookies(null)
 
         // Copy cookies from okhttp cookie store to CookieManager
-        val store = ehCookieStore
+        val store = EhCookieStore
         for (cookie in store.getCookies(url.toHttpUrl())) {
             cookieManager.setCookie(url, cookie.toString())
         }
@@ -134,7 +134,7 @@ class UConfigFragment : BaseFragment() {
         val cookieManager = CookieManager.getInstance()
         val cookiesString = cookieManager.getCookie(url)
         if (!cookiesString.isNullOrEmpty()) {
-            val store = ehCookieStore
+            val store = EhCookieStore
             val hostUrl = EhUrl.host.toHttpUrl()
 
             lifecycleScope.launchIO {

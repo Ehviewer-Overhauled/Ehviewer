@@ -55,13 +55,13 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.EhApplication.Companion.ehCookieStore
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -1642,7 +1642,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     FileUtils.sanitizeFilename("$name.torrent")
                 )
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                r.addRequestHeader("Cookie", ehCookieStore.getCookieHeader(url.toHttpUrl()))
+                r.addRequestHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
                 val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 try {
                     dm.enqueue(r)

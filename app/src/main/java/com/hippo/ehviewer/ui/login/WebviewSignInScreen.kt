@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
@@ -69,7 +68,7 @@ fun WebviewSignInScreen() {
                 }
 
                 fun addCookie(domain: String, cookie: Cookie) {
-                    EhApplication.ehCookieStore.addCookie(
+                    EhCookieStore.addCookie(
                         EhCookieStore.newCookie(
                             cookie,
                             domain,
