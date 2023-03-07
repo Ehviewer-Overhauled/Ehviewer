@@ -3,12 +3,10 @@ package com.hippo.ehviewer.coil
 import android.content.Context
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.EhCacheKeyFactory
-import com.hippo.ehviewer.client.EhUrl
 
 fun ImageRequest.Builder.ehUrl(url: String) = apply {
     val key = EhCacheKeyFactory.getImageKey(url)
-    val realUrl = EhUrl.thumbUrlPrefix + key
-    data(realUrl)
+    data(url)
     memoryCacheKey(key)
     diskCacheKey(key)
 }
