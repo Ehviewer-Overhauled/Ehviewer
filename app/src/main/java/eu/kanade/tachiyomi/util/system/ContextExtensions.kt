@@ -218,26 +218,6 @@ fun Context.getUriSize(uri: Uri): Long? {
 }
 
 /**
- * Returns true if [packageName] is installed.
- */
-fun Context.isPackageInstalled(packageName: String): Boolean {
-    return try {
-        packageManager.getApplicationInfo(packageName, 0)
-        true
-    } catch (e: PackageManager.NameNotFoundException) {
-        false
-    }
-}
-
-fun Context.getApplicationIcon(pkgName: String): Drawable? {
-    return try {
-        packageManager.getApplicationIcon(pkgName)
-    } catch (e: PackageManager.NameNotFoundException) {
-        null
-    }
-}
-
-/**
  * Gets system's config_navBarNeedsScrim boolean flag added in Android 10, defaults to true.
  */
 fun Context.isNavigationBarNeedsScrim(): Boolean {
@@ -253,7 +233,6 @@ fun Context.isNavigationBarNeedsScrim(): Boolean {
  */
 fun Context.createReaderThemeContext(): Context {
     return this
-    TODO()
 }
 
 inline fun Any.logcat(priority: Int = Log.DEBUG, tag: String? = null, message: () -> String) {
