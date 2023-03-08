@@ -80,6 +80,7 @@ object EhEngine {
     private const val SAD_PANDA_TYPE = "image/gif"
     private const val SAD_PANDA_LENGTH = "9615"
     private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
+    private const val U_CONFIG_TEXT = "Selected Profile"
     private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
     private var sEhFilter = EhFilter
 
@@ -690,7 +691,7 @@ object EhEngine {
     suspend fun getFunds(): HomeParser.Funds {
         val url = EhUrl.URL_FUNDS
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, null).build()
+        val request = EhRequestBuilder(url).build()
         val call = okHttpClient.newCall(request)
         var body: String? = null
         var headers: Headers? = null
@@ -713,7 +714,7 @@ object EhEngine {
     private suspend fun getImageLimitsInternal(): HomeParser.Limits {
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, null).build()
+        val request = EhRequestBuilder(url).build()
         val call = okHttpClient.newCall(request)
         var body: String? = null
         var headers: Headers? = null
@@ -750,7 +751,7 @@ object EhEngine {
             .add("reset", "Reset Limit")
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, null)
+        val request = EhRequestBuilder(url)
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
@@ -823,7 +824,7 @@ object EhEngine {
     suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, null).build()
+        val request = EhRequestBuilder(url).build()
         val call = okHttpClient.newCall(request)
         var body: String? = null
         var headers: Headers? = null
@@ -842,47 +843,26 @@ object EhEngine {
         }
     }
 
-    @Throws(Throwable::class)
-    suspend fun getUConfig(url: String = EhUrl.uConfigUrl): Void? {
+    private suspend fun getUConfigInternal(url: String) {
         Log.d(TAG, url)
-        var request = EhRequestBuilder(url, null).build()
-        var call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                request = response.request
-                rethrowExactly(code, headers, body, null)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
+        val request = EhRequestBuilder(url).build()
+        okHttpClient.newCall(request).executeAsync().parsingWith {
+            check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" }
         }
+    }
 
-        // TODO Use a better way to handle 302
-        if (request.url.toString() != url) {
-            Log.d(TAG, "Redirected! Retry $url")
-            request = EhRequestBuilder(url, null).build()
-            call = okHttpClient.newCall(request)
-            try {
-                call.executeAsync().use { response ->
-                    code = response.code
-                    headers = response.headers
-                    body = response.body.string()
-                    rethrowExactly(code, headers, body, null)
-                }
-            } catch (e: Throwable) {
-                ExceptionUtils.throwIfFatal(e)
-                rethrowExactly(code, headers, body, e)
-                throw e
+    suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
+        runCatching {
+            getUConfigInternal(url)
+        }.onFailure {
+            // It may get redirected when accessing ex for the first time
+            if (EhUtils.isExHentai) {
+                it.printStackTrace()
+                getUConfigInternal(url)
+            } else {
+                throw it
             }
         }
-        return null
     }
 
     @Throws(Throwable::class)
