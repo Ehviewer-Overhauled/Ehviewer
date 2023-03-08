@@ -48,7 +48,7 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache5.Apache5
+import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -246,8 +246,11 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
 
         val ktorClient by lazy {
-            if (Settings.dF) System.setProperty("jsse.enableSNIExtension", "false")
-            HttpClient(Apache5)
+            HttpClient(OkHttp) {
+                engine {
+                    preconfigured = nonCacheOkHttpClient
+                }
+            }
         }
 
         @JvmStatic
