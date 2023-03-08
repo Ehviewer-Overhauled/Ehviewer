@@ -18,11 +18,8 @@ package com.hippo.ehviewer.client
 import com.hippo.okhttp.ChromeRequestBuilder
 import io.ktor.http.HttpMessageBuilder
 
-class EhRequestBuilder @JvmOverloads constructor(
-    url: String,
-    referer: String?,
-    origin: String? = null
-) : ChromeRequestBuilder(url) {
+class EhRequestBuilder(url: String, referer: String? = null, origin: String? = null) :
+    ChromeRequestBuilder(url) {
     init {
         referer?.let { addHeader("Referer", it) }
         origin?.let { addHeader("Origin", it) }
