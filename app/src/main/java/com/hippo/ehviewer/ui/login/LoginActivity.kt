@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.EhActivity
@@ -80,6 +81,7 @@ suspend fun postLogin() = coroutineScope {
         runCatching {
             // For the `star` cookie
             EhEngine.getNews(false)
+            EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
 
             // Sad panda check
             Settings.putGallerySite(EhUrl.SITE_EX)

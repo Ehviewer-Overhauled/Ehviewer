@@ -15,8 +15,6 @@
  */
 package com.hippo.network
 
-import com.hippo.util.HashCodeUtils
-import com.hippo.yorozuya.ObjectUtils
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 
@@ -44,44 +42,27 @@ internal class CookieSet {
     /**
      * Get cookies for the url. Fill `accepted` and `expired`.
      */
-    operator fun get(url: HttpUrl?, accepted: MutableList<Cookie>, expired: MutableList<Cookie>) {
+    operator fun get(url: HttpUrl, accepted: MutableList<Cookie>, expired: MutableList<Cookie>) {
         val now = System.currentTimeMillis()
-        val iterator: MutableIterator<Map.Entry<Key, Cookie>> = map.entries.iterator()
+        val iterator = map.entries.iterator()
         while (iterator.hasNext()) {
             val cookie = iterator.next().value
             if (cookie.expiresAt <= now) {
                 iterator.remove()
                 expired.add(cookie)
-            } else if (cookie.matches(url!!)) {
+            } else if (cookie.matches(url)) {
                 accepted.add(cookie)
             }
         }
     }
 
-    internal class Key(cookie: Cookie) {
-        private val name: String
-        private val domain: String
-        private val path: String
-        override fun equals(other: Any?): Boolean {
-            if (other === this) {
-                return true
-            }
-            if (other is Key) {
-                return ObjectUtils.equal(other.name, name) &&
-                        ObjectUtils.equal(other.domain, domain) &&
-                        ObjectUtils.equal(other.path, path)
-            }
-            return false
-        }
+    fun get(name: String, domain: String, path: String) = map[Key(name, domain, path)]
 
-        override fun hashCode(): Int {
-            return HashCodeUtils.hashCode(name, domain, path)
-        }
-
-        init {
-            name = cookie.name
-            domain = cookie.domain
-            path = cookie.path
-        }
+    internal data class Key(
+        val name: String,
+        val domain: String,
+        val path: String
+    ) {
+        constructor(cookie: Cookie) : this(cookie.name, cookie.domain, cookie.path)
     }
 }

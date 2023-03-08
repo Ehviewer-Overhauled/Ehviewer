@@ -48,6 +48,7 @@ object EhCookieStore : CookieJar, CookiesStorage {
     const val KEY_IPB_PASS_HASH = "ipb_pass_hash"
     const val KEY_IGNEOUS = "igneous"
     const val KEY_SETTINGS_PROFILE = "sp"
+    const val KEY_STAR = "star"
     private const val KEY_CONTENT_WARNING = "nw"
     private const val CONTENT_WARNING_NOT_SHOW = "1"
     private val sTipsCookie: Cookie = Cookie.Builder()
@@ -59,8 +60,8 @@ object EhCookieStore : CookieJar, CookiesStorage {
         .build()
 
     fun newCookie(
-        cookie: Cookie, newDomain: String, forcePersistent: Boolean,
-        forceLongLive: Boolean, forceNotHostOnly: Boolean
+        cookie: Cookie, newDomain: String, forcePersistent: Boolean = false,
+        forceLongLive: Boolean = false, forceNotHostOnly: Boolean = false
     ): Cookie {
         val builder = Cookie.Builder()
         builder.name(cookie.name)
@@ -85,6 +86,11 @@ object EhCookieStore : CookieJar, CookiesStorage {
             builder.httpOnly()
         }
         return builder.build()
+    }
+
+    fun copyCookie(domain: String, newDomain: String, name: String, path: String = "/") {
+        val cookie = map[domain]?.get(name, domain, path)
+        cookie?.let { addCookie(newCookie(it, newDomain)) }
     }
 
     fun deleteCookie(url: HttpUrl, name: String) {
