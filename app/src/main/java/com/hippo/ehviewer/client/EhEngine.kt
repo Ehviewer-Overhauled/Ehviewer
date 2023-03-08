@@ -906,21 +906,8 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return VoteCommentParser.parse(body, commentVote)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
+        return okHttpClient.newCall(request).executeAsync().parsingWith {
+            VoteCommentParser.parse(this, commentVote)
         }
     }
 
@@ -945,22 +932,7 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return VoteTagParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(VoteTagParser::parse)
     }
 
     /**
@@ -1009,26 +981,8 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var result: GalleryListParser.Result
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                Log.d(TAG, "" + response.request.url)
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = GalleryListParser.parse(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        fillGalleryList(result.galleryInfoList, url, true)
-        return result
+        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryListParser::parse)
+            .apply { fillGalleryList(galleryInfoList, url, true) }
     }
 
     @JvmStatic
@@ -1041,23 +995,7 @@ object EhEngine {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return GalleryPageParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryPageParser::parse)
     }
 
     @JvmStatic
@@ -1086,22 +1024,6 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
             .build()
-        val call = okHttpClient.newCall(request)
-
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return GalleryPageApiParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryPageApiParser::parse)
     }
 }
