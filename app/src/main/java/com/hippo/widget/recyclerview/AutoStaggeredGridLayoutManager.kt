@@ -25,6 +25,7 @@ class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
     private var mColumnSize = -1
     private var mColumnSizeChanged = true
     private var mStrategy = 0
+    var supportsPredictiveItemAnimations = true
 
     init {
         setColumnSize(columnSize)
@@ -44,6 +45,10 @@ class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
         }
         mStrategy = strategy
         mColumnSizeChanged = true
+    }
+
+    override fun supportsPredictiveItemAnimations(): Boolean {
+        return supportsPredictiveItemAnimations && super.supportsPredictiveItemAnimations()
     }
 
     override fun onMeasure(
