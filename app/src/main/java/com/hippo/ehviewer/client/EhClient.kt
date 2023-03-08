@@ -50,11 +50,11 @@ object EhClient {
             )
 
             METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
-                params[0] as String?
+                params[0] as String
             )
 
             METHOD_GET_PREVIEW_LIST -> EhEngine.getPreviewList(
-                params[0] as String?
+                params[0] as String
             )
 
             METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
