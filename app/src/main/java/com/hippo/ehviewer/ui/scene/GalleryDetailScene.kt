@@ -75,6 +75,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
+import com.hippo.ehviewer.client.getPreviewThumbKey
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
@@ -781,7 +782,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             return
         }
         try {
-            val path = imageLoader(context).diskCache!![mGalleryInfo!!.thumb!!]!!.data
+            val key = getPreviewThumbKey(mGalleryInfo!!.thumb!!)
+            val path = imageLoader(context).diskCache!![key]!!.use { it.data }
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_IMAGE_SEARCH
             lub.imagePath = path.toString()
