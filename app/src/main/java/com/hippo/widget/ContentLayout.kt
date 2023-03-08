@@ -23,14 +23,10 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.easyrecyclerview.LayoutManagerUtils
 import com.hippo.easyrecyclerview.LayoutManagerUtils.OnScrollToPositionListener
@@ -143,11 +139,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             OnScrollToPositionListener { position: Int -> onScrollToPosition(position) }
         protected var mPrev: String? = null
         protected var mNext: String? = null
-        private var mTipView: TextView? = null
-        private var mRefreshLayout: SwipeRefreshLayout? = null
-        private var mBottomProgress: LinearProgressIndicator? = null
-        private var mRecyclerView: EasyRecyclerView? = null
-        private var mViewTransition: ViewTransition? = null
+        private lateinit var mViewTransition: ViewTransition
+        private lateinit var binding: WidgetContentLayoutBinding
 
         /**
          * Store data
@@ -162,7 +155,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
          * page 3 size is 7, page 4 size is 8, page 5 size is 9,
          * so `mPageDivider` contain 7, 15, 24.
          */
-        private var mPageDivider: IntList? = IntList()
+        private var mPageDivider = IntList()
 
         /**
          * The first page in `mData`
@@ -198,9 +191,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         private val mOnScrollListener: RecyclerView.OnScrollListener =
             object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (!mRefreshLayout!!.isRefreshing && !recyclerView.canScrollVertically(1)) {
+                    if (!binding.refreshLayout.isRefreshing && !recyclerView.canScrollVertically(1)) {
                         if (mNext != null || mEndPage < pages) {
-                            mBottomProgress!!.show()
+                            binding.bottomProgress.show()
                             // Get next page
                             // Fill pages before NextPage with empty list
                             while (mNextPage > mEndPage && mEndPage < pages) {
@@ -227,7 +220,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                 true
                             )
                         } else if (mStartPage > 0 && mEndPage == pages) {
-                            mBottomProgress!!.show()
+                            binding.bottomProgress.show()
                             // Refresh last page
                             mCurrentTaskId = mIdGenerator.nextId()
                             mCurrentTaskType = TYPE_REFRESH_PAGE
@@ -245,21 +238,16 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         private var mSavedDataId = IntIdGenerator.INVALID_ID
         fun init(contentLayout: ContentLayout) {
+            binding = contentLayout.binding
             mNextPageScrollSize = LayoutUtils.dp2pix(contentLayout.context, 48f)
-            val mProgressView = contentLayout.binding.progress
-            mTipView = contentLayout.binding.tip
-            val mContentView = contentLayout.binding.contentView
-            mRefreshLayout = contentLayout.binding.refreshLayout
-            mBottomProgress = contentLayout.binding.bottomProgress
-            mRecyclerView = contentLayout.binding.recyclerView
             val drawable = ContextCompat.getDrawable(context, R.drawable.big_sad_pandroid)!!
             drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-            mTipView!!.setCompoundDrawables(null, drawable, null, null)
-            mViewTransition = ViewTransition(mContentView, mProgressView, mTipView)
-            mViewTransition!!.setOnShowViewListener(this)
-            mRecyclerView!!.addOnScrollListener(mOnScrollListener)
-            mRefreshLayout!!.setOnRefreshListener(mOnRefreshListener)
-            mTipView!!.setOnClickListener { refresh() }
+            binding.tip.setCompoundDrawables(null, drawable, null, null)
+            mViewTransition = ViewTransition(binding.contentView, binding.progress, binding.tip)
+            mViewTransition.setOnShowViewListener(this)
+            binding.recyclerView.addOnScrollListener(mOnScrollListener)
+            binding.refreshLayout.setOnRefreshListener(mOnRefreshListener)
+            binding.tip.setOnClickListener { refresh() }
         }
 
         /**
@@ -284,22 +272,15 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         protected open fun onScrollToPosition(position: Int) {}
         override fun onShowView(hiddenView: View, shownView: View) {}
         val shownViewIndex: Int
-            get() = mViewTransition!!.shownViewIndex
+            get() = mViewTransition.shownViewIndex
 
         fun setRefreshLayoutEnable(enable: Boolean) {
-            mRefreshLayout!!.isEnabled = enable
-        }
-
-        fun setEnable(enable: Boolean) {
-            mRefreshLayout!!.isEnabled = enable
+            binding.refreshLayout.isEnabled = enable
         }
 
         fun setEmptyString(str: String) {
             mEmptyString = str
         }
-
-        val data: List<E>
-            get() = mData
 
         fun getDataAtEx(location: Int): E? {
             return if (location >= 0 && location < mData.size) {
@@ -310,7 +291,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         val firstVisibleItem: E?
-            get() = getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(mRecyclerView!!.layoutManager))
+            get() = getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager))
 
         fun size(): Int {
             return mData.size
@@ -351,8 +332,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         mNextPage = nextPage
                         mPrev = prev
                         mNext = next
-                        mPageDivider!!.clear()
-                        mPageDivider!!.add(data.size)
+                        mPageDivider.clear()
+                        mPageDivider.add(data.size)
                         if (data.isEmpty()) {
                             mData.clear()
                             onClearData()
@@ -360,8 +341,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
                             // Not found
                             // Ui change, show empty string
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             mData.clear()
@@ -371,15 +352,15 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyDataSetChanged()
 
                             // Ui change, show content
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showContent()
 
                             // RecyclerView scroll
-                            if (mRecyclerView!!.isAttachedToWindow) {
-                                mRecyclerView!!.stopScroll()
+                            if (binding.recyclerView.isAttachedToWindow) {
+                                binding.recyclerView.stopScroll()
                                 LayoutManagerUtils.scrollToPositionWithOffset(
-                                    mRecyclerView!!.layoutManager,
+                                    binding.recyclerView.layoutManager,
                                     0,
                                     0
                                 )
@@ -392,12 +373,12 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         removeDuplicateData(data, 0, CHECK_DUPLICATE_RANGE)
                         dataSize = data.size
                         var i = 0
-                        val n = mPageDivider!!.size
+                        val n = mPageDivider.size
                         while (i < n) {
-                            mPageDivider!![i] = mPageDivider!![i] + dataSize
+                            mPageDivider[i] = mPageDivider[i] + dataSize
                             i++
                         }
-                        mPageDivider!!.add(0, dataSize)
+                        mPageDivider.add(0, dataSize)
                         mStartPage--
                         this.pages = pages.coerceAtLeast(mEndPage)
                         mPrev = prev
@@ -406,19 +387,19 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             // OK, that's all
                             if (mData.isEmpty()) {
                                 // Ui change, show empty string
-                                mRefreshLayout!!.isRefreshing = false
-                                mBottomProgress!!.hide()
+                                binding.refreshLayout.isRefreshing = false
+                                binding.bottomProgress.hide()
                                 showEmptyString()
                             } else {
                                 // Ui change, show content
-                                mRefreshLayout!!.isRefreshing = false
-                                mBottomProgress!!.hide()
+                                binding.refreshLayout.isRefreshing = false
+                                binding.bottomProgress.hide()
                                 showContent()
-                                if (mCurrentTaskType == TYPE_PRE_PAGE && mRecyclerView!!.isAttachedToWindow) {
+                                if (mCurrentTaskType == TYPE_PRE_PAGE && binding.recyclerView.isAttachedToWindow) {
                                     // RecyclerView scroll, to top
-                                    mRecyclerView!!.stopScroll()
+                                    binding.recyclerView.stopScroll()
                                     LayoutManagerUtils.scrollToPositionWithOffset(
-                                        mRecyclerView!!.layoutManager,
+                                        binding.recyclerView.layoutManager,
                                         0,
                                         0
                                     )
@@ -431,21 +412,21 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyItemRangeInserted(0, data.size)
 
                             // Ui change, show content
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showContent()
-                            if (mRecyclerView!!.isAttachedToWindow) {
+                            if (binding.recyclerView.isAttachedToWindow) {
                                 // RecyclerView scroll
                                 if (mCurrentTaskType == TYPE_PRE_PAGE_KEEP_POS) {
-                                    mRecyclerView!!.stopScroll()
+                                    binding.recyclerView.stopScroll()
                                     LayoutManagerUtils.scrollToPositionProperly(
-                                        mRecyclerView!!.layoutManager, context,
+                                        binding.recyclerView.layoutManager, context,
                                         dataSize - 1, mOnScrollToPositionListener
                                     )
                                 } else {
-                                    mRecyclerView!!.stopScroll()
+                                    binding.recyclerView.stopScroll()
                                     LayoutManagerUtils.scrollToPositionWithOffset(
-                                        mRecyclerView!!.layoutManager,
+                                        binding.recyclerView.layoutManager,
                                         0,
                                         0
                                     )
@@ -459,7 +440,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         removeDuplicateData(data, mData.size - CHECK_DUPLICATE_RANGE, mData.size)
                         dataSize = data.size
                         val oldDataSize = mData.size
-                        mPageDivider!!.add(oldDataSize + dataSize)
+                        mPageDivider.add(oldDataSize + dataSize)
                         mEndPage++
                         mNextPage = nextPage
                         this.pages = pages.coerceAtLeast(mEndPage)
@@ -468,19 +449,19 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             // OK, that's all
                             if (mData.isEmpty()) {
                                 // Ui change, show empty string
-                                mRefreshLayout!!.isRefreshing = false
-                                mBottomProgress!!.hide()
+                                binding.refreshLayout.isRefreshing = false
+                                binding.bottomProgress.hide()
                                 showEmptyString()
                             } else {
                                 // Ui change, show content
-                                mRefreshLayout!!.isRefreshing = false
-                                mBottomProgress!!.hide()
+                                binding.refreshLayout.isRefreshing = false
+                                binding.bottomProgress.hide()
                                 showContent()
-                                if (mCurrentTaskType == TYPE_NEXT_PAGE && mRecyclerView!!.isAttachedToWindow) {
+                                if (mCurrentTaskType == TYPE_NEXT_PAGE && binding.recyclerView.isAttachedToWindow) {
                                     // RecyclerView scroll
-                                    mRecyclerView!!.stopScroll()
+                                    binding.recyclerView.stopScroll()
                                     LayoutManagerUtils.scrollToPositionWithOffset(
-                                        mRecyclerView!!.layoutManager,
+                                        binding.recyclerView.layoutManager,
                                         oldDataSize,
                                         0
                                     )
@@ -493,17 +474,17 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyItemRangeInserted(oldDataSize, dataSize)
 
                             // Ui change, show content
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showContent()
-                            if (mRecyclerView!!.isAttachedToWindow) {
+                            if (binding.recyclerView.isAttachedToWindow) {
                                 if (mCurrentTaskType == TYPE_NEXT_PAGE_KEEP_POS) {
-                                    mRecyclerView!!.stopScroll()
-                                    mRecyclerView!!.smoothScrollBy(0, mNextPageScrollSize)
+                                    binding.recyclerView.stopScroll()
+                                    binding.recyclerView.smoothScrollBy(0, mNextPageScrollSize)
                                 } else {
-                                    mRecyclerView!!.stopScroll()
+                                    binding.recyclerView.stopScroll()
                                     LayoutManagerUtils.scrollToPositionWithOffset(
-                                        mRecyclerView!!.layoutManager,
+                                        binding.recyclerView.layoutManager,
                                         oldDataSize,
                                         0
                                     )
@@ -520,8 +501,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         this.pages = pages
                         mPrev = prev
                         mNext = next
-                        mPageDivider!!.clear()
-                        mPageDivider!!.add(data.size)
+                        mPageDivider.clear()
+                        mPageDivider.add(data.size)
                         if (data.isEmpty()) {
                             mData.clear()
                             onClearData()
@@ -529,8 +510,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
                             // Not found
                             // Ui change, show empty string
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             mData.clear()
@@ -540,14 +521,14 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyDataSetChanged()
 
                             // Ui change, show content
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showContent()
-                            if (mRecyclerView!!.isAttachedToWindow) {
+                            if (binding.recyclerView.isAttachedToWindow) {
                                 // RecyclerView scroll
-                                mRecyclerView!!.stopScroll()
+                                binding.recyclerView.stopScroll()
                                 LayoutManagerUtils.scrollToPositionWithOffset(
-                                    mRecyclerView!!.layoutManager,
+                                    binding.recyclerView.layoutManager,
                                     0,
                                     0
                                 )
@@ -570,8 +551,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         }
                         this.pages = pages.coerceAtLeast(mEndPage)
                         val oldIndexStart =
-                            if (mCurrentTaskPage == mStartPage) 0 else mPageDivider!![mCurrentTaskPage - mStartPage - 1]
-                        val oldIndexEnd = mPageDivider!![mCurrentTaskPage - mStartPage]
+                            if (mCurrentTaskPage == mStartPage) 0 else mPageDivider[mCurrentTaskPage - mStartPage - 1]
+                        val oldIndexEnd = mPageDivider[mCurrentTaskPage - mStartPage]
                         val toRemove = mData.subList(oldIndexStart, oldIndexEnd)
                         onRemoveData(toRemove)
                         toRemove.clear()
@@ -585,27 +566,27 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         onAddData(data)
                         notifyDataSetChanged()
                         var i = mCurrentTaskPage - mStartPage
-                        val n = mPageDivider!!.size
+                        val n = mPageDivider.size
                         while (i < n) {
-                            mPageDivider!![i] = mPageDivider!![i] - oldIndexEnd + newIndexEnd
+                            mPageDivider[i] = mPageDivider[i] - oldIndexEnd + newIndexEnd
                             i++
                         }
                         if (mData.isEmpty()) {
                             // Ui change, show empty string
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             // Ui change, show content
-                            mRefreshLayout!!.isRefreshing = false
-                            mBottomProgress!!.hide()
+                            binding.refreshLayout.isRefreshing = false
+                            binding.bottomProgress.hide()
                             showContent()
 
                             // RecyclerView scroll
-                            if (newIndexEnd > oldIndexEnd && newIndexEnd > 0 && mRecyclerView!!.isAttachedToWindow) {
-                                mRecyclerView!!.stopScroll()
+                            if (newIndexEnd > oldIndexEnd && newIndexEnd > 0 && binding.recyclerView.isAttachedToWindow) {
+                                binding.recyclerView.stopScroll()
                                 LayoutManagerUtils.scrollToPositionWithOffset(
-                                    mRecyclerView!!.layoutManager,
+                                    binding.recyclerView.layoutManager,
                                     newIndexEnd - 1,
                                     0
                                 )
@@ -619,15 +600,15 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
         fun onGetException(taskId: Int, e: Exception?) {
             if (mCurrentTaskId == taskId) {
-                mRefreshLayout!!.isRefreshing = false
-                mBottomProgress!!.hide()
+                binding.refreshLayout.isRefreshing = false
+                binding.bottomProgress.hide()
                 val readableError = if (e != null) {
                     e.printStackTrace()
                     ExceptionUtils.getReadableString(e)
                 } else {
                     context.getString(R.string.error_unknown)
                 }
-                if (mViewTransition!!.shownViewIndex == 0) {
+                if (mViewTransition.shownViewIndex == 0) {
                     Toast.makeText(context, readableError, Toast.LENGTH_SHORT).show()
                 } else {
                     showText(readableError)
@@ -636,20 +617,20 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         private fun showContent() {
-            mViewTransition!!.showView(0)
+            mViewTransition.showView(0)
         }
 
         private val isContentShowing: Boolean
-            get() = mViewTransition!!.shownViewIndex == 0
+            get() = mViewTransition.shownViewIndex == 0
 
         @JvmOverloads
         fun showProgressBar(animation: Boolean = true) {
-            mViewTransition!!.showView(1, animation)
+            mViewTransition.showView(1, animation)
         }
 
         private fun showText(text: CharSequence?) {
-            mTipView!!.text = text
-            mViewTransition!!.showView(2)
+            binding.tip.text = text
+            mViewTransition.showView(2)
         }
 
         private fun showEmptyString() {
@@ -681,15 +662,15 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
         private fun cancelCurrentTask() {
             mCurrentTaskId = mIdGenerator.nextId()
-            mRefreshLayout!!.isRefreshing = false
-            mBottomProgress!!.hide()
+            binding.refreshLayout.isRefreshing = false
+            binding.bottomProgress.hide()
         }
 
         private fun getPageStart(page: Int): Int {
             return if (mStartPage == page) {
                 0
             } else {
-                mPageDivider!![page - mStartPage - 1]
+                mPageDivider[page - mStartPage - 1]
             }
         }
 
@@ -699,7 +680,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
             val pageDivider = mPageDivider
             var i = 0
-            val n = pageDivider!!.size
+            val n = pageDivider.size
             while (i < n) {
                 if (position < pageDivider[i]) {
                     return i + mStartPage
@@ -710,9 +691,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         val pageForTop: Int
-            get() = getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(mRecyclerView!!.layoutManager))
+            get() = getPageForPosition(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager))
         val pageForBottom: Int
-            get() = getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(mRecyclerView!!.layoutManager))
+            get() = getPageForPosition(LayoutManagerUtils.getLastVisibleItemPosition(binding.recyclerView.layoutManager))
 
         fun canGoTo(): Boolean {
             return isContentShowing
@@ -731,30 +712,30 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             } else if (page in mStartPage until mEndPage) {
                 cancelCurrentTask()
                 val position = getPageStart(page)
-                mRecyclerView!!.stopScroll()
+                binding.recyclerView.stopScroll()
                 LayoutManagerUtils.scrollToPositionWithOffset(
-                    mRecyclerView!!.layoutManager,
+                    binding.recyclerView.layoutManager,
                     position,
                     0
                 )
                 onScrollToPosition(position)
             } else if (page == mStartPage - 1) {
-                mRefreshLayout!!.isRefreshing = true
-                mBottomProgress!!.hide()
+                binding.refreshLayout.isRefreshing = true
+                binding.bottomProgress.hide()
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_PRE_PAGE
                 mCurrentTaskPage = page
                 getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
             } else if (page == mEndPage) {
-                mRefreshLayout!!.isRefreshing = false
-                mBottomProgress!!.show()
+                binding.refreshLayout.isRefreshing = false
+                binding.bottomProgress.show()
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_NEXT_PAGE
                 mCurrentTaskPage = page
                 getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
             } else {
-                mRefreshLayout!!.isRefreshing = true
-                mBottomProgress!!.hide()
+                binding.refreshLayout.isRefreshing = true
+                binding.bottomProgress.hide()
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_SOMEWHERE
                 mCurrentTaskPage = page
@@ -763,8 +744,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         fun goTo(index: String?, isNext: Boolean) {
-            mRefreshLayout!!.isRefreshing = true
-            mBottomProgress!!.hide()
+            binding.refreshLayout.isRefreshing = true
+            binding.bottomProgress.hide()
             mCurrentTaskId = mIdGenerator.nextId()
             mCurrentTaskType = TYPE_SOMEWHERE
             mCurrentTaskPage = 0
@@ -775,12 +756,12 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             if (mData.isNotEmpty()) cancelCurrentTask()
             val bundle = Bundle()
             bundle.putParcelable(KEY_SUPER, superState)
-            val shownView = mViewTransition!!.shownViewIndex
+            val shownView = mViewTransition.shownViewIndex
             bundle.putInt(KEY_SHOWN_VIEW, shownView)
-            bundle.putString(KEY_TIP, mTipView!!.text.toString())
+            bundle.putString(KEY_TIP, binding.tip.text.toString())
 
             // TODO It's a bad design
-            val app = context.applicationContext as EhApplication
+            val app = EhApplication.application
             if (mSavedDataId != IntIdGenerator.INVALID_ID) {
                 app.removeGlobalStuff(mSavedDataId)
                 mSavedDataId = IntIdGenerator.INVALID_ID
@@ -799,11 +780,11 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
         open fun restoreInstanceState(state: Parcelable): Parcelable? {
             return if (state is Bundle) {
-                mViewTransition!!.showView(state.getInt(KEY_SHOWN_VIEW), false)
-                mTipView!!.text = state.getString(KEY_TIP)
+                mViewTransition.showView(state.getInt(KEY_SHOWN_VIEW), false)
+                binding.tip.text = state.getString(KEY_TIP)
                 mSavedDataId = state.getInt(KEY_DATA)
                 var newData: ArrayList<E>? = null
-                val app = context.applicationContext as EhApplication
+                val app = EhApplication.application
                 if (mSavedDataId != IntIdGenerator.INVALID_ID) {
                     newData = app.removeGlobalStuff(mSavedDataId) as ArrayList<E>?
                     mSavedDataId = IntIdGenerator.INVALID_ID
@@ -812,7 +793,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                     }
                 }
                 mIdGenerator.setNextId(state.getInt(KEY_NEXT_ID))
-                mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER)
+                mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER)!!
                 mStartPage = state.getInt(KEY_START_PAGE)
                 mEndPage = state.getInt(KEY_END_PAGE)
                 pages = state.getInt(KEY_PAGES)
@@ -820,7 +801,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                 mNext = state.getString(KEY_NEXT)
                 notifyDataSetChanged()
                 if (newData == null) {
-                    mPageDivider!!.clear()
+                    mPageDivider.clear()
                     mStartPage = 0
                     mEndPage = 0
                     pages = 0
