@@ -182,7 +182,7 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.2.0-alpha04")
     implementation("androidx.paging:paging-compose:1.0.0-alpha18")
     implementation("androidx.preference:preference-ktx:1.2.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.0-rc01")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
 
     // https://developer.android.com/jetpack/androidx/releases/room
     val room_version = "2.5.0"
