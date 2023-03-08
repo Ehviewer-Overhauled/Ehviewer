@@ -119,7 +119,7 @@ object EhUtils {
     }
 
     fun needSignedIn(): Boolean {
-        return Settings.needSignIn && !EhCookieStore.hasSignedIn()
+        return Settings.needSignIn
     }
 
     @JvmStatic
