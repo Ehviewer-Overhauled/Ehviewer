@@ -4,5 +4,5 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class IntList @JvmOverloads constructor(private val delegate: MutableList<Int> = mutableListOf()) :
+class IntList constructor(private val delegate: MutableList<Int> = mutableListOf()) :
     Parcelable, MutableList<Int> by delegate
