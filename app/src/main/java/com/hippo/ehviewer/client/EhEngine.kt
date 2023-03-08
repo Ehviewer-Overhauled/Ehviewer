@@ -62,6 +62,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import okhttp3.executeAsync
 import org.json.JSONArray
 import org.json.JSONObject
@@ -69,9 +70,11 @@ import org.jsoup.Jsoup
 import java.io.File
 import kotlin.math.ceil
 
+private val okHttpClient = EhApplication.okHttpClient
+
 object EhEngine {
     private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
-    private val TAG = EhEngine::class.java.simpleName
+    private const val TAG = "EhEngine"
     private const val MAX_REQUEST_SIZE = 25
     private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
     private const val SAD_PANDA_TYPE = "image/gif"
@@ -79,9 +82,8 @@ object EhEngine {
     private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
     private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
     private var sEhFilter = EhFilter
-    private val okHttpClient = EhApplication.okHttpClient
 
-    private fun transformException(code: Int, headers: Headers?, body: String?, e: Throwable?) {
+    private fun rethrowExactly(code: Int, headers: Headers?, body: String?, e: Throwable?) {
         // Check sad panda
         if (headers != null && SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
             throw EhException("Sad Panda")
@@ -117,9 +119,18 @@ object EhEngine {
                 throw EhException(GetText.getString(R.string.error_parse_error))
             }
         }
+        e?.let { throw it }
     }
 
-    @Throws(Throwable::class)
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun <T> Result<T>.getOrThrowExactly(response: Response?): T {
+        return runCatching {
+            getOrThrow()
+        }.onFailure {
+            rethrowExactly(response?.code ?: -1, response?.headers, response?.body?.string(), it)
+        }.getOrThrow()
+    }
+
     suspend fun signIn(username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val builder = FormBody.Builder()
@@ -135,25 +146,13 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return SignInParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
-            throw e
+        return okHttpClient.newCall(request).executeAsync().use { response ->
+            runCatching {
+                SignInParser.parse(response.body.string())
+            }.getOrThrowExactly(response)
         }
     }
 
-    @Throws(Throwable::class)
     private suspend fun fillGalleryList(
         list: MutableList<GalleryInfo>,
         url: String,
@@ -214,36 +213,19 @@ object EhEngine {
         }
     }
 
-    @Throws(Throwable::class)
     suspend fun getGalleryList(url: String): GalleryListParser.Result {
         val referer = EhUrl.referer
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-
-        var body: String? = null
-        var headers: Headers? = null
-        var result: GalleryListParser.Result
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = GalleryListParser.parse(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
-            throw e
+        return okHttpClient.newCall(request).executeAsync().use { response ->
+            runCatching {
+                GalleryListParser.parse(response.body.string())
+            }.getOrThrowExactly(response)
+        }.apply {
+            fillGalleryList(galleryInfoList, url, true)
         }
-        fillGalleryList(result.galleryInfoList, url, true)
-        return result
     }
 
-    // At least, GalleryInfo contain valid gid and token
-    @JvmStatic
-    @Throws(Throwable::class)
     suspend fun fillGalleryListByApi(
         galleryInfoList: List<GalleryInfo>,
         referer: String
@@ -302,7 +284,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -330,7 +312,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -357,7 +339,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -396,7 +378,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -436,7 +418,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -474,7 +456,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -501,7 +483,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         fillGalleryList(result.galleryInfoList, url, false)
@@ -551,11 +533,11 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                transformException(code, headers, body, null)
+                rethrowExactly(code, headers, body, null)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         return null
@@ -619,7 +601,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         fillGalleryList(result.galleryInfoList, url, false)
@@ -648,7 +630,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         return result
@@ -683,7 +665,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         return result
@@ -728,12 +710,12 @@ object EhEngine {
                 code = response.code
                 headers = response.headers
                 body = response.body.string()
-                transformException(code, headers, body, null)
+                rethrowExactly(code, headers, body, null)
                 result = ArchiveParser.parseArchiveUrl(body!!)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         if (!isHAtH) {
@@ -745,12 +727,12 @@ object EhEngine {
                         code = response.code
                         headers = response.headers
                         body = response.body.string()
-                        transformException(code, headers, body, null)
+                        rethrowExactly(code, headers, body, null)
                         result = ArchiveParser.parseArchiveUrl(body!!)
                     }
                 } catch (e: Throwable) {
                     ExceptionUtils.throwIfFatal(e)
-                    transformException(code, headers, body, e)
+                    rethrowExactly(code, headers, body, e)
                     throw e
                 }
                 if (result == null) {
@@ -780,7 +762,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -803,7 +785,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -842,7 +824,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -866,7 +848,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -890,7 +872,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -913,7 +895,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -932,11 +914,11 @@ object EhEngine {
                 headers = response.headers
                 body = response.body.string()
                 request = response.request
-                transformException(code, headers, body, null)
+                rethrowExactly(code, headers, body, null)
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
 
@@ -950,11 +932,11 @@ object EhEngine {
                     code = response.code
                     headers = response.headers
                     body = response.body.string()
-                    transformException(code, headers, body, null)
+                    rethrowExactly(code, headers, body, null)
                 }
             } catch (e: Throwable) {
                 ExceptionUtils.throwIfFatal(e)
-                transformException(code, headers, body, e)
+                rethrowExactly(code, headers, body, e)
                 throw e
             }
         }
@@ -995,7 +977,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -1034,7 +1016,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -1100,7 +1082,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
         fillGalleryList(result.galleryInfoList, url, true)
@@ -1131,7 +1113,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }
@@ -1176,7 +1158,7 @@ object EhEngine {
             }
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)
-            transformException(code, headers, body, e)
+            rethrowExactly(code, headers, body, e)
             throw e
         }
     }

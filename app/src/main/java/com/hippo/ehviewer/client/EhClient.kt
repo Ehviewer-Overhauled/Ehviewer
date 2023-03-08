@@ -45,11 +45,6 @@ object EhClient {
 
     suspend fun execute(method: Int, vararg params: Any?): Any? {
         return when (method) {
-            METHOD_SIGN_IN -> EhEngine.signIn(
-                params[0] as String,
-                params[1] as String
-            )
-
             METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
                 params[0] as String
             )
@@ -111,7 +106,6 @@ object EhClient {
                 params[2] as String?
             )
 
-            METHOD_GET_PROFILE -> EhEngine.getProfile()
             METHOD_VOTE_COMMENT -> EhEngine.voteComment(
                 params[0] as Long,
                 params[1] as String?,
@@ -151,7 +145,6 @@ object EhClient {
                 params[5] as Int
             )
 
-            METHOD_GET_UCONFIG -> EhEngine.getUConfig()
             else -> throw IllegalStateException("Can't detect method $method")
         }
     }
@@ -162,7 +155,6 @@ object EhClient {
         fun onCancel()
     }
 
-    const val METHOD_SIGN_IN = 0
     const val METHOD_GET_GALLERY_LIST = 1
     const val METHOD_GET_GALLERY_DETAIL = 3
     const val METHOD_GET_PREVIEW_LIST = 4
@@ -174,11 +166,9 @@ object EhClient {
     const val METHOD_ADD_FAVORITES_RANGE = 10
     const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12
-    const val METHOD_GET_PROFILE = 14
     const val METHOD_VOTE_COMMENT = 15
     const val METHOD_IMAGE_SEARCH = 16
     const val METHOD_ARCHIVE_LIST = 17
     const val METHOD_DOWNLOAD_ARCHIVE = 18
     const val METHOD_VOTE_TAG = 19
-    const val METHOD_GET_UCONFIG = 20
 }
