@@ -245,6 +245,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
                 AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
             layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
             layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+            layoutManager.supportsPredictiveItemAnimations = false
             recyclerView.layoutManager = layoutManager
             recyclerView.clipToPadding = false
             recyclerView.clipChildren = false
