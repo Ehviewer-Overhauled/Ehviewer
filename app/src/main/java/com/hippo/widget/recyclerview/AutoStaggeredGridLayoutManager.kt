@@ -13,116 +13,92 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.widget.recyclerview
 
-package com.hippo.widget.recyclerview;
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import kotlin.math.roundToInt
 
-import android.view.View;
+class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
+    StaggeredGridLayoutManager(1, orientation) {
+    private var mColumnSize = -1
+    private var mColumnSizeChanged = true
+    private var mStrategy = 0
 
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class AutoStaggeredGridLayoutManager extends StaggeredGridLayoutManager {
-
-    public static final int STRATEGY_MIN_SIZE = 0;
-    public static final int STRATEGY_SUITABLE_SIZE = 1;
-
-    private int mColumnSize = -1;
-    private boolean mColumnSizeChanged = true;
-    private int mStrategy;
-
-    private List<OnUpdateSpanCountListener> mListeners;
-
-    public AutoStaggeredGridLayoutManager(int columnSize, int orientation) {
-        super(1, orientation);
-        setColumnSize(columnSize);
+    init {
+        setColumnSize(columnSize)
     }
 
-    public static int getSpanCountForSuitableSize(int total, int single) {
-        int span = total / single;
-        if (span <= 0) {
-            return 1;
-        }
-        int span2 = span + 1;
-        float deviation = Math.abs(1 - (total / span / (float) single));
-        float deviation2 = Math.abs(1 - (total / span2 / (float) single));
-        return deviation < deviation2 ? span : span2;
-    }
-
-    public static int getSpanCountForMinSize(int total, int single) {
-        return Math.max(1, total / single);
-    }
-
-    public void setColumnSize(int columnSize) {
+    fun setColumnSize(columnSize: Int) {
         if (columnSize == mColumnSize) {
-            return;
+            return
         }
-        mColumnSize = columnSize;
-        mColumnSizeChanged = true;
+        mColumnSize = columnSize
+        mColumnSizeChanged = true
     }
 
-    public void setStrategy(int strategy) {
+    fun setStrategy(strategy: Int) {
         if (strategy == mStrategy) {
-            return;
+            return
         }
-        mStrategy = strategy;
-        mColumnSizeChanged = true;
+        mStrategy = strategy
+        mColumnSizeChanged = true
     }
 
-    @Override
-    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
+    override fun onMeasure(
+        recycler: RecyclerView.Recycler,
+        state: RecyclerView.State,
+        widthSpec: Int,
+        heightSpec: Int
+    ) {
         if (mColumnSizeChanged && mColumnSize > 0) {
-            int totalSpace;
-            if (getOrientation() == VERTICAL) {
-                if (View.MeasureSpec.EXACTLY != View.MeasureSpec.getMode(widthSpec)) {
-                    throw new IllegalStateException("RecyclerView need a fixed width for AutoStaggeredGridLayoutManager");
-                }
-                totalSpace = View.MeasureSpec.getSize(widthSpec) - getPaddingRight() - getPaddingLeft();
+            val totalSpace = if (orientation == VERTICAL) {
+                check(
+                    View.MeasureSpec.EXACTLY == View.MeasureSpec.getMode(
+                        widthSpec
+                    )
+                ) { "RecyclerView need a fixed width for AutoStaggeredGridLayoutManager" }
+                View.MeasureSpec.getSize(widthSpec) - paddingRight - paddingLeft
             } else {
-                if (View.MeasureSpec.EXACTLY != View.MeasureSpec.getMode(heightSpec)) {
-                    throw new IllegalStateException("RecyclerView need a fixed height for AutoStaggeredGridLayoutManager");
-                }
-                totalSpace = View.MeasureSpec.getSize(heightSpec) - getPaddingTop() - getPaddingBottom();
+                check(
+                    View.MeasureSpec.EXACTLY == View.MeasureSpec.getMode(
+                        heightSpec
+                    )
+                ) { "RecyclerView need a fixed height for AutoStaggeredGridLayoutManager" }
+                View.MeasureSpec.getSize(heightSpec) - paddingTop - paddingBottom
             }
+            val spanCount = when (mStrategy) {
+                STRATEGY_MIN_SIZE -> getSpanCountForMinSize(
+                    totalSpace,
+                    mColumnSize
+                )
 
-            int spanCount;
-            switch (mStrategy) {
-                default:
-                case STRATEGY_MIN_SIZE:
-                    spanCount = getSpanCountForMinSize(totalSpace, mColumnSize);
-                    break;
-                case STRATEGY_SUITABLE_SIZE:
-                    spanCount = getSpanCountForSuitableSize(totalSpace, mColumnSize);
-                    break;
-            }
-            setSpanCount(spanCount);
-            mColumnSizeChanged = false;
+                STRATEGY_SUITABLE_SIZE -> getSpanCountForSuitableSize(
+                    totalSpace,
+                    mColumnSize
+                )
 
-            if (null != mListeners) {
-                for (int i = 0, n = mListeners.size(); i < n; i++) {
-                    mListeners.get(i).onUpdateSpanCount(spanCount);
-                }
+                else -> getSpanCountForMinSize(
+                    totalSpace,
+                    mColumnSize
+                )
             }
+            setSpanCount(spanCount)
+            mColumnSizeChanged = false
         }
-        super.onMeasure(recycler, state, widthSpec, heightSpec);
+        super.onMeasure(recycler, state, widthSpec, heightSpec)
     }
 
-    public void addOnUpdateSpanCountListener(OnUpdateSpanCountListener listener) {
-        if (null == mListeners) {
-            mListeners = new ArrayList<>();
+    companion object {
+        const val STRATEGY_MIN_SIZE = 0
+        const val STRATEGY_SUITABLE_SIZE = 1
+        private fun getSpanCountForSuitableSize(total: Int, single: Int): Int {
+            return (total / single.toFloat()).roundToInt().coerceAtLeast(1)
         }
-        mListeners.add(listener);
-    }
 
-    public void removeOnUpdateSpanCountListener(OnUpdateSpanCountListener listener) {
-        if (null != mListeners) {
-            mListeners.remove(listener);
+        private fun getSpanCountForMinSize(total: Int, single: Int): Int {
+            return (total / single).coerceAtLeast(1)
         }
-    }
-
-    public interface OnUpdateSpanCountListener {
-        void onUpdateSpanCount(int spanCount);
     }
 }
