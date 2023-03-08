@@ -123,11 +123,11 @@ object EhEngine {
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    private inline fun <T> Result<T>.getOrThrowExactly(response: Response?): T {
+    private inline fun <T> Result<T>.getOrThrowExactly(response: Response?, body: String?): T {
         return runCatching {
             getOrThrow()
         }.onFailure {
-            rethrowExactly(response?.code ?: -1, response?.headers, response?.body?.string(), it)
+            rethrowExactly(response?.code ?: -1, response?.headers, body, it)
         }.getOrThrow()
     }
 
@@ -147,9 +147,10 @@ object EhEngine {
             .post(builder.build())
             .build()
         return okHttpClient.newCall(request).executeAsync().use { response ->
+            val body = response.body.string()
             runCatching {
-                SignInParser.parse(response.body.string())
-            }.getOrThrowExactly(response)
+                SignInParser.parse(body)
+            }.getOrThrowExactly(response, body)
         }
     }
 
@@ -218,9 +219,10 @@ object EhEngine {
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
         return okHttpClient.newCall(request).executeAsync().use { response ->
+            val body = response.body.string()
             runCatching {
-                GalleryListParser.parse(response.body.string())
-            }.getOrThrowExactly(response)
+                GalleryListParser.parse(body)
+            }.getOrThrowExactly(response, body)
         }.apply {
             fillGalleryList(galleryInfoList, url, true)
         }
