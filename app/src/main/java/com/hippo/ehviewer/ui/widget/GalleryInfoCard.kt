@@ -44,12 +44,14 @@ fun ListInfoCard(
 ) {
     OutlinedCard(
         modifier = modifier.padding(6.dp),
-        border = remember { BorderStroke(1.dp, Color.Transparent) }
+        border = BorderStroke(1.dp, Color.Transparent)
     ) {
         val listCardSize = remember { Settings.listThumbSize.pxToDp }
+        val height = (listCardSize * 3).dp
+        val width = (listCardSize * 2).dp
         Row(
             modifier = Modifier
-                .height((listCardSize * 3).dp)
+                .height(height)
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick
@@ -60,8 +62,8 @@ fun ListInfoCard(
                     model = info.thumb,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .width((listCardSize * 2).dp)
-                        .height((listCardSize * 3).dp)
+                        .width(width)
+                        .height(height)
                 )
             }
             Column(Modifier.padding(8.dp, 4.dp)) {
@@ -82,9 +84,10 @@ fun ListInfoCard(
                             style = MaterialTheme.typography.labelLarge
                         )
                         SimpleRatingWidget(rating = info.rating)
-                        val categoryColor = remember { EhUtils.getCategoryColor(info.category) }
+                        val categoryColor = EhUtils.getCategoryColor(info.category)
+                        val categoryText = EhUtils.getCategory(info.category).uppercase(Locale.ROOT)
                         Text(
-                            text = EhUtils.getCategory(info.category).uppercase(Locale.ROOT),
+                            text = categoryText,
                             modifier = Modifier
                                 .background(Color(categoryColor))
                                 .padding(vertical = 2.dp, horizontal = 8.dp),
