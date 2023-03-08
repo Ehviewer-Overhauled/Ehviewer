@@ -167,7 +167,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.10.0-beta01")
 
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha07")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha08")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     // https://developer.android.com/jetpack/androidx/releases/lifecycle
     implementation("androidx.lifecycle:lifecycle-process:2.5.1")
