@@ -91,7 +91,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     ): View {
         _binding = SceneGalleryPreviewsBinding.inflate(inflater, container, false)
         binding.contentLayout.hideFastScroll()
-        setLiftOnScrollTargetView(binding.contentLayout)
+        setLiftOnScrollTargetView(binding.contentLayout.recyclerView)
         mAdapter = GalleryPreviewAdapter()
         binding.contentLayout.recyclerView.adapter = mAdapter
         val columnWidth = Settings.thumbSize
