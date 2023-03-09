@@ -15,9 +15,7 @@
  */
 package com.hippo.ehviewer.client
 
-import android.text.TextUtils
 import android.util.Log
-import android.util.Pair
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.GetText
@@ -58,10 +56,10 @@ import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
+import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import okhttp3.executeAsync
 import org.json.JSONArray
 import org.json.JSONObject
@@ -111,7 +109,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     }
 
     if (e is ParseException) {
-        if (TextUtils.isEmpty(body)) {
+        if (body.isEmpty()) {
             throw EhException(GetText.getString(R.string.error_empty_html))
         } else if (!body.contains("<")) {
             throw EhException(body)
@@ -127,9 +125,9 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     throw e
 }
 
-private inline fun <T> Response.parsingWith(block: String.() -> T): T {
-    return use { response ->
-        val body = body.string()
+private suspend inline fun <T> Request.Builder.executeAndParsingWith(block: String.() -> T): T {
+    return okHttpClient.newCall(this.build()).executeAsync().use { response ->
+        val body = response.body.string()
         runCatching {
             block(body)
         }.onFailure {
@@ -151,10 +149,9 @@ object EhEngine {
         val url = EhUrl.API_SIGN_IN
         val origin = "https://forums.e-hentai.org"
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(SignInParser::parse)
+            .executeAndParsingWith(SignInParser::parse)
     }
 
     private suspend fun fillGalleryList(
@@ -220,8 +217,7 @@ object EhEngine {
     suspend fun getGalleryList(url: String): GalleryListParser.Result {
         val referer = EhUrl.referer
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryListParser::parse)
+        return EhRequestBuilder(url, referer).executeAndParsingWith(GalleryListParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, true) }
     }
 
@@ -265,19 +261,17 @@ object EhEngine {
         val url = EhUrl.apiUrl
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(json.toString().toRequestBody(MEDIA_TYPE_JSON))
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
-            GalleryApiParser.parse(this, galleryInfoList)
-        }
+            .executeAndParsingWith {
+                GalleryApiParser.parse(this, galleryInfoList)
+            }
     }
 
     suspend fun getGalleryDetail(url: String): GalleryDetail {
         val referer = EhUrl.referer
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
+        return EhRequestBuilder(url, referer).executeAndParsingWith {
             EventPaneParser.parse(this)?.let {
                 Settings.lastDawnDay = today
                 showEventNotification(it)
@@ -289,12 +283,8 @@ object EhEngine {
     suspend fun getPreviewList(url: String): Pair<List<GalleryPreview>, Int> {
         val referer = EhUrl.referer
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
-            Pair.create(
-                GalleryDetailParser.parsePreviewList(this),
-                GalleryDetailParser.parsePreviewPages(this)
-            )
+        return EhRequestBuilder(url, referer).executeAndParsingWith {
+            GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
         }
     }
 
@@ -315,10 +305,9 @@ object EhEngine {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(requestBody)
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(RateGalleryParser::parse)
+            .executeAndParsingWith(RateGalleryParser::parse)
     }
 
     suspend fun commentGallery(
@@ -333,17 +322,16 @@ object EhEngine {
         }
         val origin = EhUrl.origin
         Log.d(TAG, url!!)
-        val request = EhRequestBuilder(url, url, origin)
+        return EhRequestBuilder(url, url, origin)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
-            val document = Jsoup.parse(this)
-            val elements = document.select("#chd + p")
-            if (elements.size > 0) {
-                throw EhException(elements[0].text())
+            .executeAndParsingWith {
+                val document = Jsoup.parse(this)
+                val elements = document.select("#chd + p")
+                if (elements.size > 0) {
+                    throw EhException(elements[0].text())
+                }
+                GalleryDetailParser.parseComments(document)
             }
-            GalleryDetailParser.parseComments(document)
-        }
     }
 
     suspend fun getGalleryToken(
@@ -362,11 +350,9 @@ object EhEngine {
         val referer = EhUrl.referer
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(requestBody)
-            .build()
-        return okHttpClient.newCall(request).executeAsync()
-            .parsingWith(GalleryTokenApiParser::parse)
+            .executeAndParsingWith(GalleryTokenApiParser::parse)
     }
 
     suspend fun getFavorites(
@@ -374,8 +360,7 @@ object EhEngine {
     ): FavoritesParser.Result {
         val referer = EhUrl.referer
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(FavoritesParser::parse)
+        return EhRequestBuilder(url, referer).executeAndParsingWith(FavoritesParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
@@ -409,10 +394,9 @@ object EhEngine {
         val url = EhUrl.getAddFavorites(gid, token)
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, url, origin)
+        return EhRequestBuilder(url, url, origin)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {}
+            .executeAndParsingWith { }
     }
 
     @Throws(Throwable::class)
@@ -455,10 +439,9 @@ object EhEngine {
         builder.add("apply", "Apply")
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, url, origin)
+        return EhRequestBuilder(url, url, origin)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(FavoritesParser::parse)
+            .executeAndParsingWith(FavoritesParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
@@ -467,8 +450,7 @@ object EhEngine {
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(TorrentParser::parse)
+        return EhRequestBuilder(url, referer).executeAndParsingWith(TorrentParser::parse)
     }
 
     suspend fun getArchiveList(
@@ -476,8 +458,7 @@ object EhEngine {
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(ArchiveParser::parse)!!
+        return EhRequestBuilder(url, referer).executeAndParsingWith(ArchiveParser::parse)!!
             .apply { funds = funds ?: getFunds() }
     }
 
@@ -508,14 +489,12 @@ object EhEngine {
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer, origin)
             .post(builder.build())
-            .build()
-        val call = okHttpClient.newCall(request)
-        var result = call.executeAsync().parsingWith(ArchiveParser::parseArchiveUrl)
+        var result = request.executeAndParsingWith(ArchiveParser::parseArchiveUrl)
         if (!isHAtH) {
             if (result == null) {
                 // Wait for the server to prepare archives
                 delay(1000)
-                result = call.clone().executeAsync().parsingWith(ArchiveParser::parseArchiveUrl)
+                result = request.executeAndParsingWith(ArchiveParser::parseArchiveUrl)
                 if (result == null) {
                     throw EhException("Archive unavailable")
                 }
@@ -528,15 +507,13 @@ object EhEngine {
     private suspend fun getFunds(): HomeParser.Funds {
         val url = EhUrl.URL_FUNDS
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(HomeParser::parseFunds)
+        return EhRequestBuilder(url).executeAndParsingWith(HomeParser::parseFunds)
     }
 
     private suspend fun getImageLimitsInternal(): HomeParser.Limits {
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(HomeParser::parse)
+        return EhRequestBuilder(url).executeAndParsingWith(HomeParser::parse)
     }
 
     suspend fun getImageLimits(): HomeParser.Result = coroutineScope {
@@ -555,19 +532,16 @@ object EhEngine {
             .add("reset", "Reset Limit")
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url)
+        return EhRequestBuilder(url)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync()
-            .parsingWith(HomeParser::parseResetLimits)
+            .executeAndParsingWith(HomeParser::parseResetLimits)
     }
 
     suspend fun getNews(parse: Boolean): String? {
         val url = EhUrl.URL_NEWS
         val referer = EhUrl.REFERER_E
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
+        return EhRequestBuilder(url, referer).executeAndParsingWith {
             if (parse) EventPaneParser.parse(this) else null
         }
     }
@@ -576,23 +550,20 @@ object EhEngine {
         url: String, referer: String
     ): ProfileParser.Result {
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(ProfileParser::parse)
+        return EhRequestBuilder(url, referer).executeAndParsingWith(ProfileParser::parse)
     }
 
     suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(ForumsParser::parse).let {
+        return EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse).let {
             getProfileInternal(it, url)
         }
     }
 
     private suspend fun getUConfigInternal(url: String) {
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url).build()
-        okHttpClient.newCall(request).executeAsync().parsingWith {
+        EhRequestBuilder(url).executeAndParsingWith {
             check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" }
         }
     }
@@ -628,12 +599,11 @@ object EhEngine {
         val referer = EhUrl.referer
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(requestBody)
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith {
-            VoteCommentParser.parse(this, commentVote)
-        }
+            .executeAndParsingWith {
+                VoteCommentParser.parse(this, commentVote)
+            }
     }
 
     suspend fun voteTag(
@@ -653,10 +623,9 @@ object EhEngine {
         val referer = EhUrl.referer
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(requestBody)
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(VoteTagParser::parse)
+            .executeAndParsingWith(VoteTagParser::parse)
     }
 
     /**
@@ -701,10 +670,9 @@ object EhEngine {
         val referer = EhUrl.referer
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(builder.build())
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryListParser::parse)
+            .executeAndParsingWith(GalleryListParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, true) }
     }
 
@@ -715,8 +683,7 @@ object EhEngine {
     ): GalleryPageParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
-        val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryPageParser::parse)
+        return EhRequestBuilder(url, referer).executeAndParsingWith(GalleryPageParser::parse)
     }
 
     suspend fun getGalleryPageApi(
@@ -740,9 +707,8 @@ object EhEngine {
         }
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = EhRequestBuilder(url, referer, origin)
+        return EhRequestBuilder(url, referer, origin)
             .post(requestBody)
-            .build()
-        return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryPageApiParser::parse)
+            .executeAndParsingWith(GalleryPageApiParser::parse)
     }
 }
