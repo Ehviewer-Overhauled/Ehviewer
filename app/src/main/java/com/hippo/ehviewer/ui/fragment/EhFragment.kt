@@ -129,7 +129,7 @@ class EhFragment : BasePreferenceFragment() {
             requireActivity().setResult(Activity.RESULT_OK)
         } else if (Settings.KEY_SHOW_TAG_TRANSLATIONS == key) {
             if (java.lang.Boolean.TRUE == newValue) {
-                EhTagDatabase.update()
+                lifecycleScope.launchNonCancellable { EhTagDatabase.update() }
             }
         } else if (Settings.KEY_BLACK_DARK_THEME == key) {
             if (requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES > 0) {

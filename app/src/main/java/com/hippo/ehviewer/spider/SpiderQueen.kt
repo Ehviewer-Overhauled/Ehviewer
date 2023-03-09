@@ -375,7 +375,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         }.getOrNull()
     }
 
-    fun getPTokenFromMultiPageViewer(index: Int): String? {
+    suspend fun getPTokenFromMultiPageViewer(index: Int): String? {
         val spiderInfo = mSpiderInfo
         val url = getGalleryMultiPageViewerUrl(
             galleryInfo.gid, galleryInfo.token!!
@@ -383,7 +383,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
         try {
-            plainTextOkHttpClient.newCall(request).execute().use { response ->
+            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()
                 val list = GalleryMultiPageViewerPTokenParser.parse(body)
                 for (i in list.indices) {
@@ -397,7 +397,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         }
     }
 
-    fun getPTokenFromInternet(index: Int): String? {
+    suspend fun getPTokenFromInternet(index: Int): String? {
         val spiderInfo = mSpiderInfo
 
         // Check previewIndex
@@ -416,7 +416,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
         try {
-            plainTextOkHttpClient.newCall(request).execute().use { response ->
+            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()
                 readPreviews(body, previewIndex, spiderInfo)
                 return spiderInfo.pTokenMap[index]
@@ -591,7 +591,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         }
 
         private suspend fun doInJob(index: Int, force: Boolean) {
-            fun getPToken(index: Int): String? {
+            suspend fun getPToken(index: Int): String? {
                 if (index !in 0 until size) return null
                 return mSpiderInfo.pTokenMap[index].takeIf { it != TOKEN_FAILED }
                     ?: getPTokenFromInternet(index)

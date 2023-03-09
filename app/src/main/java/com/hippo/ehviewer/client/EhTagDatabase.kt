@@ -22,12 +22,13 @@ import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.R
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.copyToFile
-import eu.kanade.tachiyomi.util.lang.launchIO
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.executeAsync
 import okio.BufferedSource
 import okio.HashingSink.Companion.sha1
 import okio.blackholeSink
@@ -45,6 +46,7 @@ private typealias TagGroups = Map<String, TagGroup>
 object EhTagDatabase {
     private const val NAMESPACE_PREFIX = "n"
     private lateinit var tagGroups: TagGroups
+    private val updateLock = Mutex()
 
     fun isInitialized(): Boolean {
         return this::tagGroups.isInitialized
@@ -179,11 +181,11 @@ object EhTagDatabase {
         return sha1 != null && sha1 == getFileSha1(data)
     }
 
-    private fun save(client: OkHttpClient, url: String, file: File): Boolean {
+    private suspend fun save(client: OkHttpClient, url: String, file: File): Boolean {
         val request: Request = Request.Builder().url(url).build()
         val call = client.newCall(request)
         runCatching {
-            call.execute().use { response ->
+            call.executeAsync().use { response ->
                 if (!response.isSuccessful) {
                     return false
                 }
@@ -199,16 +201,13 @@ object EhTagDatabase {
         return false
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    @JvmStatic
-    fun update() {
-        launchIO {
+    suspend fun update() {
+        updateLock.withLock {
             updateInternal()
         }
     }
 
-    @Synchronized
-    private fun updateInternal() {
+    private suspend fun updateInternal() {
         val urls = getMetadata(EhApplication.application)
         urls?.let {
             val sha1Name = urls[0]
