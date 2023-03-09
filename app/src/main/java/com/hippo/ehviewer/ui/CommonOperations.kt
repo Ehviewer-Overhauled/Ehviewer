@@ -41,12 +41,12 @@ import com.hippo.ehviewer.download.DownloadManager as downloadManager
 object CommonOperations {
     private fun doAddToFavorites(
         activity: Activity, galleryInfo: GalleryInfo,
-        slot: Int, listener: EhClient.Callback<Void?>
+        slot: Int, listener: EhClient.Callback<Unit>
     ) {
         when (slot) {
             -1 -> {
                 EhDB.putLocalFavorites(galleryInfo)
-                listener.onSuccess(null)
+                listener.onSuccess(Unit)
             }
 
             in 0..9 -> {
@@ -66,7 +66,7 @@ object CommonOperations {
     @JvmOverloads
     fun addToFavorites(
         activity: Activity, galleryInfo: GalleryInfo,
-        listener: EhClient.Callback<Void?>, select: Boolean = false
+        listener: EhClient.Callback<Unit>, select: Boolean = false
     ) {
         val slot = Settings.defaultFavSlot
         val localFav = activity.getString(R.string.local_favorites)
@@ -106,7 +106,7 @@ object CommonOperations {
 
     fun removeFromFavorites(
         activity: Activity?, galleryInfo: GalleryInfo,
-        listener: EhClient.Callback<Void?>
+        listener: EhClient.Callback<Unit>
     ) {
         EhDB.removeLocalFavorites(galleryInfo.gid)
         val request = EhRequest()
@@ -249,10 +249,10 @@ object CommonOperations {
     }
 
     private class DelegateFavoriteCallback(
-        private val delegate: EhClient.Callback<Void?>, private val info: GalleryInfo,
+        private val delegate: EhClient.Callback<Unit>, private val info: GalleryInfo,
         private val newFavoriteName: String?, private val slot: Int
-    ) : EhClient.Callback<Void?> {
-        override fun onSuccess(result: Void?) {
+    ) : EhClient.Callback<Unit> {
+        override fun onSuccess(result: Unit) {
             info.favoriteName = newFavoriteName
             info.favoriteSlot = slot
             delegate.onSuccess(result)

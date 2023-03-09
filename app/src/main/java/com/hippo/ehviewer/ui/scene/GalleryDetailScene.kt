@@ -1413,8 +1413,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         context: Context,
         private val mAddOrRemove: Boolean
     ) :
-        EhCallback<GalleryDetailScene?, Void?>(context) {
-        override fun onSuccess(result: Void?) {
+        EhCallback<GalleryDetailScene?, Unit>(context) {
+        override fun onSuccess(result: Unit) {
             showTip(
                 if (mAddOrRemove) R.string.remove_from_favorite_success else R.string.add_to_favorite_success,
                 LENGTH_SHORT
