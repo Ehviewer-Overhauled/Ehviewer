@@ -70,69 +70,75 @@ import java.io.File
 import kotlin.math.ceil
 
 private val okHttpClient = EhApplication.okHttpClient
+private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
+private const val TAG = "EhEngine"
+private const val MAX_REQUEST_SIZE = 25
+private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
+private const val SAD_PANDA_TYPE = "image/gif"
+private const val SAD_PANDA_LENGTH = "9615"
+private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
+private const val U_CONFIG_TEXT = "Selected Profile"
+private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
+private var sEhFilter = EhFilter
+
+private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwable) {
+    // Check sad panda
+    if (SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
+        throw EhException("Sad Panda")
+    }
+
+    // Check sad panda(without panda)
+    if ("text/html; charset=UTF-8" == headers["Content-Type"] && "0" == headers["Content-Length"] && EhUtils.isExHentai) {
+        throw EhException("Sad Panda\n(without panda)")
+    }
+
+    // Check kokomade
+    if (body.contains(KOKOMADE_URL)) {
+        throw EhException("今回はここまで ${GetText.getString(R.string.kokomade_tip)}".trimIndent())
+    }
+
+    // Check Gallery Not Available
+    if (body.contains("Gallery Not Available - ")) {
+        val error = GalleryNotAvailableParser.parse(body)
+        if (error.isNotBlank()) {
+            throw EhException(error)
+        }
+    }
+
+    // Check bad response code
+    if (code >= 400) {
+        throw StatusCodeException(code)
+    }
+
+    if (e is ParseException) {
+        if (TextUtils.isEmpty(body)) {
+            throw EhException(GetText.getString(R.string.error_empty_html))
+        } else if (!body.contains("<")) {
+            throw EhException(body)
+        } else {
+            if (Settings.saveParseErrorBody) {
+                AppConfig.saveParseErrorBody(e as ParseException?)
+            }
+            throw EhException(GetText.getString(R.string.error_parse_error))
+        }
+    }
+
+    // We can't translate it, rethrow it anyway
+    throw e
+}
+
+private inline fun <T> Response.parsingWith(block: String.() -> T): T {
+    return use { response ->
+        val body = body.string()
+        runCatching {
+            block(body)
+        }.onFailure {
+            rethrowExactly(response.code, response.headers, body, it)
+        }.getOrThrow()
+    }
+}
 
 object EhEngine {
-    private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
-    private const val TAG = "EhEngine"
-    private const val MAX_REQUEST_SIZE = 25
-    private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
-    private const val SAD_PANDA_TYPE = "image/gif"
-    private const val SAD_PANDA_LENGTH = "9615"
-    private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
-    private const val U_CONFIG_TEXT = "Selected Profile"
-    private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
-    private var sEhFilter = EhFilter
-
-    private fun rethrowExactly(code: Int, headers: Headers?, body: String?, e: Throwable?) {
-        // Check sad panda
-        if (headers != null && SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
-            throw EhException("Sad Panda")
-        }
-
-        // Check sad panda(without panda)
-        if (headers != null && "text/html; charset=UTF-8" == headers["Content-Type"] && "0" == headers["Content-Length"] && EhUtils.isExHentai) {
-            throw EhException("Sad Panda\n(without panda)")
-        }
-
-        // Check kokomade
-        if (body != null && body.contains(KOKOMADE_URL)) {
-            throw EhException("今回はここまで ${GetText.getString(R.string.kokomade_tip)}".trimIndent())
-        }
-        if (body != null && body.contains("Gallery Not Available - ")) {
-            val error = GalleryNotAvailableParser.parse(body)
-            if (!TextUtils.isEmpty(error)) {
-                throw EhException(error)
-            }
-        }
-        if (code >= 400) {
-            throw StatusCodeException(code)
-        }
-        if (e is ParseException) {
-            if (TextUtils.isEmpty(body)) {
-                throw EhException(GetText.getString(R.string.error_empty_html))
-            } else if (body != null && !body.contains("<")) {
-                throw EhException(body)
-            } else {
-                if (Settings.saveParseErrorBody) {
-                    AppConfig.saveParseErrorBody(e as ParseException?)
-                }
-                throw EhException(GetText.getString(R.string.error_parse_error))
-            }
-        }
-        e?.let { throw it }
-    }
-
-    private inline fun <T> Response.parsingWith(block: String.() -> T): T {
-        return use { response ->
-            val body = body.string()
-            runCatching {
-                block(body)
-            }.onFailure {
-                rethrowExactly(response.code, response.headers, body, it)
-            }.getOrThrow()
-        }
-    }
-
     suspend fun signIn(username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val builder = FormBody.Builder()
@@ -519,7 +525,7 @@ object EhEngine {
         return null
     }
 
-    suspend fun getFunds(): HomeParser.Funds {
+    private suspend fun getFunds(): HomeParser.Funds {
         val url = EhUrl.URL_FUNDS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url).build()
