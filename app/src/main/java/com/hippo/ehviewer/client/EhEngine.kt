@@ -556,9 +556,7 @@ object EhEngine {
     suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
-        return EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse).let {
-            getProfileInternal(it, url)
-        }
+        return getProfileInternal(EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse), url)
     }
 
     private suspend fun getUConfigInternal(url: String) {
