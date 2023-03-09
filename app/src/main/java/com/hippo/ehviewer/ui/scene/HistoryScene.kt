@@ -20,13 +20,11 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AbstractComposeView
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
@@ -347,31 +345,8 @@ class HistoryScene : BaseToolbarScene() {
         override fun onCancel() {}
     }
 
-    private class ComposeHolder(val composeView: HistoryCardView) :
-        RecyclerView.ViewHolder(composeView)
+    private class ComposeHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
-    private class HistoryCardView @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyle: Int = 0,
-    ) : AbstractComposeView(context, attrs, defStyle) {
-        var galleryInfo by mutableStateOf<GalleryInfo?>(null)
-        var onClick by mutableStateOf({})
-        var onLongClock by mutableStateOf({})
-
-        @Composable
-        override fun Content() {
-            Mdc3Theme {
-                galleryInfo?.let {
-                    ListInfoCard(
-                        onClick,
-                        onLongClock,
-                        it
-                    )
-                }
-            }
-        }
-    }
 
     private inner class MoveDialogHelper(
         private val mLabels: Array<String>,
@@ -389,15 +364,21 @@ class HistoryScene : BaseToolbarScene() {
         PagingDataAdapter<HistoryInfo, ComposeHolder>(diffCallback) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComposeHolder {
-            val view = HistoryCardView(requireContext())
+            val view = ComposeView(requireContext())
             return ComposeHolder(view)
         }
 
         override fun onBindViewHolder(holder: ComposeHolder, position: Int) {
             val gi: GalleryInfo = getItem(position) ?: return
-            holder.composeView.galleryInfo = gi
-            holder.composeView.onClick = { onItemClick(gi) }
-            holder.composeView.onLongClock = { onItemLongClick(gi) }
+            holder.composeView.setContent {
+                Mdc3Theme {
+                    ListInfoCard(
+                        onClick = { onItemClick(gi) },
+                        onLongClick = { onItemLongClick(gi) },
+                        info = gi
+                    )
+                }
+            }
         }
     }
 
