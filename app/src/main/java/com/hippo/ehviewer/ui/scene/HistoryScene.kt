@@ -24,7 +24,10 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +42,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.HandlerDrawable
-import com.hippo.ehviewer.*
+import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.FavouriteStatusRouter
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
@@ -55,6 +62,7 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
@@ -360,6 +368,8 @@ class HistoryScene : BaseToolbarScene() {
         }
     }
 
+    private val height = (Settings.listThumbSize * 3).pxToDp.dp
+
     private inner class HistoryAdapter(diffCallback: DiffUtil.ItemCallback<HistoryInfo>) :
         PagingDataAdapter<HistoryInfo, ComposeHolder>(diffCallback) {
 
@@ -375,7 +385,8 @@ class HistoryScene : BaseToolbarScene() {
                     ListInfoCard(
                         onClick = { onItemClick(gi) },
                         onLongClick = { onItemLongClick(gi) },
-                        info = gi
+                        info = gi,
+                        modifier = Modifier.height(height)
                     )
                 }
             }

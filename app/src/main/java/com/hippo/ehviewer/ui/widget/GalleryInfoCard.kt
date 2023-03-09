@@ -6,17 +6,15 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,14 +24,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
-import eu.kanade.tachiyomi.util.system.pxToDp
 import java.util.Locale
-
-private val downloadManager = DownloadManager
 
 @Composable
 fun ListInfoCard(
@@ -43,15 +37,11 @@ fun ListInfoCard(
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        modifier = modifier.padding(6.dp),
+        modifier = Modifier.padding(6.dp),
         border = BorderStroke(1.dp, Color.Transparent)
     ) {
-        val listCardSize = remember { Settings.listThumbSize.pxToDp }
-        val height = (listCardSize * 3).dp
-        val width = (listCardSize * 2).dp
         Row(
-            modifier = Modifier
-                .height(height)
+            modifier = modifier
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick
@@ -61,9 +51,7 @@ fun ListInfoCard(
                 EhAsyncThumb(
                     model = info.thumb,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(width)
-                        .height(height)
+                    modifier = modifier.aspectRatio(0.6666667F)
                 )
             }
             Column(Modifier.padding(8.dp, 4.dp)) {
@@ -99,8 +87,7 @@ fun ListInfoCard(
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.End) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // TODO: put this calculation in coroutines
-                            if (downloadManager.containDownloadInfo(info.gid)) {
+                            if (DownloadManager.containDownloadInfo(info.gid)) {
                                 Icon(
                                     painterResource(id = R.drawable.v_download_x16),
                                     contentDescription = null
