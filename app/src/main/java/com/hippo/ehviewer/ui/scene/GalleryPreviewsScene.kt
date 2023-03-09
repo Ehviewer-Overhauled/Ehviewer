@@ -15,15 +15,12 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
@@ -35,13 +32,11 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.databinding.DialogGoToBinding
-import com.hippo.ehviewer.databinding.ItemGalleryPreviewBinding
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.yorozuya.LayoutUtils
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import java.util.Locale
 
 class GalleryPreviewsScene : BaseToolbarScene() {
@@ -49,7 +44,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     private val binding
         get() = _binding!!
     private var mGalleryDetail: GalleryDetail? = null
-    private var mAdapter: GalleryPreviewAdapter? = null
+    private var mAdapter: GalleryPreviewsAdapter? = null
     private var mHelper: GalleryPreviewHelper? = null
     private var mHasFirstRefresh = false
     private var mNextPage: Boolean = false
@@ -91,7 +86,9 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         _binding = SceneGalleryPreviewsBinding.inflate(inflater, container, false)
         binding.contentLayout.hideFastScroll()
         setLiftOnScrollTargetView(binding.contentLayout.recyclerView)
-        mAdapter = GalleryPreviewAdapter()
+        mAdapter = GalleryPreviewsAdapter {
+            mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
+        }
         binding.contentLayout.recyclerView.adapter = mAdapter
         val columnWidth = Settings.thumbSize
         val layoutManager =
@@ -162,21 +159,6 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         return false
     }
 
-    fun onItemClick(position: Int): Boolean {
-        val context = context
-        if (null != context && null != mHelper && null != mGalleryDetail) {
-            val p = mHelper!!.getDataAtEx(position)
-            if (p != null) {
-                val intent = Intent(context, ReaderActivity::class.java)
-                intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, mGalleryDetail)
-                intent.putExtra(ReaderActivity.KEY_PAGE, p.position)
-                startActivity(intent)
-            }
-        }
-        return true
-    }
-
     private fun onGetPreviewListSuccess(result: Pair<List<GalleryPreview>, Int>, taskId: Int) {
         if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryDetail) {
             mHelper!!.onGetPageData(taskId, result.second, 0, null, null, result.first)
@@ -188,9 +170,6 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             mHelper!!.onGetException(taskId, e)
         }
     }
-
-    private class GalleryPreviewHolder(val binding: ItemGalleryPreviewBinding) :
-        RecyclerView.ViewHolder(binding.root)
 
     private inner class GetPreviewListListener(
         context: Context,
@@ -207,30 +186,6 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         }
 
         override fun onCancel() {}
-    }
-
-    private inner class GalleryPreviewAdapter : RecyclerView.Adapter<GalleryPreviewHolder>() {
-        private val mInflater: LayoutInflater = layoutInflater
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryPreviewHolder {
-            return GalleryPreviewHolder(ItemGalleryPreviewBinding.inflate(mInflater, parent, false))
-        }
-
-        @SuppressLint("SetTextI18n")
-        override fun onBindViewHolder(holder: GalleryPreviewHolder, position: Int) {
-            if (null != mHelper) {
-                val preview = mHelper!!.getDataAtEx(position)
-                if (preview != null) {
-                    preview.load(holder.binding.image)
-                    holder.binding.text.text = (preview.position + 1).toString()
-                }
-            }
-            holder.itemView.setOnClickListener { onItemClick(position) }
-        }
-
-        override fun getItemCount(): Int {
-            return if (mHelper != null) mHelper!!.size() else 0
-        }
     }
 
     private inner class GalleryPreviewHelper : ContentHelper<GalleryPreview>() {
@@ -258,18 +213,13 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         override val context
             get() = this@GalleryPreviewsScene.requireContext()
 
-        @SuppressLint("NotifyDataSetChanged")
-        override fun notifyDataSetChanged() {
-            if (mAdapter != null) {
-                mAdapter!!.notifyDataSetChanged()
-            }
+        override fun notifyDataSetChanged(callback: () -> Unit) {
+            mAdapter?.submitList(data.toMutableList(), callback)
         }
 
-        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
-            if (mAdapter != null) {
-                mAdapter!!.notifyItemRangeInserted(positionStart, itemCount)
-            }
-        }
+        override fun notifyDataSetChanged() {}
+
+        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {}
 
         override fun isDuplicate(d1: GalleryPreview, d2: GalleryPreview): Boolean {
             return false
