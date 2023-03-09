@@ -170,7 +170,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha08")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     // https://developer.android.com/jetpack/androidx/releases/lifecycle
-    implementation("androidx.lifecycle:lifecycle-process:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.6.0")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
     val nav_version = "2.5.3"
