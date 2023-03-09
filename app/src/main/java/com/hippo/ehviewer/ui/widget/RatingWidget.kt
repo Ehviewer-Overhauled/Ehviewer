@@ -10,13 +10,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import com.hippo.ehviewer.R
-import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 private val colorYellow800 = Color(0xfff9a825)
 
 @Composable
 fun SimpleRatingWidget(rating: Float) {
-    val r = ceil(rating * 2).toInt().coerceIn(0, 10)
+    val r = (rating * 2).roundToInt().coerceIn(0, 10)
     val fullStar = r / 2
     val halfStar = r % 2
     val outlineStar = 5 - fullStar - halfStar
