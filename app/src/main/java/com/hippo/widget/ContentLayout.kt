@@ -341,8 +341,6 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
                             // Not found
                             // Ui change, show empty string
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             mData.clear()
@@ -352,19 +350,11 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyDataSetChanged()
 
                             // Ui change, show content
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showContent()
 
                             // RecyclerView scroll
                             if (binding.recyclerView.isAttachedToWindow) {
-                                binding.recyclerView.stopScroll()
-                                LayoutManagerUtils.scrollToPositionWithOffset(
-                                    binding.recyclerView.layoutManager,
-                                    0,
-                                    0
-                                )
-                                onScrollToPosition(0)
+                                scrollToPosition(0)
                             }
                         }
                     }
@@ -387,23 +377,13 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             // OK, that's all
                             if (mData.isEmpty()) {
                                 // Ui change, show empty string
-                                binding.refreshLayout.isRefreshing = false
-                                binding.bottomProgress.hide()
                                 showEmptyString()
                             } else {
                                 // Ui change, show content
-                                binding.refreshLayout.isRefreshing = false
-                                binding.bottomProgress.hide()
                                 showContent()
                                 if (mCurrentTaskType == TYPE_PRE_PAGE && binding.recyclerView.isAttachedToWindow) {
                                     // RecyclerView scroll, to top
-                                    binding.recyclerView.stopScroll()
-                                    LayoutManagerUtils.scrollToPositionWithOffset(
-                                        binding.recyclerView.layoutManager,
-                                        0,
-                                        0
-                                    )
-                                    onScrollToPosition(0)
+                                    scrollToPosition(0)
                                 }
                             }
                         } else {
@@ -424,13 +404,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                         dataSize - 1, mOnScrollToPositionListener
                                     )
                                 } else {
-                                    binding.recyclerView.stopScroll()
-                                    LayoutManagerUtils.scrollToPositionWithOffset(
-                                        binding.recyclerView.layoutManager,
-                                        0,
-                                        0
-                                    )
-                                    onScrollToPosition(0)
+                                    scrollToPosition(0)
                                 }
                             }
                         }
@@ -449,23 +423,13 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             // OK, that's all
                             if (mData.isEmpty()) {
                                 // Ui change, show empty string
-                                binding.refreshLayout.isRefreshing = false
-                                binding.bottomProgress.hide()
                                 showEmptyString()
                             } else {
                                 // Ui change, show content
-                                binding.refreshLayout.isRefreshing = false
-                                binding.bottomProgress.hide()
                                 showContent()
                                 if (mCurrentTaskType == TYPE_NEXT_PAGE && binding.recyclerView.isAttachedToWindow) {
                                     // RecyclerView scroll
-                                    binding.recyclerView.stopScroll()
-                                    LayoutManagerUtils.scrollToPositionWithOffset(
-                                        binding.recyclerView.layoutManager,
-                                        oldDataSize,
-                                        0
-                                    )
-                                    onScrollToPosition(oldDataSize)
+                                    scrollToPosition(oldDataSize)
                                 }
                             }
                         } else {
@@ -482,13 +446,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                     binding.recyclerView.stopScroll()
                                     binding.recyclerView.smoothScrollBy(0, mNextPageScrollSize)
                                 } else {
-                                    binding.recyclerView.stopScroll()
-                                    LayoutManagerUtils.scrollToPositionWithOffset(
-                                        binding.recyclerView.layoutManager,
-                                        oldDataSize,
-                                        0
-                                    )
-                                    onScrollToPosition(oldDataSize)
+                                    scrollToPosition(oldDataSize)
                                 }
                             }
                         }
@@ -510,8 +468,6 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
                             // Not found
                             // Ui change, show empty string
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             mData.clear()
@@ -521,18 +477,10 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             notifyDataSetChanged()
 
                             // Ui change, show content
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showContent()
                             if (binding.recyclerView.isAttachedToWindow) {
                                 // RecyclerView scroll
-                                binding.recyclerView.stopScroll()
-                                LayoutManagerUtils.scrollToPositionWithOffset(
-                                    binding.recyclerView.layoutManager,
-                                    0,
-                                    0
-                                )
-                                onScrollToPosition(0)
+                                scrollToPosition(0)
                             }
                         }
                     }
@@ -573,24 +521,14 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         }
                         if (mData.isEmpty()) {
                             // Ui change, show empty string
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showEmptyString()
                         } else {
                             // Ui change, show content
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
                             showContent()
 
                             // RecyclerView scroll
                             if (newIndexEnd > oldIndexEnd && newIndexEnd > 0 && binding.recyclerView.isAttachedToWindow) {
-                                binding.recyclerView.stopScroll()
-                                LayoutManagerUtils.scrollToPositionWithOffset(
-                                    binding.recyclerView.layoutManager,
-                                    newIndexEnd - 1,
-                                    0
-                                )
-                                onScrollToPosition(newIndexEnd - 1)
+                                scrollToPosition(newIndexEnd - 1)
                             }
                         }
                     }
@@ -600,8 +538,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
         fun onGetException(taskId: Int, e: Exception?) {
             if (mCurrentTaskId == taskId) {
-                binding.refreshLayout.isRefreshing = false
-                binding.bottomProgress.hide()
+                showProgress(PROGRESS_NONE)
                 val readableError = if (e != null) {
                     e.printStackTrace()
                     ExceptionUtils.getReadableString(e)
@@ -616,7 +553,37 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         }
 
+        private fun scrollToPosition(position: Int) {
+            binding.recyclerView.stopScroll()
+            LayoutManagerUtils.scrollToPositionWithOffset(
+                binding.recyclerView.layoutManager,
+                position,
+                0
+            )
+            onScrollToPosition(position)
+        }
+
+        private fun showProgress(type: Int) {
+            when (type) {
+                PROGRESS_NONE -> {
+                    binding.refreshLayout.isRefreshing = false
+                    binding.bottomProgress.hide()
+                }
+
+                PROGRESS_TOP -> {
+                    binding.refreshLayout.isRefreshing = true
+                    binding.bottomProgress.hide()
+                }
+
+                PROGRESS_BOTTOM -> {
+                    binding.refreshLayout.isRefreshing = false
+                    binding.bottomProgress.show()
+                }
+            }
+        }
+
         private fun showContent() {
+            showProgress(PROGRESS_NONE)
             mViewTransition.showView(0)
         }
 
@@ -634,6 +601,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         private fun showEmptyString() {
+            showProgress(PROGRESS_NONE)
             showText(mEmptyString)
         }
 
@@ -662,8 +630,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
 
         private fun cancelCurrentTask() {
             mCurrentTaskId = mIdGenerator.nextId()
-            binding.refreshLayout.isRefreshing = false
-            binding.bottomProgress.hide()
+            showProgress(PROGRESS_NONE)
         }
 
         private fun getPageStart(page: Int): Int {
@@ -712,30 +679,21 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             } else if (page in mStartPage until mEndPage) {
                 cancelCurrentTask()
                 val position = getPageStart(page)
-                binding.recyclerView.stopScroll()
-                LayoutManagerUtils.scrollToPositionWithOffset(
-                    binding.recyclerView.layoutManager,
-                    position,
-                    0
-                )
-                onScrollToPosition(position)
+                scrollToPosition(position)
             } else if (page == mStartPage - 1) {
-                binding.refreshLayout.isRefreshing = true
-                binding.bottomProgress.hide()
+                showProgress(PROGRESS_TOP)
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_PRE_PAGE
                 mCurrentTaskPage = page
                 getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
             } else if (page == mEndPage) {
-                binding.refreshLayout.isRefreshing = false
-                binding.bottomProgress.show()
+                showProgress(PROGRESS_BOTTOM)
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_NEXT_PAGE
                 mCurrentTaskPage = page
                 getPageData(mCurrentTaskId, mCurrentTaskType, mCurrentTaskPage, null, true)
             } else {
-                binding.refreshLayout.isRefreshing = true
-                binding.bottomProgress.hide()
+                showProgress(PROGRESS_TOP)
                 mCurrentTaskId = mIdGenerator.nextId()
                 mCurrentTaskType = TYPE_SOMEWHERE
                 mCurrentTaskPage = page
@@ -744,8 +702,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
 
         fun goTo(index: String?, isNext: Boolean) {
-            binding.refreshLayout.isRefreshing = true
-            binding.bottomProgress.hide()
+            showProgress(PROGRESS_TOP)
             mCurrentTaskId = mIdGenerator.nextId()
             mCurrentTaskType = TYPE_SOMEWHERE
             mCurrentTaskPage = 0
@@ -825,6 +782,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             const val TYPE_REFRESH_PAGE = 6
             private val TAG = ContentHelper::class.java.simpleName
             private const val CHECK_DUPLICATE_RANGE = 50
+            private const val PROGRESS_NONE = 0
+            private const val PROGRESS_TOP = 1
+            private const val PROGRESS_BOTTOM = 2
             private const val KEY_SUPER = "super"
             private const val KEY_SHOWN_VIEW = "shown_view"
             private const val KEY_TIP = "tip"
