@@ -50,7 +50,6 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
 import com.hippo.network.StatusCodeException
-import com.hippo.util.ExceptionUtils
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -123,21 +122,14 @@ object EhEngine {
         e?.let { throw it }
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun <T> Result<T>.getOrThrowExactly(response: Response?, body: String?): T {
-        return runCatching {
-            getOrThrow()
-        }.onFailure {
-            rethrowExactly(response?.code ?: -1, response?.headers, body, it)
-        }.getOrThrow()
-    }
-
     private inline fun <T> Response.parsingWith(block: String.() -> T): T {
-        return use {
+        return use { response ->
             val body = body.string()
             runCatching {
                 block(body)
-            }.getOrThrowExactly(this, body)
+            }.onFailure {
+                rethrowExactly(response.code, response.headers, body, it)
+            }.getOrThrow()
         }
     }
 
@@ -279,15 +271,12 @@ object EhEngine {
         val referer = EhUrl.referer
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        return okHttpClient.newCall(request).executeAsync().use { response ->
-            val body = response.body.string()
-            runCatching {
-                EventPaneParser.parse(body)?.let {
-                    Settings.lastDawnDay = today
-                    showEventNotification(it)
-                }
-                GalleryDetailParser.parse(body)
-            }.getOrThrowExactly(response, body)
+        return okHttpClient.newCall(request).executeAsync().parsingWith {
+            EventPaneParser.parse(this)?.let {
+                Settings.lastDawnDay = today
+                showEventNotification(it)
+            }
+            GalleryDetailParser.parse(this)
         }
     }
 
@@ -326,7 +315,6 @@ object EhEngine {
         return okHttpClient.newCall(request).executeAsync().parsingWith(RateGalleryParser::parse)
     }
 
-    @Throws(Throwable::class)
     suspend fun commentGallery(
         url: String?, comment: String, id: String?
     ): GalleryCommentList {
@@ -342,31 +330,16 @@ object EhEngine {
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                val document = Jsoup.parse(body!!)
-                val elements = document.select("#chd + p")
-                if (elements.size > 0) {
-                    throw EhException(elements[0].text())
-                }
-                return GalleryDetailParser.parseComments(document)
+        return okHttpClient.newCall(request).executeAsync().parsingWith {
+            val document = Jsoup.parse(this)
+            val elements = document.select("#chd + p")
+            if (elements.size > 0) {
+                throw EhException(elements[0].text())
             }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
+            GalleryDetailParser.parseComments(document)
         }
     }
 
-    @Throws(Throwable::class)
     suspend fun getGalleryToken(
         gid: Long,
         gtoken: String?, page: Int
@@ -386,62 +359,28 @@ object EhEngine {
         val request = EhRequestBuilder(url, referer, origin)
             .post(requestBody)
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return GalleryTokenApiParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync()
+            .parsingWith(GalleryTokenApiParser::parse)
     }
 
-    @Throws(Throwable::class)
     suspend fun getFavorites(
         url: String
     ): FavoritesParser.Result {
         val referer = EhUrl.referer
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-
-        var body: String? = null
-        var headers: Headers? = null
-        var result: FavoritesParser.Result
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = FavoritesParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        fillGalleryList(result.galleryInfoList, url, false)
-        return result
+        return okHttpClient.newCall(request).executeAsync().parsingWith(FavoritesParser::parse)
+            .apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
     /**
      * @param dstCat -1 for delete, 0 - 9 for cloud favorite, others throw Exception
      * @param note   max 250 characters
      */
-    @Throws(Throwable::class)
     suspend fun addFavorites(
         gid: Long,
         token: String?, dstCat: Int, note: String?
-    ): Void? {
+    ) {
         val catStr: String = when (dstCat) {
             -1 -> {
                 "favdel"
@@ -467,23 +406,7 @@ object EhEngine {
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                rethrowExactly(code, headers, body, null)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        return null
+        return okHttpClient.newCall(request).executeAsync().parsingWith {}
     }
 
     @Throws(Throwable::class)
@@ -501,7 +424,6 @@ object EhEngine {
         return null
     }
 
-    @Throws(Throwable::class)
     suspend fun modifyFavorites(
         url: String,
         gidArray: LongArray, dstCat: Int
@@ -530,91 +452,29 @@ object EhEngine {
         val request = EhRequestBuilder(url, url, origin)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var result: FavoritesParser.Result
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = FavoritesParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        fillGalleryList(result.galleryInfoList, url, false)
-        return result
+        return okHttpClient.newCall(request).executeAsync().parsingWith(FavoritesParser::parse)
+            .apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
-    @Throws(Throwable::class)
     suspend fun getTorrentList(
-        url: String?,
-        gid: Long, token: String?
+        url: String, gid: Long, token: String?
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        Log.d(TAG, url!!)
+        Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var result: List<TorrentParser.Result>
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = TorrentParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        return result
+        return okHttpClient.newCall(request).executeAsync().parsingWith(TorrentParser::parse)
     }
 
-    @Throws(Throwable::class)
     suspend fun getArchiveList(
-        url: String?,
-        gid: Long, token: String?
+        url: String, gid: Long, token: String?
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        Log.d(TAG, url!!)
+        Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var result: ArchiveParser.Result
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                result = ArchiveParser.parse(body!!)!!
-                if (result.funds == null) {
-                    try {
-                        result.funds = getFunds()
-                    } catch (e: Throwable) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
-        return result
+        return okHttpClient.newCall(request).executeAsync().parsingWith(ArchiveParser::parse)!!
+            .apply { funds = funds ?: getFunds() }
     }
 
-    @Throws(Throwable::class)
     suspend fun downloadArchive(
         gid: Long,
         token: String?, or: String?, res: String?, isHAtH: Boolean
@@ -644,40 +504,12 @@ object EhEngine {
             .post(builder.build())
             .build()
         val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var result: String?
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                rethrowExactly(code, headers, body, null)
-                result = ArchiveParser.parseArchiveUrl(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        var result = call.executeAsync().parsingWith(ArchiveParser::parseArchiveUrl)
         if (!isHAtH) {
             if (result == null) {
                 // Wait for the server to prepare archives
                 delay(1000)
-                try {
-                    call.clone().executeAsync().use { response ->
-                        code = response.code
-                        headers = response.headers
-                        body = response.body.string()
-                        rethrowExactly(code, headers, body, null)
-                        result = ArchiveParser.parseArchiveUrl(body!!)
-                    }
-                } catch (e: Throwable) {
-                    ExceptionUtils.throwIfFatal(e)
-                    rethrowExactly(code, headers, body, e)
-                    throw e
-                }
+                result = call.clone().executeAsync().parsingWith(ArchiveParser::parseArchiveUrl)
                 if (result == null) {
                     throw EhException("Archive unavailable")
                 }
@@ -687,53 +519,20 @@ object EhEngine {
         return null
     }
 
-    @Throws(Throwable::class)
     suspend fun getFunds(): HomeParser.Funds {
         val url = EhUrl.URL_FUNDS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return HomeParser.parseFunds(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(HomeParser::parseFunds)
     }
 
-    @Throws(Throwable::class)
     private suspend fun getImageLimitsInternal(): HomeParser.Limits {
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
         val request = EhRequestBuilder(url).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return HomeParser.parse(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(HomeParser::parse)
     }
 
-    @Throws(Throwable::class)
     suspend fun getImageLimits(): HomeParser.Result = coroutineScope {
         val limitsDeferred = async {
             getImageLimitsInternal()
@@ -744,7 +543,6 @@ object EhEngine {
         HomeParser.Result(limitsDeferred.await(), fundsDeferred.await())
     }
 
-    @Throws(Throwable::class)
     suspend fun resetImageLimits(): HomeParser.Limits? {
         val builder = FormBody.Builder()
             .add("act", "limits")
@@ -754,92 +552,34 @@ object EhEngine {
         val request = EhRequestBuilder(url)
             .post(builder.build())
             .build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return HomeParser.parseResetLimits(body!!)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync()
+            .parsingWith(HomeParser::parseResetLimits)
     }
 
-    @Throws(Throwable::class)
     suspend fun getNews(parse: Boolean): String? {
         val url = EhUrl.URL_NEWS
         val referer = EhUrl.REFERER_E
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return if (parse) EventPaneParser.parse(body!!) else null
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
+        return okHttpClient.newCall(request).executeAsync().parsingWith {
+            if (parse) EventPaneParser.parse(this) else null
         }
     }
 
-    @Throws(Throwable::class)
     private suspend fun getProfileInternal(
         url: String, referer: String
     ): ProfileParser.Result {
         Log.d(TAG, url)
         val request = EhRequestBuilder(url, referer).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return ProfileParser.parse(body)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
-        }
+        return okHttpClient.newCall(request).executeAsync().parsingWith(ProfileParser::parse)
     }
 
-    @Throws(Throwable::class)
     suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
         val request = EhRequestBuilder(url).build()
-        val call = okHttpClient.newCall(request)
-        var body: String? = null
-        var headers: Headers? = null
-        var code = -1
-        try {
-            call.executeAsync().use { response ->
-                code = response.code
-                headers = response.headers
-                body = response.body.string()
-                return getProfileInternal(ForumsParser.parse(body), url)
-            }
-        } catch (e: Throwable) {
-            ExceptionUtils.throwIfFatal(e)
-            rethrowExactly(code, headers, body, e)
-            throw e
+        return okHttpClient.newCall(request).executeAsync().parsingWith(ForumsParser::parse).let {
+            getProfileInternal(it, url)
         }
     }
 
@@ -865,7 +605,6 @@ object EhEngine {
         }
     }
 
-    @Throws(Throwable::class)
     suspend fun voteComment(
         apiUid: Long,
         apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
@@ -891,7 +630,6 @@ object EhEngine {
         }
     }
 
-    @Throws(Throwable::class)
     suspend fun voteTag(
         apiUid: Long,
         apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
@@ -918,7 +656,6 @@ object EhEngine {
     /**
      * @param image Must be jpeg
      */
-    @Throws(Throwable::class)
     suspend fun imageSearch(
         image: File,
         uss: Boolean, osc: Boolean, se: Boolean
@@ -965,8 +702,6 @@ object EhEngine {
             .apply { fillGalleryList(galleryInfoList, url, true) }
     }
 
-    @JvmStatic
-    @Throws(Throwable::class)
     suspend fun getGalleryPage(
         url: String?,
         gid: Long,
@@ -978,8 +713,6 @@ object EhEngine {
         return okHttpClient.newCall(request).executeAsync().parsingWith(GalleryPageParser::parse)
     }
 
-    @JvmStatic
-    @Throws(Throwable::class)
     suspend fun getGalleryPageApi(
         gid: Long,
         index: Int,

@@ -101,7 +101,7 @@ object EhClient {
             )
 
             METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
-                params[0] as String?,
+                params[0] as String,
                 params[1] as Long,
                 params[2] as String?
             )
@@ -123,7 +123,7 @@ object EhClient {
             )
 
             METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
-                params[0] as String?,
+                params[0] as String,
                 params[1] as Long,
                 params[2] as String?
             )
