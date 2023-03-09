@@ -22,14 +22,10 @@ import kotlin.math.roundToInt
 
 class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
     StaggeredGridLayoutManager(1, orientation) {
-    private var mColumnSize = -1
+    private var mColumnSize = columnSize
     private var mColumnSizeChanged = true
     private var mStrategy = 0
     var supportsPredictiveItemAnimations = true
-
-    init {
-        setColumnSize(columnSize)
-    }
 
     fun setColumnSize(columnSize: Int) {
         if (columnSize == mColumnSize) {
@@ -94,16 +90,14 @@ class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
         }
         super.onMeasure(recycler, state, widthSpec, heightSpec)
     }
+}
 
-    companion object {
-        const val STRATEGY_MIN_SIZE = 0
-        const val STRATEGY_SUITABLE_SIZE = 1
-        private fun getSpanCountForSuitableSize(total: Int, single: Int): Int {
-            return (total / single.toFloat()).roundToInt().coerceAtLeast(1)
-        }
+const val STRATEGY_MIN_SIZE = 0
+const val STRATEGY_SUITABLE_SIZE = 1
+fun getSpanCountForSuitableSize(total: Int, single: Int): Int {
+    return (total / single.toFloat()).roundToInt().coerceAtLeast(1)
+}
 
-        private fun getSpanCountForMinSize(total: Int, single: Int): Int {
-            return (total / single).coerceAtLeast(1)
-        }
-    }
+fun getSpanCountForMinSize(total: Int, single: Int): Int {
+    return (total / single).coerceAtLeast(1)
 }

@@ -13,117 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.widget.recyclerview
 
-package com.hippo.widget.recyclerview;
+import android.content.Context
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
 
-import android.content.Context;
+class AutoGridLayoutManager(context: Context?, columnSize: Int, private var fakePadding: Int = 0) :
+    GridLayoutManager(context, 1) {
+    private var mColumnSize = columnSize
+    private var mColumnSizeChanged = true
+    private var mStrategy = 0
 
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class AutoGridLayoutManager extends GridLayoutManager {
-
-    public static final int STRATEGY_MIN_SIZE = 0;
-    public static final int STRATEGY_SUITABLE_SIZE = 1;
-
-    private int mColumnSize = -1;
-    private boolean mColumnSizeChanged = true;
-    private int mStrategy;
-    private int fakePadding;
-
-    private List<OnUpdateSpanCountListener> mListeners;
-
-    public AutoGridLayoutManager(Context context, int columnSize, int fakePadding) {
-        super(context, 1);
-        this.fakePadding = fakePadding;
-        setColumnSize(columnSize);
-    }
-
-    public AutoGridLayoutManager(Context context, int columnSize, int orientation, boolean reverseLayout) {
-        super(context, 1, orientation, reverseLayout);
-        setColumnSize(columnSize);
-    }
-
-    public static int getSpanCountForSuitableSize(int total, int single) {
-        int span = total / single;
-        if (span <= 0) {
-            return 1;
-        }
-        int span2 = span + 1;
-        float deviation = Math.abs(1 - (total / span / (float) single));
-        float deviation2 = Math.abs(1 - (total / span2 / (float) single));
-        return deviation < deviation2 ? span : span2;
-    }
-
-    public static int getSpanCountForMinSize(int total, int single) {
-        return Math.max(1, total / single);
-    }
-
-    public void setColumnSize(int columnSize) {
+    fun setColumnSize(columnSize: Int) {
         if (columnSize == mColumnSize) {
-            return;
+            return
         }
-        mColumnSize = columnSize;
-        mColumnSizeChanged = true;
+        mColumnSize = columnSize
+        mColumnSizeChanged = true
     }
 
-    public void setStrategy(int strategy) {
+    fun setStrategy(strategy: Int) {
         if (strategy == mStrategy) {
-            return;
+            return
         }
-        mStrategy = strategy;
-        mColumnSizeChanged = true;
+        mStrategy = strategy
+        mColumnSizeChanged = true
     }
 
-    @Override
-    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+    override fun onLayoutChildren(recycler: Recycler, state: RecyclerView.State) {
         if (mColumnSizeChanged && mColumnSize > 0) {
-            int totalSpace;
-            if (getOrientation() == RecyclerView.VERTICAL) {
-                totalSpace = getWidth() - getPaddingRight() - getPaddingLeft() - fakePadding;
+            val totalSpace = if (orientation == RecyclerView.VERTICAL) {
+                width - paddingRight - paddingLeft - fakePadding
             } else {
-                totalSpace = getHeight() - getPaddingTop() - getPaddingBottom() - fakePadding;
+                height - paddingTop - paddingBottom - fakePadding
             }
+            val spanCount = when (mStrategy) {
+                STRATEGY_MIN_SIZE -> getSpanCountForMinSize(
+                    totalSpace,
+                    mColumnSize
+                )
 
-            int spanCount;
-            switch (mStrategy) {
-                default:
-                case STRATEGY_MIN_SIZE:
-                    spanCount = getSpanCountForMinSize(totalSpace, mColumnSize);
-                    break;
-                case STRATEGY_SUITABLE_SIZE:
-                    spanCount = getSpanCountForSuitableSize(totalSpace, mColumnSize);
-                    break;
+                STRATEGY_SUITABLE_SIZE -> getSpanCountForSuitableSize(
+                    totalSpace,
+                    mColumnSize
+                )
+
+                else -> getSpanCountForMinSize(totalSpace, mColumnSize)
             }
-            setSpanCount(spanCount);
-            mColumnSizeChanged = false;
-
-            if (null != mListeners) {
-                for (int i = 0, n = mListeners.size(); i < n; i++) {
-                    mListeners.get(i).onUpdateSpanCount(spanCount);
-                }
-            }
+            setSpanCount(spanCount)
+            mColumnSizeChanged = false
         }
-        super.onLayoutChildren(recycler, state);
-    }
-
-    public void addOnUpdateSpanCountListener(OnUpdateSpanCountListener listener) {
-        if (null == mListeners) {
-            mListeners = new ArrayList<>();
-        }
-        mListeners.add(listener);
-    }
-
-    public void removeOnUpdateSpanCountListener(OnUpdateSpanCountListener listener) {
-        if (null != mListeners) {
-            mListeners.remove(listener);
-        }
-    }
-
-    public interface OnUpdateSpanCountListener {
-        void onUpdateSpanCount(int spanCount);
+        super.onLayoutChildren(recycler, state)
     }
 }

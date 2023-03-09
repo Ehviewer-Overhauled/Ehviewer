@@ -59,6 +59,7 @@ import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.view.ViewTransition
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
+import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -145,7 +146,7 @@ class HistoryScene : BaseToolbarScene() {
         binding.recyclerView.adapter = mAdapter
         val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
         layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
-        layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+        layoutManager.setStrategy(STRATEGY_MIN_SIZE)
         layoutManager.supportsPredictiveItemAnimations = false
         binding.recyclerView.layoutManager = layoutManager
         val itemTouchHelper = ItemTouchHelper(HistoryItemTouchHelperCallback())

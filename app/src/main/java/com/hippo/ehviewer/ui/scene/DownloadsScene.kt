@@ -66,6 +66,7 @@ import com.hippo.widget.FabLayout
 import com.hippo.widget.FabLayout.OnClickFabListener
 import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
+import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.ViewUtils
@@ -244,7 +245,7 @@ class DownloadsScene : BaseToolbarScene(), DownloadInfoListener, OnClickFabListe
             val layoutManager =
                 AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
             layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
-            layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+            layoutManager.setStrategy(STRATEGY_MIN_SIZE)
             layoutManager.supportsPredictiveItemAnimations = false
             recyclerView.layoutManager = layoutManager
             recyclerView.clipToPadding = false
