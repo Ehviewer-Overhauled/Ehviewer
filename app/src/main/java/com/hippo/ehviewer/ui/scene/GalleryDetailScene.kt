@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.DownloadManager
@@ -54,6 +53,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
+import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
@@ -106,8 +106,10 @@ import com.hippo.widget.AutoWrapLayout
 import com.hippo.widget.LoadImageView
 import com.hippo.widget.ObservedTextView
 import com.hippo.widget.SimpleGridAutoSpanLayout
+import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
+import com.hippo.yorozuya.LayoutUtils
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
@@ -151,6 +153,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
+    private var previewsAdapter: GalleryPreviewsAdapter? = null
 
     @State
     private var mState = STATE_INIT
@@ -404,6 +407,22 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         binding.content.previews.previews.setOnClickListener { navigateToPreview() }
         binding.content.previews.previewText.setOnClickListener { navigateToPreview(true) }
+        binding.content.previews.recyclerView.run {
+            previewsAdapter = GalleryPreviewsAdapter {
+                mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
+            }
+            adapter = previewsAdapter
+            val columnWidth = Settings.thumbSize
+            layoutManager = AutoGridLayoutManager(context, columnWidth).apply {
+                setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
+            }
+            val padding = LayoutUtils.dp2pix(context, 8f)
+            val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
+            addItemDecoration(decoration)
+            val lp = layoutParams
+            lp.height = resources.displayMetrics.heightPixels * 6 / 7
+            layoutParams = lp
+        }
         mViewTransition2 = ViewTransition(binding.content.belowHeader, binding.content.progress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
@@ -430,6 +449,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         (requireActivity() as MainActivity).mShareUrl = null
         mViewTransition = null
         mViewTransition2 = null
+        previewsAdapter = null
         _binding = null
     }
 
@@ -703,13 +723,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun bindPreviews(gd: GalleryDetail) {
-        val inflater = layoutInflater
-        resourcesOrNull ?: return
         _binding ?: return
         binding.content.previews.run {
-            gridLayout.removeAllViews()
             val previewList = gd.previewList
             if (gd.previewPages <= 0 || previewList.isEmpty()) {
                 previewText.setText(R.string.no_previews)
@@ -719,23 +735,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             } else {
                 previewText.setText(R.string.more_previews)
             }
-            val columnWidth = Settings.thumbSize
-            gridLayout.setColumnSize(columnWidth)
-            gridLayout.setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-            viewLifecycleOwner.lifecycleScope.launchIO {
-                previewList.forEach {
-                    val view = inflater.inflate(R.layout.item_gallery_preview, gridLayout, false)
-                    val image = view.findViewById<LoadImageView>(R.id.image)
-                    withUIContext {
-                        gridLayout.addView(view)
-                        image.setTag(R.id.index, it.position)
-                        image.setOnClickListener(this@GalleryDetailScene)
-                        val text = view.findViewById<TextView>(R.id.text)
-                        text.text = (it.position + 1).toString()
-                    }
-                    it.load(image)
-                }
-            }
+            previewsAdapter?.submitList(previewList)
         }
     }
 
@@ -997,21 +997,13 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             }
 
             else -> {
-                var o = v.getTag(R.id.tag)
+                val o = v.getTag(R.id.tag)
                 if (o is String) {
                     val lub = ListUrlBuilder()
                     lub.mode = ListUrlBuilder.MODE_TAG
                     lub.keyword = o
                     navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                     return
-                }
-                o = v.getTag(R.id.index)
-                if (o is Int) {
-                    val intent = Intent(context, ReaderActivity::class.java)
-                    intent.action = ReaderActivity.ACTION_EH
-                    intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
-                    intent.putExtra(ReaderActivity.KEY_PAGE, o)
-                    startActivity(intent)
                 }
             }
         }

@@ -28,16 +28,14 @@
     android:showDividers="middle"
     app:fitsSystemWindowsInsets="bottom">
 
-    <com.hippo.widget.SimpleGridAutoSpanLayout
-        android:id="@+id/grid_layout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:columnCount="3"
-        app:itemMargin="8dp" />
+        android:layout_height="wrap_content" />
 
     <Button
-        style="@style/Widget.Material3.Button.TextButton"
         android:id="@+id/preview_text"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
