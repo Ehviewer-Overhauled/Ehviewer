@@ -20,7 +20,7 @@ import com.hippo.widget.LoadImageView
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class GalleryPreview(
+data class GalleryPreview(
     private val imageUrl: String,
     val pageUrl: String,
     val position: Int,

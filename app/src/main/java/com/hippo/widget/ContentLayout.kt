@@ -267,6 +267,10 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         )
 
         protected abstract val context: Context
+        protected open fun notifyDataSetChanged(callback: () -> Unit) {
+            callback()
+        }
+
         protected abstract fun notifyDataSetChanged()
         protected abstract fun notifyItemRangeInserted(positionStart: Int, itemCount: Int)
         protected open fun onScrollToPosition(position: Int) {}
@@ -281,6 +285,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         fun setEmptyString(str: String) {
             mEmptyString = str
         }
+
+        val data: List<E>
+            get() = mData
 
         fun getDataAtEx(location: Int): E? {
             return if (location >= 0 && location < mData.size) {
@@ -339,9 +346,11 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onClearData()
                             notifyDataSetChanged()
 
-                            // Not found
-                            // Ui change, show empty string
-                            showEmptyString()
+                            notifyDataSetChanged {
+                                // Not found
+                                // Ui change, show empty string
+                                showEmptyString()
+                            }
                         } else {
                             mData.clear()
                             onClearData()
@@ -349,12 +358,14 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onAddData(data)
                             notifyDataSetChanged()
 
-                            // Ui change, show content
-                            showContent()
+                            notifyDataSetChanged {
+                                // Ui change, show content
+                                showContent()
 
-                            // RecyclerView scroll
-                            if (binding.recyclerView.isAttachedToWindow) {
-                                scrollToPosition(0)
+                                // RecyclerView scroll
+                                if (binding.recyclerView.isAttachedToWindow) {
+                                    scrollToPosition(0)
+                                }
                             }
                         }
                     }
@@ -391,20 +402,20 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onAddData(data)
                             notifyItemRangeInserted(0, data.size)
 
-                            // Ui change, show content
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
-                            showContent()
-                            if (binding.recyclerView.isAttachedToWindow) {
-                                // RecyclerView scroll
-                                if (mCurrentTaskType == TYPE_PRE_PAGE_KEEP_POS) {
-                                    binding.recyclerView.stopScroll()
-                                    LayoutManagerUtils.scrollToPositionProperly(
-                                        binding.recyclerView.layoutManager, context,
-                                        dataSize - 1, mOnScrollToPositionListener
-                                    )
-                                } else {
-                                    scrollToPosition(0)
+                            notifyDataSetChanged {
+                                // Ui change, show content
+                                showContent()
+                                if (binding.recyclerView.isAttachedToWindow) {
+                                    // RecyclerView scroll
+                                    if (mCurrentTaskType == TYPE_PRE_PAGE_KEEP_POS) {
+                                        binding.recyclerView.stopScroll()
+                                        LayoutManagerUtils.scrollToPositionProperly(
+                                            binding.recyclerView.layoutManager, context,
+                                            dataSize - 1, mOnScrollToPositionListener
+                                        )
+                                    } else {
+                                        scrollToPosition(0)
+                                    }
                                 }
                             }
                         }
@@ -437,16 +448,16 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onAddData(data)
                             notifyItemRangeInserted(oldDataSize, dataSize)
 
-                            // Ui change, show content
-                            binding.refreshLayout.isRefreshing = false
-                            binding.bottomProgress.hide()
-                            showContent()
-                            if (binding.recyclerView.isAttachedToWindow) {
-                                if (mCurrentTaskType == TYPE_NEXT_PAGE_KEEP_POS) {
-                                    binding.recyclerView.stopScroll()
-                                    binding.recyclerView.smoothScrollBy(0, mNextPageScrollSize)
-                                } else {
-                                    scrollToPosition(oldDataSize)
+                            notifyDataSetChanged {
+                                // Ui change, show content
+                                showContent()
+                                if (binding.recyclerView.isAttachedToWindow) {
+                                    if (mCurrentTaskType == TYPE_NEXT_PAGE_KEEP_POS) {
+                                        binding.recyclerView.stopScroll()
+                                        binding.recyclerView.smoothScrollBy(0, mNextPageScrollSize)
+                                    } else {
+                                        scrollToPosition(oldDataSize)
+                                    }
                                 }
                             }
                         }
@@ -466,9 +477,11 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onClearData()
                             notifyDataSetChanged()
 
-                            // Not found
-                            // Ui change, show empty string
-                            showEmptyString()
+                            notifyDataSetChanged {
+                                // Not found
+                                // Ui change, show empty string
+                                showEmptyString()
+                            }
                         } else {
                             mData.clear()
                             onClearData()
@@ -476,11 +489,13 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             onAddData(data)
                             notifyDataSetChanged()
 
-                            // Ui change, show content
-                            showContent()
-                            if (binding.recyclerView.isAttachedToWindow) {
-                                // RecyclerView scroll
-                                scrollToPosition(0)
+                            notifyDataSetChanged {
+                                // Ui change, show content
+                                showContent()
+                                if (binding.recyclerView.isAttachedToWindow) {
+                                    // RecyclerView scroll
+                                    scrollToPosition(0)
+                                }
                             }
                         }
                     }
@@ -513,22 +528,24 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         mData.addAll(oldIndexStart, data)
                         onAddData(data)
                         notifyDataSetChanged()
-                        var i = mCurrentTaskPage - mStartPage
-                        val n = mPageDivider.size
-                        while (i < n) {
-                            mPageDivider[i] = mPageDivider[i] - oldIndexEnd + newIndexEnd
-                            i++
-                        }
-                        if (mData.isEmpty()) {
-                            // Ui change, show empty string
-                            showEmptyString()
-                        } else {
-                            // Ui change, show content
-                            showContent()
+                        notifyDataSetChanged {
+                            var i = mCurrentTaskPage - mStartPage
+                            val n = mPageDivider.size
+                            while (i < n) {
+                                mPageDivider[i] = mPageDivider[i] - oldIndexEnd + newIndexEnd
+                                i++
+                            }
+                            if (mData.isEmpty()) {
+                                // Ui change, show empty string
+                                showEmptyString()
+                            } else {
+                                // Ui change, show content
+                                showContent()
 
-                            // RecyclerView scroll
-                            if (newIndexEnd > oldIndexEnd && newIndexEnd > 0 && binding.recyclerView.isAttachedToWindow) {
-                                scrollToPosition(newIndexEnd - 1)
+                                // RecyclerView scroll
+                                if (newIndexEnd > oldIndexEnd && newIndexEnd > 0 && binding.recyclerView.isAttachedToWindow) {
+                                    scrollToPosition(newIndexEnd - 1)
+                                }
                             }
                         }
                     }
