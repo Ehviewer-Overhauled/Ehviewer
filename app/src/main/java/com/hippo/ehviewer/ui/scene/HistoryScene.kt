@@ -140,6 +140,7 @@ class HistoryScene : BaseToolbarScene() {
         val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
         layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
         layoutManager.setStrategy(AutoStaggeredGridLayoutManager.STRATEGY_MIN_SIZE)
+        layoutManager.supportsPredictiveItemAnimations = false
         binding.recyclerView.layoutManager = layoutManager
         val itemTouchHelper = ItemTouchHelper(HistoryItemTouchHelperCallback())
         itemTouchHelper.attachToRecyclerView(binding.recyclerView)
