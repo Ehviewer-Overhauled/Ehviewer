@@ -94,9 +94,11 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
-        EhTagDatabase.update()
         AppCompatDelegate.setDefaultNightMode(Settings.theme)
         launchIO {
+            launchIO {
+                EhTagDatabase.update()
+            }
             launchIO {
                 ehDatabase
             }
