@@ -67,7 +67,7 @@ import org.jsoup.Jsoup
 import java.io.File
 import kotlin.math.ceil
 
-private val okHttpClient = EhApplication.okHttpClient
+private val okHttpClient = EhApplication.plainTextOkHttpClient
 private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
 private const val TAG = "EhEngine"
 private const val MAX_REQUEST_SIZE = 25

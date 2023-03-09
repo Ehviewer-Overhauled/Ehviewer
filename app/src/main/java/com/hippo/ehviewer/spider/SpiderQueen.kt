@@ -20,7 +20,7 @@ import android.util.Log
 import androidx.annotation.IntDef
 import androidx.collection.LongSparseArray
 import androidx.collection.set
-import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
+import com.hippo.ehviewer.EhApplication.Companion.plainTextOkHttpClient
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -362,7 +362,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             ), referer
         ).build()
         return runSuspendCatching {
-            okHttpClient.newCall(request).executeAsync().use { response ->
+            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()
                 val pages = parsePages(body)
                 val spiderInfo = SpiderInfo(galleryInfo.gid, pages)
@@ -383,7 +383,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
         try {
-            okHttpClient.newCall(request).execute().use { response ->
+            plainTextOkHttpClient.newCall(request).execute().use { response ->
                 val body = response.body.string()
                 val list = GalleryMultiPageViewerPTokenParser.parse(body)
                 for (i in list.indices) {
@@ -416,7 +416,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
         try {
-            okHttpClient.newCall(request).execute().use { response ->
+            plainTextOkHttpClient.newCall(request).execute().use { response ->
                 val body = response.body.string()
                 readPreviews(body, previewIndex, spiderInfo)
                 return spiderInfo.pTokenMap[index]

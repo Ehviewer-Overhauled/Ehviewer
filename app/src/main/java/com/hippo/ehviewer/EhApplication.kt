@@ -215,7 +215,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
-        val nonCacheOkHttpClient by lazy {
+        private fun buildOneOkHttpClient(): OkHttpClient.Builder {
             val builder = OkHttpClient.Builder()
                 .cookieJar(EhCookieStore)
                 .dns(EhDns)
@@ -231,12 +231,16 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 builder.sslSocketFactory(EhSSLSocketFactory, trustManager)
                 builder.proxy(Proxy.NO_PROXY)
             }
-            builder.build()
+            return builder
+        }
+
+        val nonCacheOkHttpClient by lazy {
+            buildOneOkHttpClient().build()
         }
 
         // Never use this okhttp client to download large blobs!!!
-        val okHttpClient by lazy {
-            nonCacheOkHttpClient.newBuilder().cache(
+        val plainTextOkHttpClient by lazy {
+            buildOneOkHttpClient().cache(
                 Cache(
                     application.cacheDir.toOkioPath() / "http_cache",
                     20L * 1024L * 1024L,
