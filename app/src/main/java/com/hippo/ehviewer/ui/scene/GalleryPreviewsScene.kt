@@ -36,6 +36,7 @@ import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
+import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import com.hippo.yorozuya.LayoutUtils
 import java.util.Locale
 
@@ -93,7 +94,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         val columnWidth = Settings.thumbSize
         val layoutManager =
             AutoGridLayoutManager(context, columnWidth, LayoutUtils.dp2pix(context, 16f))
-        layoutManager.setStrategy(AutoGridLayoutManager.STRATEGY_SUITABLE_SIZE)
+        layoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
         binding.contentLayout.recyclerView.layoutManager = layoutManager
         binding.contentLayout.recyclerView.clipToPadding = false
         val padding = LayoutUtils.dp2pix(context, 4f)
