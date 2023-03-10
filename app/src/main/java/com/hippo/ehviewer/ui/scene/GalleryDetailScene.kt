@@ -46,6 +46,7 @@ import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -154,6 +155,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
     private var previewsAdapter: GalleryPreviewsAdapter? = null
+    private var footerAdapter: FooterAdapter? = null
 
     @State
     private var mState = STATE_INIT
@@ -406,12 +408,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             binding.content.comments.comments.visibility = View.GONE
         }
         binding.content.previews.previews.setOnClickListener { navigateToPreview() }
-        binding.content.previews.previewText.setOnClickListener { navigateToPreview(true) }
         binding.content.previews.recyclerView.run {
             previewsAdapter = GalleryPreviewsAdapter {
                 mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
             }
-            adapter = previewsAdapter
+            footerAdapter = FooterAdapter { navigateToPreview(true) }
+            adapter = ConcatAdapter(previewsAdapter, footerAdapter)
             val columnWidth = Settings.thumbSize
             layoutManager = AutoGridLayoutManager(context, columnWidth).apply {
                 setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
@@ -450,6 +452,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mViewTransition = null
         mViewTransition2 = null
         previewsAdapter = null
+        footerAdapter = null
         _binding = null
     }
 
@@ -728,12 +731,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         binding.content.previews.run {
             val previewList = gd.previewList
             if (gd.previewPages <= 0 || previewList.isEmpty()) {
-                previewText.setText(R.string.no_previews)
+                footerAdapter?.text = getString(R.string.no_previews)
                 return
             } else if (gd.previewPages == 1) {
-                previewText.setText(R.string.no_more_previews)
+                footerAdapter?.text = getString(R.string.no_more_previews)
             } else {
-                previewText.setText(R.string.more_previews)
+                footerAdapter?.text = getString(R.string.more_previews)
             }
             previewsAdapter?.submitList(previewList)
         }
