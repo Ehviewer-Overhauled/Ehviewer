@@ -192,7 +192,7 @@ object EhDB {
     @Synchronized
     fun containLocalFavorites(gid: Long): Boolean {
         val dao = db.localFavoritesDao()
-        return null != dao.load(gid)
+        return dao.contains(gid)
     }
 
     @Synchronized

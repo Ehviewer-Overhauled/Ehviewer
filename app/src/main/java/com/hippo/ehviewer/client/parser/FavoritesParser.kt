@@ -13,69 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.GetText.getString
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.util.ExceptionUtils
+import com.hippo.util.JsoupUtils
+import org.jsoup.Jsoup
 
-import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.util.ExceptionUtils;
-import com.hippo.util.JsoupUtils;
-import com.hippo.yorozuya.AssertUtilsKt;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.List;
-
-public class FavoritesParser {
-
-    public static Result parse(String body) throws Exception {
+object FavoritesParser {
+    fun parse(body: String): Result {
         if (body.contains("This page requires you to log on.</p>")) {
-            throw new EhException(GetText.getString(R.string.need_sign_in));
+            throw EhException(getString(R.string.need_sign_in))
         }
-        String[] catArray = new String[10];
-        int[] countArray = new int[10];
-        try {
-            Document d = Jsoup.parse(body);
-            Element ido = JsoupUtils.getElementByClass(d, "ido");
-            //noinspection ConstantConditions
-            Elements fps = ido.getElementsByClass("fp");
+        val catArray = arrayOfNulls<String>(10)
+        val countArray = IntArray(10)
+        val d = Jsoup.parse(body)
+        runCatching {
+            val ido = JsoupUtils.getElementByClass(d, "ido")
+            val fps = ido!!.getElementsByClass("fp")
             // Last one is "fp fps"
-            AssertUtilsKt.assertEquals(11, fps.size());
-
-            for (int i = 0; i < 10; i++) {
-                Element fp = fps.get(i);
-                countArray[i] = ParserUtils.parseInt(fp.child(0).text(), 0);
-                catArray[i] = ParserUtils.trim(fp.child(2).text());
+            check(fps.size == 11)
+            for (i in 0..9) {
+                val fp = fps[i]
+                countArray[i] = ParserUtils.parseInt(fp.child(0).text(), 0)
+                catArray[i] = ParserUtils.trim(fp.child(2).text())
             }
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            e.printStackTrace();
-            throw new ParseException("Parse favorites error", body);
+        }.onFailure {
+            ExceptionUtils.throwIfFatal(it)
+            it.printStackTrace()
+            throw ParseException("Parse favorites error", body)
         }
-
-        GalleryListParser.Result result = GalleryListParser.parse(body);
-
-        Result re = new Result();
-        re.catArray = catArray;
-        re.countArray = countArray;
-        re.prev = result.prev;
-        re.next = result.next;
-        re.galleryInfoList = result.galleryInfoList;
-
-        return re;
+        val result = GalleryListParser.parse(d, body)
+        return Result(catArray, countArray, result)
     }
 
-    public static class Result {
-        public String[] catArray; // Size 10
-        public int[] countArray; // Size 10
-        public String prev;
-        public String next;
-        public List<GalleryInfo> galleryInfoList;
+    class Result(
+        val catArray: Array<String?>,
+        val countArray: IntArray,
+        galleryListResult: GalleryListParser.Result
+    ) {
+        val prev = galleryListResult.prev
+        val next = galleryListResult.next
+        val galleryInfoList = galleryListResult.galleryInfoList
     }
 }

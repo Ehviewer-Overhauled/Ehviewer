@@ -16,6 +16,9 @@ interface LocalFavoritesDao : BasicDao<LocalFavoriteInfo> {
     @Query("SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid")
     fun load(gid: Long): LocalFavoriteInfo?
 
+    @Query("SELECT EXISTS(SELECT * FROM LOCAL_FAVORITES WHERE GID = :gid)")
+    fun contains(gid: Long): Boolean
+
     @Insert
     override fun insert(t: LocalFavoriteInfo): Long
 
