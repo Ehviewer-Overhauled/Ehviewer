@@ -20,7 +20,7 @@ import android.util.Log
 import androidx.annotation.IntDef
 import androidx.collection.LongSparseArray
 import androidx.collection.set
-import com.hippo.ehviewer.EhApplication.Companion.plainTextOkHttpClient
+import com.hippo.ehviewer.EhApplication.Companion.okHttpClient as plainTextOkHttpClient
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
