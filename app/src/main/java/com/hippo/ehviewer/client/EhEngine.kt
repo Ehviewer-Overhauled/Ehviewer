@@ -161,17 +161,7 @@ object EhEngine {
     ) {
         // Filter title and uploader
         if (filter) {
-            var i = 0
-            var n = list.size
-            while (i < n) {
-                val info = list[i]
-                if (!sEhFilter.filterTitle(info) || !sEhFilter.filterUploader(info)) {
-                    list.removeAt(i)
-                    i--
-                    n--
-                }
-                i++
-            }
+            list.removeAll { !sEhFilter.filterTitle(it) || !sEhFilter.filterUploader(it) }
         }
         var hasTags = false
         var hasPages = false
@@ -187,29 +177,18 @@ object EhEngine {
                 hasRated = true
             }
         }
-        val needApi =
-            filter && sEhFilter.needTags() && !hasTags || Settings.showGalleryPages && !hasPages ||
-                    hasRated
+        val needApi = filter && sEhFilter.needTags() && !hasTags
+                || Settings.showGalleryPages && !hasPages || hasRated
         if (needApi) {
             fillGalleryListByApi(list, url)
         }
 
         // Filter tag
         if (filter) {
-            var i = 0
-            var n = list.size
-            while (i < n) {
-                val info = list[i]
-                // Thumbnail mode need filter uploader again
-                if (!sEhFilter.filterUploader(info) || !sEhFilter.filterTag(info) || !sEhFilter.filterTagNamespace(
-                        info
-                    )
-                ) {
-                    list.removeAt(i)
-                    i--
-                    n--
-                }
-                i++
+            // Thumbnail mode need filter uploader again
+            list.removeAll {
+                !sEhFilter.filterUploader(it) || !sEhFilter.filterTag(it)
+                        || !sEhFilter.filterTagNamespace(it)
             }
         }
     }
@@ -556,7 +535,10 @@ object EhEngine {
     suspend fun getProfile(): ProfileParser.Result {
         val url = EhUrl.URL_FORUMS
         Log.d(TAG, url)
-        return getProfileInternal(EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse), url)
+        return getProfileInternal(
+            EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse),
+            url
+        )
     }
 
     private suspend fun getUConfigInternal(url: String) {
