@@ -156,6 +156,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mCurrentFunds: HomeParser.Funds? = null
     private var previewsAdapter: GalleryPreviewsAdapter? = null
     private var footerAdapter: FooterAdapter? = null
+    private var headerAdapter: FooterAdapter? = null
 
     @State
     private var mState = STATE_INIT
@@ -412,7 +413,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
             }
             footerAdapter = FooterAdapter { navigateToPreview(true) }
-            adapter = ConcatAdapter(previewsAdapter, footerAdapter)
+            headerAdapter = FooterAdapter { navigateToPreview() }
+            adapter = ConcatAdapter(headerAdapter, previewsAdapter, footerAdapter)
             val columnWidth = Settings.thumbSize
             layoutManager = AutoGridLayoutManager(context, columnWidth).apply {
                 setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
@@ -452,6 +454,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mViewTransition2 = null
         previewsAdapter = null
         footerAdapter = null
+        headerAdapter = null
         _binding = null
     }
 
@@ -728,6 +731,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private fun bindPreviews(gd: GalleryDetail) {
         _binding ?: return
         val previewList = gd.previewList
+        headerAdapter?.text = getString(R.string.more_previews)
         if (gd.previewPages <= 0 || previewList.isEmpty()) {
             footerAdapter?.text = getString(R.string.no_previews)
             return

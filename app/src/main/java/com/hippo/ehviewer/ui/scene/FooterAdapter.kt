@@ -1,29 +1,29 @@
 package com.hippo.ehviewer.ui.scene
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
-import com.hippo.ehviewer.databinding.ItemGalleryPreviewFooterBinding
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 class FooterAdapter(private val onClick: () -> Unit) :
     RecyclerView.Adapter<FooterAdapter.ViewHolder>() {
-    var text: String? = null
-        set(value) {
-            field = value
-            notifyItemChanged(0)
-        }
+    var text by mutableStateOf("")
 
-    inner class ViewHolder(val binding: ItemGalleryPreviewFooterBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        init {
-            itemView.setOnClickListener { onClick() }
-        }
-    }
+    inner class ViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemGalleryPreviewFooterBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(ComposeView(parent.context))
     }
 
     override fun getItemCount(): Int {
@@ -31,6 +31,23 @@ class FooterAdapter(private val onClick: () -> Unit) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.text.text = text
+        holder.composeView.setContent {
+            Mdc3Theme {
+                Column {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Card(
+                            onClick = onClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(0.6666667F)
+                        ) {}
+                        Text(text)
+                    }
+                    Text("")
+                }
+            }
+        }
     }
 }
