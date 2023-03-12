@@ -202,7 +202,7 @@ dependencies {
     implementation("com.google.android.material:material:1.8.0")
 
     // https://square.github.io/okhttp/changelogs/changelog/
-    implementation("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11")
+    implementation("com.squareup.okhttp3:okhttp-bom:5.0.0-SNAPSHOT")
     implementation("com.squareup.okhttp3:okhttp-coroutines")
 
     implementation("com.squareup.okio:okio-jvm:3.3.0")
