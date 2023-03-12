@@ -407,8 +407,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         } else {
             binding.content.comments.comments.visibility = View.GONE
         }
-        binding.content.previews.previews.setOnClickListener { navigateToPreview() }
-        binding.content.previews.recyclerView.run {
+        binding.content.recyclerView.run {
             previewsAdapter = GalleryPreviewsAdapter {
                 mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
             }
@@ -728,18 +727,16 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private fun bindPreviews(gd: GalleryDetail) {
         _binding ?: return
-        binding.content.previews.run {
-            val previewList = gd.previewList
-            if (gd.previewPages <= 0 || previewList.isEmpty()) {
-                footerAdapter?.text = getString(R.string.no_previews)
-                return
-            } else if (gd.previewPages == 1) {
-                footerAdapter?.text = getString(R.string.no_more_previews)
-            } else {
-                footerAdapter?.text = getString(R.string.more_previews)
-            }
-            previewsAdapter?.submitList(previewList)
+        val previewList = gd.previewList
+        if (gd.previewPages <= 0 || previewList.isEmpty()) {
+            footerAdapter?.text = getString(R.string.no_previews)
+            return
+        } else if (gd.previewPages == 1) {
+            footerAdapter?.text = getString(R.string.no_more_previews)
+        } else {
+            footerAdapter?.text = getString(R.string.more_previews)
         }
+        previewsAdapter?.submitList(previewList)
     }
 
     private fun getAllRatingText(rating: Float, ratingCount: Int): String {
