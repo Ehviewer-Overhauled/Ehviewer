@@ -14,6 +14,7 @@ dependencyResolutionManagement {
         maven("https://jcenter.bintray.com")
         maven("https://jitpack.io")
         maven("https://androidx.dev/storage/compose-compiler/repository/")
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
     }
 }
 

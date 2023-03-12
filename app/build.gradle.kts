@@ -213,6 +213,10 @@ dependencies {
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.3.0")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
     implementation("dev.rikka.rikkax.material:material-preference:2.0.0")
+
+    implementation(platform("io.arrow-kt:arrow-stack:2.0.0-SNAPSHOT"))
+    implementation("io.arrow-kt:arrow-fx-coroutines")
+
     // https://coil-kt.github.io/coil/changelog/
     implementation("io.coil-kt:coil-compose:2.2.2")
 
