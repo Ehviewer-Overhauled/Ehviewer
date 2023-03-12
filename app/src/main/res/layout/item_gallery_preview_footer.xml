@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text"
-    style="@style/Widget.Material3.Button.TextButton"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Material3.CardView.Outlined"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal" />
+    app:strokeColor="@android:color/transparent">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/text_little_small"
+        android:gravity="center" />
+
+</com.google.android.material.card.MaterialCardView>
