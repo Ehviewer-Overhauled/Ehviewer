@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
-class FooterAdapter(private val onClick: () -> Unit) :
-    RecyclerView.Adapter<FooterAdapter.ViewHolder>() {
+class HintAdapter(private val onClick: () -> Unit) :
+    RecyclerView.Adapter<HintAdapter.ViewHolder>() {
     var text by mutableStateOf("")
 
     inner class ViewHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)

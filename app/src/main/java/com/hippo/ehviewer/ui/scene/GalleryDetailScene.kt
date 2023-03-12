@@ -155,8 +155,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
     private var previewsAdapter: GalleryPreviewsAdapter? = null
-    private var footerAdapter: FooterAdapter? = null
-    private var headerAdapter: FooterAdapter? = null
+    private var footerAdapter: HintAdapter? = null
+    private var headerAdapter: HintAdapter? = null
 
     @State
     private var mState = STATE_INIT
@@ -412,8 +412,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             previewsAdapter = GalleryPreviewsAdapter {
                 mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
             }
-            footerAdapter = FooterAdapter { navigateToPreview(true) }
-            headerAdapter = FooterAdapter { navigateToPreview() }
+            footerAdapter = HintAdapter { navigateToPreview(true) }
+            headerAdapter = HintAdapter { navigateToPreview() }
             adapter = ConcatAdapter(headerAdapter, previewsAdapter, footerAdapter)
             val columnWidth = Settings.thumbSize
             layoutManager = AutoGridLayoutManager(context, columnWidth).apply {
