@@ -423,7 +423,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
             addItemDecoration(decoration)
             val lp = layoutParams
-            lp.height = resources.displayMetrics.heightPixels * 6 / 7
+            lp.height = resources.displayMetrics.heightPixels * 8 / 7
             layoutParams = lp
         }
         mViewTransition2 = ViewTransition(binding.content.belowHeader, binding.content.progress)
