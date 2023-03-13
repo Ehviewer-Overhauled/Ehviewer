@@ -60,10 +60,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -573,7 +576,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                             }
                             Spacer(modifier = Modifier.weight(1F))
                             Column(
-                                modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
+                                modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
+                                horizontalAlignment = Alignment.End
                             ) {
                                 Card(
                                     onClick = {
@@ -685,6 +689,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 binding.content.header.run {
                     thumbUrl = gi.thumb!!
                     setTitle(EhUtils.getSuitableTitle(gi))
+                    uploaderText = gi.uploader.orEmpty()
+                    categoryText = EhUtils.getCategory(gi.category).toUpperCase(Locale.current)
                     updateDownloadText()
                 }
             }
@@ -734,7 +740,20 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         _binding ?: return
         val resources = resources
+        thumbUrl = gd.thumb!!
+        setTitle(EhUtils.getSuitableTitle(gd))
+        uploaderText = gd.uploader.orEmpty()
+        categoryText = EhUtils.getCategory(gd.category).toUpperCase(Locale.current)
         updateDownloadText()
+        /*
+        binding.content.header.run {
+            language.text = gd.language
+            pages.text = resources.getQuantityString(R.plurals.page_count, gd.pages, gd.pages)
+            size.text = gd.size
+            posted.text = gd.posted
+            favoredTimes.text = resources.getString(R.string.favored_times, gd.favoriteCount)
+        }
+         */
         if (gd.newerVersions.size != 0) {
             binding.content.actions.newerVersion.visibility = View.VISIBLE
         }
