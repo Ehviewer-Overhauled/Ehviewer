@@ -376,6 +376,7 @@ object EhDB {
             copyDao(db.quickSearchDao(), newDb.quickSearchDao())
             copyDao(db.localFavoritesDao(), newDb.localFavoritesDao())
             copyDao(db.filterDao(), newDb.filterDao())
+            newDb.close()
             val dbFile = context.getDatabasePath(ehExportName)
             context.contentResolver.openFileDescriptor(uri, "rw")!!.use { toFd ->
                 ParcelFileDescriptor.open(dbFile, MODE_READ_ONLY).use { fromFd ->
