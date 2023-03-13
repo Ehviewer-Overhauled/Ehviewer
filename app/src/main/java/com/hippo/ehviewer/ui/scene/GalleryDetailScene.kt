@@ -71,6 +71,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
@@ -593,45 +594,77 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                             )
                                         },
                                         modifier = Modifier
-                                            .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
                                             .padding(
                                                 top = dimensionResource(id = R.dimen.keyline_margin),
                                                 end = dimensionResource(id = R.dimen.keyline_margin)
                                             )
                                     ) {
-                                        Row {
+                                        ConstraintLayout(
+                                            modifier = Modifier.padding(8.dp)
+                                        ) {
+                                            val (langRef, sizeRef, favRef, pagesRef, postRef) = createRefs()
+
                                             Text(
                                                 text = language.orEmpty(),
-                                                style = MaterialTheme.typography.labelMedium
+                                                style = MaterialTheme.typography.labelMedium,
+                                                modifier = Modifier.constrainAs(langRef) {
+                                                    top.linkTo(parent.top)
+                                                    start.linkTo(parent.start)
+                                                }
                                             )
-                                            Spacer(modifier = Modifier.weight(1F))
                                             Text(
                                                 text = size.orEmpty(),
-                                                style = MaterialTheme.typography.labelMedium
+                                                style = MaterialTheme.typography.labelMedium,
+                                                modifier = Modifier
+                                                    .constrainAs(sizeRef) {
+                                                        baseline.linkTo(langRef.baseline)
+                                                        end.linkTo(parent.end)
+                                                        horizontalBias = 1.0f
+                                                        start.linkTo(langRef.end)
+                                                    }
+                                                    .padding(start = 16.dp)
                                             )
-                                        }
-                                        Row {
                                             Text(
                                                 text = stringResource(
                                                     id = R.string.favored_times,
                                                     favoriteCount
                                                 ),
                                                 style = MaterialTheme.typography.labelMedium,
+                                                modifier = Modifier
+                                                    .constrainAs(favRef) {
+                                                        start.linkTo(parent.start)
+                                                        top.linkTo(langRef.bottom)
+                                                    }
+                                                    .padding(top = 8.dp)
                                             )
-                                            Spacer(modifier = Modifier.weight(1F))
                                             Text(
                                                 text = pluralStringResource(
                                                     id = R.plurals.page_count,
                                                     pages,
                                                     pages
                                                 ),
-                                                style = MaterialTheme.typography.labelMedium
+                                                style = MaterialTheme.typography.labelMedium,
+                                                modifier = Modifier
+                                                    .constrainAs(pagesRef) {
+                                                        baseline.linkTo(favRef.baseline)
+                                                        end.linkTo(parent.end)
+                                                        horizontalBias = 1.0f
+                                                        start.linkTo(favRef.end)
+                                                    }
+                                                    .padding(start = 16.dp)
+                                            )
+                                            Text(
+                                                text = posted.orEmpty(),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                modifier = Modifier
+                                                    .constrainAs(postRef) {
+                                                        end.linkTo(parent.end)
+                                                        start.linkTo(parent.start)
+                                                        top.linkTo(favRef.bottom)
+                                                    }
+                                                    .padding(top = 8.dp)
                                             )
                                         }
-                                        Text(
-                                            text = posted.orEmpty(),
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
                                     }
                                 }
                                 Spacer(modifier = Modifier.weight(1F))
