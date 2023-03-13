@@ -590,7 +590,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                             )
                                         },
                                         modifier = Modifier.padding(
-                                            top = dimensionResource(id = R.dimen.keyline_margin),
+                                            top = 8.dp,
                                             end = dimensionResource(id = R.dimen.keyline_margin)
                                         )
                                     )
