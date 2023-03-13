@@ -20,9 +20,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/header"
-        layout="@layout/gallery_detail_header" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <FrameLayout
         android:layout_width="match_parent"

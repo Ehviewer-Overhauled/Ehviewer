@@ -43,12 +43,33 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
@@ -94,6 +115,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
+import com.hippo.ehviewer.ui.widget.EhAsyncThumb
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -104,7 +126,6 @@ import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.view.ViewTransition
 import com.hippo.widget.AutoWrapLayout
-import com.hippo.widget.LoadImageView
 import com.hippo.widget.ObservedTextView
 import com.hippo.widget.SimpleGridAutoSpanLayout
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
@@ -273,12 +294,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     val queen = SpiderQueen.obtainSpiderQueen(it, MODE_READ)
                     val startPage = queen.awaitStartPage()
                     SpiderQueen.releaseSpiderQueen(queen, MODE_READ)
-                    withUIContext {
-                        binding.content.header.read.text = if (startPage == 0) {
-                            getString(R.string.read)
-                        } else {
-                            getString(R.string.read_from, startPage + 1)
-                        }
+                    readButtonText = if (startPage == 0) {
+                        getString(R.string.read)
+                    } else {
+                        getString(R.string.read_from, startPage + 1)
                     }
                 }.onFailure {
                     it.printStackTrace()
@@ -380,15 +399,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         binding.tip.setCompoundDrawables(null, drawable, null, null)
         binding.tip.setOnClickListener(this)
-        binding.content.header.let {
-            it.uploader.setOnClickListener(this)
-            it.category.setOnClickListener(this)
-            it.download.setOnClickListener(this)
-            it.download.setOnLongClickListener(this)
-            it.read.setOnClickListener(this)
-            it.uploader.setOnLongClickListener(this)
-        }
-        binding.content.header.info.setOnClickListener(this)
         binding.content.actions.let {
             it.newerVersion.setOnClickListener(this)
             it.heart.setOnClickListener(this)
@@ -530,21 +540,122 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
+    private var readButtonText by mutableStateOf("")
+    private var downloadButtonText by mutableStateOf("")
+    private var thumbUrl by mutableStateOf("")
+
     private fun bindViewFirst() {
         _binding ?: return
+        readButtonText = getString(R.string.read)
+        binding.content.header.setContent {
+            Mdc3Theme {
+                Column(
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                ) {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                    ) {
+                        Row {
+                            EhAsyncThumb(
+                                model = galleryInfo?.thumb,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
+                                    .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
+                            )
+                            Spacer(modifier = Modifier.weight(1F))
+                            Column {
+                                Card(
+                                    onClick = {
+                                        val galleryDetail = mGalleryDetail ?: return@Card
+                                        val galleryInfoBottomSheet =
+                                            GalleryInfoBottomSheet(galleryDetail)
+                                        galleryInfoBottomSheet.show(
+                                            requireActivity().supportFragmentManager,
+                                            GalleryInfoBottomSheet.TAG
+                                        )
+                                    }
+                                ) {
+
+                                }
+                                AssistChip(onClick = {
+                                    val category = category
+                                    if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
+                                        return@AssistChip
+                                    }
+                                    val lub = ListUrlBuilder()
+                                    lub.category = category
+                                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                                }, label = { /*TODO*/ })
+                                AssistChip(onClick = {
+                                    if (uploader.isNullOrEmpty() || disowned) {
+                                        return@AssistChip
+                                    }
+                                    val lub = ListUrlBuilder()
+                                    lub.mode = ListUrlBuilder.MODE_UPLOADER
+                                    lub.keyword = uploader
+                                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                                }, label = { /*TODO*/ })
+                            }
+                        }
+                    }
+                    Row {
+                        FilledTonalButton(
+                            onClick = {
+                                val galleryDetail = mGalleryDetail ?: return@FilledTonalButton
+                                if (downloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
+                                    CommonOperations.startDownload(
+                                        activity as MainActivity,
+                                        galleryDetail,
+                                        false
+                                    )
+                                } else {
+                                    val builder = CheckBoxDialogBuilder(
+                                        requireContext(),
+                                        getString(
+                                            R.string.download_remove_dialog_message,
+                                            galleryDetail.title
+                                        ),
+                                        getString(R.string.download_remove_dialog_check_text),
+                                        Settings.removeImageFiles
+                                    )
+                                    val helper = DeleteDialogHelper(
+                                        downloadManager, galleryDetail, builder
+                                    )
+                                    builder.setTitle(R.string.download_remove_dialog_title)
+                                        .setPositiveButton(android.R.string.ok, helper)
+                                        .show()
+                                }
+                            }, modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .weight(1F)
+                        ) {
+                            Text(text = downloadButtonText)
+                        }
+                        Button(
+                            onClick = {
+                                val galleryDetail = mGalleryDetail ?: return@Button
+                                val intent = Intent(activity, ReaderActivity::class.java)
+                                intent.action = ReaderActivity.ACTION_EH
+                                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
+                                startActivity(intent)
+                            }, modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .weight(1F)
+                        ) {
+                            Text(text = readButtonText)
+                        }
+                    }
+                }
+            }
+        }
         mGalleryInfo?.let { gi ->
             if (mAction == ACTION_GALLERY_INFO) {
                 binding.content.header.run {
-                    (thumb as LoadImageView).load(gi.thumb!!)
+                    thumbUrl = gi.thumb!!
                     setTitle(EhUtils.getSuitableTitle(gi))
-                    uploader.text = gi.uploader
-                    if (gi.disowned) {
-                        uploader.run {
-                            setTextColor(ColorUtils.setAlphaComponent(currentTextColor, 128))
-                        }
-                    }
-                    category.text = EhUtils.getCategory(gi.category)
-                    category.setTextColor(EhUtils.getCategoryColor(gi.category))
                     updateDownloadText()
                 }
             }
@@ -594,26 +705,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         _binding ?: return
         val resources = resources
-        binding.content.header.run {
-            (thumb as LoadImageView).load(gd.thumb!!, false)
-            setTitle(EhUtils.getSuitableTitle(gd))
-            uploader.text = gd.uploader
-            if (gd.disowned) {
-                uploader.run {
-                    setTextColor(ColorUtils.setAlphaComponent(currentTextColor, 128))
-                }
-            }
-            category.text = EhUtils.getCategory(gd.category)
-            category.setTextColor(EhUtils.getCategoryColor(gd.category))
-        }
         updateDownloadText()
-        binding.content.header.run {
-            language.text = gd.language
-            pages.text = resources.getQuantityString(R.plurals.page_count, gd.pages, gd.pages)
-            size.text = gd.size
-            posted.text = gd.posted
-            favoredTimes.text = resources.getString(R.string.favored_times, gd.favoriteCount)
-        }
         if (gd.newerVersions.size != 0) {
             binding.content.actions.newerVersion.visibility = View.VISIBLE
         }
@@ -822,52 +914,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
         val galleryDetail = mGalleryDetail ?: return
         when (v) {
-            binding.content.header.uploader -> {
-                if (uploader.isNullOrEmpty() || disowned) {
-                    return
-                }
-                val lub = ListUrlBuilder()
-                lub.mode = ListUrlBuilder.MODE_UPLOADER
-                lub.keyword = uploader
-                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-            }
-
-            binding.content.header.category -> {
-                val category = category
-                if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
-                    return
-                }
-                val lub = ListUrlBuilder()
-                lub.category = category
-                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-            }
-
-            binding.content.header.download -> {
-                if (downloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
-                    CommonOperations.startDownload(activity, galleryDetail, false)
-                } else {
-                    val builder = CheckBoxDialogBuilder(
-                        context,
-                        getString(R.string.download_remove_dialog_message, galleryDetail.title),
-                        getString(R.string.download_remove_dialog_check_text),
-                        Settings.removeImageFiles
-                    )
-                    val helper = DeleteDialogHelper(
-                        downloadManager, galleryDetail, builder
-                    )
-                    builder.setTitle(R.string.download_remove_dialog_title)
-                        .setPositiveButton(android.R.string.ok, helper)
-                        .show()
-                }
-            }
-
-            binding.content.header.read -> {
-                val intent = Intent(activity, ReaderActivity::class.java)
-                intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
-                startActivity(intent)
-            }
-
             binding.content.actions.newerVersion -> {
                 val titles = ArrayList<CharSequence>()
                 for (newerVersion in galleryDetail.newerVersions) {
@@ -889,14 +935,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         navigate(R.id.galleryDetailScene, args)
                     }
                     .show()
-            }
-
-            binding.content.header.info -> {
-                val galleryInfoBottomSheet = GalleryInfoBottomSheet(galleryDetail)
-                galleryInfoBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    GalleryInfoBottomSheet.TAG
-                )
             }
 
             binding.content.actions.heart,
@@ -1013,25 +1051,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
-    private fun showFilterUploaderDialog() {
-        val context = context
-        val uploader = uploader
-        if (context == null || uploader == null) {
-            return
-        }
-        BaseDialogBuilder(context)
-            .setMessage(getString(R.string.filter_the_uploader, uploader))
-            .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                val filter = Filter()
-                filter.mode = EhFilter.MODE_UPLOADER
-                filter.text = uploader
-                EhFilter.addFilter(filter)
-                showTip(R.string.filter_added, LENGTH_SHORT)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
     private fun showFilterTagDialog(tag: String) {
         val context = context ?: return
         BaseDialogBuilder(context)
@@ -1131,18 +1150,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     override fun onLongClick(v: View): Boolean {
         val activity = mainActivity ?: return false
-        if (binding.content.header.uploader === v) {
-            if (uploader.isNullOrEmpty() || disowned) {
-                return false
-            }
-            showFilterUploaderDialog()
-        } else if (binding.content.header.download === v) {
-            val galleryInfo = galleryInfo
-            if (galleryInfo != null) {
-                CommonOperations.startDownload(activity, galleryInfo, true)
-            }
-            return true
-        } else if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
+        if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
             lifecycleScope.launchIO {
                 if (mGalleryDetail != null && !mModifyingFavorites) {
                     var remove = false
@@ -1179,15 +1187,14 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private fun updateDownloadText() {
         _binding ?: return
-        binding.content.header.download.run {
-            when (mDownloadState) {
-                DownloadInfo.STATE_INVALID -> setText(R.string.download)
-                DownloadInfo.STATE_NONE -> setText(R.string.download_state_none)
-                DownloadInfo.STATE_WAIT -> setText(R.string.download_state_wait)
-                DownloadInfo.STATE_DOWNLOAD -> setText(R.string.download_state_downloading)
-                DownloadInfo.STATE_FINISH -> setText(R.string.download_state_downloaded)
-                DownloadInfo.STATE_FAILED -> setText(R.string.download_state_failed)
-            }
+        downloadButtonText = when (mDownloadState) {
+            DownloadInfo.STATE_INVALID -> getString(R.string.download)
+            DownloadInfo.STATE_NONE -> getString(R.string.download_state_none)
+            DownloadInfo.STATE_WAIT -> getString(R.string.download_state_wait)
+            DownloadInfo.STATE_DOWNLOAD -> getString(R.string.download_state_downloading)
+            DownloadInfo.STATE_FINISH -> getString(R.string.download_state_downloaded)
+            DownloadInfo.STATE_FAILED -> getString(R.string.download_state_failed)
+            else -> throw IllegalArgumentException()
         }
     }
 
