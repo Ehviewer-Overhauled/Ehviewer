@@ -56,6 +56,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
@@ -161,7 +164,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var mGid: Long = 0
     private var mToken: String? = null
     private var mPage = 0
-    private var mGalleryDetail: GalleryDetail? = null
+    private var mGalleryDetail by mutableStateOf<GalleryDetail?>(null)
     private var mRequestId = IntIdGenerator.INVALID_ID
     private var mTorrentList: List<TorrentParser.Result>? = null
     private var requestStoragePermissionLauncher = registerForActivityResult(
@@ -579,18 +582,57 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
                                 horizontalAlignment = Alignment.End
                             ) {
-                                Card(
-                                    onClick = {
-                                        val galleryDetail = mGalleryDetail ?: return@Card
-                                        val galleryInfoBottomSheet =
-                                            GalleryInfoBottomSheet(galleryDetail)
-                                        galleryInfoBottomSheet.show(
-                                            requireActivity().supportFragmentManager,
-                                            GalleryInfoBottomSheet.TAG
+                                mGalleryDetail?.run {
+                                    Card(
+                                        onClick = {
+                                            val galleryInfoBottomSheet =
+                                                GalleryInfoBottomSheet(this)
+                                            galleryInfoBottomSheet.show(
+                                                requireActivity().supportFragmentManager,
+                                                GalleryInfoBottomSheet.TAG
+                                            )
+                                        },
+                                        modifier = Modifier
+                                            .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
+                                            .padding(
+                                                top = dimensionResource(id = R.dimen.keyline_margin),
+                                                end = dimensionResource(id = R.dimen.keyline_margin)
+                                            )
+                                    ) {
+                                        Row {
+                                            Text(
+                                                text = language.orEmpty(),
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                            Spacer(modifier = Modifier.weight(1F))
+                                            Text(
+                                                text = size.orEmpty(),
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                        }
+                                        Row {
+                                            Text(
+                                                text = stringResource(
+                                                    id = R.string.favored_times,
+                                                    favoriteCount
+                                                ),
+                                                style = MaterialTheme.typography.labelMedium,
+                                            )
+                                            Spacer(modifier = Modifier.weight(1F))
+                                            Text(
+                                                text = pluralStringResource(
+                                                    id = R.plurals.page_count,
+                                                    pages,
+                                                    pages
+                                                ),
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                        }
+                                        Text(
+                                            text = posted.orEmpty(),
+                                            style = MaterialTheme.typography.labelMedium
                                         )
                                     }
-                                ) {
-
                                 }
                                 Spacer(modifier = Modifier.weight(1F))
                                 AssistChip(onClick = {
