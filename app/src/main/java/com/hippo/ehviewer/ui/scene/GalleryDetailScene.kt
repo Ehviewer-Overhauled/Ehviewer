@@ -56,7 +56,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,12 +65,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
@@ -125,6 +121,7 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderInfoCard
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -583,89 +580,20 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
                                 horizontalAlignment = Alignment.End
                             ) {
-                                mGalleryDetail?.run {
-                                    Card(
-                                        onClick = {
-                                            val galleryInfoBottomSheet =
-                                                GalleryInfoBottomSheet(this)
+                                mGalleryDetail?.let {
+                                    GalleryDetailHeaderInfoCard(
+                                        it, onClick = {
+                                            val galleryInfoBottomSheet = GalleryInfoBottomSheet(it)
                                             galleryInfoBottomSheet.show(
                                                 requireActivity().supportFragmentManager,
                                                 GalleryInfoBottomSheet.TAG
                                             )
                                         },
-                                        modifier = Modifier
-                                            .padding(
-                                                top = dimensionResource(id = R.dimen.keyline_margin),
-                                                end = dimensionResource(id = R.dimen.keyline_margin)
-                                            )
-                                    ) {
-                                        ConstraintLayout(
-                                            modifier = Modifier.padding(8.dp)
-                                        ) {
-                                            val (langRef, sizeRef, favRef, pagesRef, postRef) = createRefs()
-
-                                            Text(
-                                                text = language.orEmpty(),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier.constrainAs(langRef) {
-                                                    top.linkTo(parent.top)
-                                                    start.linkTo(parent.start)
-                                                }
-                                            )
-                                            Text(
-                                                text = size.orEmpty(),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier
-                                                    .constrainAs(sizeRef) {
-                                                        baseline.linkTo(langRef.baseline)
-                                                        end.linkTo(parent.end)
-                                                        horizontalBias = 1.0f
-                                                        start.linkTo(langRef.end)
-                                                    }
-                                                    .padding(start = 16.dp)
-                                            )
-                                            Text(
-                                                text = stringResource(
-                                                    id = R.string.favored_times,
-                                                    favoriteCount
-                                                ),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier
-                                                    .constrainAs(favRef) {
-                                                        start.linkTo(parent.start)
-                                                        top.linkTo(langRef.bottom)
-                                                    }
-                                                    .padding(top = 8.dp)
-                                            )
-                                            Text(
-                                                text = pluralStringResource(
-                                                    id = R.plurals.page_count,
-                                                    pages,
-                                                    pages
-                                                ),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier
-                                                    .constrainAs(pagesRef) {
-                                                        baseline.linkTo(favRef.baseline)
-                                                        end.linkTo(parent.end)
-                                                        horizontalBias = 1.0f
-                                                        start.linkTo(favRef.end)
-                                                    }
-                                                    .padding(start = 16.dp)
-                                            )
-                                            Text(
-                                                text = posted.orEmpty(),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier
-                                                    .constrainAs(postRef) {
-                                                        end.linkTo(parent.end)
-                                                        start.linkTo(parent.start)
-                                                        top.linkTo(favRef.bottom)
-                                                    }
-                                                    .padding(top = 8.dp)
-                                            )
-                                        }
-                                    }
+                                        modifier = Modifier.padding(
+                                            top = dimensionResource(id = R.dimen.keyline_margin),
+                                            end = dimensionResource(id = R.dimen.keyline_margin)
+                                        )
+                                    )
                                 }
                                 Spacer(modifier = Modifier.weight(1F))
                                 AssistChip(onClick = {
