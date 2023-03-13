@@ -45,28 +45,16 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -120,8 +108,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
-import com.hippo.ehviewer.ui.widget.EhAsyncThumb
-import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderInfoCard
+import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -272,14 +259,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             mGalleryInfo!!.category
         } else {
             -1
-        }
-    private val galleryInfo: GalleryInfo?
-        get() = if (null != mGalleryDetail) {
-            mGalleryDetail
-        } else if (null != mGalleryInfo) {
-            mGalleryInfo
-        } else {
-            null
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -548,9 +527,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
     private var readButtonText by mutableStateOf("")
     private var downloadButtonText by mutableStateOf("")
-    private var thumbUrl by mutableStateOf("")
-    private var uploaderText by mutableStateOf("")
-    private var categoryText by mutableStateOf("")
+    private var composeBindingGI by mutableStateOf<GalleryInfo?>(null)
+    private var composeBindingGD by mutableStateOf<GalleryDetail?>(null)
 
     private fun bindComposeView() {
         _binding ?: return
@@ -560,82 +538,40 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 Column(
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
                 ) {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
-                    ) {
-                        Row {
-                            Card {
-                                EhAsyncThumb(
-                                    model = galleryInfo?.thumb,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
-                                        .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
+                    composeBindingGI?.let {
+                        GalleryDetailHeaderCard(
+                            galleryInfo = it,
+                            galleryDetail = composeBindingGD,
+                            onInfoCardClick = {
+                                val gd = composeBindingGD ?: return@GalleryDetailHeaderCard
+                                val galleryInfoBottomSheet = GalleryInfoBottomSheet(gd)
+                                galleryInfoBottomSheet.show(
+                                    requireActivity().supportFragmentManager,
+                                    GalleryInfoBottomSheet.TAG
                                 )
-                            }
-                            Spacer(modifier = Modifier.weight(1F))
-                            Column(
-                                modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                mGalleryDetail?.let {
-                                    GalleryDetailHeaderInfoCard(
-                                        it, onClick = {
-                                            val galleryInfoBottomSheet = GalleryInfoBottomSheet(it)
-                                            galleryInfoBottomSheet.show(
-                                                requireActivity().supportFragmentManager,
-                                                GalleryInfoBottomSheet.TAG
-                                            )
-                                        },
-                                        modifier = Modifier.padding(
-                                            top = 8.dp,
-                                            end = dimensionResource(id = R.dimen.keyline_margin)
-                                        )
-                                    )
+                            },
+                            onUploaderChipClick = {
+                                val category = category
+                                if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
+                                    return@GalleryDetailHeaderCard
                                 }
-                                Spacer(modifier = Modifier.weight(1F))
-                                AssistChip(onClick = {
-                                    val category = category
-                                    if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
-                                        return@AssistChip
-                                    }
-                                    val lub = ListUrlBuilder()
-                                    lub.category = category
-                                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                                }, label = {
-                                    Text(text = categoryText, maxLines = 1)
-                                }, modifier = Modifier.padding(
-                                    horizontal = dimensionResource(id = R.dimen.keyline_margin)
-                                ),
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_baseline_label_24),
-                                            contentDescription = null
-                                        )
-                                    })
-                                AssistChip(onClick = {
-                                    if (uploader.isNullOrEmpty() || disowned) {
-                                        return@AssistChip
-                                    }
-                                    val lub = ListUrlBuilder()
-                                    lub.mode = ListUrlBuilder.MODE_UPLOADER
-                                    lub.keyword = uploader
-                                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                                },
-                                    label = { Text(text = uploaderText, maxLines = 1) },
-                                    modifier = Modifier.padding(
-                                        horizontal = dimensionResource(id = R.dimen.keyline_margin)
-                                    ),
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.file_upload_black_24dp),
-                                            contentDescription = null
-                                        )
-                                    })
-                            }
-                        }
+                                val lub = ListUrlBuilder()
+                                lub.category = category
+                                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                            },
+                            onCategoryChipClick = {
+                                if (uploader.isNullOrEmpty() || disowned) {
+                                    return@GalleryDetailHeaderCard
+                                }
+                                val lub = ListUrlBuilder()
+                                lub.mode = ListUrlBuilder.MODE_UPLOADER
+                                lub.keyword = uploader
+                                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                        )
                     }
                     Row {
                         FilledTonalButton(
@@ -690,10 +626,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         mGalleryInfo?.let { gi ->
             if (mAction == ACTION_GALLERY_INFO) {
                 binding.content.header.run {
-                    thumbUrl = gi.thumb!!
+                    composeBindingGI = gi
                     setTitle(EhUtils.getSuitableTitle(gi))
-                    uploaderText = gi.uploader.orEmpty().toUpperCase(Locale.current)
-                    categoryText = EhUtils.getCategory(gi.category).toUpperCase(Locale.current)
                     updateDownloadText()
                 }
             }
@@ -743,10 +677,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
         _binding ?: return
         val resources = resources
-        thumbUrl = gd.thumb!!
+        composeBindingGI = gd
+        composeBindingGD = gd
         setTitle(EhUtils.getSuitableTitle(gd))
-        uploaderText = gd.uploader.orEmpty().toUpperCase(Locale.current)
-        categoryText = EhUtils.getCategory(gd.category).toUpperCase(Locale.current)
         updateDownloadText()
         /*
         binding.content.header.run {
