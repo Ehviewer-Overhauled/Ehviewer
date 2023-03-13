@@ -550,7 +550,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                     GalleryInfoBottomSheet.TAG
                                 )
                             },
-                            onUploaderChipClick = {
+                            onCategoryChipClick = {
                                 val category = category
                                 if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
                                     return@GalleryDetailHeaderCard
@@ -559,7 +559,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                 lub.category = category
                                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                             },
-                            onCategoryChipClick = {
+                            onUploaderChipClick = {
                                 if (uploader.isNullOrEmpty() || disowned) {
                                     return@GalleryDetailHeaderCard
                                 }
