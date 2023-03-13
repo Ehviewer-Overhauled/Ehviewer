@@ -55,6 +55,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -436,13 +438,13 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             lp.height = resources.displayMetrics.heightPixels * 8 / 7
             layoutParams = lp
         }
+        bindComposeView()
         mViewTransition2 = ViewTransition(binding.content.belowHeader, binding.content.progress)
         if (prepareData()) {
             if (mGalleryDetail != null) {
                 bindViewSecond()
                 adjustViewVisibility(STATE_NORMAL)
             } else if (mGalleryInfo != null) {
-                bindViewFirst()
                 adjustViewVisibility(STATE_REFRESH_HEADER)
             } else {
                 adjustViewVisibility(STATE_REFRESH)
@@ -543,8 +545,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
     private var readButtonText by mutableStateOf("")
     private var downloadButtonText by mutableStateOf("")
     private var thumbUrl by mutableStateOf("")
+    private var uploaderText by mutableStateOf("")
+    private var categoryText by mutableStateOf("")
 
-    private fun bindViewFirst() {
+    private fun bindComposeView() {
         _binding ?: return
         readButtonText = getString(R.string.read)
         binding.content.header.setContent {
@@ -558,15 +562,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                             .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
                     ) {
                         Row {
-                            EhAsyncThumb(
-                                model = galleryInfo?.thumb,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
-                                    .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
-                            )
+                            Card {
+                                EhAsyncThumb(
+                                    model = galleryInfo?.thumb,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
+                                        .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
+                                )
+                            }
                             Spacer(modifier = Modifier.weight(1F))
-                            Column {
+                            Column(
+                                modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
+                            ) {
                                 Card(
                                     onClick = {
                                         val galleryDetail = mGalleryDetail ?: return@Card
@@ -580,6 +588,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                 ) {
 
                                 }
+                                Spacer(modifier = Modifier.weight(1F))
                                 AssistChip(onClick = {
                                     val category = category
                                     if (category == EhUtils.NONE || category == EhUtils.PRIVATE || category == EhUtils.UNKNOWN) {
@@ -588,7 +597,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                     val lub = ListUrlBuilder()
                                     lub.category = category
                                     navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                                }, label = { /*TODO*/ })
+                                }, label = {
+                                    Text(text = categoryText)
+                                }, modifier = Modifier.padding(
+                                    horizontal = dimensionResource(id = R.dimen.keyline_margin)
+                                ),
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_baseline_label_24),
+                                            contentDescription = null
+                                        )
+                                    })
                                 AssistChip(onClick = {
                                     if (uploader.isNullOrEmpty() || disowned) {
                                         return@AssistChip
@@ -597,7 +616,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                     lub.mode = ListUrlBuilder.MODE_UPLOADER
                                     lub.keyword = uploader
                                     navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                                }, label = { /*TODO*/ })
+                                },
+                                    label = { Text(text = uploaderText) },
+                                    modifier = Modifier.padding(
+                                        horizontal = dimensionResource(id = R.dimen.keyline_margin)
+                                    ),
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.file_upload_black_24dp),
+                                            contentDescription = null
+                                        )
+                                    })
                             }
                         }
                     }
