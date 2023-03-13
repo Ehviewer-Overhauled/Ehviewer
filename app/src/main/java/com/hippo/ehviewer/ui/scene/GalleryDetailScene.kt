@@ -644,7 +644,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                     lub.category = category
                                     navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                                 }, label = {
-                                    Text(text = categoryText)
+                                    Text(text = categoryText, maxLines = 1)
                                 }, modifier = Modifier.padding(
                                     horizontal = dimensionResource(id = R.dimen.keyline_margin)
                                 ),
@@ -663,7 +663,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                                     lub.keyword = uploader
                                     navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                                 },
-                                    label = { Text(text = uploaderText) },
+                                    label = { Text(text = uploaderText, maxLines = 1) },
                                     modifier = Modifier.padding(
                                         horizontal = dimensionResource(id = R.dimen.keyline_margin)
                                     ),
@@ -731,7 +731,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 binding.content.header.run {
                     thumbUrl = gi.thumb!!
                     setTitle(EhUtils.getSuitableTitle(gi))
-                    uploaderText = gi.uploader.orEmpty()
+                    uploaderText = gi.uploader.orEmpty().toUpperCase(Locale.current)
                     categoryText = EhUtils.getCategory(gi.category).toUpperCase(Locale.current)
                     updateDownloadText()
                 }
@@ -784,7 +784,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         val resources = resources
         thumbUrl = gd.thumb!!
         setTitle(EhUtils.getSuitableTitle(gd))
-        uploaderText = gd.uploader.orEmpty()
+        uploaderText = gd.uploader.orEmpty().toUpperCase(Locale.current)
         categoryText = EhUtils.getCategory(gd.category).toUpperCase(Locale.current)
         updateDownloadText()
         /*
