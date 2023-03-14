@@ -13,31 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.os.Bundle
+import android.text.Html
+import androidx.preference.Preference
+import com.hippo.ehviewer.R
 
-import android.os.Bundle;
-import android.text.Html;
-
-import androidx.annotation.Nullable;
-import androidx.preference.Preference;
-
-import com.hippo.ehviewer.R;
-
-public class AboutFragment extends BasePreferenceFragment {
-
-    private static final String KEY_AUTHOR = "author";
-    private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
-
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.about_settings);
-        Preference author = findPreference(KEY_AUTHOR);
-        author.setSummary(Html.fromHtml(getString(R.string.settings_about_author_summary).replace('$', '@'), Html.FROM_HTML_MODE_LEGACY));
+class AboutFragment : BasePreferenceFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.about_settings)
+        val author = findPreference<Preference>(KEY_AUTHOR)
+        author!!.summary = Html.fromHtml(
+            getString(R.string.settings_about_author_summary).replace('$', '@'),
+            Html.FROM_HTML_MODE_LEGACY,
+        )
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings_about;
+    override val fragmentTitle: Int
+        get() = R.string.settings_about
+
+    companion object {
+        private const val KEY_AUTHOR = "author"
+        private const val KEY_CHECK_FOR_UPDATES = "check_for_updates"
     }
 }
