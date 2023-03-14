@@ -15,23 +15,16 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.ui.fragment
 
-package com.hippo.ehviewer.ui.fragment;
+import android.os.Bundle
+import com.hippo.ehviewer.R
 
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-
-import com.hippo.ehviewer.R;
-
-public class SettingsFragment extends BasePreferenceFragment {
-    @Override
-    public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.settings_headers);
+class SettingsFragment : BasePreferenceFragment() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.settings_headers)
     }
 
-    @Override
-    public int getFragmentTitle() {
-        return R.string.settings;
-    }
+    override val fragmentTitle: Int
+        get() = R.string.settings
 }
