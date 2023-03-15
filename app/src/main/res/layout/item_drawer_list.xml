@@ -30,6 +30,7 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:paddingStart="?attr/listPreferredItemPaddingLeft"
+        android:paddingVertical="@dimen/strip_item_padding_v"
         android:textAppearance="?attr/textAppearanceListItemSmall"
         android:textColor="?android:attr/textColorPrimary" />
 

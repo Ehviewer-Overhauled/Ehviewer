@@ -20,6 +20,8 @@
     <dimen name="single_max_width">260dp</dimen>
     <dimen name="drawer_max_width">280dp</dimen>
 
+    <dimen name="strip_item_padding">8dp</dimen>
+
     <!-- Text size -->
     <dimen name="text_super_large">24sp</dimen>
     <dimen name="text_little_small">16sp</dimen>
@@ -79,6 +81,8 @@
     <dimen name="search_category_title_height">48dp</dimen>
 
     <dimen name="image_search_max_size">240dp</dimen>
+
+    <dimen name="strip_item_padding_v">@dimen/strip_item_padding</dimen>
 
     <!-- Switch padding -->
 
