@@ -51,7 +51,6 @@
     <string name="error_decoding_failed">デコードに失敗しました。</string>
     <string name="error_reading_failed">読み込めませんでした。</string>
     <string name="error_out_of_range">範囲外です。</string>
-    <string name="error_write_failed">書き込めませんでした</string>
     <string name="error_parse_error">ファイル解析に失敗しました。</string>
     <string name="error_509">509エラー</string>
     <string name="error_invalid_url">無効なリンクです。</string>
@@ -59,7 +58,6 @@
     <string name="error_cant_create_temp_file">一時ファイルを作成できませんでした</string>
     <string name="error_cant_save_image">画像を保存できませんでした</string>
     <string name="error_invalid_number">無効な数字です</string>
-    <string name="error_please_login_first">ログインしてください</string>
 
     <string name="app_waring">このアプリの内容はインターネットから取得したものです。その内容の一部は使用者のお体や心理に傷つける恐れがあります。それでも続行しますか？</string>
     <string name="error_username_cannot_empty">ユーザー名を入力してください。</string>
@@ -163,7 +161,6 @@
     <string name="rate_failed">評価できませんでした</string>
     <string name="no_torrents">トレントなし</string>
     <string name="torrents">トレント</string>
-    <string name="favorited">追加済み</string>
     <string name="not_favorited">未追加</string>
     <string name="add_favorites_dialog_title">お気に入りに追加</string>
     <string name="remember_favorite_collection">お気に入りを記憶</string>
@@ -347,9 +344,6 @@
     <string name="settings_download_concurrency_summary">同時に最大%s枚の画像をダウンロードできる</string>
     <string name="settings_download_preload_image">画像をプリロード</string>
     <string name="settings_download_preload_image_summary">%s枚の画像をプリロードします</string>
-    <string name="settings_download_image_resolution">画像解像度</string>
-    <string name="settings_download_image_resolution_summary">現在は%sです。1280xを超える解像度は不安定です</string>
-    <string name="settings_download_image_resolution_auto">自動</string>
     <string name="settings_download_download_origin_image">オリジナル画像をダウンロード</string>
     <string name="settings_download_media_scan">メディアスキャンを許可</string>
     <string name="settings_download_media_scan_summary_on">ギャラリーアプリを他人に見せないでください</string>

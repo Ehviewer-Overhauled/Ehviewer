@@ -56,7 +56,6 @@
     <string name="error_decoding_failed">解碼失敗</string>
     <string name="error_reading_failed">讀取失敗</string>
     <string name="error_out_of_range">越界</string>
-    <string name="error_write_failed">寫入失敗</string>
     <string name="error_parse_error">解析失敗</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">無效鏈接</string>
@@ -64,7 +63,6 @@
     <string name="error_cant_create_temp_file">無法創建臨時文件</string>
     <string name="error_cant_save_image">無法保存圖片</string>
     <string name="error_invalid_number">非法數字</string>
-    <string name="error_please_login_first">請先登陸</string>
     <string name="error_empty_html">頁面內容為空</string>
 
     <string name="kokomade_tip">設置->Eh->畫廊站點->e-hentai</string>
@@ -172,7 +170,6 @@
     <string name="rate_failed">評分失敗</string>
     <string name="no_torrents">沒有種子</string>
     <string name="torrents">種子</string>
-    <string name="favorited">已收藏</string>
     <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">添加收藏</string>
     <string name="remember_favorite_collection">記住收藏夾</string>
@@ -382,9 +379,6 @@
     <string name="settings_download_concurrency_summary">最多同時下載 %s 張圖片</string>
     <string name="settings_download_preload_image">預載圖片</string>
     <string name="settings_download_preload_image_summary">向後預載 %s 張圖片</string>
-    <string name="settings_download_image_resolution">圖片分辨率</string>
-    <string name="settings_download_image_resolution_summary">%s，大於 1280x 的分辨率可能不好使</string>
-    <string name="settings_download_image_resolution_auto">自動</string>
     <string name="settings_download_download_origin_image">下載原圖</string>
     <string name="settings_download_download_origin_image_summary">這很危險！勾選此項會導致下載配額迅速流失</string>
     <string name="settings_download_media_scan">允許媒體掃描</string>
@@ -529,7 +523,6 @@
     <string name="color_filter_b_value">B</string>
     <string name="color_filter_a_value">A</string>
     <string name="pref_page_transitions">翻頁轉場動畫</string>
-    <string name="pref_crop_borders">邊緣裁剪</string>
     <string name="pref_color_filter_mode">濾鏡融合機制</string>
     <string name="filter_mode_multiply">色彩增值</string>
     <string name="filter_mode_screen">濾色</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2016 Hippo Sevenerror_please_login_first
+  ~ Copyright 2016 Hippo Seven
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@
     <string name="error_decoding_failed">解码失败</string>
     <string name="error_reading_failed">读取失败</string>
     <string name="error_out_of_range">越界</string>
-    <string name="error_write_failed">写入失败</string>
     <string name="error_parse_error">解析失败</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">无效链接</string>
@@ -55,7 +54,6 @@
     <string name="error_cant_create_temp_file">无法创建临时文件</string>
     <string name="error_cant_save_image">无法保存图片</string>
     <string name="error_invalid_number">非法数字</string>
-    <string name="error_please_login_first">请先登陆</string>
     <string name="error_empty_html">页面内容为空</string>
     <string name="kokomade_tip">设置-&gt;Eh-&gt;画廊站点-&gt;e-hentai</string>
     <string name="app_waring">本应用中内容来自互联网，部分内容可能对您的生理及心理造成难以恢复的伤害。本应用作者不会对由本应用造成的任何后果负责。未成年人应在监护人指导下使用本应用。继续使用即代表您同意上述条款。</string>
@@ -153,7 +151,6 @@
     <string name="download_torrent_started">开始下载种子</string>
     <string name="download_torrent_failure">无法下载种子</string>
     <string name="torrents">种子</string>
-    <string name="favorited">已收藏</string>
     <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">添加收藏</string>
     <string name="remember_favorite_collection">记住收藏夹</string>
@@ -365,9 +362,6 @@
     <string name="settings_download_concurrency_summary">最多同时下载 %s 张图片</string>
     <string name="settings_download_preload_image">预载图片</string>
     <string name="settings_download_preload_image_summary">向后预载 %s 张图片</string>
-    <string name="settings_download_image_resolution">图片分辨率</string>
-    <string name="settings_download_image_resolution_summary">%s，大于 1280x 的分辨率可能不好使</string>
-    <string name="settings_download_image_resolution_auto">自动</string>
     <string name="settings_download_download_origin_image">下载原图</string>
     <string name="settings_download_download_origin_image_summary">这很危险！勾选此项会导致下载配额迅速流失</string>
     <string name="settings_download_media_scan">允许媒体扫描</string>
@@ -433,8 +427,6 @@
     <string name="proxy_port">端口</string>
     <string name="proxy_invalid_port">无效的端口</string>
     <string name="cant_read_the_file">无法读取文件</string>
-    <string name="db_version_too_low">数据库版本过低</string>
-    <string name="db_version_too_high">数据库版本过高</string>
     <string name="app_language_system">系统语言（默认）</string>
     <!-- License -->
     <!-- Dir Picker-->
@@ -558,7 +550,6 @@
     <string name="pref_page_transitions">页面过渡动画</string>
     <string name="pref_show_page_number">显示页码</string>
     <string name="pref_show_reader_seekbar">显示跳页拖动条</string>
-    <string name="pref_crop_borders">裁剪边缘</string>
     <string name="pref_custom_brightness">自定义亮度</string>
     <string name="pref_custom_color_filter">自定义滤镜</string>
     <string name="pref_keep_screen_on">保持屏幕常亮</string>

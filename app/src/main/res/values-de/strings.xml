@@ -46,7 +46,6 @@
     <string name="error_decoding_failed">Dekodierung fehlgeschlagen</string>
     <string name="error_reading_failed">Lesefehler</string>
     <string name="error_out_of_range">Außer Reichweite</string>
-    <string name="error_write_failed">Schreibfehler</string>
     <string name="error_parse_error">Analyzierungfehler</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">URL ungültig</string>
@@ -54,7 +53,6 @@
     <string name="error_cant_create_temp_file">Die Temporäre Datei konnte erstellt nicht werden</string>
     <string name="error_cant_save_image">Das Bild konnte nicht gespeichert werden</string>
     <string name="error_invalid_number">Nummer ungültig</string>
-    <string name="error_please_login_first">Melde dich zuerst an.</string>
     <string name="get_it">Verstanden</string>
     <string name="select_scene">Wähle eine Galerie-Webseite aus.</string>
     <string name="select_scene_explain">e-hentai: für jeden verfügbar\nexhentai: nur für diejenigen verfügbar, die sich angemeldet haben</string>
@@ -122,7 +120,6 @@
     <string name="rate_failed">Bewertung fehlgeschlagen</string>
     <string name="no_torrents">Keine Torrentdatei</string>
     <string name="torrents">Torrentdateien</string>
-    <string name="favorited">Zu Favoriten hinzugefügt</string>
     <string name="not_favorited">Nicht zu Favoriten hinzugefügt</string>
     <string name="add_favorites_dialog_title">Zu Favoriten hinzufügen</string>
     <string name="remember_favorite_collection">Favoritenansammlung merken</string>
@@ -292,9 +289,6 @@
     <string name="settings_download_concurrency_summary">Bis zu %s Bild(er)</string>
     <string name="settings_download_preload_image">Bilder vorabladen</string>
     <string name="settings_download_preload_image_summary">Die nächste %s Bilder vorabladen</string>
-    <string name="settings_download_image_resolution">Auflösung der Bilder</string>
-    <string name="settings_download_image_resolution_summary">%s. Auflösung über 1280x funktioniert möglicherweise nicht</string>
-    <string name="settings_download_image_resolution_auto">Automatisch</string>
     <string name="settings_download_download_origin_image">Originale Bilder herunterladen</string>
     <string name="settings_download_download_origin_image_summary">Wenn es aktiviert wird, wird der 509-Fehler dir schneller widerfahren</string>
     <string name="settings_download_restore_download_items">Download-Elemente wiederherstellen</string>

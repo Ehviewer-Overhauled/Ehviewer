@@ -55,7 +55,6 @@
     <string name="error_decoding_failed">디코딩 실패</string>
     <string name="error_reading_failed">읽기 실패</string>
     <string name="error_out_of_range">범위 초과</string>
-    <string name="error_write_failed">쓰기 실패</string>
     <string name="error_parse_error">구문 분석 오류</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">잘못된 URL</string>
@@ -153,7 +152,6 @@
     <string name="rate_failed">평가에 실패했습니다.</string>
     <string name="no_torrents">토렌트 없음</string>
     <string name="torrents">토렌트</string>
-    <string name="favorited">즐겨찾기에 있음</string>
     <string name="not_favorited">즐겨찾기에 없음</string>
     <string name="add_favorites_dialog_title">즐겨찾기에 추가</string>
     <string name="remember_favorite_collection">즐겨찾기 저장 위치 기억</string>
@@ -330,9 +328,6 @@
     <string name="settings_download_concurrency_summary">%s개 이미지까지</string>
     <string name="settings_download_preload_image">이미지 미리 불러오기</string>
     <string name="settings_download_preload_image_summary">다음 %s개 이미지를 미리 불러옴</string>
-    <string name="settings_download_image_resolution">이미지 해상도</string>
-    <string name="settings_download_image_resolution_summary">1280x 이상으로 설정하면 작동하지 않을 수 있습니다. 현재 설정\u003a \u005b%s\u005d</string>
-    <string name="settings_download_image_resolution_auto">자동</string>
     <string name="settings_download_download_origin_image">원본 이미지 다운로드</string>
     <string name="settings_download_download_origin_image_summary">이 옵션은 위험합니다! 509 오류가 발생할 수 있습니다.</string>
     <string name="settings_download_restore_download_items">다운로드 항목 복구</string>

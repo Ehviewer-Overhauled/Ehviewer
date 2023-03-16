@@ -56,7 +56,6 @@
     <string name="error_decoding_failed">解碼失敗</string>
     <string name="error_reading_failed">讀取失敗</string>
     <string name="error_out_of_range">超出範圍</string>
-    <string name="error_write_failed">寫入失敗</string>
     <string name="error_parse_error">解析失敗</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">不正確的連結</string>
@@ -64,7 +63,6 @@
     <string name="error_cant_create_temp_file">無法建立暫存檔案</string>
     <string name="error_cant_save_image">無法儲存圖片</string>
     <string name="error_invalid_number">無效的數字</string>
-    <string name="error_please_login_first">請先登陸</string>
     <string name="error_empty_html">頁面內容為空</string>
 
     <string name="kokomade_tip">設定->Eh->圖庫站台->e-hentai</string>
@@ -178,7 +176,6 @@
     <string name="download_torrent_started">開始下載種子</string>
     <string name="download_torrent_failure">無法下載種子</string>
     <string name="torrents">種子</string>
-    <string name="favorited">已收藏</string>
     <string name="not_favorited">未收藏</string>
     <string name="add_favorites_dialog_title">新增到收藏裡</string>
     <string name="remember_favorite_collection">記住常用收藏</string>
@@ -398,9 +395,6 @@
     <string name="settings_download_concurrency_summary">最多同時下載 %s 張圖片</string>
     <string name="settings_download_preload_image">預載圖片</string>
     <string name="settings_download_preload_image_summary">向後預載 %s 張圖片</string>
-    <string name="settings_download_image_resolution">圖片解析度</string>
-    <string name="settings_download_image_resolution_summary">%s，大於 1280x 的解析度可能不會生效</string>
-    <string name="settings_download_image_resolution_auto">自動</string>
     <string name="settings_download_download_origin_image">下載原圖</string>
     <string name="settings_download_download_origin_image_summary">這很危險！勾選這個選項會導致圖片流量配額快速耗用</string>
     <string name="settings_download_media_scan">允許其他程式進行媒體掃描</string>
@@ -467,7 +461,6 @@
     <string name="proxy_invalid_port">無效的通訊埠</string>
 
     <string name="cant_read_the_file">無法讀取檔案</string>
-    <string name="db_version_too_high">資料庫版本過高</string>
 
     <string name="app_language_system">系統語言（預設）</string>
 
@@ -602,7 +595,6 @@
     <string name="pref_page_transitions">翻頁轉場動畫</string>
     <string name="pref_show_page_number">顯示頁碼</string>
     <string name="pref_show_reader_seekbar">顯示跳頁拖動條</string>
-    <string name="pref_crop_borders">邊緣裁剪</string>
     <string name="pref_custom_brightness">自訂亮度</string>
     <string name="pref_custom_color_filter">色彩濾鏡</string>
     <string name="pref_keep_screen_on">保持螢幕恆亮</string>

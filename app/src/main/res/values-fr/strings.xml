@@ -53,7 +53,6 @@
     <string name="error_decoding_failed">Échec de décodage</string>
     <string name="error_reading_failed">Échec de lecture</string>
     <string name="error_out_of_range">Hors de portée</string>
-    <string name="error_write_failed">Échec d\'écriture</string>
     <string name="error_parse_error">Échec d\'analyse syntaxique</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">URL invalide</string>
@@ -61,7 +60,6 @@
     <string name="error_cant_create_temp_file">Impossible de créer un fiche temporaire</string>
     <string name="error_cant_save_image">Impossible d\'enregistrer l\'image</string>
     <string name="error_invalid_number">Nombre invalide</string>
-    <string name="error_please_login_first">Vous devez d\'abord vous connecter</string>
 
     <string name="app_waring">Le contenu de l\'application provient de l\'Internet, dont quelque chose peut vous causer le dommage physique ou mentale. Vous l\'avez bien compris et voulez continuer quand même.</string>
     <string name="error_username_cannot_empty">Nom d\'ultilisateur ne doit pas être une chaîne vide</string>
@@ -164,7 +162,6 @@
     <string name="rate_failed">Échec de notation</string>
     <string name="no_torrents">Aucun fiche torrent</string>
     <string name="torrents">Fiches torrent</string>
-    <string name="favorited">Ajoutée à favoris</string>
     <string name="not_favorited">Non ajoutée à favoris</string>
     <string name="add_favorites_dialog_title">Ajouter à favoris</string>
     <string name="remember_favorite_collection">Enrégistrer la collection favoris</string>
@@ -350,9 +347,6 @@
     <string name="settings_download_concurrency_summary">Jusqu\'à %s image(s)</string>
     <string name="settings_download_preload_image">Charger les images d\'avance</string>
     <string name="settings_download_preload_image_summary">Charger les prochaine %s images</string>
-    <string name="settings_download_image_resolution">Resolution d\'image</string>
-    <string name="settings_download_image_resolution_summary">%s, résolutions mieux que 1280x riquent de ne pas fonctionner</string>
-    <string name="settings_download_image_resolution_auto">Auto</string>
     <string name="settings_download_download_origin_image">Télécharger l\'images originales</string>
     <string name="settings_download_download_origin_image_summary">Vous allez obtenir l\'erreur 509 plus facilement</string>
     <string name="settings_download_restore_download_items">Rétablir les galeries téléchargées</string>

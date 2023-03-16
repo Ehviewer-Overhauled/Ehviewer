@@ -33,7 +33,6 @@
     <string name="error_decoding_failed">Decode işlemi başarısız</string>
     <string name="error_reading_failed">Okuma başarısız</string>
     <string name="error_out_of_range">Kapsam dışı</string>
-    <string name="error_write_failed">Yazma başarısız</string>
     <string name="error_parse_error">Ayrıştırma hatası</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">Geçersiz bağlantı</string>
@@ -41,7 +40,6 @@
     <string name="error_cant_create_temp_file">Geçici dosya oluşturulamadı</string>
     <string name="error_cant_save_image">Görsel kaydedilemiyor</string>
     <string name="error_invalid_number">Geçersiz numara</string>
-    <string name="error_please_login_first">Lütfen önce giriş yap</string>
     <string name="error_empty_html">Boş sayfa</string>
     <string name="kokomade_tip">Ayarlar-&gt;Eh-&gt;Gallery Site-&gt;e-hentai</string>
     <string name="error_username_cannot_empty">Kullanıcı adı boş bir metin olamaz</string>

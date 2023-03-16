@@ -86,7 +86,6 @@
     <string name="error_decoding_failed">Decoding failed</string>
     <string name="error_reading_failed">Reading Failed</string>
     <string name="error_out_of_range">Out of range</string>
-    <string name="error_write_failed">Write failed</string>
     <string name="error_parse_error">Parse error</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">Invalid URL</string>
@@ -94,7 +93,6 @@
     <string name="error_cant_create_temp_file">Couldn\'t create temp file</string>
     <string name="error_cant_save_image">Can\'t save image</string>
     <string name="error_invalid_number">Invalid number</string>
-    <string name="error_please_login_first">Please log in first</string>
     <string name="error_empty_html">Empty page</string>
     <string name="kokomade_tip">Settings-&gt;Eh-&gt;Gallery Site-&gt;e-hentai</string>
     <string name="app_waring">The content of this application is from the Internet. Some of it may do physical or mental harm to you. You have learnt the risks above and would like to undertake them. By continuing to use it, you agree to the above terms.</string>
@@ -195,7 +193,6 @@
     <string name="download_torrent_started">Torrent download started</string>
     <string name="download_torrent_failure">Failed to download torrent</string>
     <string name="torrents">Torrents</string>
-    <string name="favorited">Favorited</string>
     <string name="not_favorited">Not favorited</string>
     <string name="add_favorites_dialog_title">Add to favorites</string>
     <string name="remember_favorite_collection">Remember favorite collection</string>
@@ -412,9 +409,6 @@
     <string name="settings_download_download_delay_summary">Delay %s ms per download</string>
     <string name="settings_download_preload_image">Preload image</string>
     <string name="settings_download_preload_image_summary">Preload next %s image</string>
-    <string name="settings_download_image_resolution">Image resolution</string>
-    <string name="settings_download_image_resolution_summary">Currently %s. Resolutions above 1280x may not work</string>
-    <string name="settings_download_image_resolution_auto">Auto</string>
     <string name="settings_download_download_origin_image">Download original image</string>
     <string name="settings_download_download_origin_image_summary">It is dangerous! You may get 509 error</string>
     <string name="settings_download_restore_download_items">Restore download items</string>
@@ -477,8 +471,6 @@
     <string name="proxy_port">Port</string>
     <string name="proxy_invalid_port">Invalid port</string>
     <string name="cant_read_the_file">Can\'t read the file</string>
-    <string name="db_version_too_low">Database version too low</string>
-    <string name="db_version_too_high">Database version too high</string>
     <string name="app_language_system">System Language (Default)</string>
     <string name="app_language_de" translatable="false">Deutsch</string>
     <string name="app_language_en" translatable="false">English</string>
@@ -612,7 +604,6 @@
     <!-- Tachiyomi Reader Start-->
     <string name="action_settings">Settings</string>
     <string name="pref_rotation_type">Default rotation type</string>
-    <string name="pref_crop_borders">Crop borders</string>
     <string name="viewer">Reading mode</string>
     <string name="action_menu">Menu</string>
     <string name="nav_zone_prev">Prev</string>

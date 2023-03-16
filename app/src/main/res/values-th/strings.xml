@@ -55,7 +55,6 @@
     <string name="error_decoding_failed">การถอดรหัสล้มเหลว</string>
     <string name="error_reading_failed">การอ่านล้มเหลว</string>
     <string name="error_out_of_range">ไม่อยู่ในขอบเขต</string>
-    <string name="error_write_failed">การเขียนล้มเหลว</string>
     <string name="error_parse_error">การวิเคราะห์ผิดพลาด</string>
     <string name="error_509">509</string>
     <string name="error_invalid_url">URL ไม่ถูกต้อง</string>
@@ -155,7 +154,6 @@
     <string name="rate_failed">การให้คะแนนล้มเหลว</string>
     <string name="no_torrents">ไม่มีไฟล์ torrents</string>
     <string name="torrents">Torrents</string>
-    <string name="favorited">เพิ่มในรายการโปรดแล้ว</string>
     <string name="not_favorited">ยังไม่เพิ่มรายการโปรด</string>
     <string name="add_favorites_dialog_title">เพิ่มเข้ารายการโปรด</string>
     <string name="remember_favorite_collection">จดจำรายการโปรดที่เลือก</string>
@@ -345,9 +343,6 @@
     <string name="settings_download_concurrency_summary">โหลดถึง %s ภาพ</string>
     <string name="settings_download_preload_image">โหลดภาพล่วงหน้า</string>
     <string name="settings_download_preload_image_summary">โหลดภาพล่วงหน้าไป %s ภาพ</string>
-    <string name="settings_download_image_resolution">ความละเอียดของภาพ</string>
-    <string name="settings_download_image_resolution_summary">ค่าตอนนี้เป็น %s. ความละเอียดตั้งแต่ 1280x ขึ้นไปอาจจะไม่ทำงาน</string>
-    <string name="settings_download_image_resolution_auto">อัตโนมัติ</string>
     <string name="settings_download_download_origin_image">ดาวน์โหลดรูปภาพต้นฉบับ</string>
     <string name="settings_download_download_origin_image_summary">อันตรายนะ! คุณอาจจะเจอรหัสข้อผิดพลาด 509 ได้</string>
     <string name="settings_download_restore_download_items">คืนรายการดาวน์โหลด</string>

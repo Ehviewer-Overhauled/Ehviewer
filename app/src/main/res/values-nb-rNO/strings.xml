@@ -91,7 +91,6 @@
     <string name="error_reading_failed">Lesing mislyktes</string>
     <string name="error_parse_error">Tolkningsfeil</string>
     <string name="filter_the_uploader">Blokker opplasteren «%s»\?</string>
-    <string name="error_write_failed">Skriving mislyktes</string>
     <string name="rating10">Mesterverk</string>
     <string name="rating8">Storslått</string>
     <string name="rating6">OK</string>
@@ -211,7 +210,6 @@
     <string name="scale_type_stretch">Strekk</string>
     <string name="right_and_left_nav">Høyre og venstre</string>
     <string name="settings_eh_thumb_resolution_auto">Automatisk</string>
-    <string name="db_version_too_high">Databaseversjonen er for høy</string>
     <string name="app_language_system">Systemspråk (forvalg)</string>
     <string name="error_something_wrong_happened">Noe gikk galt</string>
     <string name="need_sign_in">Innlogging kreves</string>
