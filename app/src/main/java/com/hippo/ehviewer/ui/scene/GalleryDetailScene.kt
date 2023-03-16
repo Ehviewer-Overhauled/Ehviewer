@@ -24,7 +24,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -43,12 +42,14 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -61,11 +62,12 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,6 +75,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -676,15 +679,23 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         binding.content.actions.setContent {
             Mdc3Theme {
                 Column(
-                    modifier = Modifier
-                        .padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
-                        .padding(top = dimensionResource(id = R.dimen.keyline_margin))
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
                 ) {
                     if (!composeBindingGD?.newerVersions.isNullOrEmpty()) {
                         Box(
+                            modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.keyline_margin)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Card(onClick = ::showNewerVersionDialog) {}
+                            OutlinedCard(
+                                onClick = ::showNewerVersionDialog,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(32.dp),
+                                border = BorderStroke(
+                                    CardDefaults.outlinedCardBorder().width,
+                                    Color.Transparent
+                                )
+                            ) {}
                             Text(text = stringResource(id = R.string.newer_version_avaliable))
                         }
                     }
@@ -957,7 +968,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 comments.addView(v, i)
                 val user = v.findViewById<TextView>(R.id.user)
                 user.text = comment.user
-                user.setBackgroundColor(Color.TRANSPARENT)
+                user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 val time = v.findViewById<TextView>(R.id.time)
                 time.text = ReadableTime.getTimeAgo(comment.time)
                 val c = v.findViewById<ObservedTextView>(R.id.comment)
@@ -966,7 +977,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     comment.comment, Html.FROM_HTML_MODE_LEGACY,
                     URLImageGetter(c), null
                 )
-                v.setBackgroundColor(Color.TRANSPARENT)
+                v.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             }
         }
     }
