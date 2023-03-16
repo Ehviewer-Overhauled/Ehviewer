@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -32,17 +31,17 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -52,6 +51,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Difference
@@ -82,7 +82,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.Coil.imageLoader
@@ -144,7 +143,6 @@ import com.hippo.util.ReadableTime
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.view.ViewTransition
-import com.hippo.widget.AutoWrapLayout
 import com.hippo.widget.ObservedTextView
 import com.hippo.widget.SimpleGridAutoSpanLayout
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
@@ -157,12 +155,10 @@ import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import rikka.core.res.resolveColor
 import kotlin.math.roundToInt
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, DownloadInfoListener,
-    OnLongClickListener {
+class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, DownloadInfoListener {
     private var _binding: SceneGalleryDetailBinding? = null
     private val binding
         get() = _binding!!
@@ -683,8 +679,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 Column(
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
-                        .padding(top = dimensionResource(id = R.dimen.keyline_margin)),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(top = dimensionResource(id = R.dimen.keyline_margin))
                 ) {
                     if (!composeBindingGD?.newerVersions.isNullOrEmpty()) {
                         Box(contentAlignment = Alignment.Center) {
@@ -745,13 +740,22 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
                     ElevatedCard(onClick = ::showRateDialog) {
                         Column(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             GalleryDetailRating(rating = composeBindingGD?.rating ?: 0f)
                             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
                             Text(text = ratingText)
                         }
+                    }
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
+                    val tags = composeBindingGD?.tags
+                    if (tags.isNullOrEmpty()) {
+                        Text(text = stringResource(id = R.string.no_tags))
+                    } else {
+                        GalleryDetailTags(tags)
                     }
                     Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
                 }
@@ -888,72 +892,82 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         updateFavoriteDrawable()
         ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
-        bindTags(gd.tags)
         bindComments(gd.comments!!.comments)
         bindPreviews(gd)
     }
 
-    private fun bindTags(tagGroups: Array<GalleryTagGroup>?) {
-        context ?: return
-        val inflater = layoutInflater
-        _binding ?: return
-        binding.content.tags.run {
-            tags.removeViews(1, tags.childCount - 1)
-            if (tagGroups.isNullOrEmpty()) {
-                noTags.visibility = View.VISIBLE
-                return
+    @Composable
+    private fun GalleryDetailTags(tagGroups: Array<GalleryTagGroup>) {
+
+        @Composable
+        fun baseRoundText(
+            text: String,
+            weak: Boolean = false,
+            isGroup: Boolean = false,
+            modifier: Modifier = Modifier
+        ) {
+            val bgColor = if (isGroup) {
+                MaterialTheme.colorScheme.primaryContainer
             } else {
-                noTags.visibility = View.GONE
+                MaterialTheme.colorScheme.tertiaryContainer
             }
-        }
-        tagGroups ?: return
-        val ehTags =
-            if (Settings.showTagTranslations && isTranslatable(requireContext())) EhTagDatabase else null
-        val colorTag = theme.resolveColor(R.attr.tagBackgroundColor)
-        val colorName = theme.resolveColor(R.attr.tagGroupBackgroundColor)
-        for (tg in tagGroups) {
-            val ll = inflater.inflate(
-                R.layout.gallery_tag_group,
-                binding.content.tags.tags,
-                false
-            ) as LinearLayout
-            ll.orientation = LinearLayout.HORIZONTAL
-            binding.content.tags.tags.addView(ll)
-            var readableTagName: String? = null
-            if (ehTags != null && ehTags.isInitialized()) {
-                readableTagName = ehTags.getTranslation(tag = tg.groupName)
-            }
-            val tgName = inflater.inflate(R.layout.item_gallery_tag, ll, false) as TextView
-            ll.addView(tgName)
-            tgName.text = readableTagName ?: tg.groupName
-            tgName.backgroundTintList = ColorStateList.valueOf(colorName)
-            val prefix = namespaceToPrefix(tg.groupName!!)
-            val awl = AutoWrapLayout(context)
-            ll.addView(
-                awl,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+            Text(
+                text = text,
+                modifier = modifier
+                    .background(bgColor, RoundedCornerShape(64.dp))
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelLarge
             )
-            tg.forEach {
-                val tag = inflater.inflate(R.layout.item_gallery_tag, awl, false) as TextView
-                awl.addView(tag)
-                val tagStr = if (it.startsWith('_')) {
-                    val alpha = ColorUtils.setAlphaComponent(tag.currentTextColor, 128)
-                    tag.setTextColor(alpha)
-                    it.substring(1)
-                } else {
-                    it
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+
+        val canTranslate = Settings.showTagTranslations && isTranslatable(requireContext())
+        val ehTags = EhTagDatabase.takeIf { canTranslate }
+        fun String.translate(): String {
+            return ehTags?.takeIf { it.isInitialized() }?.getTranslation(tag = this) ?: this
+        }
+
+        fun String.translate(prefix: String): String {
+            return ehTags?.takeIf { it.isInitialized() }
+                ?.getTranslation(prefix = prefix, tag = this) ?: this
+        }
+
+        tagGroups.forEach {
+            Row {
+                it.groupName?.run {
+                    baseRoundText(
+                        text = translate(),
+                        isGroup = true
+                    )
+                    val prefix = namespaceToPrefix(this) ?: return
+                    FlowRow {
+                        it.forEach {
+                            val weak = it.startsWith('_')
+                            val real = it.removePrefix("_")
+                            val translated = real.translate(prefix)
+                            fun onClick() {
+                                val lub = ListUrlBuilder()
+                                lub.mode = ListUrlBuilder.MODE_TAG
+                                lub.keyword = real
+                                navigate(R.id.galleryListScene, lub.toStartArgs(), true)
+                            }
+
+                            fun onLongClick() {
+                                showTagDialog(translated, real)
+                            }
+                            baseRoundText(
+                                text = translated,
+                                weak = weak,
+                                modifier = Modifier.combinedClickable(
+                                    onClick = ::onClick,
+                                    onLongClick = ::onLongClick
+                                )
+                            )
+                        }
+                    }
                 }
-                var readableTag: String? = null
-                if (ehTags != null && ehTags.isInitialized()) {
-                    readableTag = ehTags.getTranslation(prefix, tagStr)
-                }
-                tag.text = readableTag ?: tagStr
-                tag.backgroundTintList = ColorStateList.valueOf(colorTag)
-                tag.setTag(R.id.tag, tg.groupName + ":" + tagStr)
-                tag.setOnClickListener(this)
-                tag.setOnLongClickListener(this)
             }
+            Spacer(modifier = Modifier.size(8.dp))
         }
     }
 
@@ -1132,17 +1146,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, galleryDetail)
                 navigate(R.id.galleryCommentsScene, args)
             }
-
-            else -> {
-                val o = v.getTag(R.id.tag)
-                if (o is String) {
-                    val lub = ListUrlBuilder()
-                    lub.mode = ListUrlBuilder.MODE_TAG
-                    lub.keyword = o
-                    navigate(R.id.galleryListScene, lub.toStartArgs(), true)
-                    return
-                }
-            }
         }
     }
 
@@ -1161,7 +1164,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             .show()
     }
 
-    private fun showTagDialog(tv: TextView, tag: String) {
+    private fun showTagDialog(translated: String, tag: String) {
         val context = context ?: return
         val temp: String
         val index = tag.indexOf(':')
@@ -1175,7 +1178,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         val resources = context.resources
         menu.add(resources.getString(android.R.string.copy))
         menuId.add(R.id.copy)
-        if (temp != tv.text.toString()) {
+        if (temp != translated) {
             menu.add(resources.getString(R.string.copy_trans))
             menuId.add(R.id.copy_trans)
         }
@@ -1217,7 +1220,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     }
 
                     R.id.copy_trans -> {
-                        requireActivity().addTextToClipboard(tv.text.toString(), false)
+                        requireActivity().addTextToClipboard(translated, false)
                     }
                 }
             }.show()
@@ -1297,15 +1300,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 }
             }
         }
-    }
-
-    override fun onLongClick(v: View): Boolean {
-        val tag = v.getTag(R.id.tag) as? String
-        if (null != tag) {
-            showTagDialog(v as TextView, tag)
-            return true
-        }
-        return false
     }
 
     private fun updateDownloadText() {

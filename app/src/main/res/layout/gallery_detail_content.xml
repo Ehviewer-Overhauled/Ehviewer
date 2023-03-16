@@ -41,10 +41,6 @@
                 android:layout_height="wrap_content" />
 
             <include
-                android:id="@+id/tags"
-                layout="@layout/gallery_detail_tags" />
-
-            <include
                 android:id="@+id/comments"
                 layout="@layout/gallery_detail_comments" />
 
