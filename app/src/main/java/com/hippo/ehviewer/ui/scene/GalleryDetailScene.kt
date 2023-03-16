@@ -679,13 +679,12 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         binding.content.actions.setContent {
             Mdc3Theme {
                 Column(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                        .padding(top = dimensionResource(id = R.dimen.keyline_margin))
                 ) {
                     if (!composeBindingGD?.newerVersions.isNullOrEmpty()) {
-                        Box(
-                            modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.keyline_margin)),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(contentAlignment = Alignment.Center) {
                             OutlinedCard(
                                 onClick = ::showNewerVersionDialog,
                                 modifier = Modifier
@@ -698,6 +697,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                             ) {}
                             Text(text = stringResource(id = R.string.newer_version_avaliable))
                         }
+                        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
                     }
                     FlowRow {
                         if (favourite) {
