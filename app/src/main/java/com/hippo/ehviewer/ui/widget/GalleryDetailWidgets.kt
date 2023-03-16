@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
@@ -17,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
@@ -156,7 +158,7 @@ fun GalleryDetailHeaderCard(
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_label_24),
+                            imageVector = Icons.Default.Label,
                             contentDescription = null
                         )
                     })
@@ -168,7 +170,7 @@ fun GalleryDetailHeaderCard(
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.file_upload_black_24dp),
+                            imageVector = Icons.Default.PersonAdd,
                             contentDescription = null
                         )
                     })
