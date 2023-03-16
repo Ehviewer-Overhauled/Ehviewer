@@ -26,13 +26,15 @@ fun readLegacySpiderInfo(inputStream: InputStream): SpiderInfo {
     val pTokenMap = hashMapOf<Int, String>()
     val info = SpiderInfo(gid, pages, pTokenMap, 0, token, previewPages, previewPerPage)
     runCatching {
-        val line = read()
-        val pos = line.indexOf(" ")
-        if (pos > 0) {
-            val index = line.substring(0, pos).toInt()
-            val pToken = line.substring(pos + 1)
-            if (pToken.isNotEmpty()) {
-                pTokenMap[index] = pToken
+        while (true) {
+            val line = read()
+            val pos = line.indexOf(" ")
+            if (pos > 0) {
+                val index = line.substring(0, pos).toInt()
+                val pToken = line.substring(pos + 1)
+                if (pToken.isNotEmpty()) {
+                    pTokenMap[index] = pToken
+                }
             }
         }
     }
