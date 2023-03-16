@@ -40,7 +40,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,6 +68,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -911,13 +911,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             } else {
                 MaterialTheme.colorScheme.tertiaryContainer
             }
-            Text(
-                text = text,
-                modifier = modifier
-                    .background(bgColor, RoundedCornerShape(64.dp))
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                style = MaterialTheme.typography.labelLarge
-            )
+            Surface(
+                modifier = Modifier,
+                color = bgColor,
+                shape = RoundedCornerShape(64.dp)
+            ) {
+                Text(
+                    text = text,
+                    modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
             Spacer(modifier = Modifier.size(8.dp))
         }
 
