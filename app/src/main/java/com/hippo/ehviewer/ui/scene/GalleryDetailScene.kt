@@ -912,7 +912,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 MaterialTheme.colorScheme.tertiaryContainer
             }
             Surface(
-                modifier = Modifier,
+                modifier = Modifier.padding(4.dp),
                 color = bgColor,
                 shape = RoundedCornerShape(64.dp)
             ) {
@@ -922,7 +922,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     style = MaterialTheme.typography.labelLarge
                 )
             }
-            Spacer(modifier = Modifier.size(8.dp))
         }
 
         val canTranslate = Settings.showTagTranslations && isTranslatable(requireContext())
@@ -971,7 +970,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                     }
                 }
             }
-            Spacer(modifier = Modifier.size(8.dp))
         }
     }
 
