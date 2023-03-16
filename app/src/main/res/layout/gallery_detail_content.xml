@@ -35,9 +35,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/actions"
-                layout="@layout/gallery_detail_actions" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <include
                 android:id="@+id/tags"

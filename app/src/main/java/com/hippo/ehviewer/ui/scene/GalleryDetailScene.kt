@@ -43,18 +43,39 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IntDef
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.Difference
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.ImageSearch
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -384,20 +405,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         binding.tip.setCompoundDrawables(null, drawable, null, null)
         binding.tip.setOnClickListener(this)
-        binding.content.actions.let {
-            it.newerVersion.setOnClickListener(this)
-            it.heart.setOnClickListener(this)
-            it.heart.setOnLongClickListener(this)
-            it.heartOutline.setOnClickListener(this)
-            it.heartOutline.setOnLongClickListener(this)
-            it.torrent.setOnClickListener(this)
-            it.archive.setOnClickListener(this)
-            it.share.setOnClickListener(this)
-            it.rate.setOnClickListener(this)
-            it.similar.setOnClickListener(this)
-            it.searchCover.setOnClickListener(this)
-        }
-        binding.content.actions.newerVersion.setOnClickListener(this)
         if (Settings.showComments) {
             binding.content.comments.comments.setOnClickListener(this)
         } else {
@@ -623,6 +630,107 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 }
             }
         }
+
+        @Composable
+        fun EhIconButton(
+            icon: ImageVector,
+            text: String,
+            onClick: () -> Unit,
+        ) {
+            OutlinedButton(
+                onClick = onClick,
+                contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                Text(text = text)
+            }
+        }
+
+        @Composable
+        fun EhAccentIconButton(
+            icon: ImageVector,
+            text: String,
+            onClick: () -> Unit,
+        ) {
+            Button(
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSecondaryContainer),
+                contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                Text(text = text)
+            }
+        }
+        binding.content.actions.setContent {
+            Mdc3Theme {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                        .padding(top = dimensionResource(id = R.dimen.keyline_margin))
+                ) {
+                    if (!composeBindingGD?.newerVersions.isNullOrEmpty()) {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Card(onClick = ::showNewerVersionDialog) {}
+                            Text(text = stringResource(id = R.string.newer_version_avaliable))
+                        }
+                    }
+                    FlowRow {
+                        if (favourite) {
+                            EhAccentIconButton(
+                                icon = Icons.Default.Favorite,
+                                text = favButtonText,
+                                onClick = ::modifyFavourite
+                            )
+                        } else {
+                            EhIconButton(
+                                icon = Icons.Default.FavoriteBorder,
+                                text = stringResource(id = R.string.not_favorited),
+                                onClick = ::modifyFavourite
+                            )
+                        }
+                        EhIconButton(
+                            icon = Icons.Default.Difference,
+                            text = stringResource(id = R.string.similar_gallery),
+                            onClick = ::showSimilarGalleryList
+                        )
+                        EhIconButton(
+                            icon = Icons.Default.ImageSearch,
+                            text = stringResource(id = R.string.search_cover),
+                            onClick = ::showCoverGalleryList
+                        )
+                        EhIconButton(
+                            icon = Icons.Default.Share,
+                            text = stringResource(id = R.string.share),
+                            onClick = ::doShareGallery
+                        )
+                        EhIconButton(
+                            icon = Icons.Default.SwapVerticalCircle,
+                            text = torrentText,
+                            onClick = ::showTorrentDialog
+                        )
+                        EhIconButton(
+                            icon = Icons.Default.CloudDone,
+                            text = stringResource(id = R.string.archive),
+                            onClick = ::showArchiveDialog
+                        )
+                    }
+                }
+            }
+        }
         mGalleryInfo?.let { gi ->
             if (mAction == ACTION_GALLERY_INFO) {
                 binding.content.header.run {
@@ -634,28 +742,97 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
+    private fun doShareGallery() {
+        galleryDetailUrl?.let { AppHelper.share(requireActivity(), it) }
+    }
+
+    private var torrentText by mutableStateOf("")
+
+    private var favourite by mutableStateOf(false)
+    private var favButtonText by mutableStateOf("")
     private fun updateFavoriteDrawable() {
         val gd = mGalleryDetail ?: return
         _binding ?: return
         binding.content.actions.run {
             lifecycleScope.launchIO {
                 val containLocalFav = EhDB.containLocalFavorites(gd.gid)
-                withUIContext {
-                    if (gd.isFavorited || containLocalFav) {
-                        heart.visibility = View.VISIBLE
-                        if (gd.favoriteName == null) {
-                            heart.setText(R.string.local_favorites)
-                        } else {
-                            heart.text = gd.favoriteName
-                        }
-                        heartOutline.visibility = View.GONE
-                    } else {
-                        heart.visibility = View.GONE
-                        heartOutline.visibility = View.VISIBLE
-                    }
+                if (gd.isFavorited || containLocalFav) {
+                    favourite = true
+                    favButtonText = gd.favoriteName ?: getString(R.string.local_favorites)
+                } else {
+                    favourite = false
                 }
             }
         }
+    }
+
+    private fun modifyFavourite() {
+        val galleryDetail = mGalleryDetail ?: return
+        lifecycleScope.launchIO {
+            if (!mModifyingFavorites) {
+                var remove = false
+                val containLocalFavorites =
+                    EhDB.containLocalFavorites(galleryDetail.gid)
+                if (containLocalFavorites || galleryDetail.isFavorited) {
+                    mModifyingFavorites = true
+                    CommonOperations.removeFromFavorites(
+                        activity, galleryDetail,
+                        ModifyFavoritesListener(requireContext(), true)
+                    )
+                    remove = true
+                }
+                withUIContext {
+                    if (!remove) {
+                        mModifyingFavorites = true
+                        CommonOperations.addToFavorites(
+                            requireActivity(), galleryDetail,
+                            ModifyFavoritesListener(requireContext(), false)
+                        )
+                    }
+                    // Update UI
+                    updateFavoriteDrawable()
+                }
+            }
+        }
+    }
+
+    private fun showNewerVersionDialog() {
+        val galleryDetail = mGalleryDetail ?: return
+        val titles = ArrayList<CharSequence>()
+        for (newerVersion in galleryDetail.newerVersions) {
+            titles.add(
+                getString(
+                    R.string.newer_version_title,
+                    newerVersion.title,
+                    newerVersion.posted
+                )
+            )
+        }
+        BaseDialogBuilder(requireContext())
+            .setItems(titles.toTypedArray()) { _: DialogInterface?, which: Int ->
+                val newerVersion = galleryDetail.newerVersions[which]
+                val args = Bundle()
+                args.putString(KEY_ACTION, ACTION_GID_TOKEN)
+                args.putLong(KEY_GID, newerVersion.gid)
+                args.putString(KEY_TOKEN, newerVersion.token)
+                navigate(R.id.galleryDetailScene, args)
+            }
+            .show()
+    }
+
+    private fun showArchiveDialog() {
+        val galleryDetail = mGalleryDetail ?: return
+        if (galleryDetail.apiUid < 0) {
+            showTip(R.string.sign_in_first, LENGTH_LONG)
+            return
+        }
+        val helper = ArchiveListDialogHelper()
+        val dialog: Dialog = BaseDialogBuilder(requireContext())
+            .setTitle(R.string.settings_download)
+            .setView(R.layout.dialog_archive_list)
+            .setOnDismissListener(helper)
+            .show()
+        helper.setDialog(dialog, galleryDetail.archiveUrl)
     }
 
     private fun bindViewSecond() {
@@ -676,29 +853,19 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 .show()
         }
         _binding ?: return
-        val resources = resources
         composeBindingGI = gd
         composeBindingGD = gd
         setTitle(EhUtils.getSuitableTitle(gd))
         updateDownloadText()
+        updateFavoriteDrawable()
         /*
-        binding.content.header.run {
-            language.text = gd.language
-            pages.text = resources.getQuantityString(R.plurals.page_count, gd.pages, gd.pages)
-            size.text = gd.size
-            posted.text = gd.posted
-            favoredTimes.text = resources.getString(R.string.favored_times, gd.favoriteCount)
-        }
-         */
-        if (gd.newerVersions.size != 0) {
-            binding.content.actions.newerVersion.visibility = View.VISIBLE
-        }
         binding.content.actions.run {
             ratingText.text = getAllRatingText(gd.rating, gd.ratingCount)
             rating.rating = gd.rating
-            updateFavoriteDrawable()
-            torrent.text = resources.getString(R.string.torrent_count, gd.torrentCount)
+
         }
+         */
+        torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
         bindTags(gd.tags)
         bindComments(gd.comments!!.comments)
         bindPreviews(gd)
@@ -883,6 +1050,41 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         }
     }
 
+    private fun showTorrentDialog() {
+        val galleryDetail = mGalleryDetail ?: return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else {
+            val helper = TorrentListDialogHelper()
+            val dialog: Dialog = BaseDialogBuilder(requireContext())
+                .setTitle(R.string.torrents)
+                .setView(R.layout.dialog_torrent_list)
+                .setOnDismissListener(helper)
+                .show()
+            helper.setDialog(dialog, galleryDetail.torrentUrl)
+        }
+    }
+
+    private fun showRateDialog() {
+        val galleryDetail = mGalleryDetail ?: return
+        if (galleryDetail.apiUid < 0) {
+            showTip(R.string.sign_in_first, LENGTH_LONG)
+            return
+        }
+        val helper = RateDialogHelper()
+        val dialog: Dialog = BaseDialogBuilder(requireContext())
+            .setTitle(R.string.rate)
+            .setView(R.layout.dialog_rate)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok, helper)
+            .show()
+        helper.setDialog(dialog, galleryDetail.rating)
+    }
+
     override fun onClick(v: View) {
         val context = context
         val activity = mainActivity
@@ -898,119 +1100,6 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
         val galleryDetail = mGalleryDetail ?: return
         when (v) {
-            binding.content.actions.newerVersion -> {
-                val titles = ArrayList<CharSequence>()
-                for (newerVersion in galleryDetail.newerVersions) {
-                    titles.add(
-                        getString(
-                            R.string.newer_version_title,
-                            newerVersion.title,
-                            newerVersion.posted
-                        )
-                    )
-                }
-                BaseDialogBuilder(requireContext())
-                    .setItems(titles.toTypedArray()) { _: DialogInterface?, which: Int ->
-                        val newerVersion = galleryDetail.newerVersions[which]
-                        val args = Bundle()
-                        args.putString(KEY_ACTION, ACTION_GID_TOKEN)
-                        args.putLong(KEY_GID, newerVersion.gid)
-                        args.putString(KEY_TOKEN, newerVersion.token)
-                        navigate(R.id.galleryDetailScene, args)
-                    }
-                    .show()
-            }
-
-            binding.content.actions.heart,
-            binding.content.actions.heartOutline -> {
-                lifecycleScope.launchIO {
-                    if (!mModifyingFavorites) {
-                        var remove = false
-                        val containLocalFavorites = EhDB.containLocalFavorites(galleryDetail.gid)
-                        if (containLocalFavorites || galleryDetail.isFavorited) {
-                            mModifyingFavorites = true
-                            CommonOperations.removeFromFavorites(
-                                activity, galleryDetail,
-                                ModifyFavoritesListener(context, true)
-                            )
-                            remove = true
-                        }
-                        withUIContext {
-                            if (!remove) {
-                                mModifyingFavorites = true
-                                CommonOperations.addToFavorites(
-                                    activity, galleryDetail,
-                                    ModifyFavoritesListener(context, false)
-                                )
-                            }
-                            // Update UI
-                            updateFavoriteDrawable()
-                        }
-                    }
-                }
-            }
-
-            binding.content.actions.share -> {
-                galleryDetailUrl?.let {
-                    AppHelper.share(activity, it)
-                }
-            }
-
-            binding.content.actions.torrent -> {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
-                        activity,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                } else {
-                    val helper = TorrentListDialogHelper()
-                    val dialog: Dialog = BaseDialogBuilder(context)
-                        .setTitle(R.string.torrents)
-                        .setView(R.layout.dialog_torrent_list)
-                        .setOnDismissListener(helper)
-                        .show()
-                    helper.setDialog(dialog, galleryDetail.torrentUrl)
-                }
-            }
-
-            binding.content.actions.archive -> {
-                if (galleryDetail.apiUid < 0) {
-                    showTip(R.string.sign_in_first, LENGTH_LONG)
-                    return
-                }
-                val helper = ArchiveListDialogHelper()
-                val dialog: Dialog = BaseDialogBuilder(context)
-                    .setTitle(R.string.settings_download)
-                    .setView(R.layout.dialog_archive_list)
-                    .setOnDismissListener(helper)
-                    .show()
-                helper.setDialog(dialog, galleryDetail.archiveUrl)
-            }
-
-            binding.content.actions.rate -> {
-                if (galleryDetail.apiUid < 0) {
-                    showTip(R.string.sign_in_first, LENGTH_LONG)
-                    return
-                }
-                val helper = RateDialogHelper()
-                val dialog: Dialog = BaseDialogBuilder(context)
-                    .setTitle(R.string.rate)
-                    .setView(R.layout.dialog_rate)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, helper)
-                    .show()
-                helper.setDialog(dialog, galleryDetail.rating)
-            }
-
-            binding.content.actions.similar -> {
-                showSimilarGalleryList()
-            }
-
-            binding.content.actions.searchCover -> {
-                showCoverGalleryList()
-            }
-
             binding.content.comments.comments -> {
                 val args = Bundle()
                 args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
@@ -1132,39 +1221,38 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         request.enqueue(this)
     }
 
-    override fun onLongClick(v: View): Boolean {
-        val activity = mainActivity ?: return false
-        if (binding.content.actions.heart === v || binding.content.actions.heartOutline === v) {
-            lifecycleScope.launchIO {
-                if (mGalleryDetail != null && !mModifyingFavorites) {
-                    var remove = false
-                    if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
+    private fun modifyFavouriteLongClick() {
+        lifecycleScope.launchIO {
+            if (mGalleryDetail != null && !mModifyingFavorites) {
+                var remove = false
+                if (EhDB.containLocalFavorites(mGalleryDetail!!.gid) || mGalleryDetail!!.isFavorited) {
+                    mModifyingFavorites = true
+                    CommonOperations.removeFromFavorites(
+                        activity, mGalleryDetail!!,
+                        ModifyFavoritesListener(requireActivity(), true)
+                    )
+                    remove = true
+                }
+                withUIContext {
+                    if (!remove) {
                         mModifyingFavorites = true
-                        CommonOperations.removeFromFavorites(
-                            activity, mGalleryDetail!!,
-                            ModifyFavoritesListener(activity, true)
+                        CommonOperations.addToFavorites(
+                            requireActivity(), mGalleryDetail!!,
+                            ModifyFavoritesListener(requireActivity(), false), true
                         )
-                        remove = true
                     }
-                    withUIContext {
-                        if (!remove) {
-                            mModifyingFavorites = true
-                            CommonOperations.addToFavorites(
-                                activity, mGalleryDetail!!,
-                                ModifyFavoritesListener(activity, false), true
-                            )
-                        }
-                        // Update UI
-                        updateFavoriteDrawable()
-                    }
+                    // Update UI
+                    updateFavoriteDrawable()
                 }
             }
-        } else {
-            val tag = v.getTag(R.id.tag) as? String
-            if (null != tag) {
-                showTagDialog(v as TextView, tag)
-                return true
-            }
+        }
+    }
+
+    override fun onLongClick(v: View): Boolean {
+        val tag = v.getTag(R.id.tag) as? String
+        if (null != tag) {
+            showTagDialog(v as TextView, tag)
+            return true
         }
         return false
     }
@@ -1248,10 +1336,13 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
         // Update UI
         _binding ?: return
+        /*
         binding.content.actions.run {
             ratingText.text = getAllRatingText(result.rating, result.ratingCount)
             rating.rating = result.rating
         }
+
+         */
     }
 
     private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {
