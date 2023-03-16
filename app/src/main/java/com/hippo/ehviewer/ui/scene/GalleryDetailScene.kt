@@ -919,6 +919,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 Text(
                     text = text,
                     modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.onSurface.let { if (weak) it.copy(0.5F) else it },
                     style = MaterialTheme.typography.labelLarge
                 )
             }
