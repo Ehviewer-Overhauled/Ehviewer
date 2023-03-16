@@ -63,6 +63,7 @@ import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -742,9 +743,17 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         )
                     }
                     Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
-                    GalleryDetailRating(rating = composeBindingGD?.rating ?: 0f)
+                    ElevatedCard(onClick = ::showRateDialog) {
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            GalleryDetailRating(rating = composeBindingGD?.rating ?: 0f)
+                            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
+                            Text(text = ratingText)
+                        }
+                    }
                     Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
-                    Text(text = ratingText)
                 }
             }
         }
