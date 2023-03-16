@@ -169,10 +169,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         return mGlobalStuffMap.containsKey(id)
     }
 
-    fun getGlobalStuff(id: Int): Any? {
-        return mGlobalStuffMap[id]
-    }
-
     fun removeGlobalStuff(id: Int): Any? {
         return mGlobalStuffMap.remove(id)
     }
@@ -210,30 +206,25 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         var locked = true
         var locked_last_leave_time: Long = 0
 
-        @JvmStatic
         lateinit var application: EhApplication
             private set
 
-        @JvmStatic
         val ehProxySelector by lazy { EhProxySelector() }
 
         val nonCacheOkHttpClient by lazy {
-            val builder = OkHttpClient.Builder()
-                .cookieJar(EhCookieStore)
-                .dns(EhDns)
-                .proxySelector(ehProxySelector)
-
-            if (Settings.dF) {
-                val factory =
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
-                factory.init(null as KeyStore?)
-                val manager = factory.trustManagers!!
-
-                val trustManager = manager.filterIsInstance<X509TrustManager>().first()
-                builder.sslSocketFactory(EhSSLSocketFactory, trustManager)
-                builder.proxy(Proxy.NO_PROXY)
-            }
-            builder.build()
+            OkHttpClient.Builder().apply {
+                cookieJar(EhCookieStore)
+                dns(EhDns)
+                proxySelector(ehProxySelector)
+                if (Settings.dF) {
+                    val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
+                    factory.init(null as KeyStore?)
+                    val manager = factory.trustManagers!!
+                    val trustManager = manager.filterIsInstance<X509TrustManager>().first()
+                    sslSocketFactory(EhSSLSocketFactory, trustManager)
+                    proxy(Proxy.NO_PROXY)
+                }
+            }.build()
         }
 
         // Never use this okhttp client to download large blobs!!!
@@ -255,7 +246,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
         }
 
-        @JvmStatic
         val galleryDetailCache by lazy {
             LruCache<Long, GalleryDetail>(25).also {
                 favouriteStatusRouter.addListener { gid, slot ->
@@ -264,19 +254,14 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
         }
 
-        @JvmStatic
         val hosts by lazy { Hosts(application, "hosts.db") }
 
-        @JvmStatic
         val favouriteStatusRouter by lazy { FavouriteStatusRouter() }
 
-        @JvmStatic
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }
 
-        @JvmStatic
         val ehDatabase by lazy { buildMainDB(application) }
 
-        // We use data to store image file, and metadata for image type
         val imageCache by lazy {
             DiskCache.Builder().apply {
                 directory(application.cacheDir.toOkioPath() / "image_cache")
