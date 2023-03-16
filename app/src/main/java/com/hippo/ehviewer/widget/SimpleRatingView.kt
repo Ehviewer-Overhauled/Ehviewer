@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
-import com.hippo.ehviewer.ui.widget.SimpleRatingWidget
+import com.hippo.ehviewer.ui.widget.GalleryListCardRating
 
 class SimpleRatingView @JvmOverloads constructor(
     context: Context,
@@ -20,7 +20,7 @@ class SimpleRatingView @JvmOverloads constructor(
     @Composable
     override fun Content() {
         Mdc3Theme {
-            SimpleRatingWidget(rating)
+            GalleryListCardRating(rating)
         }
     }
 }

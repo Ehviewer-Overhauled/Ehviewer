@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 import kotlin.math.roundToInt
 
@@ -57,10 +58,15 @@ fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
 }
 
 @Composable
-fun SimpleRatingWidget(rating: Float) {
+fun GalleryListCardRating(rating: Float) {
     MetaRatingWidget(
         rating = rating,
         ratingSize = dimensionResource(id = R.dimen.rating_size),
         ratingInterval = dimensionResource(id = R.dimen.rating_interval)
     )
+}
+
+@Composable
+fun GalleryDetailRating(rating: Float) {
+    MetaRatingWidget(rating = rating, ratingSize = 48.dp, ratingInterval = 12.dp)
 }

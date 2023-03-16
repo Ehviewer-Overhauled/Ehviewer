@@ -133,6 +133,7 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
+import com.hippo.ehviewer.ui.widget.GalleryDetailRating
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -681,7 +682,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                 Column(
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
-                        .padding(top = dimensionResource(id = R.dimen.keyline_margin))
+                        .padding(top = dimensionResource(id = R.dimen.keyline_margin)),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (!composeBindingGD?.newerVersions.isNullOrEmpty()) {
                         Box(contentAlignment = Alignment.Center) {
@@ -739,6 +741,10 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                             onClick = ::showArchiveDialog
                         )
                     }
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
+                    GalleryDetailRating(rating = composeBindingGD?.rating ?: 0f)
+                    Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
+                    Text(text = ratingText)
                 }
             }
         }
@@ -752,6 +758,8 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             }
         }
     }
+
+    private var ratingText by mutableStateOf("")
 
     private fun doShareGallery() {
         galleryDetailUrl?.let { AppHelper.share(requireActivity(), it) }
@@ -869,13 +877,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         setTitle(EhUtils.getSuitableTitle(gd))
         updateDownloadText()
         updateFavoriteDrawable()
-        /*
-        binding.content.actions.run {
-            ratingText.text = getAllRatingText(gd.rating, gd.ratingCount)
-            rating.rating = gd.rating
-
-        }
-         */
+        ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
         bindTags(gd.tags)
         bindComments(gd.comments!!.comments)
@@ -1376,13 +1378,9 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
 
         // Update UI
         _binding ?: return
-        /*
-        binding.content.actions.run {
-            ratingText.text = getAllRatingText(result.rating, result.ratingCount)
-            rating.rating = result.rating
-        }
-
-         */
+        ratingText = getAllRatingText(result.rating, result.ratingCount)
+        composeBindingGD?.rating = result.rating
+        composeBindingGD = composeBindingGD
     }
 
     private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {

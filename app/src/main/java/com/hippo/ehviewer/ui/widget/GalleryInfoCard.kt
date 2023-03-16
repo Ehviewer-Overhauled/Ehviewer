@@ -71,7 +71,7 @@ fun ListInfoCard(
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelLarge
                         )
-                        SimpleRatingWidget(rating = info.rating)
+                        GalleryListCardRating(rating = info.rating)
                         val categoryColor = EhUtils.getCategoryColor(info.category)
                         val categoryText = EhUtils.getCategory(info.category).uppercase(Locale.ROOT)
                         Text(
