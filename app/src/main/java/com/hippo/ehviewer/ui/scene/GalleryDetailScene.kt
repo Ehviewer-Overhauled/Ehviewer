@@ -1232,6 +1232,35 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
         request.enqueue(this)
     }
 
+    private fun downloadLongClick() {
+        val galleryInfo = mGalleryInfo
+        if (galleryInfo != null) {
+            CommonOperations.startDownload(activity as MainActivity, galleryInfo, true)
+        }
+    }
+
+    private fun showFilterUploaderDialog() {
+        if (uploader.isNullOrEmpty() || disowned) {
+            return
+        }
+        val context = context
+        val uploader = uploader
+        if (context == null || uploader == null) {
+            return
+        }
+        BaseDialogBuilder(context)
+            .setMessage(getString(R.string.filter_the_uploader, uploader))
+            .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
+                val filter = Filter()
+                filter.mode = EhFilter.MODE_UPLOADER
+                filter.text = uploader
+                EhFilter.addFilter(filter)
+                showTip(R.string.filter_added, LENGTH_SHORT)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun modifyFavouriteLongClick() {
         lifecycleScope.launchIO {
             if (mGalleryDetail != null && !mModifyingFavorites) {
