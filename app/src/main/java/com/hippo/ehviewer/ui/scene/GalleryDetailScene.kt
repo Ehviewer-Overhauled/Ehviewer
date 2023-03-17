@@ -51,7 +51,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Difference
@@ -429,9 +431,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         return ComposeView(requireContext()).apply {
             setContent {
                 Mdc3Theme {
-                    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+                    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                     Scaffold(
-                        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                         topBar = {
                             LargeTopAppBar(
                                 title = {
@@ -465,7 +466,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 if (gi != null) {
                                     GalleryDetailContent(
                                         galleryInfo = gi,
-                                        galleryDetail = composeBindingGD
+                                        galleryDetail = composeBindingGD,
+                                        modifier = Modifier
+                                            .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                            .verticalScroll(rememberScrollState())
                                     )
                                 } else {
                                     Box(
@@ -484,9 +488,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     @Composable
-    private fun GalleryDetailContent(galleryInfo: GalleryInfo, galleryDetail: GalleryDetail?) {
+    private fun GalleryDetailContent(
+        galleryInfo: GalleryInfo,
+        galleryDetail: GalleryDetail?,
+        modifier: Modifier
+    ) {
         Column(
-            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+            modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
         ) {
             GalleryDetailHeaderCard(
                 galleryInfo = galleryInfo,
