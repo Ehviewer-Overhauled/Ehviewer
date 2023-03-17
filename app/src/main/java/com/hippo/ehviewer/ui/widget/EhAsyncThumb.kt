@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
+import com.google.accompanist.drawablepainter.DrawablePainter
+import com.hippo.drawable.PreciselyClipDrawable
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.ehUrl
 
@@ -45,10 +47,30 @@ fun EhAsyncPreview(
         model = requestOf(model.imageUrl),
         contentDescription = "",
         modifier = modifier,
+        transform = {
+            if (it is AsyncImagePainter.State.Success) {
+                model.run {
+                    if (offsetX == Int.MIN_VALUE) it
+                    else it.copy(
+                        painter = DrawablePainter(
+                            PreciselyClipDrawable(
+                                it.result.drawable,
+                                offsetX,
+                                offsetY,
+                                clipWidth,
+                                clipHeight
+                            )
+                        )
+                    )
+                }
+            } else {
+                it
+            }
+        },
         onState = {
             if (it is AsyncImagePainter.State.Success) {
                 it.result.drawable.run {
-                    if ((intrinsicWidth.toFloat() / intrinsicHeight) in 0.5..0.8) {
+                    if ((intrinsicWidth.toFloat() / intrinsicHeight) in 0.5..0.8 && model.offsetX == Int.MIN_VALUE) {
                         if (contentScale == ContentScale.Fit) contentScale = ContentScale.Crop
                     }
                 }
