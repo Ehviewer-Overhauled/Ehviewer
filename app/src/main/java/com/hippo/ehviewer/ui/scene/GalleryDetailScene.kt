@@ -35,7 +35,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -108,7 +107,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
@@ -116,6 +114,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -156,12 +155,12 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.IntIdGenerator
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import kotlin.math.roundToInt
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
@@ -183,7 +182,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var favButtonText by mutableStateOf("")
     private var getDetailError by mutableStateOf("")
 
-    private var mRequestId = IntIdGenerator.INVALID_ID
     private var mTorrentList: List<TorrentParser.Result>? = null
     private var requestStoragePermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -201,9 +199,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
-
-    @State
-    private var mState = STATE_INIT
     private var mModifyingFavorites = false
 
     @StringRes
@@ -229,7 +224,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         mAction = action
         if (ACTION_GALLERY_INFO == action) {
             composeBindingGI = args.getParcelableCompat(KEY_GALLERY_INFO)
-            // Add history
             composeBindingGI?.let { lifecycleScope.launchIO { EhDB.putHistoryInfo(it) } }
         } else if (ACTION_GID_TOKEN == action) {
             mGid = args.getLong(KEY_GID)
@@ -312,7 +306,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         mGid = savedInstanceState.getLong(KEY_GID)
         mToken = savedInstanceState.getString(KEY_TOKEN)
         composeBindingGD = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
-        mRequestId = savedInstanceState.getInt(KEY_REQUEST_ID)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -330,7 +323,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         if (composeBindingGD != null) {
             outState.putParcelable(KEY_GALLERY_DETAIL, composeBindingGD)
         }
-        outState.putInt(KEY_REQUEST_ID, mRequestId)
     }
 
     private fun actionOpenInOtherApp() {
@@ -342,10 +334,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun actionRefresh() {
-        if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
-            adjustViewVisibility(STATE_REFRESH)
-            request()
-        }
+        if (composeBindingGD == null) return
+        getDetailError = ""
+        composeBindingGD = null
+        request()
     }
 
     private fun actionAddTag() {
@@ -388,15 +380,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         if (prepareData()) {
             if (composeBindingGD != null) {
                 bindViewSecond()
-                adjustViewVisibility(STATE_NORMAL)
-            } else if (composeBindingGI != null) {
-                adjustViewVisibility(STATE_REFRESH_HEADER)
-            } else {
-                adjustViewVisibility(STATE_REFRESH)
             }
         } else {
             getDetailError = getString(R.string.error_cannot_find_gallery)
-            adjustViewVisibility(STATE_FAILED)
         }
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
@@ -820,9 +806,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun prepareData(): Boolean {
-        if (composeBindingGD != null) {
-            return true
-        }
+        composeBindingGD?.let { return true }
         val gid = gid
         if (gid == -1L) {
             return false
@@ -830,37 +814,28 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
         // Get from cache
         composeBindingGD = galleryDetailCache[gid]
-        if (composeBindingGD != null) {
-            return true
-        }
-        val application = requireContext().applicationContext as EhApplication
-        return if (application.containGlobalStuff(mRequestId)) {
-            // request exist
-            true
-        } else request()
-
-        // Do request
-    }
-
-    private fun request(): Boolean {
-        val context = context
-        val activity = mainActivity
-        val url = galleryDetailUrl
-        if (null == context || null == activity || null == url) {
-            return false
-        }
-        val callback: EhClient.Callback<*> = GetGalleryDetailListener(context)
-        mRequestId = (context.applicationContext as EhApplication).putGlobalStuff(callback)
-        val request = EhRequest()
-            .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
-            .setArgs(url)
-            .setCallback(callback)
-        request.enqueue(this)
+        composeBindingGD?.let { return true }
+        request()
         return true
     }
 
-    private fun adjustViewVisibility(state: Int) {
-        mState = state
+    private fun request() {
+        val url = galleryDetailUrl ?: return
+        viewLifecycleOwner.lifecycleScope.launchIO {
+            runSuspendCatching {
+                EhEngine.getGalleryDetail(url)
+            }.onSuccess {
+                galleryDetailCache.put(it.gid, it)
+                EhDB.putHistoryInfo(it)
+                composeBindingGD = it
+                composeBindingGI = it
+                updateDownloadState()
+                bindViewSecond()
+            }.onFailure {
+                it.printStackTrace()
+                getDetailError = ExceptionUtils.getReadableString(it)
+            }
+        }
     }
 
     private fun doShareGallery() {
@@ -1426,17 +1401,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     override fun onRenameLabel(from: String, to: String) {}
     override fun onUpdateLabels() {}
-    private fun onGetGalleryDetailSuccess(result: GalleryDetail) {
-        composeBindingGD = result
-        updateDownloadState()
-        adjustViewVisibility(STATE_NORMAL)
-        bindViewSecond()
-    }
-
-    private fun onGetGalleryDetailFailure(e: Exception) {
-        e.printStackTrace()
-        context?.let { getDetailError = ExceptionUtils.getReadableString(e) }
-    }
 
     private fun onRateGallerySuccess(result: RateGalleryParser.Result) {
         composeBindingGD?.apply {
@@ -1463,9 +1427,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         mModifyingFavorites = false
     }
 
-    @IntDef(STATE_INIT, STATE_NORMAL, STATE_REFRESH, STATE_REFRESH_HEADER, STATE_FAILED)
-    @Retention(AnnotationRetention.SOURCE)
-    private annotation class State
     private class VoteTagListener(context: Context) :
         EhCallback<GalleryDetailScene?, VoteTagParser.Result>(context) {
         override fun onSuccess(result: VoteTagParser.Result) {
@@ -1542,33 +1503,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     }
                 }
             }
-        }
-    }
-
-    private inner class GetGalleryDetailListener(context: Context) :
-        EhCallback<GalleryDetailScene?, GalleryDetail>(context) {
-        override fun onSuccess(result: GalleryDetail) {
-            application.removeGlobalStuff(this)
-
-            // Put gallery detail to cache
-            galleryDetailCache.put(result.gid, result)
-
-            // Add history
-            lifecycleScope.launchIO { EhDB.putHistoryInfo(result) }
-
-            // Notify success
-            val scene = this@GalleryDetailScene
-            scene.onGetGalleryDetailSuccess(result)
-        }
-
-        override fun onFailure(e: Exception) {
-            application.removeGlobalStuff(this)
-            val scene = this@GalleryDetailScene
-            scene.onGetGalleryDetailFailure(e)
-        }
-
-        override fun onCancel() {
-            application.removeGlobalStuff(this)
         }
     }
 
@@ -1922,13 +1856,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         const val KEY_GID = "gid"
         const val KEY_TOKEN = "token"
         const val KEY_PAGE = "page"
-        private const val STATE_INIT = -1
-        private const val STATE_NORMAL = 0
-        private const val STATE_REFRESH = 1
-        private const val STATE_REFRESH_HEADER = 2
-        private const val STATE_FAILED = 3
         private const val KEY_GALLERY_DETAIL = "gallery_detail"
-        private const val KEY_REQUEST_ID = "request_id"
         private fun getArtist(tagGroups: Array<GalleryTagGroup>?): String? {
             if (null == tagGroups) {
                 return null
