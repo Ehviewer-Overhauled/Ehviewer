@@ -27,6 +27,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -95,6 +96,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -122,6 +124,7 @@ import com.hippo.ehviewer.client.EhTagDatabase.isTranslatable
 import com.hippo.ehviewer.client.EhTagDatabase.namespaceToPrefix
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryTagGroup
@@ -150,10 +153,13 @@ import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.widget.GalleryDetailRating
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
+import com.hippo.text.URLImageGetter
 import com.hippo.util.AppHelper
 import com.hippo.util.ExceptionUtils
+import com.hippo.util.ReadableTime
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
+import com.hippo.widget.ObservedTextView
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
@@ -733,6 +739,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             GalleryDetailTags(tags)
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
+        if (Settings.showComments) {
+            GalleryDetailComment(galleryDetail.comments?.comments)
+        }
     }
 
     private fun onGalleryInfoCardClick() {
@@ -1027,44 +1036,56 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    /*
-    private fun bindComments(commentsList: Array<GalleryComment>?) {
-        context ?: return
-        val inflater = layoutInflater
-        _binding ?: return
-        binding.content.comments.run {
-            comments.removeViews(0, comments.childCount - 1)
-            val maxShowCount = 2
-            if (commentsList.isNullOrEmpty()) {
-                commentsText.setText(R.string.no_comments)
-                return
-            } else if (commentsList.size <= maxShowCount) {
-                commentsText.setText(R.string.no_more_comments)
-            } else {
-                commentsText.setText(R.string.more_comment)
-            }
+    @Composable
+    private fun GalleryDetailComment(commentsList: Array<GalleryComment>?) {
+        val maxShowCount = 2
+        val commentText = if (commentsList.isNullOrEmpty()) stringResource(R.string.no_comments)
+        else if (commentsList.size <= maxShowCount) stringResource(R.string.no_more_comments)
+        else stringResource(R.string.more_comment)
+        if (commentsList != null) {
             val length = maxShowCount.coerceAtMost(commentsList.size)
             for (i in 0 until length) {
                 val comment = commentsList[i]
-                val v = inflater.inflate(R.layout.item_gallery_comment, comments, false)
-                comments.addView(v, i)
-                val user = v.findViewById<TextView>(R.id.user)
-                user.text = comment.user
-                user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                val time = v.findViewById<TextView>(R.id.time)
-                time.text = ReadableTime.getTimeAgo(comment.time)
-                val c = v.findViewById<ObservedTextView>(R.id.comment)
-                c.maxLines = 5
-                c.text = Html.fromHtml(
-                    comment.comment, Html.FROM_HTML_MODE_LEGACY,
-                    URLImageGetter(c), null
-                )
-                v.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                AndroidView(factory = {
+                    LayoutInflater.from(it).inflate(R.layout.item_gallery_comment, null, false)
+                        .apply {
+                            val user = findViewById<TextView>(R.id.user)
+                            user.text = comment.user
+                            user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                            val time = findViewById<TextView>(R.id.time)
+                            time.text = ReadableTime.getTimeAgo(comment.time)
+                            val c = findViewById<ObservedTextView>(R.id.comment)
+                            c.maxLines = 5
+                            c.text = Html.fromHtml(
+                                comment.comment, Html.FROM_HTML_MODE_LEGACY,
+                                URLImageGetter(c), null
+                            )
+                            setOnClickListener {
+                                val galleryDetail = composeBindingGD ?: return@setOnClickListener
+                                val args = Bundle()
+                                args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
+                                args.putString(
+                                    GalleryCommentsScene.KEY_API_KEY,
+                                    galleryDetail.apiKey
+                                )
+                                args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
+                                args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
+                                args.putParcelable(
+                                    GalleryCommentsScene.KEY_COMMENT_LIST,
+                                    galleryDetail.comments
+                                )
+                                args.putParcelable(
+                                    GalleryCommentsScene.KEY_GALLERY_DETAIL,
+                                    galleryDetail
+                                )
+                                navigate(R.id.galleryCommentsScene, args)
+                            }
+                        }
+                })
             }
         }
+        Text(commentText)
     }
-
-     */
 
     private fun getAllRatingText(rating: Float, ratingCount: Int): String {
         return getString(
@@ -1177,20 +1198,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 adjustViewVisibility(STATE_REFRESH)
             }
             return
-        }
-
-        val galleryDetail = composeBindingGD ?: return
-        when (v) {
-            binding.content.comments.comments -> {
-                val args = Bundle()
-                args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
-                args.putString(GalleryCommentsScene.KEY_API_KEY, galleryDetail.apiKey)
-                args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
-                args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
-                args.putParcelable(GalleryCommentsScene.KEY_COMMENT_LIST, galleryDetail.comments)
-                args.putParcelable(GalleryCommentsScene.KEY_GALLERY_DETAIL, galleryDetail)
-                navigate(R.id.galleryCommentsScene, args)
-            }
         }
 
          */
