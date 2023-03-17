@@ -19,6 +19,8 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.DimenRes
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
@@ -364,6 +366,9 @@ object Settings {
         }
     val thumbSize: Int
         get() = dip2px(getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE))
+
+    val thumbSizeDp: Dp
+        get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).dp
 
     private fun dip2px(dpValue: Int): Int {
         val scale = application.resources.displayMetrics.density

@@ -379,27 +379,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         } else {
             DownloadInfo.STATE_INVALID
         }
-        /*
-        binding.content.recyclerView.run {
-            previewsAdapter = GalleryPreviewsAdapter {
-                mainActivity!!.startReaderActivity(composeBindingGD!!, it.position)
-            }
-            footerAdapter = HintAdapter { navigateToPreview(true) }
-            headerAdapter = HintAdapter { navigateToPreview() }
-            adapter = ConcatAdapter(headerAdapter, previewsAdapter, footerAdapter)
-            val columnWidth = Settings.thumbSize
-            layoutManager = AutoGridLayoutManager(context, columnWidth).apply {
-                setStrategy(SimpleGridAutoSpanLayout.STRATEGY_SUITABLE_SIZE)
-            }
-            val padding = LayoutUtils.dp2pix(context, 8f)
-            val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
-            addItemDecoration(decoration)
-            val lp = layoutParams
-            lp.height = resources.displayMetrics.heightPixels * 8 / 7
-            layoutParams = lp
-        }
-
-         */
         readButtonText = getString(R.string.read)
         composeBindingGI?.let { gi ->
             if (mAction == ACTION_GALLERY_INFO) {
@@ -528,8 +507,20 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         galleryDetail: GalleryDetail?,
         modifier: Modifier
     ) {
+        /*
+        binding.content.recyclerView.run {
+            previewsAdapter = GalleryPreviewsAdapter {
+                mainActivity!!.startReaderActivity(composeBindingGD!!, it.position)
+            }
+            footerAdapter = HintAdapter { navigateToPreview(true) }
+            headerAdapter = HintAdapter { navigateToPreview() }
+            adapter = ConcatAdapter(headerAdapter, previewsAdapter, footerAdapter)
+            val padding = LayoutUtils.dp2pix(context, 8f)
+        }
+
+         */
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(160.dp),
+            columns = StaggeredGridCells.Adaptive(Settings.thumbSizeDp),
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
         ) {
             item(span = StaggeredGridItemSpan.FullLine) {
