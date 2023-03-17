@@ -439,7 +439,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         topBar = {
                             LargeTopAppBar(
                                 title = {
-                                    composeBindingGI?.let { Text(text = EhUtils.getSuitableTitle(it)) }
+                                    composeBindingGI?.let { Text(text = EhUtils.getSuitableTitle(it), maxLines = 2) }
                                 },
                                 navigationIcon = {
                                     IconButton(onClick = {
