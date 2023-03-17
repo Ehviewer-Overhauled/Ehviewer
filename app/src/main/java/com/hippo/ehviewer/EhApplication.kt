@@ -165,16 +165,8 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         return id
     }
 
-    fun containGlobalStuff(id: Int): Boolean {
-        return mGlobalStuffMap.containsKey(id)
-    }
-
     fun removeGlobalStuff(id: Int): Any? {
         return mGlobalStuffMap.remove(id)
-    }
-
-    fun removeGlobalStuff(o: Any) {
-        mGlobalStuffMap.values.removeAll(setOf(o))
     }
 
     fun registerActivity(activity: Activity) {
@@ -217,7 +209,8 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 dns(EhDns)
                 proxySelector(ehProxySelector)
                 if (Settings.dF) {
-                    val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
+                    val factory =
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
                     factory.init(null as KeyStore?)
                     val manager = factory.trustManagers!!
                     val trustManager = manager.filterIsInstance<X509TrustManager>().first()
