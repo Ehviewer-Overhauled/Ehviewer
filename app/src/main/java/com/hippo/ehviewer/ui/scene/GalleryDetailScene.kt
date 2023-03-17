@@ -28,7 +28,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -61,12 +60,15 @@ import androidx.compose.material.icons.filled.Difference
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ImageSearch
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -82,6 +84,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -341,39 +344,37 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         outState.putInt(KEY_REQUEST_ID, mRequestId)
     }
 
-    fun onMenuItemClick(item: MenuItem): Boolean {
-        val itemId = item.itemId
-        if (itemId == R.id.action_open_in_other_app) {
-            val url = galleryDetailUrl
-            val activity: Activity? = mainActivity
-            if (null != url && null != activity) {
-                UrlOpener.openUrl(activity, url, false)
-            }
-        } else if (itemId == R.id.action_refresh) {
-            if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
-                adjustViewVisibility(STATE_REFRESH)
-                request()
-            }
-        } else if (itemId == R.id.action_add_tag) {
-            if (composeBindingGD == null) {
-                return false
-            }
-            if (composeBindingGD!!.apiUid < 0) {
-                showTip(R.string.sign_in_first, LENGTH_LONG)
-                return false
-            }
-            val builder =
-                EditTextDialogBuilder(requireContext(), "", getString(R.string.action_add_tag_tip))
-            builder.setPositiveButton(android.R.string.ok, null)
-            val dialog = builder.setTitle(R.string.action_add_tag)
-                .show()
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                .setOnClickListener {
-                    voteTag(builder.text.trim { it <= ' ' }, 1)
-                    dialog.dismiss()
-                }
+    private fun actionOpenInOtherApp() {
+        val url = galleryDetailUrl
+        val activity: Activity? = mainActivity
+        if (null != url && null != activity) {
+            UrlOpener.openUrl(activity, url, false)
         }
-        return true
+    }
+
+    private fun actionRefresh() {
+        if (mState != STATE_REFRESH && mState != STATE_REFRESH_HEADER) {
+            adjustViewVisibility(STATE_REFRESH)
+            request()
+        }
+    }
+
+    private fun actionAddTag() {
+        composeBindingGD ?: return
+        if (composeBindingGD!!.apiUid < 0) {
+            showTip(R.string.sign_in_first, LENGTH_LONG)
+            return
+        }
+        val builder =
+            EditTextDialogBuilder(requireContext(), "", getString(R.string.action_add_tag_tip))
+        builder.setPositiveButton(android.R.string.ok, null)
+        val dialog = builder.setTitle(R.string.action_add_tag)
+            .show()
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            .setOnClickListener {
+                voteTag(builder.text.trim { it <= ' ' }, 1)
+                dialog.dismiss()
+            }
     }
 
     override fun onCreateView(
@@ -439,7 +440,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         topBar = {
                             LargeTopAppBar(
                                 title = {
-                                    composeBindingGI?.let { Text(text = EhUtils.getSuitableTitle(it), maxLines = 2) }
+                                    composeBindingGI?.let {
+                                        Text(
+                                            text = EhUtils.getSuitableTitle(it),
+                                            maxLines = 2
+                                        )
+                                    }
                                 },
                                 navigationIcon = {
                                     IconButton(onClick = {
@@ -453,7 +459,35 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 },
                                 scrollBehavior = scrollBehavior,
                                 actions = {
-
+                                    var dropdown by remember { mutableStateOf(false) }
+                                    IconButton(onClick = { dropdown = !dropdown }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Menu,
+                                            contentDescription = null
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = dropdown,
+                                        onDismissRequest = { dropdown = false }) {
+                                        DropdownMenuItem(
+                                            text = { Text(text = stringResource(id = R.string.action_add_tag)) },
+                                            onClick = {
+                                                dropdown = false
+                                                actionAddTag()
+                                            })
+                                        DropdownMenuItem(
+                                            text = { Text(text = stringResource(id = R.string.refresh)) },
+                                            onClick = {
+                                                dropdown = false
+                                                actionRefresh()
+                                            })
+                                        DropdownMenuItem(
+                                            text = { Text(text = stringResource(id = R.string.open_in_other_app)) },
+                                            onClick = {
+                                                dropdown = false
+                                                actionOpenInOtherApp()
+                                            })
+                                    }
                                 }
                             )
                         }
