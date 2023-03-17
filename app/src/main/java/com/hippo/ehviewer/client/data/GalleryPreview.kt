@@ -21,13 +21,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class GalleryPreview(
-    private val imageUrl: String,
+    val imageUrl: String,
     val pageUrl: String,
     val position: Int,
-    private val offsetX: Int = Int.MIN_VALUE,
-    private val offsetY: Int = Int.MIN_VALUE,
-    private val clipWidth: Int = Int.MIN_VALUE,
-    private val clipHeight: Int = Int.MIN_VALUE,
+    val offsetX: Int = Int.MIN_VALUE,
+    val offsetY: Int = Int.MIN_VALUE,
+    val clipWidth: Int = Int.MIN_VALUE,
+    val clipHeight: Int = Int.MIN_VALUE,
 ) : Parcelable {
     fun load(view: LoadImageView) {
         view.setClip(offsetX, offsetY, clipWidth, clipHeight)

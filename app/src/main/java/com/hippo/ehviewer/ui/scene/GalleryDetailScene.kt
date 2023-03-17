@@ -150,6 +150,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
+import com.hippo.ehviewer.ui.widget.EhAsyncThumb
 import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.widget.GalleryDetailRating
 import com.hippo.ehviewer.widget.GalleryRatingBar
@@ -509,18 +510,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         galleryDetail: GalleryDetail?,
         modifier: Modifier
     ) {
-        /*
-        binding.content.recyclerView.run {
-            previewsAdapter = GalleryPreviewsAdapter {
-                mainActivity!!.startReaderActivity(composeBindingGD!!, it.position)
-            }
-            footerAdapter = HintAdapter { navigateToPreview(true) }
-            headerAdapter = HintAdapter { navigateToPreview() }
-            adapter = ConcatAdapter(headerAdapter, previewsAdapter, footerAdapter)
-            val padding = LayoutUtils.dp2pix(context, 8f)
-        }
-
-         */
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Adaptive(Settings.thumbSizeDp),
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
@@ -565,6 +554,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             CircularProgressIndicator()
                         }
                     }
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp))
                 }
             }
             if (galleryDetail != null) {
@@ -576,7 +568,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun LazyStaggeredGridScope.galleryDetailPreview(gd: GalleryDetail) {
         val previewList = gd.previewList
         item {
-            Column {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
@@ -592,7 +586,27 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
         }
         items(previewList) {
-
+            Column(
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Card(
+                        onClick = {
+                            mainActivity?.startReaderActivity(gd, it.position)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.6666667F)
+                    ) {
+                        EhAsyncThumb(
+                            model = it.imageUrl,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+                Text((it.position + 1).toString())
+            }
         }
         item {
             val footerText = if (gd.previewPages <= 0 || previewList.isEmpty()) {
@@ -602,7 +616,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             } else {
                 stringResource(R.string.more_previews)
             }
-            Column {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
