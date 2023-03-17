@@ -166,11 +166,20 @@ import com.hippo.ehviewer.download.DownloadManager as downloadManager
 class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var mDownloadState = 0
     private var mAction: String? = null
-    private var composeBindingGI by mutableStateOf<GalleryInfo?>(null)
     private var mGid: Long = 0
     private var mToken: String? = null
     private var mPage = 0
+
+    private var composeBindingGI by mutableStateOf<GalleryInfo?>(null)
     private var composeBindingGD by mutableStateOf<GalleryDetail?>(null)
+    private var readButtonText by mutableStateOf("")
+    private var downloadButtonText by mutableStateOf("")
+    private var ratingText by mutableStateOf("")
+    private var torrentText by mutableStateOf("")
+    private var favourite by mutableStateOf(false)
+    private var favButtonText by mutableStateOf("")
+    private var getDetailError by mutableStateOf("")
+
     private var mRequestId = IntIdGenerator.INVALID_ID
     private var mTorrentList: List<TorrentParser.Result>? = null
     private var requestStoragePermissionLauncher = registerForActivityResult(
@@ -215,8 +224,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private var getDetailError by mutableStateOf("")
-
     private fun handleArgs(args: Bundle?) {
         val action = args?.getString(KEY_ACTION) ?: return
         mAction = action
@@ -252,23 +259,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     // -1 for error
     private val gid: Long
-        get() = if (composeBindingGD != null) {
-            composeBindingGD!!.gid
-        } else if (composeBindingGI != null) {
-            composeBindingGI!!.gid
-        } else if (ACTION_GID_TOKEN == mAction) {
-            mGid
-        } else {
-            -1
-        }
+        get() = composeBindingGD?.gid ?: composeBindingGI?.gid
+        ?: mGid.takeIf { mAction == ACTION_GID_TOKEN } ?: -1
+
     private val uploader: String?
-        get() = if (composeBindingGD != null) {
-            composeBindingGD!!.uploader
-        } else if (composeBindingGI != null) {
-            composeBindingGI!!.uploader
-        } else {
-            null
-        }
+        get() = composeBindingGD?.uploader ?: composeBindingGI?.uploader
 
     // Judging by the uploader to exclude the cooldown period
     private val disowned: Boolean
@@ -276,13 +271,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     // -1 for error
     private val category: Int
-        get() = if (composeBindingGD != null) {
-            composeBindingGD!!.category
-        } else if (composeBindingGI != null) {
-            composeBindingGI!!.category
-        } else {
-            -1
-        }
+        get() = composeBindingGD?.category ?: composeBindingGI?.category ?: -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -818,39 +807,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun adjustViewVisibility(state: Int) {
-        if (state == mState) {
-            return
-        }
         mState = state
-        when (state) {
-            STATE_NORMAL -> {
-                // Show mMainView
-                // Show mBelowHeader
-            }
-
-            STATE_REFRESH -> {} // Show mProgressView
-
-            STATE_REFRESH_HEADER -> {
-                // Show mMainView
-                // Show mProgress
-            }
-
-            STATE_INIT, STATE_FAILED -> {} // Show mFailedView
-        }
     }
-
-    private var readButtonText by mutableStateOf("")
-    private var downloadButtonText by mutableStateOf("")
-    private var ratingText by mutableStateOf("")
 
     private fun doShareGallery() {
         galleryDetailUrl?.let { AppHelper.share(requireActivity(), it) }
     }
 
-    private var torrentText by mutableStateOf("")
-
-    private var favourite by mutableStateOf(false)
-    private var favButtonText by mutableStateOf("")
     private fun updateFavoriteDrawable() {
         val gd = composeBindingGD ?: return
         lifecycleScope.launchIO {
@@ -962,7 +925,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     @Composable
     private fun GalleryDetailTags(tagGroups: Array<GalleryTagGroup>) {
-
         @Composable
         fun baseRoundText(
             text: String,
@@ -1443,9 +1405,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             rating = result.rating
             ratingCount = result.ratingCount
         }
-        ratingText = getAllRatingText(result.rating, result.ratingCount)
-        composeBindingGD?.rating = result.rating
         composeBindingGD = composeBindingGD
+        ratingText = getAllRatingText(result.rating, result.ratingCount)
     }
 
     private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {
