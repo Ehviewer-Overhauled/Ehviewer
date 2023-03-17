@@ -515,6 +515,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         onInfoCardClick = ::onGalleryInfoCardClick,
                         onCategoryChipClick = ::onCategoryChipClick,
                         onUploaderChipClick = ::onUploaderChipClick,
+                        onBlockUploaderIconClick = ::showFilterUploaderDialog,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))

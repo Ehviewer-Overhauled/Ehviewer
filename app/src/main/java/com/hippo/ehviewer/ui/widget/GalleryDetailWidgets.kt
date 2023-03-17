@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.widget
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GroupOff
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.AssistChip
@@ -118,6 +120,7 @@ fun GalleryDetailHeaderCard(
     galleryDetail: GalleryDetail?,
     onInfoCardClick: () -> Unit,
     onUploaderChipClick: () -> Unit,
+    onBlockUploaderIconClick: () -> Unit,
     onCategoryChipClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -172,6 +175,13 @@ fun GalleryDetailHeaderCard(
                         Icon(
                             imageVector = Icons.Default.PersonAdd,
                             contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.GroupOff,
+                            contentDescription = null,
+                            modifier = Modifier.clickable(onClick = onBlockUploaderIconClick)
                         )
                     })
             }
