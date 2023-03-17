@@ -1036,55 +1036,63 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
+    private fun onNavigateToCommentScene() {
+        val galleryDetail = composeBindingGD ?: return
+        val args = Bundle()
+        args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
+        args.putString(
+            GalleryCommentsScene.KEY_API_KEY,
+            galleryDetail.apiKey
+        )
+        args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
+        args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
+        args.putParcelable(
+            GalleryCommentsScene.KEY_COMMENT_LIST,
+            galleryDetail.comments
+        )
+        args.putParcelable(
+            GalleryCommentsScene.KEY_GALLERY_DETAIL,
+            galleryDetail
+        )
+        navigate(R.id.galleryCommentsScene, args)
+    }
+
     @Composable
     private fun GalleryDetailComment(commentsList: Array<GalleryComment>?) {
         val maxShowCount = 2
         val commentText = if (commentsList.isNullOrEmpty()) stringResource(R.string.no_comments)
         else if (commentsList.size <= maxShowCount) stringResource(R.string.no_more_comments)
         else stringResource(R.string.more_comment)
-        if (commentsList != null) {
-            val length = maxShowCount.coerceAtMost(commentsList.size)
-            for (i in 0 until length) {
-                val comment = commentsList[i]
-                AndroidView(factory = {
-                    LayoutInflater.from(it).inflate(R.layout.item_gallery_comment, null, false)
-                        .apply {
-                            val user = findViewById<TextView>(R.id.user)
-                            user.text = comment.user
-                            user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                            val time = findViewById<TextView>(R.id.time)
-                            time.text = ReadableTime.getTimeAgo(comment.time)
-                            val c = findViewById<ObservedTextView>(R.id.comment)
-                            c.maxLines = 5
-                            c.text = Html.fromHtml(
-                                comment.comment, Html.FROM_HTML_MODE_LEGACY,
-                                URLImageGetter(c), null
-                            )
-                            setOnClickListener {
-                                val galleryDetail = composeBindingGD ?: return@setOnClickListener
-                                val args = Bundle()
-                                args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
-                                args.putString(
-                                    GalleryCommentsScene.KEY_API_KEY,
-                                    galleryDetail.apiKey
+        CrystalCard(onClick = ::onNavigateToCommentScene) {
+            if (commentsList != null) {
+                val length = maxShowCount.coerceAtMost(commentsList.size)
+                for (i in 0 until length) {
+                    val comment = commentsList[i]
+                    AndroidView(factory = {
+                        LayoutInflater.from(it).inflate(R.layout.item_gallery_comment, null, false)
+                            .apply {
+                                val user = findViewById<TextView>(R.id.user)
+                                user.text = comment.user
+                                user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                                val time = findViewById<TextView>(R.id.time)
+                                time.text = ReadableTime.getTimeAgo(comment.time)
+                                val c = findViewById<ObservedTextView>(R.id.comment)
+                                c.maxLines = 5
+                                c.text = Html.fromHtml(
+                                    comment.comment, Html.FROM_HTML_MODE_LEGACY,
+                                    URLImageGetter(c), null
                                 )
-                                args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
-                                args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
-                                args.putParcelable(
-                                    GalleryCommentsScene.KEY_COMMENT_LIST,
-                                    galleryDetail.comments
-                                )
-                                args.putParcelable(
-                                    GalleryCommentsScene.KEY_GALLERY_DETAIL,
-                                    galleryDetail
-                                )
-                                navigate(R.id.galleryCommentsScene, args)
                             }
-                        }
-                })
+                    })
+                }
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(commentText)
             }
         }
-        Text(commentText)
     }
 
     private fun getAllRatingText(rating: Float, ratingCount: Int): String {
