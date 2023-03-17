@@ -51,11 +51,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -510,11 +510,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         galleryDetail: GalleryDetail?,
         modifier: Modifier
     ) {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(Settings.thumbSizeDp),
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(Settings.thumbSizeDp),
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
         ) {
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                 Column {
                     GalleryDetailHeaderCard(
                         galleryInfo = galleryInfo,
@@ -554,9 +554,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             CircularProgressIndicator()
                         }
                     }
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp))
                 }
             }
             if (galleryDetail != null) {
@@ -565,7 +562,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private fun LazyStaggeredGridScope.galleryDetailPreview(gd: GalleryDetail) {
+    private fun LazyGridScope.galleryDetailPreview(gd: GalleryDetail) {
         val previewList = gd.previewList
         item {
             Column(
