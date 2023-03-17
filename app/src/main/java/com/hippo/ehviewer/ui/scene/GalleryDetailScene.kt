@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.DownloadManager
@@ -37,6 +38,7 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -341,7 +343,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun actionRefresh() {
-        if (composeBindingGD == null) return
+        if (composeBindingGD == null && getDetailError == "") return
         getDetailError = ""
         composeBindingGD = null
         request()
@@ -462,7 +464,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.big_sad_pandroid),
-                                        contentDescription = null
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable(onClick = ::actionRefresh)
                                     )
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Text(text = getDetailError)
@@ -1063,6 +1066,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         navigate(R.id.galleryCommentsScene, args)
     }
 
+    @SuppressLint("InflateParams")
     @Composable
     private fun GalleryDetailComment(commentsList: Array<GalleryComment>?) {
         val maxShowCount = 2
@@ -1198,23 +1202,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             .setPositiveButton(android.R.string.ok, helper)
             .show()
         helper.setDialog(dialog, galleryDetail.rating)
-    }
-
-    fun onClick(v: View) {
-        /*
-        val context = context
-        val activity = mainActivity
-        if (null == context || null == activity) {
-            return
-        }
-        if (binding.tip === v) {
-            if (request()) {
-                adjustViewVisibility(STATE_REFRESH)
-            }
-            return
-        }
-
-         */
     }
 
     private fun showFilterTagDialog(tag: String) {
