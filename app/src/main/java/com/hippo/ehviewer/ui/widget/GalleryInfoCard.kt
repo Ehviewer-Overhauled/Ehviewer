@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.widget
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,9 +36,8 @@ fun ListInfoCard(
     info: GalleryInfo,
     modifier: Modifier = Modifier
 ) {
-    OutlinedCard(
-        modifier = Modifier.padding(6.dp),
-        border = BorderStroke(1.dp, Color.Transparent)
+    CrystalCard(
+        modifier = Modifier.padding(6.dp)
     ) {
         Row(
             modifier = modifier
