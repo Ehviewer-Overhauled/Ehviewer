@@ -84,6 +84,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -599,7 +600,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 Text((it.position + 1).toString())
             }
         }
-        item {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             val footerText = if (gd.previewPages <= 0 || previewList.isEmpty()) {
                 stringResource(R.string.no_previews)
             } else if (gd.previewPages == 1) {
@@ -607,21 +608,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             } else {
                 stringResource(R.string.more_previews)
             }
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    Card(
-                        onClick = ::navigateToPreview.partially1(true),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(0.6666667F)
-                    ) {}
-                    Text(footerText)
-                }
-                Text("")
+            TextButton(onClick = ::navigateToPreview.partially1(true)) {
+                Text(footerText)
             }
         }
     }
