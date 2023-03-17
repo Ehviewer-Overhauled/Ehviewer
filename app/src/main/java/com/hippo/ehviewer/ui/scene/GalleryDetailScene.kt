@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -452,9 +453,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             )
                         }
                     ) {
-                        Surface(
-                            modifier = Modifier.padding(it)
-                        ) {
+                        Surface {
                             if (getDetailError.isNotBlank()) {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
@@ -474,6 +473,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     GalleryDetailContent(
                                         galleryInfo = gi,
                                         galleryDetail = composeBindingGD,
+                                        contentPadding = it,
                                         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
                                     )
                                 } else {
@@ -496,10 +496,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun GalleryDetailContent(
         galleryInfo: GalleryInfo,
         galleryDetail: GalleryDetail?,
+        contentPadding: PaddingValues,
         modifier: Modifier
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(Settings.thumbSizeDp),
+            contentPadding = contentPadding,
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
         ) {
             item(span = { GridItemSpan(maxCurrentLineSpan) }) {
