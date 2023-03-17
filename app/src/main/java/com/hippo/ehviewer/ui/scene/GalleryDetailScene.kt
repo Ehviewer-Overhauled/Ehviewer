@@ -931,7 +931,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
             return ehTags?.takeIf { it.isInitialized() }?.getTranslation(tag = this) ?: this
         }
 
-        fun String.translate(prefix: String): String {
+        fun String.translate(prefix: String?): String {
             return ehTags?.takeIf { it.isInitialized() }
                 ?.getTranslation(prefix = prefix, tag = this) ?: this
         }
@@ -943,7 +943,7 @@ class GalleryDetailScene : CollapsingToolbarScene(), View.OnClickListener, Downl
                         text = translate(),
                         isGroup = true
                     )
-                    val prefix = namespaceToPrefix(this) ?: return
+                    val prefix = namespaceToPrefix(this)
                     FlowRow {
                         it.forEach {
                             val weak = it.startsWith('_')
