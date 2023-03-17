@@ -50,9 +50,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
@@ -503,9 +504,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     GalleryDetailContent(
                                         galleryInfo = gi,
                                         galleryDetail = composeBindingGD,
-                                        modifier = Modifier
-                                            .nestedScroll(scrollBehavior.nestedScrollConnection)
-                                            .verticalScroll(rememberScrollState())
+                                        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
                                     )
                                 } else {
                                     Box(
@@ -529,45 +528,50 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         galleryDetail: GalleryDetail?,
         modifier: Modifier
     ) {
-        Column(
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(160.dp),
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
         ) {
-            GalleryDetailHeaderCard(
-                galleryInfo = galleryInfo,
-                galleryDetail = galleryDetail,
-                onInfoCardClick = ::onGalleryInfoCardClick,
-                onCategoryChipClick = ::onCategoryChipClick,
-                onUploaderChipClick = ::onUploaderChipClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
-            )
-            Row {
-                FilledTonalButton(
-                    onClick = ::onDownloadButtonClick,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .weight(1F)
-                ) {
-                    Text(text = downloadButtonText)
-                }
-                Button(
-                    onClick = ::onReadButtonClick,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .weight(1F)
-                ) {
-                    Text(text = readButtonText)
-                }
-            }
-            if (galleryDetail != null) {
-                BelowHeader(galleryDetail)
-            } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+            item(span = StaggeredGridItemSpan.FullLine) {
+                Column {
+                    GalleryDetailHeaderCard(
+                        galleryInfo = galleryInfo,
+                        galleryDetail = galleryDetail,
+                        onInfoCardClick = ::onGalleryInfoCardClick,
+                        onCategoryChipClick = ::onCategoryChipClick,
+                        onUploaderChipClick = ::onUploaderChipClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                    )
+                    Row {
+                        FilledTonalButton(
+                            onClick = ::onDownloadButtonClick,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .weight(1F)
+                        ) {
+                            Text(text = downloadButtonText)
+                        }
+                        Button(
+                            onClick = ::onReadButtonClick,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .weight(1F)
+                        ) {
+                            Text(text = readButtonText)
+                        }
+                    }
+                    if (galleryDetail != null) {
+                        BelowHeader(galleryDetail)
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
                 }
             }
         }
