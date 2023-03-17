@@ -45,14 +45,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -66,6 +69,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -100,6 +104,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import arrow.core.partially1
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
@@ -199,9 +204,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var mArchiveFormParamOr: String? = null
     private var mArchiveList: List<ArchiveParser.Archive>? = null
     private var mCurrentFunds: HomeParser.Funds? = null
-    private var previewsAdapter: GalleryPreviewsAdapter? = null
-    private var footerAdapter: HintAdapter? = null
-    private var headerAdapter: HintAdapter? = null
 
     @State
     private var mState = STATE_INIT
@@ -565,6 +567,55 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     }
                 }
             }
+            if (galleryDetail != null) {
+                galleryDetailPreview(galleryDetail)
+            }
+        }
+    }
+
+    private fun LazyStaggeredGridScope.galleryDetailPreview(gd: GalleryDetail) {
+        val previewList = gd.previewList
+        item {
+            Column {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        onClick = ::navigateToPreview,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.6666667F)
+                    ) {}
+                    Text(stringResource(R.string.more_previews))
+                }
+                Text("")
+            }
+        }
+        items(previewList) {
+
+        }
+        item {
+            val footerText = if (gd.previewPages <= 0 || previewList.isEmpty()) {
+                stringResource(R.string.no_previews)
+            } else if (gd.previewPages == 1) {
+                stringResource(R.string.no_more_previews)
+            } else {
+                stringResource(R.string.more_previews)
+            }
+            Column {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        onClick = ::navigateToPreview.partially1(true),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.6666667F)
+                    ) {}
+                    Text(footerText)
+                }
+                Text("")
+            }
         }
     }
 
@@ -915,7 +966,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
         // bindComments(gd.comments!!.comments)
-        bindPreviews(gd)
     }
 
     @Composable
@@ -1033,20 +1083,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
      */
-
-    private fun bindPreviews(gd: GalleryDetail) {
-        val previewList = gd.previewList
-        headerAdapter?.text = getString(R.string.more_previews)
-        if (gd.previewPages <= 0 || previewList.isEmpty()) {
-            footerAdapter?.text = getString(R.string.no_previews)
-            return
-        } else if (gd.previewPages == 1) {
-            footerAdapter?.text = getString(R.string.no_more_previews)
-        } else {
-            footerAdapter?.text = getString(R.string.more_previews)
-        }
-        previewsAdapter?.submitList(previewList)
-    }
 
     private fun getAllRatingText(rating: Float, ratingCount: Int): String {
         return getString(
