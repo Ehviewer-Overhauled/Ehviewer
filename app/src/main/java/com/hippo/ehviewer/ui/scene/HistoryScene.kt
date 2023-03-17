@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import arrow.core.partially1
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.HandlerDrawable
@@ -223,17 +224,16 @@ class HistoryScene : BaseToolbarScene() {
         return false
     }
 
-    fun onItemClick(gi: GalleryInfo): Boolean {
+    fun onItemClick(gi: GalleryInfo) {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
         navigate(R.id.galleryDetailScene, args)
-        return true
     }
 
-    fun onItemLongClick(gi: GalleryInfo): Boolean {
+    fun onItemLongClick(gi: GalleryInfo) {
         val context = requireContext()
-        val activity = mainActivity ?: return false
+        val activity = mainActivity ?: return
         val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourite = gi.favoriteSlot != -2
         val items = if (downloaded) arrayOf<CharSequence>(
@@ -325,7 +325,6 @@ class HistoryScene : BaseToolbarScene() {
                     }
                 }
             }.show()
-        return true
     }
 
     private class AddToFavoriteListener(context: Context) :
@@ -384,8 +383,8 @@ class HistoryScene : BaseToolbarScene() {
             holder.composeView.setContent {
                 Mdc3Theme {
                     ListInfoCard(
-                        onClick = { onItemClick(gi) },
-                        onLongClick = { onItemLongClick(gi) },
+                        onClick = ::onItemClick.partially1(gi),
+                        onLongClick = ::onItemLongClick.partially1(gi),
                         info = gi,
                         modifier = Modifier.height(height)
                     )
