@@ -150,7 +150,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
-import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.EhAsyncPreview
 import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.widget.GalleryDetailRating
 import com.hippo.ehviewer.widget.GalleryRatingBar
@@ -596,8 +596,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             .fillMaxWidth()
                             .aspectRatio(0.6666667F)
                     ) {
-                        EhAsyncThumb(
-                            model = it.imageUrl,
+                        EhAsyncPreview(
+                            model = it,
                             modifier = Modifier.fillMaxSize()
                         )
                     }

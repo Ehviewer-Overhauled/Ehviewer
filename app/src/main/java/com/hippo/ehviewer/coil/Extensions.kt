@@ -2,6 +2,7 @@ package com.hippo.ehviewer.coil
 
 import android.content.Context
 import coil.request.ImageRequest
+import coil.size.Size
 import com.hippo.ehviewer.client.getPreviewThumbKey
 
 fun ImageRequest.Builder.ehUrl(url: String) = apply {
@@ -9,6 +10,7 @@ fun ImageRequest.Builder.ehUrl(url: String) = apply {
     data(url)
     memoryCacheKey(key)
     diskCacheKey(key)
+    size(Size.ORIGINAL)
 }
 
 inline fun Context.imageRequest(
