@@ -734,7 +734,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         val tags = galleryDetail.tags
         if (tags.isNullOrEmpty()) {
-            Text(text = stringResource(id = R.string.no_tags))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(id = R.string.no_tags))
+            }
         } else {
             GalleryDetailTags(tags)
         }
@@ -956,7 +961,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         updateFavoriteDrawable()
         ratingText = getAllRatingText(gd.rating, gd.ratingCount)
         torrentText = resources.getString(R.string.torrent_count, gd.torrentCount)
-        // bindComments(gd.comments!!.comments)
     }
 
     @Composable
