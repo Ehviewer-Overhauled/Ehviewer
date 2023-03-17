@@ -55,6 +55,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Difference
 import androidx.compose.material.icons.filled.Favorite
@@ -69,6 +70,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -93,6 +95,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
@@ -437,6 +440,16 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             LargeTopAppBar(
                                 title = {
                                     composeBindingGI?.let { Text(text = EhUtils.getSuitableTitle(it)) }
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        findNavController().popBackStack()
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = null
+                                        )
+                                    }
                                 },
                                 scrollBehavior = scrollBehavior,
                                 actions = {
