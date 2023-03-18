@@ -538,6 +538,7 @@
     <string name="passwd_cannot_be_empty">密码不能为空</string>
     <string name="list_tile_thumb_size">详情模式下缩略图大小</string>
     <string name="account_name">账户</string>
+    <string name="preload_thumb_aggressively">激进地预载缩略图</string>
     <!-- Tachiyomi Reader Start-->
     <string name="action_settings">设置</string>
     <string name="action_retry">重试</string>

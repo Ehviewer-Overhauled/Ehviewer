@@ -204,6 +204,8 @@ object Settings {
     private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
     private const val KEY_QS_SAVE_PROGRESS = "qs_save_progress"
     private const val DEFAULT_QS_SAVE_PROGRESS = true
+    private const val KEY_PRELOAD_THUMB_AGGRESIVELY = "preload_thumb_aggressively"
+    private const val DEFAULT_PRELOAD_THUMB_AGGRESIVELY = false
     var LIST_THUMB_SIZE_INITED = false
     private lateinit var sSettingsPre: SharedPreferences
     private var LIST_THUMB_SIZE = 40
@@ -644,4 +646,7 @@ object Settings {
     fun putNotificationRequired() {
         putBoolean(KEY_NOTIFICATION_REQUIRED, true)
     }
+
+    val preloadThumbAggressively: Boolean
+        get() = getBoolean(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
 }

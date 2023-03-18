@@ -49,6 +49,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -61,7 +63,6 @@ import com.hippo.app.EditTextDialogBuilder
 import com.hippo.drawable.AddDeleteDrawable
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.FavouriteStatusRouter
@@ -82,6 +83,7 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
+import com.hippo.ehviewer.coil.ehUrl
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
@@ -113,6 +115,7 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper,
     OnClickFabListener, OnExpandListener {
@@ -1035,6 +1038,17 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
+        if (Settings.preloadThumbAggressively) {
+            lifecycleScope.launchIO {
+                result.galleryInfoList.forEach {
+                    it.thumb?.run {
+                        context?.imageLoader?.enqueue(
+                            ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                        )
+                    }
+                }
+            }
+        }
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             val emptyString =
                 getString(if (mUrlBuilder.mode == MODE_SUBSCRIPTION && result.noWatchedTags) R.string.gallery_list_empty_hit_subscription else R.string.gallery_list_empty_hit)
@@ -1113,7 +1127,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         override fun onCancel() {}
     }
 
-    private class QsDrawerHolder(val binding: ItemDrawerListBinding) : RecyclerView.ViewHolder(binding.root)
+    private class QsDrawerHolder(val binding: ItemDrawerListBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private inner class MoveDialogHelper(
         private val mLabels: Array<String>,

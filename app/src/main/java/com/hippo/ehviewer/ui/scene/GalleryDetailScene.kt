@@ -107,6 +107,8 @@ import androidx.navigation.fragment.findNavController
 import arrow.core.partially1
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -141,6 +143,7 @@ import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.client.parser.VoteTagParser
+import com.hippo.ehviewer.coil.ehUrl
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
@@ -835,6 +838,17 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }.onSuccess {
                 galleryDetailCache.put(it.gid, it)
                 EhDB.putHistoryInfo(it)
+                if (Settings.preloadThumbAggressively) {
+                    lifecycleScope.launchIO {
+                        it.previewList.forEach {
+                            it.imageUrl.run {
+                                context?.imageLoader?.enqueue(
+                                    ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                                )
+                            }
+                        }
+                    }
+                }
                 composeBindingGD = it
                 composeBindingGI = it
                 updateDownloadState()

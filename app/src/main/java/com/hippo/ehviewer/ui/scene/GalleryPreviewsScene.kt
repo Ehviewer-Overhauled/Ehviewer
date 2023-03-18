@@ -21,6 +21,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
@@ -31,6 +34,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.coil.ehUrl
 import com.hippo.ehviewer.databinding.DialogGoToBinding
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
@@ -38,6 +42,7 @@ import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import com.hippo.yorozuya.LayoutUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
 import java.util.Locale
 
 class GalleryPreviewsScene : BaseToolbarScene() {
@@ -162,6 +167,17 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     private fun onGetPreviewListSuccess(result: Pair<List<GalleryPreview>, Int>, taskId: Int) {
         if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryDetail) {
+            if (Settings.preloadThumbAggressively) {
+                lifecycleScope.launchIO {
+                    result.first.forEach {
+                        it.imageUrl.run {
+                            context?.imageLoader?.enqueue(
+                                ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                            )
+                        }
+                    }
+                }
+            }
             mHelper!!.onGetPageData(taskId, result.second, 0, null, null, result.first)
         }
     }
