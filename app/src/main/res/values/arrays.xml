@@ -139,12 +139,11 @@
     </string-array>
 
     <string-array name="read_cache_size_entries" translatable="false">
-        <item>40 MB</item>
-        <item>80 MB</item>
-        <item>160 MB</item>
         <item>320 MB</item>
         <item>640 MB</item>
         <item>1280 MB</item>
+        <item>2560 MB</item>
+        <item>5120 MB</item>
     </string-array>
 
     <string-array name="read_cache_size_entry_values" translatable="false">
