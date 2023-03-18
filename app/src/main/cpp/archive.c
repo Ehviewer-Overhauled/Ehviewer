@@ -71,7 +71,7 @@ static size_t archiveSize = 0;
 static entry *entries = NULL;
 static size_t entryCount = 0;
 
-const char supportExt[9][6] = {
+const char supportExt[10][6] = {
         "jpeg",
         "jpg",
         "png",
@@ -80,7 +80,8 @@ const char supportExt[9][6] = {
         "bmp",
         "ico",
         "wbmp",
-        "heif"
+        "heif",
+        "avif"
 };
 
 static inline int filename_is_playable_file(const char *name) {
@@ -88,7 +89,7 @@ static inline int filename_is_playable_file(const char *name) {
     if (!dotptr++)
         return false;
     int i;
-    for (i = 0; i < 9; i++)
+    for (i = 0; i < 10; i++)
         if (strcmp(dotptr, supportExt[i]) == 0)
             return true;
     return false;
