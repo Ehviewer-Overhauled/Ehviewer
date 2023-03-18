@@ -258,7 +258,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val imageCache by lazy {
             DiskCache.Builder().apply {
                 directory(application.cacheDir.toOkioPath() / "image_cache")
-                maxSizeBytes(Settings.readCacheSize.coerceIn(40, 1280).toLong() * 1024 * 1024)
+                maxSizeBytes(Settings.readCacheSize.coerceIn(320, 5120).toLong() * 1024 * 1024)
             }.build()
         }
     }

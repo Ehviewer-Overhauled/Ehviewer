@@ -148,12 +148,11 @@
     </string-array>
 
     <string-array name="read_cache_size_entry_values" translatable="false">
-        <item>40</item>
-        <item>80</item>
-        <item>160</item>
         <item>320</item>
         <item>640</item>
         <item>1280</item>
+        <item>2560</item>
+        <item>5120</item>
     </string-array>
 
     <string-array name="filter_entries">
