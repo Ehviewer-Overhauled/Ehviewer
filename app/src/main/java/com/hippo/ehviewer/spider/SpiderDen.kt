@@ -286,7 +286,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         }
         val dir = downloadDir ?: return null
         var file = findImageFile(dir, index)
-        if (file != null && mMode == SpiderQueen.MODE_DOWNLOAD) {
+        if (file == null && mMode == SpiderQueen.MODE_DOWNLOAD) {
             if (copyFromCacheToDownloadDir(index)) {
                 file = findImageFile(dir, index)
             }
