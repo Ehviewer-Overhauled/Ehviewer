@@ -948,6 +948,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private fun bindViewSecond() {
         val gd = composeBindingGD ?: return
+        context ?: return
         if (mPage != 0) {
             Snackbar.make(
                 requireActivity().findViewById(R.id.snackbar),
