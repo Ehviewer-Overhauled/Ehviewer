@@ -176,7 +176,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         } else {
             MODE_READ
         }
-        mSpiderDen.setMode(mode)
+        mSpiderDen.mode = mode
 
         // Update download page
         val intoDownloadMode = mode == MODE_DOWNLOAD

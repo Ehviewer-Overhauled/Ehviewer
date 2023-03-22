@@ -18,7 +18,6 @@ package com.hippo.ehviewer.spider
 import android.graphics.ImageDecoder
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
-import coil.disk.DiskCache
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
@@ -52,58 +51,30 @@ import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
 private val client = EhApplication.ktorClient
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
-    private val mGid: Long = mGalleryInfo.gid
-    private var mDownloadDir: UniFile? = getGalleryDownloadDir(mGid)
+    private val mGid = mGalleryInfo.gid
+    var downloadDir: UniFile? = getGalleryDownloadDir(mGid)?.takeIf { it.isDirectory }
 
     @Volatile
-    private var mMode = SpiderQueen.MODE_READ
-
-    fun setMode(@SpiderQueen.Mode mode: Int) {
-        mMode = mode
-        if (mode == SpiderQueen.MODE_DOWNLOAD) {
-            ensureDownloadDir()
-        }
-    }
-
-    private fun ensureDownloadDir(): Boolean {
-        mDownloadDir?.let { return it.ensureDir() }
-        val title = getSuitableTitle(mGalleryInfo)
-        val dirname = FileUtils.sanitizeFilename("$mGid-$title")
-        EhDB.putDownloadDirname(mGid, dirname)
-        mDownloadDir = getGalleryDownloadDir(mGid)
-        return mDownloadDir?.ensureDir() ?: false
-    }
-
-    val isReady: Boolean
-        get() = when (mMode) {
-            SpiderQueen.MODE_READ -> true
-            SpiderQueen.MODE_DOWNLOAD -> mDownloadDir?.isDirectory ?: false
-            else -> false
-        }
-    val downloadDir: UniFile?
-        get() {
-            if (mDownloadDir == null) {
-                mDownloadDir = getGalleryDownloadDir(mGid)
+    @SpiderQueen.Mode
+    var mode = SpiderQueen.MODE_READ
+        set(value) {
+            field = value
+            if (field == SpiderQueen.MODE_DOWNLOAD) {
+                val title = getSuitableTitle(mGalleryInfo)
+                val dirname = FileUtils.sanitizeFilename("$mGid-$title")
+                EhDB.putDownloadDirname(mGid, dirname)
+                downloadDir = getGalleryDownloadDir(mGid)!!.apply { check(ensureDir()) { "Download directory $uri is not valid directory!" } }
             }
-            return mDownloadDir?.takeIf { it.isDirectory }
         }
 
     private fun containInCache(index: Int): Boolean {
         val key = getImageKey(mGid, index)
-        return sCache[key]?.apply { close() } != null
+        return sCache[key]?.use { true } ?: false
     }
 
     private fun containInDownloadDir(index: Int): Boolean {
         val dir = downloadDir ?: return false
         return findImageFile(dir, index) != null
-    }
-
-    /**
-     * @param extension with dot
-     */
-    private fun fixExtension(extension: String): String {
-        return extension.takeIf { SUPPORT_IMAGE_EXTENSIONS.contains(it) }
-            ?: SUPPORT_IMAGE_EXTENSIONS[0]
     }
 
     private fun copyFromCacheToDownloadDir(index: Int): Boolean {
@@ -112,7 +83,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         return runCatching {
             sCache.read(key) {
                 val extension = fixExtension("." + metadata.toFile().readText())
-                val file = dir.createFile(generateImageFilename(index, extension)) ?: return false
+                val file = dir.createFile(perFilename(index, extension)) ?: return false
                 file.openFileDescriptor("w").use { outFd ->
                     ParcelFileDescriptor.open(data.toFile(), MODE_READ_WRITE).use {
                         it sendTo outFd
@@ -126,7 +97,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     operator fun contains(index: Int): Boolean {
-        return when (mMode) {
+        return when (mode) {
             SpiderQueen.MODE_READ -> {
                 containInCache(index) || containInDownloadDir(index)
             }
@@ -157,7 +128,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private fun findDownloadFileForIndex(index: Int, extension: String): UniFile? {
         val dir = downloadDir ?: return null
         val ext = fixExtension(".$extension")
-        return dir.createFile(generateImageFilename(index, ext))
+        return dir.createFile(perFilename(index, ext))
     }
 
     @Throws(IOException::class)
@@ -205,7 +176,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         }
 
         // Read Mode, allow save to cache
-        if (mMode == SpiderQueen.MODE_READ) {
+        if (mode == SpiderQueen.MODE_READ) {
             val key = getImageKey(mGid, index)
             var received: Long = 0
             runSuspendCatching {
@@ -269,70 +240,50 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     }
 
     fun getImageSource(index: Int): CloseableSource? {
-        if (mMode == SpiderQueen.MODE_READ) {
+        if (mode == SpiderQueen.MODE_READ) {
             val key = getImageKey(mGid, index)
-            val snapshot: DiskCache.Snapshot? = sCache[key]
+            val snapshot = sCache[key]
             if (snapshot != null) {
                 val source = ImageDecoder.createSource(snapshot.data.toFile())
-                return object : CloseableSource {
-                    override val source: ImageDecoder.Source
-                        get() = source
-
-                    override fun close() {
-                        snapshot.close()
-                    }
+                return object : CloseableSource, AutoCloseable by snapshot {
+                    override val source = source
                 }
             }
         }
         val dir = downloadDir ?: return null
-        var file = findImageFile(dir, index)
-        if (file == null && mMode == SpiderQueen.MODE_DOWNLOAD) {
-            if (copyFromCacheToDownloadDir(index)) {
-                file = findImageFile(dir, index)
-            }
-        }
-        val source = file?.imageSource ?: return null
+        val source = findImageFile(dir, index)?.imageSource ?: return null
         return object : CloseableSource {
-            override val source: ImageDecoder.Source
-                get() = source
+            override val source = source
 
             override fun close() {}
         }
     }
 
     companion object {
-        private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
-
         fun getGalleryDownloadDir(gid: Long): UniFile? {
-            val dir = Settings.downloadLocation
-            // Read from DB
-            var dirname = EhDB.getDownloadDirname(gid)
-            return if (dir != null && dirname != null) {
-                // Some dirname may be invalid in some version
-                dirname = FileUtils.sanitizeFilename(dirname)
-                EhDB.putDownloadDirname(gid, dirname)
-                dir.subFile(dirname)
-            } else {
-                null
-            }
-        }
-
-        /**
-         * @param extension with dot
-         */
-        fun generateImageFilename(index: Int, extension: String?): String {
-            return String.format(Locale.US, "%08d%s", index + 1, extension)
-        }
-
-        private fun findImageFile(dir: UniFile, index: Int): UniFile? {
-            for (extension in COMPAT_IMAGE_EXTENSIONS) {
-                val filename = generateImageFilename(index, extension)
-                val file = dir.findFile(filename)
-                if (file != null) {
-                    return file
-                }
-            }
-            return null
+            val dir = Settings.downloadLocation ?: return null
+            val dirname = EhDB.getDownloadDirname(gid) ?: return null
+            return dir.subFile(dirname)
         }
     }
+}
+
+private val COMPAT_IMAGE_EXTENSIONS = SUPPORT_IMAGE_EXTENSIONS + ".jpeg"
+
+/**
+ * @param extension with dot
+ */
+fun perFilename(index: Int, extension: String?): String {
+    return String.format(Locale.US, "%08d%s", index + 1, extension)
+}
+
+/**
+ * @param extension with dot
+ */
+private fun fixExtension(extension: String): String {
+    return extension.takeIf { SUPPORT_IMAGE_EXTENSIONS.contains(it) } ?: SUPPORT_IMAGE_EXTENSIONS[0]
+}
+
+private fun findImageFile(dir: UniFile, index: Int): UniFile? {
+    return COMPAT_IMAGE_EXTENSIONS.firstNotNullOfOrNull { dir.findFile(perFilename(index, it)) }
 }
