@@ -66,7 +66,7 @@ import androidx.compose.material.icons.filled.Difference
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ImageSearch
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
@@ -429,7 +429,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     var dropdown by remember { mutableStateOf(false) }
                                     IconButton(onClick = { dropdown = !dropdown }) {
                                         Icon(
-                                            imageVector = Icons.Default.Menu,
+                                            imageVector = Icons.Default.MoreVert,
                                             contentDescription = null
                                         )
                                     }
