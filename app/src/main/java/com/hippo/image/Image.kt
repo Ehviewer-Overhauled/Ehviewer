@@ -95,15 +95,12 @@ class Image private constructor(private val src: CloseableSource) {
                 it.printStackTrace()
             }.getOrNull()
         }
-
-        @JvmStatic
-        external fun rewriteGifSource(buffer: ByteBuffer)
-
-        @JvmStatic
-        external fun rewriteGifSource2(fd: Int)
     }
 
     interface CloseableSource : AutoCloseable {
         val source: Source
     }
 }
+
+external fun rewriteGifSource(buffer: ByteBuffer)
+external fun rewriteGifSource2(fd: Int)

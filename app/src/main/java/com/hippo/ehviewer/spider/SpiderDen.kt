@@ -28,9 +28,9 @@ import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
-import com.hippo.image.Image
 import com.hippo.image.Image.CloseableSource
-import com.hippo.sendTo
+import com.hippo.image.rewriteGifSource2
+import com.hippo.util.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import com.hippo.yorozuya.FileUtils
@@ -163,7 +163,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             }
             if (contentType == ContentType.Image.GIF)
                 outFile.openFileDescriptor("rw").use {
-                    Image.rewriteGifSource2(it.fd)
+                    rewriteGifSource2(it.fd)
                 }
             return ret
         }

@@ -16,10 +16,13 @@
 package com.hippo.ehviewer.gallery
 
 import android.content.Context
+import android.graphics.ImageDecoder
 import android.net.Uri
-import com.hippo.UriArchiveAccessor
+import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.hippo.ehviewer.Settings
 import com.hippo.image.Image
+import com.hippo.image.rewriteGifSource
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import kotlinx.coroutines.CoroutineScope
@@ -35,26 +38,26 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
+import java.nio.ByteBuffer
 
-class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : PageLoader2(),
-    CoroutineScope {
+class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow<String>) : PageLoader2(), CoroutineScope {
     override val coroutineContext = Dispatchers.IO + Job()
-    private val archiveAccessor by lazy { UriArchiveAccessor(context, uri) }
+    private lateinit var pfd: ParcelFileDescriptor
     private val hostJob = launch(start = CoroutineStart.LAZY) {
-        size = archiveAccessor.open()
+        Log.d(DEBUG_TAG, "Open archive $uri")
+        pfd = context.contentResolver.openFileDescriptor(uri, "r")!!
+        size = openArchive(pfd.fd, pfd.statSize)
         if (size == 0) {
             return@launch
         }
-        archiveAccessor.run {
-            if (needPassword()) {
-                Settings.archivePasswds?.forEach {
-                    if (providePassword(it)) return@launch
-                }
-                passwdFlow.collect {
-                    if (providePassword(it)) {
-                        Settings.putPasswdToArchivePasswds(it)
-                        currentCoroutineContext().cancel()
-                    }
+        if (needPassword()) {
+            Settings.archivePasswds?.forEach {
+                if (providePassword(it)) return@launch
+            }
+            passwdFlow.collect {
+                if (providePassword(it)) {
+                    Settings.putPasswdToArchivePasswds(it)
+                    currentCoroutineContext().cancel()
                 }
             }
         }
@@ -69,7 +72,9 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
 
     override fun stop() {
         cancel()
-        archiveAccessor.close()
+        closeArchive()
+        pfd.close()
+        Log.d(DEBUG_TAG, "Close archive $uri successfully!")
         super.stop()
     }
 
@@ -93,7 +98,19 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
     }
 
     private suspend fun doRealWork(index: Int) {
-        val src = archiveAccessor.getImageSource(index) ?: return
+        val buffer = extractToByteBuffer(index)
+        buffer ?: return
+        check(buffer.isDirect)
+        rewriteGifSource(buffer)
+        val source = ImageDecoder.createSource(buffer)
+        val src = object : Image.CloseableSource {
+            override val source: ImageDecoder.Source
+                get() = source
+
+            override fun close() {
+                releaseByteBuffer(buffer)
+            }
+        }
         runCatching {
             currentCoroutineContext().ensureActive()
         }.onFailure {
@@ -131,13 +148,13 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
     }
 
     override fun getImageFilenameWithExtension(index: Int): String {
-        return FileUtils.sanitizeFilename(archiveAccessor.getFilename(index))
+        return FileUtils.sanitizeFilename(getFilename(index))
     }
 
     override fun save(index: Int, file: UniFile): Boolean {
         runCatching {
             file.openFileDescriptor("w").use {
-                archiveAccessor.extractToFd(index, it.fd)
+                extractToFd(index, it.fd)
             }
         }.onFailure {
             it.printStackTrace()
@@ -155,3 +172,14 @@ class ArchivePageLoader(context: Context, uri: Uri, passwdFlow: Flow<String>) : 
 
     override fun preloadPages(pages: List<Int>, pair: Pair<Int, Int>) {}
 }
+
+private const val DEBUG_TAG = "ArchivePageLoader"
+
+private external fun releaseByteBuffer(buffer: ByteBuffer)
+private external fun openArchive(fd: Int, size: Long): Int
+private external fun extractToByteBuffer(index: Int): ByteBuffer?
+private external fun extractToFd(index: Int, fd: Int)
+private external fun getFilename(index: Int): String
+private external fun needPassword(): Boolean
+private external fun providePassword(str: String): Boolean
+private external fun closeArchive()

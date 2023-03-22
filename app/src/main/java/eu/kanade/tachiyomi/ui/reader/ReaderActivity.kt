@@ -73,7 +73,7 @@ import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.image.Image
-import com.hippo.sendTo
+import com.hippo.util.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getParcelableCompat

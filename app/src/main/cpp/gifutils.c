@@ -43,14 +43,14 @@ static void doRewrite(byte *addr, size_t size) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_rewriteGifSource(JNIEnv *env, jclass clazz, jobject buffer) {
+Java_com_hippo_image_ImageKt_rewriteGifSource(JNIEnv *env, jclass clazz, jobject buffer) {
     byte *addr = (*env)->GetDirectBufferAddress(env, buffer);
     size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
     doRewrite(addr, size);
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_image_Image_rewriteGifSource2(JNIEnv *env, jclass clazz, jint fd) {
+Java_com_hippo_image_ImageKt_rewriteGifSource2(JNIEnv *env, jclass clazz, jint fd) {
     struct stat64 st;
     fstat64(fd, &st);
     size_t size = st.st_size;

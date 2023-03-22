@@ -279,7 +279,8 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd, jlong size) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_openArchive(JNIEnv *env, jclass thiz, jint fd,
+                                                                jlong size) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     archive_ctx *ctx = NULL;
@@ -359,7 +360,8 @@ Java_com_hippo_UriArchiveAccessor_openArchive(JNIEnv *env, jobject thiz, jint fd
 #pragma ide diagnostic ignored "UnreachableCode"
 
 JNIEXPORT jobject JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz, jint index) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_extractToByteBuffer(JNIEnv *env, jclass thiz,
+                                                                        jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     void *addr = MEMPOOL_ADDR_BY_SORTED_IDX(index);
@@ -388,7 +390,7 @@ Java_com_hippo_UriArchiveAccessor_extractToByteBuffer(JNIEnv *env, jobject thiz,
 #pragma clang diagnostic pop
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_closeArchive(JNIEnv *env, jclass thiz) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     for (int i = 0; i < CTX_POOL_SIZE; i++)
@@ -408,14 +410,15 @@ Java_com_hippo_UriArchiveAccessor_closeArchive(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_hippo_UriArchiveAccessor_needPassword(JNIEnv *env, jobject thiz) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_needPassword(JNIEnv *env, jclass thiz) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     return need_encrypt;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jstring str) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_providePassword(JNIEnv *env, jclass thiz,
+                                                                    jstring str) {
     EH_UNUSED(thiz);
     struct archive_entry *entry;
     archive_ctx *ctx;
@@ -445,7 +448,8 @@ Java_com_hippo_UriArchiveAccessor_providePassword(JNIEnv *env, jobject thiz, jst
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint index) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_getFilename(JNIEnv *env, jclass thiz,
+                                                                jint index) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     index = entries[index].index;
@@ -460,7 +464,8 @@ Java_com_hippo_UriArchiveAccessor_getFilename(JNIEnv *env, jobject thiz, jint in
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint index, jint fd) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_extractToFd(JNIEnv *env, jclass thiz,
+                                                                jint index, jint fd) {
     EH_UNUSED(env);
     EH_UNUSED(thiz);
     index = entries[index].index;
@@ -474,7 +479,8 @@ Java_com_hippo_UriArchiveAccessor_extractToFd(JNIEnv *env, jobject thiz, jint in
 }
 
 JNIEXPORT void JNICALL
-Java_com_hippo_UriArchiveAccessor_releaseByteBuffer(JNIEnv *env, jobject thiz, jobject buffer) {
+Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_releaseByteBuffer(JNIEnv *env, jclass thiz,
+                                                                      jobject buffer) {
     EH_UNUSED(thiz);
     void *addr = (*env)->GetDirectBufferAddress(env, buffer);
     size_t size = (*env)->GetDirectBufferCapacity(env, buffer);
