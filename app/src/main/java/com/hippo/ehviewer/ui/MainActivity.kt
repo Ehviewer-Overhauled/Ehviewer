@@ -118,6 +118,18 @@ class MainActivity : EhActivity() {
         startActivity(intent)
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun onBackPressed() {
+        check(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+        val isDrawerOpen = binding.drawView.isDrawerOpen(GravityCompat.START) or
+                binding.drawView.isDrawerOpen(GravityCompat.END)
+        if (isDrawerOpen) {
+            binding.drawView.closeDrawers()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         lifecycleScope.launchUI {
