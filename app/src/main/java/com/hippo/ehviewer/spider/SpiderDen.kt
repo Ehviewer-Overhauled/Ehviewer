@@ -210,18 +210,19 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                     it.printStackTrace()
                     return false
                 }
+            }
 
-                downloadDir?.let { uniFile ->
-                    runCatching {
-                        findImageFile(uniFile, index)?.openFileDescriptor("r")?.use {
-                            it sendTo toFd
-                        }
-                    }.onFailure {
-                        it.printStackTrace()
-                        return false
-                    }.onSuccess {
-                        return true
+            // Read from download dir
+            downloadDir?.let { uniFile ->
+                runCatching {
+                    findImageFile(uniFile, index)?.openFileDescriptor("r")?.use {
+                        it sendTo toFd
                     }
+                }.onFailure {
+                    it.printStackTrace()
+                    return false
+                }.onSuccess {
+                    return true
                 }
             }
         }
