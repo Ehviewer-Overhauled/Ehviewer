@@ -35,7 +35,6 @@ android {
         storePassword = "000000"
         keyAlias = "key0"
         keyPassword = "000000"
-
         enableV3Signing = true
         enableV4Signing = true
     }
@@ -163,14 +162,13 @@ dependencies {
     implementation("androidx.collection:collection-ktx:1.3.0-alpha03")
 
     // https://developer.android.com/jetpack/androidx/releases/compose-material3
-    // implementation(platform("androidx.compose:compose-bom:2023.01.00"))
-    api(platform("dev.chrisbanes.compose:compose-bom:2023.03.00"))
+    // api(platform("androidx.compose:compose-bom:2023.03.00"))
+    api(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-SNAPSHOT"))
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3")
 
     implementation("androidx.core:core-ktx:1.10.0-rc01")
 
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha09")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha09")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
@@ -202,7 +200,7 @@ dependencies {
     // https://github.com/google/accompanist/releases
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.0")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.30.0")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.9.0-beta01")
 
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11")
@@ -232,22 +230,8 @@ dependencies {
 configurations.all {
     exclude("dev.rikka.rikkax.appcompat", "appcompat")
     exclude("dev.rikka.rikkax.material", "material")
-    exclude("org.jetbrains.kotlin", "kotlin-android-extensions-runtime")
-    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 ksp {
-    arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
-}
-
-class RoomSchemaArgProvider(
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val schemaDir: File
-) : CommandLineArgumentProvider {
-
-    override fun asArguments(): Iterable<String> {
-        return listOf("room.schemaLocation=${schemaDir.path}")
-    }
+    arg("room.schemaLocation", projectDir.resolve("schemas").path)
 }
