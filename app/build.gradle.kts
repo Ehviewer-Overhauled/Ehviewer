@@ -194,7 +194,7 @@ dependencies {
     implementation("androidx.room:room-paging:$room_version")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
-    implementation("androidx.work:work-runtime-ktx:2.8.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("com.drakeet.drawer:drawer:1.0.3")
     implementation("com.github.chrisbanes:PhotoView:2.3.0") // Dead Dependency
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
