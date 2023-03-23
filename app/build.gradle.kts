@@ -188,7 +188,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.0")
 
     // https://developer.android.com/jetpack/androidx/releases/room
-    val room_version = "2.5.1"
+    val room_version = "2.6.0-alpha01"
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-paging:$room_version")
 
@@ -233,5 +233,6 @@ configurations.all {
 }
 
 ksp {
-    arg("room.schemaLocation", projectDir.resolve("schemas").path)
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.generateKotlin", "true")
 }

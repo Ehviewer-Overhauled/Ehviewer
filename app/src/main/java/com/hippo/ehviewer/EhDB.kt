@@ -243,7 +243,9 @@ object EhDB {
     @Synchronized
     fun deleteQuickSearch(quickSearch: QuickSearch?) {
         val dao = db.quickSearchDao()
-        dao.delete(quickSearch)
+        if (quickSearch != null) {
+            dao.delete(quickSearch)
+        }
     }
 
     @Synchronized

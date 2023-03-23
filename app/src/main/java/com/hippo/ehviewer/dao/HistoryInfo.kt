@@ -12,18 +12,8 @@ class HistoryInfo() : BaseGalleryInfo() {
     var time: Long = 0
 
     // Trick: Use MODE for favoriteSlot
-    // Shadow its accessors
     @ColumnInfo(name = "MODE")
-    private val mode: Int = 0
-
-    fun getMode(): Int {
-        return favoriteSlot + 2
-    }
-
-    fun setMode(mode: Int) {
-        favoriteSlot = mode - 2
-    }
-    // Trick end
+    override var favoriteSlot: Int = -2
 
     constructor(galleryInfo: GalleryInfo) : this() {
         gid = galleryInfo.gid

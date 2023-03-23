@@ -24,5 +24,5 @@ interface QuickSearchDao : BasicDao<QuickSearch> {
     override fun insert(t: QuickSearch): Long
 
     @Delete
-    fun delete(quickSearch: QuickSearch?)
+    fun delete(quickSearch: QuickSearch)
 }
