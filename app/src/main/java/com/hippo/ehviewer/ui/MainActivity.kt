@@ -35,7 +35,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -43,7 +42,6 @@ import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.customview.widget.Openable
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -243,7 +241,6 @@ class MainActivity : EhActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         if (!EhUtils.needSignedIn()) setNavGraph()
-        binding.drawView.addDrawerListener(mDrawerOnBackPressedCallback)
         binding.navView.setupWithNavController(navController)
 
         // Trick: Tweak NavigationUI to disable multiple backstack
@@ -389,11 +386,7 @@ class MainActivity : EhActivity() {
         }
         super.onResume()
         lifecycleScope.launch {
-            delay(100)
-            // delay 100ms to make sure it take precedence over androidx navigation's callback
-            mDrawerOnBackPressedCallback.remove()
-            onBackPressedDispatcher.addCallback(mDrawerOnBackPressedCallback)
-            delay(200)
+            delay(300)
             checkClipboardUrl()
         }
     }
@@ -519,22 +512,6 @@ class MainActivity : EhActivity() {
         super.onProvideAssistContent(outContent)
         mShareUrl?.let { outContent?.webUri = Uri.parse(mShareUrl) }
     }
-
-    private val mDrawerOnBackPressedCallback =
-        object : OnBackPressedCallback(false), DrawerListener {
-            val slideThreshold = 0.05
-            override fun handleOnBackPressed() {
-                binding.drawView.closeDrawers()
-            }
-
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                isEnabled = slideOffset > slideThreshold
-            }
-
-            override fun onDrawerOpened(drawerView: View) {}
-            override fun onDrawerClosed(drawerView: View) {}
-            override fun onDrawerStateChanged(newState: Int) {}
-        }
 
     private val mNetworkCallback = object : ConnectivityManager.NetworkCallback() {
         private val TAG = "mNetworkCallback"
