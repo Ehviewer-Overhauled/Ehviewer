@@ -1027,7 +1027,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             fun onClick() {
                                 val lub = ListUrlBuilder()
                                 lub.mode = ListUrlBuilder.MODE_TAG
-                                lub.keyword = real
+                                lub.keyword = this@run + ":" + real
                                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                             }
 

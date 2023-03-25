@@ -20,6 +20,7 @@ class HistoryInfo() : BaseGalleryInfo() {
         set(value) {
             favoriteSlotBackingField = value + 2
         }
+    // Trick end
 
     constructor(galleryInfo: GalleryInfo) : this() {
         gid = galleryInfo.gid
