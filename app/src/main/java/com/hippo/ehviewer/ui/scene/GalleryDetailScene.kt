@@ -71,7 +71,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVerticalCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -569,7 +568,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
-                    Card(
+                    CrystalCard(
                         onClick = ::navigateToPreview,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -586,7 +585,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Card(
+                    CrystalCard(
                         onClick = {
                             mainActivity?.startReaderActivity(gd, it.position)
                         },
@@ -835,12 +834,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         viewLifecycleOwner.lifecycleScope.launchIO {
             runSuspendCatching {
                 EhEngine.getGalleryDetail(url)
-            }.onSuccess {
-                galleryDetailCache.put(it.gid, it)
-                EhDB.putHistoryInfo(it)
+            }.onSuccess { galleryDetail ->
+                galleryDetailCache.put(galleryDetail.gid, galleryDetail)
+                EhDB.putHistoryInfo(galleryDetail)
                 if (Settings.preloadThumbAggressively) {
                     lifecycleScope.launchIO {
-                        it.previewList.forEach {
+                        galleryDetail.previewList.forEach {
                             it.imageUrl.run {
                                 context?.imageLoader?.enqueue(
                                     ImageRequest.Builder(requireContext()).ehUrl(this).build()
@@ -849,8 +848,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         }
                     }
                 }
-                composeBindingGD = it
-                composeBindingGI = it
+                composeBindingGD = galleryDetail
+                composeBindingGI = galleryDetail
                 updateDownloadState()
                 bindViewSecond()
             }.onFailure {
