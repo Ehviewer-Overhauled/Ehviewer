@@ -743,6 +743,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         if (Settings.showComments) {
             GalleryDetailComment(galleryDetail.comments?.comments)
         }
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
     }
 
     private fun onGalleryInfoCardClick() {
