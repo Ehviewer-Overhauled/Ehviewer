@@ -137,7 +137,7 @@ fun GalleryDetailHeaderCard(
                         .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
                 )
             }
-            Spacer(modifier = Modifier.weight(1F))
+            Spacer(modifier = Modifier.weight(0.5F))
             Column(
                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
                 horizontalAlignment = Alignment.End

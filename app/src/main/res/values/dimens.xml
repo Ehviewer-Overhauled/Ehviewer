@@ -16,6 +16,10 @@
 
 <resources>
 
+    <dimen name="signinscreen_landscape_caption_frame_width">480dp</dimen>
+    <dimen name="signinscreen_landscape_caption_text_width">384dp</dimen>
+    <dimen name="gallery_detail_card_landscape_width">480dp</dimen>
+
     <dimen name="keyline_margin">16dp</dimen>
     <dimen name="single_max_width">260dp</dimen>
     <dimen name="drawer_max_width">280dp</dimen>

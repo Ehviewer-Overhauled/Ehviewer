@@ -1,6 +1,9 @@
 package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
+import android.content.Context
+import android.content.res.Resources
+import android.content.res.Resources.Theme
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -13,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.fragment.app.Fragment
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
@@ -25,6 +29,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var currentScreenDimension = getScreenDimension()
         setContent {
             Mdc3Theme {
                 val navController = rememberNavController()
@@ -32,7 +37,7 @@ class LoginActivity : EhActivity() {
                 CompositionLocalProvider(LocalNavController provides navController) {
                     NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
                         composable(SIGN_IN_ROUTE_NAME) {
-                            SignInScreen()
+                            SignInScreen(currentScreenDimension)
                         }
 
                         composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
@@ -40,7 +45,7 @@ class LoginActivity : EhActivity() {
                         }
 
                         composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-                            CookieSignInScene()
+                            CookieSignInScene(currentScreenDimension)
                         }
 
                         composable(SELECT_SITE_ROUTE_NAME) {

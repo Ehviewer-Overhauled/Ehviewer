@@ -35,6 +35,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.ehviewer.ui.ScreenDimension
 import rikka.core.res.resolveDrawable
 
 abstract class BaseScene : Fragment() {
@@ -235,10 +236,27 @@ abstract class BaseScene : Fragment() {
             .build()
         NavHostFragment.findNavController(this).navigate(id, args, options)
     }
+    fun getScreenDimension(): ScreenDimension {
 
+        var dm = context?.resources?.displayMetrics
+        var screenWidth = dm?.widthPixels
+        var screenHeight = dm?.heightPixels
+        var screenDimensionStatus = ScreenDimension.ScreenRotationLandscape
+
+        if (screenWidth != null) {
+            screenDimensionStatus = if(screenWidth > screenHeight!!)
+                ScreenDimension.ScreenRotationLandscape
+            else{
+                ScreenDimension.ScreenRotationPortrait
+            }
+        }
+        return screenDimensionStatus
+    }
     companion object {
         const val LENGTH_SHORT = 0
         const val LENGTH_LONG = 1
         const val KEY_DRAWER_VIEW_STATE = "com.hippo.ehviewer.ui.scene.BaseScene:DRAWER_VIEW_STATE"
     }
+
+
 }
