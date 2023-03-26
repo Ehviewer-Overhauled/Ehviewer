@@ -33,7 +33,10 @@ import eu.kanade.tachiyomi.util.system.isNightMode
 import eu.kanade.tachiyomi.util.view.setSecureScreen
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
-
+enum class ScreenDimension(val screenDimensionType: Int){
+    ScreenRotationLandscape(1),
+    ScreenRotationPortrait(2)
+}
 abstract class EhActivity : AppCompatActivity() {
     @StyleRes
     fun getThemeStyleRes(): Int {
@@ -85,5 +88,21 @@ abstract class EhActivity : AppCompatActivity() {
         ) return
         if (Settings.notificationRequired) return
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    fun getScreenDimension(): ScreenDimension {
+        var dm = applicationContext?.resources?.displayMetrics
+        var screenWidth = dm?.widthPixels
+        var screenHeight = dm?.heightPixels
+        var screenDimensionStatus = ScreenDimension.ScreenRotationLandscape
+
+        if (screenWidth != null) {
+            screenDimensionStatus = if(screenWidth > screenHeight!!)
+                ScreenDimension.ScreenRotationLandscape
+            else{
+                ScreenDimension.ScreenRotationPortrait
+            }
+        }
+        return screenDimensionStatus
     }
 }

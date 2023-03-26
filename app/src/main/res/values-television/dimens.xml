@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright 2023 hathlife
+  ~
+  ~ This file is part of EhViewer
+  ~
+  ~ EhViewer is free software: you can redistribute it and/or modify it
+  ~ under the terms of the GNU General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ EhViewer is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with EhViewer.
+  ~ If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+
+    <dimen name="gallery_detail_thumb_width">256dp</dimen>
+    <dimen name="gallery_detail_thumb_height">192dp</dimen>
+    <dimen name="gallery_detail_card_landscape_width">608dp</dimen>
+    <dimen name="signinscreen_landscape_caption_frame_width">640dp</dimen>
+    <dimen name="signinscreen_landscape_caption_text_width">480dp</dimen>
+
+</resources>

@@ -53,6 +53,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -157,6 +158,7 @@ import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
 import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.widget.GalleryDetailRating
+import com.hippo.ehviewer.ui.ScreenDimension
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -498,6 +500,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
+
     @Composable
     private fun GalleryDetailContent(
         galleryInfo: GalleryInfo,
@@ -505,7 +508,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         contentPadding: PaddingValues,
         modifier: Modifier
     ) {
-        LazyVerticalGrid(
+        when(getScreenDimension()){
+            ScreenDimension.ScreenRotationPortrait ->LazyVerticalGrid(
             columns = GridCells.Adaptive(Settings.thumbSizeDp),
             contentPadding = contentPadding,
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
@@ -520,23 +524,23 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         onUploaderChipClick = ::onUploaderChipClick,
                         onBlockUploaderIconClick = ::showFilterUploaderDialog,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                                .fillMaxWidth()
+                                .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
                     )
                     Row {
                         FilledTonalButton(
                             onClick = ::onDownloadButtonClick,
                             modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .weight(1F)
+                                    .padding(horizontal = 4.dp)
+                                    .weight(1F)
                         ) {
                             Text(text = downloadButtonText)
                         }
                         Button(
                             onClick = ::onReadButtonClick,
                             modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .weight(1F)
+                                    .padding(horizontal = 4.dp)
+                                    .weight(1F)
                         ) {
                             Text(text = readButtonText)
                         }
@@ -557,6 +561,67 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 galleryDetailPreview(galleryDetail)
             }
         }
+        ScreenDimension.ScreenRotationLandscape -> LazyVerticalGrid(
+                columns = GridCells.Adaptive(Settings.thumbSizeDp),
+                contentPadding = contentPadding,
+                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+        ) {
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                Column {
+                    Row(modifier = Modifier.fillMaxWidth()
+                                    ){
+                    GalleryDetailHeaderCard(
+                            galleryInfo = galleryInfo,
+                            galleryDetail = galleryDetail,
+                            onInfoCardClick = ::onGalleryInfoCardClick,
+                            onCategoryChipClick = ::onCategoryChipClick,
+                            onUploaderChipClick = ::onUploaderChipClick,
+                            onBlockUploaderIconClick = ::showFilterUploaderDialog,
+                            modifier = Modifier
+                                    .width(dimensionResource(id = R.dimen.gallery_detail_card_landscape_width))
+                                    .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                    )
+                    Column(modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = modifier.height(16.dp))
+                        Button(
+                                onClick = ::onReadButtonClick,
+                                modifier = Modifier
+                                        .height(56.dp)
+                                        .padding(horizontal = 16.dp)
+                                        .width(192.dp)
+                        ) {
+                            Text(text = readButtonText)
+                        }
+                        Spacer(modifier = modifier.height(24.dp))
+                        FilledTonalButton(
+                                onClick = ::onDownloadButtonClick,
+                                modifier = Modifier
+                                        .height(56.dp)
+                                        .padding(horizontal = 16.dp)
+                                        .width(192.dp)
+                        ) {
+                            Text(text = downloadButtonText)
+                        }
+                    }}
+                    if (galleryDetail != null) {
+                        BelowHeader(galleryDetail)
+                    } else {
+                        Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+            }
+            if (galleryDetail != null) {
+                galleryDetailPreview(galleryDetail)
+            }
+        }
+        }
     }
 
     private fun LazyGridScope.galleryDetailPreview(gd: GalleryDetail) {
@@ -571,8 +636,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     CrystalCard(
                         onClick = ::navigateToPreview,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(0.6666667F)
+                                .fillMaxWidth()
+                                .aspectRatio(0.6666667F)
                     ) {}
                     Text(stringResource(R.string.more_previews))
                 }
@@ -590,8 +655,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             mainActivity?.startReaderActivity(gd, it.position)
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(0.6666667F)
+                                .fillMaxWidth()
+                                .aspectRatio(0.6666667F)
                     ) {
                         EhAsyncPreview(
                             model = it,
@@ -665,8 +730,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 CrystalCard(
                     onClick = ::showNewerVersionDialog,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp),
+                            .fillMaxWidth()
+                            .height(32.dp),
                 ) {}
                 Text(text = stringResource(id = R.string.newer_version_avaliable))
             }
@@ -718,8 +783,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         ) {
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
+                        .padding(8.dp)
+                        .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 GalleryDetailRating(rating = galleryDetail.rating)
