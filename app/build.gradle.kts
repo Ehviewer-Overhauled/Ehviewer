@@ -219,7 +219,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-fx-coroutines")
 
     // https://coil-kt.github.io/coil/changelog/
-    implementation("io.coil-kt:coil-compose:2.3.0-SNAPSHOT")
+    implementation("io.coil-kt:coil-compose:2.3.0")
 
     implementation("io.ktor:ktor-client-okhttp:2.2.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0-Beta")
