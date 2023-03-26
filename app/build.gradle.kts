@@ -166,6 +166,7 @@ dependencies {
     api(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-SNAPSHOT"))
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3-window-size-class")
 
     implementation("androidx.core:core-ktx:1.10.0-rc01")
 
