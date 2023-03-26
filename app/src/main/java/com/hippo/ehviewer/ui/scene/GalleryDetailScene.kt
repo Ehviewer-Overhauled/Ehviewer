@@ -86,6 +86,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -153,7 +155,6 @@ import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.ScreenDimension
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
@@ -508,8 +509,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         contentPadding: PaddingValues,
         modifier: Modifier
     ) {
-        when (getScreenDimension()) {
-            ScreenDimension.ScreenRotationPortrait -> LazyVerticalGrid(
+        val windowSizeClass = calculateWindowSizeClass(requireActivity())
+        when (windowSizeClass.widthSizeClass) {
+            WindowWidthSizeClass.Medium, WindowWidthSizeClass.Compact -> LazyVerticalGrid(
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
@@ -562,7 +564,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 }
             }
 
-            ScreenDimension.ScreenRotationLandscape -> LazyVerticalGrid(
+            WindowWidthSizeClass.Expanded -> LazyVerticalGrid(
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))

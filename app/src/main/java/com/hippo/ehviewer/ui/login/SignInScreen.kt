@@ -31,6 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +62,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.ScreenDimension
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
@@ -69,7 +70,7 @@ import kotlinx.coroutines.Job
 import rikka.core.util.ContextUtils.requireActivity
 
 @Composable
-fun SignInScreen(currentScreenDimension: ScreenDimension) {
+fun SignInScreen(windowSizeClass: WindowSizeClass) {
     val navController = LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
@@ -131,8 +132,8 @@ fun SignInScreen(currentScreenDimension: ScreenDimension) {
 
 
 
-    when (currentScreenDimension) {
-        ScreenDimension.ScreenRotationPortrait -> Box(
+    when (windowSizeClass.widthSizeClass) {
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> Box(
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -311,7 +312,7 @@ fun SignInScreen(currentScreenDimension: ScreenDimension) {
             }
         }
 
-        ScreenDimension.ScreenRotationLandscape -> Box(
+        WindowWidthSizeClass.Expanded -> Box(
             contentAlignment = Alignment.Center
         ) {
             Row(

@@ -29,6 +29,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +57,6 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.ScreenDimension
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
@@ -66,7 +67,7 @@ import okhttp3.Cookie
 import java.util.Locale
 
 @Composable
-fun CookieSignInScene(currentScreenDimension: ScreenDimension) {
+fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
     val navController = LocalNavController.current
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
@@ -184,8 +185,8 @@ fun CookieSignInScene(currentScreenDimension: ScreenDimension) {
         }
     }
 
-    when (currentScreenDimension) {
-        ScreenDimension.ScreenRotationPortrait -> Box(
+    when (windowSizeClass.widthSizeClass) {
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> Box(
             contentAlignment = Alignment.Center
         ) {
             Scaffold(
@@ -316,7 +317,7 @@ fun CookieSignInScene(currentScreenDimension: ScreenDimension) {
             }
         }
 
-        ScreenDimension.ScreenRotationLandscape -> Box(
+        WindowWidthSizeClass.Expanded -> Box(
             contentAlignment = Alignment.Center
         ) {
             Scaffold(
@@ -327,6 +328,7 @@ fun CookieSignInScene(currentScreenDimension: ScreenDimension) {
                 Row(
                     Modifier
                         .padding(dimensionResource(id = R.dimen.keyline_margin))
+                        .padding(padding)
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                     verticalAlignment = Alignment.CenterVertically

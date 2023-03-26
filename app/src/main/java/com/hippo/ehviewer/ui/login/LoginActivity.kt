@@ -2,6 +2,7 @@ package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
@@ -25,15 +26,15 @@ import kotlinx.coroutines.launch
 class LoginActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var currentScreenDimension = getScreenDimension()
         setContent {
+            val windowSizeClass = calculateWindowSizeClass(this)
             Mdc3Theme {
                 val navController = rememberNavController()
 
                 CompositionLocalProvider(LocalNavController provides navController) {
                     NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
                         composable(SIGN_IN_ROUTE_NAME) {
-                            SignInScreen(currentScreenDimension)
+                            SignInScreen(windowSizeClass)
                         }
 
                         composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
@@ -41,7 +42,7 @@ class LoginActivity : EhActivity() {
                         }
 
                         composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-                            CookieSignInScene(currentScreenDimension)
+                            CookieSignInScene(windowSizeClass)
                         }
 
                         composable(SELECT_SITE_ROUTE_NAME) {
