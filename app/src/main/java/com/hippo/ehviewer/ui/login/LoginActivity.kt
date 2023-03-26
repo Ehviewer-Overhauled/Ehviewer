@@ -1,9 +1,6 @@
 package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
-import android.content.Context
-import android.content.res.Resources
-import android.content.res.Resources.Theme
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -16,7 +13,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.fragment.app.Fragment
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore

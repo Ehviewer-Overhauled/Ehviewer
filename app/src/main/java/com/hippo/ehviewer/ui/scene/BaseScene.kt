@@ -236,6 +236,7 @@ abstract class BaseScene : Fragment() {
             .build()
         NavHostFragment.findNavController(this).navigate(id, args, options)
     }
+
     fun getScreenDimension(): ScreenDimension {
 
         var dm = context?.resources?.displayMetrics
@@ -244,14 +245,15 @@ abstract class BaseScene : Fragment() {
         var screenDimensionStatus = ScreenDimension.ScreenRotationLandscape
 
         if (screenWidth != null) {
-            screenDimensionStatus = if(screenWidth > screenHeight!!)
+            screenDimensionStatus = if (screenWidth > screenHeight!!)
                 ScreenDimension.ScreenRotationLandscape
-            else{
+            else {
                 ScreenDimension.ScreenRotationPortrait
             }
         }
         return screenDimensionStatus
     }
+
     companion object {
         const val LENGTH_SHORT = 0
         const val LENGTH_LONG = 1

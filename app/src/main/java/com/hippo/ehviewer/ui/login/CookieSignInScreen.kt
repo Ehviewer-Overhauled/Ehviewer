@@ -66,7 +66,7 @@ import okhttp3.Cookie
 import java.util.Locale
 
 @Composable
-fun CookieSignInScene(currentScreenDimension : ScreenDimension) {
+fun CookieSignInScene(currentScreenDimension: ScreenDimension) {
     val navController = LocalNavController.current
     val clipboardManager = LocalClipboardManager.current
     val focusManager = LocalFocusManager.current
@@ -184,112 +184,112 @@ fun CookieSignInScene(currentScreenDimension : ScreenDimension) {
         }
     }
 
-    when(currentScreenDimension){
-        ScreenDimension.ScreenRotationPortrait->Box(
+    when (currentScreenDimension) {
+        ScreenDimension.ScreenRotationPortrait -> Box(
             contentAlignment = Alignment.Center
         ) {
-        Scaffold(
+            Scaffold(
                 snackbarHost = {
                     SnackbarHost(hostState = snackbarHostState)
                 }
-        ) { padding ->
-            Column(
+            ) { padding ->
+                Column(
                     Modifier
-                            .padding(dimensionResource(id = R.dimen.keyline_margin))
-                            .padding(padding)
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
+                        .padding(dimensionResource(id = R.dimen.keyline_margin))
+                        .padding(padding)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
+                ) {
+                    Icon(
                         imageVector = Icons.Default.Cookie,
                         contentDescription = null,
                         modifier = Modifier
-                                .padding(dimensionResource(id = R.dimen.keyline_margin))
-                                .size(48.dp),
+                            .padding(dimensionResource(id = R.dimen.keyline_margin))
+                            .size(48.dp),
                         tint = Color(0xff795548)
-                )
-                Text(
+                    )
+                    Text(
                         text = stringResource(id = R.string.cookie_explain),
                         modifier = Modifier
-                                .padding(
-                                        horizontal = 32.dp,
-                                        vertical = dimensionResource(id = R.dimen.keyline_margin)
-                                ),
+                            .padding(
+                                horizontal = 32.dp,
+                                vertical = dimensionResource(id = R.dimen.keyline_margin)
+                            ),
                         fontSize = 16.sp
-                )
-                OutlinedTextField(
+                    )
+                    OutlinedTextField(
                         value = ipbMemberId,
                         onValueChange = { ipbMemberId = it.trim { char -> char <= ' ' } },
                         Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
                         label = { Text(text = "ipb_member_id") },
                         keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next
+                            imeAction = ImeAction.Next
                         ),
                         supportingText = { if (ipbMemberIdErrorState) Text(stringResource(R.string.text_is_empty)) },
                         trailingIcon = {
                             if (ipbMemberIdErrorState) Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null
+                                imageVector = Icons.Filled.Info,
+                                contentDescription = null
                             )
                         },
                         isError = ipbMemberIdErrorState,
                         singleLine = true
-                )
-                OutlinedTextField(
+                    )
+                    OutlinedTextField(
                         value = ipbPassHash,
                         onValueChange = { ipbPassHash = it.trim { char -> char <= ' ' } },
                         Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
                         label = { Text(text = "ipb_pass_hash") },
                         keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next
+                            imeAction = ImeAction.Next
                         ),
                         supportingText = { if (ipbPassHashErrorState) Text(stringResource(R.string.text_is_empty)) },
                         trailingIcon = {
                             if (ipbPassHashErrorState) Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null
+                                imageVector = Icons.Filled.Info,
+                                contentDescription = null
                             )
                         },
                         isError = ipbPassHashErrorState,
                         singleLine = true
-                )
-                OutlinedTextField(
+                    )
+                    OutlinedTextField(
                         value = igneous,
                         onValueChange = { igneous = it.trim { char -> char <= ' ' } },
                         Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
                         label = { Text(text = "igneous") },
                         keyboardActions = KeyboardActions(
-                                onDone = { login() }
+                            onDone = { login() }
                         ),
                         singleLine = true
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Button(
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
                         onClick = { login() },
                         Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(id = android.R.string.ok))
-                }
-                TextButton(onClick = { fillCookiesFromClipboard() }) {
-                    Text(
+                    ) {
+                        Text(text = stringResource(id = android.R.string.ok))
+                    }
+                    TextButton(onClick = { fillCookiesFromClipboard() }) {
+                        Text(
                             text = buildAnnotatedString {
                                 withStyle(
-                                        style = SpanStyle(textDecoration = TextDecoration.Underline)
+                                    style = SpanStyle(textDecoration = TextDecoration.Underline)
                                 ) {
                                     append(stringResource(id = R.string.from_clipboard))
                                 }
                             },
                             modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                    )
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
                 }
             }
-        }
-        if (isProgressIndicatorVisible)
-            CircularProgressIndicator()
-        if (showErrorDialog) {
-            AlertDialog(
+            if (isProgressIndicatorVisible)
+                CircularProgressIndicator()
+            if (showErrorDialog) {
+                AlertDialog(
                     onDismissRequest = {
                         showErrorDialog = false
                     },
@@ -305,118 +305,123 @@ fun CookieSignInScene(currentScreenDimension : ScreenDimension) {
                     },
                     text = {
                         Text(
-                                text =
-                                """
+                            text =
+                            """
                             ${ExceptionUtils.getReadableString(loginErrorException!!)}
                             ${stringResource(R.string.wrong_cookie_warning)}
                         """.trimIndent()
                         )
                     }
-            )
+                )
+            }
         }
-    }
-        ScreenDimension.ScreenRotationLandscape->Box(
-                contentAlignment = Alignment.Center
+
+        ScreenDimension.ScreenRotationLandscape -> Box(
+            contentAlignment = Alignment.Center
         ) {
             Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    }
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                }
             ) { padding ->
                 Row(
-                        Modifier
-                                .padding(dimensionResource(id = R.dimen.keyline_margin))
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
-                        verticalAlignment = Alignment.CenterVertically
+                    Modifier
+                        .padding(dimensionResource(id = R.dimen.keyline_margin))
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
-                            Modifier
-                                    .width(dimensionResource(id = R.dimen.signinscreen_landscape_caption_frame_width))
-                                    .padding(dimensionResource(id = R.dimen.keyline_margin)),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                        Modifier
+                            .width(dimensionResource(id = R.dimen.signinscreen_landscape_caption_frame_width))
+                            .padding(dimensionResource(id = R.dimen.keyline_margin)),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                                imageVector = Icons.Default.Cookie,
-                                contentDescription = null,
-                                modifier = Modifier
-                                        .padding(dimensionResource(id = R.dimen.keyline_margin))
-                                        .size(48.dp),
-                                tint = Color(0xff795548)
+                            imageVector = Icons.Default.Cookie,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(dimensionResource(id = R.dimen.keyline_margin))
+                                .size(48.dp),
+                            tint = Color(0xff795548)
                         )
                         Text(
-                                text = stringResource(id = R.string.cookie_explain),
-                                Modifier.widthIn(max = dimensionResource(id = R.dimen.signinscreen_landscape_caption_text_width))
-                                        .padding(top = 24.dp),
-                                style = MaterialTheme.typography.labelLarge
+                            text = stringResource(id = R.string.cookie_explain),
+                            Modifier
+                                .widthIn(max = dimensionResource(id = R.dimen.signinscreen_landscape_caption_text_width))
+                                .padding(top = 24.dp),
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                     Column(Modifier.fillMaxWidth()) {
                         OutlinedTextField(
-                                value = ipbMemberId,
-                                onValueChange = { ipbMemberId = it.trim { char -> char <= ' ' } },
-                                Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                                label = { Text(text = "ipb_member_id") },
-                                keyboardOptions = KeyboardOptions(
-                                        imeAction = ImeAction.Next
-                                ),
-                                supportingText = { if (ipbMemberIdErrorState) Text(stringResource(R.string.text_is_empty)) },
-                                trailingIcon = {
-                                    if (ipbMemberIdErrorState) Icon(
-                                            imageVector = Icons.Filled.Info,
-                                            contentDescription = null
-                                    )
-                                },
-                                isError = ipbMemberIdErrorState,
-                                singleLine = true
+                            value = ipbMemberId,
+                            onValueChange = { ipbMemberId = it.trim { char -> char <= ' ' } },
+                            Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
+                            label = { Text(text = "ipb_member_id") },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next
+                            ),
+                            supportingText = { if (ipbMemberIdErrorState) Text(stringResource(R.string.text_is_empty)) },
+                            trailingIcon = {
+                                if (ipbMemberIdErrorState) Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = null
+                                )
+                            },
+                            isError = ipbMemberIdErrorState,
+                            singleLine = true
                         )
                         OutlinedTextField(
-                                value = ipbPassHash,
-                                onValueChange = { ipbPassHash = it.trim { char -> char <= ' ' } },
-                                Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                                label = { Text(text = "ipb_pass_hash") },
-                                keyboardOptions = KeyboardOptions(
-                                        imeAction = ImeAction.Next
-                                ),
-                                supportingText = { if (ipbPassHashErrorState) Text(stringResource(R.string.text_is_empty)) },
-                                trailingIcon = {
-                                    if (ipbPassHashErrorState) Icon(
-                                            imageVector = Icons.Filled.Info,
-                                            contentDescription = null
-                                    )
-                                },
-                                isError = ipbPassHashErrorState,
-                                singleLine = true
+                            value = ipbPassHash,
+                            onValueChange = { ipbPassHash = it.trim { char -> char <= ' ' } },
+                            Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
+                            label = { Text(text = "ipb_pass_hash") },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next
+                            ),
+                            supportingText = { if (ipbPassHashErrorState) Text(stringResource(R.string.text_is_empty)) },
+                            trailingIcon = {
+                                if (ipbPassHashErrorState) Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = null
+                                )
+                            },
+                            isError = ipbPassHashErrorState,
+                            singleLine = true
                         )
                         OutlinedTextField(
-                                value = igneous,
-                                onValueChange = { igneous = it.trim { char -> char <= ' ' } },
-                                Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                                label = { Text(text = "igneous") },
-                                keyboardActions = KeyboardActions(
-                                        onDone = { login() }
-                                ),
-                                singleLine = true
+                            value = igneous,
+                            onValueChange = { igneous = it.trim { char -> char <= ' ' } },
+                            Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
+                            label = { Text(text = "igneous") },
+                            keyboardActions = KeyboardActions(
+                                onDone = { login() }
+                            ),
+                            singleLine = true
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                                onClick = { login() },
-                                Modifier.padding(horizontal = 4.dp)
-                                        .width(128.dp)
+                            onClick = { login() },
+                            Modifier
+                                .padding(horizontal = 4.dp)
+                                .width(128.dp)
                         ) {
                             Text(text = stringResource(id = android.R.string.ok))
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = { fillCookiesFromClipboard() },                                    modifier = Modifier
-                                .padding(horizontal = 4.dp)) {
+                        TextButton(
+                            onClick = { fillCookiesFromClipboard() }, modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                        ) {
                             Text(
-                                    text = buildAnnotatedString {
-                                        withStyle(
-                                                style = SpanStyle(textDecoration = TextDecoration.Underline)
-                                        ) {
-                                            append(stringResource(id = R.string.from_clipboard))
-                                        }
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(textDecoration = TextDecoration.Underline)
+                                    ) {
+                                        append(stringResource(id = R.string.from_clipboard))
                                     }
+                                }
                             )
                         }
                     }
@@ -426,30 +431,31 @@ fun CookieSignInScene(currentScreenDimension : ScreenDimension) {
                 CircularProgressIndicator()
             if (showErrorDialog) {
                 AlertDialog(
-                        onDismissRequest = {
+                    onDismissRequest = {
+                        showErrorDialog = false
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
                             showErrorDialog = false
-                        },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                showErrorDialog = false
-                            }) {
-                                Text(text = stringResource(id = R.string.get_it))
-                            }
-                        },
-                        title = {
-                            Text(text = stringResource(id = R.string.sign_in_failed))
-                        },
-                        text = {
-                            Text(
-                                    text =
-                                    """
+                        }) {
+                            Text(text = stringResource(id = R.string.get_it))
+                        }
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.sign_in_failed))
+                    },
+                    text = {
+                        Text(
+                            text =
+                            """
                             ${ExceptionUtils.getReadableString(loginErrorException!!)}
                             ${stringResource(R.string.wrong_cookie_warning)}
                         """.trimIndent()
-                            )
-                        }
+                        )
+                    }
                 )
             }
-        }}
+        }
+    }
 
 }

@@ -77,12 +77,12 @@ import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
-import com.hippo.util.toBBCode
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.util.TextUrl
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
+import com.hippo.util.toBBCode
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
 import com.hippo.widget.LinkifyTextView
