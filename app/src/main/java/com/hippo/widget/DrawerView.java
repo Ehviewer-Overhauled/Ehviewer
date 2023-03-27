@@ -21,11 +21,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-import com.hippo.yorozuya.LayoutUtils;
-
 public class DrawerView extends FrameLayout {
-
-    private static final int DEFAULT_MAX_WIDTH = 280;
 
     private static final int[] SIZE_ATTRS = new int[]{
             android.R.attr.maxWidth
@@ -50,7 +46,7 @@ public class DrawerView extends FrameLayout {
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, SIZE_ATTRS);
-        mMaxWidth = a.getDimensionPixelOffset(0, LayoutUtils.dp2pix(context, DEFAULT_MAX_WIDTH));
+        mMaxWidth = a.getDimensionPixelOffset(0, 0);
         a.recycle();
     }
 
