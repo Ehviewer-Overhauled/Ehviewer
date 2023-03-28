@@ -1,16 +1,23 @@
 package eu.kanade.tachiyomi.ui.reader.loader
 
 import androidx.annotation.CallSuper
-import androidx.collection.LruCache
+import androidx.collection.lruCache
 import com.hippo.image.Image
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 
+private const val MAX_CACHE_SIZE = 512 * 1024 * 1024
+private const val MIN_CACHE_SIZE = 128 * 1024 * 1024
+
 abstract class PageLoader {
 
-    private val mImageCache = ImageCache()
+    private val mImageCache = lruCache<Int, Image>(
+        maxSize = (OSUtils.getTotalMemory() / 16).toInt().coerceIn(MIN_CACHE_SIZE, MAX_CACHE_SIZE),
+        sizeOf = { _, v -> v.size },
+        onEntryRemoved = { _, _, o, _ -> o.recycle() }
+    )
     val mPages by lazy {
         check(size > 0)
         (0 until size).map { ReaderPage(it) }
@@ -82,7 +89,7 @@ abstract class PageLoader {
 
     fun notifyPageSucceed(index: Int, image: Image) {
         if (mImageCache[index] != image)
-            mImageCache.add(index, image)
+            mImageCache.put(index, image)
         mPages[index].image = image
         mPages[index].status.value = Page.State.READY
     }
@@ -90,30 +97,5 @@ abstract class PageLoader {
     fun notifyPageFailed(index: Int, error: String?) {
         mPages[index].errorMsg = error
         mPages[index].status.value = Page.State.ERROR
-    }
-
-    private class ImageCache : LruCache<Int, Image>(
-        MathUtils.clamp(
-            OSUtils.getTotalMemory() / 16,
-            MIN_CACHE_SIZE,
-            MAX_CACHE_SIZE
-        ).toInt()
-    ) {
-        fun add(key: Int, value: Image) {
-            put(key, value)
-        }
-
-        override fun sizeOf(key: Int, value: Image): Int {
-            return value.size
-        }
-
-        override fun entryRemoved(evicted: Boolean, key: Int, oldValue: Image, newValue: Image?) {
-            oldValue.recycle()
-        }
-
-        companion object {
-            private const val MAX_CACHE_SIZE = (512 * 1024 * 1024).toLong()
-            private const val MIN_CACHE_SIZE = (128 * 1024 * 1024).toLong()
-        }
     }
 }
