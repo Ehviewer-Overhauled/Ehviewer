@@ -117,7 +117,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
     }
 
-    private fun cleanupDownload() {
+    private suspend fun cleanupDownload() {
         runCatching {
             keepNoMediaFileStatus()
         }.onFailure {

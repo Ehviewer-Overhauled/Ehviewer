@@ -33,6 +33,8 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.collect.LongList
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
@@ -248,12 +250,15 @@ private fun ensureNoMediaFile(downloadDir: UniFile) {
     downloadDir.createFile(".nomedia") ?: return
 }
 
-@Synchronized
-fun keepNoMediaFileStatus() {
-    val downloadLocation = Settings.downloadLocation ?: return
-    if (Settings.mediaScan) {
-        removeNoMediaFile(downloadLocation)
-    } else {
-        ensureNoMediaFile(downloadLocation)
+private val lck = Mutex()
+
+suspend fun keepNoMediaFileStatus() {
+    lck.withLock {
+        val downloadLocation = Settings.downloadLocation ?: return
+        if (Settings.mediaScan) {
+            removeNoMediaFile(downloadLocation)
+        } else {
+            ensureNoMediaFile(downloadLocation)
+        }
     }
 }
