@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
-import android.os.ParcelFileDescriptor
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.hippo.app.ListCheckBoxDialogBuilder
@@ -33,9 +32,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
-import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.collect.LongList
-import java.io.IOException
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
@@ -221,33 +218,6 @@ object CommonOperations {
         }
     }
 
-    @JvmStatic
-    fun ensureNoMediaFile(file: UniFile?) {
-        if (null == file) {
-            return
-        }
-        val noMedia = file.createFile(".nomedia") ?: return
-        var `is`: ParcelFileDescriptor? = null
-        try {
-            `is` = noMedia.openFileDescriptor("r")
-        } catch (e: IOException) {
-            // Ignore
-        } finally {
-            IOUtils.closeQuietly(`is`)
-        }
-    }
-
-    @JvmStatic
-    fun removeNoMediaFile(file: UniFile?) {
-        if (null == file) {
-            return
-        }
-        val noMedia = file.subFile(".nomedia")
-        if (null != noMedia && noMedia.isFile) {
-            noMedia.delete()
-        }
-    }
-
     private class DelegateFavoriteCallback(
         private val delegate: EhClient.Callback<Unit>, private val info: GalleryInfo,
         private val newFavoriteName: String?, private val slot: Int
@@ -266,5 +236,24 @@ object CommonOperations {
         override fun onCancel() {
             delegate.onCancel()
         }
+    }
+}
+
+private fun removeNoMediaFile(downloadDir: UniFile) {
+    val noMedia = downloadDir.subFile(".nomedia") ?: return
+    noMedia.delete()
+}
+
+private fun ensureNoMediaFile(downloadDir: UniFile) {
+    downloadDir.createFile(".nomedia") ?: return
+}
+
+@Synchronized
+fun keepNoMediaFileStatus() {
+    val downloadLocation = Settings.downloadLocation ?: return
+    if (Settings.mediaScan) {
+        removeNoMediaFile(downloadLocation)
+    } else {
+        ensureNoMediaFile(downloadLocation)
     }
 }

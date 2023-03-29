@@ -19,16 +19,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.ui.CommonOperations.ensureNoMediaFile
-import com.hippo.ehviewer.ui.CommonOperations.removeNoMediaFile
+import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
 
 class DownloadFragment : BasePreferenceFragment() {
     private var mDownloadLocation: Preference? = null
@@ -43,6 +44,9 @@ class DownloadFragment : BasePreferenceFragment() {
             val uniFile = UniFile.fromTreeUri(activity, treeUri)
             if (uniFile != null) {
                 Settings.putDownloadLocation(uniFile)
+                lifecycleScope.launchIO {
+                    keepNoMediaFileStatus()
+                }
                 onUpdateDownloadLocation()
             } else {
                 showTip(
@@ -96,6 +100,9 @@ class DownloadFragment : BasePreferenceFragment() {
                         val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
                         if (uniFile != null) {
                             Settings.putDownloadLocation(uniFile)
+                            lifecycleScope.launchIO {
+                                keepNoMediaFileStatus()
+                            }
                             onUpdateDownloadLocation()
                         } else {
                             showTip(
@@ -126,11 +133,8 @@ class DownloadFragment : BasePreferenceFragment() {
         val key = preference.key
         if (Settings.KEY_MEDIA_SCAN == key) {
             if (newValue is Boolean) {
-                val downloadLocation = Settings.downloadLocation
-                if (newValue) {
-                    removeNoMediaFile(downloadLocation)
-                } else {
-                    ensureNoMediaFile(downloadLocation)
+                lifecycleScope.launchIO {
+                    keepNoMediaFileStatus()
                 }
             }
             return true

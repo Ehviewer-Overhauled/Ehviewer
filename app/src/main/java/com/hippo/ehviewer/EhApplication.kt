@@ -38,9 +38,8 @@ import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
-import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.util.ExceptionUtils
+import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.IntIdGenerator
@@ -119,24 +118,15 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     }
 
     private fun cleanupDownload() {
-        try {
-            val downloadLocation = Settings.downloadLocation
-            if (Settings.mediaScan) {
-                CommonOperations.removeNoMediaFile(downloadLocation)
-            } else {
-                CommonOperations.ensureNoMediaFile(downloadLocation)
-            }
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            ExceptionUtils.throwIfFatal(t)
+        runCatching {
+            keepNoMediaFileStatus()
+        }.onFailure {
+            it.printStackTrace()
         }
-
-        // Clear temp files
-        try {
+        runCatching {
             clearTempDir()
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            ExceptionUtils.throwIfFatal(t)
+        }.onFailure {
+            it.printStackTrace()
         }
     }
 

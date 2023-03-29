@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.ehviewer.ui.CommonOperations.ensureNoMediaFile
-import com.hippo.ehviewer.ui.CommonOperations.removeNoMediaFile
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.NumberUtils
@@ -427,11 +425,6 @@ object Settings {
         putString(KEY_DOWNLOAD_SAVE_PATH, uri.encodedPath)
         putString(KEY_DOWNLOAD_SAVE_QUERY, uri.encodedQuery)
         putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
-        if (mediaScan) {
-            removeNoMediaFile(location)
-        } else {
-            ensureNoMediaFile(location)
-        }
     }
 
     val mediaScan: Boolean
