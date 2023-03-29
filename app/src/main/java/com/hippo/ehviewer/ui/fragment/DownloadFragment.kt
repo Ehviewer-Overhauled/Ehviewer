@@ -29,7 +29,7 @@ import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
-import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 class DownloadFragment : BasePreferenceFragment() {
     private var mDownloadLocation: Preference? = null
@@ -44,7 +44,7 @@ class DownloadFragment : BasePreferenceFragment() {
             val uniFile = UniFile.fromTreeUri(activity, treeUri)
             if (uniFile != null) {
                 Settings.putDownloadLocation(uniFile)
-                lifecycleScope.launchIO {
+                lifecycleScope.launchNonCancellable {
                     keepNoMediaFileStatus()
                 }
                 onUpdateDownloadLocation()
@@ -100,7 +100,7 @@ class DownloadFragment : BasePreferenceFragment() {
                         val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
                         if (uniFile != null) {
                             Settings.putDownloadLocation(uniFile)
-                            lifecycleScope.launchIO {
+                            lifecycleScope.launchNonCancellable {
                                 keepNoMediaFileStatus()
                             }
                             onUpdateDownloadLocation()
@@ -133,7 +133,7 @@ class DownloadFragment : BasePreferenceFragment() {
         val key = preference.key
         if (Settings.KEY_MEDIA_SCAN == key) {
             if (newValue is Boolean) {
-                lifecycleScope.launchIO {
+                lifecycleScope.launchNonCancellable {
                     keepNoMediaFileStatus()
                 }
             }
