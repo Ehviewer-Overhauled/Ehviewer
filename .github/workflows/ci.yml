@@ -27,6 +27,9 @@ jobs:
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.2.9519653" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
 
+      - name: Ktlint Check
+        run: ./gradlew ktlintCheck
+
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
         with:

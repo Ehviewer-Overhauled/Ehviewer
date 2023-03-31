@@ -5,6 +5,10 @@ plugins {
     id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
 }
 
+allprojects {
+    apply(from = "$rootDir/ktlint.gradle.kts")
+}
+
 tasks.register("Delete", Delete::class) {
     delete(rootProject.buildDir)
 }
