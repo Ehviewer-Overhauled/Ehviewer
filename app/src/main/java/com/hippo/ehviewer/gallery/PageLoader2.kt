@@ -42,7 +42,7 @@ abstract class PageLoader2 : PageLoader() {
 }
 
 val SUPPORT_IMAGE_EXTENSIONS = arrayOf(
-    ".jpg",  // Joint Photographic Experts Group
-    ".png",  // Portable Network Graphics
-    ".gif"
+    ".jpg", // Joint Photographic Experts Group
+    ".png", // Portable Network Graphics
+    ".gif",
 )

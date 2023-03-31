@@ -51,38 +51,38 @@ class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
         recycler: RecyclerView.Recycler,
         state: RecyclerView.State,
         widthSpec: Int,
-        heightSpec: Int
+        heightSpec: Int,
     ) {
         if (mColumnSizeChanged && mColumnSize > 0) {
             val totalSpace = if (orientation == VERTICAL) {
                 check(
                     View.MeasureSpec.EXACTLY == View.MeasureSpec.getMode(
-                        widthSpec
-                    )
+                        widthSpec,
+                    ),
                 ) { "RecyclerView need a fixed width for AutoStaggeredGridLayoutManager" }
                 View.MeasureSpec.getSize(widthSpec) - paddingRight - paddingLeft
             } else {
                 check(
                     View.MeasureSpec.EXACTLY == View.MeasureSpec.getMode(
-                        heightSpec
-                    )
+                        heightSpec,
+                    ),
                 ) { "RecyclerView need a fixed height for AutoStaggeredGridLayoutManager" }
                 View.MeasureSpec.getSize(heightSpec) - paddingTop - paddingBottom
             }
             val spanCount = when (mStrategy) {
                 STRATEGY_MIN_SIZE -> getSpanCountForMinSize(
                     totalSpace,
-                    mColumnSize
+                    mColumnSize,
                 )
 
                 STRATEGY_SUITABLE_SIZE -> getSpanCountForSuitableSize(
                     totalSpace,
-                    mColumnSize
+                    mColumnSize,
                 )
 
                 else -> getSpanCountForMinSize(
                     totalSpace,
-                    mColumnSize
+                    mColumnSize,
                 )
             }
             setSpanCount(spanCount)

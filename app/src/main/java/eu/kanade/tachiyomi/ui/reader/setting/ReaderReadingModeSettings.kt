@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.launchIn
  */
 class ReaderReadingModeSettings @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet? = null
+    attrs: AttributeSet? = null,
 ) :
     NestedScrollView(context, attrs) {
 
@@ -59,7 +59,8 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         }
         binding.viewer.setSelection(
             ReaderActivity.readerPreferences.defaultReadingMode().get()
-                .let { ReadingModeType.fromPreference(it).prefValue })
+                .let { ReadingModeType.fromPreference(it).prefValue },
+        )
 
         binding.rotationMode.onItemSelectedListener = { position ->
             val rotationType = OrientationType.fromSpinner(position)
@@ -68,7 +69,8 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         }
         binding.rotationMode.setSelection(
             ReaderActivity.readerPreferences.defaultOrientationType().get()
-                .let { OrientationType.fromPreference(it).prefValue })
+                .let { OrientationType.fromPreference(it).prefValue },
+        )
     }
 
     /**
@@ -80,7 +82,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
 
         binding.pagerPrefsGroup.tappingInverted.bindToPreference(
             readerPreferences.pagerNavInverted(),
-            PreferenceValues.TappingInvertMode::class.java
+            PreferenceValues.TappingInvertMode::class.java,
         )
         binding.pagerPrefsGroup.navigatePan.bindToPreference(readerPreferences.navigateToPan())
 
@@ -112,7 +114,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
 
         binding.webtoonPrefsGroup.tappingInverted.bindToPreference(
             readerPreferences.webtoonNavInverted(),
-            PreferenceValues.TappingInvertMode::class.java
+            PreferenceValues.TappingInvertMode::class.java,
         )
 
         binding.webtoonPrefsGroup.webtoonNav.bindToPreference(readerPreferences.navigationModeWebtoon())
@@ -122,7 +124,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
         // binding.webtoonPrefsGroup.cropBordersWebtoon.bindToPreference(readerPreferences.cropBordersWebtoon())
         binding.webtoonPrefsGroup.webtoonSidePadding.bindToIntPreference(
             readerPreferences.webtoonSidePadding(),
-            R.array.webtoon_side_padding_values
+            R.array.webtoon_side_padding_values,
         )
     }
 

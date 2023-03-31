@@ -87,8 +87,9 @@ class SettingsActivity : EhActivity() {
 
     fun showTip(message: CharSequence?, length: Int) {
         Snackbar.make(
-            findViewById(R.id.snackbar), message!!,
-            if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
+            findViewById(R.id.snackbar),
+            message!!,
+            if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT,
         ).show()
     }
 

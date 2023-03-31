@@ -27,7 +27,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
 abstract class TaskPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : DialogPreference(context, attrs), CoroutineScope {
     override val coroutineContext = Dispatchers.IO + Job()
     protected lateinit var dialog: AlertDialog
@@ -47,7 +48,7 @@ abstract class TaskPreference @JvmOverloads constructor(
     protected fun showTip(msg: String) {
         (context as SettingsActivity).showTip(
             msg,
-            Snackbar.LENGTH_SHORT
+            Snackbar.LENGTH_SHORT,
         )
     }
 }

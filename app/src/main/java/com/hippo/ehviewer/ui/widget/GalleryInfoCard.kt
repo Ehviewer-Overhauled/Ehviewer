@@ -34,23 +34,23 @@ fun ListInfoCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     info: GalleryInfo,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     CrystalCard(
-        modifier = Modifier.padding(6.dp)
+        modifier = Modifier.padding(6.dp),
     ) {
         Row(
             modifier = modifier
                 .combinedClickable(
                     onClick = onClick,
-                    onLongClick = onLongClick
+                    onLongClick = onLongClick,
                 ),
         ) {
             Card {
                 EhAsyncThumb(
                     model = info.thumb,
                     contentScale = ContentScale.Crop,
-                    modifier = modifier.aspectRatio(0.6666667F)
+                    modifier = modifier.aspectRatio(0.6666667F),
                 )
             }
             Column(Modifier.padding(8.dp, 4.dp)) {
@@ -59,7 +59,7 @@ fun ListInfoCard(
                     maxLines = 2,
                     modifier = Modifier.fillMaxWidth(),
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -68,7 +68,7 @@ fun ListInfoCard(
                             text = info.uploader ?: "(DISOWNED)",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                         GalleryListCardRating(rating = info.rating)
                         val categoryColor = EhUtils.getCategoryColor(info.category)
@@ -80,7 +80,7 @@ fun ListInfoCard(
                                 .padding(vertical = 2.dp, horizontal = 8.dp),
                             color = Color.White,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -90,24 +90,24 @@ fun ListInfoCard(
                                 Icon(
                                     Icons.Default.Download,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                             }
                             if (info.favoriteSlot != -2) {
                                 Icon(
                                     Icons.Default.Favorite,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                             }
                             Text(
                                 text = info.simpleLanguage.orEmpty(),
-                                style = MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
                             )
                         }
                         Text(
                             text = info.posted.orEmpty(),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }

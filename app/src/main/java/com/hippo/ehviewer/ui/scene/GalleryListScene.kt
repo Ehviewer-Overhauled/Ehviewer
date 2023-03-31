@@ -117,8 +117,12 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper,
-    OnClickFabListener, OnExpandListener {
+class GalleryListScene :
+    SearchBarScene(),
+    OnDragHandlerListener,
+    SearchLayout.Helper,
+    OnClickFabListener,
+    OnExpandListener {
     private val mCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
@@ -132,7 +136,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
     private val selectImageLauncher = registerForActivityResult<PickVisualMediaRequest, Uri>(
-        ActivityResultContracts.PickVisualMedia()
+        ActivityResultContracts.PickVisualMedia(),
     ) { result: Uri? -> binding.searchLayout.setImageUri(result) }
     private var mSearchFab: View? = null
     private val mSearchFabAnimatorListener: Animator.AnimatorListener =
@@ -287,8 +291,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     return listOf<Suggestion>(
                         GalleryDetailUrlSuggestion(
                             result1.gid,
-                            result1.token
-                        )
+                            result1.token,
+                        ),
                     )
                 }
                 val result2 = GalleryPageUrlParser.parse(text, false)
@@ -297,8 +301,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         GalleryPageUrlSuggestion(
                             result2.gid,
                             result2.pToken,
-                            result2.page
-                        )
+                            result2.page,
+                        ),
                     )
                 }
                 return null
@@ -346,8 +350,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     override fun onCreateViewWithToolbar(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = SceneGalleryListBinding.inflate(inflater, container, false)
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
@@ -355,11 +360,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         mShowActionFab = true
         mSearchFab = ViewUtils.`$$`(container, R.id.search_fab)
         ViewCompat.setWindowInsetsAnimationCallback(
-            binding.root, WindowInsetsAnimationHelper(
+            binding.root,
+            WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 binding.fabLayout,
-                mSearchFab!!.parent as View
-            )
+                mSearchFab!!.parent as View,
+            ),
         )
         (binding.fabLayout.parent as ViewGroup).removeView(binding.fabLayout)
         container!!.addView(binding.fabLayout)
@@ -371,8 +377,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.contentLayout.fastScroller.setOnDragHandlerListener(this)
         binding.contentLayout.setFitPaddingTop(paddingTopSB)
         mAdapter = GalleryListAdapter(
-            inflater, resources,
-            binding.contentLayout.recyclerView, Settings.listMode
+            inflater,
+            resources,
+            binding.contentLayout.recyclerView,
+            Settings.listMode,
         )
         binding.contentLayout.recyclerView.clipToPadding = false
         binding.contentLayout.recyclerView.clipChildren = false
@@ -391,7 +399,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 paddingLeft,
                 paddingTop + paddingTopSB,
                 paddingRight,
-                paddingBottom + paddingBottomFab
+                paddingBottom + paddingBottomFab,
             )
         }
         binding.fabLayout.setAutoCancel(true)
@@ -449,7 +457,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private fun showAddQuickSearchDialog(
         adapter: QsDrawerAdapter,
-        recyclerView: EasyRecyclerView, tip: TextView
+        recyclerView: EasyRecyclerView,
+        tip: TextView,
     ) {
         val context = context
         if (null == context || null == mHelper) {
@@ -477,7 +486,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val builder = EditTextDialogBuilder(
             context,
             getSuitableTitleForUrlBuilder(context.resources, mUrlBuilder, false),
-            getString(R.string.quick_search)
+            getString(R.string.quick_search),
         )
         builder.setTitle(R.string.add_quick_search_dialog_title)
         builder.setPositiveButton(android.R.string.ok, null)
@@ -486,7 +495,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val hint = arrayOf(getString(R.string.save_progress))
         builder.setMultiChoiceItems(
             hint,
-            checked
+            checked,
         ) { _: DialogInterface?, which: Int, isChecked: Boolean -> checked[which] = isChecked }
         val dialog = builder.show()
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
@@ -537,8 +546,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     override fun onCreateDrawerView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val drawerBinding = DrawerListRvBinding.inflate(inflater, container, false)
         drawerBinding.recyclerViewDrawer.layoutManager = LinearLayoutManager(context)
@@ -574,7 +584,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 showAddQuickSearchDialog(
                     qsDrawerAdapter,
                     drawerBinding.recyclerViewDrawer,
-                    drawerBinding.tip
+                    drawerBinding.tip,
                 )
             } else if (id == R.id.action_help) {
                 showQuickSearchTipDialog()
@@ -655,7 +665,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             datePicker.show(requireActivity().supportFragmentManager, "date-picker")
             datePicker.addOnPositiveButtonClickListener { v: Long? ->
                 mHelper!!.goTo(
-                    v!!, true
+                    v!!,
+                    true,
                 )
             }
         }
@@ -716,34 +727,42 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val gi = mHelper!!.getDataAtEx(position) ?: return true
         val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourited = gi.favoriteSlot != -2
-        val items = if (downloaded) arrayOf<CharSequence>(
-            context.getString(R.string.read),
-            context.getString(R.string.delete_downloads),
-            context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites),
-            context.getString(R.string.download_move_dialog_title)
-        ) else arrayOf<CharSequence>(
-            context.getString(R.string.read),
-            context.getString(R.string.download),
-            context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites)
-        )
-        val icons = if (downloaded) intArrayOf(
-            R.drawable.v_book_open_x24,
-            R.drawable.v_delete_x24,
-            if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
-            R.drawable.v_folder_move_x24
-        ) else intArrayOf(
-            R.drawable.v_book_open_x24,
-            R.drawable.v_download_x24,
-            if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24
-        )
+        val items = if (downloaded) {
+            arrayOf<CharSequence>(
+                context.getString(R.string.read),
+                context.getString(R.string.delete_downloads),
+                context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites),
+                context.getString(R.string.download_move_dialog_title),
+            )
+        } else {
+            arrayOf<CharSequence>(
+                context.getString(R.string.read),
+                context.getString(R.string.download),
+                context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites),
+            )
+        }
+        val icons = if (downloaded) {
+            intArrayOf(
+                R.drawable.v_book_open_x24,
+                R.drawable.v_delete_x24,
+                if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
+                R.drawable.v_folder_move_x24,
+            )
+        } else {
+            intArrayOf(
+                R.drawable.v_book_open_x24,
+                R.drawable.v_download_x24,
+                if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
+            )
+        }
         BaseDialogBuilder(context)
             .setTitle(EhUtils.getSuitableTitle(gi))
             .setAdapter(
                 SelectItemWithIconAdapter(
                     context,
                     items,
-                    icons
-                )
+                    icons,
+                ),
             ) { _: DialogInterface?, which: Int ->
                 when (which) {
                     0 -> {
@@ -759,12 +778,12 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                             .setMessage(
                                 getString(
                                     R.string.download_remove_dialog_message,
-                                    gi.title
-                                )
+                                    gi.title,
+                                ),
                             )
                             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                                 mDownloadManager.deleteDownload(
-                                    gi.gid
+                                    gi.gid,
                                 )
                             }
                             .show()
@@ -776,13 +795,13 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         CommonOperations.removeFromFavorites(
                             activity,
                             gi,
-                            RemoveFromFavoriteListener(context)
+                            RemoveFromFavoriteListener(context),
                         )
                     } else {
                         CommonOperations.addToFavorites(
                             activity,
                             gi,
-                            AddToFavoriteListener(context)
+                            AddToFavoriteListener(context),
                         )
                     }
 
@@ -1043,7 +1062,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 result.galleryInfoList.forEach {
                     it.thumb?.run {
                         context?.imageLoader?.enqueue(
-                            ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                            ImageRequest.Builder(requireContext()).ehUrl(this).build(),
                         )
                     }
                 }
@@ -1060,7 +1079,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     result.nextPage,
                     null,
                     null,
-                    result.galleryInfoList
+                    result.galleryInfoList,
                 )
             } else {
                 mHelper!!.onGetPageData(
@@ -1069,7 +1088,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     0,
                     result.prev,
                     result.next,
-                    result.galleryInfoList
+                    result.galleryInfoList,
                 )
             }
         }
@@ -1086,7 +1105,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private annotation class State
     private inner class GetGalleryListListener(
         context: Context,
-        private val mTaskId: Int
+        private val mTaskId: Int,
     ) : EhCallback<GalleryListScene, GalleryListParser.Result>(context) {
         override fun onSuccess(result: GalleryListParser.Result) {
             val scene = this@GalleryListScene
@@ -1132,7 +1151,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private inner class MoveDialogHelper(
         private val mLabels: Array<String>,
-        private val mGi: GalleryInfo
+        private val mGi: GalleryInfo,
     ) : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             // Cancel check mode
@@ -1189,7 +1208,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                         R.string.toplist_alltime,
                         R.string.toplist_pastyear,
                         R.string.toplist_pastmonth,
-                        R.string.toplist_yesterday
+                        R.string.toplist_yesterday,
                     )
                     text.text = getString(toplists[position])
                     option.visibility = View.GONE
@@ -1243,7 +1262,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private inner class GalleryDetailUrlSuggestion(
         private val mGid: Long,
-        private val mToken: String
+        private val mToken: String,
     ) : UrlSuggestion() {
         override fun getDestination(): Int {
             return R.id.galleryDetailScene
@@ -1261,7 +1280,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private inner class GalleryPageUrlSuggestion(
         private val mGid: Long,
         private val mPToken: String,
-        private val mPage: Int
+        private val mPage: Int,
     ) : UrlSuggestion() {
         override fun getDestination(): Int {
             return R.id.progressScene
@@ -1279,7 +1298,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private inner class GalleryListAdapter(
         inflater: LayoutInflater,
-        resources: Resources, recyclerView: RecyclerView, type: Int
+        resources: Resources,
+        recyclerView: RecyclerView,
+        type: Int,
     ) : GalleryAdapter(inflater, resources, recyclerView, type, true) {
         override fun getItemCount(): Int {
             return if (null != mHelper) mHelper!!.size() else 0
@@ -1304,7 +1325,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             type: Int,
             page: Int,
             index: String?,
-            isNext: Boolean
+            isNext: Boolean,
         ) {
             val activity = mainActivity
             if (null == activity || null == mHelper) {
@@ -1322,13 +1343,14 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        taskId
-                    )
+                        taskId,
+                    ),
                 )
                 request.setArgs(
                     File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
                     mUrlBuilder.isUseSimilarityScan,
-                    mUrlBuilder.isOnlySearchCovers, mUrlBuilder.isShowExpunged
+                    mUrlBuilder.isOnlySearchCovers,
+                    mUrlBuilder.isShowExpunged,
                 )
                 request.enqueue(this@GalleryListScene)
             } else {
@@ -1338,8 +1360,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 request.setCallback(
                     GetGalleryListListener(
                         context,
-                        taskId
-                    )
+                        taskId,
+                    ),
                 )
                 request.setArgs(url)
                 request.enqueue(this@GalleryListScene)
@@ -1383,18 +1405,18 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         ItemTouchHelper.Callback() {
         override fun getMovementFlags(
             recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder
+            viewHolder: RecyclerView.ViewHolder,
         ): Int {
             return makeMovementFlags(
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.LEFT
+                ItemTouchHelper.LEFT,
             )
         }
 
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
+            target: RecyclerView.ViewHolder,
         ): Boolean {
             val fromPosition = viewHolder.bindingAdapterPosition
             val toPosition = target.bindingAdapterPosition
@@ -1459,7 +1481,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 }
 
 private fun getSuitableTitleForUrlBuilder(
-    resources: Resources, urlBuilder: ListUrlBuilder, appName: Boolean
+    resources: Resources,
+    urlBuilder: ListUrlBuilder,
+    appName: Boolean,
 ): String? {
     val keyword = urlBuilder.keyword
     val category = urlBuilder.category

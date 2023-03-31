@@ -73,14 +73,18 @@ import java.time.ZoneOffset
 
 // TODO Get favorite, modify favorite, add favorite, what a mess!
 @SuppressLint("NotifyDataSetChanged", "RtlHardcoded")
-class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListener,
-    OnExpandListener, CustomChoiceListener {
+class FavoritesScene :
+    SearchBarScene(),
+    OnDragHandlerListener,
+    OnClickFabListener,
+    OnExpandListener,
+    CustomChoiceListener {
     // For modify action
     private val mModifyGiList: MutableList<GalleryInfo> = ArrayList()
-    var current // -1 for error
-            = 0
-    var limit // -1 for error
-            = 0
+    var current = // -1 for error
+        0
+    var limit = // -1 for error
+        0
 
     private var mRecyclerView: EasyRecyclerView? = null
 
@@ -183,7 +187,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
 
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val view = inflater.inflate(R.layout.scene_favorites, container, false)
         val mContentLayout = view.findViewById<ContentLayout>(R.id.content_layout)
@@ -199,10 +204,11 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         (mFabLayout!!.parent as ViewGroup).removeView(mFabLayout)
         container!!.addView(mFabLayout)
         ViewCompat.setWindowInsetsAnimationCallback(
-            view, WindowInsetsAnimationHelper(
+            view,
+            WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
-                mFabLayout
-            )
+                mFabLayout,
+            ),
         )
         val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
         mHelper = FavoritesHelper()
@@ -216,8 +222,10 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         mRecyclerView!!.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
         mRecyclerView!!.setCustomCheckedListener(this)
         fastScroller.setPadding(
-            fastScroller.paddingLeft, fastScroller.paddingTop + paddingTopSB,
-            fastScroller.paddingRight, fastScroller.paddingBottom
+            fastScroller.paddingLeft,
+            fastScroller.paddingTop + paddingTopSB,
+            fastScroller.paddingRight,
+            fastScroller.paddingBottom,
         )
         setAllowEmptySearch(false)
         updateSearchBar()
@@ -270,7 +278,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         } else {
             if (!ObjectUtils.equal(favCatName, mOldFavCat) || !ObjectUtils.equal(
                     keyword,
-                    mOldKeyword
+                    mOldKeyword,
                 )
             ) {
                 setSearchBarHint(getString(R.string.favorites_title_2, favCatName, keyword))
@@ -293,11 +301,11 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         if (mFabLayout != null && mUrlBuilder != null) {
             mFabLayout!!.setSecondaryFabVisibilityAt(
                 0,
-                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL
+                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
             )
             mFabLayout!!.setSecondaryFabVisibilityAt(
                 2,
-                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL
+                mUrlBuilder!!.favCat != FavListUrlBuilder.FAV_CAT_LOCAL,
             )
         }
     }
@@ -326,7 +334,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
 
     override fun onCreateDrawerView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         val view = inflater.inflate(R.layout.drawer_list_rv, container, false)
         val toolbar = ViewUtils.`$$`(view, R.id.toolbar) as Toolbar
@@ -344,7 +353,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     .setTitle(R.string.default_favorites_collection)
                     .setItems(items) { _: DialogInterface?, which: Int ->
                         Settings.putDefaultFavSlot(
-                            which - 2
+                            which - 2,
                         )
                     }
                     .show()
@@ -408,7 +417,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 val args = Bundle()
                 args.putString(
                     GalleryDetailScene.KEY_ACTION,
-                    GalleryDetailScene.ACTION_GALLERY_INFO
+                    GalleryDetailScene.ACTION_GALLERY_INFO,
                 )
                 args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
                 navigate(R.id.galleryDetailScene, args)
@@ -483,7 +492,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         datePicker.show(requireActivity().supportFragmentManager, "date-picker")
         datePicker.addOnPositiveButtonClickListener { v: Long? ->
             mHelper!!.goTo(
-                v!!, true
+                v!!,
+                true,
             )
         }
     }
@@ -519,7 +529,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             i++
         }
         when (position) {
-            3 ->  // Check all
+            3 -> // Check all
                 mRecyclerView!!.checkAll()
 
             4 -> { // Download
@@ -540,8 +550,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     .setMessage(
                         getString(
                             R.string.delete_favorites_dialog_message,
-                            mModifyGiList.size
-                        )
+                            mModifyGiList.size,
+                        ),
                     )
                     .setPositiveButton(android.R.string.ok, helper)
                     .setOnCancelListener(helper)
@@ -615,7 +625,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         view: EasyRecyclerView,
         position: Int,
         id: Long,
-        checked: Boolean
+        checked: Boolean,
     ) {
         if (view.checkedItemCount == 0) {
             view.outOfCustomChoiceMode()
@@ -685,7 +695,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         context: Context,
         private val mTaskId: Int,
         private val mKeyword: String?,
-        private val mBackup: List<GalleryInfo>
+        private val mBackup: List<GalleryInfo>,
     ) : EhCallback<FavoritesScene?, Void?>(context) {
         override fun onSuccess(result: Void?) {
             val scene = this@FavoritesScene
@@ -707,7 +717,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         context: Context,
         private val mTaskId: Int, // Local fav is shown now, but operation need be done for cloud fav
         private val mLocal: Boolean,
-        private val mKeyword: String?
+        private val mKeyword: String?,
     ) : EhCallback<FavoritesScene?, FavoritesParser.Result>(context) {
         override fun onSuccess(result: FavoritesParser.Result) {
             // Put fav cat
@@ -774,11 +784,14 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         override fun getItemCount(): Int {
             return if (null == mFavCatArray) {
                 2
-            } else 12
+            } else {
+                12
+            }
         }
     }
 
-    private inner class DeleteDialogHelper : DialogInterface.OnClickListener,
+    private inner class DeleteDialogHelper :
+        DialogInterface.OnClickListener,
         DialogInterface.OnCancelListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -812,7 +825,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
         }
     }
 
-    private inner class MoveDialogHelper : DialogInterface.OnClickListener,
+    private inner class MoveDialogHelper :
+        DialogInterface.OnClickListener,
         DialogInterface.OnCancelListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             if (mRecyclerView == null || mHelper == null || mUrlBuilder == null) {
@@ -861,8 +875,10 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
     }
 
     private inner class FavoritesAdapter(
-        inflater: LayoutInflater, resources: Resources,
-        recyclerView: RecyclerView, type: Int
+        inflater: LayoutInflater,
+        resources: Resources,
+        recyclerView: RecyclerView,
+        type: Int,
     ) : GalleryAdapter(inflater, resources, recyclerView, type, false) {
         override fun getItemCount(): Int {
             return if (null != mHelper) mHelper!!.size() else 0
@@ -893,7 +909,7 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
             type: Int,
             page: Int,
             index: String?,
-            isNext: Boolean
+            isNext: Boolean,
         ) {
             val activity = mainActivity
             if (null == activity || null == mUrlBuilder || null == mClient) {
@@ -922,8 +938,8 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                             context,
                             taskId,
                             mUrlBuilder!!.keyword,
-                            modifyGiListBackup
-                        )
+                            modifyGiListBackup,
+                        ),
                     )
                     request.setArgs(gidArray, tokenArray, mModifyFavCat)
                     request.enqueue(this@FavoritesScene)
@@ -947,8 +963,10 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                     request.setCallback(
                         GetFavoritesListener(
                             context,
-                            taskId, local, mUrlBuilder!!.keyword
-                        )
+                            taskId,
+                            local,
+                            mUrlBuilder!!.keyword,
+                        ),
                     )
                     request.setArgs(url, gidArray, mModifyFavCat)
                     request.enqueue(this@FavoritesScene)
@@ -965,8 +983,10 @@ class FavoritesScene : SearchBarScene(), OnDragHandlerListener, OnClickFabListen
                 request.setCallback(
                     GetFavoritesListener(
                         context,
-                        taskId, false, mUrlBuilder!!.keyword
-                    )
+                        taskId,
+                        false,
+                        mUrlBuilder!!.keyword,
+                    ),
                 )
                 request.setArgs(url)
                 request.enqueue(this@FavoritesScene)

@@ -71,7 +71,7 @@ class ImageLimitsPreference(context: Context, attrs: AttributeSet) :
         val (fundsGP, fundsC) = mActivity.mFunds!!
         val cost = if (fundsGP >= resetCost) "$resetCost GP" else "$resetCost Credits"
         val message = mActivity.getString(R.string.current_limits, "$current / $maximum", cost) +
-                "\n" + mActivity.getString(R.string.current_funds, "$fundsGP+", fundsC)
+            "\n" + mActivity.getString(R.string.current_funds, "$fundsGP+", fundsC)
         mDialog.setMessage(message)
         resetButton.isEnabled = resetCost in 1..maxOf(fundsGP, fundsC)
     }

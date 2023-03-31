@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [BookmarkInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
     version = 4,
-    exportSchema = false
+    exportSchema = false,
 )
 abstract class EhDatabase : RoomDatabase() {
     abstract fun bookmarksBao(): BookmarksDao

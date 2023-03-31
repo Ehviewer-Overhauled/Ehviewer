@@ -149,7 +149,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         val view = inflater.inflate(R.layout.scene_gallery_comments, container, false) as ViewGroup
         mRecyclerView = ViewUtils.`$$`(view, R.id.recycler_view) as EasyRecyclerView
@@ -162,7 +163,6 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         mFab = ViewUtils.`$$`(view, R.id.fab) as FloatingActionButton
         mRefreshLayout = ViewUtils.`$$`(view, R.id.refresh_layout) as SwipeRefreshLayout
 
-
         // Workaround for fab and edittext render out of screen
         view.removeView(mFabLayout)
         view.removeView(mEditPanel!!.parent as View)
@@ -170,11 +170,12 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         container!!.addView(mFabLayout)
         container.addView(mEditPanel!!.parent as View)
         ViewCompat.setWindowInsetsAnimationCallback(
-            view, WindowInsetsAnimationHelper(
+            view,
+            WindowInsetsAnimationHelper(
                 WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP,
                 mEditPanel,
-                mFabLayout
-            )
+                mFabLayout,
+            ),
         )
         mRefreshLayout!!.setOnRefreshListener(this)
         val context = requireContext()
@@ -187,7 +188,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         mRecyclerView!!.adapter = mAdapter
         mRecyclerView!!.layoutManager = LinearLayoutManager(
             context,
-            RecyclerView.VERTICAL, false
+            RecyclerView.VERTICAL,
+            false,
         )
         mRecyclerView!!.setHasFixedSize(true)
         // Cancel change animator
@@ -229,24 +231,28 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                                 }
                             }
                             val builder = EditTextDialogBuilder(
-                                context, oldUrl, getString(R.string.format_url)
+                                context,
+                                oldUrl,
+                                getString(R.string.format_url),
                             )
                             builder.setTitle(getString(R.string.format_url))
                             builder.setPositiveButton(android.R.string.ok, null)
                             val dialog = builder.show()
                             val button: View? = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                            button?.setOnClickListener(View.OnClickListener {
-                                val url = builder.text.trim()
-                                if (TextUtils.isEmpty(url)) {
-                                    builder.setError(getString(R.string.text_is_empty))
-                                    return@OnClickListener
-                                } else {
-                                    builder.setError(null)
-                                }
-                                text.clearSpan(start, end, true)
-                                text[start, end] = URLSpan(url)
-                                dialog.dismiss()
-                            })
+                            button?.setOnClickListener(
+                                View.OnClickListener {
+                                    val url = builder.text.trim()
+                                    if (TextUtils.isEmpty(url)) {
+                                        builder.setError(getString(R.string.text_is_empty))
+                                        return@OnClickListener
+                                    } else {
+                                        builder.setError(null)
+                                    }
+                                    text.clearSpan(start, end, true)
+                                    text[start, end] = URLSpan(url)
+                                    dialog.dismiss()
+                                },
+                            )
                         }
 
                         R.id.action_clear -> {
@@ -339,7 +345,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
         val oldCommentsList = mGalleryDetail!!.comments!!.comments
         val newCommentsList = arrayOfNulls<GalleryComment>(
-            oldCommentsList!!.size - 1
+            oldCommentsList!!.size - 1,
         )
         var i = 0
         var j = 0
@@ -369,7 +375,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 mGalleryDetail!!.gid,
                 mGalleryDetail!!.token,
                 id,
-                vote
+                vote,
             )
             .setCallback(VoteCommentListener(context))
         request.enqueue(this)
@@ -554,7 +560,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                         halfW,
                         halfH,
                         0f,
-                        hypot(halfW.toDouble(), halfH.toDouble()).toFloat()
+                        hypot(halfW.toDouble(), halfH.toDouble()).toFloat(),
                     ).setDuration(300L)
                     animator.addListener(object : SimpleAnimatorListener() {
                         override fun onAnimationEnd(a: Animator) {
@@ -591,7 +597,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             halfW,
             halfH,
             hypot(halfW.toDouble(), halfH.toDouble()).toFloat(),
-            0.0f
+            0.0f,
         ).setDuration(300L)
         animator.addListener(object : SimpleAnimatorListener() {
             override fun onAnimationEnd(a: Animator) {
@@ -646,7 +652,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 mGalleryDetail!!.gid,
                 mGalleryDetail!!.token,
                 0,
-                mShowAllComments
+                mShowAllComments,
             )
         } else {
             null
@@ -677,7 +683,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                     .setArgs(
                         url,
                         comment,
-                        if (mCommentId != 0L) mCommentId.toString() else null
+                        if (mCommentId != 0L) mCommentId.toString() else null,
                     )
                     .setCallback(CommentGalleryListener(context, mCommentId))
                 request.enqueue(this)
@@ -774,7 +780,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private class InfoHolder(itemView: View?) : RecyclerView.ViewHolder(
-        itemView!!
+        itemView!!,
     ) {
         val key: TextView
         val value: TextView
@@ -814,7 +820,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         override fun onSuccess(result: GalleryCommentList) {
             showTip(
                 if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully,
-                LENGTH_SHORT
+                LENGTH_SHORT,
             )
             val scene = this@GalleryCommentsScene
             scene.onCommentGallerySuccess(result)
@@ -825,7 +831,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 """
     ${content.getString(if (mCommentId != 0L) R.string.edit_comment_failed else R.string.comment_failed)}
     ${ExceptionUtils.getReadableString(e)}
-    """.trimIndent(), LENGTH_LONG
+                """.trimIndent(),
+                LENGTH_LONG,
             )
         }
 
@@ -837,7 +844,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         override fun onSuccess(result: VoteCommentParser.Result) {
             showTip(
                 if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
-                LENGTH_SHORT
+                LENGTH_SHORT,
             )
             val scene = this@GalleryCommentsScene
             scene.onVoteCommentSuccess(result)
@@ -860,13 +867,13 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         private fun generateComment(
             context: Context,
             textView: ObservedTextView,
-            comment: GalleryComment
+            comment: GalleryComment,
         ): CharSequence {
             sp = Html.fromHtml(
                 comment.comment,
                 Html.FROM_HTML_MODE_LEGACY,
                 URLImageGetter(textView),
-                null
+                null,
             )
             val ssb = SpannableStringBuilder(sp)
             if (0L != comment.id && 0 != comment.score) {
@@ -875,7 +882,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 ssb.append("  ").inSpans(
                     RelativeSizeSpan(0.8f),
                     StyleSpan(Typeface.BOLD),
-                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary))
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
                 ) {
                     append(scoreString)
                 }
@@ -883,12 +890,12 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             if (comment.lastEdited != 0L) {
                 val str = context.getString(
                     R.string.last_edited,
-                    ReadableTime.getTimeAgo(comment.lastEdited)
+                    ReadableTime.getTimeAgo(comment.lastEdited),
                 )
                 ssb.append("\n\n").inSpans(
                     RelativeSizeSpan(0.8f),
                     StyleSpan(Typeface.BOLD),
-                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary))
+                    ForegroundColorSpan(theme.resolveColor(android.R.attr.textColorSecondary)),
                 ) {
                     append(str)
                 }
@@ -935,7 +942,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 onItemClick(
                     mRecyclerView,
                     holder.itemView,
-                    position
+                    position,
                 )
             }
             holder.itemView.isClickable = true

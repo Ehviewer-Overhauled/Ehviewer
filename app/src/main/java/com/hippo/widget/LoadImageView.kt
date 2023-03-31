@@ -33,8 +33,11 @@ private val application = EhApplication.application
 private val errorDrawable = AppCompatResources.getDrawable(application, R.drawable.image_failed)
 
 open class LoadImageView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FixedAspectImageView(context, attrs, defStyleAttr), View.OnClickListener,
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : FixedAspectImageView(context, attrs, defStyleAttr),
+    View.OnClickListener,
     View.OnLongClickListener {
     private var mOffsetX = Integer.MIN_VALUE
     private var mOffsetY = Integer.MIN_VALUE
@@ -90,7 +93,7 @@ open class LoadImageView @JvmOverloads constructor(
                     super.setImageDrawable(errorDrawable)
                     setRetry(true)
                 },
-                { _, _ -> setRetry(false) }
+                { _, _ -> setRetry(false) },
             )
             ehUrl(url)
         }

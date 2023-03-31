@@ -32,7 +32,9 @@ import com.hippo.yorozuya.AnimationUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 
 class FabLayout @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
 ) : ViewGroup(context, attrs, defStyleAttr), View.OnClickListener {
     private var mFabSize = 0
     private var mFabMiniSize = 0
@@ -92,7 +94,9 @@ class FabLayout @JvmOverloads constructor(
     private fun getSecondaryFabAt(index: Int): FloatingActionButton? {
         return if (index < 0 || index >= secondaryFabCount) {
             null
-        } else getChildAt(index) as FloatingActionButton
+        } else {
+            getChildAt(index) as FloatingActionButton
+        }
     }
 
     fun setSecondaryFabVisibilityAt(index: Int, visible: Boolean) {
@@ -152,7 +156,7 @@ class FabLayout @JvmOverloads constructor(
         maxWidth = maxWidth.coerceAtLeast(suggestedMinimumWidth)
         setMeasuredDimension(
             resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
-            resolveSizeAndState(maxHeight, heightMeasureSpec, 0)
+            resolveSizeAndState(maxHeight, heightMeasureSpec, 0),
         )
     }
 
@@ -185,7 +189,7 @@ class FabLayout @JvmOverloads constructor(
                 layoutRight - childWidth,
                 layoutBottom - childHeight,
                 layoutRight,
-                layoutBottom
+                layoutBottom,
             )
         }
     }
@@ -378,12 +382,14 @@ class FabLayout @JvmOverloads constructor(
     override fun onClick(v: View) {
         if (this === v) {
             isExpanded = false
-        } else mOnClickFabListener?.let {
-            val position = indexOfChild(v)
-            if (position == childCount - 1) {
-                it.onClickPrimaryFab(this, v as FloatingActionButton)
-            } else if (position >= 0 && mExpanded) {
-                it.onClickSecondaryFab(this, v as FloatingActionButton, position)
+        } else {
+            mOnClickFabListener?.let {
+                val position = indexOfChild(v)
+                if (position == childCount - 1) {
+                    it.onClickPrimaryFab(this, v as FloatingActionButton)
+                } else if (position >= 0 && mExpanded) {
+                    it.onClickSecondaryFab(this, v as FloatingActionButton, position)
+                }
             }
         }
     }

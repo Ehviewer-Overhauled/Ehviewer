@@ -9,7 +9,7 @@ import com.davemorrissey.labs.subscaleview.provider.InputProvider
 
 class ImageDecoder @JvmOverloads constructor(
     private val cropBorders: Boolean,
-    bitmapConfig: Bitmap.Config? = null
+    bitmapConfig: Bitmap.Config? = null,
 ) : Decoder {
     init {
         val globalBitmapConfig = SubsamplingScaleImageView.preferredBitmapConfig

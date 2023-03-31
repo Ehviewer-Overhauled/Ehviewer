@@ -22,11 +22,12 @@ import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 
 class VersionPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : Preference(context, attrs) {
     init {
         setTitle(R.string.settings_about_version)
         summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.COMMIT_SHA})\n" +
-                context.getString(R.string.settings_about_build_time, BuildConfig.BUILD_TIME)
+            context.getString(R.string.settings_about_build_time, BuildConfig.BUILD_TIME)
     }
 }

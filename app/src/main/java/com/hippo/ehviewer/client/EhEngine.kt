@@ -157,7 +157,7 @@ object EhEngine {
     private suspend fun fillGalleryList(
         list: MutableList<GalleryInfo>,
         url: String,
-        filter: Boolean
+        filter: Boolean,
     ) {
         // Filter title and uploader
         if (filter) {
@@ -177,8 +177,8 @@ object EhEngine {
                 hasRated = true
             }
         }
-        val needApi = filter && sEhFilter.needTags() && !hasTags
-                || Settings.showGalleryPages && !hasPages || hasRated
+        val needApi = filter && sEhFilter.needTags() && !hasTags ||
+            Settings.showGalleryPages && !hasPages || hasRated
         if (needApi) {
             fillGalleryListByApi(list, url)
         }
@@ -187,8 +187,8 @@ object EhEngine {
         if (filter) {
             // Thumbnail mode need filter uploader again
             list.removeAll {
-                !sEhFilter.filterUploader(it) || !sEhFilter.filterTag(it)
-                        || !sEhFilter.filterTagNamespace(it)
+                !sEhFilter.filterUploader(it) || !sEhFilter.filterTag(it) ||
+                    !sEhFilter.filterTagNamespace(it)
             }
         }
     }
@@ -202,7 +202,7 @@ object EhEngine {
 
     suspend fun fillGalleryListByApi(
         galleryInfoList: List<GalleryInfo>,
-        referer: String
+        referer: String,
     ): List<GalleryInfo> {
         val requestItems: MutableList<GalleryInfo> = ArrayList(MAX_REQUEST_SIZE)
         var i = 0
@@ -220,7 +220,7 @@ object EhEngine {
 
     private suspend fun doFillGalleryListByApi(
         galleryInfoList: List<GalleryInfo>,
-        referer: String
+        referer: String,
     ) {
         val json = JSONObject()
         json.put("method", "gdata")
@@ -269,8 +269,11 @@ object EhEngine {
 
     @Throws(Throwable::class)
     suspend fun rateGallery(
-        apiUid: Long, apiKey: String?, gid: Long, token: String?,
-        rating: Float
+        apiUid: Long,
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        rating: Float,
     ): RateGalleryParser.Result {
         val json = JSONObject()
         json.put("method", "rategallery")
@@ -290,7 +293,9 @@ object EhEngine {
     }
 
     suspend fun commentGallery(
-        url: String?, comment: String, id: String?
+        url: String?,
+        comment: String,
+        id: String?,
     ): GalleryCommentList {
         val builder = FormBody.Builder()
         if (id == null) {
@@ -315,14 +320,16 @@ object EhEngine {
 
     suspend fun getGalleryToken(
         gid: Long,
-        gtoken: String?, page: Int
+        gtoken: String?,
+        page: Int,
     ): String {
         val json = JSONObject()
             .put("method", "gtoken")
             .put(
-                "pagelist", JSONArray().put(
-                    JSONArray().put(gid).put(gtoken).put(page + 1)
-                )
+                "pagelist",
+                JSONArray().put(
+                    JSONArray().put(gid).put(gtoken).put(page + 1),
+                ),
             )
         val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
         val url = EhUrl.apiUrl
@@ -335,7 +342,7 @@ object EhEngine {
     }
 
     suspend fun getFavorites(
-        url: String
+        url: String,
     ): FavoritesParser.Result {
         val referer = EhUrl.referer
         Log.d(TAG, url)
@@ -349,7 +356,9 @@ object EhEngine {
      */
     suspend fun addFavorites(
         gid: Long,
-        token: String?, dstCat: Int, note: String?
+        token: String?,
+        dstCat: Int,
+        note: String?,
     ) {
         val catStr: String = when (dstCat) {
             -1 -> {
@@ -381,7 +390,8 @@ object EhEngine {
     @Throws(Throwable::class)
     suspend fun addFavoritesRange(
         gidArray: LongArray,
-        tokenArray: Array<String?>, dstCat: Int
+        tokenArray: Array<String?>,
+        dstCat: Int,
     ): Void? {
         check(gidArray.size == tokenArray.size)
         var i = 0
@@ -395,7 +405,8 @@ object EhEngine {
 
     suspend fun modifyFavorites(
         url: String,
-        gidArray: LongArray, dstCat: Int
+        gidArray: LongArray,
+        dstCat: Int,
     ): FavoritesParser.Result {
         val catStr: String = when (dstCat) {
             -1 -> {
@@ -425,7 +436,9 @@ object EhEngine {
     }
 
     suspend fun getTorrentList(
-        url: String, gid: Long, token: String?
+        url: String,
+        gid: Long,
+        token: String?,
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url)
@@ -433,7 +446,9 @@ object EhEngine {
     }
 
     suspend fun getArchiveList(
-        url: String, gid: Long, token: String?
+        url: String,
+        gid: Long,
+        token: String?,
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url)
@@ -443,7 +458,10 @@ object EhEngine {
 
     suspend fun downloadArchive(
         gid: Long,
-        token: String?, or: String?, res: String?, isHAtH: Boolean
+        token: String?,
+        or: String?,
+        res: String?,
+        isHAtH: Boolean,
     ): String? {
         if (or.isNullOrEmpty()) {
             throw EhException("Invalid form param or: $or")
@@ -526,7 +544,8 @@ object EhEngine {
     }
 
     private suspend fun getProfileInternal(
-        url: String, referer: String
+        url: String,
+        referer: String,
     ): ProfileParser.Result {
         Log.d(TAG, url)
         return EhRequestBuilder(url, referer).executeAndParsingWith(ProfileParser::parse)
@@ -537,7 +556,7 @@ object EhEngine {
         Log.d(TAG, url)
         return getProfileInternal(
             EhRequestBuilder(url).executeAndParsingWith(ForumsParser::parse),
-            url
+            url,
         )
     }
 
@@ -564,7 +583,11 @@ object EhEngine {
 
     suspend fun voteComment(
         apiUid: Long,
-        apiKey: String?, gid: Long, token: String?, commentId: Long, commentVote: Int
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        commentId: Long,
+        commentVote: Int,
     ): VoteCommentParser.Result {
         val json = JSONObject()
         json.put("method", "votecomment")
@@ -588,7 +611,11 @@ object EhEngine {
 
     suspend fun voteTag(
         apiUid: Long,
-        apiKey: String?, gid: Long, token: String?, tags: String?, vote: Int
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        tags: String?,
+        vote: Int,
     ): VoteTagParser.Result {
         val json = JSONObject()
         json.put("method", "taggallery")
@@ -613,38 +640,40 @@ object EhEngine {
      */
     suspend fun imageSearch(
         image: File,
-        uss: Boolean, osc: Boolean, se: Boolean
+        uss: Boolean,
+        osc: Boolean,
+        se: Boolean,
     ): GalleryListParser.Result {
         val builder = MultipartBody.Builder()
         builder.setType(MultipartBody.FORM)
         builder.addPart(
             Headers.headersOf(
                 "Content-Disposition",
-                "form-data; name=\"sfile\"; filename=\"a.jpg\""
+                "form-data; name=\"sfile\"; filename=\"a.jpg\"",
             ),
-            image.asRequestBody(MEDIA_TYPE_JPEG)
+            image.asRequestBody(MEDIA_TYPE_JPEG),
         )
         if (uss) {
             builder.addPart(
                 Headers.headersOf("Content-Disposition", "form-data; name=\"fs_similar\""),
-                "on".toRequestBody()
+                "on".toRequestBody(),
             )
         }
         if (osc) {
             builder.addPart(
                 Headers.headersOf("Content-Disposition", "form-data; name=\"fs_covers\""),
-                "on".toRequestBody()
+                "on".toRequestBody(),
             )
         }
         if (se) {
             builder.addPart(
                 Headers.headersOf("Content-Disposition", "form-data; name=\"fs_exp\""),
-                "on".toRequestBody()
+                "on".toRequestBody(),
             )
         }
         builder.addPart(
             Headers.headersOf("Content-Disposition", "form-data; name=\"f_sfile\""),
-            "File Search".toRequestBody()
+            "File Search".toRequestBody(),
         )
         val url = EhUrl.imageSearchUrl
         val referer = EhUrl.referer
@@ -659,7 +688,7 @@ object EhEngine {
     suspend fun getGalleryPage(
         url: String?,
         gid: Long,
-        token: String?
+        token: String?,
     ): GalleryPageParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         Log.d(TAG, url!!)
@@ -671,7 +700,7 @@ object EhEngine {
         index: Int,
         pToken: String?,
         showKey: String?,
-        previousPToken: String?
+        previousPToken: String?,
     ): GalleryPageApiParser.Result {
         val json = JSONObject()
         json.put("method", "showpage")

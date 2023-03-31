@@ -199,7 +199,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private var mTorrentList: List<TorrentParser.Result>? = null
     private var requestStoragePermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { result: Boolean ->
         if (result && composeBindingGD != null) {
             val helper = TorrentListDialogHelper()
@@ -269,7 +269,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     // -1 for error
     private val gid: Long
         get() = composeBindingGD?.gid ?: composeBindingGI?.gid
-        ?: mGid.takeIf { mAction == ACTION_GID_TOKEN } ?: -1
+            ?: mGid.takeIf { mAction == ACTION_GID_TOKEN } ?: -1
 
     private val uploader: String?
         get() = composeBindingGD?.uploader ?: composeBindingGI?.uploader
@@ -376,7 +376,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         // Get download state
         val gid = gid
@@ -412,7 +412,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     composeBindingGI?.let {
                                         Text(
                                             text = EhUtils.getSuitableTitle(it),
-                                            maxLines = 2
+                                            maxLines = 2,
                                         )
                                     }
                                 },
@@ -422,7 +422,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     }) {
                                         Icon(
                                             imageVector = Icons.Default.ArrowBack,
-                                            contentDescription = null
+                                            contentDescription = null,
                                         )
                                     }
                                 },
@@ -432,46 +432,50 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     IconButton(onClick = { dropdown = !dropdown }) {
                                         Icon(
                                             imageVector = Icons.Default.MoreVert,
-                                            contentDescription = null
+                                            contentDescription = null,
                                         )
                                     }
                                     DropdownMenu(
                                         expanded = dropdown,
-                                        onDismissRequest = { dropdown = false }) {
+                                        onDismissRequest = { dropdown = false },
+                                    ) {
                                         DropdownMenuItem(
                                             text = { Text(text = stringResource(id = R.string.action_add_tag)) },
                                             onClick = {
                                                 dropdown = false
                                                 actionAddTag()
-                                            })
+                                            },
+                                        )
                                         DropdownMenuItem(
                                             text = { Text(text = stringResource(id = R.string.refresh)) },
                                             onClick = {
                                                 dropdown = false
                                                 actionRefresh()
-                                            })
+                                            },
+                                        )
                                         DropdownMenuItem(
                                             text = { Text(text = stringResource(id = R.string.open_in_other_app)) },
                                             onClick = {
                                                 dropdown = false
                                                 actionOpenInOtherApp()
-                                            })
+                                            },
+                                        )
                                     }
-                                }
+                                },
                             )
-                        }
+                        },
                     ) {
                         Surface {
                             if (getDetailError.isNotBlank()) {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
+                                    verticalArrangement = Arrangement.Center,
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.big_sad_pandroid),
                                         contentDescription = null,
-                                        modifier = Modifier.clickable(onClick = ::actionRefresh)
+                                        modifier = Modifier.clickable(onClick = ::actionRefresh),
                                     )
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Text(text = getDetailError)
@@ -483,12 +487,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                         galleryInfo = gi,
                                         galleryDetail = composeBindingGD,
                                         contentPadding = it,
-                                        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+                                        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                                     )
                                 } else {
                                     Box(
                                         modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                                        contentAlignment = Alignment.Center,
                                     ) {
                                         CircularProgressIndicator()
                                     }
@@ -501,20 +505,19 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-
     @Composable
     private fun GalleryDetailContent(
         galleryInfo: GalleryInfo,
         galleryDetail: GalleryDetail?,
         contentPadding: PaddingValues,
-        modifier: Modifier
+        modifier: Modifier,
     ) {
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
         when (windowSizeClass.widthSizeClass) {
             WindowWidthSizeClass.Medium, WindowWidthSizeClass.Compact -> LazyVerticalGrid(
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
-                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     Column {
@@ -527,14 +530,14 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             onBlockUploaderIconClick = ::showFilterUploaderDialog,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                                .padding(vertical = dimensionResource(id = R.dimen.keyline_margin)),
                         )
                         Row {
                             FilledTonalButton(
                                 onClick = ::onDownloadButtonClick,
                                 modifier = Modifier
                                     .padding(horizontal = 4.dp)
-                                    .weight(1F)
+                                    .weight(1F),
                             ) {
                                 Text(text = downloadButtonText)
                             }
@@ -542,7 +545,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 onClick = ::onReadButtonClick,
                                 modifier = Modifier
                                     .padding(horizontal = 4.dp)
-                                    .weight(1F)
+                                    .weight(1F),
                             ) {
                                 Text(text = readButtonText)
                             }
@@ -552,7 +555,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         } else {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 CircularProgressIndicator()
                             }
@@ -567,12 +570,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             WindowWidthSizeClass.Expanded -> LazyVerticalGrid(
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
-                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin))
+                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     Column {
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             GalleryDetailHeaderCard(
                                 galleryInfo = galleryInfo,
@@ -583,11 +586,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 onBlockUploaderIconClick = ::showFilterUploaderDialog,
                                 modifier = Modifier
                                     .width(dimensionResource(id = R.dimen.gallery_detail_card_landscape_width))
-                                    .padding(vertical = dimensionResource(id = R.dimen.keyline_margin))
+                                    .padding(vertical = dimensionResource(id = R.dimen.keyline_margin)),
                             )
                             Column(
                                 modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Spacer(modifier = modifier.height(16.dp))
                                 Button(
@@ -595,7 +598,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     modifier = Modifier
                                         .height(56.dp)
                                         .padding(horizontal = 16.dp)
-                                        .width(192.dp)
+                                        .width(192.dp),
                                 ) {
                                     Text(text = readButtonText)
                                 }
@@ -605,7 +608,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     modifier = Modifier
                                         .height(56.dp)
                                         .padding(horizontal = 16.dp)
-                                        .width(192.dp)
+                                        .width(192.dp),
                                 ) {
                                     Text(text = downloadButtonText)
                                 }
@@ -616,7 +619,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         } else {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 CircularProgressIndicator()
                             }
@@ -634,16 +637,16 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         val previewList = gd.previewList
         item {
             Column(
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
             ) {
                 Box(
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CrystalCard(
                         onClick = ::navigateToPreview,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(0.6666667F)
+                            .aspectRatio(0.6666667F),
                     ) {}
                     Text(stringResource(R.string.more_previews))
                 }
@@ -653,7 +656,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         items(previewList) {
             Column(
                 modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     CrystalCard(
@@ -662,11 +665,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(0.6666667F)
+                            .aspectRatio(0.6666667F),
                     ) {
                         EhAsyncPreview(
                             model = it,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 }
@@ -698,12 +701,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             OutlinedButton(
                 onClick = onClick,
                 contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp),
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                    modifier = Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                 Text(text = text)
@@ -720,12 +723,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onSecondaryContainer),
                 contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp),
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                    modifier = Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                 Text(text = text)
@@ -748,39 +751,39 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 EhAccentIconButton(
                     icon = Icons.Default.Favorite,
                     text = favButtonText,
-                    onClick = ::modifyFavourite
+                    onClick = ::modifyFavourite,
                 )
             } else {
                 EhIconButton(
                     icon = Icons.Default.FavoriteBorder,
                     text = stringResource(id = R.string.not_favorited),
-                    onClick = ::modifyFavourite
+                    onClick = ::modifyFavourite,
                 )
             }
             EhIconButton(
                 icon = Icons.Default.Difference,
                 text = stringResource(id = R.string.similar_gallery),
-                onClick = ::showSimilarGalleryList
+                onClick = ::showSimilarGalleryList,
             )
             EhIconButton(
                 icon = Icons.Default.ImageSearch,
                 text = stringResource(id = R.string.search_cover),
-                onClick = ::showCoverGalleryList
+                onClick = ::showCoverGalleryList,
             )
             EhIconButton(
                 icon = Icons.Default.Share,
                 text = stringResource(id = R.string.share),
-                onClick = ::doShareGallery
+                onClick = ::doShareGallery,
             )
             EhIconButton(
                 icon = Icons.Default.SwapVerticalCircle,
                 text = torrentText,
-                onClick = ::showTorrentDialog
+                onClick = ::showTorrentDialog,
             )
             EhIconButton(
                 icon = Icons.Default.CloudDone,
                 text = stringResource(id = R.string.archive),
-                onClick = ::showArchiveDialog
+                onClick = ::showArchiveDialog,
             )
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
@@ -791,7 +794,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 GalleryDetailRating(rating = galleryDetail.rating)
                 Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
@@ -803,7 +806,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         if (tags.isNullOrEmpty()) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(text = stringResource(id = R.string.no_tags))
             }
@@ -822,7 +825,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         val galleryInfoBottomSheet = GalleryInfoBottomSheet(gd)
         galleryInfoBottomSheet.show(
             requireActivity().supportFragmentManager,
-            GalleryInfoBottomSheet.TAG
+            GalleryInfoBottomSheet.TAG,
         )
     }
 
@@ -852,20 +855,22 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             CommonOperations.startDownload(
                 activity as MainActivity,
                 galleryDetail,
-                false
+                false,
             )
         } else {
             val builder = CheckBoxDialogBuilder(
                 requireContext(),
                 getString(
                     R.string.download_remove_dialog_message,
-                    galleryDetail.title
+                    galleryDetail.title,
                 ),
                 getString(R.string.download_remove_dialog_check_text),
-                Settings.removeImageFiles
+                Settings.removeImageFiles,
             )
             val helper = DeleteDialogHelper(
-                downloadManager, galleryDetail, builder
+                downloadManager,
+                galleryDetail,
+                builder,
             )
             builder.setTitle(R.string.download_remove_dialog_title)
                 .setPositiveButton(android.R.string.ok, helper)
@@ -914,7 +919,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         galleryDetail.previewList.forEach {
                             it.imageUrl.run {
                                 context?.imageLoader?.enqueue(
-                                    ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                                    ImageRequest.Builder(requireContext()).ehUrl(this).build(),
                                 )
                             }
                         }
@@ -958,8 +963,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (containLocalFavorites || galleryDetail.isFavorited) {
                     mModifyingFavorites = true
                     CommonOperations.removeFromFavorites(
-                        activity, galleryDetail,
-                        ModifyFavoritesListener(requireContext(), true)
+                        activity,
+                        galleryDetail,
+                        ModifyFavoritesListener(requireContext(), true),
                     )
                     remove = true
                 }
@@ -967,8 +973,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     if (!remove) {
                         mModifyingFavorites = true
                         CommonOperations.addToFavorites(
-                            requireActivity(), galleryDetail,
-                            ModifyFavoritesListener(requireContext(), false)
+                            requireActivity(),
+                            galleryDetail,
+                            ModifyFavoritesListener(requireContext(), false),
                         )
                     }
                     // Update UI
@@ -986,8 +993,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 getString(
                     R.string.newer_version_title,
                     newerVersion.title,
-                    newerVersion.posted
-                )
+                    newerVersion.posted,
+                ),
             )
         }
         BaseDialogBuilder(requireContext())
@@ -1024,7 +1031,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             Snackbar.make(
                 requireActivity().findViewById(R.id.snackbar),
                 getString(R.string.read_from, mPage),
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_LONG,
             )
                 .setAction(R.string.read) {
                     val intent = Intent(requireContext(), ReaderActivity::class.java)
@@ -1050,7 +1057,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             text: String,
             weak: Boolean = false,
             isGroup: Boolean = false,
-            modifier: Modifier = Modifier
+            modifier: Modifier = Modifier,
         ) {
             val bgColor = if (isGroup) {
                 MaterialTheme.colorScheme.primaryContainer
@@ -1060,13 +1067,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             Surface(
                 modifier = Modifier.padding(4.dp),
                 color = bgColor,
-                shape = RoundedCornerShape(64.dp)
+                shape = RoundedCornerShape(64.dp),
             ) {
                 Text(
                     text = text,
                     modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     color = MaterialTheme.colorScheme.onSurface.let { if (weak) it.copy(0.5F) else it },
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         }
@@ -1087,7 +1094,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 it.groupName?.run {
                     baseRoundText(
                         text = translate(),
-                        isGroup = true
+                        isGroup = true,
                     )
                     val prefix = namespaceToPrefix(this)
                     FlowRow {
@@ -1110,8 +1117,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 weak = weak,
                                 modifier = Modifier.combinedClickable(
                                     onClick = ::onClick,
-                                    onLongClick = ::onLongClick
-                                )
+                                    onLongClick = ::onLongClick,
+                                ),
                             )
                         }
                     }
@@ -1126,17 +1133,17 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         args.putLong(GalleryCommentsScene.KEY_API_UID, galleryDetail.apiUid)
         args.putString(
             GalleryCommentsScene.KEY_API_KEY,
-            galleryDetail.apiKey
+            galleryDetail.apiKey,
         )
         args.putLong(GalleryCommentsScene.KEY_GID, galleryDetail.gid)
         args.putString(GalleryCommentsScene.KEY_TOKEN, galleryDetail.token)
         args.putParcelable(
             GalleryCommentsScene.KEY_COMMENT_LIST,
-            galleryDetail.comments
+            galleryDetail.comments,
         )
         args.putParcelable(
             GalleryCommentsScene.KEY_GALLERY_DETAIL,
-            galleryDetail
+            galleryDetail,
         )
         navigate(R.id.galleryCommentsScene, args)
     }
@@ -1145,9 +1152,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     @Composable
     private fun GalleryDetailComment(commentsList: Array<GalleryComment>?) {
         val maxShowCount = 2
-        val commentText = if (commentsList.isNullOrEmpty()) stringResource(R.string.no_comments)
-        else if (commentsList.size <= maxShowCount) stringResource(R.string.no_more_comments)
-        else stringResource(R.string.more_comment)
+        val commentText = if (commentsList.isNullOrEmpty()) {
+            stringResource(R.string.no_comments)
+        } else if (commentsList.size <= maxShowCount) {
+            stringResource(R.string.no_more_comments)
+        } else {
+            stringResource(R.string.more_comment)
+        }
         CrystalCard(onClick = ::onNavigateToCommentScene) {
             if (commentsList != null) {
                 val length = maxShowCount.coerceAtMost(commentsList.size)
@@ -1164,8 +1175,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 val c = findViewById<ObservedTextView>(R.id.comment)
                                 c.maxLines = 5
                                 c.text = Html.fromHtml(
-                                    comment.comment, Html.FROM_HTML_MODE_LEGACY,
-                                    URLImageGetter(c), null
+                                    comment.comment,
+                                    Html.FROM_HTML_MODE_LEGACY,
+                                    URLImageGetter(c),
+                                    null,
                                 )
                             }
                     })
@@ -1173,7 +1186,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(commentText)
             }
@@ -1185,7 +1198,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             R.string.rating_text,
             getString(getRatingText(rating)),
             rating,
-            ratingCount
+            ratingCount,
         )
     }
 
@@ -1248,7 +1261,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         val galleryDetail = composeBindingGD ?: return
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
                 requireActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestStoragePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -1370,7 +1383,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 composeBindingGD!!.gid,
                 composeBindingGD!!.token!!,
                 tag,
-                vote
+                vote,
             )
             .setCallback(VoteTagListener(context))
         request.enqueue(this)
@@ -1412,8 +1425,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (EhDB.containLocalFavorites(composeBindingGD!!.gid) || composeBindingGD!!.isFavorited) {
                     mModifyingFavorites = true
                     CommonOperations.removeFromFavorites(
-                        activity, composeBindingGD!!,
-                        ModifyFavoritesListener(requireActivity(), true)
+                        activity,
+                        composeBindingGD!!,
+                        ModifyFavoritesListener(requireActivity(), true),
                     )
                     remove = true
                 }
@@ -1421,8 +1435,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     if (!remove) {
                         mModifyingFavorites = true
                         CommonOperations.addToFavorites(
-                            requireActivity(), composeBindingGD!!,
-                            ModifyFavoritesListener(requireActivity(), false), true
+                            requireActivity(),
+                            composeBindingGD!!,
+                            ModifyFavoritesListener(requireActivity(), false),
+                            true,
                         )
                     }
                     // Update UI
@@ -1529,7 +1545,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private class DownloadArchiveListener(
         context: Context,
-        private val mGalleryInfo: GalleryInfo?
+        private val mGalleryInfo: GalleryInfo?,
     ) : EhCallback<GalleryDetailScene?, String?>(context) {
         override fun onSuccess(result: String?) {
             // TODO: Don't use buggy system download service
@@ -1538,7 +1554,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 mGalleryInfo!!.gid.toString() + "-" + EhUtils.getSuitableTitle(mGalleryInfo) + ".zip"
             r.setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
-                FileUtils.sanitizeFilename(name)
+                FileUtils.sanitizeFilename(name),
             )
             r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             val dm = application.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -1564,7 +1580,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private inner class DeleteDialogHelper(
         private val mDownloadManager: com.hippo.ehviewer.download.DownloadManager?,
-        private val mGalleryInfo: GalleryInfo, private val mBuilder: CheckBoxDialogBuilder
+        private val mGalleryInfo: GalleryInfo,
+        private val mBuilder: CheckBoxDialogBuilder,
     ) : DialogInterface.OnClickListener {
         override fun onClick(dialog: DialogInterface, which: Int) {
             if (which != DialogInterface.BUTTON_POSITIVE) {
@@ -1590,7 +1607,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private inner class RateGalleryListener(
-        context: Context
+        context: Context,
     ) : EhCallback<GalleryDetailScene?, RateGalleryParser.Result>(context) {
         override fun onSuccess(result: RateGalleryParser.Result) {
             showTip(R.string.rate_successfully, LENGTH_SHORT)
@@ -1608,13 +1625,13 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private inner class ModifyFavoritesListener(
         context: Context,
-        private val mAddOrRemove: Boolean
+        private val mAddOrRemove: Boolean,
     ) :
         EhCallback<GalleryDetailScene?, Unit>(context) {
         override fun onSuccess(result: Unit) {
             showTip(
                 if (mAddOrRemove) R.string.remove_from_favorite_success else R.string.add_to_favorite_success,
-                LENGTH_SHORT
+                LENGTH_SHORT,
             )
             val scene = this@GalleryDetailScene
             scene.onModifyFavoritesSuccess(mAddOrRemove)
@@ -1623,7 +1640,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         override fun onFailure(e: Exception) {
             showTip(
                 if (mAddOrRemove) R.string.remove_from_favorite_failure else R.string.add_to_favorite_failure,
-                LENGTH_LONG
+                LENGTH_LONG,
             )
             val scene = this@GalleryDetailScene
             scene.onModifyFavoritesFailure()
@@ -1635,8 +1652,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private inner class ArchiveListDialogHelper : AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener, EhClient.Callback<ArchiveParser.Result> {
+    private inner class ArchiveListDialogHelper :
+        AdapterView.OnItemClickListener,
+        DialogInterface.OnDismissListener,
+        EhClient.Callback<ArchiveParser.Result> {
         private var mProgressView: CircularProgressIndicator? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
@@ -1713,7 +1732,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     return
                 } else if (mCurrentFunds != null) {
                     val cost = ParserUtils.parseInt(
-                        mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"), 0
+                        mArchiveList!![position].cost.removeSuffix("GP").removeSuffix("Credits"),
+                        0,
                     )
                     if (cost > maxOf(mCurrentFunds!!.fundsGP, mCurrentFunds!!.fundsC)) {
                         showTip(R.string.insufficient_funds, LENGTH_SHORT)
@@ -1729,7 +1749,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     composeBindingGD!!.token!!,
                     mArchiveFormParamOr!!,
                     res,
-                    isHAtH
+                    isHAtH,
                 )
                 request.setCallback(DownloadArchiveListener(context, composeBindingGD))
                 request.enqueue(this@GalleryDetailScene)
@@ -1777,8 +1797,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private inner class TorrentListDialogHelper : AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener, EhClient.Callback<List<TorrentParser.Result>> {
+    private inner class TorrentListDialogHelper :
+        AdapterView.OnItemClickListener,
+        DialogInterface.OnDismissListener,
+        EhClient.Callback<List<TorrentParser.Result>> {
         private var mProgressView: CircularProgressIndicator? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
@@ -1838,7 +1860,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     DownloadManager.Request(Uri.parse(url.replace("exhentai.org", "ehtracker.org")))
                 r.setDestinationInExternalPublicDir(
                     Environment.DIRECTORY_DOWNLOADS,
-                    FileUtils.sanitizeFilename("$name.torrent")
+                    FileUtils.sanitizeFilename("$name.torrent"),
                 )
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 r.addRequestHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
@@ -1919,13 +1941,16 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             val request = EhRequest()
                 .setMethod(EhClient.METHOD_GET_RATE_GALLERY)
                 .setArgs(
-                    composeBindingGD!!.apiUid, composeBindingGD!!.apiKey!!,
-                    composeBindingGD!!.gid, composeBindingGD!!.token!!, mRatingBar!!.rating
+                    composeBindingGD!!.apiUid,
+                    composeBindingGD!!.apiKey!!,
+                    composeBindingGD!!.gid,
+                    composeBindingGD!!.token!!,
+                    mRatingBar!!.rating,
                 )
                 .setCallback(
                     RateGalleryListener(
-                        context
-                    )
+                        context,
+                    ),
                 )
             request.enqueue(this@GalleryDetailScene)
         }

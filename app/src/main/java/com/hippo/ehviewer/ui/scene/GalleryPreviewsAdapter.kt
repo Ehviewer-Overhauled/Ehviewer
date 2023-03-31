@@ -11,7 +11,7 @@ class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) :
     BaseListAdapter<GalleryPreview>(PreviewDiffCallback) {
     class GalleryPreviewHolder(
         private val binding: ItemGalleryPreviewBinding,
-        onClick: (GalleryPreview) -> Unit
+        onClick: (GalleryPreview) -> Unit,
     ) : BaseViewHolder<GalleryPreview>(binding, onClick) {
         @SuppressLint("SetTextI18n")
         override fun bind(item: GalleryPreview) {
@@ -23,7 +23,7 @@ class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) :
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): BaseViewHolder<GalleryPreview> {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemGalleryPreviewBinding.inflate(inflater, parent, false)

@@ -51,11 +51,11 @@ fun SelectSiteScreen() {
             .padding(horizontal = dimensionResource(R.dimen.keyline_margin))
             .padding(top = dimensionResource(R.dimen.keyline_margin))
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(id = R.string.select_scene),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.weight(1f))
 
@@ -67,27 +67,28 @@ fun SelectSiteScreen() {
                 .border(
                     1.dp,
                     MaterialTheme.colorScheme.outline,
-                    RoundedCornerShape(90f, 90f, 90f, 90f)
+                    RoundedCornerShape(90f, 90f, 90f, 90f),
                 )
-                .clip(RoundedCornerShape(90f, 90f, 90f, 90f))
+                .clip(RoundedCornerShape(90f, 90f, 90f, 90f)),
         ) {
             Box(
                 modifier = Modifier
                     .background(if (!siteEx) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
                     .clickable { siteEx = false }
                     .size(100.dp, 40.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = stringResource(id = R.string.site_e),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
             Divider(
-                color = MaterialTheme.colorScheme.outline, modifier = Modifier
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier
                     .fillMaxHeight()
-                    .width(1.dp)
+                    .width(1.dp),
             )
 
             Box(
@@ -95,11 +96,11 @@ fun SelectSiteScreen() {
                     .background(if (siteEx) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
                     .clickable { siteEx = true }
                     .size(100.dp, 40.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = stringResource(id = R.string.site_ex),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         }
@@ -107,7 +108,7 @@ fun SelectSiteScreen() {
 
         Text(
             text = stringResource(id = R.string.select_scene_explain),
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -115,7 +116,7 @@ fun SelectSiteScreen() {
             modifier = Modifier
                 .padding(horizontal = 12.dp)
                 .padding(top = 4.dp, bottom = 20.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Button(onClick = {
                 Settings.putSelectSite(false)

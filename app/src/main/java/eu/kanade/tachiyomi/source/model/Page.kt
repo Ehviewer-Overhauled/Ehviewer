@@ -3,7 +3,7 @@ package eu.kanade.tachiyomi.source.model
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-open class Page(val index: Int)  {
+open class Page(val index: Int) {
 
     val number: Int
         get() = index + 1

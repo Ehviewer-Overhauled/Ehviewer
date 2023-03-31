@@ -39,7 +39,7 @@ class Image private constructor(private val src: CloseableSource) {
             }
             decoder.setTargetColorSpace(colorSpace)
             decoder.setTargetSampleSize(
-                calculateSampleSize(info, 2 * screenHeight, 2 * screenWidth)
+                calculateSampleSize(info, 2 * screenHeight, 2 * screenWidth),
             )
         }.also {
             if (it !is Animatable) src.close()
@@ -62,7 +62,7 @@ class Image private constructor(private val src: CloseableSource) {
         fun calculateSampleSize(info: ImageInfo, targetHeight: Int, targetWeight: Int): Int {
             return min(
                 info.size.width / targetWeight,
-                info.size.height / targetHeight
+                info.size.height / targetHeight,
             ).coerceAtLeast(1)
         }
 
@@ -73,7 +73,7 @@ class Image private constructor(private val src: CloseableSource) {
         val imageSearchDecoderSampleListener =
             ImageDecoder.OnHeaderDecodedListener { decoder, info, _ ->
                 decoder.setTargetSampleSize(
-                    calculateSampleSize(info, imageSearchMaxSize, imageSearchMaxSize)
+                    calculateSampleSize(info, imageSearchMaxSize, imageSearchMaxSize),
                 )
             }
         val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
@@ -83,7 +83,11 @@ class Image private constructor(private val src: CloseableSource) {
         var colorSpace = ColorSpace.get(
             if (isWideColorGamut && EhApplication.readerPreferences.wideColorGamut()
                     .get()
-            ) ColorSpace.Named.DISPLAY_P3 else ColorSpace.Named.SRGB
+            ) {
+                ColorSpace.Named.DISPLAY_P3
+            } else {
+                ColorSpace.Named.SRGB
+            },
         )
 
         @JvmStatic

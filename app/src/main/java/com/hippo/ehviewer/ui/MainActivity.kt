@@ -122,7 +122,7 @@ class MainActivity : EhActivity() {
     override fun onBackPressed() {
         check(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
         val isDrawerOpen = binding.drawView.isDrawerOpen(GravityCompat.START) or
-                binding.drawView.isDrawerOpen(GravityCompat.END)
+            binding.drawView.isDrawerOpen(GravityCompat.END)
         if (isDrawerOpen) {
             binding.drawView.closeDrawers()
         } else {
@@ -142,7 +142,7 @@ class MainActivity : EhActivity() {
                             .setPositiveButton(android.R.string.copy) { _: DialogInterface?, _: Int ->
                                 this@MainActivity.addTextToClipboard(
                                     url,
-                                    false
+                                    false,
                                 )
                             }
                             .show()
@@ -167,7 +167,7 @@ class MainActivity : EhActivity() {
                 val args = Bundle()
                 args.putString(
                     GalleryListScene.KEY_ACTION,
-                    GalleryListScene.ACTION_LIST_URL_BUILDER
+                    GalleryListScene.ACTION_LIST_URL_BUILDER,
                 )
                 args.putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, listUrlBuilder)
                 navController.navigate(R.id.galleryListScene, args)
@@ -201,7 +201,7 @@ class MainActivity : EhActivity() {
                 builder.keyword = intent.getStringExtra(Intent.EXTRA_TEXT)
                 navController.navigate(
                     R.id.galleryListScene,
-                    builder.toStartArgs()
+                    builder.toStartArgs(),
                 )
                 return true
             } else if (type != null && type.startsWith("image/")) {
@@ -215,7 +215,7 @@ class MainActivity : EhActivity() {
                         builder.isUseSimilarityScan = true
                         navController.navigate(
                             R.id.galleryListScene,
-                            builder.toStartArgs()
+                            builder.toStartArgs(),
                         )
                         return true
                     }
@@ -329,13 +329,13 @@ class MainActivity : EhActivity() {
                     try {
                         val intent = Intent(
                             android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                            Uri.parse("package:$packageName")
+                            Uri.parse("package:$packageName"),
                         )
                         startActivity(intent)
                     } catch (t: Throwable) {
                         val intent = Intent(
                             android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:$packageName")
+                            Uri.parse("package:$packageName"),
                         )
                         startActivity(intent)
                     }
@@ -343,7 +343,7 @@ class MainActivity : EhActivity() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setNeutralButton(R.string.dont_show_again) { _: DialogInterface?, _: Int ->
                     Settings.putAppLinkVerifyTip(
-                        true
+                        true,
                     )
                 }
                 .show()
@@ -369,7 +369,7 @@ class MainActivity : EhActivity() {
                 Snackbar.make(
                     binding.drawView,
                     R.string.metered_network_warning,
-                    Snackbar.LENGTH_LONG
+                    Snackbar.LENGTH_LONG,
                 )
                     .setAction(R.string.settings) {
                         val panelIntent =
@@ -430,7 +430,7 @@ class MainActivity : EhActivity() {
                     val snackbar = Snackbar.make(
                         binding.drawView,
                         R.string.clipboard_gallery_url_snack_message,
-                        Snackbar.LENGTH_SHORT
+                        Snackbar.LENGTH_SHORT,
                     )
                     snackbar.setAction(R.string.clipboard_gallery_url_snack_action) {
                         it()
@@ -447,18 +447,20 @@ class MainActivity : EhActivity() {
         if (scene is BaseScene) {
             binding.rightDrawer.removeAllViews()
             val drawerView = scene.createDrawerView(
-                scene.layoutInflater, binding.rightDrawer, null
+                scene.layoutInflater,
+                binding.rightDrawer,
+                null,
             )
             if (drawerView != null) {
                 binding.rightDrawer.addView(drawerView)
                 binding.drawView.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_UNLOCKED,
-                    GravityCompat.END
+                    GravityCompat.END,
                 )
             } else {
                 binding.drawView.setDrawerLockMode(
                     DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-                    GravityCompat.END
+                    GravityCompat.END,
                 )
             }
         }
@@ -510,12 +512,14 @@ class MainActivity : EhActivity() {
     fun showTip(message: CharSequence, length: Int, useToast: Boolean = false) {
         findViewById<View>(R.id.snackbar)?.takeUnless { useToast }?.apply {
             Snackbar.make(
-                this, message,
-                if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
+                this,
+                message,
+                if (length == BaseScene.LENGTH_LONG) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT,
             ).show()
         } ?: Toast.makeText(
-            this, message,
-            if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+            this,
+            message,
+            if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT,
         ).show()
     }
 
@@ -540,7 +544,7 @@ class MainActivity : EhActivity() {
             availableNetworks.remove(network)
             if (network == activeNetwork) {
                 connectivityManager.bindProcessToNetwork(
-                    availableNetworks.takeIf { it.isNotEmpty() }?.last()
+                    availableNetworks.takeIf { it.isNotEmpty() }?.last(),
                 )
             }
         }

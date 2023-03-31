@@ -23,5 +23,5 @@ class GalleryCommentList(
     @JvmField
     var comments: Array<GalleryComment>?,
     @JvmField
-    var hasMore: Boolean
+    var hasMore: Boolean,
 ) : Parcelable

@@ -52,7 +52,7 @@ class HostsFragment : BaseFragment(), View.OnClickListener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val recyclerView = inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
         val tip = getTipView(R.string.hosts)

@@ -80,9 +80,11 @@ abstract class EhActivity : AppCompatActivity() {
     fun checkAndRequestNotificationPermission() {
         if (ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
-        ) return
+        ) {
+            return
+        }
         if (Settings.notificationRequired) return
         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }

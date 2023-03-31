@@ -12,9 +12,9 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
-import eu.kanade.tachiyomi.core.preference.getAndSet
 import com.hippo.ehviewer.databinding.ReaderColorFilterSettingsBinding
 import com.hippo.image.Image
+import eu.kanade.tachiyomi.core.preference.getAndSet
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.preference.asHotFlow
 import eu.kanade.tachiyomi.util.preference.bindToPreference
@@ -36,8 +36,9 @@ class ReaderColorFilterSettings @JvmOverloads constructor(context: Context, attr
         addView(binding.root)
 
         binding.wideColorGamut.isEnabled = Image.isWideColorGamut
-        if (!Image.isWideColorGamut)
+        if (!Image.isWideColorGamut) {
             readerPreferences.wideColorGamut().set(false)
+        }
         binding.wideColorGamut.bindToPreference(readerPreferences.wideColorGamut())
 
         readerPreferences.wideColorGamut().asHotFlow {

@@ -149,7 +149,7 @@ object EhFilter {
             val n = filters.size
             while (i < n) {
                 if (filters[i].enable!! && title.lowercase(Locale.getDefault()).contains(
-                        filters[i].text!!
+                        filters[i].text!!,
                     )
                 ) {
                     return false
@@ -210,7 +210,9 @@ object EhFilter {
             tagNamespace != filterNamespace
         ) {
             false
-        } else tagName == filterName
+        } else {
+            tagName == filterName
+        }
     }
 
     @Synchronized

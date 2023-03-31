@@ -78,20 +78,20 @@ interface GalleryInfo : AbstractGalleryInfo, Parcelable {
             S_LANG_VI,
             S_LANG_PL,
             S_LANG_HU,
-            S_LANG_NL
+            S_LANG_NL,
         )
         val S_LANG_PATTERNS = arrayOf(
             Pattern.compile(
                 "[(\\[]eng(?:lish)?[)\\]]|英訳",
-                Pattern.CASE_INSENSITIVE
-            ),  // [(（\[]ch(?:inese)?[)）\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳
+                Pattern.CASE_INSENSITIVE,
+            ), // [(（\[]ch(?:inese)?[)）\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳
             Pattern.compile(
                 "[(\uFF08\\[]ch(?:inese)?[)\uFF09\\]]|[汉漢]化|中[国國][语語]|中文|中国翻訳",
-                Pattern.CASE_INSENSITIVE
+                Pattern.CASE_INSENSITIVE,
             ),
             Pattern.compile(
                 "[(\\[]spanish[)\\]]|[(\\[]Español[)\\]]|スペイン翻訳",
-                Pattern.CASE_INSENSITIVE
+                Pattern.CASE_INSENSITIVE,
             ),
             Pattern.compile("[(\\[]korean?[)\\]]|韓国翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]rus(?:sian)?[)\\]]|ロシア翻訳", Pattern.CASE_INSENSITIVE),
@@ -99,17 +99,17 @@ interface GalleryInfo : AbstractGalleryInfo, Parcelable {
             Pattern.compile("[(\\[]portuguese|ポルトガル翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile(
                 "[(\\[]thai(?: ภาษาไทย)?[)\\]]|แปลไทย|タイ翻訳",
-                Pattern.CASE_INSENSITIVE
+                Pattern.CASE_INSENSITIVE,
             ),
             Pattern.compile("[(\\[]german[)\\]]|ドイツ翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]italiano?[)\\]]|イタリア翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile(
                 "[(\\[]vietnamese(?: Tiếng Việt)?[)\\]]|ベトナム翻訳",
-                Pattern.CASE_INSENSITIVE
+                Pattern.CASE_INSENSITIVE,
             ),
             Pattern.compile("[(\\[]polish[)\\]]|ポーランド翻訳", Pattern.CASE_INSENSITIVE),
             Pattern.compile("[(\\[]hun(?:garian)?[)\\]]|ハンガリー翻訳", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("[(\\[]dutch[)\\]]|オランダ翻訳", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("[(\\[]dutch[)\\]]|オランダ翻訳", Pattern.CASE_INSENSITIVE),
         )
         val S_LANG_TAGS = arrayOf(
             "language:english",
@@ -125,7 +125,7 @@ interface GalleryInfo : AbstractGalleryInfo, Parcelable {
             "language:vietnamese",
             "language:polish",
             "language:hungarian",
-            "language:dutch"
+            "language:dutch",
         )
     }
 }

@@ -60,7 +60,7 @@ import com.hippo.ehviewer.Settings as AppSettings
 
 class AdvancedFragment : BasePreferenceFragment() {
     private var exportLauncher = registerForActivityResult<String, Uri>(
-        ActivityResultContracts.CreateDocument("application/vnd.sqlite3")
+        ActivityResultContracts.CreateDocument("application/vnd.sqlite3"),
     ) { uri: Uri? ->
         if (uri != null) {
             try {
@@ -68,7 +68,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                 requireActivity().grantUriPermission(
                     BuildConfig.APPLICATION_ID,
                     uri,
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
                 )
             } catch (e: Exception) {
                 ExceptionUtils.throwIfFatal(e)
@@ -86,11 +86,15 @@ class AdvancedFragment : BasePreferenceFragment() {
                             alertDialog.dismiss()
                         }
                         showTip(
-                            if (success) GetText.getString(
-                                R.string.settings_advanced_export_data_to,
-                                uri.toString()
-                            ) else GetText.getString(R.string.settings_advanced_export_data_failed),
-                            BaseScene.LENGTH_SHORT
+                            if (success) {
+                                GetText.getString(
+                                    R.string.settings_advanced_export_data_to,
+                                    uri.toString(),
+                                )
+                            } else {
+                                GetText.getString(R.string.settings_advanced_export_data_failed)
+                            },
+                            BaseScene.LENGTH_SHORT,
                         )
                     }
                 }
@@ -100,7 +104,7 @@ class AdvancedFragment : BasePreferenceFragment() {
         }
     }
     private var dumpLogcatLauncher = registerForActivityResult<String, Uri>(
-        ActivityResultContracts.CreateDocument("application/zip")
+        ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri: Uri? ->
         if (uri != null) {
             try {
@@ -108,7 +112,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                 requireActivity().grantUriPermission(
                     BuildConfig.APPLICATION_ID,
                     uri,
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
                 )
             } catch (e: Exception) {
                 ExceptionUtils.throwIfFatal(e)
@@ -156,7 +160,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                     out.close()
                     IOUtils.copy(
                         FileInputStream(zipFile),
-                        requireActivity().contentResolver.openOutputStream(uri)
+                        requireActivity().contentResolver.openOutputStream(uri),
                     )
                     finished = true
                 } catch (e: Exception) {
@@ -169,22 +173,26 @@ class AdvancedFragment : BasePreferenceFragment() {
                     finished = LogCat.save(requireActivity().contentResolver.openOutputStream(uri))
                 }
                 showTip(
-                    if (finished) getString(
-                        R.string.settings_advanced_dump_logcat_to,
-                        uri.toString()
-                    ) else getString(R.string.settings_advanced_dump_logcat_failed),
-                    BaseScene.LENGTH_SHORT
+                    if (finished) {
+                        getString(
+                            R.string.settings_advanced_dump_logcat_to,
+                            uri.toString(),
+                        )
+                    } else {
+                        getString(R.string.settings_advanced_dump_logcat_failed)
+                    },
+                    BaseScene.LENGTH_SHORT,
                 )
             } catch (e: Exception) {
                 showTip(
                     getString(R.string.settings_advanced_dump_logcat_failed),
-                    BaseScene.LENGTH_SHORT
+                    BaseScene.LENGTH_SHORT,
                 )
             }
         }
     }
     private var importDataLauncher = registerForActivityResult<Array<String>, Uri>(
-        ActivityResultContracts.OpenDocument()
+        ActivityResultContracts.OpenDocument(),
     ) { uri: Uri? ->
         if (uri != null) {
             try {
@@ -192,7 +200,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                 requireActivity().grantUriPermission(
                     BuildConfig.APPLICATION_ID,
                     uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
                 )
             } catch (e: Exception) {
                 ExceptionUtils.throwIfFatal(e)
@@ -212,7 +220,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                         if (null == error) {
                             showTip(
                                 getString(R.string.settings_advanced_import_data_successfully),
-                                BaseScene.LENGTH_SHORT
+                                BaseScene.LENGTH_SHORT,
                             )
                         } else {
                             showTip(error, BaseScene.LENGTH_SHORT)
@@ -289,15 +297,16 @@ class AdvancedFragment : BasePreferenceFragment() {
             return true
         } else if (KEY_OPEN_BY_DEFAULT == key) {
             try {
-                @SuppressLint("InlinedApi") val intent = Intent(
+                @SuppressLint("InlinedApi")
+                val intent = Intent(
                     Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                    Uri.parse("package:" + requireContext().packageName)
+                    Uri.parse("package:" + requireContext().packageName),
                 )
                 startActivity(intent)
             } catch (t: Throwable) {
                 val intent = Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:" + requireContext().packageName)
+                    Uri.parse("package:" + requireContext().packageName),
                 )
                 startActivity(intent)
             }
@@ -319,7 +328,7 @@ class AdvancedFragment : BasePreferenceFragment() {
                     if (result.galleryInfoList.isEmpty()) {
                         showTip(
                             R.string.settings_advanced_backup_favorite_nothing,
-                            BaseScene.LENGTH_SHORT
+                            BaseScene.LENGTH_SHORT,
                         )
                     } else {
                         if (favTotal == 0 && result.countArray != null) {
@@ -334,8 +343,9 @@ class AdvancedFragment : BasePreferenceFragment() {
                         showTip(
                             GetText.getString(
                                 R.string.settings_advanced_backup_favorite_start,
-                                status
-                            ), BaseScene.LENGTH_SHORT
+                                status,
+                            ),
+                            BaseScene.LENGTH_SHORT,
                         )
                         Log.d("LocalFavorites", "now backup page $status")
                         EhDB.putLocalFavorites(result.galleryInfoList)
@@ -357,14 +367,14 @@ class AdvancedFragment : BasePreferenceFragment() {
                         } else {
                             showTip(
                                 R.string.settings_advanced_backup_favorite_success,
-                                BaseScene.LENGTH_SHORT
+                                BaseScene.LENGTH_SHORT,
                             )
                         }
                     }
                 } catch (e: Exception) {
                     showTip(
                         R.string.settings_advanced_backup_favorite_failed,
-                        BaseScene.LENGTH_SHORT
+                        BaseScene.LENGTH_SHORT,
                     )
                 }
             }

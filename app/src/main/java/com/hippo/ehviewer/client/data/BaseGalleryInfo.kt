@@ -84,6 +84,6 @@ open class BaseGalleryInfo(
     override var favoriteSlot: Int = -2,
 
     @Ignore
-    override var favoriteName: String? = null
+    override var favoriteName: String? = null,
 
 ) : GalleryInfo

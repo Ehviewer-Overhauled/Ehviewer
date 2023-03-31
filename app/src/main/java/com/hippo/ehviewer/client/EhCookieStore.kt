@@ -41,7 +41,7 @@ object EhCookieStore : CookieJar, CookiesStorage {
     fun hasSignedIn(): Boolean {
         val url = EhUrl.HOST_E.toHttpUrl()
         return contains(url, KEY_IPB_MEMBER_ID) &&
-                contains(url, KEY_IPB_PASS_HASH)
+            contains(url, KEY_IPB_PASS_HASH)
     }
 
     const val KEY_IPB_MEMBER_ID = "ipb_member_id"
@@ -60,8 +60,11 @@ object EhCookieStore : CookieJar, CookiesStorage {
         .build()
 
     fun newCookie(
-        cookie: Cookie, newDomain: String, forcePersistent: Boolean = false,
-        forceLongLive: Boolean = false, forceNotHostOnly: Boolean = false
+        cookie: Cookie,
+        newDomain: String,
+        forcePersistent: Boolean = false,
+        forceLongLive: Boolean = false,
+        forceNotHostOnly: Boolean = false,
     ): Cookie {
         val builder = Cookie.Builder()
         builder.name(cookie.name)
@@ -212,7 +215,7 @@ object EhCookieStore : CookieJar, CookiesStorage {
         return loadForRequest(requestUrl.toString().toHttpUrl()).map {
             okhttpCookieToKtorCookieMap[it] ?: KtorCookie(
                 it.name,
-                it.value
+                it.value,
             ).apply { okhttpCookieToKtorCookieMap[it] = this }
         }
     }
@@ -253,10 +256,12 @@ object EhCookieStore : CookieJar, CookiesStorage {
         val urlHost = url.host
         return if (urlHost == domain) {
             true // As in 'example.com' matching 'example.com'.
-        } else urlHost.endsWith(domain!!)
-                && urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(
-            urlHost
-        )
+        } else {
+            urlHost.endsWith(domain!!) &&
+                urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(
+                    urlHost,
+                )
+        }
         // As in 'example.com' matching 'www.example.com'.
     }
 

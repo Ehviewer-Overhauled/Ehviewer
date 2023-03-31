@@ -15,7 +15,7 @@ fun ImageRequest.Builder.ehUrl(url: String) = apply {
 
 inline fun Context.imageRequest(
     url: String,
-    builder: ImageRequest.Builder.() -> Unit = {}
+    builder: ImageRequest.Builder.() -> Unit = {},
 ): ImageRequest {
     return ImageRequest.Builder(this)
         .ehUrl(url)

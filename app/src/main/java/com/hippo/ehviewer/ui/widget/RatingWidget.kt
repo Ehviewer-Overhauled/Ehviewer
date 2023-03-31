@@ -32,7 +32,7 @@ fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
                 imageVector = Icons.Default.Star,
                 contentDescription = null,
                 modifier = Modifier.size(ratingSize),
-                tint = colorYellow800
+                tint = colorYellow800,
             )
             Spacer(modifier = Modifier.width(ratingInterval))
         }
@@ -41,7 +41,7 @@ fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
                 imageVector = Icons.Default.StarHalf,
                 contentDescription = null,
                 modifier = Modifier.size(ratingSize),
-                tint = colorYellow800
+                tint = colorYellow800,
             )
             Spacer(modifier = Modifier.width(ratingInterval))
         }
@@ -50,7 +50,7 @@ fun MetaRatingWidget(rating: Float, ratingSize: Dp, ratingInterval: Dp) {
                 imageVector = Icons.Default.StarOutline,
                 contentDescription = null,
                 modifier = Modifier.size(ratingSize),
-                tint = colorYellow800
+                tint = colorYellow800,
             )
             Spacer(modifier = Modifier.width(ratingInterval))
         }
@@ -62,7 +62,7 @@ fun GalleryListCardRating(rating: Float) {
     MetaRatingWidget(
         rating = rating,
         ratingSize = dimensionResource(id = R.dimen.rating_size),
-        ratingInterval = dimensionResource(id = R.dimen.rating_interval)
+        ratingInterval = dimensionResource(id = R.dimen.rating_interval),
     )
 }
 

@@ -40,7 +40,7 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         parseDetail()
         val view = inflater.inflate(R.layout.scene_gallery_info, container, false)
@@ -155,8 +155,8 @@ class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment(
                 mInflater.inflate(
                     if (viewType == TYPE_HEADER) R.layout.item_gallery_info_header else R.layout.item_gallery_info_data,
                     parent,
-                    false
-                )
+                    false,
+                ),
             )
         }
 

@@ -45,20 +45,24 @@ infix fun Context.tellClipboardWithToast(text: String?) {
 @JvmOverloads
 fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToast: Boolean = false) {
     getClipboardManager().apply {
-        setPrimaryClip(ClipData.newPlainText(null, text).apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive)
-                description.extras = PersistableBundle().apply {
-                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+        setPrimaryClip(
+            ClipData.newPlainText(null, text).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive) {
+                    description.extras = PersistableBundle().apply {
+                        putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                    }
                 }
-        })
+            },
+        )
     }
     // Avoid double notify user since system have done that on Tiramisu above
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
         if (this is MainActivity) {
             showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT, useToast)
         } else if (this is SettingsActivity) {
             showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
         }
+    }
 }
 
 fun ClipboardManager.getTextFromClipboard(context: Context): String? {
@@ -69,8 +73,10 @@ fun ClipboardManager.getTextFromClipboard(context: Context): String? {
 
 fun ClipboardManager.getUrlFromClipboard(context: Context): String? {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && primaryClipDescription?.classificationStatus == ClipDescription.CLASSIFICATION_COMPLETE) {
-        if ((primaryClipDescription?.getConfidenceScore(TextClassifier.TYPE_URL)
-                ?.let { it <= 0 }) == true
+        if ((
+                primaryClipDescription?.getConfidenceScore(TextClassifier.TYPE_URL)
+                    ?.let { it <= 0 }
+                ) == true
         ) {
             return null
         }

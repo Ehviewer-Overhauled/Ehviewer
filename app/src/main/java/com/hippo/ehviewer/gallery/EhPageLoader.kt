@@ -48,7 +48,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
             "%d-%s-%08d",
             mGalleryInfo.gid,
             mGalleryInfo.token,
-            index + 1
+            index + 1,
         )
     }
 
@@ -61,7 +61,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
                 mGalleryInfo.gid,
                 mGalleryInfo.token,
                 index + 1,
-                extension
+                extension,
             )
         }
         return String.format(
@@ -69,7 +69,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
             "%d-%s-%08d",
             mGalleryInfo.gid,
             mGalleryInfo.token,
-            index + 1
+            index + 1,
         )
     }
 
@@ -115,7 +115,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         index: Int,
         contentLength: Long,
         receivedSize: Long,
-        bytesRead: Int
+        bytesRead: Int,
     ) {
         if (contentLength > 0) {
             notifyPagePercent(index, receivedSize.toFloat() / contentLength)
@@ -128,7 +128,7 @@ class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpi
         error: String?,
         finished: Int,
         downloaded: Int,
-        total: Int
+        total: Int,
     ) {
         notifyPageFailed(index, error)
     }

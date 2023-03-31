@@ -50,18 +50,21 @@ fun EhAsyncPreview(
         transform = {
             if (it is AsyncImagePainter.State.Success) {
                 model.run {
-                    if (offsetX == Int.MIN_VALUE) it
-                    else it.copy(
-                        painter = DrawablePainter(
-                            PreciselyClipDrawable(
-                                it.result.drawable,
-                                offsetX,
-                                offsetY,
-                                clipWidth,
-                                clipHeight
-                            )
+                    if (offsetX == Int.MIN_VALUE) {
+                        it
+                    } else {
+                        it.copy(
+                            painter = DrawablePainter(
+                                PreciselyClipDrawable(
+                                    it.result.drawable,
+                                    offsetX,
+                                    offsetY,
+                                    clipWidth,
+                                    clipHeight,
+                                ),
+                            ),
                         )
-                    )
+                    }
                 }
             } else {
                 it

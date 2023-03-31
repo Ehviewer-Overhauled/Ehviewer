@@ -73,7 +73,7 @@ object Crash {
         fw.write("${collectClassStaticInfo(Build.VERSION::class.java)}\r\n")
         fw.write("MEMORY=")
         fw.write(
-            FileUtils.humanReadableByteCount(OSUtils.getAppAllocatedMemory(), false)
+            FileUtils.humanReadableByteCount(OSUtils.getAppAllocatedMemory(), false),
         )
         fw.write("\r\n")
         fw.write("MEMORY_NATIVE=")

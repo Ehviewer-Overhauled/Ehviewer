@@ -64,7 +64,7 @@ class GalleryDetail(
             "Vietnamese",
             "Polish",
             "Hungarian",
-            "Dutch"
+            "Dutch",
         )
     }
 }

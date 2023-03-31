@@ -11,5 +11,5 @@ data class DownloadDirname(
     var gid: Long = 0,
 
     @ColumnInfo(name = "DIRNAME")
-    var dirname: String? = null
+    var dirname: String? = null,
 )

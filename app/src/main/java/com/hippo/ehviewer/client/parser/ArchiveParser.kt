@@ -78,7 +78,7 @@ object ArchiveParser {
         val name: String,
         val size: String,
         val cost: String,
-        val isHAtH: Boolean
+        val isHAtH: Boolean,
     )
 
     class Result(val paramOr: String?, val archiveList: List<Archive>, var funds: HomeParser.Funds?)

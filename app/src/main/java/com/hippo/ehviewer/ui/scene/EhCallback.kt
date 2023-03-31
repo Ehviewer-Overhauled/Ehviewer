@@ -45,8 +45,9 @@ abstract class EhCallback<E : Fragment?, T>(context: Context) : EhClient.Callbac
             activity.showTip(id, length)
         } else {
             Toast.makeText(
-                application, id,
-                if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+                application,
+                id,
+                if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT,
             ).show()
         }
     }
@@ -57,8 +58,9 @@ abstract class EhCallback<E : Fragment?, T>(context: Context) : EhClient.Callbac
             activity.showTip(tip, length)
         } else {
             Toast.makeText(
-                application, tip,
-                if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+                application,
+                tip,
+                if (length == BaseScene.LENGTH_LONG) Toast.LENGTH_LONG else Toast.LENGTH_SHORT,
             ).show()
         }
     }

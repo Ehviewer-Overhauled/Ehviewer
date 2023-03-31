@@ -46,5 +46,5 @@ class GalleryComment(
     @JvmField
     var comment: String? = null,
     @JvmField
-    var lastEdited: Long = 0
+    var lastEdited: Long = 0,
 ) : Parcelable

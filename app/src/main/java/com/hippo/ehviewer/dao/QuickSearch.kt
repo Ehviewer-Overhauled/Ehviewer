@@ -35,5 +35,5 @@ data class QuickSearch(
     var pageTo: Int = 0,
 
     @ColumnInfo(name = "TIME")
-    var time: Long = 0
+    var time: Long = 0,
 )

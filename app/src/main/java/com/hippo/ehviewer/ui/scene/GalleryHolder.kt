@@ -37,7 +37,7 @@ internal class ListGalleryHolder(
     private val binding: ItemGalleryListBinding,
     private val showFavourited: Boolean,
     thumbWidth: Int,
-    thumbHeight: Int
+    thumbHeight: Int,
 ) : GalleryHolder(binding) {
     init {
         val lp = binding.thumb.layoutParams

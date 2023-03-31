@@ -70,27 +70,27 @@ object EhDns : Dns {
         put(
             builtInHosts,
             "ehgt.org",
-            *ehgtHosts
+            *ehgtHosts,
         )
         put(
             builtInHosts,
             "gt0.ehgt.org",
-            *ehgtHosts
+            *ehgtHosts,
         )
         put(
             builtInHosts,
             "gt1.ehgt.org",
-            *ehgtHosts
+            *ehgtHosts,
         )
         put(
             builtInHosts,
             "gt2.ehgt.org",
-            *ehgtHosts
+            *ehgtHosts,
         )
         put(
             builtInHosts,
             "gt3.ehgt.org",
-            *ehgtHosts
+            *ehgtHosts,
         )
         put(
             builtInHosts,
@@ -111,7 +111,7 @@ object EhDns : Dns {
     private fun put(
         map: MutableMap<String, List<InetAddress>>,
         host: String,
-        vararg ips: Pair<String, Boolean>
+        vararg ips: Pair<String, Boolean>,
     ) {
         map[host] = ips.mapNotNull { pair ->
             Hosts.toInetAddress(host, pair.first).takeUnless { Settings.dF && pair.second }
@@ -121,7 +121,7 @@ object EhDns : Dns {
     @Throws(UnknownHostException::class)
     override fun lookup(hostname: String): List<InetAddress> {
         return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.builtInHosts }
-        ?: Dns.SYSTEM.lookup(hostname)
+            ?: Dns.SYSTEM.lookup(hostname)
     }
 
     fun isInHosts(hostname: String): Boolean {

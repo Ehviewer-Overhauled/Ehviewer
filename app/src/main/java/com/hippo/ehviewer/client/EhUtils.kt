@@ -51,13 +51,13 @@ object EhUtils {
 
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff
     private val PATTERN_TITLE_PREFIX = Pattern.compile(
-        "^(?:\\([^)]*\\)|\\[[^]]*]|\\{[^}]*\\}|~[^~]*~|\\s+)*"
+        "^(?:\\([^)]*\\)|\\[[^]]*]|\\{[^}]*\\}|~[^~]*~|\\s+)*",
     )
 
     // Remove [XXX], (XXX), {XXX}, ~XXX~ stuff and something like ch. 1-23
     private val PATTERN_TITLE_SUFFIX = Pattern.compile(
         "(?:\\s+ch.[\\s\\d-]+)?(?:\\([^)]*\\)|\\[[^]]*]|\\{[^}]*\\}|~[^~]*~|\\s+)*$",
-        Pattern.CASE_INSENSITIVE
+        Pattern.CASE_INSENSITIVE,
     )
 
     private val CATEGORY_VALUES = hashMapOf(
@@ -72,7 +72,7 @@ object EhUtils {
         NON_H to arrayOf("non-h"),
         WESTERN to arrayOf("western"),
         PRIVATE to arrayOf("private"),
-        UNKNOWN to arrayOf("unknown")
+        UNKNOWN to arrayOf("unknown"),
     )
     private val CATEGORY_STRINGS = CATEGORY_VALUES.entries.map { (k, v) -> v to k }
 
@@ -83,8 +83,9 @@ object EhUtils {
     fun getCategory(type: String?): Int {
         for (entry in CATEGORY_STRINGS) {
             for (str in entry.first)
-                if (str.equals(type, ignoreCase = true))
+                if (str.equals(type, ignoreCase = true)) {
                     return entry.second
+                }
         }
         return UNKNOWN
     }
