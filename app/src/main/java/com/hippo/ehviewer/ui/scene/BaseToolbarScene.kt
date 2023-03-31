@@ -31,7 +31,8 @@ abstract class BaseToolbarScene : BaseScene(), ToolBarScene {
 
     override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = SceneToolbarBinding.inflate(inflater, container, false)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)

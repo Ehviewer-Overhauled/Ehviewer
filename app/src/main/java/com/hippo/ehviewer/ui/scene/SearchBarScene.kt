@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
     private val binding get() = _binding!!
@@ -43,7 +42,8 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
 
     override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = SceneSearchbarBinding.inflate(inflater, container, false)
         binding.appbar.statusBarForeground =
@@ -61,10 +61,11 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         val layoutManager = LinearLayoutManager(context)
         binding.searchBarList.layoutManager = layoutManager
         binding.searchview.addTransitionListener { _, _, newState ->
-            if (newState == SearchView.TransitionState.SHOWING)
+            if (newState == SearchView.TransitionState.SHOWING) {
                 onSearchViewExpanded()
-            else if (newState == SearchView.TransitionState.HIDING)
+            } else if (newState == SearchView.TransitionState.HIDING) {
                 onSearchViewHidden()
+            }
         }
         binding.searchview.addTransitionListener(mSearchViewOnBackPressedCallback)
         val contentView = onCreateViewWithToolbar(inflater, binding.root, savedInstanceState)
@@ -100,13 +101,13 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         privLockModeStart?.let {
             setDrawerLockMode(
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-                GravityCompat.START
+                GravityCompat.START,
             )
         }
         privLockModeEnd?.let {
             setDrawerLockMode(
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-                GravityCompat.END
+                GravityCompat.END,
             )
         }
         updateSuggestions()
@@ -183,7 +184,6 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         open fun onLongClick(): Boolean {
             return false
         }
-
     }
 
     private class SuggestionHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -235,12 +235,11 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         override fun getItemCount(): Int {
             return mSuggestionList?.size ?: 0
         }
-
     }
 
     inner class TagSuggestion constructor(
         private var mHint: String?,
-        private var mKeyword: String
+        private var mKeyword: String,
     ) :
         Suggestion() {
 
@@ -350,12 +349,13 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             override fun onStateChanged(
                 searchView: SearchView,
                 previousState: SearchView.TransitionState,
-                newState: SearchView.TransitionState
+                newState: SearchView.TransitionState,
             ) {
-                if (newState == SearchView.TransitionState.SHOWING)
+                if (newState == SearchView.TransitionState.SHOWING) {
                     isEnabled = true
-                else if (newState == SearchView.TransitionState.HIDING)
+                } else if (newState == SearchView.TransitionState.HIDING) {
                     isEnabled = false
+                }
             }
         }
 }

@@ -20,5 +20,5 @@ data class Filter(
 
     @PrimaryKey
     @ColumnInfo(name = "_id")
-    var id: Long? = null
+    var id: Long? = null,
 )

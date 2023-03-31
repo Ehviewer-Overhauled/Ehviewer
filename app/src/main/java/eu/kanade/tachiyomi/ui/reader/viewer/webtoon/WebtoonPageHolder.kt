@@ -197,12 +197,14 @@ class WebtoonPageHolder(
     private fun setImage(drawable: Drawable) {
         progressIndicator.setProgress(0)
         removeErrorLayout()
-        frame.setImage(drawable,
+        frame.setImage(
+            drawable,
             ReaderPageImageView.Config(
-            zoomDuration = viewer.config.doubleTapAnimDuration,
-            minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
-            cropBorders = viewer.config.imageCropBorders,
-        ),)
+                zoomDuration = viewer.config.doubleTapAnimDuration,
+                minimumScaleType = SubsamplingScaleImageView.SCALE_TYPE_FIT_WIDTH,
+                cropBorders = viewer.config.imageCropBorders,
+            ),
+        )
     }
 
     /**

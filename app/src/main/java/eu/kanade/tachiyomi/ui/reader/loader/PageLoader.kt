@@ -16,7 +16,7 @@ abstract class PageLoader {
     private val mImageCache = lruCache<Int, Image>(
         maxSize = (OSUtils.getTotalMemory() / 16).toInt().coerceIn(MIN_CACHE_SIZE, MAX_CACHE_SIZE),
         sizeOf = { _, v -> v.size },
-        onEntryRemoved = { _, _, o, _ -> o.recycle() }
+        onEntryRemoved = { _, _, o, _ -> o.recycle() },
     )
     val mPages by lazy {
         check(size > 0)
@@ -55,9 +55,10 @@ abstract class PageLoader {
         val pagesAbsent =
             ((index - 5).coerceAtLeast(0) until (mPreloads + index).coerceAtMost(size)).mapNotNull { it.takeIf { mImageCache[it] == null } }
         preloadPages(
-            pagesAbsent, (index - 10).coerceAtLeast(0) to (mPreloads + index + 10).coerceAtMost(
-                size
-            )
+            pagesAbsent,
+            (index - 10).coerceAtLeast(0) to (mPreloads + index + 10).coerceAtMost(
+                size,
+            ),
         )
     }
 
@@ -88,8 +89,9 @@ abstract class PageLoader {
     }
 
     fun notifyPageSucceed(index: Int, image: Image) {
-        if (mImageCache[index] != image)
+        if (mImageCache[index] != image) {
             mImageCache.put(index, image)
+        }
         mPages[index].image = image
         mPages[index].status.value = Page.State.READY
     }

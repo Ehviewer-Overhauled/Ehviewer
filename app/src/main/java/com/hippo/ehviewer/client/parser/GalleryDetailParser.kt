@@ -52,7 +52,7 @@ object GalleryDetailParser {
     private val PATTERN_ERROR = Regex("<div class=\"d\">\n<p>([^<]+)</p>")
     private val PATTERN_DETAIL = Regex(
         "var gid = (\\d+);.+?var token = \"([a-f0-9]+)\";.+?var apiuid = ([\\-\\d]+);.+?var apikey = \"([a-f0-9]+)\";",
-        RegexOption.DOT_MATCHES_ALL
+        RegexOption.DOT_MATCHES_ALL,
     )
     private val PATTERN_TORRENT =
         Regex("<a[^<>]*onclick=\"return popUp\\('([^']+)'[^)]+\\)\">Torrent Download[^<]+(\\d+)[^<]+</a")
@@ -170,7 +170,8 @@ object GalleryDetailParser {
             val ratingCount = gm.getElementById("rating_count")
             if (null != ratingCount) {
                 gd.ratingCount = NumberUtils.parseIntSafely(
-                    StringUtils.trim(ratingCount.text()), 0
+                    StringUtils.trim(ratingCount.text()),
+                    0,
                 )
             } else {
                 gd.ratingCount = 0
@@ -293,7 +294,7 @@ object GalleryDetailParser {
                     tag = tag.substring(0, index).trim()
                 }
                 if (it.className() == "gtw") {
-                    tag = "_$tag"   // weak tag
+                    tag = "_$tag" // weak tag
                 }
                 group.add(tag)
             }
@@ -370,7 +371,8 @@ object GalleryDetailParser {
                 val es = c5.children()
                 if (!es.isEmpty()) {
                     comment.score = NumberUtils.parseIntSafely(
-                        StringUtils.trim(es[0].text()), 0
+                        StringUtils.trim(es[0].text()),
+                        0,
                     )
                 }
             }
@@ -428,15 +430,18 @@ object GalleryDetailParser {
             val list = c1s.mapNotNull { parseComment(it) }
             val chd = cdiv.getElementById("chd")
             var hasMore = false
-            NodeTraversor.traverse(object : NodeVisitor {
-                override fun head(node: Node, depth: Int) {
-                    if (node is Element && node.text() == "click to show all") {
-                        hasMore = true
+            NodeTraversor.traverse(
+                object : NodeVisitor {
+                    override fun head(node: Node, depth: Int) {
+                        if (node is Element && node.text() == "click to show all") {
+                            hasMore = true
+                        }
                     }
-                }
 
-                override fun tail(node: Node, depth: Int) {}
-            }, chd!!)
+                    override fun tail(node: Node, depth: Int) {}
+                },
+                chd!!,
+            )
             GalleryCommentList(list.toTypedArray(), hasMore)
         } catch (e: Throwable) {
             ExceptionUtils.throwIfFatal(e)

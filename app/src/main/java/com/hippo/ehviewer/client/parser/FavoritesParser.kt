@@ -53,7 +53,7 @@ object FavoritesParser {
     class Result(
         val catArray: Array<String?>,
         val countArray: IntArray,
-        galleryListResult: GalleryListParser.Result
+        galleryListResult: GalleryListParser.Result,
     ) {
         val prev = galleryListResult.prev
         val next = galleryListResult.next

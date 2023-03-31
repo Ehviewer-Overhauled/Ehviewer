@@ -74,7 +74,7 @@ object EhTagDatabase {
         tags: Map<String, String>,
         keyword: String,
         translate: Boolean,
-        exactly: Boolean
+        exactly: Boolean,
     ): Flow<Pair<String?, String>> = flow {
         if (exactly) {
             tags[keyword]?.let {
@@ -103,7 +103,7 @@ object EhTagDatabase {
     fun suggestFlow(
         keyword: String,
         translate: Boolean,
-        exactly: Boolean = false
+        exactly: Boolean = false,
     ): Flow<Pair<String?, String>> = flow {
         val keywordPrefix = keyword.substringBefore(':')
         val keywordTag = keyword.drop(keywordPrefix.length + 1)
@@ -130,7 +130,6 @@ object EhTagDatabase {
 
     private fun String.containsIgnoreSpace(other: String, ignoreCase: Boolean = true): Boolean =
         removeSpace().contains(other.removeSpace(), ignoreCase)
-
 
     private val NAMESPACE_TO_PREFIX = HashMap<String, String>().also {
         it["artist"] = "a"

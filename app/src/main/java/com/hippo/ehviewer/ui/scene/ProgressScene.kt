@@ -70,8 +70,8 @@ class ProgressScene : BaseScene(), View.OnClickListener {
                 .setArgs(mGid, mPToken!!, mPage)
                 .setCallback(
                     GetGalleryTokenListener(
-                        context
-                    )
+                        context,
+                    ),
                 )
             request.enqueue()
             return true
@@ -124,7 +124,8 @@ class ProgressScene : BaseScene(), View.OnClickListener {
 
     override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         val view = inflater.inflate(R.layout.scene_progress, container, false)
         val progress = ViewUtils.`$$`(view, R.id.progress)
@@ -183,7 +184,7 @@ class ProgressScene : BaseScene(), View.OnClickListener {
     }
 
     private inner class GetGalleryTokenListener(
-        context: Context
+        context: Context,
     ) : EhCallback<ProgressScene, String>(context) {
         override fun onSuccess(result: String) {
             val scene = this@ProgressScene

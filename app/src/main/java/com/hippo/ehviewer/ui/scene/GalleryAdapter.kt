@@ -35,8 +35,11 @@ import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import com.hippo.yorozuya.ViewUtils
 
 internal abstract class GalleryAdapter(
-    private val mInflater: LayoutInflater, private val mResources: Resources,
-    private val mRecyclerView: RecyclerView, type: Int, showFavourited: Boolean
+    private val mInflater: LayoutInflater,
+    private val mResources: Resources,
+    private val mRecyclerView: RecyclerView,
+    type: Int,
+    showFavourited: Boolean,
 ) : RecyclerView.Adapter<GalleryHolder>() {
     private val mLayoutManager: AutoStaggeredGridLayoutManager =
         AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
@@ -106,7 +109,8 @@ internal abstract class GalleryAdapter(
         mShowFavourited = showFavourited
         mRecyclerView.adapter = this
         mRecyclerView.layoutManager = mLayoutManager
-        @SuppressLint("InflateParams") val calculator =
+        @SuppressLint("InflateParams")
+        val calculator =
             mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
         ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
         mListThumbHeight = calculator.measuredHeight
@@ -118,8 +122,10 @@ internal abstract class GalleryAdapter(
     private fun adjustPaddings() {
         val recyclerView = mRecyclerView
         recyclerView.setPadding(
-            recyclerView.paddingLeft, recyclerView.paddingTop + mPaddingTopSB,
-            recyclerView.paddingRight, recyclerView.paddingBottom
+            recyclerView.paddingLeft,
+            recyclerView.paddingTop + mPaddingTopSB,
+            recyclerView.paddingRight,
+            recyclerView.paddingBottom,
         )
     }
 
@@ -129,7 +135,7 @@ internal abstract class GalleryAdapter(
                 ItemGalleryListBinding.inflate(mInflater, parent, false),
                 mShowFavourited,
                 mListThumbWidth,
-                mListThumbHeight
+                mListThumbHeight,
             )
 
             TYPE_GRID -> GridGalleryHolder(ItemGalleryGridBinding.inflate(mInflater, parent, false))

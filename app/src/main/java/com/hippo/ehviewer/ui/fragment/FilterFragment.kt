@@ -68,7 +68,7 @@ class FilterFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val recyclerView =
             inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
@@ -237,7 +237,7 @@ class FilterFragment : BaseFragment() {
                 holder.itemView.setOnClickListener {
                     mFilterList.trigger(filter)
 
-                    //for updating delete line on filter text
+                    // for updating delete line on filter text
                     mAdapter.notifyItemChanged(position)
                 }
                 holder.delete?.setOnClickListener { showDeleteFilterDialog(filter) }
@@ -253,7 +253,9 @@ class FilterFragment : BaseFragment() {
                 val filter = mFilterList[position]
                 if (filter.id != null) {
                     (filter.text.hashCode() shr filter.mode) + filter.id!!
-                } else (filter.text.hashCode() shr filter.mode).toLong()
+                } else {
+                    (filter.text.hashCode() shr filter.mode).toLong()
+                }
             }
         }
     }

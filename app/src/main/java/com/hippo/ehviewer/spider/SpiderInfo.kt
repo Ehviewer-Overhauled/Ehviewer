@@ -26,7 +26,7 @@ class SpiderInfo @JvmOverloads constructor(
 
     var previewPages: Int = -1,
 
-    var previewPerPage: Int = -1
+    var previewPerPage: Int = -1,
 )
 
 fun SpiderInfo.write(file: UniFile) {

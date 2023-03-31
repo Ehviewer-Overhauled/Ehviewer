@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
-import kotlin.Throws
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
 import java.lang.Exception
+import kotlin.Throws
 
 /**
  * Interface for image decoding classes.

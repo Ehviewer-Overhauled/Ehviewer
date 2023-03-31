@@ -22,5 +22,5 @@ import kotlinx.parcelize.Parcelize
 class GalleryTagGroup(
     private val mTagList: ArrayList<String> = arrayListOf(),
     @JvmField
-    var groupName: String? = null
+    var groupName: String? = null,
 ) : Parcelable, MutableList<String> by mTagList

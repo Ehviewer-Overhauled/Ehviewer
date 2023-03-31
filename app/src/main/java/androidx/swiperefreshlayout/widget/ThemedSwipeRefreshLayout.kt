@@ -7,10 +7,10 @@ import android.util.AttributeSet
 import androidx.core.graphics.ColorUtils
 import rikka.core.res.resolveColor
 
-
 @SuppressLint("PrivateResource")
 class ThemedSwipeRefreshLayout @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : SwipeRefreshLayout(context, attrs) {
 
     init {

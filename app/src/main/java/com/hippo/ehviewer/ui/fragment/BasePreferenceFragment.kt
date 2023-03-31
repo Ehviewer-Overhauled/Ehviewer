@@ -25,8 +25,10 @@ import androidx.preference.PreferenceFragmentCompat
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.SettingsActivity
 
-open class BasePreferenceFragment : PreferenceFragmentCompat(),
-    Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+open class BasePreferenceFragment :
+    PreferenceFragmentCompat(),
+    Preference.OnPreferenceClickListener,
+    Preference.OnPreferenceChangeListener {
     override fun onStart() {
         super.onStart()
         setTitle(fragmentTitle)

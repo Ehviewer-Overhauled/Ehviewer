@@ -20,7 +20,6 @@ import android.util.Log
 import androidx.annotation.IntDef
 import androidx.collection.LongSparseArray
 import androidx.collection.set
-import com.hippo.ehviewer.EhApplication.Companion.okHttpClient as plainTextOkHttpClient
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -33,8 +32,8 @@ import com.hippo.ehviewer.client.EhUrl.referer
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
-import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewList
+import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
 import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.image.Image
@@ -57,6 +56,7 @@ import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.executeAsync
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+import com.hippo.ehviewer.EhApplication.Companion.okHttpClient as plainTextOkHttpClient
 
 class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineScope {
     override val coroutineContext = Dispatchers.IO + Job()
@@ -103,7 +103,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     index,
                     contentLength,
                     receivedSize,
-                    bytesRead
+                    bytesRead,
                 )
             }
         }
@@ -116,7 +116,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     index,
                     mFinishedPages.get(),
                     mDownloadedPages.get(),
-                    mPageStateArray.size
+                    mPageStateArray.size,
                 )
             }
         }
@@ -130,7 +130,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     error,
                     mFinishedPages.get(),
                     mDownloadedPages.get(),
-                    mPageStateArray.size
+                    mPageStateArray.size,
                 )
             }
         }
@@ -142,7 +142,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 it.onFinish(
                     mFinishedPages.get(),
                     mDownloadedPages.get(),
-                    mPageStateArray.size
+                    mPageStateArray.size,
                 )
             }
         }
@@ -298,7 +298,9 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val state = getPageState(index)
         return if (STATE_FINISHED != state) {
             false
-        } else mSpiderDen.saveToUniFile(index, file)
+        } else {
+            mSpiderDen.saveToUniFile(index, file)
+        }
     }
 
     fun save(index: Int, dir: UniFile, filename: String): UniFile? {
@@ -315,7 +317,9 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
         val state = getPageState(index)
         return if (STATE_FINISHED != state) {
             null
-        } else mSpiderDen.getExtension(index)
+        } else {
+            mSpiderDen.getExtension(index)
+        }
     }
 
     val startPage: Int
@@ -358,8 +362,12 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     private suspend fun readSpiderInfoFromInternet(): SpiderInfo? {
         val request = EhRequestBuilder(
             getGalleryDetailUrl(
-                galleryInfo.gid, galleryInfo.token, 0, false
-            ), referer
+                galleryInfo.gid,
+                galleryInfo.token,
+                0,
+                false,
+            ),
+            referer,
         ).build()
         return runSuspendCatching {
             plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
@@ -378,7 +386,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     suspend fun getPTokenFromMultiPageViewer(index: Int): String? {
         val spiderInfo = mSpiderInfo
         val url = getGalleryMultiPageViewerUrl(
-            galleryInfo.gid, galleryInfo.token!!
+            galleryInfo.gid,
+            galleryInfo.token!!,
         )
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
@@ -411,7 +420,10 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             previewIndex = previewIndex.coerceAtMost(spiderInfo.previewPages - 1)
         }
         val url = getGalleryDetailUrl(
-            galleryInfo.gid, galleryInfo.token, previewIndex, false
+            galleryInfo.gid,
+            galleryInfo.token,
+            previewIndex,
+            false,
         )
         val referer = referer
         val request = EhRequestBuilder(url, referer).build()
@@ -552,12 +564,14 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             if (isDownloadMode) return
             synchronized(mFetcherJobMap) {
                 mFetcherJobMap.forEach { (i, job) ->
-                    if (i < cancelBounds.first || i > cancelBounds.second)
+                    if (i < cancelBounds.first || i > cancelBounds.second) {
                         job.cancel()
+                    }
                 }
                 list.forEach {
-                    if (mFetcherJobMap[it]?.isActive != true)
+                    if (mFetcherJobMap[it]?.isActive != true) {
                         doLaunchDownloadJob(it, false)
+                    }
                 }
             }
         }
@@ -615,7 +629,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 pToken = getPToken(index) ?: return updatePageState(
                     index,
                     STATE_FAILED,
-                    PTOKEN_FAILED_MESSAGE
+                    PTOKEN_FAILED_MESSAGE,
                 ).also {
                     mSpiderInfo.pTokenMap[index] = TOKEN_FAILED
                 }
@@ -697,7 +711,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                             index,
                             pToken,
                             localShowKey,
-                            previousPToken
+                            previousPToken,
                         ).also {
                             if (check509(it.imageUrl)) {
                                 // Get 509
@@ -742,7 +756,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                     val success: Boolean = mSpiderDen.makeHttpCallAndSaveImage(
                         index,
                         targetImageUrl,
-                        referer
+                        referer,
                     ) { contentLength: Long, receivedSize: Long, bytesRead: Int ->
                         mPagePercentMap[index] = receivedSize.toFloat() / contentLength
                         notifyPageDownload(index, contentLength, receivedSize, bytesRead)
@@ -826,7 +840,7 @@ private val URL_509_ARRAY = arrayOf(
     "https://ehgt.org/g/509.gif",
     "https://ehgt.org/g/509s.gif",
     "https://exhentai.org/img/509.gif",
-    "https://exhentai.org/img/509s.gif"
+    "https://exhentai.org/img/509s.gif",
 )
 private const val WORKER_DEBUG_TAG = "SpiderQueenWorker"
 

@@ -24,7 +24,7 @@ class ParseException : EhException {
 
     constructor(detailMessage: String?, body: String, cause: Throwable?) : super(
         detailMessage,
-        cause
+        cause,
     ) {
         this.body = body
     }

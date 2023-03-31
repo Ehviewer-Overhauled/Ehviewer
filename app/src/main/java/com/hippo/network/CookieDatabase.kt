@@ -52,7 +52,7 @@ class Cookie(
     var hostOnly: Boolean,
     @PrimaryKey
     @ColumnInfo(name = "_id")
-    var id: Long?
+    var id: Long?,
 )
 
 @Dao
@@ -77,9 +77,9 @@ interface CookiesDao {
     autoMigrations = [
         AutoMigration(
             from = 1,
-            to = 2
-        )
-    ]
+            to = 2,
+        ),
+    ],
 )
 abstract class CookiesDatabase : RoomDatabase() {
     abstract fun cookiesDao(): CookiesDao
@@ -150,6 +150,6 @@ fun Cookie.toOkHttp3Cookie(): OkHttpCookie {
 
 private fun OkHttpCookie.toCookie(id: Long? = null): Cookie {
     return Cookie(
-        name, value, expiresAt, domain, path, secure, httpOnly, persistent, hostOnly, id
+        name, value, expiresAt, domain, path, secure, httpOnly, persistent, hostOnly, id,
     )
 }

@@ -33,7 +33,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.LinkedList
 
 class AccountPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : MessagePreference(context, attrs) {
     private val mActivity = context as SettingsActivity
     private var message: String? = null
@@ -59,16 +60,19 @@ class AccountPreference @JvmOverloads constructor(
             i++
         }
         if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
-            message = (EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>"
-                    + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>"
-                    + EhCookieStore.KEY_IGNEOUS + ": " + igneous)
+            message = (
+                EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" +
+                    EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" +
+                    EhCookieStore.KEY_IGNEOUS + ": " + igneous
+                )
             setDialogMessage(
                 Html.fromHtml(
                     context.getString(
                         R.string.settings_eh_identity_cookies_signed,
-                        message
-                    ), Html.FROM_HTML_MODE_LEGACY
-                )
+                        message,
+                    ),
+                    Html.FROM_HTML_MODE_LEGACY,
+                ),
             )
             message = message!!.replace("<br>", "\n")
         } else {

@@ -54,25 +54,25 @@ class MSQLiteBuilder {
      */
     fun version(version: Int): MSQLiteBuilder {
         check(version > this.version) {
-            ("New version must be bigger than current version. "
-                    + "current version: " + this.version + ", new version: " + version + ".")
+            (
+                "New version must be bigger than current version. " +
+                    "current version: " + this.version + ", new version: " + version + "."
+                )
         }
         this.version = version
         statements = ArrayList()
         statementsMap.put(version, statements)
         return this
     }
+
     /**
      * Creates a table.
-     */
-    /**
-     * Creates a table with int [.COLUMN_ID] primary key.
      */
     @JvmOverloads
     fun createTable(
         table: String,
         column: String = COLUMN_ID,
-        clazz: Class<*>? = Int::class.javaPrimitiveType
+        clazz: Class<*>? = Int::class.javaPrimitiveType,
     ): MSQLiteBuilder {
         return statement("CREATE TABLE " + table + " (" + column + " " + javaTypeToSQLiteType(clazz) + " PRIMARY KEY);")
     }
@@ -90,8 +90,8 @@ class MSQLiteBuilder {
     fun insertColumn(table: String, column: String, clazz: Class<*>?): MSQLiteBuilder {
         return statement(
             "ALTER TABLE $table ADD COLUMN $column " + javaTypeToSQLiteType(
-                clazz
-            ) + ";"
+                clazz,
+            ) + ";",
         )
     }
 

@@ -37,15 +37,15 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 private fun GalleryDetailHeaderInfoCard(
     galleryDetail: GalleryDetail,
     onClick: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     galleryDetail.run {
         Card(
             onClick = onClick,
-            modifier = modifier
+            modifier = modifier,
         ) {
             ConstraintLayout(
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
             ) {
                 val (langRef, sizeRef, favRef, pagesRef, postRef) = createRefs()
 
@@ -55,7 +55,7 @@ private fun GalleryDetailHeaderInfoCard(
                     modifier = Modifier.constrainAs(langRef) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
-                    }
+                    },
                 )
                 Text(
                     text = size.orEmpty(),
@@ -67,12 +67,12 @@ private fun GalleryDetailHeaderInfoCard(
                             horizontalBias = 1.0f
                             start.linkTo(langRef.end)
                         }
-                        .padding(start = 16.dp)
+                        .padding(start = 16.dp),
                 )
                 Text(
                     text = stringResource(
                         id = R.string.favored_times,
-                        favoriteCount
+                        favoriteCount,
                     ),
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
@@ -80,13 +80,13 @@ private fun GalleryDetailHeaderInfoCard(
                             start.linkTo(parent.start)
                             top.linkTo(langRef.bottom)
                         }
-                        .padding(top = 8.dp)
+                        .padding(top = 8.dp),
                 )
                 Text(
                     text = pluralStringResource(
                         id = R.plurals.page_count,
                         pages,
-                        pages
+                        pages,
                     ),
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
@@ -96,7 +96,7 @@ private fun GalleryDetailHeaderInfoCard(
                             horizontalBias = 1.0f
                             start.linkTo(favRef.end)
                         }
-                        .padding(start = 16.dp)
+                        .padding(start = 16.dp),
                 )
                 Text(
                     text = posted.orEmpty(),
@@ -107,7 +107,7 @@ private fun GalleryDetailHeaderInfoCard(
                             start.linkTo(parent.start)
                             top.linkTo(favRef.bottom)
                         }
-                        .padding(top = 8.dp)
+                        .padding(top = 8.dp),
                 )
             }
         }
@@ -122,10 +122,10 @@ fun GalleryDetailHeaderCard(
     onUploaderChipClick: () -> Unit,
     onBlockUploaderIconClick: () -> Unit,
     onCategoryChipClick: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     ElevatedCard(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Row {
             Card {
@@ -134,13 +134,13 @@ fun GalleryDetailHeaderCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
-                        .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width))
+                        .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width)),
                 )
             }
             Spacer(modifier = Modifier.weight(0.5F))
             Column(
                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
             ) {
                 galleryDetail?.let {
                     GalleryDetailHeaderInfoCard(
@@ -148,8 +148,8 @@ fun GalleryDetailHeaderCard(
                         onClick = onInfoCardClick,
                         modifier = Modifier.padding(
                             top = 8.dp,
-                            end = dimensionResource(id = R.dimen.keyline_margin)
-                        )
+                            end = dimensionResource(id = R.dimen.keyline_margin),
+                        ),
                     )
                 }
                 Spacer(modifier = Modifier.weight(1F))
@@ -162,9 +162,10 @@ fun GalleryDetailHeaderCard(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Label,
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    })
+                    },
+                )
 
                 val uploaderText = galleryInfo.uploader.orEmpty().toUpperCase(Locale.current)
                 AssistChip(
@@ -174,16 +175,17 @@ fun GalleryDetailHeaderCard(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.PersonAdd,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.GroupOff,
                             contentDescription = null,
-                            modifier = Modifier.clickable(onClick = onBlockUploaderIconClick)
+                            modifier = Modifier.clickable(onClick = onBlockUploaderIconClick),
                         )
-                    })
+                    },
+                )
             }
         }
     }

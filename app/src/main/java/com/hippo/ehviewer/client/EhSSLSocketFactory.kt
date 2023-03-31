@@ -39,7 +39,7 @@ object EhSSLSocketFactory : SSLSocketFactory() {
         val sslSession = socket.session
         Log.d(
             "EhSSLSocketFactory",
-            "Host: " + host + " Address: " + address + " Protocol:" + sslSession.protocol + " CipherSuite:" + sslSession.cipherSuite
+            "Host: " + host + " Address: " + address + " Protocol:" + sslSession.protocol + " CipherSuite:" + sslSession.cipherSuite,
         )
         return socket
     }
@@ -52,7 +52,7 @@ object EhSSLSocketFactory : SSLSocketFactory() {
         host: String,
         port: Int,
         localHost: InetAddress,
-        localPort: Int
+        localPort: Int,
     ): Socket {
         return sslSocketFactory.createSocket(host, port, localHost, localPort)
     }
@@ -65,7 +65,7 @@ object EhSSLSocketFactory : SSLSocketFactory() {
         address: InetAddress,
         port: Int,
         localAddress: InetAddress,
-        localPort: Int
+        localPort: Int,
     ): Socket {
         return sslSocketFactory.createSocket(address, port, localAddress, localPort)
     }

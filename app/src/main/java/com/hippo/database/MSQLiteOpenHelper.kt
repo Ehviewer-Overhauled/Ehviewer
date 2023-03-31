@@ -24,7 +24,7 @@ internal class MSQLiteOpenHelper(
     context: Context?,
     name: String?,
     private val version: Int,
-    private val builder: MSQLiteBuilder
+    private val builder: MSQLiteBuilder,
 ) : SQLiteOpenHelper(context, name, null, version) {
     override fun onCreate(db: SQLiteDatabase) {
         onUpgrade(db, 0, version)

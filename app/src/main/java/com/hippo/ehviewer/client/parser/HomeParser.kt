@@ -22,7 +22,7 @@ object HomeParser {
     }
 
     fun parseResetLimits(body: String): Limits? {
-        return if (body.contains(RESET_SUCCEED)){
+        return if (body.contains(RESET_SUCCEED)) {
             null
         } else {
             parse(body)

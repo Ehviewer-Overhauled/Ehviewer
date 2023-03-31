@@ -16,8 +16,8 @@ import androidx.core.view.forEach
 import androidx.core.view.get
 import androidx.core.view.size
 import com.hippo.ehviewer.R
-import eu.kanade.tachiyomi.core.preference.Preference
 import com.hippo.ehviewer.databinding.PrefSpinnerBinding
+import eu.kanade.tachiyomi.core.preference.Preference
 import eu.kanade.tachiyomi.util.system.getResourceColor
 
 class MaterialSpinnerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :

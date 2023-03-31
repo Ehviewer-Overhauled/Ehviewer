@@ -168,8 +168,9 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     }
 
     override fun onPause(owner: LifecycleOwner) {
-        if (!locked)
+        if (!locked) {
             locked_last_leave_time = System.currentTimeMillis() / 1000
+        }
         locked = true
     }
 
@@ -216,8 +217,8 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 Cache(
                     application.cacheDir.toOkioPath() / "http_cache",
                     20L * 1024L * 1024L,
-                    FileSystem.SYSTEM
-                )
+                    FileSystem.SYSTEM,
+                ),
             ).build()
         }
 

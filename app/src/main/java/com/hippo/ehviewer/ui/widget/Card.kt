@@ -12,21 +12,20 @@ import androidx.compose.ui.graphics.Color
 fun CrystalCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) = OutlinedCard(
     onClick = onClick,
     modifier = modifier,
     border = BorderStroke(CardDefaults.outlinedCardBorder().width, Color.Transparent),
-    content = content
+    content = content,
 )
 
 @Composable
 fun CrystalCard(
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) = OutlinedCard(
     modifier = modifier,
     border = BorderStroke(CardDefaults.outlinedCardBorder().width, Color.Transparent),
-    content = content
+    content = content,
 )
-

@@ -72,8 +72,8 @@ android {
                 "de",
                 "th",
                 "tr",
-                "nb-rNO"
-            )
+                "nb-rNO",
+            ),
         )
         buildConfigField("String", "COMMIT_SHA", "\"$commitSha\"")
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
@@ -124,7 +124,6 @@ android {
             excludes += "**.txt"
             excludes += "**.bin"
         }
-
     }
 
     dependenciesInfo.includeInApk = false

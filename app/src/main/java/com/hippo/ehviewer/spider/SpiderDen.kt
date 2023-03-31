@@ -30,9 +30,9 @@ import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.image.Image.CloseableSource
 import com.hippo.image.rewriteGifSource2
-import com.hippo.util.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
+import com.hippo.util.sendTo
 import com.hippo.yorozuya.FileUtils
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.prepareGet
@@ -136,7 +136,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         index: Int,
         url: String,
         referer: String?,
-        notifyProgress: (Long, Long, Int) -> Unit
+        notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
         return client.prepareGet(url) {
             var state: Long = 0
@@ -161,10 +161,11 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             outFile.openOutputStream().use {
                 ret = body.bodyAsChannel().copyTo(it.channel)
             }
-            if (contentType == ContentType.Image.GIF)
+            if (contentType == ContentType.Image.GIF) {
                 outFile.openFileDescriptor("rw").use {
                     rewriteGifSource2(it.fd)
                 }
+            }
             return ret
         }
 

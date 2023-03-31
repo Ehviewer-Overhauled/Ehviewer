@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -222,7 +221,7 @@ fun Context.getUriSize(uri: Uri): Long? {
  */
 fun Context.isNavigationBarNeedsScrim(): Boolean {
     return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
-            InternalResourceHelper.getBoolean(this, "config_navBarNeedsScrim", true)
+        InternalResourceHelper.getBoolean(this, "config_navBarNeedsScrim", true)
 }
 
 /**

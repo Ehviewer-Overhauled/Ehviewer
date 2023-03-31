@@ -44,7 +44,7 @@ object MergeInterceptor : Interceptor {
                         pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
                     }
                 }
-            }
+            },
         ).build()
 
         pendingContinuationMapLock.lock()

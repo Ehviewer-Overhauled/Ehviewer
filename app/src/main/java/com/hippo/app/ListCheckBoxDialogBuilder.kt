@@ -31,9 +31,9 @@ class ListCheckBoxDialogBuilder(
     items: List<CharSequence>,
     listener: (ListCheckBoxDialogBuilder?, AlertDialog?, Int) -> Unit,
     checkText: String?,
-    checked: Boolean
+    checked: Boolean,
 ) : BaseDialogBuilder(
-    context
+    context,
 ) {
     private val mCheckBox: CheckBox
     private var mDialog: AlertDialog? = null

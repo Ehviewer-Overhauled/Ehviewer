@@ -31,7 +31,8 @@ import com.hippo.ehviewer.R
 import com.hippo.yorozuya.NumberUtils
 
 class AdvanceSearchTable @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : LinearLayout(context, attrs) {
     private var mSh: CheckBox
     private var mSto: CheckBox
@@ -64,7 +65,7 @@ class AdvanceSearchTable @JvmOverloads constructor(
 
         mSpt.setOnEditorActionListener { v: TextView, _: Int, _: KeyEvent? ->
             val nextView = v.focusSearch(
-                FOCUS_DOWN
+                FOCUS_DOWN,
             )
             nextView?.requestFocus(FOCUS_DOWN)
             true
@@ -107,13 +108,15 @@ class AdvanceSearchTable @JvmOverloads constructor(
         set(minRating) {
             (mMinRating.editText!! as AutoCompleteTextView).setText(
                 mArray[if (minRating in 2..5) minRating - 1 else 0],
-                false
+                false,
             )
         }
     var pageFrom: Int
         get() = if (mSp.isChecked) {
             NumberUtils.parseIntSafely(mSpf.text.toString(), -1)
-        } else -1
+        } else {
+            -1
+        }
         set(pageFrom) {
             if (pageFrom > 0) {
                 mSpf.setText(pageFrom.toString())
@@ -126,7 +129,9 @@ class AdvanceSearchTable @JvmOverloads constructor(
     var pageTo: Int
         get() = if (mSp.isChecked) {
             NumberUtils.parseIntSafely(mSpt.text.toString(), -1)
-        } else -1
+        } else {
+            -1
+        }
         set(pageTo) {
             if (pageTo > 0) {
                 mSpt.setText(pageTo.toString())

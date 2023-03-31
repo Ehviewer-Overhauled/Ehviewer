@@ -66,7 +66,9 @@ abstract class BaseScene : Fragment() {
         val activity = activity
         return if (activity is MainActivity) {
             activity.getDrawerLockMode(edgeGravity)
-        } else null
+        } else {
+            null
+        }
     }
 
     fun openDrawer(drawerGravity: Int) {
@@ -115,7 +117,8 @@ abstract class BaseScene : Fragment() {
 
     fun createDrawerView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         drawerView = onCreateDrawerView(inflater, container, savedInstanceState)
         if (drawerView != null) {
@@ -132,7 +135,8 @@ abstract class BaseScene : Fragment() {
 
     open fun onCreateDrawerView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         return null
     }
@@ -193,10 +197,12 @@ abstract class BaseScene : Fragment() {
     fun showSoftInput(view: View?) {
         if (view != null) {
             view.requestFocus()
-            view.post(Runnable {
-                val insetsController = getInsetsController()
-                insetsController?.show(WindowInsetsCompat.Type.ime())
-            })
+            view.post(
+                Runnable {
+                    val insetsController = getInsetsController()
+                    insetsController?.show(WindowInsetsCompat.Type.ime())
+                },
+            )
         }
     }
 

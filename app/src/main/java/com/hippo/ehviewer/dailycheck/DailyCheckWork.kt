@@ -72,7 +72,7 @@ fun updateDailyCheckWork(context: Context) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             workName,
             ExistingPeriodicWorkPolicy.UPDATE,
-            getDailyCheckWorkRequest()
+            getDailyCheckWorkRequest(),
         )
     } else {
         WorkManager.getInstance(context).cancelUniqueWork(workName)
@@ -92,7 +92,6 @@ suspend fun checkDawn() = runCatching {
 }.onFailure {
     it.printStackTrace()
 }
-
 
 @SuppressLint("MissingPermission")
 fun showEventNotification(html: String) {

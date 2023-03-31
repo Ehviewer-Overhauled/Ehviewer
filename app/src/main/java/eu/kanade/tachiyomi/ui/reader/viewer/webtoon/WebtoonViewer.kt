@@ -62,7 +62,6 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      */
     private var currentPage: Any? = null
 
-
     private val threshold: Int = 13
 
     private var longPressed = false

@@ -52,12 +52,12 @@ class AutoGridLayoutManager(context: Context?, columnSize: Int, private var fake
             val spanCount = when (mStrategy) {
                 STRATEGY_MIN_SIZE -> getSpanCountForMinSize(
                     totalSpace,
-                    mColumnSize
+                    mColumnSize,
                 )
 
                 STRATEGY_SUITABLE_SIZE -> getSpanCountForSuitableSize(
                     totalSpace,
-                    mColumnSize
+                    mColumnSize,
                 )
 
                 else -> getSpanCountForMinSize(totalSpace, mColumnSize)

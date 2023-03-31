@@ -9,7 +9,7 @@ private val OBSOLETE_CACHE_DIRS = arrayOf(
     "image",
     "thumb",
     "gallery_image",
-    "spider_info"
+    "spider_info",
 )
 
 @OptIn(DelicateCoroutinesApi::class)

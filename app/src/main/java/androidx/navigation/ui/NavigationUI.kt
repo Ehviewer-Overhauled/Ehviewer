@@ -13,7 +13,7 @@ fun onNavDestinationSelected2(item: MenuItem, navController: NavController): Boo
     val builder = NavOptions.Builder().setLaunchSingleTop(true)
     if (
         navController.currentDestination!!.parent!!.findNode(item.itemId)
-                is ActivityNavigator.Destination
+        is ActivityNavigator.Destination
     ) {
         builder.setEnterAnim(R.anim.nav_default_enter_anim)
             .setExitAnim(R.anim.nav_default_exit_anim)

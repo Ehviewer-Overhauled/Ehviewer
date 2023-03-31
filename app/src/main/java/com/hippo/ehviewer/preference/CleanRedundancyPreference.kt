@@ -17,7 +17,6 @@ package com.hippo.ehviewer.preference
 
 import android.content.Context
 import android.util.AttributeSet
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -26,6 +25,7 @@ import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 private val NO_REDUNDANCY =
     GetText.getString(R.string.settings_download_clean_redundancy_no_redundancy)
@@ -35,7 +35,8 @@ private val FINAL_CLEAR_REDUNDANCY_MSG =
     { cnt: Int -> if (cnt == 0) NO_REDUNDANCY else CLEAR_REDUNDANCY_DONE(cnt) }
 
 class CleanRedundancyPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : TaskPreference(context, attrs) {
     private fun clearFile(file: UniFile): Boolean {
         var name = file.name ?: return false
@@ -56,16 +57,19 @@ class CleanRedundancyPreference @JvmOverloads constructor(
     }
 
     override fun launchJob() {
-        if (singletonJob?.isActive == true) singletonJob?.invokeOnCompletion {
-            launchUI {
-                dialog.dismiss()
+        if (singletonJob?.isActive == true) {
+            singletonJob?.invokeOnCompletion {
+                launchUI {
+                    dialog.dismiss()
+                }
             }
-        }
-        else singletonJob = launch {
-            val cnt = doRealWork()
-            withUIContext {
-                showTip(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
-                dialog.dismiss()
+        } else {
+            singletonJob = launch {
+                val cnt = doRealWork()
+                withUIContext {
+                    showTip(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
+                    dialog.dismiss()
+                }
             }
         }
     }

@@ -35,8 +35,9 @@ class ReaderSettingsSheet(
             valueAnimator.addUpdateListener {
                 window?.run {
                     setDimAmount(it.animatedValue as Float)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         attributes.blurBehindRadius = (it.animatedValue as Float * 50).toInt()
+                    }
                 }
             }
         }

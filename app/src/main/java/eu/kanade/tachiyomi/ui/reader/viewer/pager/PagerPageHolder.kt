@@ -155,16 +155,19 @@ class PagerPageHolder(
     private fun setImage(drawable: Drawable) {
         progressIndicator.setProgress(0)
         errorLayout?.root?.isVisible = false
-        setImage(drawable,
+        setImage(
+            drawable,
             Config(
                 zoomDuration = viewer.config.doubleTapAnimDuration,
                 minimumScaleType = viewer.config.imageScaleType,
                 cropBorders = viewer.config.imageCropBorders,
                 zoomStartPosition = viewer.config.imageZoomType,
                 landscapeZoom = viewer.config.landscapeZoom,
-            ),)
-        if (drawable !is Animatable)
+            ),
+        )
+        if (drawable !is Animatable) {
             pageBackground = background
+        }
     }
 
     /**

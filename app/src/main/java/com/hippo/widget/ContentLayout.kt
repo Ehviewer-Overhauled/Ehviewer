@@ -85,7 +85,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         binding.refreshLayout.setProgressViewOffset(
             true,
             0,
-            fitPaddingTop + LayoutUtils.dp2pix(context, 32f)
+            fitPaddingTop + LayoutUtils.dp2pix(context, 32f),
         ) // TODO
     }
 
@@ -95,25 +95,25 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             binding.recyclerView.paddingLeft,
             binding.recyclerView.paddingTop,
             binding.recyclerView.paddingRight,
-            mRecyclerViewOriginBottom + fitPaddingBottom
+            mRecyclerViewOriginBottom + fitPaddingBottom,
         )
         binding.tip.setPadding(
             binding.tip.paddingLeft,
             binding.tip.paddingTop,
             binding.tip.paddingRight,
-            fitPaddingBottom
+            fitPaddingBottom,
         )
         binding.progress.setPadding(
             binding.progress.paddingLeft,
             binding.progress.paddingTop,
             binding.progress.paddingRight,
-            fitPaddingBottom
+            fitPaddingBottom,
         )
         binding.fastScroller.setPadding(
             binding.fastScroller.paddingLeft,
             binding.fastScroller.paddingTop,
             binding.fastScroller.paddingRight,
-            mFastScrollerOriginBottom + fitPaddingBottom
+            mFastScrollerOriginBottom + fitPaddingBottom,
         )
         if (fitPaddingBottom > LayoutUtils.dp2pix(context, 16f)) {
             binding.bottomProgress.setPadding(0, 0, 0, fitPaddingBottom)
@@ -206,7 +206,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                     mNextPage,
                                     null,
                                     null,
-                                    emptyList()
+                                    emptyList(),
                                 )
                             }
                             mCurrentTaskId = mIdGenerator.nextId()
@@ -217,7 +217,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                 mCurrentTaskType,
                                 mCurrentTaskPage,
                                 mNext,
-                                true
+                                true,
                             )
                         } else if (mStartPage > 0 && mEndPage == pages) {
                             binding.bottomProgress.show()
@@ -230,7 +230,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                 mCurrentTaskType,
                                 mCurrentTaskPage,
                                 null,
-                                true
+                                true,
                             )
                         }
                     }
@@ -263,7 +263,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             type: Int,
             page: Int,
             index: String?,
-            isNext: Boolean
+            isNext: Boolean,
         )
 
         protected abstract val context: Context
@@ -327,7 +327,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             nextPage: Int,
             prev: String?,
             next: String?,
-            data: List<E>
+            data: List<E>,
         ) {
             if (mCurrentTaskId == taskId) {
                 val dataSize: Int
@@ -410,8 +410,10 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                                     if (mCurrentTaskType == TYPE_PRE_PAGE_KEEP_POS) {
                                         binding.recyclerView.stopScroll()
                                         LayoutManagerUtils.scrollToPositionProperly(
-                                            binding.recyclerView.layoutManager, context,
-                                            dataSize - 1, mOnScrollToPositionListener
+                                            binding.recyclerView.layoutManager,
+                                            context,
+                                            dataSize - 1,
+                                            mOnScrollToPositionListener,
                                         )
                                     } else {
                                         scrollToPosition(0)
@@ -505,7 +507,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                             Log.e(
                                 TAG,
                                 "TYPE_REFRESH_PAGE, but mCurrentTaskPage = " + mCurrentTaskPage +
-                                        ", mStartPage = " + mStartPage + ", mEndPage = " + mEndPage
+                                    ", mStartPage = " + mStartPage + ", mEndPage = " + mEndPage,
                             )
                             return
                         }
@@ -522,7 +524,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                         removeDuplicateData(
                             data,
                             oldIndexStart - CHECK_DUPLICATE_RANGE,
-                            oldIndexStart + CHECK_DUPLICATE_RANGE
+                            oldIndexStart + CHECK_DUPLICATE_RANGE,
                         )
                         val newIndexEnd = oldIndexStart + data.size
                         mData.addAll(oldIndexStart, data)
@@ -575,7 +577,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             LayoutManagerUtils.scrollToPositionWithOffset(
                 binding.recyclerView.layoutManager,
                 position,
-                0
+                0,
             )
             onScrollToPosition(position)
         }

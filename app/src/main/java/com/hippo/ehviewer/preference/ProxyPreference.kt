@@ -35,7 +35,8 @@ import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ViewUtils
 
 class ProxyPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : DialogPreference(context, attrs), View.OnClickListener {
     private var mType: TextInputLayout? = null
     private var mIpInputLayout: TextInputLayout? = null
@@ -56,8 +57,8 @@ class ProxyPreference @JvmOverloads constructor(
 
     private fun updateSummary(type: Int, ip: String?, port: Int) {
         var type1 = type
-        if ((type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS)
-            && (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))
+        if ((type1 == EhProxySelector.TYPE_HTTP || type1 == EhProxySelector.TYPE_SOCKS) &&
+            (TextUtils.isEmpty(ip) || !InetValidator.isValidInetPort(port))
         ) {
             type1 = EhProxySelector.TYPE_SYSTEM
         }
@@ -67,13 +68,13 @@ class ProxyPreference @JvmOverloads constructor(
                 R.string.settings_advanced_proxy_summary_1,
                 getProxyTypeText(type1),
                 ip,
-                port
+                port,
             )
         } else {
             val context = context
             context.getString(
                 R.string.settings_advanced_proxy_summary_2,
-                getProxyTypeText(type1)
+                getProxyTypeText(type1),
             )
         }
     }
@@ -95,11 +96,14 @@ class ProxyPreference @JvmOverloads constructor(
         mPort = ViewUtils.`$$`(dialog, R.id.port) as EditText
         val type = Settings.proxyType
         (mType!!.editText as AutoCompleteTextView).setText(
-            array[MathUtils.clamp(
-                type,
-                0,
-                array.size
-            )], false
+            array[
+                MathUtils.clamp(
+                    type,
+                    0,
+                    array.size,
+                ),
+            ],
+            false,
         )
         mIp!!.setText(Settings.proxyIp)
         val portString: String?

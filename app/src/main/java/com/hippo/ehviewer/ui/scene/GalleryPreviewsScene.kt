@@ -87,7 +87,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = SceneGalleryPreviewsBinding.inflate(inflater, container, false)
         binding.contentLayout.hideFastScroll()
@@ -117,7 +118,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                 0,
                 null,
                 null,
-                mGalleryDetail!!.previewList
+                mGalleryDetail!!.previewList,
             )
         }
         return binding.root
@@ -172,7 +173,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                     result.first.forEach {
                         it.imageUrl.run {
                             context?.imageLoader?.enqueue(
-                                ImageRequest.Builder(requireContext()).ehUrl(this).build()
+                                ImageRequest.Builder(requireContext()).ehUrl(this).build(),
                             )
                         }
                     }
@@ -190,7 +191,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
 
     private inner class GetPreviewListListener(
         context: Context,
-        private val mTaskId: Int
+        private val mTaskId: Int,
     ) : EhCallback<GalleryPreviewsScene, Pair<List<GalleryPreview>, Int>>(context) {
         override fun onSuccess(result: Pair<List<GalleryPreview>, Int>) {
             val scene = this@GalleryPreviewsScene
@@ -211,7 +212,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             type: Int,
             page: Int,
             index: String?,
-            isNext: Boolean
+            isNext: Boolean,
         ) {
             val activity = mainActivity
             if (null == activity || null == mGalleryDetail) {

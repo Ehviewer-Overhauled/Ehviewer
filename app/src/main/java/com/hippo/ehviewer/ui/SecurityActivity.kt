@@ -39,10 +39,11 @@ fun Context.isAuthenticationSupported(): Boolean {
 class SecurityActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
-        if (isAuthenticationSupported())
+        if (isAuthenticationSupported()) {
             startAuthentication(getString(R.string.settings_privacy_require_unlock))
-        else
+        } else {
             onSuccess()
+        }
     }
 
     @Synchronized
@@ -61,8 +62,8 @@ class SecurityActivity : AppCompatActivity() {
             callback = callback(
                 { _, _, _ -> onFailed() },
                 { _, _ -> onSuccess() },
-                { onFailed() }
-            )
+                { onFailed() },
+            ),
         )
     }
 
@@ -70,25 +71,25 @@ class SecurityActivity : AppCompatActivity() {
         crossinline onAuthenticationError: (
             activity: FragmentActivity?,
             errorCode: Int,
-            errString: CharSequence
+            errString: CharSequence,
         ) -> Unit,
         crossinline onAuthenticationSucceeded: (
             activity: FragmentActivity?,
-            result: BiometricPrompt.AuthenticationResult
+            result: BiometricPrompt.AuthenticationResult,
         ) -> Unit,
         crossinline onAuthenticationFailed: (
-            activity: FragmentActivity?
-        ) -> Unit
+            activity: FragmentActivity?,
+        ) -> Unit,
     ) = object : AuthPromptCallback() {
         override fun onAuthenticationError(
             activity: FragmentActivity?,
             errorCode: Int,
-            errString: CharSequence
+            errString: CharSequence,
         ) = onAuthenticationError(activity, errorCode, errString)
 
         override fun onAuthenticationSucceeded(
             activity: FragmentActivity?,
-            result: BiometricPrompt.AuthenticationResult
+            result: BiometricPrompt.AuthenticationResult,
         ) = onAuthenticationSucceeded(activity, result)
 
         override fun onAuthenticationFailed(activity: FragmentActivity?) =

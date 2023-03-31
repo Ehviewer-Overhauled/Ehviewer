@@ -34,5 +34,5 @@ class GalleryApiInfo(
     var expunged: Boolean = false,
     var rating: Float = 0f,
     var torrentcount: Int = 0,
-    var tags: Array<String>?
+    var tags: Array<String>?,
 ) : Parcelable

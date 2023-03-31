@@ -26,7 +26,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.IntDef
 import androidx.core.content.edit
 import androidx.core.view.forEach
@@ -51,9 +55,13 @@ import com.hippo.yorozuya.ViewUtils
 
 @SuppressLint("InflateParams")
 class SearchLayout @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : EasyRecyclerView(context, attrs), CompoundButton.OnCheckedChangeListener, View.OnClickListener,
-    ImageSearchLayout.Helper, OnTabSelectedListener {
+    context: Context,
+    attrs: AttributeSet? = null,
+) : EasyRecyclerView(context, attrs),
+    CompoundButton.OnCheckedChangeListener,
+    View.OnClickListener,
+    ImageSearchLayout.Helper,
+    OnTabSelectedListener {
 
     @SearchMode
     private var mSearchMode = SEARCH_MODE_NORMAL
@@ -88,7 +96,11 @@ class SearchLayout @JvmOverloads constructor(
         val paddingH = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_h)
         val paddingV = resources.getDimensionPixelOffset(R.dimen.search_layout_margin_v)
         val decoration = MarginItemDecoration(
-            interval, paddingH, paddingV, paddingH, paddingV
+            interval,
+            paddingH,
+            paddingV,
+            paddingH,
+            paddingV,
         )
         addItemDecoration(decoration)
         decoration.applyPaddings(this)
@@ -138,12 +150,11 @@ class SearchLayout @JvmOverloads constructor(
         mActionView = mInflater.inflate(R.layout.search_action, null)
         mActionView.layoutParams = LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         mAction = mActionView.findViewById(R.id.action)
         mAction.addOnTabSelectedListener(this)
     }
-
 
     fun setHelper(helper: Helper?) {
         mHelper = helper
@@ -218,7 +229,8 @@ class SearchLayout @JvmOverloads constructor(
                 }
                 urlBuilder.keyword = query
                 urlBuilder.category = PreferenceManager.getDefaultSharedPreferences(context).getInt(
-                    SEARCH_CATEGORY_PREF, 0
+                    SEARCH_CATEGORY_PREF,
+                    0,
                 )
                 if (mEnableAdvance) {
                     urlBuilder.advanceSearch = mTableAdvanceSearch.advanceSearch
@@ -359,7 +371,8 @@ class SearchLayout @JvmOverloads constructor(
         private const val ITEM_TYPE_IMAGE = 2
         private const val ITEM_TYPE_ACTION = 3
         private val SEARCH_ITEM_COUNT_ARRAY = intArrayOf(
-            3, 2
+            3,
+            2,
         )
         private val mCategoryTable: ArrayList<Pair<Int, Int>> = arrayListOf(
             Pair(EhUtils.DOUJINSHI, R.string.doujinshi),
@@ -371,20 +384,24 @@ class SearchLayout @JvmOverloads constructor(
             Pair(EhUtils.IMAGE_SET, R.string.image_set),
             Pair(EhUtils.COSPLAY, R.string.cosplay),
             Pair(EhUtils.ASIAN_PORN, R.string.asian_porn),
-            Pair(EhUtils.MISC, R.string.misc)
+            Pair(EhUtils.MISC, R.string.misc),
         )
         private val SEARCH_ITEM_TYPE = arrayOf(
-            intArrayOf(ITEM_TYPE_NORMAL, ITEM_TYPE_NORMAL_ADVANCE, ITEM_TYPE_ACTION), intArrayOf(
-                ITEM_TYPE_IMAGE, ITEM_TYPE_ACTION
-            )
+            intArrayOf(ITEM_TYPE_NORMAL, ITEM_TYPE_NORMAL_ADVANCE, ITEM_TYPE_ACTION),
+            intArrayOf(
+                ITEM_TYPE_IMAGE,
+                ITEM_TYPE_ACTION,
+            ),
         )
     }
 }
 
 class IdentifiedChip @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : Chip(
-    context, attrs
+    context,
+    attrs,
 ) {
     var idt = 0
 }

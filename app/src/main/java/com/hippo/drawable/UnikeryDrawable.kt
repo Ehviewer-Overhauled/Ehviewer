@@ -22,7 +22,8 @@ import coil.request.ImageRequest
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.widget.ObservedTextView
 
-class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) : WrapDrawable(),
+class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
+    WrapDrawable(),
     ObservedTextView.OnWindowAttachListener {
     private val mImageRequest: ImageRequest
 

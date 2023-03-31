@@ -62,7 +62,7 @@ object Settings {
         KEY_SHOW_JPN_TITLE,
         KEY_REQUEST_NEWS,
         KEY_REQUEST_NEWS_TIMER,
-        KEY_HIDE_HV_EVENTS
+        KEY_HIDE_HV_EVENTS,
     )
 
     /********************
@@ -275,8 +275,10 @@ object Settings {
 
     private fun putStringToStringSet(key: String, value: String) {
         var set = getStringSet(key)
-        if (set == null) set =
-            mutableSetOf(value) else if (set.contains(value)) return else set.add(value)
+        if (set == null) {
+            set =
+                mutableSetOf(value)
+        } else if (set.contains(value)) return else set.add(value)
         sSettingsPre.edit().putStringSet(key, set).apply()
     }
 
@@ -284,7 +286,7 @@ object Settings {
         return try {
             NumberUtils.parseIntSafely(
                 sSettingsPre.getString(key, defValue.toString()),
-                defValue
+                defValue,
             )
         } catch (e: ClassCastException) {
             Log.d(TAG, "Get ClassCastException when get $key value", e)
@@ -469,7 +471,7 @@ object Settings {
             sSettingsPre.getString(KEY_FAV_CAT_6, DEFAULT_FAV_CAT_6)!!,
             sSettingsPre.getString(KEY_FAV_CAT_7, DEFAULT_FAV_CAT_7)!!,
             sSettingsPre.getString(KEY_FAV_CAT_8, DEFAULT_FAV_CAT_8)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_9, DEFAULT_FAV_CAT_9)!!
+            sSettingsPre.getString(KEY_FAV_CAT_9, DEFAULT_FAV_CAT_9)!!,
         )
 
     fun putFavCat(value: Array<String?>) {
@@ -499,7 +501,7 @@ object Settings {
             sSettingsPre.getInt(KEY_FAV_COUNT_6, DEFAULT_FAV_COUNT),
             sSettingsPre.getInt(KEY_FAV_COUNT_7, DEFAULT_FAV_COUNT),
             sSettingsPre.getInt(KEY_FAV_COUNT_8, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_9, DEFAULT_FAV_COUNT)
+            sSettingsPre.getInt(KEY_FAV_COUNT_9, DEFAULT_FAV_COUNT),
         )
 
     fun putFavCount(count: IntArray) {

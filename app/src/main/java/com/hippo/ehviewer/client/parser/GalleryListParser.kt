@@ -51,7 +51,7 @@ object GalleryListParser {
         Triple("64", "176", "240"),
         Triple("0", "0", "240"),
         Triple("80", "0", "128"),
-        Triple("224", "128", "224")
+        Triple("224", "128", "224"),
     )
 
     private fun parseRating(ratingStyle: String): String? {
@@ -71,7 +71,9 @@ object GalleryListParser {
         rate -= num1 / 16
         return if (num2 == 21) {
             "${rate - 1}.5"
-        } else rate.toString()
+        } else {
+            rate.toString()
+        }
     }
 
     private fun parseFavoriteSlot(style: String): Int {

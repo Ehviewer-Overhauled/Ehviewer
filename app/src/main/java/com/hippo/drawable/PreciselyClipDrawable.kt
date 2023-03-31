@@ -30,7 +30,7 @@ class PreciselyClipDrawable(
     offsetX: Int,
     offsetY: Int,
     width: Int,
-    height: Int
+    height: Int,
 ) : DrawableWrapper(drawable) {
     private val mScale: RectF
     private val mTemp = Rect()

@@ -39,7 +39,7 @@ fun WebviewSignInScreen() {
         WebView(context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
             setBackgroundColor(Color.TRANSPARENT)
             settings.run {
@@ -74,8 +74,8 @@ fun WebviewSignInScreen() {
                             domain,
                             forcePersistent = true,
                             forceLongLive = true,
-                            forceNotHostOnly = true
-                        )
+                            forceNotHostOnly = true,
+                        ),
                     )
                 }
 

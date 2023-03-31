@@ -73,11 +73,11 @@ import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
 import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.image.Image
-import com.hippo.util.sendTo
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getParcelableCompat
 import com.hippo.util.getParcelableExtraCompat
+import com.hippo.util.sendTo
 import com.hippo.yorozuya.FileUtils
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -128,7 +128,7 @@ class ReaderActivity : EhActivity() {
         private set
 
     private var saveImageToLauncher = registerForActivityResult(
-        CreateDocument("todo/todo")
+        CreateDocument("todo/todo"),
     ) { uri ->
         if (uri != null) {
             val filepath = AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
@@ -147,7 +147,7 @@ class ReaderActivity : EhActivity() {
                         Toast.makeText(
                             this@ReaderActivity,
                             getString(R.string.image_saved, uri.path),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         ).show()
                     }
                 }
@@ -162,7 +162,7 @@ class ReaderActivity : EhActivity() {
     private var dialogShown = false
     private lateinit var dialog: AlertDialog
     private var requestStoragePermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { result ->
         if (result!! && mSavingPage != -1) {
             saveImage(mSavingPage)
@@ -198,14 +198,16 @@ class ReaderActivity : EhActivity() {
                     grantUriPermission(
                         BuildConfig.APPLICATION_ID,
                         mUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
                     )
                 } catch (e: Exception) {
                     Toast.makeText(this, R.string.error_reading_failed, Toast.LENGTH_SHORT).show()
                 }
 
                 val continuation: AtomicReference<Continuation<String>?> = AtomicReference(null)
-                mGalleryProvider = ArchivePageLoader(this, mUri!!,
+                mGalleryProvider = ArchivePageLoader(
+                    this,
+                    mUri!!,
                     flow {
                         if (!dialogShown) {
                             withUIContext {
@@ -214,9 +216,9 @@ class ReaderActivity : EhActivity() {
                                     show()
                                     getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                                         val passwd = builder.text
-                                        if (passwd.isEmpty())
+                                        if (passwd.isEmpty()) {
                                             builder.setError(getString(R.string.passwd_cannot_be_empty))
-                                        else {
+                                        } else {
                                             continuation.getAndSet(null)?.resume(passwd)
                                         }
                                     }
@@ -237,7 +239,7 @@ class ReaderActivity : EhActivity() {
                                 builder.setError(getString(R.string.passwd_wrong))
                             }
                         }
-                    }
+                    },
                 )
             }
         }
@@ -274,9 +276,11 @@ class ReaderActivity : EhActivity() {
         mGalleryProvider?.let {
             lifecycleScope.launchIO {
                 it.start()
-                if (it.awaitReady()) withUIContext {
-                    viewer?.setGalleryProvider(it)
-                    moveToPageIndex(0)
+                if (it.awaitReady()) {
+                    withUIContext {
+                        viewer?.setGalleryProvider(it)
+                        moveToPageIndex(0)
+                    }
                 }
             }
         }
@@ -298,7 +302,11 @@ class ReaderActivity : EhActivity() {
         super.onCreate(savedInstanceState)
         window.colorMode = if (Image.isWideColorGamut && readerPreferences.wideColorGamut()
                 .get()
-        ) ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT else ActivityInfo.COLOR_MODE_DEFAULT
+        ) {
+            ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT
+        } else {
+            ActivityInfo.COLOR_MODE_DEFAULT
+        }
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -333,8 +341,9 @@ class ReaderActivity : EhActivity() {
         dialog.dismiss()
 
         // Get start page
-        if (mCurrentIndex == 0)
+        if (mCurrentIndex == 0) {
             mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
+        }
         val viewerMode =
             ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
@@ -373,7 +382,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page)
+            mGalleryProvider!!.getImageFilename(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
@@ -386,7 +395,7 @@ class ReaderActivity : EhActivity() {
         }
 
         var mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-            MimeTypeMap.getFileExtensionFromUrl(filename)
+            MimeTypeMap.getFileExtensionFromUrl(filename),
         )
         if (TextUtils.isEmpty(mimeType)) {
             mimeType = "image/jpeg"
@@ -395,18 +404,19 @@ class ReaderActivity : EhActivity() {
         val uri = FileProvider.getUriForFile(
             this,
             BuildConfig.APPLICATION_ID + ".fileprovider",
-            File(dir, filename)
+            File(dir, filename),
         )
 
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.putExtra(Intent.EXTRA_STREAM, uri)
-        if (mGalleryInfo != null)
+        if (mGalleryInfo != null) {
             intent.putExtra(
                 Intent.EXTRA_TEXT,
-                EhUrl.getGalleryDetailUrl(mGalleryInfo!!.gid, mGalleryInfo!!.token)
+                EhUrl.getGalleryDetailUrl(mGalleryInfo!!.gid, mGalleryInfo!!.token),
             )
+        }
         intent.setDataAndType(uri, mimeType)
 
         try {
@@ -415,7 +425,6 @@ class ReaderActivity : EhActivity() {
             ExceptionUtils.throwIfFatal(e)
             Toast.makeText(this, R.string.error_cant_find_activity, Toast.LENGTH_SHORT).show()
         }
-
     }
 
     fun copyImage(page: Int) {
@@ -431,7 +440,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page)
+            mGalleryProvider!!.getImageFilename(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
@@ -446,7 +455,7 @@ class ReaderActivity : EhActivity() {
         val uri = FileProvider.getUriForFile(
             this,
             BuildConfig.APPLICATION_ID + ".fileprovider",
-            File(dir, filename)
+            File(dir, filename),
         )
 
         val clipboardManager = getSystemService(ClipboardManager::class.java)
@@ -464,7 +473,7 @@ class ReaderActivity : EhActivity() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             mSavingPage = page
@@ -474,7 +483,7 @@ class ReaderActivity : EhActivity() {
 
         val filename = mGalleryProvider!!.getImageFilenameWithExtension(page)
         var mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-            MimeTypeMap.getFileExtensionFromUrl(filename)
+            MimeTypeMap.getFileExtensionFromUrl(filename),
         )
         if (TextUtils.isEmpty(mimeType)) {
             mimeType = "image/jpeg"
@@ -489,14 +498,14 @@ class ReaderActivity : EhActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             values.put(
                 MediaStore.MediaColumns.RELATIVE_PATH,
-                Environment.DIRECTORY_PICTURES + File.separator + AppConfig.APP_DIRNAME
+                Environment.DIRECTORY_PICTURES + File.separator + AppConfig.APP_DIRNAME,
             )
             values.put(MediaStore.MediaColumns.IS_PENDING, 1)
             realPath = Environment.DIRECTORY_PICTURES + File.separator + AppConfig.APP_DIRNAME
         } else {
             val path = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                AppConfig.APP_DIRNAME
+                AppConfig.APP_DIRNAME,
             )
             realPath = path.toString()
             if (!FileUtils.ensureDirectory(path)) {
@@ -528,7 +537,7 @@ class ReaderActivity : EhActivity() {
         Toast.makeText(
             this,
             getString(R.string.image_saved, realPath + File.separator + filename),
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_SHORT,
         ).show()
     }
 
@@ -544,7 +553,7 @@ class ReaderActivity : EhActivity() {
         val file = mGalleryProvider!!.save(
             page,
             UniFile.fromFile(dir)!!,
-            mGalleryProvider!!.getImageFilename(page)
+            mGalleryProvider!!.getImageFilename(page),
         )
         if (file == null) {
             Toast.makeText(this, R.string.error_cant_save_image, Toast.LENGTH_SHORT).show()
@@ -603,7 +612,7 @@ class ReaderActivity : EhActivity() {
     private val windowInsetsController by lazy {
         WindowInsetsControllerCompat(
             window,
-            binding.root
+            binding.root,
         )
     }
 
@@ -810,7 +819,6 @@ class ReaderActivity : EhActivity() {
     }
      */
 
-
     /**
      * Dispatches a key event. If the viewer doesn't handle it, call the default implementation.
      */
@@ -1012,12 +1020,12 @@ class ReaderActivity : EhActivity() {
 
             merge(
                 readerPreferences.grayscale().changes(),
-                readerPreferences.invertedColors().changes()
+                readerPreferences.invertedColors().changes(),
             )
                 .onEach {
                     setLayerPaint(
                         readerPreferences.grayscale().get(),
-                        readerPreferences.invertedColors().get()
+                        readerPreferences.invertedColors().get(),
                     )
                 }
                 .launchIn(lifecycleScope)
@@ -1151,10 +1159,14 @@ class ReaderActivity : EhActivity() {
         }
 
         private fun setLayerPaint(grayscale: Boolean, invertedColors: Boolean) {
-            val paint = if (grayscale || invertedColors) getCombinedPaint(
-                grayscale,
-                invertedColors
-            ) else null
+            val paint = if (grayscale || invertedColors) {
+                getCombinedPaint(
+                    grayscale,
+                    invertedColors,
+                )
+            } else {
+                null
+            }
             binding.viewerContainer.setLayerType(LAYER_TYPE_HARDWARE, paint)
         }
     }

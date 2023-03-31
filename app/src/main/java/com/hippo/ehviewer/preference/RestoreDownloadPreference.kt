@@ -17,7 +17,6 @@ package com.hippo.ehviewer.preference
 
 import android.content.Context
 import android.util.AttributeSet
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
@@ -35,6 +34,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
+import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 private val RESTORE_NOT_FOUND = GetText.getString(R.string.settings_download_restore_not_found)
 private val RESTORE_FAILED = GetText.getString(R.string.settings_download_restore_failed)
@@ -42,7 +42,8 @@ private val RESTORE_COUNT_MSG =
     { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else GetText.getString(R.string.settings_download_restore_successfully, cnt) }
 
 class RestoreDownloadPreference @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null,
 ) : TaskPreference(context, attrs) {
     private val mManager: DownloadManager = downloadManager
     private var restoreDirCount = 0
@@ -88,39 +89,42 @@ class RestoreDownloadPreference @JvmOverloads constructor(
     }
 
     override fun launchJob() {
-        if (singletonJob?.isActive == true) singletonJob?.invokeOnCompletion {
-            launchUI {
-                dialog.dismiss()
-            }
-        }
-        else singletonJob = launch {
-            val result = doRealWork()
-            withUIContext {
-                if (result == null) {
-                    showTip(RESTORE_FAILED)
-                } else {
-                    if (result.isEmpty()) {
-                        showTip(RESTORE_COUNT_MSG(restoreDirCount))
-                    } else {
-                        var count = 0
-                        var i = 0
-                        val n = result.size
-                        while (i < n) {
-                            val item = result[i]
-                            // Avoid failed gallery info
-                            if (null != item.title) {
-                                // Put to download
-                                mManager.addDownload(item, null)
-                                // Put download dir to DB
-                                EhDB.putDownloadDirname(item.gid, (item as RestoreItem).dirname)
-                                count++
-                            }
-                            i++
-                        }
-                        showTip(RESTORE_COUNT_MSG(count + restoreDirCount))
-                    }
+        if (singletonJob?.isActive == true) {
+            singletonJob?.invokeOnCompletion {
+                launchUI {
+                    dialog.dismiss()
                 }
-                dialog.dismiss()
+            }
+        } else {
+            singletonJob = launch {
+                val result = doRealWork()
+                withUIContext {
+                    if (result == null) {
+                        showTip(RESTORE_FAILED)
+                    } else {
+                        if (result.isEmpty()) {
+                            showTip(RESTORE_COUNT_MSG(restoreDirCount))
+                        } else {
+                            var count = 0
+                            var i = 0
+                            val n = result.size
+                            while (i < n) {
+                                val item = result[i]
+                                // Avoid failed gallery info
+                                if (null != item.title) {
+                                    // Put to download
+                                    mManager.addDownload(item, null)
+                                    // Put download dir to DB
+                                    EhDB.putDownloadDirname(item.gid, (item as RestoreItem).dirname)
+                                    count++
+                                }
+                                i++
+                            }
+                            showTip(RESTORE_COUNT_MSG(count + restoreDirCount))
+                        }
+                    }
+                    dialog.dismiss()
+                }
             }
         }
     }
