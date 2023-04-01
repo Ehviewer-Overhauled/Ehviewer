@@ -59,7 +59,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     var mode = SpiderQueen.MODE_READ
         set(value) {
             field = value
-            if (field == SpiderQueen.MODE_DOWNLOAD) {
+            if (field == SpiderQueen.MODE_DOWNLOAD && downloadDir == null) {
                 val title = getSuitableTitle(mGalleryInfo)
                 val dirname = FileUtils.sanitizeFilename("$mGid-$title")
                 EhDB.putDownloadDirname(mGid, dirname)
