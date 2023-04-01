@@ -217,7 +217,10 @@ dependencies {
     implementation("dev.rikka.rikkax.material:material-preference:2.0.0")
 
     implementation(platform("io.arrow-kt:arrow-stack:2.0.0-SNAPSHOT"))
-    implementation("io.arrow-kt:arrow-fx-coroutines")
+    implementation("io.arrow-kt:arrow-functions:2.0.0-SNAPSHOT")
+    implementation("io.arrow-kt:arrow-fx-coroutines") {
+        exclude("io.arrow-kt", "arrow-core-jvm") // Temp workaround, wait for upstream fix
+    }
 
     // https://coil-kt.github.io/coil/changelog/
     implementation("io.coil-kt:coil-compose:2.3.0")
