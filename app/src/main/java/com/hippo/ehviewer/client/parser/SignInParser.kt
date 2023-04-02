@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.client.exception.ParseException
+import java.util.regex.Pattern
 
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.ehviewer.client.exception.ParseException;
+object SignInParser {
+    private val NAME_PATTERN = Pattern.compile("<p>You are now logged in as: (.+?)<")
+    private val ERROR_PATTERN = Pattern.compile(
+        "<h4>The error returned was:</h4>\\s*<p>(.+?)</p>" +
+            "|<span class=\"postcolor\">(.+?)</span>",
+    )
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class SignInParser {
-
-    private static final Pattern NAME_PATTERN = Pattern.compile("<p>You are now logged in as: (.+?)<");
-    private static final Pattern ERROR_PATTERN = Pattern.compile(
-            "(?:<h4>The error returned was:</h4>\\s*<p>(.+?)</p>)"
-                    + "|(?:<span class=\"postcolor\">(.+?)</span>)");
-
-    public static String parse(String body) throws Exception {
-        Matcher m = NAME_PATTERN.matcher(body);
-        if (m.find()) {
-            return m.group(1);
+    fun parse(body: String): String {
+        var m = NAME_PATTERN.matcher(body)
+        return if (m.find()) {
+            m.group(1)!!
         } else {
-            m = ERROR_PATTERN.matcher(body);
+            m = ERROR_PATTERN.matcher(body)
             if (m.find()) {
-                throw new EhException(m.group(1) == null ? m.group(2) : m.group(1));
+                throw EhException(m.group(1) ?: m.group(2))
             } else {
-                throw new ParseException("Can't parse sign in", body);
+                throw ParseException("Can't parse sign in", body)
             }
         }
     }
