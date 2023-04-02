@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.exception.ParseException
+import org.json.JSONException
+import org.json.JSONObject
 
-import com.hippo.ehviewer.client.exception.ParseException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class RateGalleryParser {
-
-    public static Result parse(String body) throws Exception {
-        try {
-            JSONObject jsonObject = new JSONObject(body);
-            Result result = new Result();
-            result.rating = (float) jsonObject.getDouble("rating_avg");
-            result.ratingCount = jsonObject.getInt("rating_cnt");
-            return result;
-        } catch (JSONException e) {
-            Exception exception = new ParseException("Can't parse rate gallery", body, e);
-            throw exception;
+object RateGalleryParser {
+    fun parse(body: String): Result {
+        return try {
+            val jsonObject = JSONObject(body)
+            val rating = jsonObject.getDouble("rating_avg").toFloat()
+            val ratingCount = jsonObject.getInt("rating_cnt")
+            Result(rating, ratingCount)
+        } catch (e: JSONException) {
+            throw ParseException("Can't parse rate gallery", body, e)
         }
     }
 
-    public static class Result {
-        public float rating;
-        public int ratingCount;
-    }
+    class Result(val rating: Float, val ratingCount: Int)
 }
