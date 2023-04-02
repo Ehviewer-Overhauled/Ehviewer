@@ -1692,7 +1692,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 mListView!!.visibility = View.GONE
                 mErrorText!!.setText(R.string.no_archives)
             } else {
-                val nameArray = data.stream().map {
+                val nameArray = data.map {
                     it.run {
                         if (isHAtH) {
                             val costStr =
@@ -1706,7 +1706,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             "$nameStr [$size] [$costStr]"
                         }
                     }
-                }.toArray()
+                }.toTypedArray()
                 mProgressView!!.visibility = View.GONE
                 mErrorText!!.visibility = View.GONE
                 mListView!!.visibility = View.VISIBLE
@@ -1837,11 +1837,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 mListView!!.visibility = View.GONE
                 mErrorText!!.setText(R.string.no_torrents)
             } else {
-                val nameArray = data.stream().map { torrent: TorrentParser.Result ->
-                    torrent.format { id: Int ->
-                        resources.getString(id)
-                    }
-                }.toArray()
+                val nameArray = data.map { it.format() }.toTypedArray()
                 mProgressView!!.visibility = View.GONE
                 mErrorText!!.visibility = View.GONE
                 mListView!!.visibility = View.VISIBLE
@@ -1853,8 +1849,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
             val context = context
             if (null != context && null != mTorrentList && position < mTorrentList!!.size) {
-                val url = mTorrentList!![position].url()
-                val name = mTorrentList!![position].name()
+                val url = mTorrentList!![position].url
+                val name = mTorrentList!![position].name
                 // TODO: Don't use buggy system download service
                 val r =
                     DownloadManager.Request(Uri.parse(url.replace("exhentai.org", "ehtracker.org")))
