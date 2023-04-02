@@ -13,61 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.util
 
-package com.hippo.util;
+import com.hippo.ehviewer.GetText.getString
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.network.StatusCodeException
+import java.net.MalformedURLException
+import java.net.ProtocolException
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.net.ssl.SSLException
 
-import androidx.annotation.NonNull;
-
-import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.network.StatusCodeException;
-
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-
-import javax.net.ssl.SSLException;
-
-public final class ExceptionUtils {
-
-    @NonNull
-    public static String getReadableString(@NonNull Throwable e) {
-        e.printStackTrace();
-        if (e instanceof MalformedURLException) {
-            return GetText.getString(R.string.error_invalid_url);
-        } else if (e instanceof SocketTimeoutException) {
-            return GetText.getString(R.string.error_timeout);
-        } else if (e instanceof UnknownHostException) {
-            return GetText.getString(R.string.error_unknown_host);
-        } else if (e instanceof StatusCodeException sce) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(GetText.getString(R.string.error_bad_status_code, sce.getResponseCode()));
-            if (sce.isIdentifiedResponseCode()) {
-                sb.append(", ").append(sce.getMessage());
+object ExceptionUtils {
+    fun getReadableString(e: Throwable): String {
+        e.printStackTrace()
+        return if (e is MalformedURLException) {
+            getString(R.string.error_invalid_url)
+        } else if (e is SocketTimeoutException) {
+            getString(R.string.error_timeout)
+        } else if (e is UnknownHostException) {
+            getString(R.string.error_unknown_host)
+        } else if (e is StatusCodeException) {
+            val sb = StringBuilder()
+            sb.append(getString(R.string.error_bad_status_code, e.responseCode))
+            if (e.isIdentifiedResponseCode) {
+                sb.append(", ").append(e.message)
             }
-            return sb.toString();
-        } else if (e instanceof ProtocolException && e.getMessage().startsWith("Too many follow-up requests:")) {
-            return GetText.getString(R.string.error_redirection);
-        } else if (e instanceof ProtocolException || e instanceof SocketException || e instanceof SSLException) {
-            return GetText.getString(R.string.error_socket);
-        } else if (e instanceof EhException) {
-            return e.getMessage();
+            sb.toString()
+        } else if (e is ProtocolException && e.message!!.startsWith("Too many follow-up requests:")) {
+            getString(R.string.error_redirection)
+        } else if (e is ProtocolException || e is SocketException || e is SSLException) {
+            getString(R.string.error_socket)
+        } else if (e is EhException) {
+            e.message!!
         } else {
-            return GetText.getString(R.string.error_unknown);
+            getString(R.string.error_unknown)
         }
     }
 
-    public static void throwIfFatal(@NonNull Throwable t) {
+    fun throwIfFatal(t: Throwable) {
         // values here derived from https://github.com/ReactiveX/RxJava/issues/748#issuecomment-32471495
-        if (t instanceof VirtualMachineError) {
-            throw (VirtualMachineError) t;
-        } else if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        } else if (t instanceof LinkageError) {
-            throw (LinkageError) t;
+        when (t) {
+            is VirtualMachineError -> {
+                throw t
+            }
+
+            is ThreadDeath -> {
+                throw t
+            }
+
+            is LinkageError -> {
+                throw t
+            }
         }
     }
 }
