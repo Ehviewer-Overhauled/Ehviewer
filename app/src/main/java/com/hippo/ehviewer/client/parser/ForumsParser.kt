@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.util.ExceptionUtils
+import org.jsoup.Jsoup
 
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.util.ExceptionUtils;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-public class ForumsParser {
-
-    public static String parse(String body) throws EhException {
-        try {
-            Document d = Jsoup.parse(body, EhUrl.URL_FORUMS);
-            Element userlinks = d.getElementById("userlinks");
-            Element child = userlinks.child(0).child(0).child(0);
-            return child.attr("href");
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throw new EhException("Not logged in");
+object ForumsParser {
+    fun parse(body: String): String {
+        return runCatching {
+            val d = Jsoup.parse(body, EhUrl.URL_FORUMS)
+            val userlinks = d.getElementById("userlinks")
+            val child = userlinks!!.child(0).child(0).child(0)
+            child.attr("href")
+        }.getOrElse {
+            ExceptionUtils.throwIfFatal(it)
+            throw EhException("Not logged in")
         }
     }
 }
