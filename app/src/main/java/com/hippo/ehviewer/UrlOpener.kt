@@ -13,74 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer
 
-package com.hippo.ehviewer;
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
+import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.parser.GalleryPageUrlParser.parse
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.browser.customtabs.CustomTabsIntent;
-
-import com.hippo.ehviewer.client.data.GalleryDetail;
-import com.hippo.ehviewer.client.parser.GalleryPageUrlParser;
-
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity;
-
-public final class UrlOpener {
-
-    private UrlOpener() {
-    }
-
-    public static void openUrl(@NonNull Context context, String url, boolean ehUrl) {
-        openUrl(context, url, ehUrl, null);
-    }
-
-    public static void openUrl(@NonNull Context context, String url, boolean ehUrl, GalleryDetail galleryDetail) {
-        if (TextUtils.isEmpty(url)) {
-            return;
+object UrlOpener {
+    fun openUrl(
+        context: Context,
+        url: String?,
+        ehUrl: Boolean,
+        galleryDetail: GalleryDetail? = null,
+    ) {
+        if (url.isNullOrEmpty()) {
+            return
         }
-
-        Intent intent;
-        Uri uri = Uri.parse(url);
-
+        val intent: Intent
+        val uri = Uri.parse(url)
         if (ehUrl) {
             if (galleryDetail != null) {
-                GalleryPageUrlParser.Result result = GalleryPageUrlParser.parse(url);
+                val result = parse(url)
                 if (result != null) {
-                    if (result.gid == galleryDetail.getGid()) {
-                        intent = new Intent(context, ReaderActivity.class);
-                        intent.setAction(ReaderActivity.ACTION_EH);
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail);
-                        intent.putExtra(ReaderActivity.KEY_PAGE, result.page);
-                        context.startActivity(intent);
-                        return;
+                    if (result.gid == galleryDetail.gid) {
+                        intent = Intent(context, ReaderActivity::class.java)
+                        intent.action = ReaderActivity.ACTION_EH
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
+                        intent.putExtra(ReaderActivity.KEY_PAGE, result.page)
+                        context.startActivity(intent)
+                        return
                     }
                 } else if (url.startsWith("#c")) {
                     try {
-                        intent = new Intent(context, ReaderActivity.class);
-                        intent.setAction(ReaderActivity.ACTION_EH);
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail);
-                        intent.putExtra(ReaderActivity.KEY_PAGE, Integer.parseInt(url.replace("#c", "")) - 1);
-                        context.startActivity(intent);
-                        return;
-                    } catch (NumberFormatException e) {
-                        //
+                        intent = Intent(context, ReaderActivity::class.java)
+                        intent.action = ReaderActivity.ACTION_EH
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
+                        intent.putExtra(ReaderActivity.KEY_PAGE, url.replace("#c", "").toInt() - 1)
+                        context.startActivity(intent)
+                        return
+                    } catch (_: NumberFormatException) {
                     }
                 }
             }
         }
-
-        CustomTabsIntent.Builder customTabsIntent = new CustomTabsIntent.Builder();
-        customTabsIntent.setShowTitle(true);
+        val customTabsIntent = CustomTabsIntent.Builder()
+        customTabsIntent.setShowTitle(true)
         try {
-            customTabsIntent.build().launchUrl(context, uri);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, R.string.no_browser_installed, Toast.LENGTH_LONG).show();
+            customTabsIntent.build().launchUrl(context, uri)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(context, R.string.no_browser_installed, Toast.LENGTH_LONG).show()
         }
     }
 }
