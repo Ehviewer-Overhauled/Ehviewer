@@ -89,7 +89,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
         super<Application>.onCreate()
         System.loadLibrary("ehviewer")
-        GetText.initialize(this)
         Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
