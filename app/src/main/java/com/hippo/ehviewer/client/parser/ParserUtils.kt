@@ -13,40 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.yorozuya.NumberUtils
+import com.hippo.yorozuya.StringUtils
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-import com.hippo.yorozuya.NumberUtils;
-import com.hippo.yorozuya.StringUtils;
+object ParserUtils {
+    private val formatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.US).withZone(ZoneOffset.UTC)
 
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
-public class ParserUtils {
-
-    public static final DateTimeFormatter formatter = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm", Locale.US).withZone(ZoneOffset.UTC);
-
-    public static synchronized String formatDate(long time) {
-        return formatter.format(Instant.ofEpochMilli(time));
+    @Synchronized
+    fun formatDate(time: Long): String {
+        return formatter.format(Instant.ofEpochMilli(time))
     }
 
-    public static String trim(String str) {
-        // Avoid null
-        if (str == null) {
-            str = "";
-        }
-        return StringUtils.unescapeXml(str).trim();
+    fun trim(str: String?): String {
+        return str?.let { StringUtils.unescapeXml(it).trim() } ?: ""
     }
 
-    public static int parseInt(String str, int defValue) {
-        return NumberUtils.parseIntSafely(trim(str).replace(",", ""), defValue);
+    fun parseInt(str: String?, defValue: Int): Int {
+        return NumberUtils.parseIntSafely(trim(str).replace(",", ""), defValue)
     }
 
-    public static long parseLong(String str, long defValue) {
-        return NumberUtils.parseLongSafely(trim(str).replace(",", ""), defValue);
+    fun parseLong(str: String?, defValue: Long): Long {
+        return NumberUtils.parseLongSafely(trim(str).replace(",", ""), defValue)
     }
-
 }
