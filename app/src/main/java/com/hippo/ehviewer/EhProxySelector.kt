@@ -13,98 +13,80 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer
 
-package com.hippo.ehviewer;
+import android.text.TextUtils
+import com.hippo.ehviewer.Settings.proxyIp
+import com.hippo.ehviewer.Settings.proxyPort
+import com.hippo.ehviewer.Settings.proxyType
+import com.hippo.network.InetValidator.isValidInetPort
+import com.hippo.util.ExceptionUtils
+import java.io.IOException
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
 
-import android.text.TextUtils;
+class EhProxySelector internal constructor() : ProxySelector() {
+    private var delegation: ProxySelector? = null
+    private var alternative: ProxySelector?
 
-import com.hippo.network.InetValidator;
-import com.hippo.util.ExceptionUtils;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
-public class EhProxySelector extends ProxySelector {
-
-    public static final int TYPE_DIRECT = 0;
-    public static final int TYPE_SYSTEM = 1;
-    public static final int TYPE_HTTP = 2;
-    public static final int TYPE_SOCKS = 3;
-
-    private ProxySelector delegation;
-    private ProxySelector alternative;
-
-    EhProxySelector() {
-        alternative = ProxySelector.getDefault();
-        if (alternative == null) {
-            alternative = new NullProxySelector();
-        }
-
-        updateProxy();
+    init {
+        alternative = getDefault() ?: NullProxySelector()
+        updateProxy()
     }
 
-    public void updateProxy() {
-        switch (Settings.getProxyType()) {
-            case TYPE_DIRECT:
-                delegation = new NullProxySelector();
-                break;
-            default:
-            case TYPE_SYSTEM:
-                delegation = alternative;
-                break;
-            case TYPE_HTTP:
-            case TYPE_SOCKS:
-                delegation = null;
-                break;
+    fun updateProxy() {
+        delegation = when (proxyType) {
+            TYPE_DIRECT -> NullProxySelector()
+            TYPE_SYSTEM -> alternative
+            TYPE_HTTP, TYPE_SOCKS -> null
+            else -> alternative
         }
     }
 
-    @Override
-    public List<Proxy> select(URI uri) {
-        int type = Settings.getProxyType();
+    override fun select(uri: URI): List<Proxy> {
+        val type = proxyType
         if (type == TYPE_HTTP || type == TYPE_SOCKS) {
-            try {
-                String ip = Settings.getProxyIp();
-                int port = Settings.getProxyPort();
-                if (!TextUtils.isEmpty(ip) && InetValidator.isValidInetPort(port)) {
-                    InetAddress inetAddress = InetAddress.getByName(ip);
-                    SocketAddress socketAddress = new InetSocketAddress(inetAddress, port);
-                    return Collections.singletonList(new Proxy(type == TYPE_HTTP ? Proxy.Type.HTTP : Proxy.Type.SOCKS, socketAddress));
+            runCatching {
+                val ip = proxyIp
+                val port = proxyPort
+                if (!TextUtils.isEmpty(ip) && isValidInetPort(port)) {
+                    val inetAddress = InetAddress.getByName(ip)
+                    val socketAddress = InetSocketAddress(inetAddress, port)
+                    return listOf(
+                        Proxy(
+                            if (type == TYPE_HTTP) Proxy.Type.HTTP else Proxy.Type.SOCKS,
+                            socketAddress,
+                        ),
+                    )
                 }
-            } catch (Throwable t) {
-                ExceptionUtils.throwIfFatal(t);
+            }.onFailure {
+                ExceptionUtils.throwIfFatal(it)
+                it.printStackTrace()
             }
         }
-
-        if (delegation != null) {
-            return delegation.select(uri);
-        }
-
-        return alternative.select(uri);
+        return delegation?.select(uri) ?: alternative!!.select(uri)
     }
 
-    @Override
-    public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        if (delegation != null) {
-            delegation.select(uri);
-        }
+    override fun connectFailed(uri: URI, sa: SocketAddress, ioe: IOException) {
+        delegation?.select(uri)
     }
 
-    private static class NullProxySelector extends ProxySelector {
-        @Override
-        public List<Proxy> select(URI uri) {
-            return Collections.singletonList(Proxy.NO_PROXY);
+    private class NullProxySelector : ProxySelector() {
+        override fun select(uri: URI): List<Proxy> {
+            return listOf(Proxy.NO_PROXY)
         }
 
-        @Override
-        public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        }
+        override fun connectFailed(uri: URI, sa: SocketAddress, ioe: IOException) {}
+    }
+
+    companion object {
+        const val TYPE_DIRECT = 0
+        const val TYPE_SYSTEM = 1
+        const val TYPE_HTTP = 2
+        const val TYPE_SOCKS = 3
     }
 }
