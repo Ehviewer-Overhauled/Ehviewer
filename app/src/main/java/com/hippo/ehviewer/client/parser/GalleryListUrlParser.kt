@@ -13,159 +13,132 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import android.net.Uri
+import android.os.Build
+import android.text.TextUtils
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.ListUrlBuilder
+import com.hippo.yorozuya.Utilities
+import java.io.UnsupportedEncodingException
+import java.net.MalformedURLException
+import java.net.URL
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
-import android.net.Uri;
-import android.os.Build;
-import android.text.TextUtils;
-
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.data.ListUrlBuilder;
-import com.hippo.yorozuya.Utilities;
-
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
-public final class GalleryListUrlParser {
-
-    private static final String[] VALID_HOSTS = {EhUrl.DOMAIN_EX, EhUrl.DOMAIN_E, EhUrl.DOMAIN_LOFI};
-
-    private static final String PATH_NORMAL = "/";
-    private static final String PATH_UPLOADER = "/uploader/";
-    private static final String PATH_TAG = "/tag/";
-    private static final String PATH_TOPLIST = "/toplist.php";
-
-    public static ListUrlBuilder parse(String urlStr) {
-        URL url;
-        try {
-            url = new URL(urlStr);
-        } catch (MalformedURLException e) {
-            return null;
+object GalleryListUrlParser {
+    private val VALID_HOSTS = arrayOf(EhUrl.DOMAIN_EX, EhUrl.DOMAIN_E, EhUrl.DOMAIN_LOFI)
+    private const val PATH_NORMAL = "/"
+    private const val PATH_UPLOADER = "/uploader/"
+    private const val PATH_TAG = "/tag/"
+    private const val PATH_TOPLIST = "/toplist.php"
+    fun parse(urlStr: String): ListUrlBuilder? {
+        val url = try {
+            URL(urlStr)
+        } catch (e: MalformedURLException) {
+            return null
         }
-
-        if (!Utilities.contain(VALID_HOSTS, url.getHost())) {
-            return null;
+        if (!Utilities.contain(VALID_HOSTS, url.host)) {
+            return null
         }
-
-        String path = url.getPath();
-        if (path == null) {
-            return null;
-        }
-        if (PATH_NORMAL.equals(path) || path.length() == 0) {
-            ListUrlBuilder builder = new ListUrlBuilder();
-            builder.setQuery(url.getQuery());
-            return builder;
+        val path = url.path ?: return null
+        return if (PATH_NORMAL == path || path.isEmpty()) {
+            val builder = ListUrlBuilder()
+            builder.setQuery(url.query)
+            builder
         } else if (path.startsWith(PATH_UPLOADER)) {
-            return parseUploader(path);
+            parseUploader(path)
         } else if (path.startsWith(PATH_TAG)) {
-            return parseTag(path);
+            parseTag(path)
         } else if (path.startsWith(PATH_TOPLIST)) {
-            return parseToplist(urlStr);
+            parseToplist(urlStr)
         } else if (path.startsWith("/")) {
-            int category;
-            try {
-                category = Integer.parseInt(path.substring(1));
-            } catch (NumberFormatException e) {
-                return null;
+            val category = try {
+                path.substring(1).toInt()
+            } catch (e: NumberFormatException) {
+                return null
             }
-            ListUrlBuilder builder = new ListUrlBuilder();
-            builder.setQuery(url.getQuery());
-            builder.setCategory(category);
-            return builder;
+            val builder = ListUrlBuilder()
+            builder.setQuery(url.query)
+            builder.category = category
+            builder
         } else {
-            return null;
+            null
         }
     }
 
     // TODO get page
-    private static ListUrlBuilder parseUploader(String path) {
-        String uploader;
-        int prefixLength = PATH_UPLOADER.length();
-        int index = path.indexOf('/', prefixLength);
-
-        if (index < 0) {
-            uploader = path.substring(prefixLength);
+    private fun parseUploader(path: String): ListUrlBuilder? {
+        var uploader: String?
+        val prefixLength = PATH_UPLOADER.length
+        val index = path.indexOf('/', prefixLength)
+        uploader = if (index < 0) {
+            path.substring(prefixLength)
         } else {
-            uploader = path.substring(prefixLength, index);
+            path.substring(prefixLength, index)
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            uploader = URLDecoder.decode(uploader, StandardCharsets.UTF_8);
+        uploader = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            URLDecoder.decode(uploader, StandardCharsets.UTF_8)
         } else {
             try {
-                uploader = URLDecoder.decode(uploader, StandardCharsets.UTF_8.displayName());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return null;
+                URLDecoder.decode(uploader, StandardCharsets.UTF_8.displayName())
+            } catch (e: UnsupportedEncodingException) {
+                e.printStackTrace()
+                return null
             }
         }
-
         if (TextUtils.isEmpty(uploader)) {
-            return null;
+            return null
         }
-
-        ListUrlBuilder builder = new ListUrlBuilder();
-        builder.setMode(ListUrlBuilder.MODE_UPLOADER);
-        builder.setKeyword(uploader);
-        return builder;
+        val builder = ListUrlBuilder()
+        builder.mode = ListUrlBuilder.MODE_UPLOADER
+        builder.keyword = uploader
+        return builder
     }
 
     // TODO get page
-    private static ListUrlBuilder parseTag(String path) {
-        String tag;
-        int prefixLength = PATH_TAG.length();
-        int index = path.indexOf('/', prefixLength);
-
-
-        if (index < 0) {
-            tag = path.substring(prefixLength);
+    private fun parseTag(path: String): ListUrlBuilder? {
+        var tag: String?
+        val prefixLength = PATH_TAG.length
+        val index = path.indexOf('/', prefixLength)
+        tag = if (index < 0) {
+            path.substring(prefixLength)
         } else {
-            tag = path.substring(prefixLength, index);
+            path.substring(prefixLength, index)
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            tag = URLDecoder.decode(tag, StandardCharsets.UTF_8);
+        tag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            URLDecoder.decode(tag, StandardCharsets.UTF_8)
         } else {
             try {
-                tag = URLDecoder.decode(tag, StandardCharsets.UTF_8.displayName());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return null;
+                URLDecoder.decode(tag, StandardCharsets.UTF_8.displayName())
+            } catch (e: UnsupportedEncodingException) {
+                e.printStackTrace()
+                return null
             }
         }
-
         if (TextUtils.isEmpty(tag)) {
-            return null;
+            return null
         }
-
-        ListUrlBuilder builder = new ListUrlBuilder();
-        builder.setMode(ListUrlBuilder.MODE_TAG);
-        builder.setKeyword(tag);
-        return builder;
+        val builder = ListUrlBuilder()
+        builder.mode = ListUrlBuilder.MODE_TAG
+        builder.keyword = tag
+        return builder
     }
 
     // TODO get page
-    private static ListUrlBuilder parseToplist(String path) {
-        Uri uri = Uri.parse(path);
-
+    private fun parseToplist(path: String): ListUrlBuilder? {
+        val uri = Uri.parse(path)
         if (uri == null || TextUtils.isEmpty(uri.getQueryParameter("tl"))) {
-            return null;
+            return null
         }
-
-        int tl = Integer.parseInt(uri.getQueryParameter("tl"));
-
+        val tl = uri.getQueryParameter("tl")!!.toInt()
         if (tl > 15 || tl < 11) {
-            return null;
+            return null
         }
-
-        ListUrlBuilder builder = new ListUrlBuilder();
-        builder.setMode(ListUrlBuilder.MODE_TOPLIST);
-        builder.setKeyword(String.valueOf(tl));
-        return builder;
+        val builder = ListUrlBuilder()
+        builder.mode = ListUrlBuilder.MODE_TOPLIST
+        builder.keyword = tl.toString()
+        return builder
     }
-
 }
