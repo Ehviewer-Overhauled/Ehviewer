@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.util.ExceptionUtils
+import org.json.JSONObject
 
-import com.hippo.ehviewer.client.exception.EhException;
-import com.hippo.util.ExceptionUtils;
-
-import org.json.JSONObject;
-
-public class GalleryTokenApiParser {
-
+object GalleryTokenApiParser {
     /**
      * {
      * "tokenlist": [
@@ -33,13 +30,13 @@ public class GalleryTokenApiParser {
      * ]
      * }
      */
-    public static String parse(String body) throws Exception {
-        JSONObject jo = new JSONObject(body).getJSONArray("tokenlist").getJSONObject(0);
-        try {
-            return jo.getString("token");
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throw new EhException(jo.getString("error"));
+    fun parse(body: String): String {
+        val jo = JSONObject(body).getJSONArray("tokenlist").getJSONObject(0)
+        return runCatching {
+            jo.getString("token")
+        }.getOrElse {
+            ExceptionUtils.throwIfFatal(it)
+            throw EhException(jo.getString("error"))
         }
     }
 }
