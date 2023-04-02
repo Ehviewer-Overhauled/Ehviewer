@@ -13,59 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.EhUtils.getCategory
+import com.hippo.ehviewer.client.EhUtils.handleThumbUrlResolution
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.yorozuya.NumberUtils
+import org.json.JSONObject
 
-import com.hippo.ehviewer.client.EhUtils;
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.yorozuya.NumberUtils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-
-public class GalleryApiParser {
-
-    public static void parse(String body, List<GalleryInfo> galleryInfoList) throws JSONException {
-        JSONObject jo = new JSONObject(body);
-        JSONArray ja = jo.getJSONArray("gmetadata");
-
-        for (int i = 0, length = ja.length(); i < length; i++) {
-            JSONObject g = ja.getJSONObject(i);
-            long gid = g.getLong("gid");
-            GalleryInfo gi = getGalleryInfoByGid(galleryInfoList, gid);
-            if (gi == null) {
-                continue;
-            }
-            gi.setTitle(ParserUtils.trim(g.getString("title")));
-            gi.setTitleJpn(ParserUtils.trim(g.getString("title_jpn")));
-            gi.setCategory(EhUtils.getCategory(g.getString("category")));
-            gi.setThumb(EhUtils.handleThumbUrlResolution(g.getString("thumb")));
-            gi.setUploader(g.getString("uploader"));
-            gi.setPosted(ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000));
-            gi.setRating(NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f));
+object GalleryApiParser {
+    fun parse(body: String, galleryInfoList: List<GalleryInfo>) {
+        val jo = JSONObject(body)
+        val ja = jo.getJSONArray("gmetadata")
+        for (i in 0 until ja.length()) {
+            val g = ja.getJSONObject(i)
+            val gid = g.getLong("gid")
+            val gi = galleryInfoList.find { it.gid == gid } ?: continue
+            gi.title = ParserUtils.trim(g.getString("title"))
+            gi.titleJpn = ParserUtils.trim(g.getString("title_jpn"))
+            gi.category = getCategory(g.getString("category"))
+            gi.thumb = handleThumbUrlResolution(g.getString("thumb"))
+            gi.uploader = g.getString("uploader")
+            gi.posted =
+                ParserUtils.formatDate(ParserUtils.parseLong(g.getString("posted"), 0) * 1000)
+            gi.rating = NumberUtils.parseFloatSafely(g.getString("rating"), 0.0f)
             // tags
-            JSONArray tagJa = g.getJSONArray("tags");
-            int tagLength = tagJa.length();
-            String[] tags = new String[tagLength];
-            for (int j = 0; j < tagLength; j++) {
-                tags[j] = tagJa.getString(j);
-            }
-            gi.setSimpleTags(tags);
-            gi.setPages(NumberUtils.parseIntSafely(g.getString("filecount"), 0));
-            gi.generateSLang();
+            val tagJa = g.getJSONArray("tags")
+            gi.simpleTags = (0 until tagJa.length()).map { tagJa.getString(it) }.toTypedArray()
+            gi.pages = NumberUtils.parseIntSafely(g.getString("filecount"), 0)
+            gi.generateSLang()
         }
-    }
-
-    private static GalleryInfo getGalleryInfoByGid(List<GalleryInfo> galleryInfoList, long gid) {
-        for (int i = 0, size = galleryInfoList.size(); i < size; i++) {
-            GalleryInfo gi = galleryInfoList.get(i);
-            if (gi.getGid() == gid) {
-                return gi;
-            }
-        }
-        return null;
     }
 }
