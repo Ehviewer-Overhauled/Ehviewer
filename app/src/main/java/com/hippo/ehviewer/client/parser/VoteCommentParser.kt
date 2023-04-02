@@ -13,29 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import org.json.JSONObject
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class VoteCommentParser {
-
+object VoteCommentParser {
     // {"comment_id":1253922,"comment_score":-19,"comment_vote":0}
-    public static Result parse(String body, int vote) throws JSONException {
-        Result result = new Result();
-        JSONObject jo = new JSONObject(body);
-        result.id = jo.getLong("comment_id");
-        result.score = jo.getInt("comment_score");
-        result.vote = jo.getInt("comment_vote");
-        result.expectVote = vote;
-        return result;
+    fun parse(body: String, expectVote: Int): Result {
+        val jo = JSONObject(body)
+        val id = jo.getLong("comment_id")
+        val score = jo.getInt("comment_score")
+        val vote = jo.getInt("comment_vote")
+        return Result(id, score, vote, expectVote)
     }
 
-    public static class Result {
-        public long id;
-        public int score;
-        public int vote;
-        public int expectVote;
-    }
+    class Result(val id: Long, val score: Int, val vote: Int, val expectVote: Int)
 }
