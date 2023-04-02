@@ -13,50 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import android.util.Log
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.util.ExceptionUtils
+import org.jsoup.Jsoup
 
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.hippo.ehviewer.client.EhUrl;
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.util.ExceptionUtils;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-public class ProfileParser {
-
-    private static final String TAG = ProfileParser.class.getSimpleName();
-
-    public static Result parse(String body) throws ParseException {
-        try {
-            Result result = new Result();
-            Document d = Jsoup.parse(body);
-            Element profilename = d.getElementById("profilename");
-            result.displayName = profilename.child(0).text();
-            try {
-                result.avatar = profilename.nextElementSibling().nextElementSibling().child(0).attr("src");
-                if (TextUtils.isEmpty(result.avatar)) {
-                    result.avatar = null;
-                } else if (!result.avatar.startsWith("http")) {
-                    result.avatar = EhUrl.URL_FORUMS + result.avatar;
+object ProfileParser {
+    private val TAG = ProfileParser::class.java.simpleName
+    fun parse(body: String): Result {
+        return runCatching {
+            val d = Jsoup.parse(body)
+            val profilename = d.getElementById("profilename")
+            val displayName = profilename!!.child(0).text()
+            val avatar = runCatching {
+                val avatar =
+                    profilename.nextElementSibling()!!.nextElementSibling()!!.child(0).attr("src")
+                if (avatar.isNullOrEmpty()) {
+                    null
+                } else if (!avatar.startsWith("http")) {
+                    EhUrl.URL_FORUMS + avatar
+                } else {
+                    avatar
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.throwIfFatal(e);
-                Log.i(TAG, "No avatar");
+            }.getOrElse {
+                ExceptionUtils.throwIfFatal(it)
+                Log.i(TAG, "No avatar")
+                null
             }
-            return result;
-        } catch (Throwable e) {
-            ExceptionUtils.throwIfFatal(e);
-            throw new ParseException("Parse forums error", body);
+            Result(displayName, avatar)
+        }.getOrElse {
+            ExceptionUtils.throwIfFatal(it)
+            throw ParseException("Parse forums error", body)
         }
     }
 
-    public static class Result {
-        public String displayName;
-        public String avatar;
-    }
+    class Result(val displayName: String?, val avatar: String?)
 }
