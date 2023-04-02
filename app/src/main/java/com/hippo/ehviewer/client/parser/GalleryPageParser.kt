@@ -13,56 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.yorozuya.StringUtils
+import java.util.regex.Pattern
 
-import android.text.TextUtils;
+object GalleryPageParser {
+    private val PATTERN_IMAGE_URL = Pattern.compile("<img[^>]*src=\"([^\"]+)\" style")
+    private val PATTERN_SKIP_HATH_KEY = Pattern.compile("onclick=\"return nl\\('([^)]+)'\\)")
+    private val PATTERN_ORIGIN_IMAGE_URL =
+        Pattern.compile("<a href=\"([^\"]+)fullimg.php([^\"]+)\">")
 
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.yorozuya.StringUtils;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class GalleryPageParser {
-
-    private static final Pattern PATTERN_IMAGE_URL = Pattern.compile("<img[^>]*src=\"([^\"]+)\" style");
-    private static final Pattern PATTERN_SKIP_HATH_KEY = Pattern.compile("onclick=\"return nl\\('([^\\)]+)'\\)");
-    private static final Pattern PATTERN_ORIGIN_IMAGE_URL = Pattern.compile("<a href=\"([^\"]+)fullimg.php([^\"]+)\">");
     // TODO Not sure about the size of show keys
-    private static final Pattern PATTERN_SHOW_KEY = Pattern.compile("var showkey=\"([0-9a-z]+)\";");
+    private val PATTERN_SHOW_KEY = Pattern.compile("var showkey=\"([0-9a-z]+)\";")
 
-    public static Result parse(String body) throws ParseException {
-        Matcher m;
-        Result result = new Result();
-        m = PATTERN_IMAGE_URL.matcher(body);
-        if (m.find()) {
-            result.imageUrl = StringUtils.unescapeXml(StringUtils.trim(m.group(1)));
-        }
-        m = PATTERN_SKIP_HATH_KEY.matcher(body);
-        if (m.find()) {
-            result.skipHathKey = StringUtils.unescapeXml(StringUtils.trim(m.group(1)));
-        }
-        m = PATTERN_ORIGIN_IMAGE_URL.matcher(body);
-        if (m.find()) {
-            result.originImageUrl = StringUtils.unescapeXml(m.group(1)) + "fullimg.php" + StringUtils.unescapeXml(m.group(2));
-        }
-        m = PATTERN_SHOW_KEY.matcher(body);
-        if (m.find()) {
-            result.showKey = m.group(1);
-        }
-
-        if (!TextUtils.isEmpty(result.imageUrl) && !TextUtils.isEmpty(result.showKey)) {
-            return result;
+    fun parse(body: String): Result {
+        var m = PATTERN_IMAGE_URL.matcher(body)
+        val imageUrl = if (m.find()) {
+            StringUtils.unescapeXml(StringUtils.trim(m.group(1)))
         } else {
-            throw new ParseException("Parse image url and show error", body);
+            null
+        }
+        m = PATTERN_SKIP_HATH_KEY.matcher(body)
+        val skipHathKey = if (m.find()) {
+            StringUtils.unescapeXml(StringUtils.trim(m.group(1)))
+        } else {
+            null
+        }
+        m = PATTERN_ORIGIN_IMAGE_URL.matcher(body)
+        val originImageUrl = if (m.find()) {
+            StringUtils.unescapeXml(m.group(1)) + "fullimg.php" +
+                StringUtils.unescapeXml(m.group(2))
+        } else {
+            null
+        }
+        m = PATTERN_SHOW_KEY.matcher(body)
+        val showKey = if (m.find()) {
+            m.group(1)
+        } else {
+            null
+        }
+        return if (!imageUrl.isNullOrEmpty() && !showKey.isNullOrEmpty()) {
+            Result(imageUrl, skipHathKey, originImageUrl, showKey)
+        } else {
+            throw ParseException("Parse image url and show error", body)
         }
     }
 
-    public static class Result {
-        public String imageUrl;
-        public String skipHathKey;
-        public String originImageUrl;
-        public String showKey;
-    }
+    class Result(
+        val imageUrl: String,
+        val skipHathKey: String?,
+        val originImageUrl: String?,
+        val showKey: String,
+    )
 }
