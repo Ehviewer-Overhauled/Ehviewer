@@ -144,7 +144,6 @@ import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
-import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.coil.ehUrl
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
@@ -1527,10 +1526,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private class VoteTagListener(context: Context) :
-        EhCallback<GalleryDetailScene?, VoteTagParser.Result>(context) {
-        override fun onSuccess(result: VoteTagParser.Result) {
-            if (!result.error.isNullOrEmpty()) {
-                showTip(result.error, LENGTH_SHORT)
+        EhCallback<GalleryDetailScene?, String>(context) {
+        override fun onSuccess(result: String) {
+            if (result.isNotEmpty()) {
+                showTip(result, LENGTH_SHORT)
             } else {
                 showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
             }

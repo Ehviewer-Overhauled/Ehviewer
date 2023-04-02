@@ -15,23 +15,13 @@
  * You should have received a copy of the GNU General Public License along with EhViewer.
  * If not, see <https://www.gnu.org/licenses/>.
  */
+package com.hippo.ehviewer.client.parser
 
-package com.hippo.ehviewer.client.parser;
+import org.json.JSONObject
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class VoteTagParser {
-
+object VoteTagParser {
     // {"error":"The tag \"neko\" is not allowed. Use character:neko or artist:neko"}
-    public static VoteTagParser.Result parse(String body) throws JSONException {
-        VoteTagParser.Result result = new VoteTagParser.Result();
-        JSONObject jo = new JSONObject(body);
-        if (jo.has("error")) result.error = jo.getString("error");
-        return result;
-    }
-
-    public static class Result {
-        public String error;
+    fun parse(body: String): String {
+        return JSONObject(body).optString("error")
     }
 }

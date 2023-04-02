@@ -617,7 +617,7 @@ object EhEngine {
         token: String?,
         tags: String?,
         vote: Int,
-    ): VoteTagParser.Result {
+    ): String {
         val json = JSONObject()
         json.put("method", "taggallery")
         json.put("apiuid", apiUid)
