@@ -98,7 +98,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     // Check Gallery Not Available
     if (body.contains("Gallery Not Available - ")) {
         val error = GalleryNotAvailableParser.parse(body)
-        if (error.isNotBlank()) {
+        if (!error.isNullOrBlank()) {
             throw EhException(error)
         }
     }
@@ -263,7 +263,8 @@ object EhEngine {
         val referer = EhUrl.referer
         Log.d(TAG, url)
         return EhRequestBuilder(url, referer).executeAndParsingWith {
-            GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
+            GalleryDetailParser.parsePreviewList(this) to
+                GalleryDetailParser.parsePreviewPages(this)
         }
     }
 
