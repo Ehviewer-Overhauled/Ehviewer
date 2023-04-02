@@ -477,7 +477,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                         modifier = Modifier.clickable(onClick = ::actionRefresh),
                                     )
                                     Spacer(modifier = Modifier.size(8.dp))
-                                    Text(text = getDetailError)
+                                    Text(
+                                        text = getDetailError,
+                                        modifier = Modifier.width(228.dp),
+                                    )
                                 }
                             } else {
                                 val gi = composeBindingGI
