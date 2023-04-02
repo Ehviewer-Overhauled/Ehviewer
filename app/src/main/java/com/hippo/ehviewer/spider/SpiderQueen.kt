@@ -671,7 +671,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                                 }
                         }.onSuccess { result ->
                             imageUrl = result.imageUrl
-                            skipHathKey = result.skipHathKey.takeIf { it.isNotBlank() }
+                            skipHathKey = result.skipHathKey?.takeIf { it.isNotBlank() }
                             originImageUrl = result.originImageUrl
                             localShowKey = result.showKey
 
