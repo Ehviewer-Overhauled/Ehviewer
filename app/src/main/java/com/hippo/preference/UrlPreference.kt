@@ -13,54 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.preference
 
-package com.hippo.preference;
+import android.content.Context
+import android.util.AttributeSet
+import androidx.preference.Preference
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.UrlOpener
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
+class UrlPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    Preference(context, attrs) {
+    private val mUrl: String?
 
-import androidx.preference.Preference;
-
-import com.hippo.ehviewer.R;
-import com.hippo.ehviewer.UrlOpener;
-
-public class UrlPreference extends Preference {
-
-    private String mUrl;
-
-    public UrlPreference(Context context) {
-        super(context);
-        init(context, null, 0, 0);
+    init {
+        val a = context.obtainStyledAttributes(attrs, R.styleable.UrlPreference, 0, 0)
+        mUrl = a.getString(R.styleable.UrlPreference_url)
+        a.recycle()
     }
 
-    public UrlPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs, 0, 0);
+    override fun getSummary(): CharSequence? {
+        return mUrl ?: super.getSummary()
     }
 
-    public UrlPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context, attrs, defStyleAttr, 0);
-    }
-
-    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UrlPreference, defStyleAttr, defStyleRes);
-        mUrl = a.getString(R.styleable.UrlPreference_url);
-        a.recycle();
-    }
-
-    @Override
-    public CharSequence getSummary() {
-        if (null != mUrl) {
-            return mUrl;
-        } else {
-            return super.getSummary();
-        }
-    }
-
-    @Override
-    protected void onClick() {
-        UrlOpener.openUrl(getContext(), mUrl, true);
+    override fun onClick() {
+        UrlOpener.openUrl(context, mUrl, true)
     }
 }
