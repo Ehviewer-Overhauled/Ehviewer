@@ -19,11 +19,9 @@ import android.os.Build
 import android.os.Debug
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.IOUtils
 import com.hippo.yorozuya.OSUtils
 import java.io.File
 import java.io.FileWriter
-import java.io.IOException
 import java.io.PrintWriter
 
 private fun joinIfStringArray(any: Any?): String {
@@ -31,61 +29,43 @@ private fun joinIfStringArray(any: Any?): String {
 }
 
 private fun collectClassStaticInfo(clazz: Class<*>): String {
-    return clazz.declaredFields.joinToString("\r\n") {
+    return clazz.declaredFields.joinToString("\n") {
         "${it.name}=${joinIfStringArray(it.get(null))}"
     }
 }
 
 object Crash {
-
-    @Throws(IOException::class)
     private fun collectInfo(fw: FileWriter) {
-        fw.write("======== PackageInfo ========\r\n")
-        fw.write("PackageName=")
-        fw.write(BuildConfig.APPLICATION_ID)
-        fw.write("\r\n")
-        fw.write("VersionName=")
-        fw.write(BuildConfig.VERSION_NAME)
-        fw.write("\r\n")
-        fw.write("VersionCode=")
-        fw.write(BuildConfig.VERSION_CODE)
-        fw.write("\r\n")
-        fw.write("CommitSha=")
-        fw.write(BuildConfig.COMMIT_SHA)
-        fw.write("\r\n")
-        fw.write("BuildTime=")
-        fw.write(BuildConfig.BUILD_TIME)
-        fw.write("\r\n")
-        fw.write("\r\n")
+        fw.write("======== PackageInfo ========\n")
+        fw.write("PackageName=${BuildConfig.APPLICATION_ID}\n")
+        fw.write("VersionName=${BuildConfig.VERSION_NAME}\n")
+        fw.write("VersionCode=${BuildConfig.VERSION_CODE}\n")
+        fw.write("CommitSha=${BuildConfig.COMMIT_SHA}\n")
+        fw.write("BuildTime=${BuildConfig.BUILD_TIME}\n")
+        fw.write("\n")
 
         // Runtime
-        val topActivityClazzName = EhApplication.application.topActivity?.javaClass?.name
-        fw.write("======== Runtime ========\r\n")
-        fw.write("TopActivity=")
-        fw.write(topActivityClazzName ?: "null")
-        fw.write("\r\n")
-        fw.write("\r\n")
-        fw.write("\r\n")
+        fw.write("======== Runtime ========\n")
+        fw.write("TopActivity=${EhApplication.application.topActivity?.javaClass?.name}\n")
+        fw.write("\n")
 
         // Device info
-        fw.write("======== DeviceInfo ========\r\n")
-        fw.write("${collectClassStaticInfo(Build::class.java)}\r\n")
-        fw.write("${collectClassStaticInfo(Build.VERSION::class.java)}\r\n")
+        fw.write("======== DeviceInfo ========\n")
+        fw.write("${collectClassStaticInfo(Build::class.java)}\n")
+        fw.write("${collectClassStaticInfo(Build.VERSION::class.java)}\n")
         fw.write("MEMORY=")
-        fw.write(
-            FileUtils.humanReadableByteCount(OSUtils.getAppAllocatedMemory(), false),
-        )
-        fw.write("\r\n")
+        fw.write(FileUtils.humanReadableByteCount(OSUtils.getAppAllocatedMemory(), false))
+        fw.write("\n")
         fw.write("MEMORY_NATIVE=")
         fw.write(FileUtils.humanReadableByteCount(Debug.getNativeHeapAllocatedSize(), false))
-        fw.write("\r\n")
+        fw.write("\n")
         fw.write("MEMORY_MAX=")
         fw.write(FileUtils.humanReadableByteCount(OSUtils.getAppMaxMemory(), false))
-        fw.write("\r\n")
+        fw.write("\n")
         fw.write("MEMORY_TOTAL=")
         fw.write(FileUtils.humanReadableByteCount(OSUtils.getTotalMemory(), false))
-        fw.write("\r\n")
-        fw.write("\r\n")
+        fw.write("\n")
+        fw.write("\n")
     }
 
     private fun getThrowableInfo(t: Throwable, fw: FileWriter) {
@@ -103,22 +83,19 @@ object Crash {
         val nowString = ReadableTime.getFilenamableTime(System.currentTimeMillis())
         val fileName = "crash-$nowString.log"
         val file = File(dir, fileName)
-        var fw: FileWriter? = null
-        try {
-            fw = FileWriter(file)
-            fw.write("TIME=")
-            fw.write(nowString)
-            fw.write("\r\n")
-            fw.write("\r\n")
-            collectInfo(fw)
-            fw.write("======== CrashInfo ========\r\n")
-            getThrowableInfo(t, fw)
-            fw.write("\r\n")
-            fw.flush()
-        } catch (e: Exception) {
+        runCatching {
+            FileWriter(file).use { fw ->
+                fw.write("TIME=${nowString}\n")
+                fw.write("\n")
+                collectInfo(fw)
+                fw.write("======== CrashInfo ========\n")
+                getThrowableInfo(t, fw)
+                fw.write("\n")
+                fw.flush()
+            }
+        }.onFailure {
+            it.printStackTrace()
             file.delete()
-        } finally {
-            IOUtils.closeQuietly(fw)
         }
     }
 }
