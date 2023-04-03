@@ -22,31 +22,35 @@ import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.R
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.copyToFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.executeAsync
-import okio.BufferedSource
 import okio.HashingSink.Companion.sha1
 import okio.blackholeSink
 import okio.buffer
 import okio.source
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
-import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 private typealias TagGroup = Map<String, String>
 private typealias TagGroups = Map<String, TagGroup>
 
-object EhTagDatabase {
+object EhTagDatabase : CoroutineScope {
     private const val NAMESPACE_PREFIX = "n"
     private lateinit var tagGroups: TagGroups
     private val updateLock = Mutex()
+    private val dbLock = Mutex()
+    override val coroutineContext = Dispatchers.IO + Job()
 
     fun isInitialized(): Boolean {
         return this::tagGroups.isInitialized
@@ -57,14 +61,6 @@ object EhTagDatabase {
 
     private fun JSONObject.toTagGroup(): TagGroup =
         keys().asSequence().associateWith { getString(it) }
-
-    private fun updateData(source: BufferedSource) {
-        try {
-            tagGroups = JSONObject(source.readString(StandardCharsets.UTF_8)).toTagGroups()
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-    }
 
     fun getTranslation(prefix: String? = NAMESPACE_PREFIX, tag: String?): String? {
         return tagGroups[prefix]?.get(tag)?.trim()?.takeIf { it.isNotEmpty() }
@@ -206,6 +202,27 @@ object EhTagDatabase {
         }
     }
 
+    private suspend fun issueUpdateInMemoryData() {
+        dbLock.withLock {
+            getMetadata(EhApplication.application)?.let { urls ->
+                val dataName = urls[2]
+                val dir = AppConfig.getFilesDir("tag-translations")
+                val dataFile = File(dir, dataName).takeIf { it.exists() } ?: return
+                runSuspendCatching {
+                    tagGroups = JSONObject(dataFile.source().buffer().readString(StandardCharsets.UTF_8)).toTagGroups()
+                }.onFailure {
+                    it.printStackTrace()
+                }
+            }
+        }
+    }
+
+    init {
+        launch {
+            issueUpdateInMemoryData()
+        }
+    }
+
     private suspend fun updateInternal() {
         val urls = getMetadata(EhApplication.application)
         urls?.let {
@@ -259,22 +276,9 @@ object EhTagDatabase {
                 tempDataFile.renameTo(dataFile)
 
                 // Read new EhTagDatabase
-                try {
-                    dataFile.source().buffer().use { updateData(it) }
-                } catch (_: IOException) {
-                }
+                issueUpdateInMemoryData()
             }.onFailure {
                 it.printStackTrace()
-            }
-
-            // Read current EhTagDatabase
-            if (!isInitialized() && dataFile.exists()) {
-                try {
-                    dataFile.source().buffer().use { updateData(it) }
-                } catch (e: IOException) {
-                    FileUtils.delete(sha1File)
-                    FileUtils.delete(dataFile)
-                }
             }
         }
     }
