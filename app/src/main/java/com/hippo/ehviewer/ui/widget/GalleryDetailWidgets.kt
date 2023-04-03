@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GroupOff
 import androidx.compose.material.icons.filled.Label
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
@@ -173,12 +172,6 @@ fun GalleryDetailHeaderCard(
                     label = { Text(text = uploaderText, maxLines = 1) },
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.PersonAdd,
-                            contentDescription = null,
-                        )
-                    },
-                    trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.GroupOff,
                             contentDescription = null,
