@@ -2,7 +2,7 @@ plugins {
     id("com.android.application") version "8.1.0-alpha11" apply false
     kotlin("android") version "1.8.10" apply false
     kotlin("plugin.serialization") version "1.8.10" apply false
-    id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10" apply false
 }
 
 allprojects {
