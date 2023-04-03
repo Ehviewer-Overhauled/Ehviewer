@@ -34,10 +34,10 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
+import moe.tarsin.coroutines.NamedMutex
+import moe.tarsin.coroutines.withLock
 import java.nio.ByteBuffer
 
 class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow<String>) : PageLoader2(), CoroutineScope {
@@ -79,7 +79,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
     }
 
     private val mJobMap = hashMapOf<Int, Job>()
-    private val mWorkerMutex by lazy { (0 until size).map { Mutex() } }
+    private val mWorkerMutex = NamedMutex<Int>()
     private val mSemaphore = Semaphore(4)
 
     override fun onRequest(index: Int) {
@@ -87,7 +87,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
             val current = mJobMap[index]
             if (current?.isActive != true) {
                 mJobMap[index] = launch {
-                    mWorkerMutex[index].withLock {
+                    mWorkerMutex.withLock(index) {
                         mSemaphore.withPermit {
                             doRealWork(index)
                         }
