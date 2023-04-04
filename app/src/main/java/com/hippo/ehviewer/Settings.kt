@@ -371,7 +371,7 @@ object Settings {
         get() = dp2pix(application, getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).toFloat())
 
     val thumbSizeDp: Dp
-        get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).dp
+        get() = (getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE) - 8).dp
 
     val thumbResolution: Int
         get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
