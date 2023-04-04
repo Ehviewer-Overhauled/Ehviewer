@@ -99,6 +99,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -169,6 +170,7 @@ import com.hippo.util.ReadableTime
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.ObservedTextView
+import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
@@ -516,9 +518,12 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         modifier: Modifier,
     ) {
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
+        // Padding is not subtracted here to have the same column count as gallery list and preview
+        val totalSpace = LocalConfiguration.current.screenWidthDp
+        val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
         when (windowSizeClass.widthSizeClass) {
             WindowWidthSizeClass.Medium, WindowWidthSizeClass.Compact -> LazyVerticalGrid(
-                columns = GridCells.Adaptive(Settings.thumbSizeDp),
+                columns = GridCells.Fixed(columnCount),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding)),
@@ -573,7 +578,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
 
             WindowWidthSizeClass.Expanded -> LazyVerticalGrid(
-                columns = GridCells.Adaptive(Settings.thumbSizeDp),
+                columns = GridCells.Fixed(columnCount),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding)),
