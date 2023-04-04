@@ -19,8 +19,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.DimenRes
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
@@ -368,10 +366,10 @@ object Settings {
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
     val thumbSize: Int
-        get() = dp2pix(application, getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).toFloat())
+        get() = dp2pix(application, thumbSizeDp.toFloat())
 
-    val thumbSizeDp: Dp
-        get() = (getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE) - 8).dp
+    val thumbSizeDp: Int
+        get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
 
     val thumbResolution: Int
         get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
