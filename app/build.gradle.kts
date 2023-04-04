@@ -199,7 +199,7 @@ dependencies {
     implementation("com.github.chrisbanes:PhotoView:2.3.0") // Dead Dependency
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
     // https://github.com/google/accompanist/releases
-    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.0")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.1")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.30.0")
     implementation("com.google.android.material:material:1.9.0-beta01")
 
