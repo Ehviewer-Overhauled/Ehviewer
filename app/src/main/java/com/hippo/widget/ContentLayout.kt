@@ -776,6 +776,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                 mPrev = state.getString(KEY_PREV)
                 mNext = state.getString(KEY_NEXT)
                 notifyDataSetChanged()
+                notifyDataSetChanged {}
                 if (newData == null) {
                     mPageDivider.clear()
                     mStartPage = 0
