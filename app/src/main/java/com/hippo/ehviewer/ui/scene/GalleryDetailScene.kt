@@ -54,6 +54,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -479,7 +480,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Text(
                                         text = getDetailError,
-                                        modifier = Modifier.width(228.dp),
+                                        modifier = Modifier.widthIn(max = 228.dp),
                                     )
                                 }
                             } else {
@@ -520,6 +521,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     Column {
@@ -573,6 +576,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 columns = GridCells.Adaptive(Settings.thumbSizeDp),
                 contentPadding = contentPadding,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     Column {
@@ -638,9 +643,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun LazyGridScope.galleryDetailPreview(gd: GalleryDetail) {
         val previewList = gd.previewList
         item {
-            Column(
-                modifier = Modifier.padding(8.dp),
-            ) {
+            Column {
                 Box(
                     contentAlignment = Alignment.Center,
                 ) {
@@ -657,7 +660,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
         items(previewList) {
             Column(
-                modifier = Modifier.padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -818,8 +820,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         if (Settings.showComments) {
             GalleryDetailComment(galleryDetail.comments?.comments)
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.strip_item_padding_v)))
         }
-        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
     }
 
     private fun onGalleryInfoCardClick() {
@@ -1187,7 +1189,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 }
             }
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = dimensionResource(id = R.dimen.strip_item_padding_v)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(commentText)
