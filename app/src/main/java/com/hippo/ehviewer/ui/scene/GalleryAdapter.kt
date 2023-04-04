@@ -31,7 +31,6 @@ import com.hippo.ehviewer.databinding.ItemGalleryGridBinding
 import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
-import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import com.hippo.yorozuya.ViewUtils
 
 internal abstract class GalleryAdapter(
@@ -60,6 +59,7 @@ internal abstract class GalleryAdapter(
             }
             mType = type
             val recyclerView = mRecyclerView
+            @SuppressLint("NotifyDataSetChanged")
             when (type) {
                 TYPE_LIST -> {
                     val columnWidth = mResources.getDimensionPixelOffset(Settings.detailSizeResId)
@@ -85,7 +85,7 @@ internal abstract class GalleryAdapter(
                 TYPE_GRID -> {
                     val columnWidth = Settings.thumbSize
                     mLayoutManager.setColumnSize(columnWidth)
-                    mLayoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
+                    mLayoutManager.setStrategy(STRATEGY_MIN_SIZE)
                     if (null != mListDecoration) {
                         recyclerView.removeItemDecoration(mListDecoration!!)
                     }

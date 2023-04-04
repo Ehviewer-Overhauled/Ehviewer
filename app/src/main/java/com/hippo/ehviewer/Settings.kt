@@ -26,6 +26,7 @@ import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.unifile.UniFile
+import com.hippo.yorozuya.LayoutUtils.dp2pix
 import com.hippo.yorozuya.NumberUtils
 import java.util.Locale
 
@@ -367,15 +368,10 @@ object Settings {
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
     val thumbSize: Int
-        get() = dip2px(getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE))
+        get() = dp2pix(application, getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).toFloat())
 
     val thumbSizeDp: Dp
         get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE).dp
-
-    private fun dip2px(dpValue: Int): Int {
-        val scale = application.resources.displayMetrics.density
-        return (dpValue * scale + 0.5f).toInt()
-    }
 
     val thumbResolution: Int
         get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
