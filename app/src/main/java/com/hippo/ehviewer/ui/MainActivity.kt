@@ -75,6 +75,7 @@ import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getParcelableExtraCompat
 import com.hippo.util.getUrlFromClipboard
+import com.hippo.util.initPermission
 import com.hippo.yorozuya.IOUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -91,6 +92,10 @@ class MainActivity : EhActivity() {
     private lateinit var navController: NavController
     private val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
     private val availableNetworks = mutableListOf<Network>()
+
+    init {
+        initPermission()
+    }
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)

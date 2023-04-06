@@ -15,13 +15,13 @@
  */
 package com.hippo.ehviewer.ui
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.hippo.app.ListCheckBoxDialogBuilder
-import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
@@ -32,7 +32,9 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
+import com.hippo.util.requestPermission
 import com.hippo.yorozuya.collect.LongList
+import eu.kanade.tachiyomi.util.lang.launchNow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
@@ -132,10 +134,12 @@ object CommonOperations {
         galleryInfos: List<GalleryInfo>,
         forceDefault: Boolean,
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            application.topActivity?.checkAndRequestNotificationPermission()
+        launchNow {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                activity.requestPermission(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            doStartDownload(activity, galleryInfos, forceDefault)
         }
-        doStartDownload(activity, galleryInfos, forceDefault)
     }
 
     private fun doStartDownload(
