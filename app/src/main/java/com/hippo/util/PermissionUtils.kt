@@ -1,6 +1,5 @@
 package com.hippo.util
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
@@ -21,7 +20,7 @@ private fun permissionCallback(v: Boolean) {
 }
 
 suspend fun Context.requestPermission(key: String): Boolean {
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return true
+    if (ContextCompat.checkSelfPermission(this, key) == PackageManager.PERMISSION_GRANTED) return true
     return suspendCancellableCoroutine { cont ->
         callback = {
             cont.resume(it)
