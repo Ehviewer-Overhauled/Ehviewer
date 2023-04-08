@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.client.data
 
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.S_LANGS
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -38,8 +37,6 @@ class GalleryDetail(
     var tags: Array<GalleryTagGroup>? = null,
     var comments: GalleryCommentList? = null,
     var previewPages: Int = 0,
-
-    @IgnoredOnParcel
     var previewList: List<GalleryPreview> = emptyList(),
 ) : AbstractGalleryInfo by galleryInfo, GalleryInfo {
     override fun generateSLang() {
