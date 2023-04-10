@@ -1,33 +1,58 @@
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
-import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import arrow.core.partially1
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.databinding.ItemGalleryPreviewBinding
+import com.hippo.ehviewer.ui.widget.CrystalCard
+import com.hippo.ehviewer.ui.widget.EhAsyncPreview
 
-class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) :
-    BaseListAdapter<GalleryPreview>(PreviewDiffCallback) {
-    class GalleryPreviewHolder(
-        private val binding: ItemGalleryPreviewBinding,
-        onClick: (GalleryPreview) -> Unit,
-    ) : BaseViewHolder<GalleryPreview>(binding, onClick) {
-        @SuppressLint("SetTextI18n")
-        override fun bind(item: GalleryPreview) {
-            currentItem = item
-            item.load(binding.image)
-            binding.text.text = (item.position + 1).toString()
-        }
-    }
+class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) : ListAdapter<GalleryPreview, GalleryPreviewsAdapter.ComposeHolder>(PreviewDiffCallback) {
+    class ComposeHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): BaseViewHolder<GalleryPreview> {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemGalleryPreviewBinding.inflate(inflater, parent, false)
-        return GalleryPreviewHolder(binding, onClick)
+    ): ComposeHolder {
+        return ComposeHolder(ComposeView(parent.context))
+    }
+
+    override fun onBindViewHolder(holder: ComposeHolder, position: Int) {
+        val it = getItem(position)
+        holder.composeView.setContent {
+            Mdc3Theme {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CrystalCard(
+                            onClick = onClick.partially1(it),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(0.6666667F),
+                        ) {
+                            EhAsyncPreview(
+                                model = it,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                    Text((it.position + 1).toString())
+                }
+            }
+        }
     }
 
     override fun getItemId(position: Int): Long {
