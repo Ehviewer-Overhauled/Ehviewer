@@ -50,7 +50,7 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/title"
+            android:layout_above="@id/rating"
             android:layout_alignStart="@id/title"
             android:layout_marginTop="2dp" />
 
@@ -58,9 +58,9 @@
             android:id="@+id/rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/uploader"
+            android:layout_above="@id/category"
             android:layout_alignStart="@id/title"
-            android:layout_marginTop="2dp" />
+            android:layout_marginBottom="2dp" />
 
         <TextView
             android:id="@+id/category"
