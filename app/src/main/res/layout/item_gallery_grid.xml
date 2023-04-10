@@ -15,7 +15,6 @@
   -->
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card"
     style="@style/Widget.Material3.CardView.Elevated"
     android:layout_width="match_parent"
@@ -26,13 +25,10 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.hippo.ehviewer.widget.TileThumb
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/thumb"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:foreground="@drawable/tile_background"
-        android:scaleType="centerCrop"
-        app:retryType="none" />
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/category"

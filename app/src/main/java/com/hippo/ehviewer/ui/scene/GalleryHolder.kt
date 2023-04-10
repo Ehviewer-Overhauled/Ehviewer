@@ -58,7 +58,9 @@ internal class ListGalleryHolder(
                         EhAsyncThumb(
                             model = galleryInfo.thumb,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.height(height).aspectRatio(0.6666667F),
+                            modifier = Modifier
+                                .height(height)
+                                .aspectRatio(0.6666667F),
                         )
                     }
                 }
@@ -99,8 +101,16 @@ internal class GridGalleryHolder(private val binding: ItemGalleryGridBinding) :
     GalleryHolder(binding) {
     override fun bind(galleryInfo: GalleryInfo) {
         binding.run {
-            thumb.setThumbSize(galleryInfo.thumbWidth, galleryInfo.thumbHeight)
-            thumb.load(galleryInfo.thumb!!)
+            val aspect = (galleryInfo.thumbWidth.toFloat() / galleryInfo.thumbHeight).coerceIn(0.33F, 1.5F)
+            thumb.setContent {
+                Mdc3Theme {
+                    EhAsyncThumb(
+                        model = galleryInfo.thumb,
+                        modifier = Modifier.aspectRatio(aspect),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+            }
             var drawable = category.background
             val color = EhUtils.getCategoryColor(galleryInfo.category)
             if (drawable !is TriangleDrawable) {
