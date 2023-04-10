@@ -18,8 +18,15 @@ package com.hippo.ehviewer.ui.scene
 import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.view.View
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Card
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.drawable.TriangleDrawable
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
@@ -27,6 +34,8 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.ItemGalleryGridBinding
 import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import eu.kanade.tachiyomi.util.system.pxToDp
 
 internal abstract class GalleryHolder(binding: ViewBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -36,20 +45,24 @@ internal abstract class GalleryHolder(binding: ViewBinding) :
 internal class ListGalleryHolder(
     private val binding: ItemGalleryListBinding,
     private val showFavourited: Boolean,
-    thumbWidth: Int,
-    thumbHeight: Int,
 ) : GalleryHolder(binding) {
-    init {
-        val lp = binding.thumb.layoutParams
-        lp.width = thumbWidth
-        lp.height = thumbHeight
-        binding.thumb.layoutParams = lp
-    }
+
+    private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
     @SuppressLint("SetTextI18n")
     override fun bind(galleryInfo: GalleryInfo) {
         binding.run {
-            thumb.load(galleryInfo.thumb!!)
+            thumb.setContent {
+                Mdc3Theme {
+                    Card {
+                        EhAsyncThumb(
+                            model = galleryInfo.thumb,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.height(height).aspectRatio(0.6666667F),
+                        )
+                    }
+                }
+            }
             title.text = EhUtils.getSuitableTitle(galleryInfo)
             uploader.text = galleryInfo.uploader
             uploader.alpha = if (galleryInfo.disowned) .5f else 1f

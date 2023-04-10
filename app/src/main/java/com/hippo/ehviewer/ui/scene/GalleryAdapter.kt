@@ -32,7 +32,6 @@ import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
-import com.hippo.yorozuya.ViewUtils
 
 internal abstract class GalleryAdapter(
     private val mInflater: LayoutInflater,
@@ -45,8 +44,6 @@ internal abstract class GalleryAdapter(
         AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
     private val mPaddingTopSB: Int =
         mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
-    private val mListThumbWidth: Int
-    private val mListThumbHeight: Int
     private val mShowFavourited: Boolean
     private var mListDecoration: MarginItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
@@ -111,11 +108,6 @@ internal abstract class GalleryAdapter(
         mRecyclerView.adapter = this
         mRecyclerView.layoutManager = mLayoutManager
         @SuppressLint("InflateParams")
-        val calculator =
-            mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
-        ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
-        mListThumbHeight = calculator.measuredHeight
-        mListThumbWidth = mListThumbHeight * 2 / 3
         this.type = type
         adjustPaddings()
     }
@@ -135,8 +127,6 @@ internal abstract class GalleryAdapter(
             TYPE_LIST -> ListGalleryHolder(
                 ItemGalleryListBinding.inflate(mInflater, parent, false),
                 mShowFavourited,
-                mListThumbWidth,
-                mListThumbHeight,
             )
 
             TYPE_GRID -> GridGalleryHolder(ItemGalleryGridBinding.inflate(mInflater, parent, false))

@@ -29,20 +29,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/thumb_card"
-            style="@style/Widget.Material3.CardView.Filled"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/thumb"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <com.hippo.ehviewer.widget.ResizeableFixedThumb
-                android:id="@+id/thumb"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:alwaysCutAndScale="true"
-                app:retryType="click" />
-
-        </com.google.android.material.card.MaterialCardView>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/title"
@@ -53,7 +43,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="8dp"
-            android:layout_toEndOf="@id/thumb_card" />
+            android:layout_toEndOf="@id/thumb" />
 
         <TextView
             android:id="@+id/uploader"
@@ -70,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignStart="@id/title"
-            android:layout_alignBottom="@id/thumb_card"
+            android:layout_alignBottom="@id/thumb"
             android:layout_marginBottom="8dp"
             android:paddingLeft="8dp"
             android:paddingTop="2dp"
@@ -92,7 +82,7 @@
             style="@style/CardMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/thumb_card"
+            android:layout_alignBottom="@id/thumb"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="6dp"
             android:layout_marginBottom="4dp" />

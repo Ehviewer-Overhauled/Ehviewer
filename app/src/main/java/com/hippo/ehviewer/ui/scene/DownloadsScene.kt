@@ -28,6 +28,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Card
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -37,6 +43,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
@@ -60,6 +67,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
+import com.hippo.ehviewer.ui.widget.EhAsyncThumb
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -69,13 +77,13 @@ import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ObjectUtils
-import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.system.pxToDp
 import rikka.core.res.resolveColor
 import java.util.LinkedList
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
@@ -808,16 +816,9 @@ class DownloadsScene :
 
     private inner class DownloadHolder(
         private val binding: ItemDownloadBinding,
-        thumbWidth: Int,
-        thumbHeight: Int,
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         init {
-            val lp = binding.thumb.layoutParams
-            lp.width = thumbWidth
-            lp.height = thumbHeight
-            binding.thumb.layoutParams = lp
-
             // TODO cancel on click listener when select items
             binding.thumb.setOnClickListener(this)
             binding.start.setOnClickListener(this)
@@ -857,8 +858,22 @@ class DownloadsScene :
             }
         }
 
+        private val height = (Settings.listThumbSize * 3).pxToDp.dp
+
         fun bind(info: DownloadInfo) {
-            info.thumb?.let { binding.thumb.load(it) }
+            binding.thumb.setContent {
+                Mdc3Theme {
+                    Card {
+                        EhAsyncThumb(
+                            model = info.thumb,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .height(height)
+                                .aspectRatio(0.6666667F),
+                        )
+                    }
+                }
+            }
             binding.title.text = EhUtils.getSuitableTitle(info)
             binding.uploader.text = info.uploader
             binding.rating.rating = info.rating
@@ -955,16 +970,6 @@ class DownloadsScene :
 
     private inner class DownloadAdapter : RecyclerView.Adapter<DownloadHolder>() {
         private val mInflater: LayoutInflater = layoutInflater
-        private val mListThumbWidth: Int
-        private val mListThumbHeight: Int
-
-        init {
-            @SuppressLint("InflateParams")
-            val calculator = mInflater.inflate(R.layout.item_gallery_list_thumb_height, null)
-            ViewUtils.measureView(calculator, 1024, ViewGroup.LayoutParams.WRAP_CONTENT)
-            mListThumbHeight = calculator.measuredHeight
-            mListThumbWidth = mListThumbHeight * 2 / 3
-        }
 
         override fun getItemId(position: Int): Long {
             return if (mList == null || position < 0 || position >= mList!!.size) {
@@ -975,11 +980,7 @@ class DownloadsScene :
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadHolder {
-            val holder = DownloadHolder(
-                ItemDownloadBinding.inflate(mInflater, parent, false),
-                mListThumbWidth,
-                mListThumbHeight,
-            )
+            val holder = DownloadHolder(ItemDownloadBinding.inflate(mInflater, parent, false))
             holder.itemView.setOnClickListener { onItemClick(holder.bindingAdapterPosition) }
             holder.itemView.setOnLongClickListener { onItemLongClick(holder.bindingAdapterPosition) }
             return holder
