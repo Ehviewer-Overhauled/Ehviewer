@@ -179,6 +179,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             components { add(MergeInterceptor) }
             diskCache(imageCache)
             crossfade(300)
+            error(R.drawable.image_failed)
             if (BuildConfig.DEBUG) logger(DebugLogger())
         }.build()
     }

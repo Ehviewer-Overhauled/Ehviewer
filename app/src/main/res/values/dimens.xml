@@ -22,7 +22,6 @@
 
     <dimen name="keyline_margin">16dp</dimen>
     <dimen name="single_max_width">260dp</dimen>
-    <dimen name="drawer_max_width">280dp</dimen>
 
     <dimen name="strip_item_padding">8dp</dimen>
 
