@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -58,6 +57,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
+import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.view.ViewTransition
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
@@ -304,11 +304,14 @@ class HistoryScene : BaseToolbarScene() {
                     }
 
                     2 -> if (favourite) {
-                        CommonOperations.removeFromFavorites(
-                            activity,
-                            gi,
-                            RemoveFromFavoriteListener(context),
-                        )
+                        lifecycleScope.launchIO {
+                            runSuspendCatching {
+                                removeFromFavorites(gi)
+                                showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
+                            }.onFailure {
+                                showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                            }
+                        }
                     } else {
                         lifecycleScope.launchIO {
                             runSuspendCatching {
@@ -339,19 +342,6 @@ class HistoryScene : BaseToolbarScene() {
                     }
                 }
             }.show()
-    }
-
-    private class RemoveFromFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene?, Unit>(context) {
-        override fun onSuccess(result: Unit) {
-            showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
-        }
-
-        override fun onCancel() {}
     }
 
     private class ComposeHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)

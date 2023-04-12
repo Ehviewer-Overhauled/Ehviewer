@@ -157,6 +157,7 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
+import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
@@ -969,15 +970,17 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         lifecycleScope.launchIO {
             if (!mModifyingFavorites) {
                 var remove = false
-                val containLocalFavorites =
-                    EhDB.containLocalFavorites(galleryDetail.gid)
+                val containLocalFavorites = EhDB.containLocalFavorites(galleryDetail.gid)
                 if (containLocalFavorites || galleryDetail.isFavorited) {
                     mModifyingFavorites = true
-                    CommonOperations.removeFromFavorites(
-                        activity,
-                        galleryDetail,
-                        ModifyFavoritesListener(requireContext(), true),
-                    )
+                    runCatching {
+                        removeFromFavorites(galleryDetail)
+                        showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
+                        onModifyFavoritesSuccess(true)
+                    }.onFailure {
+                        if (it !is CancellationException) showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                    }
+                    mModifyingFavorites = false
                     remove = true
                 }
                 if (!remove) {
@@ -990,8 +993,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         }
                     }.onFailure {
                         if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-                        mModifyingFavorites = false
                     }
+                    mModifyingFavorites = false
                 }
                 withUIContext {
                     // Update UI
@@ -1442,11 +1445,14 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 var remove = false
                 if (EhDB.containLocalFavorites(composeBindingGD!!.gid) || composeBindingGD!!.isFavorited) {
                     mModifyingFavorites = true
-                    CommonOperations.removeFromFavorites(
-                        activity,
-                        composeBindingGD!!,
-                        ModifyFavoritesListener(requireActivity(), true),
-                    )
+                    runCatching {
+                        removeFromFavorites(composeBindingGD!!)
+                        showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
+                        onModifyFavoritesSuccess(true)
+                    }.onFailure {
+                        if (it !is CancellationException) showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                    }
+                    mModifyingFavorites = false
                     remove = true
                 }
                 if (!remove) {
@@ -1459,8 +1465,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                         }
                     }.onFailure {
                         if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-                        mModifyingFavorites = false
                     }
+                    mModifyingFavorites = false
                 }
                 withUIContext {
                     // Update UI
@@ -1533,19 +1539,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {
-        mModifyingFavorites = false
         if (composeBindingGD != null) {
             composeBindingGD!!.isFavorited = !addOrRemove && composeBindingGD!!.favoriteName != null
             updateFavoriteDrawable()
         }
-    }
-
-    private fun onModifyFavoritesFailure() {
-        mModifyingFavorites = false
-    }
-
-    private fun onModifyFavoritesCancel() {
-        mModifyingFavorites = false
     }
 
     private class VoteTagListener(context: Context) :
@@ -1643,35 +1640,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         override fun onCancel() {}
-    }
-
-    private inner class ModifyFavoritesListener(
-        context: Context,
-        private val mAddOrRemove: Boolean,
-    ) :
-        EhCallback<GalleryDetailScene?, Unit>(context) {
-        override fun onSuccess(result: Unit) {
-            showTip(
-                if (mAddOrRemove) R.string.remove_from_favorite_success else R.string.add_to_favorite_success,
-                LENGTH_SHORT,
-            )
-            val scene = this@GalleryDetailScene
-            scene.onModifyFavoritesSuccess(mAddOrRemove)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(
-                if (mAddOrRemove) R.string.remove_from_favorite_failure else R.string.add_to_favorite_failure,
-                LENGTH_LONG,
-            )
-            val scene = this@GalleryDetailScene
-            scene.onModifyFavoritesFailure()
-        }
-
-        override fun onCancel() {
-            val scene = this@GalleryDetailScene
-            scene.onModifyFavoritesCancel()
-        }
     }
 
     private inner class ArchiveListDialogHelper :

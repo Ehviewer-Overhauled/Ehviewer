@@ -83,13 +83,6 @@ object EhClient {
                 params[0] as String,
             )
 
-            METHOD_ADD_FAVORITES -> EhEngine.addFavorites(
-                params[0] as Long,
-                params[1] as String?,
-                params[2] as Int,
-                params[3] as String?,
-            )
-
             METHOD_ADD_FAVORITES_RANGE ->
                 @Suppress("UNCHECKED_CAST")
                 EhEngine.addFavoritesRange(
@@ -166,7 +159,6 @@ object EhClient {
     const val METHOD_GET_COMMENT_GALLERY = 6
     const val METHOD_GET_GALLERY_TOKEN = 7
     const val METHOD_GET_FAVORITES = 8
-    const val METHOD_ADD_FAVORITES = 9
     const val METHOD_ADD_FAVORITES_RANGE = 10
     const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12

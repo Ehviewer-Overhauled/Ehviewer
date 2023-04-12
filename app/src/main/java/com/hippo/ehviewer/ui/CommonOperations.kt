@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -27,9 +26,7 @@ import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.download.DownloadService
@@ -46,19 +43,6 @@ import kotlin.coroutines.resume
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
-    fun removeFromFavorites(
-        activity: Activity?,
-        galleryInfo: GalleryInfo,
-        listener: EhClient.Callback<Unit>,
-    ) {
-        EhDB.removeLocalFavorites(galleryInfo.gid)
-        val request = EhRequest()
-        request.setMethod(EhClient.METHOD_ADD_FAVORITES)
-        request.setArgs(galleryInfo.gid, galleryInfo.token, -1, "")
-        request.setCallback(DelegateFavoriteCallback(listener, galleryInfo, null, -2))
-        request.enqueue(activity!!)
-    }
-
     fun startDownload(activity: MainActivity?, galleryInfo: GalleryInfo, forceDefault: Boolean) {
         startDownload(activity!!, listOf(galleryInfo), forceDefault)
     }
@@ -168,28 +152,6 @@ object CommonOperations {
                 .show()
         }
     }
-
-    private class DelegateFavoriteCallback(
-        private val delegate: EhClient.Callback<Unit>,
-        private val info: GalleryInfo,
-        private val newFavoriteName: String?,
-        private val slot: Int,
-    ) : EhClient.Callback<Unit> {
-        override fun onSuccess(result: Unit) {
-            info.favoriteName = newFavoriteName
-            info.favoriteSlot = slot
-            delegate.onSuccess(result)
-            favouriteStatusRouter.modifyFavourites(info.gid, slot)
-        }
-
-        override fun onFailure(e: Exception) {
-            delegate.onFailure(e)
-        }
-
-        override fun onCancel() {
-            delegate.onCancel()
-        }
-    }
 }
 
 private fun removeNoMediaFile(downloadDir: UniFile) {
@@ -260,5 +222,15 @@ suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = f
         } else {
             Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT)
         }
+    }
+}
+
+suspend fun removeFromFavorites(galleryInfo: GalleryInfo) {
+    EhDB.removeLocalFavorites(galleryInfo.gid)
+    EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, -1, "")
+    galleryInfo.favoriteName = null
+    galleryInfo.favoriteSlot = -2
+    withUIContext {
+        favouriteStatusRouter.modifyFavourites(galleryInfo.gid, -2)
     }
 }

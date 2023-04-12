@@ -94,6 +94,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
+import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
 import com.hippo.util.getParcelableCompat
@@ -794,11 +795,14 @@ class GalleryListScene :
                     }
 
                     2 -> if (favourited) {
-                        CommonOperations.removeFromFavorites(
-                            activity,
-                            gi,
-                            RemoveFromFavoriteListener(context),
-                        )
+                        lifecycleScope.launchIO {
+                            runSuspendCatching {
+                                removeFromFavorites(gi)
+                                showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
+                            }.onFailure {
+                                showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
+                            }
+                        }
                     } else {
                         lifecycleScope.launchIO {
                             runSuspendCatching {
@@ -1120,19 +1124,6 @@ class GalleryListScene :
         override fun onFailure(e: Exception) {
             val scene = this@GalleryListScene
             scene.onGetGalleryListFailure(e, mTaskId)
-        }
-
-        override fun onCancel() {}
-    }
-
-    private class RemoveFromFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene, Unit>(context) {
-        override fun onSuccess(result: Unit) {
-            showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
         }
 
         override fun onCancel() {}
