@@ -29,7 +29,7 @@ import com.hippo.yorozuya.ViewUtils
 class ListCheckBoxDialogBuilder(
     context: Context,
     items: List<CharSequence>,
-    listener: (ListCheckBoxDialogBuilder?, AlertDialog?, Int) -> Unit,
+    listener: (ListCheckBoxDialogBuilder, AlertDialog?, Int) -> Unit,
     checkText: String?,
     checked: Boolean,
 ) : BaseDialogBuilder(

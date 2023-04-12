@@ -156,6 +156,7 @@ import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
@@ -177,6 +178,7 @@ import com.hippo.yorozuya.collect.IntList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.CancellationException
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import kotlin.math.roundToInt
@@ -978,15 +980,20 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     )
                     remove = true
                 }
-                withUIContext {
-                    if (!remove) {
-                        mModifyingFavorites = true
-                        CommonOperations.addToFavorites(
-                            requireActivity(),
-                            galleryDetail,
-                            ModifyFavoritesListener(requireContext(), false),
-                        )
+                if (!remove) {
+                    mModifyingFavorites = true
+                    runCatching {
+                        requireContext().addToFavorites(galleryDetail)
+                        showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
+                        withUIContext {
+                            onModifyFavoritesSuccess(false)
+                        }
+                    }.onFailure {
+                        if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        mModifyingFavorites = false
                     }
+                }
+                withUIContext {
                     // Update UI
                     updateFavoriteDrawable()
                 }
@@ -1442,16 +1449,20 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     )
                     remove = true
                 }
-                withUIContext {
-                    if (!remove) {
-                        mModifyingFavorites = true
-                        CommonOperations.addToFavorites(
-                            requireActivity(),
-                            composeBindingGD!!,
-                            ModifyFavoritesListener(requireActivity(), false),
-                            true,
-                        )
+                if (!remove) {
+                    mModifyingFavorites = true
+                    runCatching {
+                        requireContext().addToFavorites(composeBindingGD!!, true)
+                        showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
+                        withUIContext {
+                            onModifyFavoritesSuccess(false)
+                        }
+                    }.onFailure {
+                        if (it !is CancellationException) showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                        mModifyingFavorites = false
                     }
+                }
+                withUIContext {
                     // Update UI
                     updateFavoriteDrawable()
                 }

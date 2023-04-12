@@ -17,6 +17,7 @@ package com.hippo.ehviewer.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AlertDialog
@@ -27,91 +28,24 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.requestPermission
 import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.util.lang.launchNow
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.resume
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
-    private fun doAddToFavorites(
-        activity: Activity,
-        galleryInfo: GalleryInfo,
-        slot: Int,
-        listener: EhClient.Callback<Unit>,
-    ) {
-        when (slot) {
-            -1 -> {
-                EhDB.putLocalFavorites(galleryInfo)
-                listener.onSuccess(Unit)
-            }
-
-            in 0..9 -> {
-                val request = EhRequest()
-                request.setMethod(EhClient.METHOD_ADD_FAVORITES)
-                request.setArgs(galleryInfo.gid, galleryInfo.token, slot, "")
-                request.setCallback(listener)
-                request.enqueue(activity)
-            }
-
-            else -> {
-                listener.onFailure(Exception()) // TODO Add text
-            }
-        }
-    }
-
-    @JvmOverloads
-    fun addToFavorites(
-        activity: Activity,
-        galleryInfo: GalleryInfo,
-        listener: EhClient.Callback<Unit>,
-        select: Boolean = false,
-    ) {
-        val slot = Settings.defaultFavSlot
-        val localFav = activity.getString(R.string.local_favorites)
-        val items = Settings.favCat.toMutableList().apply { add(0, localFav) }
-        if (!select && slot >= -1 && slot <= 9) {
-            val newFavoriteName = if (slot >= 0) items[slot + 1] else null
-            doAddToFavorites(
-                activity,
-                galleryInfo,
-                slot,
-                DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot),
-            )
-        } else {
-            ListCheckBoxDialogBuilder(
-                activity,
-                items,
-                { builder: ListCheckBoxDialogBuilder?, _: AlertDialog?, position: Int ->
-                    val slot1 = position - 1
-                    val newFavoriteName = if (slot1 in 0..9) items[slot1 + 1] else null
-                    doAddToFavorites(
-                        activity,
-                        galleryInfo,
-                        slot1,
-                        DelegateFavoriteCallback(listener, galleryInfo, newFavoriteName, slot1),
-                    )
-                    if (builder?.isChecked == true) {
-                        Settings.putDefaultFavSlot(slot1)
-                    } else {
-                        Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT)
-                    }
-                },
-                activity.getString(R.string.remember_favorite_collection),
-                false,
-            )
-                .setTitle(R.string.add_favorites_dialog_title)
-                .setOnCancelListener { listener.onCancel() }
-                .show()
-        }
-    }
-
     fun removeFromFavorites(
         activity: Activity?,
         galleryInfo: GalleryInfo,
@@ -276,6 +210,55 @@ suspend fun keepNoMediaFileStatus() {
             removeNoMediaFile(downloadLocation)
         } else {
             ensureNoMediaFile(downloadLocation)
+        }
+    }
+}
+
+suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = false) {
+    val slot = Settings.defaultFavSlot
+    val localFav = getString(R.string.local_favorites)
+    val items = Settings.favCat.toMutableList().apply { add(0, localFav) }
+    suspend fun doAddToFavorites(slot: Int, newFavoriteName: String?) {
+        when (slot) {
+            -1 -> {
+                EhDB.putLocalFavorites(galleryInfo)
+            }
+
+            in 0..9 -> {
+                EhEngine.addFavorites(galleryInfo.gid, galleryInfo.token, slot, "")
+            }
+
+            else -> {
+                throw EhException("Invalid favslot!")
+            }
+        }
+        galleryInfo.favoriteName = newFavoriteName
+        galleryInfo.favoriteSlot = slot
+        withUIContext {
+            favouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
+        }
+    }
+    if (!select && slot >= -1 && slot <= 9) {
+        val newFavoriteName = if (slot >= 0) items[slot + 1] else null
+        doAddToFavorites(slot, newFavoriteName)
+    } else {
+        val (slot1, checked) = withUIContext {
+            suspendCancellableCoroutine { cont ->
+                ListCheckBoxDialogBuilder(
+                    this@addToFavorites,
+                    items,
+                    { b, _, position -> cont.resume(position - 1 to b.isChecked) },
+                    getString(R.string.remember_favorite_collection),
+                    false,
+                ).setTitle(R.string.add_favorites_dialog_title).setOnCancelListener { cont.cancel() }.show()
+            }
+        }
+        val newFavoriteName = if (slot1 in 0..9) items[slot1 + 1] else null
+        doAddToFavorites(slot1, newFavoriteName)
+        if (checked) {
+            Settings.putDefaultFavSlot(slot1)
+        } else {
+            Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT)
         }
     }
 }

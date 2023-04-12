@@ -92,6 +92,7 @@ import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
@@ -110,6 +111,7 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
+import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.io.File
 import java.time.LocalDateTime
@@ -798,11 +800,14 @@ class GalleryListScene :
                             RemoveFromFavoriteListener(context),
                         )
                     } else {
-                        CommonOperations.addToFavorites(
-                            activity,
-                            gi,
-                            AddToFavoriteListener(context),
-                        )
+                        lifecycleScope.launchIO {
+                            runSuspendCatching {
+                                requireContext().addToFavorites(gi)
+                                showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
+                            }.onFailure {
+                                showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                            }
+                        }
                     }
 
                     3 -> {
@@ -1115,19 +1120,6 @@ class GalleryListScene :
         override fun onFailure(e: Exception) {
             val scene = this@GalleryListScene
             scene.onGetGalleryListFailure(e, mTaskId)
-        }
-
-        override fun onCancel() {}
-    }
-
-    private class AddToFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene, Unit>(context) {
-        override fun onSuccess(result: Unit) {
-            showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
         }
 
         override fun onCancel() {}

@@ -56,6 +56,7 @@ import com.hippo.ehviewer.databinding.SceneHistoryBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.view.ViewTransition
@@ -67,6 +68,7 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 
 @SuppressLint("NotifyDataSetChanged")
@@ -308,11 +310,14 @@ class HistoryScene : BaseToolbarScene() {
                             RemoveFromFavoriteListener(context),
                         )
                     } else {
-                        CommonOperations.addToFavorites(
-                            activity,
-                            gi,
-                            AddToFavoriteListener(context),
-                        )
+                        lifecycleScope.launchIO {
+                            runSuspendCatching {
+                                requireContext().addToFavorites(gi)
+                                showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
+                            }.onFailure {
+                                showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                            }
+                        }
                     }
 
                     3 -> {
@@ -334,19 +339,6 @@ class HistoryScene : BaseToolbarScene() {
                     }
                 }
             }.show()
-    }
-
-    private class AddToFavoriteListener(context: Context) :
-        EhCallback<GalleryListScene?, Unit>(context) {
-        override fun onSuccess(result: Unit) {
-            showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-        }
-
-        override fun onCancel() {}
     }
 
     private class RemoveFromFavoriteListener(context: Context) :
