@@ -222,7 +222,7 @@ dependencies {
     // https://coil-kt.github.io/coil/changelog/
     implementation("io.coil-kt:coil-compose:2.3.0")
 
-    implementation("io.ktor:ktor-client-okhttp:2.2.4")
+    implementation("io.ktor:ktor-client-okhttp:2.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0-Beta")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0")
     implementation("org.jsoup:jsoup:1.15.4")
