@@ -43,6 +43,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import arrow.core.partially1
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.app.BaseDialogBuilder
@@ -820,7 +821,6 @@ class DownloadsScene :
 
         init {
             // TODO cancel on click listener when select items
-            binding.thumb.setOnClickListener(this)
             binding.start.setOnClickListener(this)
             binding.stop.setOnClickListener(this)
         }
@@ -863,7 +863,9 @@ class DownloadsScene :
         fun bind(info: DownloadInfo) {
             binding.thumb.setContent {
                 Mdc3Theme {
-                    Card {
+                    Card(
+                        onClick = ::onClick.partially1(binding.thumb),
+                    ) {
                         EhAsyncThumb(
                             model = info.thumb,
                             contentScale = ContentScale.Crop,
