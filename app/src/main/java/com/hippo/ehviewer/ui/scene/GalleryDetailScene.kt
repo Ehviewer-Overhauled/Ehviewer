@@ -758,7 +758,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         }
-        FlowRow {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
             if (favourite) {
                 EhAccentIconButton(
                     icon = Icons.Default.Favorite,
