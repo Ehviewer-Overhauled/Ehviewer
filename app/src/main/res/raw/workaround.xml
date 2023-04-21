@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@id/*"
-/>
-
-<!-- Workaround for https://issuetracker.google.com/issues/269500888 , remove this file when fix is public in AGP -->
