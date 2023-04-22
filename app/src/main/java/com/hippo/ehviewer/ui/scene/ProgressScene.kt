@@ -15,20 +15,22 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.util.ExceptionUtils
 import com.hippo.view.ViewTransition
 import com.hippo.yorozuya.ViewUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import moe.tarsin.coroutines.runSuspendCatching
 
 /**
  * Only show a progress with jobs in background
@@ -65,15 +67,31 @@ class ProgressScene : BaseScene(), View.OnClickListener {
             if (mGid == -1L || mPToken == null || mPage == -1) {
                 return false
             }
-            val request = EhRequest()
-                .setMethod(EhClient.METHOD_GET_GALLERY_TOKEN)
-                .setArgs(mGid, mPToken!!, mPage)
-                .setCallback(
-                    GetGalleryTokenListener(
-                        context,
-                    ),
-                )
-            request.enqueue()
+            lifecycleScope.launchIO {
+                runSuspendCatching {
+                    EhEngine.getGalleryToken(mGid, mPToken, mPage)
+                }.onSuccess {
+                    val arg = Bundle()
+                    arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+                    arg.putLong(GalleryDetailScene.KEY_GID, mGid)
+                    arg.putString(GalleryDetailScene.KEY_TOKEN, it)
+                    arg.putInt(GalleryDetailScene.KEY_PAGE, mPage)
+                    withUIContext {
+                        findNavController().popBackStack()
+                        navigate(R.id.galleryDetailScene, arg)
+                    }
+                }.onFailure {
+                    mValid = false
+                    if (null != mViewTransition && null != mTip) {
+                        // Show tip
+                        mError = ExceptionUtils.getReadableString(it)
+                        withUIContext {
+                            mViewTransition!!.showView(1)
+                            mTip!!.text = mError
+                        }
+                    }
+                }
+            }
             return true
         }
         return false
@@ -160,43 +178,6 @@ class ProgressScene : BaseScene(), View.OnClickListener {
                 }
             }
         }
-    }
-
-    private fun onGetGalleryTokenSuccess(result: String) {
-        val arg = Bundle()
-        arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-        arg.putLong(GalleryDetailScene.KEY_GID, mGid)
-        arg.putString(GalleryDetailScene.KEY_TOKEN, result)
-        arg.putInt(GalleryDetailScene.KEY_PAGE, mPage)
-        findNavController().popBackStack()
-        navigate(R.id.galleryDetailScene, arg)
-    }
-
-    private fun onGetGalleryTokenFailure(e: Exception) {
-        mValid = false
-        val context = context
-        if (null != context && null != mViewTransition && null != mTip) {
-            // Show tip
-            mError = ExceptionUtils.getReadableString(e)
-            mViewTransition!!.showView(1)
-            mTip!!.text = mError
-        }
-    }
-
-    private inner class GetGalleryTokenListener(
-        context: Context,
-    ) : EhCallback<ProgressScene, String>(context) {
-        override fun onSuccess(result: String) {
-            val scene = this@ProgressScene
-            scene.onGetGalleryTokenSuccess(result)
-        }
-
-        override fun onFailure(e: Exception) {
-            val scene = this@ProgressScene
-            scene.onGetGalleryTokenFailure(e)
-        }
-
-        override fun onCancel() {}
     }
 
     companion object {
