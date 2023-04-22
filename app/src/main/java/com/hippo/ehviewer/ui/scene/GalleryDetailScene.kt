@@ -126,7 +126,6 @@ import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
-import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhTagDatabase.isTranslatable
 import com.hippo.ehviewer.client.EhTagDatabase.namespaceToPrefix
@@ -178,6 +177,7 @@ import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import kotlin.math.roundToInt
@@ -1562,13 +1562,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private inner class ArchiveListDialogHelper :
-        AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener {
+    private inner class ArchiveListDialogHelper : AdapterView.OnItemClickListener, DialogInterface.OnDismissListener {
         private var mProgressView: CircularProgressIndicator? = null
+        private var mJob: Job? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
-        private var mRequest: EhRequest? = null
         private var mDialog: Dialog? = null
         fun setDialog(dialog: Dialog?, url: String?) {
             mDialog = dialog
@@ -1667,7 +1665,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 val res = mArchiveList!![position].res
                 val isHAtH = mArchiveList!![position].isHAtH
                 composeBindingGD?.run {
-                    lifecycleScope.launchIO {
+                    mJob = lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.downloadArchive(gid, token, mArchiveFormParamOr, res, isHAtH)
                         }.onSuccess { result ->
@@ -1688,6 +1686,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 showTip(R.string.download_archive_failure, LENGTH_LONG)
                             }
                         }
+                        mJob = null
                     }
                 }
             }
@@ -1698,10 +1697,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         override fun onDismiss(dialog: DialogInterface) {
-            if (mRequest != null) {
-                mRequest!!.cancel()
-                mRequest = null
-            }
+            mJob?.cancel()
+            mJob = null
             mDialog = null
             mProgressView = null
             mErrorText = null
@@ -1709,13 +1706,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private inner class TorrentListDialogHelper :
-        AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener {
+    private inner class TorrentListDialogHelper : AdapterView.OnItemClickListener, DialogInterface.OnDismissListener {
         private var mProgressView: CircularProgressIndicator? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
-        private var mRequest: EhRequest? = null
+        private var mJob: Job? = null
         private var mDialog: Dialog? = null
         fun setDialog(dialog: Dialog?, url: String?) {
             mDialog = dialog
@@ -1728,7 +1723,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (mTorrentList == null) {
                     mErrorText!!.visibility = View.GONE
                     mListView!!.visibility = View.GONE
-                    lifecycleScope.launchIO {
+                    mJob = lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.getTorrentList(url!!, mGid, mToken)
                         }.onSuccess {
@@ -1744,6 +1739,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 mErrorText?.text = ExceptionUtils.getReadableString(it)
                             }
                         }
+                        mJob = null
                     }
                 } else {
                     bind(mTorrentList)
@@ -1801,10 +1797,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         override fun onDismiss(dialog: DialogInterface) {
-            if (mRequest != null) {
-                mRequest!!.cancel()
-                mRequest = null
-            }
+            mJob?.cancel()
+            mJob = null
             mDialog = null
             mProgressView = null
             mErrorText = null

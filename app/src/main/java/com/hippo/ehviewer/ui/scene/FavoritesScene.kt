@@ -50,7 +50,6 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
@@ -101,8 +100,6 @@ class FavoritesScene :
 
     private var mDrawerAdapter: FavDrawerAdapter? = null
 
-    private var mClient: EhClient? = null
-
     private var mFavCatArray: Array<String>? = Settings.favCat
 
     private var mFavCountArray: IntArray? = Settings.favCount
@@ -138,7 +135,6 @@ class FavoritesScene :
     private var mModifyAdd = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mClient = EhClient
         mFavLocalCount = Settings.favLocalCount
         mFavCountSum = Settings.favCloudCount
         if (savedInstanceState == null) {
@@ -181,7 +177,6 @@ class FavoritesScene :
 
     override fun onDestroy() {
         super.onDestroy()
-        mClient = null
         mFavCatArray = null
         mFavCountArray = null
         mFavCountSum = 0
@@ -860,7 +855,7 @@ class FavoritesScene :
             isNext: Boolean,
         ) {
             val activity = mainActivity
-            if (null == activity || null == mUrlBuilder || null == mClient) {
+            if (null == activity || null == mUrlBuilder) {
                 return
             }
             if (mEnableModify) {
