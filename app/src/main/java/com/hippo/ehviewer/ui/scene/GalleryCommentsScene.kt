@@ -65,10 +65,8 @@ import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
-import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryComment
 import com.hippo.ehviewer.client.data.GalleryCommentList
@@ -677,22 +675,26 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             }
         } else if (mSendImage === v) {
             if (!mInAnimation) {
-                val comment = mEditText!!.text.toBBCode()
-                if (TextUtils.isEmpty(comment)) {
-                    // Comment is empty
-                    return
-                }
+                val comment = mEditText?.text?.toBBCode()?.takeIf { it.isNotBlank() } ?: return
                 val url = galleryDetailUrl ?: return
-                // Request
-                val request = EhRequest()
-                    .setMethod(EhClient.METHOD_GET_COMMENT_GALLERY)
-                    .setArgs(
-                        url,
-                        comment,
-                        if (mCommentId != 0L) mCommentId.toString() else null,
-                    )
-                    .setCallback(CommentGalleryListener(context, mCommentId))
-                request.enqueue(this)
+                lifecycleScope.launchIO {
+                    runSuspendCatching {
+                        EhEngine.commentGallery(url, comment, if (mCommentId != 0L) mCommentId.toString() else null)
+                    }.onSuccess {
+                        showTip(if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully, LENGTH_SHORT)
+                        withUIContext {
+                            onCommentGallerySuccess(it)
+                        }
+                    }.onFailure {
+                        showTip(
+                            """
+    ${getString(if (mCommentId != 0L) R.string.edit_comment_failed else R.string.comment_failed)}
+    ${ExceptionUtils.getReadableString(it)}
+                            """.trimIndent(),
+                            LENGTH_LONG,
+                        )
+                    }
+                }
                 hideSoftInput()
                 hideEditPanel(true)
             }
@@ -796,30 +798,6 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private class ProgressCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
         CommentHolder(inflater, R.layout.item_gallery_comment_progress, parent)
-
-    private inner class CommentGalleryListener(context: Context, private val mCommentId: Long) :
-        EhCallback<GalleryCommentsScene?, GalleryCommentList>(context) {
-        override fun onSuccess(result: GalleryCommentList) {
-            showTip(
-                if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully,
-                LENGTH_SHORT,
-            )
-            val scene = this@GalleryCommentsScene
-            scene.onCommentGallerySuccess(result)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(
-                """
-    ${content.getString(if (mCommentId != 0L) R.string.edit_comment_failed else R.string.comment_failed)}
-    ${ExceptionUtils.getReadableString(e)}
-                """.trimIndent(),
-                LENGTH_LONG,
-            )
-        }
-
-        override fun onCancel() {}
-    }
 
     private inner class ActualCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
         CommentHolder(inflater, R.layout.item_gallery_comment, parent) {
