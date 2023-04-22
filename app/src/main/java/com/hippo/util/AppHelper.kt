@@ -16,8 +16,10 @@
 package com.hippo.util
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.R
 
 object AppHelper {
@@ -37,3 +39,5 @@ object AppHelper {
         }
     }
 }
+
+inline fun <reified T> Context.getSystemService(): T? = ContextCompat.getSystemService(this, T::class.java)

@@ -170,6 +170,7 @@ import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
+import com.hippo.util.getSystemService
 import com.hippo.widget.ObservedTextView
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import com.hippo.yorozuya.FileUtils
@@ -1543,41 +1544,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private class DownloadArchiveListener(
-        context: Context,
-        private val mGalleryInfo: GalleryInfo?,
-    ) : EhCallback<GalleryDetailScene?, String?>(context) {
-        override fun onSuccess(result: String?) {
-            // TODO: Don't use buggy system download service
-            val r = DownloadManager.Request(Uri.parse(result))
-            val name =
-                mGalleryInfo!!.gid.toString() + "-" + EhUtils.getSuitableTitle(mGalleryInfo) + ".zip"
-            r.setDestinationInExternalPublicDir(
-                Environment.DIRECTORY_DOWNLOADS,
-                FileUtils.sanitizeFilename(name),
-            )
-            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            val dm = application.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            try {
-                dm.enqueue(r)
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                ExceptionUtils.throwIfFatal(e)
-            }
-            showTip(R.string.download_archive_started, LENGTH_SHORT)
-        }
-
-        override fun onFailure(e: Exception) {
-            if (e is NoHAtHClientException) {
-                showTip(R.string.download_archive_failure_no_hath, LENGTH_LONG)
-            } else {
-                showTip(R.string.download_archive_failure, LENGTH_LONG)
-            }
-        }
-
-        override fun onCancel() {}
-    }
-
     private inner class DeleteDialogHelper(
         private val mDownloadManager: com.hippo.ehviewer.download.DownloadManager?,
         private val mGalleryInfo: GalleryInfo,
@@ -1713,17 +1679,30 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 }
                 val res = mArchiveList!![position].res
                 val isHAtH = mArchiveList!![position].isHAtH
-                val request = EhRequest()
-                request.setMethod(EhClient.METHOD_DOWNLOAD_ARCHIVE)
-                request.setArgs(
-                    composeBindingGD!!.gid,
-                    composeBindingGD!!.token!!,
-                    mArchiveFormParamOr!!,
-                    res,
-                    isHAtH,
-                )
-                request.setCallback(DownloadArchiveListener(context, composeBindingGD))
-                request.enqueue(this@GalleryDetailScene)
+                composeBindingGD?.run {
+                    lifecycleScope.launchIO {
+                        runSuspendCatching {
+                            EhEngine.downloadArchive(gid, token, mArchiveFormParamOr, res, isHAtH)
+                        }.onSuccess { result ->
+                            val r = DownloadManager.Request(Uri.parse(result))
+                            val name = gid.toString() + "-" + EhUtils.getSuitableTitle(this@run) + ".zip"
+                            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, FileUtils.sanitizeFilename(name))
+                            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                            runCatching {
+                                requireContext().getSystemService<DownloadManager>()!!.enqueue(r)
+                            }.onFailure {
+                                it.printStackTrace()
+                            }
+                            showTip(R.string.download_archive_started, LENGTH_SHORT)
+                        }.onFailure {
+                            if (it is NoHAtHClientException) {
+                                showTip(R.string.download_archive_failure_no_hath, LENGTH_LONG)
+                            } else {
+                                showTip(R.string.download_archive_failure, LENGTH_LONG)
+                            }
+                        }
+                    }
+                }
             }
             if (mDialog != null) {
                 mDialog!!.dismiss()

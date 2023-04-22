@@ -125,14 +125,6 @@ object EhClient {
                 params[2] as String?,
             )
 
-            METHOD_DOWNLOAD_ARCHIVE -> EhEngine.downloadArchive(
-                params[0] as Long,
-                params[1] as String?,
-                params[2] as String?,
-                params[3] as String?,
-                params[4] as Boolean,
-            )
-
             else -> throw IllegalStateException("Can't detect method $method")
         }
     }
@@ -156,5 +148,4 @@ object EhClient {
     const val METHOD_VOTE_COMMENT = 15
     const val METHOD_IMAGE_SEARCH = 16
     const val METHOD_ARCHIVE_LIST = 17
-    const val METHOD_DOWNLOAD_ARCHIVE = 18
 }
