@@ -594,7 +594,7 @@ class ReaderActivity : EhActivity() {
         val readerPreferences = EhApplication.readerPreferences
     }
 
-    /* Tachiyomi funcs */
+    // Tachiyomi funcs
 
     var isScrollingThroughPages = false
         private set

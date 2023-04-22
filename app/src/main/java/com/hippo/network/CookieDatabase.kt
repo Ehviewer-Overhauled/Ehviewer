@@ -70,7 +70,7 @@ interface CookiesDao {
     fun update(cookie: Cookie)
 }
 
-/* 1 -> 2 some nullability changes */
+// 1 -> 2 some nullability changes
 @Database(
     entities = [Cookie::class],
     version = 2,

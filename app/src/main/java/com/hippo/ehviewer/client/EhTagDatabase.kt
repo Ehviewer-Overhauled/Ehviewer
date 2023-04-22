@@ -95,7 +95,7 @@ object EhTagDatabase : CoroutineScope {
         }
     }
 
-    /* Construct a cold flow for tag database suggestions */
+    // Construct a cold flow for tag database suggestions
     fun suggestFlow(
         keyword: String,
         translate: Boolean,

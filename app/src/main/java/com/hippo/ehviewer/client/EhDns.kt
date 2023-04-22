@@ -27,7 +27,7 @@ object EhDns : Dns {
     private val builtInHosts: MutableMap<String, List<InetAddress>> = mutableMapOf()
 
     init {
-        /* Pair(ip: String!, blockedByCCP: Boolean!) */
+        // Pair(ip: String!, blockedByCCP: Boolean!)
         val ehgtHosts = arrayOf(
             Pair("37.48.89.44", false),
             Pair("81.171.10.48", false),
