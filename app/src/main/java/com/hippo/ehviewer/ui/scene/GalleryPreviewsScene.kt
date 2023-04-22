@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import coil.imageLoader
-import coil.request.ImageRequest
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
@@ -34,7 +33,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.ehviewer.coil.ehUrl
+import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.databinding.DialogGoToBinding
 import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
 import com.hippo.util.getParcelableCompat
@@ -169,10 +168,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             if (Settings.preloadThumbAggressively) {
                 lifecycleScope.launchIO {
                     result.first.forEach {
-                        it.imageUrl.run {
-                            context?.imageLoader?.enqueue(
-                                ImageRequest.Builder(requireContext()).ehUrl(this).build(),
-                            )
+                        context?.run {
+                            imageLoader.enqueue(imageRequest(it.imageUrl))
                         }
                     }
                 }

@@ -112,7 +112,6 @@ import arrow.core.partially1
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
-import coil.request.ImageRequest
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -146,7 +145,7 @@ import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
-import com.hippo.ehviewer.coil.ehUrl
+import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
@@ -932,10 +931,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (Settings.preloadThumbAggressively) {
                     lifecycleScope.launchIO {
                         galleryDetail.previewList.forEach {
-                            it.imageUrl.run {
-                                context?.imageLoader?.enqueue(
-                                    ImageRequest.Builder(requireContext()).ehUrl(this).build(),
-                                )
+                            context?.run {
+                                imageLoader.enqueue(imageRequest(it.imageUrl))
                             }
                         }
                     }

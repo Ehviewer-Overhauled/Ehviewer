@@ -50,7 +50,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.imageLoader
-import coil.request.ImageRequest
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.CompositeDateValidator
@@ -83,7 +82,7 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
-import com.hippo.ehviewer.coil.ehUrl
+import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
@@ -1069,10 +1068,8 @@ class GalleryListScene :
         if (Settings.preloadThumbAggressively) {
             lifecycleScope.launchIO {
                 result.galleryInfoList.forEach {
-                    it.thumb?.run {
-                        context?.imageLoader?.enqueue(
-                            ImageRequest.Builder(requireContext()).ehUrl(this).build(),
-                        )
+                    context?.run {
+                        imageLoader.enqueue(imageRequest(it.thumb))
                     }
                 }
             }

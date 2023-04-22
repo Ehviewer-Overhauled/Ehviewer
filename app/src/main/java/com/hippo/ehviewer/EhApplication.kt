@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.disk.DiskCache
 import coil.util.DebugLogger
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
@@ -34,6 +33,7 @@ import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
+import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
@@ -247,10 +247,10 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val ehDatabase by lazy { buildMainDB(application) }
 
         val imageCache by lazy {
-            DiskCache.Builder().apply {
+            diskCache {
                 directory(application.cacheDir.toOkioPath() / "image_cache")
                 maxSizeBytes(Settings.readCacheSize.coerceIn(320, 5120).toLong() * 1024 * 1024)
-            }.build()
+            }
         }
     }
 }

@@ -18,12 +18,12 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.coil.ehUrl
+import com.hippo.ehviewer.coil.imageRequest
 
 @Composable
 @ReadOnlyComposable
 fun requestOf(model: String?): ImageRequest {
-    return ImageRequest.Builder(LocalContext.current).apply { model?.let { ehUrl(it) } }.build()
+    return LocalContext.current.imageRequest(model)
 }
 
 @Composable
