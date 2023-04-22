@@ -17,7 +17,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.animation.Animator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Resources
@@ -68,8 +67,7 @@ import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
@@ -1100,31 +1098,9 @@ class GalleryListScene :
         }
     }
 
-    private fun onGetGalleryListFailure(e: Exception, taskId: Int) {
-        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
-            mHelper!!.onGetException(taskId, e)
-        }
-    }
-
     @IntDef(STATE_NORMAL, STATE_SIMPLE_SEARCH, STATE_SEARCH, STATE_SEARCH_SHOW_LIST)
     @Retention(AnnotationRetention.SOURCE)
     private annotation class State
-    private inner class GetGalleryListListener(
-        context: Context,
-        private val mTaskId: Int,
-    ) : EhCallback<GalleryListScene, GalleryListParser.Result>(context) {
-        override fun onSuccess(result: GalleryListParser.Result) {
-            val scene = this@GalleryListScene
-            scene.onGetGalleryListSuccess(result, mTaskId)
-        }
-
-        override fun onFailure(e: Exception) {
-            val scene = this@GalleryListScene
-            scene.onGetGalleryListFailure(e, mTaskId)
-        }
-
-        override fun onCancel() {}
-    }
 
     private class QsDrawerHolder(val binding: ItemDrawerListBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -1317,34 +1293,28 @@ class GalleryListScene :
                 mUrlBuilder.setIndex(index, isNext)
                 mUrlBuilder.setJumpTo(jumpTo)
             }
-            if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
-                val request = EhRequest()
-                request.setMethod(EhClient.METHOD_IMAGE_SEARCH)
-                request.setCallback(
-                    GetGalleryListListener(
-                        context,
-                        taskId,
-                    ),
-                )
-                request.setArgs(
-                    File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
-                    mUrlBuilder.isUseSimilarityScan,
-                    mUrlBuilder.isOnlySearchCovers,
-                    mUrlBuilder.isShowExpunged,
-                )
-                request.enqueue(this@GalleryListScene)
-            } else {
-                val url = mUrlBuilder.build()
-                val request = EhRequest()
-                request.setMethod(EhClient.METHOD_GET_GALLERY_LIST)
-                request.setCallback(
-                    GetGalleryListListener(
-                        context,
-                        taskId,
-                    ),
-                )
-                request.setArgs(url)
-                request.enqueue(this@GalleryListScene)
+            lifecycleScope.launchIO {
+                runSuspendCatching {
+                    if (ListUrlBuilder.MODE_IMAGE_SEARCH == mUrlBuilder.mode) {
+                        EhEngine.imageSearch(
+                            File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
+                            mUrlBuilder.isUseSimilarityScan,
+                            mUrlBuilder.isOnlySearchCovers,
+                            mUrlBuilder.isShowExpunged,
+                        )
+                    } else {
+                        val url = mUrlBuilder.build()
+                        EhEngine.getGalleryList(url)
+                    }
+                }.onSuccess {
+                    withUIContext {
+                        onGetGalleryListSuccess(it, taskId)
+                    }
+                }.onFailure { throwable ->
+                    withUIContext {
+                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetException(taskId, throwable)
+                    }
+                }
             }
         }
 

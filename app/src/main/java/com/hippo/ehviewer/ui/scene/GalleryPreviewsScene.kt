@@ -40,6 +40,7 @@ import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 
@@ -190,9 +191,13 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                                 }
                             }
                         }
-                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.run { onGetPageData(taskId, result.second, 0, null, null, result.first) }
-                    }.onFailure {
-                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.run { onGetException(taskId, it) }
+                        withUIContext {
+                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetPageData(taskId, result.second, 0, null, null, result.first)
+                        }
+                    }.onFailure { throwable ->
+                        withUIContext {
+                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetException(taskId, throwable)
+                        }
                     }
                 }
             }

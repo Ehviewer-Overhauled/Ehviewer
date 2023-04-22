@@ -19,7 +19,6 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import java.io.File
 
 object EhClient {
     internal fun enqueue(request: EhRequest, scope: CoroutineScope) {
@@ -47,10 +46,6 @@ object EhClient {
 
     suspend fun execute(method: Int, vararg params: Any?): Any? {
         return when (method) {
-            METHOD_GET_GALLERY_LIST -> EhEngine.getGalleryList(
-                params[0] as String,
-            )
-
             METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
                 params[0] as String,
             )
@@ -91,13 +86,6 @@ object EhClient {
                 params[2] as String?,
             )
 
-            METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
-                params[0] as File,
-                params[1] as Boolean,
-                params[2] as Boolean,
-                params[3] as Boolean,
-            )
-
             METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
                 params[0] as String,
                 params[1] as Long,
@@ -114,7 +102,6 @@ object EhClient {
         fun onCancel()
     }
 
-    const val METHOD_GET_GALLERY_LIST = 1
     const val METHOD_GET_GALLERY_DETAIL = 3
     const val METHOD_GET_COMMENT_GALLERY = 6
     const val METHOD_GET_GALLERY_TOKEN = 7
@@ -122,6 +109,5 @@ object EhClient {
     const val METHOD_ADD_FAVORITES_RANGE = 10
     const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12
-    const val METHOD_IMAGE_SEARCH = 16
     const val METHOD_ARCHIVE_LIST = 17
 }
