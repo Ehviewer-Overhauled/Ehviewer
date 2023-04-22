@@ -59,14 +59,6 @@ object EhClient {
                 params[0] as String,
             )
 
-            METHOD_GET_RATE_GALLERY -> EhEngine.rateGallery(
-                params[0] as Long,
-                params[1] as String?,
-                params[2] as Long,
-                params[3] as String?,
-                params[4] as Float,
-            )
-
             METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
                 params[0] as String?,
                 params[1] as String,
@@ -138,7 +130,6 @@ object EhClient {
     const val METHOD_GET_GALLERY_LIST = 1
     const val METHOD_GET_GALLERY_DETAIL = 3
     const val METHOD_GET_PREVIEW_LIST = 4
-    const val METHOD_GET_RATE_GALLERY = 5
     const val METHOD_GET_COMMENT_GALLERY = 6
     const val METHOD_GET_GALLERY_TOKEN = 7
     const val METHOD_GET_FAVORITES = 8

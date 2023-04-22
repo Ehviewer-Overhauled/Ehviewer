@@ -143,7 +143,6 @@ import com.hippo.ehviewer.client.getPreviewThumbKey
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
-import com.hippo.ehviewer.client.parser.RateGalleryParser
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.dao.DownloadInfo
@@ -1528,15 +1527,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     override fun onRenameLabel(from: String, to: String) {}
     override fun onUpdateLabels() {}
 
-    private fun onRateGallerySuccess(result: RateGalleryParser.Result) {
-        composeBindingGD?.apply {
-            rating = result.rating
-            ratingCount = result.ratingCount
-        }
-        composeBindingGD = composeBindingGD
-        ratingText = getAllRatingText(result.rating, result.ratingCount)
-    }
-
     private fun onModifyFavoritesSuccess(addOrRemove: Boolean) {
         if (composeBindingGD != null) {
             composeBindingGD!!.isFavorited = !addOrRemove && composeBindingGD!!.favoriteName != null
@@ -1570,23 +1560,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 }
             }
         }
-    }
-
-    private inner class RateGalleryListener(
-        context: Context,
-    ) : EhCallback<GalleryDetailScene?, RateGalleryParser.Result>(context) {
-        override fun onSuccess(result: RateGalleryParser.Result) {
-            showTip(R.string.rate_successfully, LENGTH_SHORT)
-            val scene = this@GalleryDetailScene
-            scene.onRateGallerySuccess(result)
-        }
-
-        override fun onFailure(e: Exception) {
-            e.printStackTrace()
-            showTip(R.string.rate_failed, LENGTH_LONG)
-        }
-
-        override fun onCancel() {}
     }
 
     private inner class ArchiveListDialogHelper :
@@ -1879,26 +1852,24 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
 
         override fun onClick(dialog: DialogInterface, which: Int) {
-            val context = context
-            val activity = mainActivity
-            if (null == context || null == activity || which != DialogInterface.BUTTON_POSITIVE || null == composeBindingGD || null == mRatingBar) {
-                return
+            if (which != DialogInterface.BUTTON_POSITIVE) return
+            val gd = composeBindingGD ?: return
+            val r = mRatingBar?.rating ?: return
+            lifecycleScope.launchIO {
+                runSuspendCatching {
+                    EhEngine.rateGallery(gd.apiUid, gd.apiKey, gd.gid, gd.token, r)
+                }.onSuccess { result ->
+                    showTip(R.string.rate_successfully, LENGTH_SHORT)
+                    composeBindingGD = composeBindingGD?.apply {
+                        rating = result.rating
+                        ratingCount = result.ratingCount
+                    }
+                    ratingText = getAllRatingText(result.rating, result.ratingCount)
+                }.onFailure {
+                    it.printStackTrace()
+                    showTip(R.string.rate_failed, LENGTH_LONG)
+                }
             }
-            val request = EhRequest()
-                .setMethod(EhClient.METHOD_GET_RATE_GALLERY)
-                .setArgs(
-                    composeBindingGD!!.apiUid,
-                    composeBindingGD!!.apiKey!!,
-                    composeBindingGD!!.gid,
-                    composeBindingGD!!.token!!,
-                    mRatingBar!!.rating,
-                )
-                .setCallback(
-                    RateGalleryListener(
-                        context,
-                    ),
-                )
-            request.enqueue(this@GalleryDetailScene)
         }
     }
 
