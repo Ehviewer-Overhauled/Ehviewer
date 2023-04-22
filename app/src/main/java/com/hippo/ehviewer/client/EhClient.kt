@@ -50,18 +50,6 @@ object EhClient {
                 params[0] as String,
             )
 
-            METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
-                params[0] as String,
-                params[1] as Long,
-                params[2] as String?,
-            )
-
-            METHOD_ARCHIVE_LIST -> EhEngine.getArchiveList(
-                params[0] as String,
-                params[1] as Long,
-                params[2] as String?,
-            )
-
             else -> throw IllegalStateException("Can't detect method $method")
         }
     }
@@ -73,6 +61,4 @@ object EhClient {
     }
 
     const val METHOD_GET_FAVORITES = 8
-    const val METHOD_GET_TORRENT_LIST = 12
-    const val METHOD_ARCHIVE_LIST = 17
 }

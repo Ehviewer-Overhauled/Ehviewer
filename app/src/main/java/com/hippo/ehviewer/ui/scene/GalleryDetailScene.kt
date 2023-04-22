@@ -123,7 +123,6 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
-import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
@@ -1565,8 +1564,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private inner class ArchiveListDialogHelper :
         AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener,
-        EhClient.Callback<ArchiveParser.Result> {
+        DialogInterface.OnDismissListener {
         private var mProgressView: CircularProgressIndicator? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
@@ -1583,10 +1581,25 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (mArchiveList == null) {
                     mErrorText!!.visibility = View.GONE
                     mListView!!.visibility = View.GONE
-                    mRequest = EhRequest().setMethod(EhClient.METHOD_ARCHIVE_LIST)
-                        .setArgs(url!!, mGid, mToken)
-                        .setCallback(this)
-                    mRequest!!.enqueue(this@GalleryDetailScene)
+                    lifecycleScope.launchIO {
+                        runSuspendCatching {
+                            EhEngine.getArchiveList(url!!, mGid, mToken)
+                        }.onSuccess { result ->
+                            mArchiveFormParamOr = result.paramOr
+                            mArchiveList = result.archiveList
+                            mCurrentFunds = result.funds
+                            withUIContext {
+                                bind(result.archiveList, result.funds)
+                            }
+                        }.onFailure {
+                            withUIContext {
+                                mProgressView?.visibility = View.GONE
+                                mErrorText?.visibility = View.VISIBLE
+                                mListView?.visibility = View.GONE
+                                mErrorText?.text = ExceptionUtils.getReadableString(it)
+                            }
+                        }
+                    }
                 } else {
                     bind(mArchiveList, mCurrentFunds)
                 }
@@ -1694,37 +1707,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             mErrorText = null
             mListView = null
         }
-
-        override fun onSuccess(result: ArchiveParser.Result) {
-            if (mRequest != null) {
-                mRequest = null
-                mArchiveFormParamOr = result.paramOr
-                mArchiveList = result.archiveList
-                mCurrentFunds = result.funds
-                bind(result.archiveList, result.funds)
-            }
-        }
-
-        override fun onFailure(e: Exception) {
-            mRequest = null
-            val context = context
-            if (null != context && null != mProgressView && null != mErrorText && null != mListView) {
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.VISIBLE
-                mListView!!.visibility = View.GONE
-                mErrorText!!.text = ExceptionUtils.getReadableString(e)
-            }
-        }
-
-        override fun onCancel() {
-            mRequest = null
-        }
     }
 
     private inner class TorrentListDialogHelper :
         AdapterView.OnItemClickListener,
-        DialogInterface.OnDismissListener,
-        EhClient.Callback<List<TorrentParser.Result>> {
+        DialogInterface.OnDismissListener {
         private var mProgressView: CircularProgressIndicator? = null
         private var mErrorText: TextView? = null
         private var mListView: ListView? = null
@@ -1741,10 +1728,23 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (mTorrentList == null) {
                     mErrorText!!.visibility = View.GONE
                     mListView!!.visibility = View.GONE
-                    mRequest = EhRequest().setMethod(EhClient.METHOD_GET_TORRENT_LIST)
-                        .setArgs(url!!, mGid, mToken)
-                        .setCallback(this)
-                    mRequest!!.enqueue(this@GalleryDetailScene)
+                    lifecycleScope.launchIO {
+                        runSuspendCatching {
+                            EhEngine.getTorrentList(url!!, mGid, mToken)
+                        }.onSuccess {
+                            mTorrentList = it
+                            withUIContext {
+                                bind(it)
+                            }
+                        }.onFailure {
+                            withUIContext {
+                                mProgressView?.visibility = View.GONE
+                                mErrorText?.visibility = View.VISIBLE
+                                mListView?.visibility = View.GONE
+                                mErrorText?.text = ExceptionUtils.getReadableString(it)
+                            }
+                        }
+                    }
                 } else {
                     bind(mTorrentList)
                 }
@@ -1809,29 +1809,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             mProgressView = null
             mErrorText = null
             mListView = null
-        }
-
-        override fun onSuccess(result: List<TorrentParser.Result>) {
-            if (mRequest != null) {
-                mRequest = null
-                mTorrentList = result
-                bind(result)
-            }
-        }
-
-        override fun onFailure(e: Exception) {
-            mRequest = null
-            val context = context
-            if (null != context && null != mProgressView && null != mErrorText && null != mListView) {
-                mProgressView!!.visibility = View.GONE
-                mErrorText!!.visibility = View.VISIBLE
-                mListView!!.visibility = View.GONE
-                mErrorText!!.text = ExceptionUtils.getReadableString(e)
-            }
-        }
-
-        override fun onCancel() {
-            mRequest = null
         }
     }
 
