@@ -17,7 +17,6 @@ package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
@@ -53,7 +52,6 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -656,7 +654,7 @@ class FavoritesScene :
         }
     }
 
-    private fun onGetFavoritesFailure(e: Exception, taskId: Int) {
+    private fun onGetFavoritesFailure(e: Throwable, taskId: Int) {
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             mHelper!!.onGetException(taskId, e)
         }
@@ -692,37 +690,6 @@ class FavoritesScene :
             key = ViewUtils.`$$`(itemView, R.id.key) as TextView
             value = ViewUtils.`$$`(itemView, R.id.value) as TextView
         }
-    }
-
-    private inner class GetFavoritesListener(
-        context: Context,
-        private val mTaskId: Int, // Local fav is shown now, but operation need be done for cloud fav
-        private val mLocal: Boolean,
-        private val mKeyword: String?,
-    ) : EhCallback<FavoritesScene?, FavoritesParser.Result>(context) {
-        override fun onSuccess(result: FavoritesParser.Result) {
-            // Put fav cat
-            Settings.putFavCat(result.catArray)
-            Settings.putFavCount(result.countArray)
-            val scene = this@FavoritesScene
-            if (mLocal) {
-                scene.onGetFavoritesLocal(mKeyword, mTaskId)
-            } else {
-                scene.onGetFavoritesSuccess(result, mTaskId)
-            }
-        }
-
-        override fun onFailure(e: Exception) {
-            val scene = this@FavoritesScene
-            if (mLocal) {
-                e.printStackTrace()
-                scene.onGetFavoritesLocal(mKeyword, mTaskId)
-            } else {
-                scene.onGetFavoritesFailure(e, mTaskId)
-            }
-        }
-
-        override fun onCancel() {}
     }
 
     private inner class FavDrawerAdapter(private val mInflater: LayoutInflater) :
@@ -943,18 +910,31 @@ class FavoritesScene :
                         mUrlBuilder!!.build()
                     }
                     mUrlBuilder!!.setIndex(index, true)
-                    val request = EhRequest()
-                    request.setMethod(EhClient.METHOD_MODIFY_FAVORITES)
-                    request.setCallback(
-                        GetFavoritesListener(
-                            context,
-                            taskId,
-                            local,
-                            mUrlBuilder!!.keyword,
-                        ),
-                    )
-                    request.setArgs(url, gidArray, mModifyFavCat)
-                    request.enqueue(this@FavoritesScene)
+                    lifecycleScope.launchIO {
+                        runSuspendCatching {
+                            EhEngine.modifyFavorites(url, gidArray, mModifyFavCat)
+                        }.onSuccess { result ->
+                            // Put fav cat
+                            Settings.putFavCat(result.catArray)
+                            Settings.putFavCount(result.countArray)
+                            withUIContext {
+                                if (local) {
+                                    onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
+                                } else {
+                                    onGetFavoritesSuccess(result, taskId)
+                                }
+                            }
+                        }.onFailure {
+                            it.printStackTrace()
+                            withUIContext {
+                                if (local) {
+                                    onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
+                                } else {
+                                    onGetFavoritesFailure(it, taskId)
+                                }
+                            }
+                        }
+                    }
                 }
             } else if (mUrlBuilder!!.favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
                 val keyword = mUrlBuilder!!.keyword
@@ -963,18 +943,21 @@ class FavoritesScene :
                 mUrlBuilder!!.setIndex(index, isNext)
                 mUrlBuilder!!.jumpTo = jumpTo
                 val url = mUrlBuilder!!.build()
-                val request = EhRequest()
-                request.setMethod(EhClient.METHOD_GET_FAVORITES)
-                request.setCallback(
-                    GetFavoritesListener(
-                        context,
-                        taskId,
-                        false,
-                        mUrlBuilder!!.keyword,
-                    ),
-                )
-                request.setArgs(url)
-                request.enqueue(this@FavoritesScene)
+                lifecycleScope.launchIO {
+                    runSuspendCatching {
+                        EhEngine.getFavorites(url)
+                    }.onSuccess { result ->
+                        Settings.putFavCat(result.catArray)
+                        Settings.putFavCount(result.countArray)
+                        withUIContext {
+                            onGetFavoritesSuccess(result, taskId)
+                        }
+                    }.onFailure {
+                        withUIContext {
+                            onGetFavoritesFailure(it, taskId)
+                        }
+                    }
+                }
             }
         }
 

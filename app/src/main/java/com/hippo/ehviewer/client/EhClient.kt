@@ -50,12 +50,6 @@ object EhClient {
                 params[0] as String,
             )
 
-            METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
-                params[0] as String,
-                params[1] as LongArray,
-                params[2] as Int,
-            )
-
             METHOD_GET_TORRENT_LIST -> EhEngine.getTorrentList(
                 params[0] as String,
                 params[1] as Long,
@@ -79,7 +73,6 @@ object EhClient {
     }
 
     const val METHOD_GET_FAVORITES = 8
-    const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12
     const val METHOD_ARCHIVE_LIST = 17
 }
