@@ -133,15 +133,6 @@ object EhClient {
                 params[4] as Boolean,
             )
 
-            METHOD_VOTE_TAG -> EhEngine.voteTag(
-                params[0] as Long,
-                params[1] as String?,
-                params[2] as Long,
-                params[3] as String?,
-                params[4] as String?,
-                params[5] as Int,
-            )
-
             else -> throw IllegalStateException("Can't detect method $method")
         }
     }
@@ -166,5 +157,4 @@ object EhClient {
     const val METHOD_IMAGE_SEARCH = 16
     const val METHOD_ARCHIVE_LIST = 17
     const val METHOD_DOWNLOAD_ARCHIVE = 18
-    const val METHOD_VOTE_TAG = 19
 }

@@ -1391,23 +1391,21 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun voteTag(tag: String, vote: Int) {
-        val context = context
-        val activity = mainActivity
-        if (null == context || null == activity) {
-            return
+        composeBindingGD?.run {
+            lifecycleScope.launchIO {
+                runSuspendCatching {
+                    EhEngine.voteTag(apiUid, apiKey, gid, token, tag, vote)
+                }.onSuccess { result ->
+                    if (result.isNotEmpty()) {
+                        showTip(result, LENGTH_SHORT)
+                    } else {
+                        showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
+                    }
+                }.onFailure {
+                    showTip(R.string.vote_failed, LENGTH_LONG)
+                }
+            }
         }
-        val request = EhRequest()
-            .setMethod(EhClient.METHOD_VOTE_TAG)
-            .setArgs(
-                composeBindingGD!!.apiUid,
-                composeBindingGD!!.apiKey!!,
-                composeBindingGD!!.gid,
-                composeBindingGD!!.token!!,
-                tag,
-                vote,
-            )
-            .setCallback(VoteTagListener(context))
-        request.enqueue(this)
     }
 
     private fun downloadLongClick() {
@@ -1543,23 +1541,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             composeBindingGD!!.isFavorited = !addOrRemove && composeBindingGD!!.favoriteName != null
             updateFavoriteDrawable()
         }
-    }
-
-    private class VoteTagListener(context: Context) :
-        EhCallback<GalleryDetailScene?, String>(context) {
-        override fun onSuccess(result: String) {
-            if (result.isNotEmpty()) {
-                showTip(result, LENGTH_SHORT)
-            } else {
-                showTip(R.string.tag_vote_successfully, LENGTH_SHORT)
-            }
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.vote_failed, LENGTH_LONG)
-        }
-
-        override fun onCancel() {}
     }
 
     private class DownloadArchiveListener(
