@@ -1121,15 +1121,16 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             val weak = it.startsWith('_')
                             val real = it.removePrefix("_")
                             val translated = real.translate(prefix)
+                            val tag = this@run + ":" + real
                             fun onClick() {
                                 val lub = ListUrlBuilder()
                                 lub.mode = ListUrlBuilder.MODE_TAG
-                                lub.keyword = this@run + ":" + real
+                                lub.keyword = tag
                                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                             }
 
                             fun onLongClick() {
-                                showTagDialog(translated, real)
+                                showTagDialog(translated, tag)
                             }
                             baseRoundText(
                                 text = translated,
