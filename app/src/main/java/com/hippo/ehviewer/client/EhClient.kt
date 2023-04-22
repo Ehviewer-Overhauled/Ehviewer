@@ -46,10 +46,6 @@ object EhClient {
 
     suspend fun execute(method: Int, vararg params: Any?): Any? {
         return when (method) {
-            METHOD_GET_GALLERY_DETAIL -> EhEngine.getGalleryDetail(
-                params[0] as String,
-            )
-
             METHOD_GET_COMMENT_GALLERY -> EhEngine.commentGallery(
                 params[0] as String?,
                 params[1] as String,
@@ -96,7 +92,6 @@ object EhClient {
         fun onCancel()
     }
 
-    const val METHOD_GET_GALLERY_DETAIL = 3
     const val METHOD_GET_COMMENT_GALLERY = 6
     const val METHOD_GET_FAVORITES = 8
     const val METHOD_ADD_FAVORITES_RANGE = 10

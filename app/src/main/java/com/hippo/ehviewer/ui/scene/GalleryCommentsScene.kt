@@ -76,7 +76,6 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
-import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
 import com.hippo.util.ExceptionUtils
@@ -493,17 +492,25 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             mRefreshingComments = true
             mShowAllComments = true
             mAdapter!!.notifyItemChanged(position)
-            val url = galleryDetailUrl
-            if (url != null) {
-                // Request
-                val request = EhRequest()
-                    .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
-                    .setArgs(url)
-                    .setCallback(RefreshCommentListener(activity))
-                request.enqueue(this)
-            }
+            galleryDetailUrl?.let { refreshComment(it) }
         }
         return true
+    }
+
+    private fun refreshComment(url: String) {
+        lifecycleScope.launchIO {
+            runSuspendCatching {
+                EhEngine.getGalleryDetail(url)
+            }.onSuccess {
+                withUIContext {
+                    onRefreshGallerySuccess(it.comments)
+                }
+            }.onFailure {
+                withUIContext {
+                    onRefreshGalleryFailure()
+                }
+            }
+        }
     }
 
     private fun updateView(animation: Boolean) {
@@ -764,17 +771,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     override fun onRefresh() {
         if (!mRefreshingComments && mAdapter != null) {
-            val activity = requireActivity() as MainActivity
             mRefreshingComments = true
-            val url = galleryDetailUrl
-            if (url != null) {
-                // Request
-                val request = EhRequest()
-                    .setMethod(EhClient.METHOD_GET_GALLERY_DETAIL)
-                    .setArgs(url)
-                    .setCallback(RefreshCommentListener(activity))
-                request.enqueue(this)
-            }
+            galleryDetailUrl?.let { refreshComment(it) }
         }
     }
 
@@ -798,21 +796,6 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private class ProgressCommentHolder(inflater: LayoutInflater, parent: ViewGroup?) :
         CommentHolder(inflater, R.layout.item_gallery_comment_progress, parent)
-
-    private inner class RefreshCommentListener(context: Context) :
-        EhCallback<GalleryCommentsScene?, GalleryDetail>(context) {
-        override fun onSuccess(result: GalleryDetail) {
-            val scene = this@GalleryCommentsScene
-            scene.onRefreshGallerySuccess(result.comments)
-        }
-
-        override fun onFailure(e: Exception) {
-            val scene = this@GalleryCommentsScene
-            scene.onRefreshGalleryFailure()
-        }
-
-        override fun onCancel() {}
-    }
 
     private inner class CommentGalleryListener(context: Context, private val mCommentId: Long) :
         EhCallback<GalleryCommentsScene?, GalleryCommentList>(context) {
