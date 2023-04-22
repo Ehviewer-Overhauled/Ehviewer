@@ -555,14 +555,12 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         }
 
-        fun onGetException(taskId: Int, e: Exception?) {
+        fun onGetException(taskId: Int, e: Throwable) {
             if (mCurrentTaskId == taskId) {
                 showProgress(PROGRESS_NONE)
-                val readableError = if (e != null) {
+                val readableError = run {
                     e.printStackTrace()
                     ExceptionUtils.getReadableString(e)
-                } else {
-                    context.getString(R.string.error_unknown)
                 }
                 if (mViewTransition.shownViewIndex == 0) {
                     Toast.makeText(context, readableError, Toast.LENGTH_SHORT).show()

@@ -27,8 +27,7 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
@@ -41,6 +40,7 @@ import com.hippo.widget.ContentLayout.ContentHelper
 import com.hippo.widget.recyclerview.AutoGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 import eu.kanade.tachiyomi.util.lang.launchIO
+import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 
 class GalleryPreviewsScene : BaseToolbarScene() {
@@ -163,44 +163,6 @@ class GalleryPreviewsScene : BaseToolbarScene() {
         return false
     }
 
-    private fun onGetPreviewListSuccess(result: Pair<List<GalleryPreview>, Int>, taskId: Int) {
-        if (null != mHelper && mHelper!!.isCurrentTask(taskId) && null != mGalleryDetail) {
-            if (Settings.preloadThumbAggressively) {
-                lifecycleScope.launchIO {
-                    result.first.forEach {
-                        context?.run {
-                            imageLoader.enqueue(imageRequest(it.imageUrl))
-                        }
-                    }
-                }
-            }
-            mHelper!!.onGetPageData(taskId, result.second, 0, null, null, result.first)
-        }
-    }
-
-    private fun onGetPreviewListFailure(e: Exception, taskId: Int) {
-        if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
-            mHelper!!.onGetException(taskId, e)
-        }
-    }
-
-    private inner class GetPreviewListListener(
-        context: Context,
-        private val mTaskId: Int,
-    ) : EhCallback<GalleryPreviewsScene, Pair<List<GalleryPreview>, Int>>(context) {
-        override fun onSuccess(result: Pair<List<GalleryPreview>, Int>) {
-            val scene = this@GalleryPreviewsScene
-            scene.onGetPreviewListSuccess(result, mTaskId)
-        }
-
-        override fun onFailure(e: Exception) {
-            val scene = this@GalleryPreviewsScene
-            scene.onGetPreviewListFailure(e, mTaskId)
-        }
-
-        override fun onCancel() {}
-    }
-
     private inner class GalleryPreviewHelper : ContentHelper<GalleryPreview>() {
         override fun getPageData(
             taskId: Int,
@@ -209,18 +171,31 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             index: String?,
             isNext: Boolean,
         ) {
-            val activity = mainActivity
-            if (null == activity || null == mGalleryDetail) {
+            val detail = mGalleryDetail ?: run {
                 onGetException(taskId, EhException(getString(R.string.error_cannot_find_gallery)))
                 return
             }
-            val url =
-                EhUrl.getGalleryDetailUrl(mGalleryDetail!!.gid, mGalleryDetail!!.token, page, false)
-            val request = EhRequest()
-            request.setMethod(EhClient.METHOD_GET_PREVIEW_LIST)
-            request.setCallback(GetPreviewListListener(context, taskId))
-            request.setArgs(url)
-            request.enqueue(this@GalleryPreviewsScene)
+            detail.run {
+                val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
+                lifecycleScope.launchIO {
+                    runSuspendCatching {
+                        EhEngine.getPreviewList(url)
+                    }.onSuccess { result ->
+                        if (Settings.preloadThumbAggressively) {
+                            lifecycleScope.launchIO {
+                                result.first.forEach {
+                                    context.run {
+                                        imageLoader.enqueue(imageRequest(it.imageUrl))
+                                    }
+                                }
+                            }
+                        }
+                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.run { onGetPageData(taskId, result.second, 0, null, null, result.first) }
+                    }.onFailure {
+                        mHelper?.takeIf { it.isCurrentTask(taskId) }?.run { onGetException(taskId, it) }
+                    }
+                }
+            }
         }
 
         override val context
