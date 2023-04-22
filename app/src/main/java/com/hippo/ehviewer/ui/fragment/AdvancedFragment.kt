@@ -25,7 +25,6 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import com.hippo.app.BaseDialogBuilder
@@ -34,10 +33,8 @@ import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhClient
-import com.hippo.ehviewer.client.EhRequest
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.LogCat
@@ -46,8 +43,7 @@ import com.hippo.yorozuya.IOUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import moe.tarsin.coroutines.runSuspendCatching
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -55,7 +51,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.math.ceil
 import com.hippo.ehviewer.Settings as AppSettings
 
 class AdvancedFragment : BasePreferenceFragment() {
@@ -232,8 +227,7 @@ class AdvancedFragment : BasePreferenceFragment() {
             }
         }
     }
-    private var favTotal = 0
-    private var favIndex = 0
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.advanced_settings)
         val dumpLogcat = findPreference<Preference>(KEY_DUMP_LOGCAT)
@@ -316,79 +310,36 @@ class AdvancedFragment : BasePreferenceFragment() {
     }
 
     private fun backupFavorite() {
-        val mClient = EhClient
         val favListUrlBuilder = FavListUrlBuilder()
-        favTotal = 0
-        favIndex = 1
-        val request = EhRequest()
-        request.setMethod(EhClient.METHOD_GET_FAVORITES)
-        request.setCallback(object : EhClient.Callback<FavoritesParser.Result> {
-            override fun onSuccess(result: FavoritesParser.Result) {
-                try {
-                    if (result.galleryInfoList.isEmpty()) {
-                        showTip(
-                            R.string.settings_advanced_backup_favorite_nothing,
-                            BaseScene.LENGTH_SHORT,
-                        )
-                    } else {
-                        if (favTotal == 0 && result.countArray != null) {
-                            var totalFav = 0
-                            for (i in 0..9) {
-                                totalFav += result.countArray[i]
-                            }
-                            favTotal =
-                                ceil(totalFav.toDouble() / result.galleryInfoList.size).toInt()
-                        }
-                        val status = "($favIndex/$favTotal)"
-                        showTip(
-                            GetText.getString(
-                                R.string.settings_advanced_backup_favorite_start,
-                                status,
-                            ),
-                            BaseScene.LENGTH_SHORT,
-                        )
-                        Log.d("LocalFavorites", "now backup page $status")
-                        EhDB.putLocalFavorites(result.galleryInfoList)
-                        if (result.next != null) {
-                            try {
-                                runBlocking {
-                                    delay(AppSettings.downloadDelay.toLong())
-                                }
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-                            favIndex++
-                            favListUrlBuilder.setIndex(result.next, true)
-                            request.setArgs(favListUrlBuilder.build())
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                delay(100)
-                                request.enqueue(this@AdvancedFragment)
-                            }
-                        } else {
-                            showTip(
-                                R.string.settings_advanced_backup_favorite_success,
-                                BaseScene.LENGTH_SHORT,
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    showTip(
-                        R.string.settings_advanced_backup_favorite_failed,
-                        BaseScene.LENGTH_SHORT,
-                    )
+        var favTotal = 0
+        var favIndex = 0
+        tailrec suspend fun doBackup() {
+            val result = EhEngine.getFavorites(favListUrlBuilder.build())
+            if (result.galleryInfoList.isEmpty()) {
+                showTip(R.string.settings_advanced_backup_favorite_nothing, BaseScene.LENGTH_SHORT)
+            } else {
+                if (favTotal == 0) favTotal = result.countArray.sum()
+                favIndex += result.galleryInfoList.size
+                val status = "($favIndex/$favTotal)"
+                Log.d("LocalFavorites", "now backup page $status")
+                EhDB.putLocalFavorites(result.galleryInfoList)
+                showTip(getString(R.string.settings_advanced_backup_favorite_start, status), BaseScene.LENGTH_SHORT)
+                if (result.next != null) {
+                    delay(AppSettings.downloadDelay.toLong())
+                    favListUrlBuilder.setIndex(result.next, true)
+                    doBackup()
                 }
             }
-
-            override fun onFailure(e: Exception) {
+        }
+        viewLifecycleOwner.lifecycleScope.launchIO {
+            runSuspendCatching {
+                doBackup()
+            }.onSuccess {
+                showTip(R.string.settings_advanced_backup_favorite_success, BaseScene.LENGTH_SHORT)
+            }.onFailure {
                 showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT)
             }
-
-            override fun onCancel() {
-                showTip(R.string.settings_advanced_backup_favorite_failed, BaseScene.LENGTH_SHORT)
-            }
-        })
-        request.setArgs(favListUrlBuilder.build())
-        mClient.enqueue(request, viewLifecycleOwner.lifecycle.coroutineScope)
+        }
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
