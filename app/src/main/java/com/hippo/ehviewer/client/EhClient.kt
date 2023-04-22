@@ -95,15 +95,6 @@ object EhClient {
                 params[2] as String?,
             )
 
-            METHOD_VOTE_COMMENT -> EhEngine.voteComment(
-                params[0] as Long,
-                params[1] as String?,
-                params[2] as Long,
-                params[3] as String?,
-                params[4] as Long,
-                params[5] as Int,
-            )
-
             METHOD_IMAGE_SEARCH -> EhEngine.imageSearch(
                 params[0] as File,
                 params[1] as Boolean,
@@ -136,7 +127,6 @@ object EhClient {
     const val METHOD_ADD_FAVORITES_RANGE = 10
     const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12
-    const val METHOD_VOTE_COMMENT = 15
     const val METHOD_IMAGE_SEARCH = 16
     const val METHOD_ARCHIVE_LIST = 17
 }

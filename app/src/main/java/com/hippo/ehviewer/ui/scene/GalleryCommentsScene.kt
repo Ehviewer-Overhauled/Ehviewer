@@ -52,6 +52,7 @@ import androidx.core.text.inSpans
 import androidx.core.text.set
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -65,6 +66,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
@@ -92,6 +94,9 @@ import com.hippo.yorozuya.SimpleAnimatorListener
 import com.hippo.yorozuya.StringUtils
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import kotlin.math.hypot
 
@@ -362,23 +367,17 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun voteComment(id: Long, vote: Int) {
-        val context = context
-        val activity = mainActivity
-        if (null == context || null == activity) {
-            return
+        val gd = mGalleryDetail ?: return
+        lifecycleScope.launchIO {
+            runSuspendCatching {
+                EhEngine.voteComment(gd.apiUid, gd.apiKey, gd.gid, gd.token, id, vote)
+            }.onSuccess { result ->
+                showTip(if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully, LENGTH_SHORT)
+                withUIContext { onVoteCommentSuccess(result) }
+            }.onFailure {
+                showTip(R.string.vote_failed, LENGTH_LONG)
+            }
         }
-        val request = EhRequest()
-            .setMethod(EhClient.METHOD_VOTE_COMMENT)
-            .setArgs(
-                mGalleryDetail!!.apiUid,
-                mGalleryDetail!!.apiKey,
-                mGalleryDetail!!.gid,
-                mGalleryDetail!!.token,
-                id,
-                vote,
-            )
-            .setCallback(VoteCommentListener(context))
-        request.enqueue(this)
     }
 
     @SuppressLint("InflateParams")
@@ -834,24 +833,6 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 """.trimIndent(),
                 LENGTH_LONG,
             )
-        }
-
-        override fun onCancel() {}
-    }
-
-    private inner class VoteCommentListener(context: Context) :
-        EhCallback<GalleryCommentsScene?, VoteCommentParser.Result>(context) {
-        override fun onSuccess(result: VoteCommentParser.Result) {
-            showTip(
-                if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
-                LENGTH_SHORT,
-            )
-            val scene = this@GalleryCommentsScene
-            scene.onVoteCommentSuccess(result)
-        }
-
-        override fun onFailure(e: Exception) {
-            showTip(R.string.vote_failed, LENGTH_LONG)
         }
 
         override fun onCancel() {}
