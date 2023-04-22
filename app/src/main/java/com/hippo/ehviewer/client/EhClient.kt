@@ -26,7 +26,7 @@ object EhClient {
         request.job = scope.launchIO {
             val callback: Callback<Any?>? = request.callback
             try {
-                val result: Any? = request.run {
+                val result: Any = request.run {
                     if (args == null) {
                         execute(method)
                     } else {
@@ -44,19 +44,11 @@ object EhClient {
         }
     }
 
-    suspend fun execute(method: Int, vararg params: Any?): Any? {
+    suspend fun execute(method: Int, vararg params: Any?): Any {
         return when (method) {
             METHOD_GET_FAVORITES -> EhEngine.getFavorites(
                 params[0] as String,
             )
-
-            METHOD_ADD_FAVORITES_RANGE ->
-                @Suppress("UNCHECKED_CAST")
-                EhEngine.addFavoritesRange(
-                    params[0] as LongArray,
-                    params[1] as Array<String?>,
-                    params[2] as Int,
-                )
 
             METHOD_MODIFY_FAVORITES -> EhEngine.modifyFavorites(
                 params[0] as String,
@@ -87,7 +79,6 @@ object EhClient {
     }
 
     const val METHOD_GET_FAVORITES = 8
-    const val METHOD_ADD_FAVORITES_RANGE = 10
     const val METHOD_MODIFY_FAVORITES = 11
     const val METHOD_GET_TORRENT_LIST = 12
     const val METHOD_ARCHIVE_LIST = 17

@@ -32,6 +32,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
@@ -51,6 +52,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.client.EhClient
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
@@ -66,6 +68,9 @@ import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.ViewUtils
+import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
+import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.res.resolveColor
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -638,13 +643,11 @@ class FavoritesScene :
                 System.arraycopy(result.catArray, 0, mFavCatArray!!, 0, 10)
             }
             mFavCountArray = result.countArray
-            if (mFavCountArray != null) {
-                mFavCountSum = 0
-                for (i in 0..9) {
-                    mFavCountSum += mFavCountArray!![i]
-                }
-                Settings.putFavCloudCount(mFavCountSum)
+            mFavCountSum = 0
+            for (i in 0..9) {
+                mFavCountSum += mFavCountArray!![i]
             }
+            Settings.putFavCloudCount(mFavCountSum)
             updateSearchBar()
             mHelper!!.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
             if (mDrawerAdapter != null) {
@@ -689,28 +692,6 @@ class FavoritesScene :
             key = ViewUtils.`$$`(itemView, R.id.key) as TextView
             value = ViewUtils.`$$`(itemView, R.id.value) as TextView
         }
-    }
-
-    private inner class AddFavoritesListener(
-        context: Context,
-        private val mTaskId: Int,
-        private val mKeyword: String?,
-        private val mBackup: List<GalleryInfo>,
-    ) : EhCallback<FavoritesScene?, Void?>(context) {
-        override fun onSuccess(result: Void?) {
-            val scene = this@FavoritesScene
-            scene.onGetFavoritesLocal(mKeyword, mTaskId)
-        }
-
-        override fun onFailure(e: Exception) {
-            // TODO It's a failure, add all of backup back to db.
-            // But how to known which one is failed?
-            EhDB.putLocalFavorites(mBackup)
-            val scene = this@FavoritesScene
-            scene.onGetFavoritesLocal(mKeyword, mTaskId)
-        }
-
-        override fun onCancel() {}
     }
 
     private inner class GetFavoritesListener(
@@ -931,18 +912,22 @@ class FavoritesScene :
                     }
                     val modifyGiListBackup: List<GalleryInfo> = ArrayList(mModifyGiList)
                     mModifyGiList.clear()
-                    val request = EhRequest()
-                    request.setMethod(EhClient.METHOD_ADD_FAVORITES_RANGE)
-                    request.setCallback(
-                        AddFavoritesListener(
-                            context,
-                            taskId,
-                            mUrlBuilder!!.keyword,
-                            modifyGiListBackup,
-                        ),
-                    )
-                    request.setArgs(gidArray, tokenArray, mModifyFavCat)
-                    request.enqueue(this@FavoritesScene)
+                    lifecycleScope.launchIO {
+                        runSuspendCatching {
+                            EhEngine.addFavoritesRange(gidArray, tokenArray, mModifyFavCat)
+                        }.onSuccess {
+                            withUIContext {
+                                onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
+                            }
+                        }.onFailure {
+                            // TODO It's a failure, add all of backup back to db.
+                            // But how to known which one is failed?
+                            EhDB.putLocalFavorites(modifyGiListBackup)
+                            withUIContext {
+                                onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
+                            }
+                        }
+                    }
                 } else {
                     var i = 0
                     val n = mModifyGiList.size

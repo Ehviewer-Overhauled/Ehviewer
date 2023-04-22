@@ -393,7 +393,7 @@ object EhEngine {
         gidArray: LongArray,
         tokenArray: Array<String?>,
         dstCat: Int,
-    ): Void? {
+    ) {
         check(gidArray.size == tokenArray.size)
         var i = 0
         val n = gidArray.size
@@ -401,7 +401,6 @@ object EhEngine {
             addFavorites(gidArray[i], tokenArray[i], dstCat, null)
             i++
         }
-        return null
     }
 
     suspend fun modifyFavorites(
