@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.client
 
 import io.ktor.http.HttpMessageBuilder
+import okhttp3.FormBody
 import okhttp3.Request
 inline fun ehRequest(url: String, referer: String? = null, origin: String? = null, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
     addHeader("User-Agent", CHROME_USER_AGENT)
@@ -24,6 +25,8 @@ inline fun ehRequest(url: String, referer: String? = null, origin: String? = nul
     referer?.let { addHeader("Referer", it) }
     origin?.let { addHeader("Origin", it) }
 }.apply(builder).build()
+
+inline fun Request.Builder.formbody(builder: FormBody.Builder.() -> Unit) = post(FormBody.Builder().apply(builder).build())
 
 fun HttpMessageBuilder.referer(value: String?): Unit = value?.let { headers.append("Referer", it) } ?: Unit
 

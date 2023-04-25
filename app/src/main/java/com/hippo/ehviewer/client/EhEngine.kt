@@ -51,7 +51,6 @@ import com.hippo.network.StatusCodeException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import okhttp3.FormBody
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -139,18 +138,19 @@ private suspend inline fun <T> Request.executeAndParsingWith(block: String.() ->
 object EhEngine {
     suspend fun signIn(username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
-        val builder = FormBody.Builder()
-            .add("referer", referer)
-            .add("b", "")
-            .add("bt", "")
-            .add("UserName", username)
-            .add("PassWord", password)
-            .add("CookieDate", "1")
         val url = EhUrl.API_SIGN_IN
         val origin = "https://forums.e-hentai.org"
         Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(builder.build()) }
-            .executeAndParsingWith(SignInParser::parse)
+        return ehRequest(url, referer, origin) {
+            formbody {
+                add("referer", referer)
+                add("b", "")
+                add("bt", "")
+                add("UserName", username)
+                add("PassWord", password)
+                add("CookieDate", "1")
+            }
+        }.executeAndParsingWith(SignInParser::parse)
     }
 
     private suspend fun fillGalleryList(
@@ -293,24 +293,25 @@ object EhEngine {
         comment: String,
         id: String?,
     ): GalleryCommentList {
-        val builder = FormBody.Builder()
-        if (id == null) {
-            builder.add("commenttext_new", comment)
-        } else {
-            builder.add("commenttext_edit", comment)
-            builder.add("edit_comment", id)
-        }
         val origin = EhUrl.origin
         Log.d(TAG, url!!)
-        return ehRequest(url, url, origin) { post(builder.build()) }
-            .executeAndParsingWith {
-                val document = Jsoup.parse(this)
-                val elements = document.select("#chd + p")
-                if (elements.size > 0) {
-                    throw EhException(elements[0].text())
+        return ehRequest(url, url, origin) {
+            formbody {
+                if (id == null) {
+                    add("commenttext_new", comment)
+                } else {
+                    add("commenttext_edit", comment)
+                    add("edit_comment", id)
                 }
-                GalleryDetailParser.parseComments(document)
             }
+        }.executeAndParsingWith {
+            val document = Jsoup.parse(this)
+            val elements = document.select("#chd + p")
+            if (elements.size > 0) {
+                throw EhException(elements[0].text())
+            }
+            GalleryDetailParser.parseComments(document)
+        }
     }
 
     suspend fun getGalleryToken(
@@ -367,17 +368,18 @@ object EhEngine {
                 throw EhException("Invalid dstCat: $dstCat")
             }
         }
-        val builder = FormBody.Builder()
-        builder.add("favcat", catStr)
-        builder.add("favnote", note ?: "")
-        // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
-        builder.add("submit", "Apply Changes")
-        builder.add("update", "1")
         val url = EhUrl.getAddFavorites(gid, token)
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        return ehRequest(url, url, origin) { post(builder.build()) }
-            .executeAndParsingWith { }
+        return ehRequest(url, url, origin) {
+            formbody {
+                add("favcat", catStr)
+                add("favnote", note ?: "")
+                // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
+                add("submit", "Apply Changes")
+                add("update", "1")
+            }
+        }.executeAndParsingWith { }
     }
 
     @Throws(Throwable::class)
@@ -413,17 +415,17 @@ object EhEngine {
                 throw EhException("Invalid dstCat: $dstCat")
             }
         }
-        val builder = FormBody.Builder()
-        builder.add("ddact", catStr)
-        for (gid in gidArray) {
-            builder.add("modifygids[]", gid.toString())
-        }
-        builder.add("apply", "Apply")
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        return ehRequest(url, url, origin) { post(builder.build()) }
-            .executeAndParsingWith(FavoritesParser::parse)
-            .apply { fillGalleryList(galleryInfoList, url, false) }
+        return ehRequest(url, url, origin) {
+            formbody {
+                add("ddact", catStr)
+                for (gid in gidArray) {
+                    add("modifygids[]", gid.toString())
+                }
+                add("apply", "Apply")
+            }
+        }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
     suspend fun getTorrentList(
@@ -460,22 +462,24 @@ object EhEngine {
         if (res.isNullOrEmpty()) {
             throw EhException("Invalid res: $res")
         }
-        val builder = FormBody.Builder()
-        if (isHAtH) {
-            builder.add("hathdl_xres", res)
-        } else {
-            builder.add("dltype", res)
-            if (res == "org") {
-                builder.add("dlcheck", "Download Original Archive")
-            } else {
-                builder.add("dlcheck", "Download Resample Archive")
-            }
-        }
         val url = EhUrl.getDownloadArchive(gid, token, or)
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         val origin = EhUrl.origin
         Log.d(TAG, url)
-        val request = ehRequest(url, referer, origin) { builder.build() }
+        val request = ehRequest(url, referer, origin) {
+            formbody {
+                if (isHAtH) {
+                    add("hathdl_xres", res)
+                } else {
+                    add("dltype", res)
+                    if (res == "org") {
+                        add("dlcheck", "Download Original Archive")
+                    } else {
+                        add("dlcheck", "Download Resample Archive")
+                    }
+                }
+            }
+        }
         var result = request.executeAndParsingWith(ArchiveParser::parseArchiveUrl)
         if (!isHAtH) {
             if (result == null) {
@@ -514,13 +518,14 @@ object EhEngine {
     }
 
     suspend fun resetImageLimits(): HomeParser.Limits? {
-        val builder = FormBody.Builder()
-            .add("act", "limits")
-            .add("reset", "Reset Limit")
         val url = EhUrl.URL_HOME
         Log.d(TAG, url)
-        return ehRequest(url) { post(builder.build()) }
-            .executeAndParsingWith(HomeParser::parseResetLimits)
+        return ehRequest(url) {
+            formbody {
+                add("act", "limits")
+                add("reset", "Reset Limit")
+            }
+        }.executeAndParsingWith(HomeParser::parseResetLimits)
     }
 
     suspend fun getNews(parse: Boolean): String? {
