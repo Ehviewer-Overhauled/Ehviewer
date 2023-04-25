@@ -51,23 +51,21 @@ import com.hippo.network.StatusCodeException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.executeAsync
 import org.json.JSONArray
-import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.File
 import kotlin.math.ceil
 
 private val okHttpClient = EhApplication.okHttpClient
-private val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
 private const val TAG = "EhEngine"
 private const val MAX_REQUEST_SIZE = 25
 private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
@@ -125,6 +123,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 }
 
 private suspend inline fun <T> Request.executeAndParsingWith(block: String.() -> T): T {
+    Log.d(TAG, url.toString())
     return okHttpClient.newCall(this).executeAsync().use { response ->
         val body = response.body.string()
         runCatching {
@@ -140,7 +139,6 @@ object EhEngine {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val url = EhUrl.API_SIGN_IN
         val origin = "https://forums.e-hentai.org"
-        Log.d(TAG, url)
         return ehRequest(url, referer, origin) {
             formbody {
                 add("referer", referer)
@@ -193,9 +191,7 @@ object EhEngine {
     }
 
     suspend fun getGalleryList(url: String): GalleryListParser.Result {
-        val referer = EhUrl.referer
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith(GalleryListParser::parse)
+        return ehRequest(url, EhUrl.referer).executeAndParsingWith(GalleryListParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, true) }
     }
 
@@ -221,8 +217,6 @@ object EhEngine {
         galleryInfoList: List<GalleryInfo>,
         referer: String,
     ) {
-        val json = JSONObject()
-        json.put("method", "gdata")
         val ja = JSONArray()
         var i = 0
         val size = galleryInfoList.size
@@ -234,19 +228,17 @@ object EhEngine {
             ja.put(g)
             i++
         }
-        json.put("gidlist", ja)
-        json.put("namespace", 1)
-        val url = EhUrl.apiUrl
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(json.toString().toRequestBody(MEDIA_TYPE_JSON)) }
-            .executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
+        return ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "gdata")
+                put("gidlist", ja)
+                put("namespace", 1)
+            }
+        }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
     }
 
     suspend fun getGalleryDetail(url: String): GalleryDetail {
-        val referer = EhUrl.referer
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith {
+        return ehRequest(url, EhUrl.referer).executeAndParsingWith {
             EventPaneParser.parse(this)?.let {
                 Settings.lastDawnDay = today
                 showEventNotification(it)
@@ -256,11 +248,8 @@ object EhEngine {
     }
 
     suspend fun getPreviewList(url: String): Pair<List<GalleryPreview>, Int> {
-        val referer = EhUrl.referer
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith {
-            GalleryDetailParser.parsePreviewList(this) to
-                GalleryDetailParser.parsePreviewPages(this)
+        return ehRequest(url, EhUrl.referer).executeAndParsingWith {
+            GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
         }
     }
 
@@ -272,20 +261,16 @@ object EhEngine {
         token: String?,
         rating: Float,
     ): RateGalleryParser.Result {
-        val json = JSONObject()
-        json.put("method", "rategallery")
-        json.put("apiuid", apiUid)
-        json.put("apikey", apiKey)
-        json.put("gid", gid)
-        json.put("token", token)
-        json.put("rating", ceil((rating * 2).toDouble()).toInt())
-        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.apiUrl
-        val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(requestBody) }
-            .executeAndParsingWith(RateGalleryParser::parse)
+        return ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
+            jsonBody {
+                put("method", "rategallery")
+                put("apiuid", apiUid)
+                put("apikey", apiKey)
+                put("gid", gid)
+                put("token", token)
+                put("rating", ceil((rating * 2).toDouble()).toInt())
+            }
+        }.executeAndParsingWith(RateGalleryParser::parse)
     }
 
     suspend fun commentGallery(
@@ -319,29 +304,18 @@ object EhEngine {
         gtoken: String?,
         page: Int,
     ): String {
-        val json = JSONObject()
-            .put("method", "gtoken")
-            .put(
-                "pagelist",
-                JSONArray().put(
-                    JSONArray().put(gid).put(gtoken).put(page + 1),
-                ),
-            )
-        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.apiUrl
-        val referer = EhUrl.referer
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(requestBody) }
-            .executeAndParsingWith(GalleryTokenApiParser::parse)
+        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "gtoken")
+                put("pagelist", JSONArray().put(JSONArray().put(gid).put(gtoken).put(page + 1)))
+            }
+        }.executeAndParsingWith(GalleryTokenApiParser::parse)
     }
 
     suspend fun getFavorites(
         url: String,
     ): FavoritesParser.Result {
-        val referer = EhUrl.referer
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith(FavoritesParser::parse)
+        return ehRequest(url, EhUrl.referer).executeAndParsingWith(FavoritesParser::parse)
             .apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
@@ -369,9 +343,7 @@ object EhEngine {
             }
         }
         val url = EhUrl.getAddFavorites(gid, token)
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, url, origin) {
+        return ehRequest(url, url, EhUrl.origin) {
             formbody {
                 add("favcat", catStr)
                 add("favnote", note ?: "")
@@ -415,9 +387,7 @@ object EhEngine {
                 throw EhException("Invalid dstCat: $dstCat")
             }
         }
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, url, origin) {
+        return ehRequest(url, url, EhUrl.origin) {
             formbody {
                 add("ddact", catStr)
                 for (gid in gidArray) {
@@ -434,7 +404,6 @@ object EhEngine {
         token: String?,
     ): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        Log.d(TAG, url)
         return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
     }
 
@@ -444,7 +413,6 @@ object EhEngine {
         token: String?,
     ): ArchiveParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        Log.d(TAG, url)
         return ehRequest(url, referer).executeAndParsingWith(ArchiveParser::parse)!!
             .apply { funds = funds ?: getFunds() }
     }
@@ -496,31 +464,21 @@ object EhEngine {
     }
 
     private suspend fun getFunds(): HomeParser.Funds {
-        val url = EhUrl.URL_FUNDS
-        Log.d(TAG, url)
-        return ehRequest(url).executeAndParsingWith(HomeParser::parseFunds)
+        return ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds)
     }
 
     private suspend fun getImageLimitsInternal(): HomeParser.Limits {
-        val url = EhUrl.URL_HOME
-        Log.d(TAG, url)
-        return ehRequest(url).executeAndParsingWith(HomeParser::parse)
+        return ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse)
     }
 
     suspend fun getImageLimits(): HomeParser.Result = coroutineScope {
-        val limitsDeferred = async {
-            getImageLimitsInternal()
-        }
-        val fundsDeferred = async {
-            getFunds()
-        }
+        val limitsDeferred = async { getImageLimitsInternal() }
+        val fundsDeferred = async { getFunds() }
         HomeParser.Result(limitsDeferred.await(), fundsDeferred.await())
     }
 
     suspend fun resetImageLimits(): HomeParser.Limits? {
-        val url = EhUrl.URL_HOME
-        Log.d(TAG, url)
-        return ehRequest(url) {
+        return ehRequest(EhUrl.URL_HOME) {
             formbody {
                 add("act", "limits")
                 add("reset", "Reset Limit")
@@ -529,46 +487,24 @@ object EhEngine {
     }
 
     suspend fun getNews(parse: Boolean): String? {
-        val url = EhUrl.URL_NEWS
-        val referer = EhUrl.REFERER_E
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith {
+        return ehRequest(EhUrl.URL_NEWS, EhUrl.REFERER_E).executeAndParsingWith {
             if (parse) EventPaneParser.parse(this) else null
         }
     }
 
-    private suspend fun getProfileInternal(
-        url: String,
-        referer: String,
-    ): ProfileParser.Result {
-        Log.d(TAG, url)
-        return ehRequest(url, referer).executeAndParsingWith(ProfileParser::parse)
-    }
-
     suspend fun getProfile(): ProfileParser.Result {
-        val url = EhUrl.URL_FORUMS
-        Log.d(TAG, url)
-        return getProfileInternal(
-            ehRequest(url).executeAndParsingWith(ForumsParser::parse),
-            url,
-        )
-    }
-
-    private suspend fun getUConfigInternal(url: String) {
-        Log.d(TAG, url)
-        ehRequest(url).executeAndParsingWith {
-            check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" }
-        }
+        val url = ehRequest(EhUrl.URL_FORUMS).executeAndParsingWith(ForumsParser::parse)
+        return ehRequest(url, EhUrl.URL_FORUMS).executeAndParsingWith(ProfileParser::parse)
     }
 
     suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
-        runCatching {
-            getUConfigInternal(url)
+        runSuspendCatching {
+            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
         }.onFailure {
             // It may get redirected when accessing ex for the first time
             if (EhUtils.isExHentai) {
                 it.printStackTrace()
-                getUConfigInternal(url)
+                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
             } else {
                 throw it
             }
@@ -583,21 +519,17 @@ object EhEngine {
         commentId: Long,
         commentVote: Int,
     ): VoteCommentParser.Result {
-        val json = JSONObject()
-        json.put("method", "votecomment")
-        json.put("apiuid", apiUid)
-        json.put("apikey", apiKey)
-        json.put("gid", gid)
-        json.put("token", token)
-        json.put("comment_id", commentId)
-        json.put("comment_vote", commentVote)
-        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.apiUrl
-        val referer = EhUrl.referer
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(requestBody) }
-            .executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
+        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "votecomment")
+                put("apiuid", apiUid)
+                put("apikey", apiKey)
+                put("gid", gid)
+                put("token", token)
+                put("comment_id", commentId)
+                put("comment_vote", commentVote)
+            }
+        }.executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
     }
 
     suspend fun voteTag(
@@ -608,21 +540,17 @@ object EhEngine {
         tags: String?,
         vote: Int,
     ): String {
-        val json = JSONObject()
-        json.put("method", "taggallery")
-        json.put("apiuid", apiUid)
-        json.put("apikey", apiKey)
-        json.put("gid", gid)
-        json.put("token", token)
-        json.put("tags", tags)
-        json.put("vote", vote)
-        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.apiUrl
-        val referer = EhUrl.referer
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(requestBody) }
-            .executeAndParsingWith(VoteTagParser::parse)
+        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "taggallery")
+                put("apiuid", apiUid)
+                put("apikey", apiKey)
+                put("gid", gid)
+                put("token", token)
+                put("tags", tags)
+                put("vote", vote)
+            }
+        }.executeAndParsingWith(VoteTagParser::parse)
     }
 
     /**
@@ -675,12 +603,11 @@ object EhEngine {
     }
 
     suspend fun getGalleryPage(
-        url: String?,
+        url: String,
         gid: Long,
         token: String?,
     ): GalleryPageParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        Log.d(TAG, url!!)
         return ehRequest(url, referer).executeAndParsingWith(GalleryPageParser::parse)
     }
 
@@ -691,21 +618,15 @@ object EhEngine {
         showKey: String?,
         previousPToken: String?,
     ): GalleryPageApiParser.Result {
-        val json = JSONObject()
-        json.put("method", "showpage")
-        json.put("gid", gid)
-        json.put("page", index + 1)
-        json.put("imgkey", pToken)
-        json.put("showkey", showKey)
-        val requestBody: RequestBody = json.toString().toRequestBody(MEDIA_TYPE_JSON)
-        val url = EhUrl.apiUrl
-        var referer: String? = null
-        if (index > 0 && previousPToken != null) {
-            referer = EhUrl.getPageUrl(gid, index - 1, previousPToken)
-        }
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { post(requestBody) }
-            .executeAndParsingWith(GalleryPageApiParser::parse)
+        val referer = if (index > 0 && previousPToken != null) EhUrl.getPageUrl(gid, index - 1, previousPToken) else null
+        return ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "showpage")
+                put("gid", gid)
+                put("page", index + 1)
+                put("imgkey", pToken)
+                put("showkey", showKey)
+            }
+        }.executeAndParsingWith(GalleryPageApiParser::parse)
     }
 }

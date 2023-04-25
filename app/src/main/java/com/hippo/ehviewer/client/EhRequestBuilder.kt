@@ -17,7 +17,12 @@ package com.hippo.ehviewer.client
 
 import io.ktor.http.HttpMessageBuilder
 import okhttp3.FormBody
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+
 inline fun ehRequest(url: String, referer: String? = null, origin: String? = null, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
     addHeader("User-Agent", CHROME_USER_AGENT)
     addHeader("Accept", CHROME_ACCEPT)
@@ -27,6 +32,10 @@ inline fun ehRequest(url: String, referer: String? = null, origin: String? = nul
 }.apply(builder).build()
 
 inline fun Request.Builder.formbody(builder: FormBody.Builder.() -> Unit) = post(FormBody.Builder().apply(builder).build())
+
+val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
+
+inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
 fun HttpMessageBuilder.referer(value: String?): Unit = value?.let { headers.append("Referer", it) } ?: Unit
 
