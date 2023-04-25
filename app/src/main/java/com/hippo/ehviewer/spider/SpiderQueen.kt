@@ -24,12 +24,12 @@ import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUrl.getGalleryDetailUrl
 import com.hippo.ehviewer.client.EhUrl.getGalleryMultiPageViewerUrl
 import com.hippo.ehviewer.client.EhUrl.referer
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.ehRequest
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewList
@@ -360,15 +360,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private suspend fun readSpiderInfoFromInternet(): SpiderInfo? {
-        val request = EhRequestBuilder(
-            getGalleryDetailUrl(
-                galleryInfo.gid,
-                galleryInfo.token,
-                0,
-                false,
-            ),
-            referer,
-        ).build()
+        val request = ehRequest(getGalleryDetailUrl(galleryInfo.gid, galleryInfo.token, 0, false), referer)
         return runSuspendCatching {
             plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()
@@ -390,7 +382,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             galleryInfo.token!!,
         )
         val referer = referer
-        val request = EhRequestBuilder(url, referer).build()
+        val request = ehRequest(url, referer)
         try {
             plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()
@@ -426,7 +418,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             false,
         )
         val referer = referer
-        val request = EhRequestBuilder(url, referer).build()
+        val request = ehRequest(url, referer)
         try {
             plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
                 val body = response.body.string()

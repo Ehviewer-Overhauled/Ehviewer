@@ -15,16 +15,18 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.okhttp.ChromeRequestBuilder
 import io.ktor.http.HttpMessageBuilder
+import okhttp3.Request
+inline fun ehRequest(url: String, referer: String? = null, origin: String? = null, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
+    addHeader("User-Agent", CHROME_USER_AGENT)
+    addHeader("Accept", CHROME_ACCEPT)
+    addHeader("Accept-Language", CHROME_ACCEPT_LANGUAGE)
+    referer?.let { addHeader("Referer", it) }
+    origin?.let { addHeader("Origin", it) }
+}.apply(builder).build()
 
-class EhRequestBuilder(url: String, referer: String? = null, origin: String? = null) :
-    ChromeRequestBuilder(url) {
-    init {
-        referer?.let { addHeader("Referer", it) }
-        origin?.let { addHeader("Origin", it) }
-    }
-}
+fun HttpMessageBuilder.referer(value: String?): Unit = value?.let { headers.append("Referer", it) } ?: Unit
 
-fun HttpMessageBuilder.referer(value: String?): Unit =
-    value?.let { headers.append("Referer", it) } ?: Unit
+const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
+const val CHROME_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+const val CHROME_ACCEPT_LANGUAGE = "en-US,en;q=0.5"
