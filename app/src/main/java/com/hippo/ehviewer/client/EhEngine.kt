@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import arrow.fx.coroutines.parZip
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.GetText
@@ -48,8 +49,6 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
 import com.hippo.network.StatusCodeException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Headers
@@ -409,9 +408,8 @@ object EhEngine {
         gid: Long,
         token: String?,
     ): ArchiveParser.Result {
-        val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeAndParsingWith(ArchiveParser::parse)!!
-            .apply { funds = funds ?: getFunds() }
+        return ehRequest(url, EhUrl.getGalleryDetailUrl(gid, token)).executeAndParsingWith(ArchiveParser::parse)
+            .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) }
     }
 
     suspend fun downloadArchive(
@@ -458,19 +456,11 @@ object EhEngine {
         return null
     }
 
-    private suspend fun getFunds(): HomeParser.Funds {
-        return ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds)
-    }
-
-    private suspend fun getImageLimitsInternal(): HomeParser.Limits {
-        return ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse)
-    }
-
-    suspend fun getImageLimits(): HomeParser.Result = coroutineScope {
-        val limitsDeferred = async { getImageLimitsInternal() }
-        val fundsDeferred = async { getFunds() }
-        HomeParser.Result(limitsDeferred.await(), fundsDeferred.await())
-    }
+    suspend fun getImageLimits() = parZip(
+        { ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse) },
+        { ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) },
+        { limits, funds -> HomeParser.Result(limits, funds) },
+    )
 
     suspend fun resetImageLimits(): HomeParser.Limits? {
         return ehRequest(EhUrl.URL_HOME) {

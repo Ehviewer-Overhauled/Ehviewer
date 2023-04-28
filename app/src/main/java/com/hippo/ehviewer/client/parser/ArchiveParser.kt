@@ -30,8 +30,8 @@ object ArchiveParser {
     private val PATTERN_NEED_HATH_CLIENT =
         Regex("You must have a H@H client assigned to your account to use this feature\\.")
 
-    fun parse(body: String): Result? {
-        val m = PATTERN_HATH_FORM.find(body) ?: return null
+    fun parse(body: String): Result {
+        val m = PATTERN_HATH_FORM.find(body)!!
         val paramOr = m.groupValues[1]
         val archiveList = ArrayList<Archive>()
         Jsoup.parse(body).select("#db>div>div").forEach { element ->
