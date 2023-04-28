@@ -43,6 +43,8 @@ inline fun JSONObject.array(name: String, builder: JSONArray.() -> Unit): JSONOb
 
 inline fun JSONArray.array(builder: JSONArray.() -> Unit): JSONArray = put(JSONArray().apply(builder))
 
+fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { put(it) } } // Should ensure it is inlined
+
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
 fun HttpMessageBuilder.referer(value: String?): Unit = value?.let { headers.append("Referer", it) } ?: Unit

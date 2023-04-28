@@ -218,16 +218,7 @@ object EhEngine {
         return ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
             jsonBody {
                 put("method", "gdata")
-                array("gidlist") {
-                    galleryInfoList.forEach {
-                        put(
-                            array {
-                                put(it.gid)
-                                put(it.token)
-                            },
-                        )
-                    }
-                }
+                array("gidlist") { galleryInfoList.forEach { put(jsonArrayOf(it.gid, it.token)) } }
                 put("namespace", 1)
             }
         }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
