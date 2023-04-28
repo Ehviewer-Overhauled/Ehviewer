@@ -22,8 +22,6 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.data.GalleryCommentList
-import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
@@ -133,6 +131,72 @@ private suspend inline fun <T> Request.executeAndParsingWith(block: String.() ->
 }
 
 object EhEngine {
+    suspend fun getTorrentList(url: String, gid: Long, token: String?): List<TorrentParser.Result> {
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
+    }
+
+    suspend fun getArchiveList(url: String, gid: Long, token: String?) = ehRequest(url, EhUrl.getGalleryDetailUrl(gid, token))
+        .executeAndParsingWith(ArchiveParser::parse)
+        .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) }
+
+    suspend fun getImageLimits() = parZip(
+        { ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse) },
+        { ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) },
+        { limits, funds -> HomeParser.Result(limits, funds) },
+    )
+
+    suspend fun getNews(parse: Boolean) = ehRequest(EhUrl.URL_NEWS, EhUrl.REFERER_E)
+        .executeAndParsingWith { if (parse) EventPaneParser.parse(this) else null }
+
+    suspend fun getProfile(): ProfileParser.Result {
+        val url = ehRequest(EhUrl.URL_FORUMS).executeAndParsingWith(ForumsParser::parse)
+        return ehRequest(url, EhUrl.URL_FORUMS).executeAndParsingWith(ProfileParser::parse)
+    }
+
+    suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
+        runSuspendCatching {
+            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
+        }.onFailure {
+            // It may get redirected when accessing ex for the first time
+            if (EhUtils.isExHentai) {
+                it.printStackTrace()
+                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
+            } else {
+                throw it
+            }
+        }
+    }
+
+    suspend fun getGalleryPage(
+        url: String,
+        gid: Long,
+        token: String?,
+    ): GalleryPageParser.Result {
+        val referer = EhUrl.getGalleryDetailUrl(gid, token)
+        return ehRequest(url, referer).executeAndParsingWith(GalleryPageParser::parse)
+    }
+
+    suspend fun getGalleryList(url: String) = ehRequest(url, EhUrl.referer)
+        .executeAndParsingWith(GalleryListParser::parse)
+        .apply { fillGalleryList(galleryInfoList, url, true) }
+
+    suspend fun getGalleryDetail(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
+        EventPaneParser.parse(this)?.let {
+            Settings.lastDawnDay = today
+            showEventNotification(it)
+        }
+        GalleryDetailParser.parse(this)
+    }
+
+    suspend fun getPreviewList(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
+        GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
+    }
+
+    suspend fun getFavorites(url: String) = ehRequest(url, EhUrl.referer)
+        .executeAndParsingWith(FavoritesParser::parse)
+        .apply { fillGalleryList(galleryInfoList, url, false) }
+
     suspend fun signIn(username: String, password: String): String {
         val referer = "https://forums.e-hentai.org/index.php?act=Login&CODE=00"
         val url = EhUrl.API_SIGN_IN
@@ -149,121 +213,22 @@ object EhEngine {
         }.executeAndParsingWith(SignInParser::parse)
     }
 
-    private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
-        // Filter title and uploader
-        if (filter) list.removeAll { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
-
-        var hasTags = false
-        var hasPages = false
-        var hasRated = false
-        for (gi in list) {
-            if (gi.simpleTags != null) {
-                hasTags = true
-            }
-            if (gi.pages != 0) {
-                hasPages = true
-            }
-            if (gi.rated) {
-                hasRated = true
+    suspend fun commentGallery(url: String, comment: String, id: String?) = ehRequest(url, url, EhUrl.origin) {
+        form {
+            if (id == null) {
+                add("commenttext_new", comment)
+            } else {
+                add("commenttext_edit", comment)
+                add("edit_comment", id)
             }
         }
-        val needApi = filter && EhFilter.needTags() && !hasTags || Settings.showGalleryPages && !hasPages || hasRated
-        if (needApi) fillGalleryListByApi(list, url)
-
-        // Filter tag, thumbnail mode need filter uploader again
-        if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
-    }
-
-    suspend fun getGalleryList(url: String) = ehRequest(url, EhUrl.referer)
-        .executeAndParsingWith(GalleryListParser::parse)
-        .apply { fillGalleryList(galleryInfoList, url, true) }
-
-    suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).forEach { doFillGalleryListByApi(it, referer) }
-
-    private suspend fun doFillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
-        jsonBody {
-            put("method", "gdata")
-            array("gidlist") { galleryInfoList.forEach { put(jsonArrayOf(it.gid, it.token)) } }
-            put("namespace", 1)
+    }.executeAndParsingWith {
+        val document = Jsoup.parse(this)
+        val elements = document.select("#chd + p")
+        if (elements.size > 0) {
+            throw EhException(elements[0].text())
         }
-    }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
-
-    suspend fun getGalleryDetail(url: String): GalleryDetail {
-        return ehRequest(url, EhUrl.referer).executeAndParsingWith {
-            EventPaneParser.parse(this)?.let {
-                Settings.lastDawnDay = today
-                showEventNotification(it)
-            }
-            GalleryDetailParser.parse(this)
-        }
-    }
-
-    suspend fun getPreviewList(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
-        GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
-    }
-
-    @Throws(Throwable::class)
-    suspend fun rateGallery(
-        apiUid: Long,
-        apiKey: String?,
-        gid: Long,
-        token: String?,
-        rating: Float,
-    ): RateGalleryParser.Result {
-        return ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
-            jsonBody {
-                put("method", "rategallery")
-                put("apiuid", apiUid)
-                put("apikey", apiKey)
-                put("gid", gid)
-                put("token", token)
-                put("rating", ceil((rating * 2).toDouble()).toInt())
-            }
-        }.executeAndParsingWith(RateGalleryParser::parse)
-    }
-
-    suspend fun commentGallery(
-        url: String,
-        comment: String,
-        id: String?,
-    ): GalleryCommentList {
-        return ehRequest(url, url, EhUrl.origin) {
-            form {
-                if (id == null) {
-                    add("commenttext_new", comment)
-                } else {
-                    add("commenttext_edit", comment)
-                    add("edit_comment", id)
-                }
-            }
-        }.executeAndParsingWith {
-            val document = Jsoup.parse(this)
-            val elements = document.select("#chd + p")
-            if (elements.size > 0) {
-                throw EhException(elements[0].text())
-            }
-            GalleryDetailParser.parseComments(document)
-        }
-    }
-
-    suspend fun getGalleryToken(
-        gid: Long,
-        gtoken: String?,
-        page: Int,
-    ): String {
-        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
-            jsonBody {
-                put("method", "gtoken")
-                put("pagelist", JSONArray().put(JSONArray().put(gid).put(gtoken).put(page + 1)))
-            }
-        }.executeAndParsingWith(GalleryTokenApiParser::parse)
-    }
-
-    suspend fun getFavorites(
-        url: String,
-    ): FavoritesParser.Result {
-        return ehRequest(url, EhUrl.referer).executeAndParsingWith(FavoritesParser::parse)
-            .apply { fillGalleryList(galleryInfoList, url, false) }
+        GalleryDetailParser.parseComments(document)
     }
 
     /**
@@ -277,17 +242,9 @@ object EhEngine {
         note: String?,
     ) {
         val catStr: String = when (dstCat) {
-            -1 -> {
-                "favdel"
-            }
-
-            in 0..9 -> {
-                dstCat.toString()
-            }
-
-            else -> {
-                throw EhException("Invalid dstCat: $dstCat")
-            }
+            -1 -> "favdel"
+            in 0..9 -> dstCat.toString()
+            else -> throw EhException("Invalid dstCat: $dstCat")
         }
         val url = EhUrl.getAddFavorites(gid, token)
         return ehRequest(url, url, EhUrl.origin) {
@@ -299,58 +256,6 @@ object EhEngine {
                 add("update", "1")
             }
         }.executeAndParsingWith { }
-    }
-
-    @Throws(Throwable::class)
-    suspend fun addFavoritesRange(
-        gidArray: LongArray,
-        tokenArray: Array<String?>,
-        dstCat: Int,
-    ) {
-        check(gidArray.size == tokenArray.size)
-        var i = 0
-        val n = gidArray.size
-        while (i < n) {
-            addFavorites(gidArray[i], tokenArray[i], dstCat, null)
-            i++
-        }
-    }
-
-    suspend fun modifyFavorites(
-        url: String,
-        gidArray: LongArray,
-        dstCat: Int,
-    ): FavoritesParser.Result {
-        val catStr: String = when (dstCat) {
-            -1 -> { "delete" }
-            in 0..9 -> { "fav$dstCat" }
-            else -> { throw EhException("Invalid dstCat: $dstCat") }
-        }
-        return ehRequest(url, url, EhUrl.origin) {
-            form {
-                add("ddact", catStr)
-                for (gid in gidArray) add("modifygids[]", gid.toString())
-                add("apply", "Apply")
-            }
-        }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
-    }
-
-    suspend fun getTorrentList(
-        url: String,
-        gid: Long,
-        token: String?,
-    ): List<TorrentParser.Result> {
-        val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
-    }
-
-    suspend fun getArchiveList(
-        url: String,
-        gid: Long,
-        token: String?,
-    ): ArchiveParser.Result {
-        return ehRequest(url, EhUrl.getGalleryDetailUrl(gid, token)).executeAndParsingWith(ArchiveParser::parse)
-            .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) }
     }
 
     suspend fun downloadArchive(
@@ -397,12 +302,6 @@ object EhEngine {
         return null
     }
 
-    suspend fun getImageLimits() = parZip(
-        { ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse) },
-        { ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) },
-        { limits, funds -> HomeParser.Result(limits, funds) },
-    )
-
     suspend fun resetImageLimits(): HomeParser.Limits? {
         return ehRequest(EhUrl.URL_HOME) {
             form {
@@ -412,99 +311,19 @@ object EhEngine {
         }.executeAndParsingWith(HomeParser::parseResetLimits)
     }
 
-    suspend fun getNews(parse: Boolean): String? {
-        return ehRequest(EhUrl.URL_NEWS, EhUrl.REFERER_E).executeAndParsingWith {
-            if (parse) EventPaneParser.parse(this) else null
+    suspend fun modifyFavorites(url: String, gidArray: LongArray, dstCat: Int): FavoritesParser.Result {
+        val catStr: String = when (dstCat) {
+            -1 -> "delete"
+            in 0..9 -> "fav$dstCat"
+            else -> throw EhException("Invalid dstCat: $dstCat")
         }
-    }
-
-    suspend fun getProfile(): ProfileParser.Result {
-        val url = ehRequest(EhUrl.URL_FORUMS).executeAndParsingWith(ForumsParser::parse)
-        return ehRequest(url, EhUrl.URL_FORUMS).executeAndParsingWith(ProfileParser::parse)
-    }
-
-    suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
-        runSuspendCatching {
-            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
-        }.onFailure {
-            // It may get redirected when accessing ex for the first time
-            if (EhUtils.isExHentai) {
-                it.printStackTrace()
-                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
-            } else {
-                throw it
+        return ehRequest(url, url, EhUrl.origin) {
+            form {
+                add("ddact", catStr)
+                gidArray.forEach { add("modifygids[]", it.toString()) }
+                add("apply", "Apply")
             }
-        }
-    }
-
-    suspend fun voteComment(
-        apiUid: Long,
-        apiKey: String?,
-        gid: Long,
-        token: String?,
-        commentId: Long,
-        commentVote: Int,
-    ): VoteCommentParser.Result {
-        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
-            jsonBody {
-                put("method", "votecomment")
-                put("apiuid", apiUid)
-                put("apikey", apiKey)
-                put("gid", gid)
-                put("token", token)
-                put("comment_id", commentId)
-                put("comment_vote", commentVote)
-            }
-        }.executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
-    }
-
-    suspend fun voteTag(
-        apiUid: Long,
-        apiKey: String?,
-        gid: Long,
-        token: String?,
-        tags: String?,
-        vote: Int,
-    ): String {
-        return ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
-            jsonBody {
-                put("method", "taggallery")
-                put("apiuid", apiUid)
-                put("apikey", apiKey)
-                put("gid", gid)
-                put("token", token)
-                put("tags", tags)
-                put("vote", vote)
-            }
-        }.executeAndParsingWith(VoteTagParser::parse)
-    }
-
-    /**
-     * @param image Must be jpeg
-     */
-    suspend fun imageSearch(
-        image: File,
-        uss: Boolean,
-        osc: Boolean,
-    ): GalleryListParser.Result {
-        return ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) {
-            multipart {
-                setType(MultipartBody.FORM)
-                addFormDataPart("sfile", "a.jpg", image.asRequestBody(MEDIA_TYPE_JPEG))
-                if (uss) addFormDataPart("fs_similar", "on")
-                if (osc) addFormDataPart("fs_covers", "on")
-                addFormDataPart("f_sfile", "File Search")
-            }
-        }.executeAndParsingWith(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
-    }
-
-    suspend fun getGalleryPage(
-        url: String,
-        gid: Long,
-        token: String?,
-    ): GalleryPageParser.Result {
-        val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeAndParsingWith(GalleryPageParser::parse)
+        }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
     suspend fun getGalleryPageApi(
@@ -524,5 +343,114 @@ object EhEngine {
                 put("showkey", showKey)
             }
         }.executeAndParsingWith(GalleryPageApiParser::parse)
+    }
+
+    suspend fun rateGallery(apiUid: Long, apiKey: String?, gid: Long, token: String?, rating: Float) = ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
+        jsonBody {
+            put("method", "rategallery")
+            put("apiuid", apiUid)
+            put("apikey", apiKey)
+            put("gid", gid)
+            put("token", token)
+            put("rating", ceil((rating * 2).toDouble()).toInt())
+        }
+    }.executeAndParsingWith(RateGalleryParser::parse)
+
+    suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).forEach {
+        ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
+            jsonBody {
+                put("method", "gdata")
+                array("gidlist") { it.forEach { put(jsonArrayOf(it.gid, it.token)) } }
+                put("namespace", 1)
+            }
+        }.executeAndParsingWith { GalleryApiParser.parse(this, it) }
+    }
+
+    suspend fun voteComment(
+        apiUid: Long,
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        commentId: Long,
+        commentVote: Int,
+    ) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+        jsonBody {
+            put("method", "votecomment")
+            put("apiuid", apiUid)
+            put("apikey", apiKey)
+            put("gid", gid)
+            put("token", token)
+            put("comment_id", commentId)
+            put("comment_vote", commentVote)
+        }
+    }.executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
+
+    suspend fun voteTag(
+        apiUid: Long,
+        apiKey: String?,
+        gid: Long,
+        token: String?,
+        tags: String?,
+        vote: Int,
+    ) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+        jsonBody {
+            put("method", "taggallery")
+            put("apiuid", apiUid)
+            put("apikey", apiKey)
+            put("gid", gid)
+            put("token", token)
+            put("tags", tags)
+            put("vote", vote)
+        }
+    }.executeAndParsingWith(VoteTagParser::parse)
+
+    suspend fun getGalleryToken(gid: Long, gtoken: String?, page: Int) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
+        jsonBody {
+            put("method", "gtoken")
+            put("pagelist", JSONArray().put(JSONArray().put(gid).put(gtoken).put(page + 1)))
+        }
+    }.executeAndParsingWith(GalleryTokenApiParser::parse)
+
+    /**
+     * @param image Must be jpeg
+     */
+    suspend fun imageSearch(image: File, uss: Boolean, osc: Boolean) = ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) {
+        multipart {
+            setType(MultipartBody.FORM)
+            addFormDataPart("sfile", "a.jpg", image.asRequestBody(MEDIA_TYPE_JPEG))
+            if (uss) addFormDataPart("fs_similar", "on")
+            if (osc) addFormDataPart("fs_covers", "on")
+            addFormDataPart("f_sfile", "File Search")
+        }
+    }.executeAndParsingWith(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
+
+    private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
+        // Filter title and uploader
+        if (filter) list.removeAll { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
+
+        var hasTags = false
+        var hasPages = false
+        var hasRated = false
+        for (gi in list) {
+            if (gi.simpleTags != null) {
+                hasTags = true
+            }
+            if (gi.pages != 0) {
+                hasPages = true
+            }
+            if (gi.rated) {
+                hasRated = true
+            }
+        }
+        val needApi = filter && EhFilter.needTags() && !hasTags || Settings.showGalleryPages && !hasPages || hasRated
+        if (needApi) fillGalleryListByApi(list, url)
+
+        // Filter tag, thumbnail mode need filter uploader again
+        if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
+    }
+
+    suspend fun addFavoritesRange(gidArray: LongArray, tokenArray: Array<String?>, dstCat: Int) {
+        require(gidArray.size == tokenArray.size)
+        gidArray.forEachIndexed { index, gid -> addFavorites(gid, tokenArray[index], dstCat, null) }
     }
 }
