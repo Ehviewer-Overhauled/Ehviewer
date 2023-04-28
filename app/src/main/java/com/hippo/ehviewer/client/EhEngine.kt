@@ -274,13 +274,11 @@ object EhEngine {
     }
 
     suspend fun commentGallery(
-        url: String?,
+        url: String,
         comment: String,
         id: String?,
     ): GalleryCommentList {
-        val origin = EhUrl.origin
-        Log.d(TAG, url!!)
-        return ehRequest(url, url, origin) {
+        return ehRequest(url, url, EhUrl.origin) {
             formbody {
                 if (id == null) {
                     add("commenttext_new", comment)
@@ -432,9 +430,7 @@ object EhEngine {
         }
         val url = EhUrl.getDownloadArchive(gid, token, or)
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        val request = ehRequest(url, referer, origin) {
+        val request = ehRequest(url, referer, EhUrl.origin) {
             formbody {
                 if (isHAtH) {
                     add("hathdl_xres", res)
@@ -593,13 +589,9 @@ object EhEngine {
             Headers.headersOf("Content-Disposition", "form-data; name=\"f_sfile\""),
             "File Search".toRequestBody(),
         )
-        val url = EhUrl.imageSearchUrl
-        val referer = EhUrl.referer
-        val origin = EhUrl.origin
-        Log.d(TAG, url)
-        return ehRequest(url, referer, origin) { builder.build() }
+        return ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) { post(builder.build()) }
             .executeAndParsingWith(GalleryListParser::parse)
-            .apply { fillGalleryList(galleryInfoList, url, true) }
+            .apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
     }
 
     suspend fun getGalleryPage(
