@@ -202,7 +202,7 @@ object EhEngine {
         val url = EhUrl.API_SIGN_IN
         val origin = "https://forums.e-hentai.org"
         return ehRequest(url, referer, origin) {
-            form {
+            formBody {
                 add("referer", referer)
                 add("b", "")
                 add("bt", "")
@@ -214,7 +214,7 @@ object EhEngine {
     }
 
     suspend fun commentGallery(url: String, comment: String, id: String?) = ehRequest(url, url, EhUrl.origin) {
-        form {
+        formBody {
             if (id == null) {
                 add("commenttext_new", comment)
             } else {
@@ -248,7 +248,7 @@ object EhEngine {
         }
         val url = EhUrl.getAddFavorites(gid, token)
         return ehRequest(url, url, EhUrl.origin) {
-            form {
+            formBody {
                 add("favcat", catStr)
                 add("favnote", note ?: "")
                 // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
@@ -274,7 +274,7 @@ object EhEngine {
         val url = EhUrl.getDownloadArchive(gid, token, or)
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         val request = ehRequest(url, referer, EhUrl.origin) {
-            form {
+            formBody {
                 if (isHAtH) {
                     add("hathdl_xres", res)
                 } else {
@@ -304,7 +304,7 @@ object EhEngine {
 
     suspend fun resetImageLimits(): HomeParser.Limits? {
         return ehRequest(EhUrl.URL_HOME) {
-            form {
+            formBody {
                 add("act", "limits")
                 add("reset", "Reset Limit")
             }
@@ -318,7 +318,7 @@ object EhEngine {
             else -> throw EhException("Invalid dstCat: $dstCat")
         }
         return ehRequest(url, url, EhUrl.origin) {
-            form {
+            formBody {
                 add("ddact", catStr)
                 gidArray.forEach { add("modifygids[]", it.toString()) }
                 add("apply", "Apply")
@@ -415,7 +415,7 @@ object EhEngine {
      * @param image Must be jpeg
      */
     suspend fun imageSearch(image: File, uss: Boolean, osc: Boolean) = ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) {
-        multipart {
+        multipartBody {
             setType(MultipartBody.FORM)
             addFormDataPart("sfile", "a.jpg", image.asRequestBody(MEDIA_TYPE_JPEG))
             if (uss) addFormDataPart("fs_similar", "on")
