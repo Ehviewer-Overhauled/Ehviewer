@@ -215,21 +215,19 @@ object EhEngine {
         galleryInfoList: List<GalleryInfo>,
         referer: String,
     ) {
-        val ja = JSONArray()
-        var i = 0
-        val size = galleryInfoList.size
-        while (i < size) {
-            val gi = galleryInfoList[i]
-            val g = JSONArray()
-            g.put(gi.gid)
-            g.put(gi.token)
-            ja.put(g)
-            i++
-        }
         return ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
             jsonBody {
                 put("method", "gdata")
-                put("gidlist", ja)
+                array("gidlist") {
+                    galleryInfoList.forEach {
+                        put(
+                            array {
+                                put(it.gid)
+                                put(it.token)
+                            },
+                        )
+                    }
+                }
                 put("namespace", 1)
             }
         }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }

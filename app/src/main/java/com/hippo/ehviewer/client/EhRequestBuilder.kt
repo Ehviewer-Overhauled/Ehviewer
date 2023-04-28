@@ -22,6 +22,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 inline fun ehRequest(url: String, referer: String? = null, origin: String? = null, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
@@ -37,6 +38,10 @@ inline fun Request.Builder.form(builder: FormBody.Builder.() -> Unit) = post(For
 inline fun Request.Builder.multipart(builder: MultipartBody.Builder.() -> Unit) = post(MultipartBody.Builder().apply(builder).build())
 
 val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
+
+inline fun JSONObject.array(name: String, builder: JSONArray.() -> Unit): JSONObject = put(name, JSONArray().apply(builder))
+
+inline fun JSONArray.array(builder: JSONArray.() -> Unit): JSONArray = put(JSONArray().apply(builder))
 
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
