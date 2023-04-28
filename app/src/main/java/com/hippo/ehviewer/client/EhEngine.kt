@@ -25,7 +25,6 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.parser.ArchiveParser
@@ -49,6 +48,7 @@ import com.hippo.ehviewer.client.parser.VoteTagParser
 import com.hippo.ehviewer.dailycheck.showEventNotification
 import com.hippo.ehviewer.dailycheck.today
 import com.hippo.network.StatusCodeException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Headers
@@ -72,9 +72,11 @@ private const val SAD_PANDA_LENGTH = "9615"
 private const val KOKOMADE_URL = "https://exhentai.org/img/kokomade.jpg"
 private const val U_CONFIG_TEXT = "Selected Profile"
 private val MEDIA_TYPE_JPEG: MediaType = "image/jpeg".toMediaType()
-private var sEhFilter = EhFilter
 
-private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwable) {
+private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwable): Nothing {
+    // Don't translate coroutine cancellation
+    if (e is CancellationException) throw e
+
     // Check sad panda
     if (SAD_PANDA_DISPOSITION == headers["Content-Disposition"] && SAD_PANDA_TYPE == headers["Content-Type"] && SAD_PANDA_LENGTH == headers["Content-Length"]) {
         throw EhException("Sad Panda")
@@ -106,12 +108,10 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     if (e is ParseException) {
         if (body.isEmpty()) {
             throw EhException(GetText.getString(R.string.error_empty_html))
-        } else if (!body.contains("<")) {
+        } else if ("<" !in body) {
             throw EhException(body)
         } else {
-            if (Settings.saveParseErrorBody) {
-                AppConfig.saveParseErrorBody(e as ParseException?)
-            }
+            if (Settings.saveParseErrorBody) AppConfig.saveParseErrorBody(e)
             throw EhException(GetText.getString(R.string.error_parse_error))
         }
     }
@@ -124,11 +124,11 @@ private suspend inline fun <T> Request.executeAndParsingWith(block: String.() ->
     Log.d(TAG, url.toString())
     return okHttpClient.newCall(this).executeAsync().use { response ->
         val body = response.body.string()
-        runCatching {
+        try {
             block(body)
-        }.onFailure {
-            rethrowExactly(response.code, response.headers, body, it)
-        }.getOrThrow()
+        } catch (e: Exception) {
+            rethrowExactly(response.code, response.headers, body, e)
+        }
     }
 }
 
@@ -149,15 +149,10 @@ object EhEngine {
         }.executeAndParsingWith(SignInParser::parse)
     }
 
-    private suspend fun fillGalleryList(
-        list: MutableList<GalleryInfo>,
-        url: String,
-        filter: Boolean,
-    ) {
+    private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
         // Filter title and uploader
-        if (filter) {
-            list.removeAll { !sEhFilter.filterTitle(it) || !sEhFilter.filterUploader(it) }
-        }
+        if (filter) list.removeAll { EhFilter.filterTitle(it) || EhFilter.filterUploader(it) }
+
         var hasTags = false
         var hasPages = false
         var hasRated = false
@@ -172,57 +167,26 @@ object EhEngine {
                 hasRated = true
             }
         }
-        val needApi = filter && sEhFilter.needTags() && !hasTags ||
-            Settings.showGalleryPages && !hasPages || hasRated
-        if (needApi) {
-            fillGalleryListByApi(list, url)
+        val needApi = filter && EhFilter.needTags() && !hasTags || Settings.showGalleryPages && !hasPages || hasRated
+        if (needApi) fillGalleryListByApi(list, url)
+
+        // Filter tag, thumbnail mode need filter uploader again
+        if (filter) list.removeAll { EhFilter.filterUploader(it) || EhFilter.filterTag(it) || EhFilter.filterTagNamespace(it) }
+    }
+
+    suspend fun getGalleryList(url: String) = ehRequest(url, EhUrl.referer)
+        .executeAndParsingWith(GalleryListParser::parse)
+        .apply { fillGalleryList(galleryInfoList, url, true) }
+
+    suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).forEach { doFillGalleryListByApi(it, referer) }
+
+    private suspend fun doFillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
+        jsonBody {
+            put("method", "gdata")
+            array("gidlist") { galleryInfoList.forEach { put(jsonArrayOf(it.gid, it.token)) } }
+            put("namespace", 1)
         }
-
-        // Filter tag
-        if (filter) {
-            // Thumbnail mode need filter uploader again
-            list.removeAll {
-                !sEhFilter.filterUploader(it) || !sEhFilter.filterTag(it) ||
-                    !sEhFilter.filterTagNamespace(it)
-            }
-        }
-    }
-
-    suspend fun getGalleryList(url: String): GalleryListParser.Result {
-        return ehRequest(url, EhUrl.referer).executeAndParsingWith(GalleryListParser::parse)
-            .apply { fillGalleryList(galleryInfoList, url, true) }
-    }
-
-    suspend fun fillGalleryListByApi(
-        galleryInfoList: List<GalleryInfo>,
-        referer: String,
-    ): List<GalleryInfo> {
-        val requestItems: MutableList<GalleryInfo> = ArrayList(MAX_REQUEST_SIZE)
-        var i = 0
-        val size = galleryInfoList.size
-        while (i < size) {
-            requestItems.add(galleryInfoList[i])
-            if (requestItems.size == MAX_REQUEST_SIZE || i == size - 1) {
-                doFillGalleryListByApi(requestItems, referer)
-                requestItems.clear()
-            }
-            i++
-        }
-        return galleryInfoList
-    }
-
-    private suspend fun doFillGalleryListByApi(
-        galleryInfoList: List<GalleryInfo>,
-        referer: String,
-    ) {
-        return ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
-            jsonBody {
-                put("method", "gdata")
-                array("gidlist") { galleryInfoList.forEach { put(jsonArrayOf(it.gid, it.token)) } }
-                put("namespace", 1)
-            }
-        }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
-    }
+    }.executeAndParsingWith { GalleryApiParser.parse(this, galleryInfoList) }
 
     suspend fun getGalleryDetail(url: String): GalleryDetail {
         return ehRequest(url, EhUrl.referer).executeAndParsingWith {
@@ -234,10 +198,8 @@ object EhEngine {
         }
     }
 
-    suspend fun getPreviewList(url: String): Pair<List<GalleryPreview>, Int> {
-        return ehRequest(url, EhUrl.referer).executeAndParsingWith {
-            GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
-        }
+    suspend fun getPreviewList(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
+        GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
     }
 
     @Throws(Throwable::class)
@@ -360,24 +322,14 @@ object EhEngine {
         dstCat: Int,
     ): FavoritesParser.Result {
         val catStr: String = when (dstCat) {
-            -1 -> {
-                "delete"
-            }
-
-            in 0..9 -> {
-                "fav$dstCat"
-            }
-
-            else -> {
-                throw EhException("Invalid dstCat: $dstCat")
-            }
+            -1 -> { "delete" }
+            in 0..9 -> { "fav$dstCat" }
+            else -> { throw EhException("Invalid dstCat: $dstCat") }
         }
         return ehRequest(url, url, EhUrl.origin) {
             form {
                 add("ddact", catStr)
-                for (gid in gidArray) {
-                    add("modifygids[]", gid.toString())
-                }
+                for (gid in gidArray) add("modifygids[]", gid.toString())
                 add("apply", "Apply")
             }
         }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.client.exception.ParseException;
@@ -134,7 +135,7 @@ public class AppConfig {
         return FileUtils.createTempFile(getTempDir(), null);
     }
 
-    public static void saveParseErrorBody(ParseException e) {
+    public static void saveParseErrorBody(@NonNull ParseException e) {
         File dir = getExternalParseErrorDir();
         if (null == dir) {
             return;
@@ -150,9 +151,7 @@ public class AppConfig {
                 os.write(message.getBytes(StandardCharsets.UTF_8));
                 os.write('\n');
             }
-            if (null != body) {
-                os.write(body.getBytes(StandardCharsets.UTF_8));
-            }
+            os.write(body.getBytes(StandardCharsets.UTF_8));
             os.flush();
         } catch (IOException e1) {
             // Ignore

@@ -76,12 +76,13 @@ class RestoreDownloadPreference @JvmOverloads constructor(
     private suspend fun doRealWork(): List<GalleryInfo>? {
         val dir = Settings.downloadLocation ?: return null
         val files = dir.listFiles() ?: return null
-        val restoreItemList = files.mapNotNull { getRestoreItem(it) }
-        return runSuspendCatching {
-            fillGalleryListByApi(restoreItemList, EhUrl.referer)
-        }.onFailure {
-            it.printStackTrace()
-        }.getOrNull()
+        return files.mapNotNull { getRestoreItem(it) }.apply {
+            runSuspendCatching {
+                fillGalleryListByApi(this, EhUrl.referer)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
     }
 
     private class RestoreItem : BaseGalleryInfo() {

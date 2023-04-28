@@ -130,56 +130,25 @@ object EhFilter {
         }
     }
 
+    private inline fun <T> Iterable<T>.contains(predicate: (T) -> Boolean) = firstOrNull(predicate) != null
+
+    private inline fun <T> Array<T>.contains(predicate: (T) -> Boolean) = firstOrNull(predicate) != null
+
     @Synchronized
     fun needTags(): Boolean {
         return 0 != mTagFilterList.size || 0 != mTagNamespaceFilterList.size
     }
 
     @Synchronized
-    fun filterTitle(info: GalleryInfo?): Boolean {
-        if (null == info) {
-            return false
-        }
-
-        // Title
-        val title = info.title
-        val filters: List<Filter> = mTitleFilterList
-        if (null != title && filters.isNotEmpty()) {
-            var i = 0
-            val n = filters.size
-            while (i < n) {
-                if (filters[i].enable!! && title.lowercase(Locale.getDefault()).contains(
-                        filters[i].text!!,
-                    )
-                ) {
-                    return false
-                }
-                i++
-            }
-        }
-        return true
+    fun filterTitle(info: GalleryInfo): Boolean {
+        val title = info.title ?: return false
+        return mTitleFilterList.contains { it.enable!! && it.text!! in title.lowercase() }
     }
 
     @Synchronized
-    fun filterUploader(info: GalleryInfo?): Boolean {
-        if (null == info) {
-            return false
-        }
-
-        // Uploader
-        val uploader = info.uploader
-        val filters: List<Filter> = mUploaderFilterList
-        if (null != uploader && filters.isNotEmpty()) {
-            var i = 0
-            val n = filters.size
-            while (i < n) {
-                if (filters[i].enable!! && uploader == filters[i].text) {
-                    return false
-                }
-                i++
-            }
-        }
-        return true
+    fun filterUploader(info: GalleryInfo): Boolean {
+        val uploader = info.uploader ?: return false
+        return mUploaderFilterList.contains { it.enable!! && it.text == uploader }
     }
 
     private fun matchTag(tag: String?, filter: String?): Boolean {
@@ -216,27 +185,9 @@ object EhFilter {
     }
 
     @Synchronized
-    fun filterTag(info: GalleryInfo?): Boolean {
-        if (null == info) {
-            return false
-        }
-
-        // Tag
-        val tags = info.simpleTags
-        val filters: List<Filter> = mTagFilterList
-        if (null != tags && filters.isNotEmpty()) {
-            for (tag in tags) {
-                var i = 0
-                val n = filters.size
-                while (i < n) {
-                    if (filters[i].enable!! && matchTag(tag, filters[i].text)) {
-                        return false
-                    }
-                    i++
-                }
-            }
-        }
-        return true
+    fun filterTag(info: GalleryInfo): Boolean {
+        val tags = info.simpleTags ?: return false
+        return tags.contains { tag -> mTagFilterList.contains { it.enable!! && matchTag(tag, it.text) } }
     }
 
     private fun matchTagNamespace(tag: String?, filter: String?): Boolean {
@@ -254,25 +205,9 @@ object EhFilter {
     }
 
     @Synchronized
-    fun filterTagNamespace(info: GalleryInfo?): Boolean {
-        if (null == info) {
-            return false
-        }
-        val tags = info.simpleTags
-        val filters: List<Filter> = mTagNamespaceFilterList
-        if (null != tags && filters.isNotEmpty()) {
-            for (tag in tags) {
-                var i = 0
-                val n = filters.size
-                while (i < n) {
-                    if (filters[i].enable!! && matchTagNamespace(tag, filters[i].text)) {
-                        return false
-                    }
-                    i++
-                }
-            }
-        }
-        return true
+    fun filterTagNamespace(info: GalleryInfo): Boolean {
+        val tags = info.simpleTags ?: return false
+        return tags.contains { tag -> mTagNamespaceFilterList.contains { it.enable!! && matchTagNamespace(tag, it.text) } }
     }
 
     @Synchronized
