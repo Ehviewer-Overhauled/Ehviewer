@@ -1300,7 +1300,6 @@ class GalleryListScene :
                             File(StringUtils.avoidNull(mUrlBuilder.imagePath)),
                             mUrlBuilder.isUseSimilarityScan,
                             mUrlBuilder.isOnlySearchCovers,
-                            mUrlBuilder.isShowExpunged,
                         )
                     } else {
                         val url = mUrlBuilder.build()

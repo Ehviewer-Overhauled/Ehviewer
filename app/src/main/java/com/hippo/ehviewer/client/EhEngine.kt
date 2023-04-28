@@ -58,7 +58,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.executeAsync
 import org.json.JSONArray
 import org.jsoup.Jsoup
@@ -140,7 +139,7 @@ object EhEngine {
         val url = EhUrl.API_SIGN_IN
         val origin = "https://forums.e-hentai.org"
         return ehRequest(url, referer, origin) {
-            formbody {
+            form {
                 add("referer", referer)
                 add("b", "")
                 add("bt", "")
@@ -279,7 +278,7 @@ object EhEngine {
         id: String?,
     ): GalleryCommentList {
         return ehRequest(url, url, EhUrl.origin) {
-            formbody {
+            form {
                 if (id == null) {
                     add("commenttext_new", comment)
                 } else {
@@ -342,7 +341,7 @@ object EhEngine {
         }
         val url = EhUrl.getAddFavorites(gid, token)
         return ehRequest(url, url, EhUrl.origin) {
-            formbody {
+            form {
                 add("favcat", catStr)
                 add("favnote", note ?: "")
                 // submit=Add+to+Favorites is not necessary, just use submit=Apply+Changes all the time
@@ -386,7 +385,7 @@ object EhEngine {
             }
         }
         return ehRequest(url, url, EhUrl.origin) {
-            formbody {
+            form {
                 add("ddact", catStr)
                 for (gid in gidArray) {
                     add("modifygids[]", gid.toString())
@@ -431,7 +430,7 @@ object EhEngine {
         val url = EhUrl.getDownloadArchive(gid, token, or)
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
         val request = ehRequest(url, referer, EhUrl.origin) {
-            formbody {
+            form {
                 if (isHAtH) {
                     add("hathdl_xres", res)
                 } else {
@@ -475,7 +474,7 @@ object EhEngine {
 
     suspend fun resetImageLimits(): HomeParser.Limits? {
         return ehRequest(EhUrl.URL_HOME) {
-            formbody {
+            form {
                 add("act", "limits")
                 add("reset", "Reset Limit")
             }
@@ -556,42 +555,16 @@ object EhEngine {
         image: File,
         uss: Boolean,
         osc: Boolean,
-        se: Boolean,
     ): GalleryListParser.Result {
-        val builder = MultipartBody.Builder()
-        builder.setType(MultipartBody.FORM)
-        builder.addPart(
-            Headers.headersOf(
-                "Content-Disposition",
-                "form-data; name=\"sfile\"; filename=\"a.jpg\"",
-            ),
-            image.asRequestBody(MEDIA_TYPE_JPEG),
-        )
-        if (uss) {
-            builder.addPart(
-                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_similar\""),
-                "on".toRequestBody(),
-            )
-        }
-        if (osc) {
-            builder.addPart(
-                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_covers\""),
-                "on".toRequestBody(),
-            )
-        }
-        if (se) {
-            builder.addPart(
-                Headers.headersOf("Content-Disposition", "form-data; name=\"fs_exp\""),
-                "on".toRequestBody(),
-            )
-        }
-        builder.addPart(
-            Headers.headersOf("Content-Disposition", "form-data; name=\"f_sfile\""),
-            "File Search".toRequestBody(),
-        )
-        return ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) { post(builder.build()) }
-            .executeAndParsingWith(GalleryListParser::parse)
-            .apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
+        return ehRequest(EhUrl.imageSearchUrl, EhUrl.referer, EhUrl.origin) {
+            multipart {
+                setType(MultipartBody.FORM)
+                addFormDataPart("sfile", "a.jpg", image.asRequestBody(MEDIA_TYPE_JPEG))
+                if (uss) addFormDataPart("fs_similar", "on")
+                if (osc) addFormDataPart("fs_covers", "on")
+                addFormDataPart("f_sfile", "File Search")
+            }
+        }.executeAndParsingWith(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
     }
 
     suspend fun getGalleryPage(
@@ -606,7 +579,7 @@ object EhEngine {
     suspend fun getGalleryPageApi(
         gid: Long,
         index: Int,
-        pToken: String?,
+        pToken: String,
         showKey: String?,
         previousPToken: String?,
     ): GalleryPageApiParser.Result {

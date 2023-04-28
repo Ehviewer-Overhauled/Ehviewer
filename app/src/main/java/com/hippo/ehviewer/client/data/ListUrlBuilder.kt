@@ -47,7 +47,6 @@ data class ListUrlBuilder(
     var imagePath: String? = null,
     var isUseSimilarityScan: Boolean = false,
     var isOnlySearchCovers: Boolean = false,
-    var isShowExpunged: Boolean = false,
 ) : Parcelable {
 
     fun reset() {
@@ -64,7 +63,6 @@ data class ListUrlBuilder(
         imagePath = null
         isUseSimilarityScan = false
         isOnlySearchCovers = false
-        isShowExpunged = false
         mSHash = null
     }
 
@@ -94,7 +92,6 @@ data class ListUrlBuilder(
         imagePath = null
         isUseSimilarityScan = false
         isOnlySearchCovers = false
-        isShowExpunged = false
     }
 
     fun toQuickSearch(): QuickSearch {

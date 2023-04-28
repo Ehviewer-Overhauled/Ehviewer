@@ -19,6 +19,7 @@ import io.ktor.http.HttpMessageBuilder
 import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -31,7 +32,9 @@ inline fun ehRequest(url: String, referer: String? = null, origin: String? = nul
     origin?.let { addHeader("Origin", it) }
 }.apply(builder).build()
 
-inline fun Request.Builder.formbody(builder: FormBody.Builder.() -> Unit) = post(FormBody.Builder().apply(builder).build())
+inline fun Request.Builder.form(builder: FormBody.Builder.() -> Unit) = post(FormBody.Builder().apply(builder).build())
+
+inline fun Request.Builder.multipart(builder: MultipartBody.Builder.() -> Unit) = post(MultipartBody.Builder().apply(builder).build())
 
 val MEDIA_TYPE_JSON: MediaType = "application/json; charset=utf-8".toMediaType()
 
