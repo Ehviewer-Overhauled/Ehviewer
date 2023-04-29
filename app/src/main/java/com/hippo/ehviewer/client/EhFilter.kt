@@ -39,37 +39,9 @@ object EhFilter {
     const val MODE_COMMENT = 5
     private const val TAG = "EhFilter"
 
-    init {
-        EhDB.allFilter.forEach { filter ->
-            when (filter.mode) {
-                MODE_TITLE -> {
-                    filter.text = filter.text!!.lowercase()
-                    titleFilterList.add(filter)
-                }
+    init { EhDB.allFilter.forEach(::memorizeFilter) }
 
-                MODE_TAG -> {
-                    filter.text = filter.text!!.lowercase()
-                    tagFilterList.add(filter)
-                }
-
-                MODE_TAG_NAMESPACE -> {
-                    filter.text = filter.text!!.lowercase()
-                    tagNamespaceFilterList.add(filter)
-                }
-
-                MODE_UPLOADER -> uploaderFilterList.add(filter)
-                MODE_COMMENTER -> commenterFilterList.add(filter)
-                MODE_COMMENT -> commentFilterList.add(filter)
-                else -> Log.d(TAG, "Unknown mode: " + filter.mode)
-            }
-        }
-    }
-
-    @Synchronized
-    fun addFilter(filter: Filter): Boolean {
-        // enable filter by default before it is added to database
-        filter.enable = true
-        if (!EhDB.addFilter(filter)) return false
+    private fun memorizeFilter(filter: Filter) {
         when (filter.mode) {
             MODE_TITLE -> {
                 filter.text = filter.text!!.lowercase()
@@ -91,6 +63,13 @@ object EhFilter {
             MODE_COMMENT -> commentFilterList.add(filter)
             else -> Log.d(TAG, "Unknown mode: " + filter.mode)
         }
+    }
+
+    @Synchronized
+    fun addFilter(filter: Filter): Boolean {
+        filter.enable = true
+        if (!EhDB.addFilter(filter)) return false
+        memorizeFilter(filter)
         return true
     }
 
