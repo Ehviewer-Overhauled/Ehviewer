@@ -399,7 +399,7 @@ object GalleryDetailParser {
             // filter comment
             if (!comment.uploader) {
                 val sEhFilter = EhFilter
-                if (!sEhFilter.filterCommenter(comment.user) || !sEhFilter.filterComment(comment.comment)) {
+                if (sEhFilter.filterCommenter(comment.user!!) || sEhFilter.filterComment(comment.comment!!)) {
                     return null
                 }
             }
