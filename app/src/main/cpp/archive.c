@@ -48,7 +48,7 @@ typedef struct {
     size_t size;
 } entry;
 
-pthread_mutex_t ctx_lock;
+pthread_spinlock_t ctx_lock;
 static archive_ctx **ctx_pool;
 #define CTX_POOL_SIZE 20
 
@@ -223,7 +223,7 @@ static int archive_skip_to_index(archive_ctx *ctx, int index) {
 static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
     int ret;
     archive_ctx *ctx = NULL;
-    pthread_mutex_lock(&ctx_lock);
+    pthread_spin_lock(&ctx_lock);
     for (int i = 0; i < CTX_POOL_SIZE; i++) {
         if (!ctx_pool[i])
             continue;
@@ -238,7 +238,7 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
     }
     if (ctx)
         ctx->using = 1;
-    pthread_mutex_unlock(&ctx_lock);
+    pthread_spin_unlock(&ctx_lock);
 
     if (!ctx) {
         archive_ctx *victimCtx = NULL;
@@ -247,7 +247,7 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
         ret = archive_alloc_ctx(&ctx);
         if (ret)
             return ret;
-        pthread_mutex_lock(&ctx_lock);
+        pthread_spin_lock(&ctx_lock);
         for (int i = 0; i < CTX_POOL_SIZE; i++) {
             if (!ctx_pool[i]) {
                 ctx_pool[i] = ctx;
@@ -261,11 +261,9 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
                 victimIdx = i;
             }
         }
-        if (replace) {
-            archive_release_ctx(victimCtx);
-            ctx_pool[victimIdx] = ctx;
-        }
-        pthread_mutex_unlock(&ctx_lock);
+        if (replace) ctx_pool[victimIdx] = ctx;
+        pthread_spin_unlock(&ctx_lock);
+        archive_release_ctx(victimCtx);
     }
     ret = archive_skip_to_index(ctx, idx);
     if (ret != idx) {
@@ -292,7 +290,7 @@ Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_openArchive(JNIEnv *env, jcl
     }
     archiveSize = size;
     madvise_log_if_error(archiveAddr, archiveSize, MADV_WILLNEED);
-    pthread_mutex_init(&ctx_lock, 0);
+    pthread_spin_init(&ctx_lock, PTHREAD_PROCESS_PRIVATE);
     ctx_pool = calloc(CTX_POOL_SIZE, sizeof(archive_ctx **));
     if (!ctx_pool) {
         LOGE("Allocate archive ctx pool failed:ENOMEM");
@@ -397,7 +395,7 @@ Java_com_hippo_ehviewer_gallery_ArchivePageLoaderKt_closeArchive(JNIEnv *env, jc
         archive_release_ctx(ctx_pool[i]);
     free(passwd);
     free(ctx_pool);
-    pthread_mutex_destroy(&ctx_lock);
+    pthread_spin_destroy(&ctx_lock);
     passwd = NULL;
     need_encrypt = false;
     munmap(archiveAddr, archiveSize);
