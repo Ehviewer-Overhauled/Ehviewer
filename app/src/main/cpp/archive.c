@@ -263,7 +263,7 @@ static int archive_get_ctx(archive_ctx **ctxptr, int idx) {
         }
         if (replace) ctx_pool[victimIdx] = ctx;
         pthread_spin_unlock(&ctx_lock);
-        archive_release_ctx(victimCtx);
+        if (replace) archive_release_ctx(victimCtx);
     }
     ret = archive_skip_to_index(ctx, idx);
     if (ret != idx) {
