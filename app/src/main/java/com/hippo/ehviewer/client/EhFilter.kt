@@ -16,9 +16,12 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import arrow.core.memoize
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.Filter
+
+private val regex = { p: Filter -> Regex(p.text!!) }.memoize()
 
 object EhFilter {
     val titleFilterList = mutableListOf<Filter>()
@@ -170,6 +173,6 @@ object EhFilter {
 
     @Synchronized
     fun filterComment(comment: String): Boolean {
-        return commentFilterList.contains { it.enable!! && Regex(it.text!!).containsMatchIn(comment) }
+        return commentFilterList.contains { it.enable!! && regex(it).containsMatchIn(comment) }
     }
 }
