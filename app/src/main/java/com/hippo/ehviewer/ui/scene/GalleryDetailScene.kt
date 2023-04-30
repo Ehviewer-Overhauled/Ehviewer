@@ -532,8 +532,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    val pin = LocalPinnableContainer.current
-                    remember { pin?.pin() }
+                    LocalPinnableContainer.current!!.run { remember { pin() } }
                     Column {
                         GalleryDetailHeaderCard(
                             galleryInfo = galleryInfo,
@@ -589,8 +588,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    val pin = LocalPinnableContainer.current
-                    remember { pin?.pin() }
+                    LocalPinnableContainer.current!!.run { remember { pin() } }
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
