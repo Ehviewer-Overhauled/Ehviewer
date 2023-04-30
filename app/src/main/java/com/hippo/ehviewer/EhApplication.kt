@@ -42,7 +42,6 @@ import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.IntIdGenerator
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -59,8 +58,6 @@ import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
-    private val mIdGenerator = IntIdGenerator()
-    private val mGlobalStuffMap = HashMap<Int, Any>()
     private val mActivityList = ArrayList<Activity>()
     val topActivity: EhActivity?
         get() = if (mActivityList.isNotEmpty()) {
@@ -113,7 +110,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
         }
         cleanObsoleteCache(this)
-        mIdGenerator.setNextId(Settings.getInt(KEY_GLOBAL_STUFF_NEXT_ID, 0))
     }
 
     private suspend fun cleanupDownload() {
@@ -147,17 +143,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
     }
 
-    fun putGlobalStuff(o: Any): Int {
-        val id = mIdGenerator.nextId()
-        mGlobalStuffMap[id] = o
-        Settings.putInt(KEY_GLOBAL_STUFF_NEXT_ID, mIdGenerator.nextId())
-        return id
-    }
-
-    fun removeGlobalStuff(id: Int): Any? {
-        return mGlobalStuffMap.remove(id)
-    }
-
     fun registerActivity(activity: Activity) {
         mActivityList.add(activity)
     }
@@ -185,7 +170,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     }
 
     companion object {
-        private const val KEY_GLOBAL_STUFF_NEXT_ID = "global_stuff_next_id"
         var locked = true
         var locked_last_leave_time: Long = 0
 

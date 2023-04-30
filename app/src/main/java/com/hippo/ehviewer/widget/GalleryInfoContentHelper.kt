@@ -28,7 +28,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
+abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo>() {
     @JvmField
     var jumpTo: String? = null
     private val listener: FavouriteStatusRouter.Listener
@@ -50,18 +50,12 @@ abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo?>() {
         EhApplication.favouriteStatusRouter.removeListener(listener)
     }
 
-    override fun onAddData(data: List<GalleryInfo?>) {
-        for (info in data) {
-            info?.let {
-                map[info.gid] = info
-            }
-        }
+    override fun onAddData(data: List<GalleryInfo>) {
+        data.forEach { map[it.gid] = it }
     }
 
-    override fun onRemoveData(data: List<GalleryInfo?>) {
-        for (info in data) {
-            info?.let { map.remove(info.gid) }
-        }
+    override fun onRemoveData(data: List<GalleryInfo>) {
+        data.forEach { map.remove(it.gid) }
     }
 
     override fun onClearData() {

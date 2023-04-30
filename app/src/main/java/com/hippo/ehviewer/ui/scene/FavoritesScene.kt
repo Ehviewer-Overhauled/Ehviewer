@@ -979,8 +979,8 @@ class FavoritesScene :
             showSearchBar()
         }
 
-        override fun isDuplicate(d1: GalleryInfo?, d2: GalleryInfo?): Boolean {
-            return d1?.gid == d2?.gid && d1 != null && d2 != null
+        override fun isDuplicate(d1: GalleryInfo, d2: GalleryInfo): Boolean {
+            return d1.gid == d2.gid
         }
 
         override fun onScrollToPosition(position: Int) {

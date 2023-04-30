@@ -30,7 +30,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.easyrecyclerview.LayoutManagerUtils
 import com.hippo.easyrecyclerview.LayoutManagerUtils.OnScrollToPositionListener
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.databinding.WidgetContentLayoutBinding
 import com.hippo.util.ExceptionUtils
@@ -130,7 +129,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         super.onRestoreInstanceState(mContentHelper.restoreInstanceState(state))
     }
 
-    abstract class ContentHelper<E : Parcelable?> : OnShowViewListener {
+    abstract class ContentHelper<E : Parcelable> : OnShowViewListener {
         /**
          * Generate task id
          */
@@ -236,7 +235,6 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                     }
                 }
             }
-        private var mSavedDataId = IntIdGenerator.INVALID_ID
         fun init(contentLayout: ContentLayout) {
             binding = contentLayout.binding
             mNextPageScrollSize = LayoutUtils.dp2pix(contentLayout.context, 48f)
@@ -733,15 +731,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             val shownView = mViewTransition.shownViewIndex
             bundle.putInt(KEY_SHOWN_VIEW, shownView)
             bundle.putString(KEY_TIP, binding.tip.text.toString())
-
-            // TODO It's a bad design
-            val app = EhApplication.application
-            if (mSavedDataId != IntIdGenerator.INVALID_ID) {
-                app.removeGlobalStuff(mSavedDataId)
-                mSavedDataId = IntIdGenerator.INVALID_ID
-            }
-            mSavedDataId = app.putGlobalStuff(mData)
-            bundle.putInt(KEY_DATA, mSavedDataId)
+            bundle.putParcelableArrayList(KEY_DATA, mData)
             bundle.putInt(KEY_NEXT_ID, mIdGenerator.nextId())
             bundle.putParcelable(KEY_PAGE_DIVIDER, mPageDivider)
             bundle.putInt(KEY_START_PAGE, mStartPage)
@@ -756,16 +746,9 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             return if (state is Bundle) {
                 mViewTransition.showView(state.getInt(KEY_SHOWN_VIEW), false)
                 binding.tip.text = state.getString(KEY_TIP)
-                mSavedDataId = state.getInt(KEY_DATA)
-                var newData: ArrayList<E>? = null
-                val app = EhApplication.application
-                if (mSavedDataId != IntIdGenerator.INVALID_ID) {
-                    newData = app.removeGlobalStuff(mSavedDataId) as ArrayList<E>?
-                    mSavedDataId = IntIdGenerator.INVALID_ID
-                    if (newData != null) {
-                        mData = newData
-                    }
-                }
+                @Suppress("DEPRECATION")
+                val newData = state.getParcelableArrayList<E>(KEY_DATA)
+                newData?.let { mData = it }
                 mIdGenerator.setNextId(state.getInt(KEY_NEXT_ID))
                 mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER)!!
                 mStartPage = state.getInt(KEY_START_PAGE)
