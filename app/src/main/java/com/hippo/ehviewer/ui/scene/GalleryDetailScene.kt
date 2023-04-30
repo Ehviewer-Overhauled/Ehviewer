@@ -377,6 +377,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
     }
 
+    private var showSheet by mutableStateOf(false)
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -409,6 +411,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             setContent {
                 Mdc3Theme {
                     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+                    composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
+
                     Scaffold(
                         topBar = {
                             LargeTopAppBar(
@@ -837,12 +842,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun onGalleryInfoCardClick() {
-        val gd = composeBindingGD ?: return
-        val galleryInfoBottomSheet = GalleryInfoBottomSheet(gd)
-        galleryInfoBottomSheet.show(
-            requireActivity().supportFragmentManager,
-            GalleryInfoBottomSheet.TAG,
-        )
+        showSheet = true
     }
 
     private fun onCategoryChipClick() {

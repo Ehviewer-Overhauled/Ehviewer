@@ -15,14 +15,26 @@
  */
 package com.hippo.ehviewer.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
@@ -31,152 +43,95 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.util.tellClipboardWithToast
 
-class GalleryInfoBottomSheet(detail: GalleryDetail) : BottomSheetDialogFragment() {
-    private var mKeys: ArrayList<String> = arrayListOf()
-    private var mValues: ArrayList<String?> = arrayListOf()
-    private var mRecyclerView: RecyclerView? = null
-    private val mDetail: GalleryDetail = detail
+private const val INDEX_URL = 2
+private const val INDEX_PARENT = 9
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        parseDetail()
-        val view = inflater.inflate(R.layout.scene_gallery_info, container, false)
-        val recyclerView = view.findViewById(R.id.recycler_view) as RecyclerView
-        val adapter = InfoAdapter()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        recyclerView.clipToPadding = false
-        recyclerView.setHasFixedSize(true)
-        mRecyclerView = recyclerView
-        return view
-    }
+private val keys = arrayOf(
+    R.string.key_gid,
+    R.string.key_token,
+    R.string.key_url,
+    R.string.key_title,
+    R.string.key_title_jpn,
+    R.string.key_thumb,
+    R.string.key_category,
+    R.string.key_uploader,
+    R.string.key_posted,
+    R.string.key_parent,
+    R.string.key_visible,
+    R.string.key_language,
+    R.string.key_pages,
+    R.string.key_size,
+    R.string.key_favorite_count,
+    R.string.key_favorited,
+    R.string.key_rating_count,
+    R.string.key_rating,
+    R.string.key_torrents,
+    R.string.key_torrent_url,
+    R.string.favorite_name,
+)
 
-    private fun parseDetail() {
-        mKeys.add(getString(R.string.header_key))
-        mValues.add(getString(R.string.header_value))
-        mKeys.add(getString(R.string.key_gid))
-        mValues.add(mDetail.gid.toString())
-        mKeys.add(getString(R.string.key_token))
-        mValues.add(mDetail.token)
-        mKeys.add(getString(R.string.key_url))
-        mValues.add(EhUrl.getGalleryDetailUrl(mDetail.gid, mDetail.token))
-        mKeys.add(getString(R.string.key_title))
-        mValues.add(mDetail.title)
-        mKeys.add(getString(R.string.key_title_jpn))
-        mValues.add(mDetail.titleJpn)
-        mKeys.add(getString(R.string.key_thumb))
-        mValues.add(mDetail.thumb)
-        mKeys.add(getString(R.string.key_category))
-        mValues.add(EhUtils.getCategory(mDetail.category))
-        mKeys.add(getString(R.string.key_uploader))
-        mValues.add(mDetail.uploader)
-        mKeys.add(getString(R.string.key_posted))
-        mValues.add(mDetail.posted)
-        mKeys.add(getString(R.string.key_parent))
-        mValues.add(mDetail.parent)
-        mKeys.add(getString(R.string.key_visible))
-        mValues.add(mDetail.visible)
-        mKeys.add(getString(R.string.key_language))
-        mValues.add(mDetail.language)
-        mKeys.add(getString(R.string.key_pages))
-        mValues.add(mDetail.pages.toString())
-        mKeys.add(getString(R.string.key_size))
-        mValues.add(mDetail.size)
-        mKeys.add(getString(R.string.key_favorite_count))
-        mValues.add(mDetail.favoriteCount.toString())
-        mKeys.add(getString(R.string.key_favorited))
-        mValues.add(java.lang.Boolean.toString(mDetail.isFavorited))
-        mKeys.add(getString(R.string.key_rating_count))
-        mValues.add(mDetail.ratingCount.toString())
-        mKeys.add(getString(R.string.key_rating))
-        mValues.add(mDetail.rating.toString())
-        mKeys.add(getString(R.string.key_torrents))
-        mValues.add(mDetail.torrentCount.toString())
-        mKeys.add(getString(R.string.key_torrent_url))
-        mValues.add(mDetail.torrentUrl)
-        mKeys.add(getString(R.string.favorite_name))
-        mValues.add(mDetail.favoriteName)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        (view.findViewById(R.id.title) as TextView).setText(R.string.gallery_info)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mRecyclerView?.stopScroll()
-    }
-
-    fun onItemClick(position: Int): Boolean {
-        val context = context
-        return if (null != context && 0 != position) {
-            if (position == INDEX_PARENT) {
-                UrlOpener.openUrl(context, mValues[position], true)
-            } else {
-                requireActivity() tellClipboardWithToast mValues[position]
-                if (position == INDEX_URL) {
-                    // Save it to avoid detect the gallery
-                    Settings.putClipboardTextHashCode(mValues[position].hashCode())
-                }
-            }
-            true
-        } else {
-            false
-        }
-    }
-
-    private class InfoHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val key: TextView
-        val value: TextView
-
-        init {
-            key = itemView.findViewById(R.id.key)
-            value = itemView.findViewById(R.id.value)
-        }
-    }
-
-    private inner class InfoAdapter : RecyclerView.Adapter<InfoHolder>() {
-        private val mInflater: LayoutInflater = layoutInflater
-
-        override fun getItemViewType(position: Int): Int {
-            return if (position == 0) {
-                TYPE_HEADER
-            } else {
-                TYPE_DATA
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoHolder {
-            return InfoHolder(
-                mInflater.inflate(
-                    if (viewType == TYPE_HEADER) R.layout.item_gallery_info_header else R.layout.item_gallery_info_data,
-                    parent,
-                    false,
-                ),
+@Composable
+fun GalleryInfoBottomSheet(
+    galleryDetail: GalleryDetail,
+    onDismissRequest: () -> Unit,
+) {
+    val data = remember(galleryDetail) {
+        galleryDetail.run {
+            arrayOf(
+                gid.toString(),
+                token,
+                EhUrl.getGalleryDetailUrl(gid, token),
+                title,
+                titleJpn,
+                thumb,
+                EhUtils.getCategory(category),
+                uploader,
+                posted,
+                parent,
+                visible,
+                language,
+                pages.toString(),
+                size,
+                favoriteCount.toString(),
+                isFavorited.toString(),
+                ratingCount.toString(),
+                rating.toString(),
+                torrentCount.toString(),
+                torrentUrl,
+                favoriteName,
             )
         }
-
-        override fun onBindViewHolder(holder: InfoHolder, position: Int) {
-            holder.key.text = mKeys[position]
-            holder.value.text = mValues[position]
-            holder.itemView.isEnabled = position != 0
-            holder.itemView.setOnClickListener { onItemClick(position) }
-        }
-
-        override fun getItemCount(): Int {
-            return mKeys.size.coerceAtMost(mValues.size)
-        }
     }
 
-    companion object {
-        const val TAG = "GalleryInfoBottomSheet"
-        private const val INDEX_URL = 3
-        private const val INDEX_PARENT = 10
-        private const val TYPE_HEADER = 0
-        private const val TYPE_DATA = 1
+    ModalBottomSheet(onDismissRequest) {
+        check(data.size == keys.size)
+        val context = LocalContext.current
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = stringResource(id = R.string.gallery_info), style = MaterialTheme.typography.titleLarge)
+        }
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
+            keys.forEachIndexed { index, i ->
+                val key = stringResource(i)
+                Row(
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)).clickable {
+                        if (index == INDEX_PARENT) {
+                            UrlOpener.openUrl(context, data[index], true)
+                        } else {
+                            EhApplication.application.topActivity!! tellClipboardWithToast data[index]
+                            if (index == INDEX_URL) {
+                                // Save it to avoid detect the gallery
+                                Settings.putClipboardTextHashCode(data[index].hashCode())
+                            }
+                        }
+                    }.fillMaxWidth(),
+                ) {
+                    Text(key, modifier = Modifier.width(90.dp).padding(8.dp))
+                    Text(data[index].orEmpty(), modifier = Modifier.padding(8.dp))
+                }
+            }
+        }
     }
 }
