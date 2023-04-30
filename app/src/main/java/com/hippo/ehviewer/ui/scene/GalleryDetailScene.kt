@@ -98,6 +98,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
@@ -531,6 +532,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    val pin = LocalPinnableContainer.current
+                    remember { pin?.pin() }
                     Column {
                         GalleryDetailHeaderCard(
                             galleryInfo = galleryInfo,
@@ -586,6 +589,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.strip_item_padding_v)),
             ) {
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    val pin = LocalPinnableContainer.current
+                    remember { pin?.pin() }
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
