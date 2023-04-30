@@ -93,6 +93,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -377,8 +378,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             }
     }
 
-    private var showSheet by mutableStateOf(false)
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -411,9 +410,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             setContent {
                 Mdc3Theme {
                     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
-                    composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
-
                     Scaffold(
                         topBar = {
                             LargeTopAppBar(
@@ -524,6 +520,11 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         contentPadding: PaddingValues,
         modifier: Modifier,
     ) {
+        var showSheet by rememberSaveable { mutableStateOf(false) }
+        fun onGalleryInfoCardClick() {
+            showSheet = true
+        }
+        composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
         // Padding is not subtracted here to have the same column count as gallery list and preview
         val totalSpace = LocalConfiguration.current.screenWidthDp
@@ -839,10 +840,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             GalleryDetailComment(galleryDetail.comments?.comments)
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.strip_item_padding_v)))
         }
-    }
-
-    private fun onGalleryInfoCardClick() {
-        showSheet = true
     }
 
     private fun onCategoryChipClick() {
