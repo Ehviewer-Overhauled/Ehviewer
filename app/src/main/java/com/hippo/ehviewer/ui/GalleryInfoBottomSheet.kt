@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
@@ -120,7 +119,7 @@ fun GalleryInfoBottomSheet(
                         if (index == INDEX_PARENT) {
                             UrlOpener.openUrl(context, data[index], true)
                         } else {
-                            EhApplication.application.topActivity!! tellClipboardWithToast data[index]
+                            context tellClipboardWithToast data[index]
                             if (index == INDEX_URL) {
                                 // Save it to avoid detect the gallery
                                 Settings.putClipboardTextHashCode(data[index].hashCode())
