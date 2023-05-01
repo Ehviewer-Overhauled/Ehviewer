@@ -476,10 +476,10 @@ object GalleryDetailParser {
     private fun parseLargePreview(body: String): Pair<List<GalleryPreview>, List<String>> {
         check(PATTERN_LARGE_PREVIEW.containsMatchIn(body))
         return PATTERN_LARGE_PREVIEW.findAll(body).unzip {
-            val index = it.groupValues[2].toInt()
+            val position = it.groupValues[2].toInt() - 1
             val imageUrl = it.groupValues[3].trim()
             val pageUrl = it.groupValues[1].trim()
-            GalleryPreview(imageUrl, index) to pageUrl
+            GalleryPreview(imageUrl, position) to pageUrl
         }.run {
             first.toList() to second.toList()
         }
