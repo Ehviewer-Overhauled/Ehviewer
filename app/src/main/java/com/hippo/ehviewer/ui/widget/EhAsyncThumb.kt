@@ -28,6 +28,12 @@ fun requestOf(model: String?): ImageRequest {
 }
 
 @Composable
+@ReadOnlyComposable
+fun requestOf(model: GalleryPreview): ImageRequest {
+    return LocalContext.current.imageRequest(model)
+}
+
+@Composable
 fun EhAsyncThumb(
     model: String?,
     modifier: Modifier = Modifier,
@@ -49,7 +55,7 @@ fun EhAsyncPreview(
 ) {
     var contentScale by remember { mutableStateOf(ContentScale.Fit) }
     AsyncImage(
-        model = requestOf(model.imageUrl),
+        model = requestOf(model),
         contentDescription = "",
         modifier = modifier,
         transform = {

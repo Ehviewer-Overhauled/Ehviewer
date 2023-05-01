@@ -15,6 +15,14 @@
  */
 package com.hippo.ehviewer.client
 
+import com.hippo.ehviewer.client.data.GalleryPreview
+import com.hippo.ehviewer.client.data.NormalGalleryPreview
+
+// ExHentai Large Preview: https://exhentai.org/t/***
+// ExHentai Normal Preview: https://exhentai.org/m/***
+// EHentai Normal Preview: https://ehgt.org/m/***
+// EHentai Large Preview: https://ehgt.org/***
+
 private const val URL_PREFIX_THUMB_E = "https://ehgt.org/"
 private const val URL_PREFIX_THUMB_EX = "https://exhentai.org/"
 
@@ -27,3 +35,10 @@ fun getPreviewThumbKey(url: String): String {
         .removePrefix(URL_PREFIX_THUMB_EX)
         .removePrefix("t/")
 }
+
+val GalleryPreview.url
+    get() = if (this is NormalGalleryPreview) {
+        if (EhUtils.isExHentai) URL_PREFIX_THUMB_EX + imageKey else URL_PREFIX_THUMB_E + imageKey
+    } else {
+        if (EhUtils.isExHentai) URL_PREFIX_THUMB_EX + "t/" + imageKey else URL_PREFIX_THUMB_E + imageKey
+    }

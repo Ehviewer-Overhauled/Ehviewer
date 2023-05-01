@@ -187,7 +187,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                                 val previewList = result.first.first
                                 previewList.forEach {
                                     context.run {
-                                        imageLoader.enqueue(imageRequest(it.imageUrl))
+                                        imageLoader.enqueue(imageRequest(it))
                                     }
                                 }
                             }

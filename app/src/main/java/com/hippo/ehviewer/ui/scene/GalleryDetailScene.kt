@@ -837,7 +837,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         if (Settings.showComments) {
-            GalleryDetailComment(galleryDetail.comments?.comments)
+            GalleryDetailComment(galleryDetail.comments.comments)
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.strip_item_padding_v)))
         }
     }
@@ -931,7 +931,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     lifecycleScope.launchIO {
                         galleryDetail.previewList.forEach {
                             context?.run {
-                                imageLoader.enqueue(imageRequest(it.imageUrl))
+                                imageLoader.enqueue(imageRequest(it))
                             }
                         }
                     }

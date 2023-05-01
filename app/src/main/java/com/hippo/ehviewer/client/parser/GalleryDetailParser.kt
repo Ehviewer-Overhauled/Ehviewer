@@ -33,6 +33,7 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.OffensiveException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.client.exception.PiningException
+import com.hippo.ehviewer.client.getPreviewThumbKey
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.JsoupUtils
 import com.hippo.yorozuya.NumberUtils
@@ -480,9 +481,9 @@ object GalleryDetailParser {
         check(PATTERN_LARGE_PREVIEW.containsMatchIn(body))
         return PATTERN_LARGE_PREVIEW.findAll(body).unzip {
             val position = it.groupValues[2].toInt() - 1
-            val imageUrl = it.groupValues[3].trim()
+            val imageKey = getPreviewThumbKey(it.groupValues[3].trim())
             val pageUrl = it.groupValues[1].trim()
-            LargeGalleryPreview(imageUrl, position) to pageUrl
+            LargeGalleryPreview(imageKey, position) to pageUrl
         }.run {
             first.toList() to second.toList()
         }
@@ -492,13 +493,13 @@ object GalleryDetailParser {
         check(PATTERN_NORMAL_PREVIEW.containsMatchIn(body))
         return PATTERN_NORMAL_PREVIEW.findAll(body).unzip {
             val position = it.groupValues[6].toInt() - 1
-            val imageUrl = it.groupValues[3].trim()
+            val imageKey = getPreviewThumbKey(it.groupValues[3].trim())
             val xOffset = it.groupValues[4].toIntOrNull() ?: 0
             val yOffset = 0
             val width = it.groupValues[1].toInt()
             val height = it.groupValues[2].toInt()
             val pageUrl = it.groupValues[5].trim()
-            NormalGalleryPreview(imageUrl, position, xOffset, yOffset, width, height) to pageUrl
+            NormalGalleryPreview(imageKey, position, xOffset, yOffset, width, height) to pageUrl
         }.run {
             first.toList() to second.toList()
         }
