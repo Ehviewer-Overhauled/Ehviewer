@@ -343,7 +343,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     @Throws(ParseException::class)
     private fun readPreviews(body: String, index: Int, spiderInfo: SpiderInfo) {
         spiderInfo.previewPages = parsePreviewPages(body)
-        val previewList = parsePreviewList(body)
+        val (previewList, pageUrlList) = parsePreviewList(body)
         if (previewList.isNotEmpty()) {
             if (index == 0) {
                 spiderInfo.previewPerPage = previewList.size
@@ -351,8 +351,8 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
                 spiderInfo.previewPerPage = previewList[0].position / index
             }
         }
-        previewList.forEach {
-            val result = GalleryPageUrlParser.parse(it.pageUrl)
+        pageUrlList.forEach {
+            val result = GalleryPageUrlParser.parse(it)
             if (result != null) {
                 spiderInfo.pTokenMap[result.page] = result.pToken
             }

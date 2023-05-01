@@ -16,14 +16,11 @@
 package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class GalleryPreview(
     val imageUrl: String,
-    @IgnoredOnParcel
-    val pageUrl: String = "",
     val position: Int,
     val offsetX: Int = Int.MIN_VALUE,
     val offsetY: Int = Int.MIN_VALUE,

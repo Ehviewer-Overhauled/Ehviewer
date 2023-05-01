@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client.parser
 
+import arrow.core.unzip
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.client.EhUtils
@@ -96,7 +97,7 @@ object GalleryDetailParser {
         galleryDetail.tags = parseTagGroups(document)
         galleryDetail.comments = parseComments(document)
         galleryDetail.previewPages = parsePreviewPages(body)
-        galleryDetail.previewList = parsePreviewList(body)
+        galleryDetail.previewList = parsePreviewList(body).first
 
         // Generate simpleLanguage for local favorites
         galleryDetail.generateSLang()
@@ -468,50 +469,35 @@ object GalleryDetailParser {
             ?: throw ParseException("Parse pages error", body)
     }
 
-    @Throws(ParseException::class)
-    fun parsePreviewList(body: String): List<GalleryPreview> {
-        return try {
-            parseLargePreview(body)
-        } catch (e: ParseException) {
-            parseNormalPreview(body)
-        }
+    fun parsePreviewList(body: String): Pair<List<GalleryPreview>, List<String>> {
+        return runCatching { parseNormalPreview(body) }.getOrElse { parseLargePreview(body) }
     }
 
-    /**
-     * Parse large previews with regular expressions
-     */
-    @Throws(ParseException::class)
-    private fun parseLargePreview(body: String): List<GalleryPreview> {
-        val list = PATTERN_LARGE_PREVIEW.findAll(body).mapNotNull {
-            val index = (it.groupValues[2].toIntOrNull() ?: return@mapNotNull null) - 1
+    private fun parseLargePreview(body: String): Pair<List<GalleryPreview>, List<String>> {
+        check(PATTERN_LARGE_PREVIEW.containsMatchIn(body))
+        return PATTERN_LARGE_PREVIEW.findAll(body).unzip {
+            val index = it.groupValues[2].toInt()
             val imageUrl = it.groupValues[3].trim()
             val pageUrl = it.groupValues[1].trim()
-            GalleryPreview(imageUrl, pageUrl, index)
-        }.toList()
-        if (list.isEmpty()) {
-            throw ParseException("Can't parse large preview", body)
+            GalleryPreview(imageUrl, index) to pageUrl
+        }.run {
+            first.toList() to second.toList()
         }
-        return list
     }
 
-    /**
-     * Parse normal previews with regular expressions
-     */
-    @Throws(ParseException::class)
-    private fun parseNormalPreview(body: String): List<GalleryPreview> {
-        val list = PATTERN_NORMAL_PREVIEW.findAll(body).mapNotNull {
-            val position = (it.groupValues[6].toIntOrNull() ?: return@mapNotNull null) - 1
+    private fun parseNormalPreview(body: String): Pair<List<GalleryPreview>, List<String>> {
+        check(PATTERN_NORMAL_PREVIEW.containsMatchIn(body))
+        return PATTERN_NORMAL_PREVIEW.findAll(body).unzip {
+            val position = it.groupValues[6].toInt() - 1
             val imageUrl = it.groupValues[3].trim()
             val xOffset = it.groupValues[4].toIntOrNull() ?: 0
             val yOffset = 0
-            val width = it.groupValues[1].toIntOrNull() ?: return@mapNotNull null
-            val height = it.groupValues[2].toIntOrNull() ?: return@mapNotNull null
+            val width = it.groupValues[1].toInt()
+            val height = it.groupValues[2].toInt()
             val pageUrl = it.groupValues[5].trim()
-            GalleryPreview(imageUrl, pageUrl, position, xOffset, yOffset, width, height)
-        }.toList()
-        if (list.isEmpty()) {
-            throw ParseException("Can't parse normal preview", body)
+            GalleryPreview(imageUrl, position, xOffset, yOffset, width, height) to pageUrl
+        }.run {
+            first.toList() to second.toList()
         }
-        return list
     }
 }

@@ -184,7 +184,8 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                     }.onSuccess { result ->
                         if (Settings.preloadThumbAggressively) {
                             lifecycleScope.launchIO {
-                                result.first.forEach {
+                                val previewList = result.first.first
+                                previewList.forEach {
                                     context.run {
                                         imageLoader.enqueue(imageRequest(it.imageUrl))
                                     }
@@ -192,7 +193,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
                             }
                         }
                         withUIContext {
-                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetPageData(taskId, result.second, 0, null, null, result.first)
+                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetPageData(taskId, result.second, 0, null, null, result.first.first)
                         }
                     }.onFailure { throwable ->
                         withUIContext {
