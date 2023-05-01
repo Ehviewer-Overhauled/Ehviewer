@@ -34,7 +34,6 @@ data class NormalGalleryPreview(
     override val imageKey: String,
     override val position: Int,
     val offsetX: Int,
-    val offsetY: Int,
     val clipWidth: Int,
     val clipHeight: Int,
 ) : GalleryPreview

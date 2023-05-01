@@ -495,11 +495,10 @@ object GalleryDetailParser {
             val position = it.groupValues[6].toInt() - 1
             val imageKey = getPreviewThumbKey(it.groupValues[3].trim())
             val xOffset = it.groupValues[4].toIntOrNull() ?: 0
-            val yOffset = 0
             val width = it.groupValues[1].toInt()
             val height = it.groupValues[2].toInt()
             val pageUrl = it.groupValues[5].trim()
-            NormalGalleryPreview(imageKey, position, xOffset, yOffset, width, height) to pageUrl
+            NormalGalleryPreview(imageKey, position, xOffset, width, height) to pageUrl
         }.run {
             first.toList() to second.toList()
         }

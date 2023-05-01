@@ -64,7 +64,7 @@ fun EhAsyncPreview(
                     it.copy(
                         painter = BitmapPainter(
                             (it.result.drawable as BitmapDrawable).bitmap.asImageBitmap(),
-                            IntOffset(offsetX, offsetY),
+                            IntOffset(offsetX, 0),
                             IntSize(clipWidth - 1, clipHeight - 1),
                         ),
                     )
