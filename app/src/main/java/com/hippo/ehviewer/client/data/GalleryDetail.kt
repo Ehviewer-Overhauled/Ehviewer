@@ -18,6 +18,23 @@ package com.hippo.ehviewer.client.data
 import com.hippo.ehviewer.client.data.GalleryInfo.Companion.S_LANGS
 import kotlinx.parcelize.Parcelize
 
+private val LANGUAGES = arrayOf(
+    "English",
+    "Chinese",
+    "Spanish",
+    "Korean",
+    "Russian",
+    "French",
+    "Portuguese",
+    "Thai",
+    "German",
+    "Italian",
+    "Vietnamese",
+    "Polish",
+    "Hungarian",
+    "Dutch",
+)
+
 @Parcelize
 class GalleryDetail(
     val galleryInfo: GalleryInfo = BaseGalleryInfo(),
@@ -34,34 +51,13 @@ class GalleryDetail(
     var favoriteCount: Int = 0,
     var isFavorited: Boolean = false,
     var ratingCount: Int = 0,
-    var tags: Array<GalleryTagGroup>? = null,
-    var comments: GalleryCommentList? = null,
-    var previewPages: Int = 0,
-    var previewList: List<GalleryPreview> = emptyList(),
+    val tags: Array<GalleryTagGroup>,
+    var comments: GalleryCommentList,
+    val previewPages: Int,
+    val previewList: List<GalleryPreview>,
 ) : AbstractGalleryInfo by galleryInfo, GalleryInfo {
     override fun generateSLang() {
         val index = LANGUAGES.indexOf(language)
-        if (index != -1) {
-            simpleLanguage = S_LANGS[index]
-        }
-    }
-
-    companion object {
-        private val LANGUAGES = arrayOf(
-            "English",
-            "Chinese",
-            "Spanish",
-            "Korean",
-            "Russian",
-            "French",
-            "Portuguese",
-            "Thai",
-            "German",
-            "Italian",
-            "Vietnamese",
-            "Polish",
-            "Hungarian",
-            "Dutch",
-        )
+        if (index != -1) simpleLanguage = S_LANGS[index]
     }
 }

@@ -90,14 +90,15 @@ object GalleryDetailParser {
 
         // Error info
         PATTERN_ERROR.find(body)?.run { throw EhException(groupValues[1]) }
-        val galleryDetail = GalleryDetail()
         // Temporary workaround, see https://github.com/jhy/jsoup/issues/1850
         val document = Jsoup.parse(body.replace("del>", "s>"))
+        val galleryDetail = GalleryDetail(
+            tags = parseTagGroups(document),
+            comments = parseComments(document),
+            previewPages = parsePreviewPages(body),
+            previewList = parsePreviewList(body).first,
+        )
         parseDetail(galleryDetail, document, body)
-        galleryDetail.tags = parseTagGroups(document)
-        galleryDetail.comments = parseComments(document)
-        galleryDetail.previewPages = parsePreviewPages(body)
-        galleryDetail.previewList = parsePreviewList(body).first
 
         // Generate simpleLanguage for local favorites
         galleryDetail.generateSLang()

@@ -131,7 +131,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
         mGalleryDetail = args.getParcelableCompat(KEY_GALLERY_DETAIL)
         mShowAllComments =
-            mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
+            mGalleryDetail != null && true && !mGalleryDetail!!.comments.hasMore
     }
 
     private fun onInit() {
@@ -140,8 +140,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private fun onRestore(savedInstanceState: Bundle) {
         mGalleryDetail = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
-        mShowAllComments =
-            mGalleryDetail != null && mGalleryDetail!!.comments != null && !mGalleryDetail!!.comments!!.hasMore
+        mShowAllComments = mGalleryDetail != null && !mGalleryDetail!!.comments.hasMore
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -342,10 +341,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun hideComment(position: Int) {
-        if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+        if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null) {
             return
         }
-        val oldCommentsList = mGalleryDetail!!.comments!!.comments
+        val oldCommentsList = mGalleryDetail!!.comments.comments
         val newCommentsList = arrayOfNulls<GalleryComment>(
             oldCommentsList!!.size - 1,
         )
@@ -358,7 +357,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             }
             i++
         }
-        mGalleryDetail!!.comments!!.comments = newCommentsList.requireNoNulls()
+        mGalleryDetail!!.comments.comments = newCommentsList.requireNoNulls()
         mAdapter!!.notifyDataSetChanged()
         updateView(true)
     }
@@ -369,7 +368,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             runSuspendCatching {
                 EhEngine.voteComment(gd.apiUid, gd.apiKey, gd.gid, gd.token, id, vote)
             }.onSuccess { result ->
-                showTip(if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully, LENGTH_SHORT)
+                showTip(
+                    if (result.expectVote > 0) (if (0 != result.vote) R.string.vote_up_successfully else R.string.cancel_vote_up_successfully) else if (0 != result.vote) R.string.vote_down_successfully else R.string.cancel_vote_down_successfully,
+                    LENGTH_SHORT,
+                )
                 withUIContext { onVoteCommentSuccess(result) }
             }.onFailure {
                 showTip(R.string.vote_failed, LENGTH_LONG)
@@ -421,10 +423,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private fun showCommentDialog(position: Int, text: CharSequence) {
         val context = context
-        if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null || position >= mGalleryDetail!!.comments!!.comments!!.size || position < 0) {
+        if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments.comments == null || position >= mGalleryDetail!!.comments.comments!!.size || position < 0) {
             return
         }
-        val comment = mGalleryDetail!!.comments!!.comments!![position]
+        val comment = mGalleryDetail!!.comments.comments!![position]
         val menu: MutableList<String> = ArrayList()
         val menuId = IntList()
         val resources = context.resources
@@ -515,7 +517,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (null == mViewTransition) {
             return
         }
-        if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null || mGalleryDetail!!.comments!!.comments!!.isEmpty()) {
+        if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null || mGalleryDetail!!.comments.comments!!.isEmpty()) {
             mViewTransition!!.showView(1, animation)
         } else {
             mViewTransition!!.showView(0, animation)
@@ -679,9 +681,16 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
                 val url = galleryDetailUrl ?: return
                 lifecycleScope.launchIO {
                     runSuspendCatching {
-                        EhEngine.commentGallery(url, comment, if (mCommentId != 0L) mCommentId.toString() else null)
+                        EhEngine.commentGallery(
+                            url,
+                            comment,
+                            if (mCommentId != 0L) mCommentId.toString() else null,
+                        )
                     }.onSuccess {
-                        showTip(if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully, LENGTH_SHORT)
+                        showTip(
+                            if (mCommentId != 0L) R.string.edit_comment_successfully else R.string.comment_successfully,
+                            LENGTH_SHORT,
+                        )
                         withUIContext {
                             onCommentGallerySuccess(it)
                         }
@@ -701,7 +710,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
     }
 
-    private fun onRefreshGallerySuccess(result: GalleryCommentList?) {
+    private fun onRefreshGallerySuccess(result: GalleryCommentList) {
         if (mGalleryDetail == null || mAdapter == null) {
             return
         }
@@ -739,14 +748,14 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun onVoteCommentSuccess(result: VoteCommentParser.Result) {
-        if (mAdapter == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+        if (mAdapter == null || mGalleryDetail!!.comments.comments == null) {
             return
         }
         var position = -1
         var i = 0
-        val n = mGalleryDetail!!.comments!!.comments!!.size
+        val n = mGalleryDetail!!.comments.comments!!.size
         while (i < n) {
-            val comment = mGalleryDetail!!.comments!!.comments!![i]
+            val comment = mGalleryDetail!!.comments.comments!![i]
             if (comment.id == result.id) {
                 position = i
                 break
@@ -759,7 +768,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
 
         // Update comment
-        val comment = mGalleryDetail!!.comments!!.comments!![position]
+        val comment = mGalleryDetail!!.comments.comments!![position]
         comment.score = result.score
         if (result.expectVote > 0) {
             comment.voteUpEd = 0 != result.vote
@@ -877,7 +886,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
         override fun onBindViewHolder(holder: CommentHolder, position: Int) {
             val context = context
-            if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments == null) {
+            if (context == null || mGalleryDetail == null) {
                 return
             }
             holder.itemView.setOnClickListener {
@@ -890,22 +899,22 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             holder.itemView.isClickable = true
             holder.itemView.isFocusable = true
             if (holder is ActualCommentHolder) {
-                holder.bind(mGalleryDetail!!.comments!!.comments!![position])
+                holder.bind(mGalleryDetail!!.comments.comments!![position])
             }
         }
 
         override fun getItemCount(): Int {
-            return if (mGalleryDetail == null || mGalleryDetail!!.comments == null || mGalleryDetail!!.comments!!.comments == null) {
+            return if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null) {
                 0
-            } else if (mGalleryDetail!!.comments!!.hasMore) {
-                mGalleryDetail!!.comments!!.comments!!.size + 1
+            } else if (mGalleryDetail!!.comments.hasMore) {
+                mGalleryDetail!!.comments.comments!!.size + 1
             } else {
-                mGalleryDetail!!.comments!!.comments!!.size
+                mGalleryDetail!!.comments.comments!!.size
             }
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position >= mGalleryDetail!!.comments!!.comments!!.size) {
+            return if (position >= mGalleryDetail!!.comments.comments!!.size) {
                 if (mRefreshingComments) TYPE_PROGRESS else TYPE_MORE
             } else {
                 TYPE_COMMENT

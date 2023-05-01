@@ -825,7 +825,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
         Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.keyline_margin)))
         val tags = galleryDetail.tags
-        if (tags.isNullOrEmpty()) {
+        if (tags.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
