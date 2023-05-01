@@ -16,7 +16,6 @@
 
 package com.hippo.ehviewer
 
-import android.app.Activity
 import android.app.Application
 import android.content.ComponentCallbacks2
 import androidx.appcompat.app.AppCompatDelegate
@@ -38,7 +37,6 @@ import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
-import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.util.ReadableTime
 import com.hippo.yorozuya.FileUtils
@@ -58,18 +56,6 @@ import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 
 class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
-    private val mActivityList = ArrayList<Activity>()
-    val topActivity: EhActivity?
-        get() = if (mActivityList.isNotEmpty()) {
-            mActivityList[mActivityList.size - 1] as EhActivity
-        } else {
-            null
-        }
-
-    fun recreateAllActivity() {
-        mActivityList.forEach { it.recreate() }
-    }
-
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -141,14 +127,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
             galleryDetailCache.evictAll()
         }
-    }
-
-    fun registerActivity(activity: Activity) {
-        mActivityList.add(activity)
-    }
-
-    fun unregisterActivity(activity: Activity) {
-        mActivityList.remove(activity)
     }
 
     override fun onPause(owner: LifecycleOwner) {

@@ -44,11 +44,6 @@ object Crash {
         fw.write("BuildTime=${BuildConfig.BUILD_TIME}\n")
         fw.write("\n")
 
-        // Runtime
-        fw.write("======== Runtime ========\n")
-        fw.write("TopActivity=${EhApplication.application.topActivity?.javaClass?.name}\n")
-        fw.write("\n")
-
         // Device info
         fw.write("======== DeviceInfo ========\n")
         fw.write("${collectClassStaticInfo(Build::class.java)}\n")

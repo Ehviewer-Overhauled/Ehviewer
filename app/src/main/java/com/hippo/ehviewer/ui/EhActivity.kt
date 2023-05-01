@@ -47,12 +47,6 @@ abstract class EhActivity : AppCompatActivity() {
         layoutInflater.factory2 =
             LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
         super.onCreate(savedInstanceState)
-        (application as EhApplication).registerActivity(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (application as EhApplication).unregisterActivity(this)
     }
 
     override fun onResume() {

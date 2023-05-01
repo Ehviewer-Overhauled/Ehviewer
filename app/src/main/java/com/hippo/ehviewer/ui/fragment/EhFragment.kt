@@ -28,7 +28,6 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat.CLOCK_12H
 import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
@@ -133,7 +132,10 @@ class EhFragment : BasePreferenceFragment() {
             }
         } else if (Settings.KEY_BLACK_DARK_THEME == key) {
             if (requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_YES > 0) {
-                EhApplication.application.recreateAllActivity()
+                val nightMode = AppCompatDelegate.getDefaultNightMode()
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_TIME)
+                AppCompatDelegate.setDefaultNightMode(nightMode)
+                requireActivity().recreate()
             }
             return true
         } else if (Settings.KEY_REQUEST_NEWS == key) {
