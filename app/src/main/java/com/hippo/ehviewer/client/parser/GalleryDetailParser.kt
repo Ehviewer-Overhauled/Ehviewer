@@ -27,6 +27,8 @@ import com.hippo.ehviewer.client.data.GalleryCommentList
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.GalleryTagGroup
+import com.hippo.ehviewer.client.data.LargeGalleryPreview
+import com.hippo.ehviewer.client.data.NormalGalleryPreview
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.OffensiveException
 import com.hippo.ehviewer.client.exception.ParseException
@@ -480,7 +482,7 @@ object GalleryDetailParser {
             val position = it.groupValues[2].toInt() - 1
             val imageUrl = it.groupValues[3].trim()
             val pageUrl = it.groupValues[1].trim()
-            GalleryPreview(imageUrl, position) to pageUrl
+            LargeGalleryPreview(imageUrl, position) to pageUrl
         }.run {
             first.toList() to second.toList()
         }
@@ -496,7 +498,7 @@ object GalleryDetailParser {
             val width = it.groupValues[1].toInt()
             val height = it.groupValues[2].toInt()
             val pageUrl = it.groupValues[5].trim()
-            GalleryPreview(imageUrl, position, xOffset, yOffset, width, height) to pageUrl
+            NormalGalleryPreview(imageUrl, position, xOffset, yOffset, width, height) to pageUrl
         }.run {
             first.toList() to second.toList()
         }

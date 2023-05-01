@@ -18,6 +18,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryPreview
+import com.hippo.ehviewer.client.data.NormalGalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
 
 @Composable
@@ -38,9 +39,6 @@ fun EhAsyncThumb(
     contentScale = contentScale,
 )
 
-private val GalleryPreview.shouldClip
-    get() = offsetX != Int.MIN_VALUE
-
 /**
  * Show a part of the original drawable, non-animated only implementation.
  */
@@ -56,7 +54,7 @@ fun EhAsyncPreview(
         modifier = modifier,
         transform = {
             model.run {
-                if (it is AsyncImagePainter.State.Success && shouldClip) {
+                if (it is AsyncImagePainter.State.Success && this is NormalGalleryPreview) {
                     it.copy(
                         painter = BitmapPainter(
                             (it.result.drawable as BitmapDrawable).bitmap.asImageBitmap(),
@@ -72,7 +70,7 @@ fun EhAsyncPreview(
         onState = {
             if (it is AsyncImagePainter.State.Success) {
                 model.run {
-                    if (shouldClip) {
+                    if (this is NormalGalleryPreview) {
                         if (clipWidth.toFloat() / clipHeight in 0.5..0.8) {
                             if (contentScale == ContentScale.Fit) contentScale = ContentScale.Crop
                         }
