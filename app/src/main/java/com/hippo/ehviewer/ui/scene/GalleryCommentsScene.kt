@@ -341,12 +341,12 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun hideComment(position: Int) {
-        if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null) {
+        if (mGalleryDetail == null) {
             return
         }
         val oldCommentsList = mGalleryDetail!!.comments.comments
         val newCommentsList = arrayOfNulls<GalleryComment>(
-            oldCommentsList!!.size - 1,
+            oldCommentsList.size - 1,
         )
         var i = 0
         var j = 0
@@ -423,10 +423,10 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
 
     private fun showCommentDialog(position: Int, text: CharSequence) {
         val context = context
-        if (context == null || mGalleryDetail == null || mGalleryDetail!!.comments.comments == null || position >= mGalleryDetail!!.comments.comments!!.size || position < 0) {
+        if (context == null || mGalleryDetail == null || position >= mGalleryDetail!!.comments.comments.size || position < 0) {
             return
         }
-        val comment = mGalleryDetail!!.comments.comments!![position]
+        val comment = mGalleryDetail!!.comments.comments[position]
         val menu: MutableList<String> = ArrayList()
         val menuId = IntList()
         val resources = context.resources
@@ -517,7 +517,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (null == mViewTransition) {
             return
         }
-        if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null || mGalleryDetail!!.comments.comments!!.isEmpty()) {
+        if (mGalleryDetail == null || mGalleryDetail!!.comments.comments.isEmpty()) {
             mViewTransition!!.showView(1, animation)
         } else {
             mViewTransition!!.showView(0, animation)
@@ -748,14 +748,14 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
     }
 
     private fun onVoteCommentSuccess(result: VoteCommentParser.Result) {
-        if (mAdapter == null || mGalleryDetail!!.comments.comments == null) {
+        if (mAdapter == null) {
             return
         }
         var position = -1
         var i = 0
-        val n = mGalleryDetail!!.comments.comments!!.size
+        val n = mGalleryDetail!!.comments.comments.size
         while (i < n) {
-            val comment = mGalleryDetail!!.comments.comments!![i]
+            val comment = mGalleryDetail!!.comments.comments[i]
             if (comment.id == result.id) {
                 position = i
                 break
@@ -768,7 +768,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         }
 
         // Update comment
-        val comment = mGalleryDetail!!.comments.comments!![position]
+        val comment = mGalleryDetail!!.comments.comments[position]
         comment.score = result.score
         if (result.expectVote > 0) {
             comment.voteUpEd = 0 != result.vote
@@ -899,22 +899,22 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             holder.itemView.isClickable = true
             holder.itemView.isFocusable = true
             if (holder is ActualCommentHolder) {
-                holder.bind(mGalleryDetail!!.comments.comments!![position])
+                holder.bind(mGalleryDetail!!.comments.comments[position])
             }
         }
 
         override fun getItemCount(): Int {
-            return if (mGalleryDetail == null || mGalleryDetail!!.comments.comments == null) {
+            return if (mGalleryDetail == null) {
                 0
             } else if (mGalleryDetail!!.comments.hasMore) {
-                mGalleryDetail!!.comments.comments!!.size + 1
+                mGalleryDetail!!.comments.comments.size + 1
             } else {
-                mGalleryDetail!!.comments.comments!!.size
+                mGalleryDetail!!.comments.comments.size
             }
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position >= mGalleryDetail!!.comments.comments!!.size) {
+            return if (position >= mGalleryDetail!!.comments.comments.size) {
                 if (mRefreshingComments) TYPE_PROGRESS else TYPE_MORE
             } else {
                 TYPE_COMMENT
