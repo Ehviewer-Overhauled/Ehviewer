@@ -19,7 +19,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.preference.Preference
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.ui.UrlOpener
+import com.hippo.ehviewer.ui.openBrowser
 
 class UrlPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     Preference(context, attrs) {
@@ -36,6 +36,8 @@ class UrlPreference @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onClick() {
-        UrlOpener.openUrl(context, mUrl)
+        if (mUrl != null) {
+            context.openBrowser(mUrl)
+        }
     }
 }

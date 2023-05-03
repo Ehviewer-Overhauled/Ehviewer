@@ -34,19 +34,14 @@ import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 
-object UrlOpener {
-    fun openUrl(context: Context, url: String?) {
-        if (url.isNullOrEmpty()) {
-            return
-        }
-        val uri = Uri.parse(url)
-        val customTabsIntent = CustomTabsIntent.Builder()
-        customTabsIntent.setShowTitle(true)
-        try {
-            customTabsIntent.build().launchUrl(context, uri)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, R.string.no_browser_installed, Toast.LENGTH_LONG).show()
-        }
+private val intent = CustomTabsIntent.Builder().apply { setShowTitle(true) }.build()
+
+fun Context.openBrowser(url: String) {
+    if (url.isEmpty()) return
+    try {
+        intent.launchUrl(this, Uri.parse(url))
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.no_browser_installed, Toast.LENGTH_LONG).show()
     }
 }
 

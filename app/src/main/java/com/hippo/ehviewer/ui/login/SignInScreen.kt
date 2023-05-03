@@ -61,13 +61,12 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.ui.UrlOpener
+import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
-import rikka.core.util.ContextUtils.requireActivity
 
 @Composable
 fun SignInScreen(windowSizeClass: WindowSizeClass) {
@@ -207,10 +206,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                 Row {
                     FilledTonalButton(
                         onClick = {
-                            UrlOpener.openUrl(
-                                requireActivity(context),
-                                EhUrl.URL_REGISTER,
-                            )
+                            context.openBrowser(EhUrl.URL_REGISTER)
                         },
                         Modifier
                             .weight(1f)
@@ -403,10 +399,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                     }
                     FilledTonalButton(
                         onClick = {
-                            UrlOpener.openUrl(
-                                requireActivity(context),
-                                EhUrl.URL_REGISTER,
-                            )
+                            context.openBrowser(EhUrl.URL_REGISTER)
                         },
                         Modifier
                             .padding(horizontal = 4.dp)

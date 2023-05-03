@@ -154,9 +154,9 @@ import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.UrlOpener
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.login.LocalNavController
+import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.CrystalCard
@@ -348,11 +348,9 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     }
 
     private fun actionOpenInOtherApp() {
-        val url = galleryDetailUrl
-        val activity: Activity? = mainActivity
-        if (null != url && null != activity) {
-            UrlOpener.openUrl(activity, url)
-        }
+        val url = galleryDetailUrl ?: return
+        val activity: Activity = mainActivity ?: return
+        activity.openBrowser(url)
     }
 
     private fun actionRefresh() {
@@ -1377,7 +1375,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     }
 
                     R.id.show_definition -> {
-                        UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(temp))
+                        context.openBrowser(EhUrl.getTagDefinitionUrl(temp))
                     }
 
                     R.id.add_filter -> {
