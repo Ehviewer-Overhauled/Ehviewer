@@ -92,10 +92,6 @@ object EhFilter {
         }
     }
 
-    private inline fun <T> Iterable<T>.contains(predicate: (T) -> Boolean) = firstOrNull(predicate) != null
-
-    private inline fun <T> Array<T>.contains(predicate: (T) -> Boolean) = firstOrNull(predicate) != null
-
     @Synchronized
     fun needTags(): Boolean {
         return 0 != tagFilterList.size || 0 != tagNamespaceFilterList.size
@@ -104,13 +100,13 @@ object EhFilter {
     @Synchronized
     fun filterTitle(info: GalleryInfo): Boolean {
         val title = info.title ?: return false
-        return titleFilterList.contains { it.enable!! && it.text!! in title.lowercase() }
+        return titleFilterList.any { it.enable!! && it.text!! in title.lowercase() }
     }
 
     @Synchronized
     fun filterUploader(info: GalleryInfo): Boolean {
         val uploader = info.uploader ?: return false
-        return uploaderFilterList.contains { it.enable!! && it.text == uploader }
+        return uploaderFilterList.any { it.enable!! && it.text == uploader }
     }
 
     private fun spiltTag(tag: String) = tag.run {
@@ -131,7 +127,7 @@ object EhFilter {
     @Synchronized
     fun filterTag(info: GalleryInfo): Boolean {
         val tags = info.simpleTags ?: return false
-        return tags.contains { tag -> tagFilterList.contains { it.enable!! && matchTag(tag, it.text!!) } }
+        return tags.any { tag -> tagFilterList.any { it.enable!! && matchTag(tag, it.text!!) } }
     }
 
     private fun matchTagNamespace(tag: String, filter: String): Boolean {
@@ -142,16 +138,16 @@ object EhFilter {
     @Synchronized
     fun filterTagNamespace(info: GalleryInfo): Boolean {
         val tags = info.simpleTags ?: return false
-        return tags.contains { tag -> tagNamespaceFilterList.contains { it.enable!! && matchTagNamespace(tag, it.text!!) } }
+        return tags.any { tag -> tagNamespaceFilterList.any { it.enable!! && matchTagNamespace(tag, it.text!!) } }
     }
 
     @Synchronized
     fun filterCommenter(commenter: String): Boolean {
-        return commenterFilterList.contains { it.enable!! && it.text == commenter }
+        return commenterFilterList.any { it.enable!! && it.text == commenter }
     }
 
     @Synchronized
     fun filterComment(comment: String): Boolean {
-        return commentFilterList.contains { it.enable!! && regex(it).containsMatchIn(comment) }
+        return commentFilterList.any { it.enable!! && regex(it).containsMatchIn(comment) }
     }
 }
