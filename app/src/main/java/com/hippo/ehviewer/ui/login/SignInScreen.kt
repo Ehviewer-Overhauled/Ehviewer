@@ -210,7 +210,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                             UrlOpener.openUrl(
                                 requireActivity(context),
                                 EhUrl.URL_REGISTER,
-                                false,
                             )
                         },
                         Modifier
@@ -407,7 +406,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                             UrlOpener.openUrl(
                                 requireActivity(context),
                                 EhUrl.URL_REGISTER,
-                                false,
                             )
                         },
                         Modifier

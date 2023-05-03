@@ -36,6 +36,6 @@ class UrlPreference @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     override fun onClick() {
-        UrlOpener.openUrl(context, mUrl, true)
+        UrlOpener.openUrl(context, mUrl)
     }
 }

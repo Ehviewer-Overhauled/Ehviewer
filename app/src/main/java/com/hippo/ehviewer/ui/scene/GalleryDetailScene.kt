@@ -90,6 +90,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -155,6 +156,7 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.UrlOpener
 import com.hippo.ehviewer.ui.addToFavorites
+import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.widget.CrystalCard
@@ -349,7 +351,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         val url = galleryDetailUrl
         val activity: Activity? = mainActivity
         if (null != url && null != activity) {
-            UrlOpener.openUrl(activity, url, false)
+            UrlOpener.openUrl(activity, url)
         }
     }
 
@@ -524,7 +526,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         fun onGalleryInfoCardClick() {
             showSheet = true
         }
-        composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
+        val navController = remember { findNavController() }
+        CompositionLocalProvider(LocalNavController provides navController) {
+            composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
+        }
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
         // Padding is not subtracted here to have the same column count as gallery list and preview
         val totalSpace = LocalConfiguration.current.screenWidthDp
@@ -1372,7 +1377,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     }
 
                     R.id.show_definition -> {
-                        UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(temp), false)
+                        UrlOpener.openUrl(context, EhUrl.getTagDefinitionUrl(temp))
                     }
 
                     R.id.add_filter -> {

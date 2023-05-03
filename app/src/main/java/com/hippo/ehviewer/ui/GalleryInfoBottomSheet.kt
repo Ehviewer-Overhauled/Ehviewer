@@ -39,6 +39,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.util.tellClipboardWithToast
 
 private const val INDEX_URL = 2
@@ -104,6 +105,7 @@ fun GalleryInfoBottomSheet(
     ModalBottomSheet(onDismissRequest) {
         check(data.size == keys.size)
         val context = LocalContext.current
+        val navController = LocalNavController.current
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
@@ -116,7 +118,7 @@ fun GalleryInfoBottomSheet(
                 Row(
                     modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)).clickable {
                         if (index == INDEX_PARENT) {
-                            UrlOpener.openUrl(context, data[index], true)
+                            data[index]?.let { navController.navWithUrl(it) }
                         } else {
                             context tellClipboardWithToast data[index]
                             if (index == INDEX_URL) {

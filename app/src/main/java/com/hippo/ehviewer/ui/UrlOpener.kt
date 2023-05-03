@@ -35,42 +35,11 @@ import com.hippo.ehviewer.ui.scene.ProgressScene
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 
 object UrlOpener {
-    fun openUrl(
-        context: Context,
-        url: String?,
-        ehUrl: Boolean,
-        galleryDetail: GalleryDetail? = null,
-    ) {
+    fun openUrl(context: Context, url: String?) {
         if (url.isNullOrEmpty()) {
             return
         }
-        val intent: Intent
         val uri = Uri.parse(url)
-        if (ehUrl) {
-            if (galleryDetail != null) {
-                val result = GalleryPageUrlParser.parse(url)
-                if (result != null) {
-                    if (result.gid == galleryDetail.gid) {
-                        intent = Intent(context, ReaderActivity::class.java)
-                        intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
-                        intent.putExtra(ReaderActivity.KEY_PAGE, result.page)
-                        context.startActivity(intent)
-                        return
-                    }
-                } else if (url.startsWith("#c")) {
-                    try {
-                        intent = Intent(context, ReaderActivity::class.java)
-                        intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
-                        intent.putExtra(ReaderActivity.KEY_PAGE, url.replace("#c", "").toInt() - 1)
-                        context.startActivity(intent)
-                        return
-                    } catch (_: NumberFormatException) {
-                    }
-                }
-            }
-        }
         val customTabsIntent = CustomTabsIntent.Builder()
         customTabsIntent.setShowTitle(true)
         try {
@@ -82,7 +51,32 @@ object UrlOpener {
 }
 
 @MainThread
-fun NavController.jumpWithUrl(url: String): Boolean {
+fun Context.jumpToReaderByPage(url: String, detail: GalleryDetail): Boolean {
+    fun jump(page: Int) {
+        Intent(this, ReaderActivity::class.java).apply {
+            action = ReaderActivity.ACTION_EH
+            putExtra(ReaderActivity.KEY_GALLERY_INFO, detail)
+            putExtra(ReaderActivity.KEY_PAGE, page)
+            startActivity(this)
+        }
+    }
+    GalleryPageUrlParser.parse(url)?.let {
+        if (it.gid == detail.gid) {
+            jump(it.page)
+            return true
+        }
+    }
+    if (url.startsWith("#c")) {
+        runCatching {
+            jump(url.replace("#c", "").toInt() - 1)
+            return true
+        }
+    }
+    return false
+}
+
+@MainThread
+fun NavController.navWithUrl(url: String): Boolean {
     if (url.isEmpty()) return false
     GalleryListUrlParser.parse(url)?.let { lub ->
         Bundle().apply {

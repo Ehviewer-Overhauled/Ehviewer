@@ -158,7 +158,7 @@ class MainActivity : EhActivity() {
         val action = intent.action
         if (Intent.ACTION_VIEW == action) {
             val uri = intent.data ?: return false
-            navController.jumpWithUrl(uri.toString())
+            navController.navWithUrl(uri.toString())
         } else if (Intent.ACTION_SEND == action) {
             val type = intent.type
             if ("text/plain" == type) {

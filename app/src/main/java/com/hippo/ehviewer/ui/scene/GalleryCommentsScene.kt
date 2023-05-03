@@ -75,7 +75,8 @@ import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.UrlOpener
-import com.hippo.ehviewer.ui.jumpWithUrl
+import com.hippo.ehviewer.ui.jumpToReaderByPage
+import com.hippo.ehviewer.ui.navWithUrl
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
 import com.hippo.util.ExceptionUtils
@@ -485,8 +486,13 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         if (holder is ActualCommentHolder) {
             val span = holder.comment.currentSpan
             holder.comment.clearCurrentSpan()
+            val detail = mGalleryDetail ?: return false
             if (span is URLSpan) {
-                if (!findNavController().jumpWithUrl(span.url)) UrlOpener.openUrl(activity, span.url, true, mGalleryDetail)
+                if (!activity.jumpToReaderByPage(span.url, detail)) {
+                    if (!findNavController().navWithUrl(span.url)) {
+                        UrlOpener.openUrl(activity, span.url)
+                    }
+                }
             } else {
                 showCommentDialog(position, holder.sp)
             }
