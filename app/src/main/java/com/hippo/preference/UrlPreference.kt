@@ -19,7 +19,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.preference.Preference
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.UrlOpener
+import com.hippo.ehviewer.ui.UrlOpener
 
 class UrlPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     Preference(context, attrs) {

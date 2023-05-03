@@ -124,7 +124,6 @@ import com.hippo.ehviewer.EhApplication.Companion.galleryDetailCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
@@ -154,6 +153,7 @@ import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
+import com.hippo.ehviewer.ui.UrlOpener
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs

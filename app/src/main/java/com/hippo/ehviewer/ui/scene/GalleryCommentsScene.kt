@@ -53,6 +53,7 @@ import androidx.core.text.set
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -63,7 +64,6 @@ import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.EditTextDialogBuilder
 import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhFilter
@@ -74,6 +74,8 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.ui.UrlOpener
+import com.hippo.ehviewer.ui.jumpWithUrl
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.text.URLImageGetter
 import com.hippo.util.ExceptionUtils
@@ -484,7 +486,7 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
             val span = holder.comment.currentSpan
             holder.comment.clearCurrentSpan()
             if (span is URLSpan) {
-                UrlOpener.openUrl(activity, span.url, true, mGalleryDetail)
+                if (!findNavController().jumpWithUrl(span.url)) UrlOpener.openUrl(activity, span.url, true, mGalleryDetail)
             } else {
                 showCommentDialog(position, holder.sp)
             }

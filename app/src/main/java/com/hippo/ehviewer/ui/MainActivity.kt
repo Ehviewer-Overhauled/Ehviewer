@@ -31,7 +31,6 @@ import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -60,7 +59,6 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
-import com.hippo.ehviewer.client.parser.GalleryListUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.download.DownloadService
@@ -160,43 +158,7 @@ class MainActivity : EhActivity() {
         val action = intent.action
         if (Intent.ACTION_VIEW == action) {
             val uri = intent.data ?: return false
-            val url = uri.toString()
-            if (TextUtils.isEmpty(url)) {
-                return false
-            }
-
-            val listUrlBuilder = GalleryListUrlParser.parse(url)
-            if (listUrlBuilder != null) {
-                val args = Bundle()
-                args.putString(
-                    GalleryListScene.KEY_ACTION,
-                    GalleryListScene.ACTION_LIST_URL_BUILDER,
-                )
-                args.putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, listUrlBuilder)
-                navController.navigate(R.id.galleryListScene, args)
-                return true
-            }
-
-            val result1 = GalleryDetailUrlParser.parse(url)
-            if (result1 != null) {
-                val args = Bundle()
-                args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-                args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
-                args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
-                navController.navigate(R.id.galleryDetailScene, args)
-                return true
-            }
-
-            val result2 = GalleryPageUrlParser.parse(url)
-            if (result2 != null) {
-                val args = Bundle()
-                args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-                args.putLong(ProgressScene.KEY_GID, result2.gid)
-                args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
-                args.putInt(ProgressScene.KEY_PAGE, result2.page)
-                navController.navigate(R.id.progressScene, args)
-                return true
-            }
+            navController.jumpWithUrl(uri.toString())
         } else if (Intent.ACTION_SEND == action) {
             val type = intent.type
             if ("text/plain" == type) {
