@@ -21,6 +21,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.navigation.NavController
 import com.hippo.ehviewer.R
@@ -80,38 +81,36 @@ object UrlOpener {
     }
 }
 
+@MainThread
 fun NavController.jumpWithUrl(url: String): Boolean {
     if (url.isEmpty()) return false
-    val listUrlBuilder = GalleryListUrlParser.parse(url)
-    if (listUrlBuilder != null) {
-        val args = Bundle()
-        args.putString(
-            GalleryListScene.KEY_ACTION,
-            GalleryListScene.ACTION_LIST_URL_BUILDER,
-        )
-        args.putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, listUrlBuilder)
-        navigate(R.id.galleryListScene, args)
+    GalleryListUrlParser.parse(url)?.let { lub ->
+        Bundle().apply {
+            putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_LIST_URL_BUILDER)
+            putParcelable(GalleryListScene.KEY_LIST_URL_BUILDER, lub)
+            navigate(R.id.galleryListScene, this)
+        }
         return true
     }
 
-    val result1 = GalleryDetailUrlParser.parse(url)
-    if (result1 != null) {
-        val args = Bundle()
-        args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-        args.putLong(GalleryDetailScene.KEY_GID, result1.gid)
-        args.putString(GalleryDetailScene.KEY_TOKEN, result1.token)
-        navigate(R.id.galleryDetailScene, args)
+    GalleryDetailUrlParser.parse(url)?.apply {
+        Bundle().apply {
+            putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+            putLong(GalleryDetailScene.KEY_GID, gid)
+            putString(GalleryDetailScene.KEY_TOKEN, token)
+            navigate(R.id.galleryDetailScene, this)
+        }
         return true
     }
 
-    val result2 = GalleryPageUrlParser.parse(url)
-    if (result2 != null) {
-        val args = Bundle()
-        args.putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
-        args.putLong(ProgressScene.KEY_GID, result2.gid)
-        args.putString(ProgressScene.KEY_PTOKEN, result2.pToken)
-        args.putInt(ProgressScene.KEY_PAGE, result2.page)
-        navigate(R.id.progressScene, args)
+    GalleryPageUrlParser.parse(url)?.apply {
+        Bundle().apply {
+            putString(ProgressScene.KEY_ACTION, ProgressScene.ACTION_GALLERY_TOKEN)
+            putLong(ProgressScene.KEY_GID, gid)
+            putString(ProgressScene.KEY_PTOKEN, pToken)
+            putInt(ProgressScene.KEY_PAGE, page)
+            navigate(R.id.progressScene, this)
+        }
         return true
     }
     return false
