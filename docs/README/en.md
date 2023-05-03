@@ -57,7 +57,6 @@
   </h3>
 </div>
 
-
 # Description
 
 EhViewer fork dedicated to lightweight and high-performance
@@ -77,18 +76,20 @@ with Material Design 3 and Dynamic Color Support
 
 Here is the libraries
 
+- [Arrow](https://arrow-kt.io/)
 - [AOSP & AndroidX](http://source.android.com/)
-- [Coil](https://coil-kt.github.io/coil/)
+- [Kotlin & KotlinX](https://kotlinlang.org/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
-- [GnuTLS](https://gnutls.org/)
-- [material-components-android](https://github.com/material-components/material-components-android)
+- [MCA](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [jsoup](https://github.com/jhy/jsoup)
-- [okhttp](https://github.com/square/okhttp)
+- [Okhttp](https://square.github.io/okhttp/)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
-- [libarchive](http://www.libarchive.org/)
-- [XZ Utils](https://tukaani.org/xz/)
+- [Libarchive](http://www.libarchive.org/)
+- [Coil](https://coil-kt.github.io/coil/)
+- [Ktor](https://ktor.io/)
+- [Jsoup](https://jsoup.org/)
 
+Specially thanks [Tachiyomi](https://tachiyomi.org/) for its reader implementation!
 
 # License
 

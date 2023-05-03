@@ -60,12 +60,12 @@
   </h3>
 </div>
 
-
 # Description
 
 EhViewer fork dedicated to lightweight and high-performance
 
-with [Material Design 3](https://m3.material.io/) and [Dynamic Color](https://m3.material.io/styles/color/dynamic-color/overview) Support
+with [Material Design 3](https://m3.material.io/)
+and [Dynamic Color](https://m3.material.io/styles/color/dynamic-color/overview) Support
 
 # Download
 
@@ -80,19 +80,20 @@ with [Material Design 3](https://m3.material.io/) and [Dynamic Color](https://m3
 
 Here is the libraries
 
+- [Arrow](https://arrow-kt.io/)
 - [AOSP & AndroidX](http://source.android.com/)
 - [Kotlin & KotlinX](https://kotlinlang.org/)
-- [Tachiyomi](https://tachiyomi.org/)
-- [Coil](https://coil-kt.github.io/coil/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
-- [material-components-android](https://github.com/material-components/material-components-android)
+- [MCA](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [jsoup](https://jsoup.org/)
-- [okhttp](https://square.github.io/okhttp/)
-- [Ktor](https://ktor.io/)
+- [Okhttp](https://square.github.io/okhttp/)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
-- [libarchive](http://www.libarchive.org/)
+- [Libarchive](http://www.libarchive.org/)
+- [Coil](https://coil-kt.github.io/coil/)
+- [Ktor](https://ktor.io/)
+- [Jsoup](https://jsoup.org/)
 
+Specially thanks [Tachiyomi](https://tachiyomi.org/) for its reader implementation!
 
 # License
 

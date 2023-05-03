@@ -57,7 +57,6 @@
   </h3>
 </div>
 
-
 # 描述
 
 致力于轻量化与良好性能表现的 EhViewer 分支
@@ -77,18 +76,20 @@
 
 本项目受到了诸多开源项目的帮助
 
+- [Arrow](https://arrow-kt.io/)
 - [AOSP & AndroidX](http://source.android.com/)
-- [Coil](https://coil-kt.github.io/coil/)
+- [Kotlin & KotlinX](https://kotlinlang.org/)
 - [FullDraggableDrawer](https://github.com/PureWriter/FullDraggableDrawer)
-- [GnuTLS](https://gnutls.org/)
-- [material-components-android](https://github.com/material-components/material-components-android)
+- [MCA](https://github.com/material-components/material-components-android)
 - [material-design-icons](https://github.com/google/material-design-icons)
-- [jsoup](https://github.com/jhy/jsoup)
-- [okhttp](https://github.com/square/okhttp)
+- [Okhttp](https://square.github.io/okhttp/)
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
-- [libarchive](http://www.libarchive.org/)
-- [XZ Utils](https://tukaani.org/xz/)
+- [Libarchive](http://www.libarchive.org/)
+- [Coil](https://coil-kt.github.io/coil/)
+- [Ktor](https://ktor.io/)
+- [Jsoup](https://jsoup.org/)
 
+特别感谢[Tachiyomi](https://tachiyomi.org/)的阅读器实现
 
 # 许可证
 
