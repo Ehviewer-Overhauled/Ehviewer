@@ -59,7 +59,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import arrow.core.partially1
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.EhDB
@@ -116,9 +117,13 @@ class HistoryScene : BaseScene() {
                         contentPadding = paddingValues,
                     ) {
                         items(
-                            items = historyData,
-                            key = { item -> item.gid },
-                        ) { info ->
+                            count = historyData.itemCount,
+                            key = historyData.itemKey(key = { item -> item.gid }),
+                            contentType = historyData.itemContentType(),
+                        ) { index ->
+                            val info = historyData[index]
+                            // TODO: item delete & add animation
+                            // Bug tracker: https://issuetracker.google.com/issues/150812265
                             info?.let {
                                 val dismissState = rememberDismissState(
                                     confirmValueChange = {
