@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -76,6 +75,7 @@ import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.Deferred
 import com.hippo.ehviewer.ui.widget.LazyColumnWithScrollBar
 import com.hippo.ehviewer.ui.widget.ListInfoCard
+import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -91,6 +91,8 @@ class HistoryScene : BaseScene() {
     ): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
+                val dialogState = rememberDialogState()
+                dialogState.Handler()
                 val coroutineScope = rememberCoroutineScope()
                 val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
                 val historyData = remember { Pager(PagingConfig(20)) { EhDB.historyLazyList }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
@@ -105,7 +107,16 @@ class HistoryScene : BaseScene() {
                                 }
                             },
                             actions = {
-                                IconButton(onClick = ::showClearAllDialog) {
+                                IconButton(onClick = {
+                                    coroutineScope.launchIO {
+                                        val clear = dialogState.show(
+                                            confirmText = R.string.clear_all,
+                                            dismissText = android.R.string.cancel,
+                                            text = R.string.clear_all_history,
+                                        )
+                                        if (clear) EhDB.clearHistoryInfo()
+                                    }
+                                }) {
                                     Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)
                                 }
                             },
@@ -187,22 +198,6 @@ class HistoryScene : BaseScene() {
 
     private fun onNavigationClick() {
         toggleDrawer(GravityCompat.START)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showClearAllDialog() {
-        BaseDialogBuilder(requireContext())
-            .setMessage(R.string.clear_all_history)
-            .setPositiveButton(R.string.clear_all) { _: DialogInterface?, which: Int ->
-                if (DialogInterface.BUTTON_POSITIVE != which) {
-                    return@setPositiveButton
-                }
-                lifecycleScope.launchIO {
-                    EhDB.clearHistoryInfo()
-                }
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
     }
 
     private fun onItemClick(gi: GalleryInfo) {
