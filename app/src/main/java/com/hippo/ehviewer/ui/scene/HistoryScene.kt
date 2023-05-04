@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Menu
@@ -75,6 +74,7 @@ import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.Deferred
+import com.hippo.ehviewer.ui.widget.LazyColumnWithScrollBar
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
@@ -113,7 +113,7 @@ class HistoryScene : BaseScene() {
                         )
                     },
                 ) { paddingValues ->
-                    LazyColumn(
+                    LazyColumnWithScrollBar(
                         contentPadding = paddingValues,
                     ) {
                         items(

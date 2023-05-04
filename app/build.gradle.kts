@@ -198,6 +198,7 @@ dependencies {
     implementation("com.drakeet.drawer:drawer:1.0.3")
     implementation("com.github.chrisbanes:PhotoView:2.3.0") // Dead Dependency
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") // Dead Dependency
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
     // https://github.com/google/accompanist/releases
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.1")
     implementation("com.google.android.material:material:1.9.0-rc01")
