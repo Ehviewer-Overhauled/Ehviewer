@@ -188,8 +188,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">ギャラリー詳細</string>
     <string name="copied_to_clipboard">クリップボードにコピーされました。</string>
-    <string name="header_key">キー</string>
-    <string name="header_value">値</string>
     <string name="key_gid">Gid</string>
     <string name="key_token">Token</string>
     <string name="key_url">リンク</string>

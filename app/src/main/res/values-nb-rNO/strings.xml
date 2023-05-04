@@ -119,11 +119,9 @@
     <string name="rating1">Utolererbar</string>
     <string name="rating0">Katastrofe</string>
     <string name="gallery_info">Galleri-info</string>
-    <string name="header_key">Nøkkel</string>
     <string name="add_host">Legg til en vert</string>
     <string name="settings_eh_list_mode">Listemodus</string>
     <string name="copied_to_clipboard">Kopiert til utklippstavlen</string>
-    <string name="header_value">Verdi</string>
     <string name="key_title">Navn</string>
     <string name="stat_download_action_stop_all">Stopp alle</string>
     <string name="default_download_label_name">Forvalg</string>

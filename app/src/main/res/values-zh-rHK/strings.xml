@@ -197,8 +197,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">畫廊信息</string>
     <string name="copied_to_clipboard">已複製到剪切板</string>
-    <string name="header_key">鍵</string>
-    <string name="header_value">值</string>
     <string name="key_gid">Gid</string>
     <string name="key_token">Token</string>
     <string name="key_url">鏈接</string>

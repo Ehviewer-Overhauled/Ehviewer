@@ -176,8 +176,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">Información de la galería</string>
     <string name="copied_to_clipboard">Copiado al portapapeles</string>
-    <string name="header_key">Clave</string>
-    <string name="header_value">Valor</string>
     <string name="key_gid">Guía</string>
     <string name="key_token">Clave</string>
     <string name="key_url">URL</string>

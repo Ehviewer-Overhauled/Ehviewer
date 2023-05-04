@@ -178,8 +178,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">ข้อมูลแกลเลอรี่</string>
     <string name="copied_to_clipboard">คัดลอกลงคลิปบอร์ดแล้ว</string>
-    <string name="header_key">คีย์</string>
-    <string name="header_value">ข้อมูล</string>
     <string name="key_gid">Gid</string>
     <string name="key_token">โทเคน</string>
     <string name="key_url">URL</string>

@@ -143,8 +143,6 @@
     <string name="rating0">KATASTROPHE</string>
     <string name="gallery_info">Galeriesinfomationen</string>
     <string name="copied_to_clipboard">Text in Zwischenablage kopiert</string>
-    <string name="header_key">Schlüssel</string>
-    <string name="header_value">Wert</string>
     <string name="key_gid">Gid</string>
     <string name="key_token">Token</string>
     <string name="key_url">URL</string>

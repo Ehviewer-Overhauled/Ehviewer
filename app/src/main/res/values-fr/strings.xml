@@ -189,8 +189,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">Infos de la galerie</string>
     <string name="copied_to_clipboard">Copié à presse-papiers</string>
-    <string name="header_key">Clé</string>
-    <string name="header_value">Valeur</string>
     <string name="key_gid">Gid</string>
     <string name="key_token">Token</string>
     <string name="key_url">URL</string>

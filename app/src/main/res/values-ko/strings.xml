@@ -163,8 +163,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">갤러리 정보</string>
     <string name="copied_to_clipboard">클립보드에 복사했습니다.</string>
-    <string name="header_key">키</string>
-    <string name="header_value">값</string>
     <string name="key_gid">GID</string>
     <string name="key_token">토큰</string>
     <string name="key_url">주소</string>

@@ -221,8 +221,6 @@
     <!-- Gallery Info -->
     <string name="gallery_info">Gallery Info</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
-    <string name="header_key">Key</string>
-    <string name="header_value">Value</string>
     <string name="key_gid">GID</string>
     <string name="key_token">Token</string>
     <string name="key_url">URL</string>
