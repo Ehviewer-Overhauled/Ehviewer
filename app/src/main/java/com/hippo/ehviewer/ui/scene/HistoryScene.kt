@@ -20,182 +20,164 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDismissState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingDataAdapter
 import androidx.paging.cachedIn
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import arrow.core.partially1
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.HandlerDrawable
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
-import com.hippo.ehviewer.dao.HistoryInfo
-import com.hippo.ehviewer.databinding.SceneHistoryBinding
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.ListInfoCard
-import com.hippo.view.ViewTransition
-import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import rikka.core.res.resolveColor
 
-@SuppressLint("NotifyDataSetChanged")
-class HistoryScene : BaseToolbarScene() {
-    private var _binding: SceneHistoryBinding? = null
-    private val binding get() = _binding!!
-    private val mAdapter: HistoryAdapter by lazy {
-        HistoryAdapter(object : DiffUtil.ItemCallback<HistoryInfo>() {
-            override fun areItemsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
-                return oldItem.gid == newItem.gid
-            }
-
-            override fun areContentsTheSame(oldItem: HistoryInfo, newItem: HistoryInfo): Boolean {
-                return oldItem.gid == newItem.gid
-            }
-        })
-    }
-    private val mDownloadManager = DownloadManager
-    private val mDownloadInfoListener: DownloadInfoListener by lazy {
-        object : DownloadInfoListener {
-            override fun onAdd(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                mAdapter.notifyDataSetChanged()
-            }
-
-            override fun onUpdate(info: DownloadInfo, list: List<DownloadInfo>) {}
-            override fun onUpdateAll() {}
-            override fun onReload() {
-                mAdapter.notifyDataSetChanged()
-            }
-
-            override fun onChange() {
-                mAdapter.notifyDataSetChanged()
-            }
-
-            override fun onRenameLabel(from: String, to: String) {}
-            override fun onRemove(info: DownloadInfo, list: List<DownloadInfo>, position: Int) {
-                mAdapter.notifyDataSetChanged()
-            }
-
-            override fun onUpdateLabels() {}
-        }
-    }
-    private val mFavouriteStatusRouter = EhApplication.favouriteStatusRouter
-    private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener by lazy {
-        FavouriteStatusRouter.Listener { _: Long, _: Int ->
-            mAdapter.notifyDataSetChanged()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
-    }
-
-    override fun onCreateViewWithToolbar(
+class HistoryScene : BaseScene() {
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SceneHistoryBinding.inflate(inflater, container, false)
-        setLiftOnScrollTargetView(binding.recyclerView)
-        val mViewTransition = ViewTransition(binding.content, binding.tip)
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_history)
-        drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        binding.tip.setCompoundDrawables(null, drawable, null, null)
-        val historyData = Pager(
-            PagingConfig(20),
-        ) {
-            EhDB.historyLazyList
-        }.flow.cachedIn(viewLifecycleOwner.lifecycleScope)
-        binding.recyclerView.adapter = mAdapter
-        val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-        layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
-        layoutManager.setStrategy(STRATEGY_MIN_SIZE)
-        layoutManager.supportsPredictiveItemAnimations = false
-        binding.recyclerView.layoutManager = layoutManager
-        val itemTouchHelper = ItemTouchHelper(HistoryItemTouchHelperCallback())
-        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
-        binding.fastScroller.attachToRecyclerView(binding.recyclerView)
-        val handlerDrawable = HandlerDrawable()
-        handlerDrawable.setColor(theme.resolveColor(com.google.android.material.R.attr.colorPrimary))
-        binding.fastScroller.setHandlerDrawable(handlerDrawable)
-        lifecycleScope.launchIO {
-            historyData.collectLatest { value ->
-                mAdapter.submitData(
-                    value,
-                )
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            mAdapter.onPagesUpdatedFlow.collectLatest {
-                if (mAdapter.itemCount == 0) {
-                    mViewTransition.showView(1, true)
-                } else {
-                    mViewTransition.showView(0, true)
+        return ComposeView(inflater.context).apply {
+            setMD3Content {
+                val coroutineScope = rememberCoroutineScope()
+                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+                val historyData = remember { Pager(PagingConfig(20)) { EhDB.historyLazyList }.flow.cachedIn(viewLifecycleOwner.lifecycleScope) }.collectAsLazyPagingItems()
+                Scaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(text = stringResource(id = R.string.history)) },
+                            navigationIcon = {
+                                IconButton(onClick = ::onNavigationClick) {
+                                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+                                }
+                            },
+                            actions = {
+                                IconButton(onClick = ::showClearAllDialog) {
+                                    Icon(imageVector = Icons.Default.ClearAll, contentDescription = null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                ) { paddingValues ->
+                    LazyColumn(
+                        contentPadding = paddingValues,
+                    ) {
+                        items(
+                            items = historyData,
+                            key = { item -> item.gid },
+                        ) { info ->
+                            info?.let {
+                                val dismissState = rememberDismissState(
+                                    confirmValueChange = {
+                                        if (it == DismissValue.DismissedToStart) {
+                                            coroutineScope.launchIO {
+                                                EhDB.deleteHistoryInfo(info)
+                                            }
+                                        }
+                                        true
+                                    },
+                                )
+
+                                SwipeToDismiss(
+                                    state = dismissState,
+                                    background = {},
+                                    dismissContent = {
+                                        // TODO: item delete & add animation
+                                        // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                        ListInfoCard(
+                                            onClick = ::onItemClick.partially1(it),
+                                            onLongClick = ::onItemLongClick.partially1(it),
+                                            info = it,
+                                            modifier = Modifier.height(cardHeight),
+                                        )
+                                    },
+                                    directions = setOf(DismissDirection.EndToStart),
+                                )
+                            }
+                        }
+                    }
+                    if (historyData.itemCount == 0) {
+                        NoHistory(modifier = Modifier.padding(paddingValues))
+                    }
                 }
             }
         }
-        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setTitle(R.string.history)
-        setNavigationIcon(R.drawable.ic_baseline_menu_24)
+    @Composable
+    private fun NoHistory(
+        modifier: Modifier = Modifier,
+    ) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.big_history),
+                contentDescription = null,
+                Modifier.padding(16.dp),
+            )
+            Text(
+                text = stringResource(id = R.string.no_history),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding.recyclerView.stopScroll()
-        _binding = null
-    }
-
-    override fun onNavigationClick() {
+    private fun onNavigationClick() {
         toggleDrawer(GravityCompat.START)
-    }
-
-    override fun getMenuResId(): Int {
-        return R.menu.scene_history
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -208,36 +190,23 @@ class HistoryScene : BaseToolbarScene() {
                 }
                 lifecycleScope.launchIO {
                     EhDB.clearHistoryInfo()
-                    withUIContext {
-                        mAdapter.refresh()
-                        mAdapter.notifyDataSetChanged()
-                    }
                 }
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_clear_all) {
-            showClearAllDialog()
-            return true
-        }
-        return false
-    }
-
-    fun onItemClick(gi: GalleryInfo) {
+    private fun onItemClick(gi: GalleryInfo) {
         val args = Bundle()
         args.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GALLERY_INFO)
         args.putParcelable(GalleryDetailScene.KEY_GALLERY_INFO, gi)
         navigate(R.id.galleryDetailScene, args)
     }
 
-    fun onItemLongClick(gi: GalleryInfo) {
+    private fun onItemLongClick(gi: GalleryInfo) {
         val context = requireContext()
         val activity = mainActivity ?: return
-        val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
+        val downloaded = DownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourite = gi.favoriteSlot != -2
         val items = if (downloaded) {
             arrayOf<CharSequence>(
@@ -294,9 +263,7 @@ class HistoryScene : BaseToolbarScene() {
                                 ),
                             )
                             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                                mDownloadManager.deleteDownload(
-                                    gi.gid,
-                                )
+                                DownloadManager.deleteDownload(gi.gid)
                             }
                             .show()
                     } else {
@@ -344,8 +311,6 @@ class HistoryScene : BaseToolbarScene() {
             }.show()
     }
 
-    private class ComposeHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
-
     private inner class MoveDialogHelper(
         private val mLabels: Array<String>,
         private val mGi: GalleryInfo,
@@ -358,56 +323,5 @@ class HistoryScene : BaseToolbarScene() {
         }
     }
 
-    private val height = (Settings.listThumbSize * 3).pxToDp.dp
-
-    private inner class HistoryAdapter(diffCallback: DiffUtil.ItemCallback<HistoryInfo>) :
-        PagingDataAdapter<HistoryInfo, ComposeHolder>(diffCallback) {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComposeHolder {
-            val view = ComposeView(requireContext())
-            return ComposeHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ComposeHolder, position: Int) {
-            val gi: GalleryInfo = getItem(position) ?: return
-            holder.composeView.setContent {
-                Mdc3Theme {
-                    ListInfoCard(
-                        onClick = ::onItemClick.partially1(gi),
-                        onLongClick = ::onItemLongClick.partially1(gi),
-                        info = gi,
-                        modifier = Modifier.height(height),
-                    )
-                }
-            }
-        }
-    }
-
-    private inner class HistoryItemTouchHelperCallback : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-        ): Int {
-            return makeMovementFlags(0, ItemTouchHelper.LEFT)
-        }
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder,
-        ): Boolean {
-            return false
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val mPosition = viewHolder.bindingAdapterPosition
-            lifecycleScope.launchIO {
-                val info: HistoryInfo? = mAdapter.peek(mPosition)
-                info?.let { EhDB.deleteHistoryInfo(info) }
-                withUIContext {
-                    mAdapter.refresh()
-                }
-            }
-        }
-    }
+    private val cardHeight = (Settings.listThumbSize * 3).pxToDp.dp
 }
