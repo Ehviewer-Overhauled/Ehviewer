@@ -93,7 +93,7 @@ class HistoryScene : BaseScene() {
             setMD3Content {
                 val coroutineScope = rememberCoroutineScope()
                 val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-                val historyData = remember { Pager(PagingConfig(20)) { EhDB.historyLazyList }.flow.cachedIn(viewLifecycleOwner.lifecycleScope) }.collectAsLazyPagingItems()
+                val historyData = remember { Pager(PagingConfig(20)) { EhDB.historyLazyList }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
                 Scaffold(
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
