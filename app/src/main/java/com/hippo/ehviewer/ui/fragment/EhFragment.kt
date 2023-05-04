@@ -30,6 +30,7 @@ import com.google.android.material.timepicker.TimeFormat.CLOCK_12H
 import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.INVALID_DEFAULT_FAV_SLOT
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -52,6 +53,16 @@ class EhFragment : BasePreferenceFragment() {
         val thumbResolution = findPreference<Preference>(Settings.KEY_THUMB_RESOLUTION)
         val showTagTranslations = findPreference<Preference>(Settings.KEY_SHOW_TAG_TRANSLATIONS)
         val tagTranslationsSource = findPreference<Preference>(Settings.KEY_TAG_TRANSLATIONS_SOURCE)
+
+        /* Workaround https://github.com/Ehviewer-Overhauled/Ehviewer/issues/1056
+         * Currently no elegant way to implement a longclickable Compose Button
+         */
+        findPreference<Preference>("reset_default_fav")!!.setOnPreferenceClickListener {
+            Settings.putDefaultFavSlot(INVALID_DEFAULT_FAV_SLOT)
+            true
+        }
+
+
         Settings.displayName?.let { account?.summary = it }
         theme!!.onPreferenceChangeListener = this
         gallerySite!!.onPreferenceChangeListener = this
