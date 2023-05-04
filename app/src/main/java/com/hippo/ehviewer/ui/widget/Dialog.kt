@@ -40,7 +40,7 @@ class DialogState : DialogScope {
         @StringRes confirmText: Int? = null,
         @StringRes dismissText: Int? = null,
         @StringRes title: Int? = null,
-        @StringRes text: Int? = null,
+        text: (@Composable () -> Unit)? = null,
     ): Boolean {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation { dismiss() }
@@ -69,7 +69,7 @@ class DialogState : DialogScope {
                         }
                     },
                     title = title?.let { { Text(text = stringResource(id = title)) } },
-                    text = text?.let { { Text(text = stringResource(id = text)) } },
+                    text = text,
                 )
             }
         }

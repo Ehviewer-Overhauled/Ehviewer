@@ -112,7 +112,7 @@ class HistoryScene : BaseScene() {
                                         val clear = dialogState.show(
                                             confirmText = R.string.clear_all,
                                             dismissText = android.R.string.cancel,
-                                            text = R.string.clear_all_history,
+                                            text = { Text(text = stringResource(id = R.string.clear_all_history)) },
                                         )
                                         if (clear) EhDB.clearHistoryInfo()
                                     }

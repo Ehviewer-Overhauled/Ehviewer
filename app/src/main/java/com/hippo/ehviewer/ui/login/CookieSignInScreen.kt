@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cookie
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -57,6 +56,7 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
@@ -84,8 +84,8 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
 
     var signInJob by remember { mutableStateOf<Job?>(null) }
 
-    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
-    var loginErrorException by remember { mutableStateOf<Throwable?>(null) }
+    val dialogState = rememberDialogState()
+    dialogState.Handler()
 
     val noCookies = stringResource(R.string.from_clipboard_error)
 
@@ -134,8 +134,19 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
                 }
             }.onFailure {
                 EhCookieStore.signOut()
-                loginErrorException = it
-                showErrorDialog = true
+                dialogState.show(
+                    confirmText = R.string.get_it,
+                    title = R.string.sign_in_failed,
+                    text = {
+                        Text(
+                            text =
+                            """
+                            ${ExceptionUtils.getReadableString(it)}
+                            ${stringResource(R.string.wrong_cookie_warning)}
+                            """.trimIndent(),
+                        )
+                    },
+                )
                 isProgressIndicatorVisible = false
             }
         }
@@ -294,32 +305,6 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
             if (isProgressIndicatorVisible) {
                 CircularProgressIndicator()
             }
-            if (showErrorDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showErrorDialog = false
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showErrorDialog = false
-                        }) {
-                            Text(text = stringResource(id = R.string.get_it))
-                        }
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.sign_in_failed))
-                    },
-                    text = {
-                        Text(
-                            text =
-                            """
-                            ${ExceptionUtils.getReadableString(loginErrorException!!)}
-                            ${stringResource(R.string.wrong_cookie_warning)}
-                            """.trimIndent(),
-                        )
-                    },
-                )
-            }
         }
 
         WindowWidthSizeClass.Expanded -> Box(
@@ -441,32 +426,6 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
             }
             if (isProgressIndicatorVisible) {
                 CircularProgressIndicator()
-            }
-            if (showErrorDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showErrorDialog = false
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showErrorDialog = false
-                        }) {
-                            Text(text = stringResource(id = R.string.get_it))
-                        }
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.sign_in_failed))
-                    },
-                    text = {
-                        Text(
-                            text =
-                            """
-                            ${ExceptionUtils.getReadableString(loginErrorException!!)}
-                            ${stringResource(R.string.wrong_cookie_warning)}
-                            """.trimIndent(),
-                        )
-                    },
-                )
             }
         }
     }
