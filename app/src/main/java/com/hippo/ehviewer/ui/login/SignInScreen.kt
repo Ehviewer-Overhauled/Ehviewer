@@ -3,6 +3,7 @@ package com.hippo.ehviewer.ui.login
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -89,7 +90,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
         (context as Activity).moveTaskToBack(true)
     }
 
-    // Basic login request
     fun signIn() {
         if (signInJob?.isActive == true) return
         if (username.isEmpty()) {
@@ -140,297 +140,112 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
         }
     }
 
-    when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> Box(
-            contentAlignment = Alignment.Center,
-        ) {
-            Column(
-                Modifier
-                    .padding(dimensionResource(id = R.dimen.keyline_margin))
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    Modifier.padding(dimensionResource(id = R.dimen.keyline_margin)),
-                )
-
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                    label = { Text(stringResource(R.string.username)) },
-                    supportingText = { if (showUsernameError) Text(stringResource(R.string.error_username_cannot_empty)) },
-                    trailingIcon = {
-                        if (showUsernameError) {
-                            Icon(
-                                imageVector = Icons.Filled.Info,
-                                contentDescription = null,
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                    ),
-                    singleLine = true,
-                    isError = showUsernameError,
-                )
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                    label = { Text(stringResource(R.string.password)) },
-                    visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-                    supportingText = { if (showPasswordError) Text(stringResource(R.string.error_password_cannot_empty)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    keyboardActions = KeyboardActions(
-                        onDone = { signIn() },
-                    ),
-                    trailingIcon = {
-                        if (showPasswordError) {
-                            Icon(imageVector = Icons.Filled.Info, contentDescription = null)
-                        } else {
-                            IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                                val visibilityIcon =
-                                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                                Icon(imageVector = visibilityIcon, contentDescription = null)
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    isError = showPasswordError,
-                )
-
-                Text(
-                    text = stringResource(id = R.string.app_waring),
-                    Modifier
-                        .widthIn(max = dimensionResource(id = R.dimen.single_max_width))
-                        .padding(top = 24.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row {
-                    FilledTonalButton(
-                        onClick = {
-                            context.openBrowser(EhUrl.URL_REGISTER)
-                        },
-                        Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp),
-                    ) {
-                        Text(text = stringResource(id = R.string.register))
-                    }
-
-                    Button(
-                        onClick = { signIn() },
-                        Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp),
-                    ) {
-                        Text(text = stringResource(id = R.string.sign_in))
+    @Composable
+    fun UsernameAndPasswordTextField() {
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            modifier = Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
+            label = { Text(stringResource(R.string.username)) },
+            supportingText = { if (showUsernameError) Text(stringResource(R.string.error_username_cannot_empty)) },
+            trailingIcon = { if (showUsernameError) Icon(imageVector = Icons.Filled.Info, contentDescription = null) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            singleLine = true,
+            isError = showUsernameError,
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
+            label = { Text(stringResource(R.string.password)) },
+            visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
+            supportingText = { if (showPasswordError) Text(stringResource(R.string.error_password_cannot_empty)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardActions = KeyboardActions(onDone = { signIn() }),
+            trailingIcon = {
+                if (showPasswordError) {
+                    Icon(imageVector = Icons.Filled.Info, contentDescription = null)
+                } else {
+                    IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                        val visibilityIcon = if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        Icon(imageVector = visibilityIcon, contentDescription = null)
                     }
                 }
+            },
+            singleLine = true,
+            isError = showPasswordError,
+        )
+    }
 
-                Row(
-                    Modifier.padding(horizontal = 4.dp),
-                ) {
-                    TextButton(
-                        onClick = { navController.navigate(WEBVIEW_SIGN_IN_ROUTE_NAME) },
-                        Modifier.padding(horizontal = 8.dp),
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(textDecoration = TextDecoration.Underline),
-                                ) {
-                                    append(stringResource(id = R.string.sign_in_via_webview))
-                                }
-                            },
-                        )
-                    }
-
-                    TextButton(
-                        onClick = { navController.navigate(COOKIE_SIGN_IN_ROUTE_NAME) },
-                        Modifier.padding(horizontal = 8.dp),
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(textDecoration = TextDecoration.Underline),
-                                ) {
-                                    append(stringResource(id = R.string.sign_in_via_cookies))
-                                }
-                            },
-                        )
-                    }
-                }
-
-                TextButton(
-                    onClick = {
-                        Settings.putSelectSite(false)
-                        Settings.putGallerySite(EhUrl.SITE_E)
-                        navController.navigate(SELECT_SITE_ROUTE_NAME)
-                    },
-                ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(textDecoration = TextDecoration.Underline),
-                            ) {
-                                append(stringResource(id = R.string.tourist_mode))
-                            }
-                        },
-                    )
-                }
-            }
-            if (isProgressIndicatorVisible) {
-                CircularProgressIndicator()
-            }
-        }
-
-        WindowWidthSizeClass.Expanded -> Box(
-            contentAlignment = Alignment.Center,
-        ) {
-            Row(
-                Modifier
-                    .padding(dimensionResource(id = R.dimen.keyline_margin))
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+    Box(contentAlignment = Alignment.Center) {
+        when (windowSizeClass.widthSizeClass) {
+            WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> {
                 Column(
-                    Modifier
-                        .width(dimensionResource(id = R.dimen.signinscreen_landscape_caption_frame_width))
-                        .padding(dimensionResource(id = R.dimen.keyline_margin)),
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.keyline_margin)).fillMaxSize().verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_launcher_foreground),
                         contentDescription = null,
-                        alignment = Alignment.Center,
                         modifier = Modifier.padding(dimensionResource(id = R.dimen.keyline_margin)),
                     )
+                    UsernameAndPasswordTextField()
                     Text(
                         text = stringResource(id = R.string.app_waring),
-                        Modifier
-                            .widthIn(max = 480.dp)
-                            .padding(top = 24.dp),
-                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.widthIn(max = dimensionResource(id = R.dimen.single_max_width)).padding(top = 24.dp),
+                        style = MaterialTheme.typography.titleMedium,
                     )
-                }
-
-                Column(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
-                        Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                        label = { Text(stringResource(R.string.username)) },
-                        supportingText = { if (showUsernameError) Text(stringResource(R.string.error_username_cannot_empty)) },
-                        trailingIcon = {
-                            if (showUsernameError) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                        ),
-                        singleLine = true,
-                        isError = showUsernameError,
-                    )
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        Modifier.width(dimensionResource(id = R.dimen.single_max_width)),
-                        label = { Text(stringResource(R.string.password)) },
-                        visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-                        supportingText = { if (showPasswordError) Text(stringResource(R.string.error_password_cannot_empty)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        keyboardActions = KeyboardActions(
-                            onDone = { signIn() },
-                        ),
-                        trailingIcon = {
-                            if (showPasswordError) {
-                                Icon(imageVector = Icons.Filled.Info, contentDescription = null)
-                            } else {
-                                IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                                    val visibilityIcon =
-                                        if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                                    Icon(imageVector = visibilityIcon, contentDescription = null)
-                                }
-                            }
-                        },
-                        singleLine = true,
-                        isError = showPasswordError,
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = { signIn() },
-                        Modifier
-                            .padding(horizontal = 4.dp)
-                            .width(128.dp),
-                    ) {
-                        Text(text = stringResource(id = R.string.sign_in))
+                    Spacer(modifier = Modifier.weight(1f))
+                    Row(modifier = Modifier.padding(top = dimensionResource(R.dimen.keyline_margin))) {
+                        FilledTonalButton(
+                            onClick = { context.openBrowser(EhUrl.URL_REGISTER) },
+                            modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        ) {
+                            Text(text = stringResource(id = R.string.register))
+                        }
+                        Button(
+                            onClick = ::signIn,
+                            modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        ) {
+                            Text(text = stringResource(id = R.string.sign_in))
+                        }
                     }
-                    FilledTonalButton(
-                        onClick = {
-                            context.openBrowser(EhUrl.URL_REGISTER)
-                        },
-                        Modifier
-                            .padding(horizontal = 4.dp)
-                            .width(128.dp),
-                    ) {
-                        Text(text = stringResource(id = R.string.register))
+                    Row(modifier = Modifier.padding(horizontal = 4.dp)) {
+                        TextButton(
+                            onClick = { navController.navigate(WEBVIEW_SIGN_IN_ROUTE_NAME) },
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        ) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(textDecoration = TextDecoration.Underline),
+                                    ) {
+                                        append(stringResource(id = R.string.sign_in_via_webview))
+                                    }
+                                },
+                            )
+                        }
+                        TextButton(
+                            onClick = { navController.navigate(COOKIE_SIGN_IN_ROUTE_NAME) },
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        ) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(textDecoration = TextDecoration.Underline),
+                                    ) {
+                                        append(stringResource(id = R.string.sign_in_via_cookies))
+                                    }
+                                },
+                            )
+                        }
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    TextButton(
-                        onClick = { navController.navigate(COOKIE_SIGN_IN_ROUTE_NAME) },
-                        Modifier.padding(horizontal = 4.dp),
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(textDecoration = TextDecoration.Underline),
-                                ) {
-                                    append(stringResource(id = R.string.sign_in_via_cookies))
-                                }
-                            },
-                        )
-                    }
-                    TextButton(
-                        onClick = { navController.navigate(WEBVIEW_SIGN_IN_ROUTE_NAME) },
-                        Modifier.padding(horizontal = 4.dp),
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(textDecoration = TextDecoration.Underline),
-                                ) {
-                                    append(stringResource(id = R.string.sign_in_via_webview))
-                                }
-                            },
-                        )
-                    }
-
                     TextButton(
                         onClick = {
                             Settings.putSelectSite(false)
                             Settings.putGallerySite(EhUrl.SITE_E)
                             navController.navigate(SELECT_SITE_ROUTE_NAME)
                         },
-                        Modifier.padding(horizontal = 4.dp),
                     ) {
                         Text(
                             text = buildAnnotatedString {
@@ -444,9 +259,102 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                     }
                 }
             }
-            if (isProgressIndicatorVisible) {
-                CircularProgressIndicator()
+            WindowWidthSizeClass.Expanded -> {
+                Row(
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.keyline_margin)).fillMaxSize().verticalScroll(rememberScrollState()),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(
+                        modifier = Modifier.width(dimensionResource(id = R.dimen.signinscreen_landscape_caption_frame_width)).padding(dimensionResource(id = R.dimen.keyline_margin)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentDescription = null,
+                            alignment = Alignment.Center,
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.keyline_margin)),
+                        )
+                        Text(
+                            text = stringResource(id = R.string.app_waring),
+                            modifier = Modifier.widthIn(max = 360.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        UsernameAndPasswordTextField()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.Center) {
+                            Button(
+                                onClick = ::signIn,
+                                modifier = Modifier.padding(horizontal = 4.dp).width(128.dp),
+                            ) {
+                                Text(text = stringResource(id = R.string.sign_in))
+                            }
+                            FilledTonalButton(
+                                onClick = { context.openBrowser(EhUrl.URL_REGISTER) },
+                                modifier = Modifier.padding(horizontal = 4.dp).width(128.dp),
+                            ) {
+                                Text(text = stringResource(id = R.string.register))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.Center) {
+                            TextButton(
+                                onClick = { navController.navigate(COOKIE_SIGN_IN_ROUTE_NAME) },
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                            ) {
+                                Text(
+                                    text = buildAnnotatedString {
+                                        withStyle(
+                                            style = SpanStyle(textDecoration = TextDecoration.Underline),
+                                        ) {
+                                            append(stringResource(id = R.string.sign_in_via_cookies))
+                                        }
+                                    },
+                                )
+                            }
+                            TextButton(
+                                onClick = { navController.navigate(WEBVIEW_SIGN_IN_ROUTE_NAME) },
+                                modifier = Modifier.padding(horizontal = 4.dp),
+                            ) {
+                                Text(
+                                    text = buildAnnotatedString {
+                                        withStyle(
+                                            style = SpanStyle(textDecoration = TextDecoration.Underline),
+                                        ) {
+                                            append(stringResource(id = R.string.sign_in_via_webview))
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                        TextButton(
+                            onClick = {
+                                Settings.putSelectSite(false)
+                                Settings.putGallerySite(EhUrl.SITE_E)
+                                navController.navigate(SELECT_SITE_ROUTE_NAME)
+                            },
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                        ) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    withStyle(
+                                        style = SpanStyle(textDecoration = TextDecoration.Underline),
+                                    ) {
+                                        append(stringResource(id = R.string.tourist_mode))
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
             }
+        }
+        if (isProgressIndicatorVisible) {
+            CircularProgressIndicator()
         }
     }
 }

@@ -102,8 +102,7 @@ suspend fun postLogin() = coroutineScope {
     }.join()
 }
 
-val LocalNavController =
-    compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
+val LocalNavController = compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
 
 const val SIGN_IN_ROUTE_NAME = "SignIn"
 const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
