@@ -184,9 +184,4 @@
         app:dependency="request_news"
         app:iconSpaceReserved="false" />
 
-    <Preference
-        android:key="reset_default_fav"
-        android:title="@string/reset_default_fav"
-        app:iconSpaceReserved="false" />
-
 </PreferenceScreen>
