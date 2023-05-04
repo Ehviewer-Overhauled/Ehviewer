@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
@@ -62,6 +61,7 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.openBrowser
+import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
@@ -76,13 +76,14 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
     var isProgressIndicatorVisible by rememberSaveable { mutableStateOf(false) }
     var showUsernameError by rememberSaveable { mutableStateOf(false) }
     var showPasswordError by rememberSaveable { mutableStateOf(false) }
-    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
-    var loginErrorException by remember { mutableStateOf<Throwable?>(null) }
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
     var signInJob by remember { mutableStateOf<Job?>(null) }
+
+    val dialogState = rememberDialogState()
+    dialogState.Handler()
 
     BackHandler {
         (context as Activity).moveTaskToBack(true)
@@ -114,9 +115,19 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                 it.printStackTrace()
                 withUIContext {
                     focusManager.clearFocus()
+                    dialogState.show(
+                        confirmText = R.string.get_it,
+                        title = R.string.sign_in_failed,
+                        text = {
+                            Text(
+                                """
+                                ${ExceptionUtils.getReadableString(it)}
+                                ${stringResource(R.string.sign_in_failed_tip)}
+                                """.trimIndent(),
+                            )
+                        },
+                    )
                     isProgressIndicatorVisible = false
-                    loginErrorException = it
-                    showErrorDialog = true
                 }
             }.onSuccess {
                 withNonCancellableContext {
@@ -280,32 +291,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
             if (isProgressIndicatorVisible) {
                 CircularProgressIndicator()
             }
-            if (showErrorDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showErrorDialog = false
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showErrorDialog = false
-                        }) {
-                            Text(text = stringResource(id = R.string.get_it))
-                        }
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.sign_in_failed))
-                    },
-                    text = {
-                        Text(
-                            text =
-                            """
-                            ${ExceptionUtils.getReadableString(loginErrorException!!)}
-                            ${stringResource(R.string.sign_in_failed_tip)}
-                            """.trimIndent(),
-                        )
-                    },
-                )
-            }
         }
 
         WindowWidthSizeClass.Expanded -> Box(
@@ -461,32 +446,6 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
             }
             if (isProgressIndicatorVisible) {
                 CircularProgressIndicator()
-            }
-            if (showErrorDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showErrorDialog = false
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showErrorDialog = false
-                        }) {
-                            Text(text = stringResource(id = R.string.get_it))
-                        }
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.sign_in_failed))
-                    },
-                    text = {
-                        Text(
-                            text =
-                            """
-                            ${ExceptionUtils.getReadableString(loginErrorException!!)}
-                            ${stringResource(R.string.sign_in_failed_tip)}
-                            """.trimIndent(),
-                        )
-                    },
-                )
             }
         }
     }

@@ -139,7 +139,6 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
                     title = R.string.sign_in_failed,
                     text = {
                         Text(
-                            text =
                             """
                             ${ExceptionUtils.getReadableString(it)}
                             ${stringResource(R.string.wrong_cookie_warning)}
