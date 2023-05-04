@@ -73,11 +73,13 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
+import com.hippo.ehviewer.ui.widget.Deferred
 import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
+import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
 
 class HistoryScene : BaseScene() {
@@ -147,8 +149,10 @@ class HistoryScene : BaseScene() {
                             }
                         }
                     }
-                    if (historyData.itemCount == 0) {
-                        NoHistory(modifier = Modifier.padding(paddingValues))
+                    Deferred({ delay(200) }) {
+                        if (historyData.itemCount == 0) {
+                            NoHistory(modifier = Modifier.padding(paddingValues))
+                        }
                     }
                 }
             }
