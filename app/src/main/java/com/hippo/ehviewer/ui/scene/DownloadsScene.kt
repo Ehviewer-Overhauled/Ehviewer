@@ -44,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import arrow.core.partially1
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hippo.app.BaseDialogBuilder
 import com.hippo.app.CheckBoxDialogBuilder
@@ -69,6 +68,7 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
 import com.hippo.widget.FabLayout
@@ -861,19 +861,17 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
-            binding.thumb.setContent {
-                Mdc3Theme {
-                    Card(
-                        onClick = ::onClick.partially1(binding.thumb),
-                    ) {
-                        EhAsyncThumb(
-                            model = info.thumb,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .height(height)
-                                .aspectRatio(0.6666667F),
-                        )
-                    }
+            binding.thumb.setMD3Content {
+                Card(
+                    onClick = ::onClick.partially1(binding.thumb),
+                ) {
+                    EhAsyncThumb(
+                        model = info.thumb,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(height)
+                            .aspectRatio(0.6666667F),
+                    )
                 }
             }
             binding.title.text = EhUtils.getSuitableTitle(info)

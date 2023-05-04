@@ -115,7 +115,6 @@ import arrow.core.partially1
 import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.app.BaseDialogBuilder
@@ -163,6 +162,7 @@ import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
 import com.hippo.ehviewer.ui.widget.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.widget.GalleryDetailRating
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.ehviewer.widget.GalleryRatingBar
 import com.hippo.ehviewer.widget.GalleryRatingBar.OnUserRateListener
 import com.hippo.text.URLImageGetter
@@ -407,103 +407,101 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         downloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
         return ComposeView(requireContext()).apply {
-            setContent {
-                Mdc3Theme {
-                    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-                    Scaffold(
-                        topBar = {
-                            LargeTopAppBar(
-                                title = {
-                                    composeBindingGI?.let {
-                                        Text(
-                                            text = EhUtils.getSuitableTitle(it),
-                                            maxLines = 2,
-                                        )
-                                    }
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        findNavController().popBackStack()
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowBack,
-                                            contentDescription = null,
-                                        )
-                                    }
-                                },
-                                scrollBehavior = scrollBehavior,
-                                actions = {
-                                    var dropdown by remember { mutableStateOf(false) }
-                                    IconButton(onClick = { dropdown = !dropdown }) {
-                                        Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = null,
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = dropdown,
-                                        onDismissRequest = { dropdown = false },
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text(text = stringResource(id = R.string.action_add_tag)) },
-                                            onClick = {
-                                                dropdown = false
-                                                actionAddTag()
-                                            },
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(text = stringResource(id = R.string.refresh)) },
-                                            onClick = {
-                                                dropdown = false
-                                                actionRefresh()
-                                            },
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(text = stringResource(id = R.string.open_in_other_app)) },
-                                            onClick = {
-                                                dropdown = false
-                                                actionOpenInOtherApp()
-                                            },
-                                        )
-                                    }
-                                },
-                            )
-                        },
-                    ) {
-                        Surface {
-                            if (getDetailError.isNotBlank()) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.big_sad_pandroid),
-                                        contentDescription = null,
-                                        modifier = Modifier.clickable(onClick = ::actionRefresh),
-                                    )
-                                    Spacer(modifier = Modifier.size(8.dp))
+            setMD3Content {
+                val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+                Scaffold(
+                    topBar = {
+                        LargeTopAppBar(
+                            title = {
+                                composeBindingGI?.let {
                                     Text(
-                                        text = getDetailError,
-                                        modifier = Modifier.widthIn(max = 228.dp),
+                                        text = EhUtils.getSuitableTitle(it),
+                                        maxLines = 2,
                                     )
                                 }
-                            } else {
-                                val gi = composeBindingGI
-                                if (gi != null) {
-                                    GalleryDetailContent(
-                                        galleryInfo = gi,
-                                        galleryDetail = composeBindingGD,
-                                        contentPadding = it,
-                                        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    findNavController().popBackStack()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = null,
                                     )
-                                } else {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        CircularProgressIndicator()
-                                    }
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                            actions = {
+                                var dropdown by remember { mutableStateOf(false) }
+                                IconButton(onClick = { dropdown = !dropdown }) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = null,
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = dropdown,
+                                    onDismissRequest = { dropdown = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(text = stringResource(id = R.string.action_add_tag)) },
+                                        onClick = {
+                                            dropdown = false
+                                            actionAddTag()
+                                        },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(text = stringResource(id = R.string.refresh)) },
+                                        onClick = {
+                                            dropdown = false
+                                            actionRefresh()
+                                        },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(text = stringResource(id = R.string.open_in_other_app)) },
+                                        onClick = {
+                                            dropdown = false
+                                            actionOpenInOtherApp()
+                                        },
+                                    )
+                                }
+                            },
+                        )
+                    },
+                ) {
+                    Surface {
+                        if (getDetailError.isNotBlank()) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.big_sad_pandroid),
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable(onClick = ::actionRefresh),
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(
+                                    text = getDetailError,
+                                    modifier = Modifier.widthIn(max = 228.dp),
+                                )
+                            }
+                        } else {
+                            val gi = composeBindingGI
+                            if (gi != null) {
+                                GalleryDetailContent(
+                                    galleryInfo = gi,
+                                    galleryDetail = composeBindingGD,
+                                    contentPadding = it,
+                                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator()
                                 }
                             }
                         }

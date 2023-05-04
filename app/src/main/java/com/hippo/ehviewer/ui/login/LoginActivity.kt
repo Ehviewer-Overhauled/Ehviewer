@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -14,45 +13,43 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.EhActivity
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class LoginActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
+        setMD3Content {
             val windowSizeClass = calculateWindowSizeClass(this)
-            Mdc3Theme {
-                val navController = rememberNavController()
+            val navController = rememberNavController()
 
-                CompositionLocalProvider(LocalNavController provides navController) {
-                    NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
-                        composable(SIGN_IN_ROUTE_NAME) {
-                            SignInScreen(windowSizeClass)
-                        }
+            CompositionLocalProvider(LocalNavController provides navController) {
+                NavHost(navController = navController, startDestination = SIGN_IN_ROUTE_NAME) {
+                    composable(SIGN_IN_ROUTE_NAME) {
+                        SignInScreen(windowSizeClass)
+                    }
 
-                        composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
-                            WebviewSignInScreen()
-                        }
+                    composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
+                        WebviewSignInScreen()
+                    }
 
-                        composable(COOKIE_SIGN_IN_ROUTE_NAME) {
-                            CookieSignInScene(windowSizeClass)
-                        }
+                    composable(COOKIE_SIGN_IN_ROUTE_NAME) {
+                        CookieSignInScene(windowSizeClass)
+                    }
 
-                        composable(SELECT_SITE_ROUTE_NAME) {
-                            val selectSite by remember { mutableStateOf(Settings.selectSite) }
-                            if (selectSite) {
-                                SelectSiteScreen()
-                            } else {
-                                SideEffect {
-                                    finish()
-                                }
+                    composable(SELECT_SITE_ROUTE_NAME) {
+                        val selectSite by remember { mutableStateOf(Settings.selectSite) }
+                        if (selectSite) {
+                            SelectSiteScreen()
+                        } else {
+                            SideEffect {
+                                finish()
                             }
                         }
                     }

@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.partially1
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
+import com.hippo.ehviewer.ui.widget.setMD3Content
 
 class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) : ListAdapter<GalleryPreview, GalleryPreviewsAdapter.ComposeHolder>(PreviewDiffCallback) {
     class ComposeHolder(val composeView: ComposeView) : RecyclerView.ViewHolder(composeView)
@@ -31,26 +31,24 @@ class GalleryPreviewsAdapter(private val onClick: (GalleryPreview) -> Unit) : Li
 
     override fun onBindViewHolder(holder: ComposeHolder, position: Int) {
         val it = getItem(position)
-        holder.composeView.setContent {
-            Mdc3Theme {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        CrystalCard(
-                            onClick = onClick.partially1(it),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(0.6666667F),
-                        ) {
-                            EhAsyncPreview(
-                                model = it,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        }
+        holder.composeView.setMD3Content {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    CrystalCard(
+                        onClick = onClick.partially1(it),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.6666667F),
+                    ) {
+                        EhAsyncPreview(
+                            model = it,
+                            modifier = Modifier.fillMaxSize(),
+                        )
                     }
-                    Text((it.position + 1).toString())
                 }
+                Text((it.position + 1).toString())
             }
         }
     }

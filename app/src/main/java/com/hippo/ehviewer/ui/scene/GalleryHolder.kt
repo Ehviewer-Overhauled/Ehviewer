@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.drawable.TriangleDrawable
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
@@ -35,6 +34,7 @@ import com.hippo.ehviewer.databinding.ItemGalleryGridBinding
 import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.util.system.pxToDp
 
 internal abstract class GalleryHolder(binding: ViewBinding) :
@@ -52,17 +52,15 @@ internal class ListGalleryHolder(
     @SuppressLint("SetTextI18n")
     override fun bind(galleryInfo: GalleryInfo) {
         binding.run {
-            thumb.setContent {
-                Mdc3Theme {
-                    Card {
-                        EhAsyncThumb(
-                            model = galleryInfo.thumb,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .height(height)
-                                .aspectRatio(0.6666667F),
-                        )
-                    }
+            thumb.setMD3Content {
+                Card {
+                    EhAsyncThumb(
+                        model = galleryInfo.thumb,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(height)
+                            .aspectRatio(0.6666667F),
+                    )
                 }
             }
             title.text = EhUtils.getSuitableTitle(galleryInfo)
@@ -102,14 +100,12 @@ internal class GridGalleryHolder(private val binding: ItemGalleryGridBinding) :
     override fun bind(galleryInfo: GalleryInfo) {
         binding.run {
             val aspect = (galleryInfo.thumbWidth.toFloat() / galleryInfo.thumbHeight).coerceIn(0.33F, 1.5F)
-            thumb.setContent {
-                Mdc3Theme {
-                    EhAsyncThumb(
-                        model = galleryInfo.thumb,
-                        modifier = Modifier.aspectRatio(aspect),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
+            thumb.setMD3Content {
+                EhAsyncThumb(
+                    model = galleryInfo.thumb,
+                    modifier = Modifier.aspectRatio(aspect),
+                    contentScale = ContentScale.Crop,
+                )
             }
             var drawable = category.background
             val color = EhUtils.getCategoryColor(galleryInfo.category)
