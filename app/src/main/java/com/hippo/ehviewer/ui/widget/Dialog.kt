@@ -28,10 +28,16 @@ class DialogState : DialogScope {
     }
 
     suspend fun show(block: @Composable DialogScope.() -> Unit) {
-        suspendCancellableCoroutine<Unit> {
+        return suspendCancellableCoroutine { cont ->
+            cont.invokeOnCancellation { dismiss() }
             content = {
-                AlertDialog(onDismissRequest = { dismiss() }, confirmButton = { /*TODO*/ })
-                block()
+                AlertDialog(
+                    onDismissRequest = {
+                        dismiss()
+                        cont.resume(Unit)
+                    },
+                    content = { block() },
+                )
             }
         }
     }
