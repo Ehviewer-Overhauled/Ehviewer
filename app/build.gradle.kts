@@ -201,7 +201,7 @@ dependencies {
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.6.3")
     // https://github.com/google/accompanist/releases
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.1")
-    implementation("com.google.android.material:material:1.9.0-rc01")
+    implementation("com.google.android.material:material:1.9.0")
 
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11")
