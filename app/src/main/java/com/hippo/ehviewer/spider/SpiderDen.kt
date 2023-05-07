@@ -18,13 +18,13 @@ package com.hippo.ehviewer.spider
 import android.graphics.ImageDecoder
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
-import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.client.ehRequest
 import com.hippo.ehviewer.client.getImageKey
-import com.hippo.ehviewer.client.referer
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
@@ -34,21 +34,17 @@ import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import com.hippo.util.sendTo
 import com.hippo.yorozuya.FileUtils
-import io.ktor.client.plugins.onDownload
-import io.ktor.client.request.prepareGet
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.ContentType
-import io.ktor.http.contentLength
-import io.ktor.http.contentType
-import io.ktor.utils.io.jvm.nio.copyTo
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import moe.tarsin.coroutines.runSuspendCatching
+import okhttp3.Response
+import okhttp3.executeAsync
+import okio.buffer
+import okio.sink
 import java.io.IOException
 import java.util.Locale
 import kotlin.io.path.readText
 import com.hippo.ehviewer.EhApplication.Companion.imageCache as sCache
-
-private val client = EhApplication.ktorClient
 
 class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     private val mGid = mGalleryInfo.gid
@@ -138,30 +134,34 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         referer: String?,
         notifyProgress: (Long, Long, Int) -> Unit,
     ): Boolean {
-        return client.prepareGet(url) {
-            var state: Long = 0
-            referer(referer)
-            onDownload { bytesSentTotal, contentLength ->
-                notifyProgress(contentLength, bytesSentTotal, (bytesSentTotal - state).toInt())
-                state = bytesSentTotal
-            }
-        }.execute {
-            if (it.status.value >= 400) return@execute false
-            saveFromHttpResponse(index, it)
+        // TODO: Use HttpEngine[https://developer.android.com/reference/android/net/http/HttpEngine] directly here if available
+        // Since we don't want unnecessary copy between jvm heap & native heap
+        nonCacheOkHttpClient.newCall(ehRequest(url, referer)).executeAsync().use {
+            if (it.code >= 400) return false
+            return saveFromHttpResponse(index, it, notifyProgress)
         }
     }
 
-    private suspend fun saveFromHttpResponse(index: Int, body: HttpResponse): Boolean {
-        val contentType = body.contentType()
-        val extension = contentType?.contentSubtype ?: "jpg"
-        val length = body.contentLength() ?: return false
+    private suspend fun saveFromHttpResponse(index: Int, response: Response, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
+        val contentType = response.body.contentType()
+        val extension = contentType?.subtype ?: "jpg"
+        val length = response.body.contentLength()
 
         suspend fun doSave(outFile: UniFile): Long {
-            val ret: Long
-            outFile.openOutputStream().use {
-                ret = body.bodyAsChannel().copyTo(it.channel)
+            var ret: Long = 1
+            outFile.openOutputStream().sink().buffer().use { sink ->
+                response.body.source().use { source ->
+                    while (true) {
+                        currentCoroutineContext().ensureActive()
+                        val bytesRead = source.read(sink.buffer, 8192)
+                        sink.emitCompleteSegments()
+                        ret += bytesRead
+                        notifyProgress(length, ret, bytesRead.toInt())
+                        if (bytesRead.toInt() < 0) break
+                    }
+                }
             }
-            if (contentType == ContentType.Image.GIF) {
+            if (extension.lowercase() == "gif") {
                 outFile.openFileDescriptor("rw").use {
                     rewriteGifSource2(it.fd)
                 }

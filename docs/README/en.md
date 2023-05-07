@@ -86,7 +86,6 @@ Here is the libraries
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [Libarchive](http://www.libarchive.org/)
 - [Coil](https://coil-kt.github.io/coil/)
-- [Ktor](https://ktor.io/)
 - [Jsoup](https://jsoup.org/)
 
 Specially thanks [Tachiyomi](https://tachiyomi.org/) for its reader implementation!

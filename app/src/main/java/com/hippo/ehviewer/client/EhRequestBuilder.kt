@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import io.ktor.http.HttpMessageBuilder
 import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -44,8 +43,6 @@ inline fun JSONObject.array(name: String, builder: JSONArray.() -> Unit): JSONOb
 fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { put(it) } } // Should ensure it is inlined
 
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
-
-fun HttpMessageBuilder.referer(value: String?): Unit = value?.let { headers.append("Referer", it) } ?: Unit
 
 const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
 const val CHROME_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"

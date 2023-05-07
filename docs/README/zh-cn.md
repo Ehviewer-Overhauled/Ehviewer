@@ -86,7 +86,6 @@
 - [RikkaX](https://github.com/RikkaApps/RikkaX)
 - [Libarchive](http://www.libarchive.org/)
 - [Coil](https://coil-kt.github.io/coil/)
-- [Ktor](https://ktor.io/)
 - [Jsoup](https://jsoup.org/)
 
 特别感谢[Tachiyomi](https://tachiyomi.org/)的阅读器实现

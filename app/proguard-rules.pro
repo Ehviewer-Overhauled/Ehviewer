@@ -13,9 +13,6 @@
 
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 
-# Ktor logger
--dontwarn org.slf4j.impl.StaticLoggerBinder
-
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
 

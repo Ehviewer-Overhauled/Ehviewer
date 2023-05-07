@@ -13,7 +13,7 @@ plugins {
 
 android {
     compileSdk = 33
-    buildToolsVersion = "33.0.2"
+    buildToolsVersion = "34.0.0 rc2"
     ndkVersion = "25.2.9519653"
     androidResources.generateLocaleConfig = true
 
@@ -222,8 +222,6 @@ dependencies {
 
     // https://coil-kt.github.io/coil/changelog/
     implementation("io.coil-kt:coil-compose:2.3.0")
-
-    implementation("io.ktor:ktor-client-okhttp:2.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0")
     implementation("org.jsoup:jsoup:1.16.1")
