@@ -148,16 +148,16 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         val length = response.body.contentLength()
 
         suspend fun doSave(outFile: UniFile): Long {
-            var ret: Long = 1
+            var ret = 0L
             outFile.openOutputStream().sink().buffer().use { sink ->
                 response.body.source().use { source ->
                     while (true) {
                         currentCoroutineContext().ensureActive()
                         val bytesRead = source.read(sink.buffer, 8192)
-                        sink.emitCompleteSegments()
+                        if (bytesRead == -1L) break
                         ret += bytesRead
+                        sink.emitCompleteSegments()
                         notifyProgress(length, ret, bytesRead.toInt())
-                        if (bytesRead.toInt() < 0) break
                     }
                 }
             }
