@@ -31,6 +31,7 @@ import com.hippo.ehviewer.client.EhUrl.referer
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
 import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.client.execute
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePages
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewList
 import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
@@ -53,10 +54,8 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import moe.tarsin.coroutines.runSuspendCatching
-import okhttp3.executeAsync
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import com.hippo.ehviewer.EhApplication.Companion.okHttpClient as plainTextOkHttpClient
 
 class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineScope {
     override val coroutineContext = Dispatchers.IO + Job()
@@ -360,14 +359,13 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 
     private suspend fun readSpiderInfoFromInternet(): SpiderInfo? {
-        val request = ehRequest(getGalleryDetailUrl(galleryInfo.gid, galleryInfo.token, 0, false), referer)
         return runSuspendCatching {
-            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
-                val body = response.body.string()
-                val pages = parsePages(body)
+            ehRequest(getGalleryDetailUrl(galleryInfo.gid, galleryInfo.token, 0, false), referer).execute {
+                val bodyStr = body.string()
+                val pages = parsePages(bodyStr)
                 val spiderInfo = SpiderInfo(galleryInfo.gid, pages)
                 spiderInfo.token = galleryInfo.token
-                readPreviews(body, 0, spiderInfo)
+                readPreviews(bodyStr, 0, spiderInfo)
                 spiderInfo
             }
         }.onFailure {
@@ -381,14 +379,11 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             galleryInfo.gid,
             galleryInfo.token!!,
         )
-        val referer = referer
-        val request = ehRequest(url, referer)
         try {
-            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
-                val body = response.body.string()
-                val list = GalleryMultiPageViewerPTokenParser.parse(body)
-                for (i in list.indices) {
-                    spiderInfo.pTokenMap[i] = list[i]
+            ehRequest(url, referer).execute {
+                val bodyStr = body.string()
+                GalleryMultiPageViewerPTokenParser.parse(bodyStr).forEachIndexed { index, s ->
+                    spiderInfo.pTokenMap[index] = s
                 }
                 return spiderInfo.pTokenMap[index]
             }
@@ -417,12 +412,9 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
             previewIndex,
             false,
         )
-        val referer = referer
-        val request = ehRequest(url, referer)
         try {
-            plainTextOkHttpClient.newCall(request).executeAsync().use { response ->
-                val body = response.body.string()
-                readPreviews(body, previewIndex, spiderInfo)
+            ehRequest(url, referer).execute {
+                readPreviews(body.string(), previewIndex, spiderInfo)
                 return spiderInfo.pTokenMap[index]
             }
         } catch (e: Throwable) {
