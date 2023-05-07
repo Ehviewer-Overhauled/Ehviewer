@@ -18,12 +18,12 @@ package com.hippo.ehviewer.spider
 import android.graphics.ImageDecoder
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
-import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
+import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
@@ -38,7 +38,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Response
-import okhttp3.executeAsync
 import okio.buffer
 import okio.sink
 import java.io.IOException
@@ -136,9 +135,9 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     ): Boolean {
         // TODO: Use HttpEngine[https://developer.android.com/reference/android/net/http/HttpEngine] directly here if available
         // Since we don't want unnecessary copy between jvm heap & native heap
-        nonCacheOkHttpClient.newCall(ehRequest(url, referer)).executeAsync().use {
-            if (it.code >= 400) return false
-            return saveFromHttpResponse(index, it, notifyProgress)
+        ehRequest(url, referer).executeNonCache {
+            if (code >= 400) return false
+            return saveFromHttpResponse(index, this, notifyProgress)
         }
     }
 

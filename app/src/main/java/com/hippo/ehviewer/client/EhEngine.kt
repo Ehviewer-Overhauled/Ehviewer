@@ -18,7 +18,6 @@ package com.hippo.ehviewer.client
 import android.util.Log
 import arrow.fx.coroutines.parZip
 import com.hippo.ehviewer.AppConfig
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -55,13 +54,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.executeAsync
 import org.json.JSONArray
 import org.jsoup.Jsoup
 import java.io.File
 import kotlin.math.ceil
 
-private val okHttpClient = EhApplication.okHttpClient
 private const val TAG = "EhEngine"
 private const val MAX_REQUEST_SIZE = 25
 private const val SAD_PANDA_DISPOSITION = "inline; filename=\"sadpanda.jpg\""
@@ -120,12 +117,12 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 
 private suspend inline fun <T> Request.executeAndParsingWith(block: String.() -> T): T {
     Log.d(TAG, url.toString())
-    return okHttpClient.newCall(this).executeAsync().use { response ->
-        val body = response.body.string()
+    return execute {
+        val body = body.string()
         try {
             block(body)
         } catch (e: Exception) {
-            rethrowExactly(response.code, response.headers, body, e)
+            rethrowExactly(code, headers, body, e)
         }
     }
 }
