@@ -13,7 +13,7 @@ plugins {
 
 android {
     compileSdk = 33
-    buildToolsVersion = "34.0.0 rc2"
+    buildToolsVersion = "33.0.0"
     ndkVersion = "25.2.9519653"
     androidResources.generateLocaleConfig = true
 
