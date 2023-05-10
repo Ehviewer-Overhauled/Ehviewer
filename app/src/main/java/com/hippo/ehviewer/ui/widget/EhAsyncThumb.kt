@@ -1,12 +1,19 @@
 package com.hippo.ehviewer.ui.widget
 
 import android.graphics.drawable.BitmapDrawable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -92,4 +99,20 @@ fun EhAsyncPreview(
         },
         contentScale = contentScale,
     )
+}
+
+@Composable
+fun EhPreviewItem(
+    galleryPreview: GalleryPreview,
+    onClick: (() -> Unit),
+) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(contentAlignment = Alignment.Center) {
+        CrystalCard(
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
+        ) {
+            EhAsyncPreview(model = galleryPreview, modifier = Modifier.fillMaxSize())
+        }
+    }
+    Text((galleryPreview.position + 1).toString())
 }

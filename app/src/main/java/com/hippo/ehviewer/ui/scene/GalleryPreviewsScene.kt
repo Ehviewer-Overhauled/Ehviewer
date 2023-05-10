@@ -20,12 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -76,8 +71,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.ui.widget.CrystalCard
-import com.hippo.ehviewer.ui.widget.EhAsyncPreview
+import com.hippo.ehviewer.ui.widget.EhPreviewItem
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
@@ -130,25 +124,24 @@ class GalleryPreviewsScene : BaseScene() {
                 }
 
                 // No Refresh support
-                val source = remember {
-                    object : PagingSource<Int, GalleryPreview>() {
-                        override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = null
-                        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
-                            val key = params.key
-                            if (key == null) {
-                                return LoadResult.Page(galleryDetail.previewList, null, if (galleryDetail.previewPages == 1) null else pgSize, 0, pages - pgSize)
-                            } else {
-                                val page = key / pgSize
-                                val result = runSuspendCatching { withIOContext { getPreviewListByPage(galleryDetail, page) } }.onFailure { return LoadResult.Error(it) }.getOrThrow()
-                                val more = pages - result.size - key
-                                return LoadResult.Page(result, key - 1, if (more == 0) null else key + result.size, 0, more)
-                            }
+                fun pageSource() = object : PagingSource<Int, GalleryPreview>() {
+                    override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = null
+                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
+                        val key = params.key
+                        if (key == null) {
+                            return LoadResult.Page(galleryDetail.previewList, null, if (galleryDetail.previewPages == 1) null else pgSize, 0, pages - pgSize)
+                        } else {
+                            val page = key / pgSize
+                            val result = runSuspendCatching { withIOContext { getPreviewListByPage(galleryDetail, page) } }.onFailure { return LoadResult.Error(it) }.getOrThrow()
+                            val more = pages - result.size - key
+                            return LoadResult.Page(result, key - 1, if (more == 0) null else key + result.size, 0, more)
                         }
-                        override val jumpingSupported = true
                     }
+                    override val jumpingSupported = true
+                    override val keyReuseSupported = true
                 }
 
-                val data = remember { Pager(PagingConfig(pgSize)) { source }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
+                val data = remember { Pager(PagingConfig(pgSize, jumpThreshold = 3 * pgSize)) { pageSource() }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -187,23 +180,9 @@ class GalleryPreviewsScene : BaseScene() {
                             count = data.itemCount,
                             key = data.itemKey { item -> item.position },
                             contentType = data.itemContentType(),
-                        ) {
-                            data[it]?.run {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        CrystalCard(
-                                            onClick = ::onPreviewCLick.partially1(position),
-                                            modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
-                                        ) {
-                                            EhAsyncPreview(
-                                                model = this@run,
-                                                modifier = Modifier.fillMaxSize(),
-                                            )
-                                        }
-                                    }
-                                    Text((position + 1).toString())
-                                }
-                            }
+                        ) { index ->
+                            val item = data[index]
+                            item?.position?.let { ::onPreviewCLick.partially1(it) }?.let { EhPreviewItem(item, it) }
                         }
                     }
                 }
