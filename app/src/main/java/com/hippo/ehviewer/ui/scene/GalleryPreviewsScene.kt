@@ -18,205 +18,147 @@ package com.hippo.ehviewer.ui.scene
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CallMissedOutgoing
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import arrow.core.partially1
 import coil.imageLoader
 import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.databinding.DialogGoToBinding
-import com.hippo.ehviewer.databinding.SceneGalleryPreviewsBinding
+import com.hippo.ehviewer.ui.widget.CrystalCard
+import com.hippo.ehviewer.ui.widget.EhAsyncPreview
+import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
-import com.hippo.widget.ContentLayout.ContentHelper
-import com.hippo.widget.recyclerview.AutoGridLayoutManager
-import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
+import com.hippo.widget.ContentLayout
+import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
+import com.hippo.widget.rememberContentState
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withUIContext
-import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 
-class GalleryPreviewsScene : BaseToolbarScene() {
-    private var _binding: SceneGalleryPreviewsBinding? = null
-    private val binding
-        get() = _binding!!
-    private var mGalleryDetail: GalleryDetail? = null
-    private var mAdapter: GalleryPreviewsAdapter? = null
-    private var mHelper: GalleryPreviewHelper? = null
-    private var mHasFirstRefresh = false
-    private var mNextPage: Boolean = false
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            onInit()
-        } else {
-            onRestore(savedInstanceState)
-        }
-    }
-
-    private fun onInit() {
-        val args = arguments ?: return
-        mGalleryDetail = args.getParcelableCompat(KEY_GALLERY_DETAIL)
-        mNextPage = args.getBoolean(KEY_NEXT_PAGE)
-    }
-
-    private fun onRestore(savedInstanceState: Bundle) {
-        mGalleryDetail = savedInstanceState.getParcelableCompat(KEY_GALLERY_DETAIL)
-        mHasFirstRefresh = savedInstanceState.getBoolean(KEY_HAS_FIRST_REFRESH)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val hasFirstRefresh: Boolean = if (mHelper != null && 1 == mHelper!!.shownViewIndex) {
-            false
-        } else {
-            mHasFirstRefresh
-        }
-        outState.putBoolean(KEY_HAS_FIRST_REFRESH, hasFirstRefresh)
-        outState.putParcelable(KEY_GALLERY_DETAIL, mGalleryDetail)
-    }
-
-    override fun onCreateViewWithToolbar(
+class GalleryPreviewsScene : BaseScene() {
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SceneGalleryPreviewsBinding.inflate(inflater, container, false)
-        binding.contentLayout.hideFastScroll()
-        setLiftOnScrollTargetView(binding.contentLayout.recyclerView)
-        mAdapter = GalleryPreviewsAdapter {
-            mainActivity!!.startReaderActivity(mGalleryDetail!!, it.position)
-        }
-        binding.contentLayout.recyclerView.adapter = mAdapter
-        val columnWidth = Settings.thumbSize
-        val layoutManager = AutoGridLayoutManager(context, columnWidth)
-        layoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
-        binding.contentLayout.recyclerView.layoutManager = layoutManager
-        binding.contentLayout.recyclerView.clipToPadding = false
-        val padding = resources.getDimensionPixelSize(R.dimen.gallery_grid_margin_h)
-        val decoration = MarginItemDecoration(padding, padding, padding, padding, padding)
-        binding.contentLayout.recyclerView.addItemDecoration(decoration)
-        mHelper = GalleryPreviewHelper()
-        binding.contentLayout.setHelper(mHelper!!)
+        return ComposeView(inflater.context).apply {
+            setMD3Content {
+                val galleryDetail = rememberSaveable { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
+                fun onPreviewCLick(index: Int) = mainActivity!!.startReaderActivity(galleryDetail, index)
+                val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
+                val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
+                val showJumpMenuButton by rememberSaveable { mutableStateOf(false) }
+                // Padding is not subtracted here to have the same column count as gallery list and preview
+                val totalSpace = LocalConfiguration.current.screenWidthDp
+                val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
 
-        // Only refresh for the first time
-        if (!mHasFirstRefresh) {
-            mHasFirstRefresh = true
-            mHelper!!.onGetPageData(
-                0,
-                mGalleryDetail!!.previewPages,
-                0,
-                null,
-                null,
-                mGalleryDetail!!.previewList,
-            )
-        }
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        if (null != mHelper) {
-            if (1 == mHelper!!.shownViewIndex) {
-                mHasFirstRefresh = false
-            }
-        }
-        binding.contentLayout.recyclerView.stopScroll()
-        _binding = null
-        mAdapter = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setTitle(R.string.gallery_previews)
-        setNavigationIcon(R.drawable.v_arrow_left_dark_x24)
-        if (mGalleryDetail != null) {
-            if (mGalleryDetail!!.previewPages > 2) showMenu(R.menu.scene_gallery_previews)
-        }
-        runCatching {
-            if (mNextPage && mHelper!!.pages > 1) mHelper!!.goTo(1)
-        }.onFailure {
-            it.printStackTrace()
-        }
-    }
-
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        val context = context ?: return false
-        val id = item.itemId
-        if (id == R.id.action_go_to) {
-            if (mHelper == null) {
-                return true
-            }
-            val pages = mHelper!!.pages
-            if (pages > 1 && mHelper!!.canGoTo()) {
-                showGoToDialog(context, pages, mHelper!!.pageForBottom)
-            }
-            return true
-        }
-        return false
-    }
-
-    private inner class GalleryPreviewHelper : ContentHelper<GalleryPreview>() {
-        override fun getPageData(
-            taskId: Int,
-            type: Int,
-            page: Int,
-            index: String?,
-            isNext: Boolean,
-        ) {
-            val detail = mGalleryDetail ?: run {
-                onGetException(taskId, EhException(getString(R.string.error_cannot_find_gallery)))
-                return
-            }
-            detail.run {
-                val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
-                lifecycleScope.launchIO {
-                    runSuspendCatching {
-                        EhEngine.getPreviewList(url)
-                    }.onSuccess { result ->
-                        if (Settings.preloadThumbAggressively) {
-                            lifecycleScope.launchIO {
-                                val previewList = result.first.first
-                                previewList.forEach {
-                                    context.run {
-                                        imageLoader.enqueue(imageRequest(it))
+                val state = rememberContentState(galleryDetail.previewList)
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(stringResource(R.string.gallery_previews)) },
+                            navigationIcon = {
+                                IconButton(onClick = { findNavController().popBackStack() }) {
+                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                                }
+                            },
+                            actions = {
+                                if (showJumpMenuButton) {
+                                    IconButton(onClick = ::showGoto) {
+                                        Icon(imageVector = Icons.Default.CallMissedOutgoing, contentDescription = null)
                                     }
                                 }
+                            },
+                            scrollBehavior = scrollBehaviour,
+                        )
+                    },
+                ) {
+                    ContentLayout(state, getData = { page -> getPreviewListByPage(galleryDetail, page) }, modifier = Modifier.padding(top = it.calculateTopPadding())) { data: Array<GalleryPreview> ->
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(columnCount),
+                            modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+                            contentPadding = it,
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
+                        ) {
+                            items(data) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        CrystalCard(
+                                            onClick = ::onPreviewCLick.partially1(it.position),
+                                            modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
+                                        ) {
+                                            EhAsyncPreview(
+                                                model = it,
+                                                modifier = Modifier.fillMaxSize(),
+                                            )
+                                        }
+                                    }
+                                    Text((it.position + 1).toString())
+                                }
                             }
-                        }
-                        withUIContext {
-                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetPageData(taskId, result.second, 0, null, null, result.first.first)
-                        }
-                    }.onFailure { throwable ->
-                        withUIContext {
-                            mHelper?.takeIf { it.isCurrentTask(taskId) }?.onGetException(taskId, throwable)
                         }
                     }
                 }
             }
         }
+    }
 
-        override val context
-            get() = this@GalleryPreviewsScene.requireContext()
-
-        override fun notifyDataSetChanged(callback: () -> Unit) {
-            mAdapter?.submitList(data.toMutableList(), callback)
+    private fun showGoto() {
+        /*
+        val pages = mHelper!!.pages
+        if (pages > 1 && mHelper!!.canGoTo()) {
+            showGoToDialog(requireContext(), pages, mHelper!!.pageForBottom)
         }
 
-        override fun notifyDataSetChanged() {}
+         */
+    }
 
-        override fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {}
-
-        override fun isDuplicate(d1: GalleryPreview, d2: GalleryPreview): Boolean {
-            return false
+    private suspend fun getPreviewListByPage(galleryDetail: GalleryDetail, page: Int): List<GalleryPreview> {
+        galleryDetail.run {
+            val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
+            val result = EhEngine.getPreviewList(url)
+            if (Settings.preloadThumbAggressively) {
+                lifecycleScope.launchIO { context?.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it)) } } }
+            }
+            return result.first.first
         }
     }
 
@@ -231,7 +173,7 @@ class GalleryPreviewsScene : BaseToolbarScene() {
             .setView(dialogBinding.root)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val page = (dialogBinding.slider.value - 1).toInt()
-                mHelper!!.goTo(page)
+                // mHelper!!.goTo(page)
             }
             .create()
         dialog.show()
@@ -240,6 +182,5 @@ class GalleryPreviewsScene : BaseToolbarScene() {
     companion object {
         const val KEY_GALLERY_DETAIL = "gallery_detail"
         const val KEY_NEXT_PAGE = "next_page"
-        private const val KEY_HAS_FIRST_REFRESH = "has_first_refresh"
     }
 }
