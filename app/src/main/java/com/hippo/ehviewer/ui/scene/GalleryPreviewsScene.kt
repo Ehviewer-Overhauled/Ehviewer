@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CallMissedOutgoing
@@ -37,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -74,6 +76,7 @@ import com.hippo.util.getParcelableCompat
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withIOContext
+import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 
@@ -132,9 +135,15 @@ class GalleryPreviewsScene : BaseScene() {
                         )
                     },
                 ) { paddingValues ->
+                    val state = rememberLazyGridState()
+                    LaunchedEffect(toNextPage) {
+                        delay(500) // Should we wait this animation?
+                        if (toNextPage) state.scrollToItem(pgSize)
+                    }
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(columnCount),
                         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+                        state = state,
                         contentPadding = paddingValues,
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
                         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
