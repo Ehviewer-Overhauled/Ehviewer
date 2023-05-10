@@ -13,30 +13,46 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-interface DialogScope {
-    fun dismiss()
+interface DialogScope<R> {
+    infix fun shouldReturn(value: R)
 }
 
-class DialogState : DialogScope {
+class DialogState {
     private var content: (@Composable () -> Unit)? by mutableStateOf(null)
 
     @Composable
     fun Handler() = content?.invoke()
 
-    override fun dismiss() {
+    fun dismiss() {
         content = null
     }
 
-    suspend fun show(block: @Composable DialogScope.() -> Unit) {
+    suspend fun <R> show(initial: R, @StringRes title: Int? = null, block: @Composable DialogScope<R>.() -> Unit): R {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation { dismiss() }
             content = {
+                var result by remember { mutableStateOf(initial) }
                 AlertDialog(
                     onDismissRequest = {
+                        cont.cancel()
                         dismiss()
-                        cont.resume(Unit)
                     },
-                    content = { block() },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            dismiss()
+                            cont.resume(result)
+                        }) {
+                            Text(text = stringResource(id = android.R.string.ok))
+                        }
+                    },
+                    title = title?.let { { Text(text = stringResource(id = title)) } },
+                    text = {
+                        block(object : DialogScope<R> {
+                            override infix fun shouldReturn(value: R) {
+                                result = value
+                            }
+                        })
+                    },
                 )
             }
         }

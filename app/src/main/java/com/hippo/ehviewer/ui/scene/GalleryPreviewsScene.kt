@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,9 +22,13 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -35,12 +38,17 @@ import androidx.compose.material.icons.filled.CallMissedOutgoing
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -48,6 +56,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
@@ -60,7 +69,6 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import arrow.core.partially1
 import coil.imageLoader
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -68,17 +76,19 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.databinding.DialogGoToBinding
 import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
+import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withIOContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class GalleryPreviewsScene : BaseScene() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -91,9 +101,33 @@ class GalleryPreviewsScene : BaseScene() {
                 // Padding is not subtracted here to have the same column count as gallery list and preview
                 val totalSpace = LocalConfiguration.current.screenWidthDp
                 val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
-
+                val state = rememberLazyGridState()
+                val dialogState = rememberDialogState()
+                dialogState.Handler()
+                val coroutineScope = rememberCoroutineScope()
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
+
+                suspend fun showGoToDialog() {
+                    val goto = dialogState.show(initial = 1, title = R.string.go_to) {
+                        var jumpTo by remember { mutableStateOf(1f) }
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 18.dp)) {
+                            Text(text = String.format(Locale.US, "%d", 1), modifier = Modifier.padding(12.dp))
+                            Slider(
+                                value = jumpTo,
+                                onValueChange = { jumpTo = it },
+                                modifier = Modifier.height(48.dp).width(0.dp).weight(1F).align(Alignment.CenterVertically),
+                                valueRange = 1f..galleryDetail.previewPages.toFloat(),
+                                steps = galleryDetail.previewPages - 2,
+                                onValueChangeFinished = {
+                                    this@show shouldReturn jumpTo.roundToInt()
+                                },
+                            )
+                            Text(text = String.format(Locale.US, "%d", pages), modifier = Modifier.padding(12.dp))
+                        }
+                    }
+                    state.scrollToItem((goto - 1) * pgSize)
+                }
 
                 // No Refresh support
                 val source = remember {
@@ -126,7 +160,9 @@ class GalleryPreviewsScene : BaseScene() {
                             },
                             actions = {
                                 if (galleryDetail.previewPages > 1) {
-                                    IconButton(onClick = ::showGoto) {
+                                    IconButton(onClick = {
+                                        coroutineScope.launch { showGoToDialog() }
+                                    }) {
                                         Icon(imageVector = Icons.Default.CallMissedOutgoing, contentDescription = null)
                                     }
                                 }
@@ -135,7 +171,6 @@ class GalleryPreviewsScene : BaseScene() {
                         )
                     },
                 ) { paddingValues ->
-                    val state = rememberLazyGridState()
                     LaunchedEffect(toNextPage) {
                         delay(500) // Should we wait this animation?
                         if (toNextPage) state.scrollToItem(pgSize)
@@ -176,16 +211,6 @@ class GalleryPreviewsScene : BaseScene() {
         }
     }
 
-    private fun showGoto() {
-        /*
-        val pages = mHelper!!.pages
-        if (pages > 1 && mHelper!!.canGoTo()) {
-            showGoToDialog(requireContext(), pages, mHelper!!.pageForBottom)
-        }
-
-         */
-    }
-
     private suspend fun getPreviewListByPage(galleryDetail: GalleryDetail, page: Int): List<GalleryPreview> {
         galleryDetail.run {
             val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
@@ -195,23 +220,6 @@ class GalleryPreviewsScene : BaseScene() {
             }
             return result.first.first
         }
-    }
-
-    private fun showGoToDialog(context: Context, pages: Int, currentPage: Int) {
-        val dialogBinding = DialogGoToBinding.inflate(layoutInflater)
-        dialogBinding.start.text = String.format(Locale.US, "%d", 1)
-        dialogBinding.end.text = String.format(Locale.US, "%d", pages)
-        dialogBinding.slider.valueTo = pages.toFloat()
-        dialogBinding.slider.value = (currentPage + 1).toFloat()
-        val dialog = BaseDialogBuilder(context)
-            .setTitle(R.string.go_to)
-            .setView(dialogBinding.root)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val page = (dialogBinding.slider.value - 1).toInt()
-                // mHelper!!.goTo(page)
-            }
-            .create()
-        dialog.show()
     }
 
     companion object {
