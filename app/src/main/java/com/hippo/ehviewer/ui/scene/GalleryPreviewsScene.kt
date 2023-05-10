@@ -26,10 +26,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CallMissedOutgoing
@@ -39,8 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +48,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import arrow.core.partially1
 import coil.imageLoader
 import com.hippo.app.BaseDialogBuilder
@@ -66,30 +71,47 @@ import com.hippo.ehviewer.ui.widget.CrystalCard
 import com.hippo.ehviewer.ui.widget.EhAsyncPreview
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
-import com.hippo.widget.ContentLayout
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
-import com.hippo.widget.rememberContentState
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withIOContext
+import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 
 class GalleryPreviewsScene : BaseScene() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
                 val galleryDetail = rememberSaveable { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
                 fun onPreviewCLick(index: Int) = mainActivity!!.startReaderActivity(galleryDetail, index)
                 val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
                 val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
-                val showJumpMenuButton by rememberSaveable { mutableStateOf(false) }
                 // Padding is not subtracted here to have the same column count as gallery list and preview
                 val totalSpace = LocalConfiguration.current.screenWidthDp
                 val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
 
-                val state = rememberContentState(galleryDetail.previewList)
+                val pages = galleryDetail.pages
+                val pgSize = galleryDetail.previewList.size
+
+                // No Refresh support
+                val source = remember {
+                    object : PagingSource<Int, GalleryPreview>() {
+                        override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = null
+                        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
+                            val key = params.key
+                            if (key == null) {
+                                return LoadResult.Page(galleryDetail.previewList, null, if (galleryDetail.previewPages == 1) null else pgSize, 0, pages - pgSize)
+                            } else {
+                                val page = key / pgSize
+                                val result = runSuspendCatching { withIOContext { getPreviewListByPage(galleryDetail, page) } }.onFailure { return LoadResult.Error(it) }.getOrThrow()
+                                val more = pages - result.size - key
+                                return LoadResult.Page(result, key - 1, if (more == 0) null else key + result.size, 0, more)
+                            }
+                        }
+                        override val jumpingSupported = true
+                    }
+                }
+
+                val data = remember { Pager(PagingConfig(pgSize)) { source }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -100,7 +122,7 @@ class GalleryPreviewsScene : BaseScene() {
                                 }
                             },
                             actions = {
-                                if (showJumpMenuButton) {
+                                if (galleryDetail.previewPages > 1) {
                                     IconButton(onClick = ::showGoto) {
                                         Icon(imageVector = Icons.Default.CallMissedOutgoing, contentDescription = null)
                                     }
@@ -109,29 +131,33 @@ class GalleryPreviewsScene : BaseScene() {
                             scrollBehavior = scrollBehaviour,
                         )
                     },
-                ) {
-                    ContentLayout(state, getData = { page -> getPreviewListByPage(galleryDetail, page) }, modifier = Modifier.padding(top = it.calculateTopPadding())) { data: Array<GalleryPreview> ->
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(columnCount),
-                            modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-                            contentPadding = it,
-                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
-                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
+                ) { paddingValues ->
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(columnCount),
+                        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+                        contentPadding = paddingValues,
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
+                    ) {
+                        items(
+                            count = data.itemCount,
+                            key = data.itemKey { item -> item.position },
+                            contentType = data.itemContentType(),
                         ) {
-                            items(data) {
+                            data[it]?.run {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Box(contentAlignment = Alignment.Center) {
                                         CrystalCard(
-                                            onClick = ::onPreviewCLick.partially1(it.position),
+                                            onClick = ::onPreviewCLick.partially1(position),
                                             modifier = Modifier.fillMaxWidth().aspectRatio(0.6666667F),
                                         ) {
                                             EhAsyncPreview(
-                                                model = it,
+                                                model = this@run,
                                                 modifier = Modifier.fillMaxSize(),
                                             )
                                         }
                                     }
-                                    Text((it.position + 1).toString())
+                                    Text((position + 1).toString())
                                 }
                             }
                         }
