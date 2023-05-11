@@ -34,6 +34,7 @@ import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.unifile.UniFile
 import com.hippo.util.requestPermission
 import com.hippo.yorozuya.collect.LongList
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchNow
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -233,4 +234,12 @@ suspend fun removeFromFavorites(galleryInfo: GalleryInfo) {
     withUIContext {
         favouriteStatusRouter.modifyFavourites(galleryInfo.gid, -2)
     }
+}
+
+fun Context.navToReader(info: GalleryInfo, page: Int) {
+    val intent = Intent(this, ReaderActivity::class.java)
+    intent.action = ReaderActivity.ACTION_EH
+    intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
+    intent.putExtra(ReaderActivity.KEY_PAGE, page)
+    startActivity(intent)
 }

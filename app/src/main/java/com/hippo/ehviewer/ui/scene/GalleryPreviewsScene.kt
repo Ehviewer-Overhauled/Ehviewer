@@ -48,9 +48,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.Pager
@@ -69,6 +71,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.widget.EhPreviewItem
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
@@ -83,12 +86,13 @@ import kotlin.math.roundToInt
 
 typealias PreviewPage = List<GalleryPreview>
 
-class GalleryPreviewsScene : BaseScene() {
+class GalleryPreviewsScene : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
                 val galleryDetail = rememberSaveable { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
-                fun onPreviewCLick(index: Int) = mainActivity!!.startReaderActivity(galleryDetail, index)
+                val context = LocalContext.current
+                fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
                 val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
                 val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
                 // Padding is not subtracted here to have the same column count as gallery list and preview
