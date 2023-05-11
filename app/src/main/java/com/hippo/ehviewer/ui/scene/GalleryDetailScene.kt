@@ -102,7 +102,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -173,7 +172,7 @@ import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.util.getSystemService
 import com.hippo.widget.ObservedTextView
-import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
+import com.hippo.widget.recyclerview.calculateSuitableSpanCount
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ViewUtils
 import com.hippo.yorozuya.collect.IntList
@@ -527,9 +526,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             composeBindingGD?.let { if (showSheet) GalleryInfoBottomSheet(galleryDetail = it) { showSheet = false } }
         }
         val windowSizeClass = calculateWindowSizeClass(requireActivity())
-        // Padding is not subtracted here to have the same column count as gallery list and preview
-        val totalSpace = LocalConfiguration.current.screenWidthDp
-        val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
+        val columnCount = calculateSuitableSpanCount()
         when (windowSizeClass.widthSizeClass) {
             WindowWidthSizeClass.Medium, WindowWidthSizeClass.Compact -> LazyVerticalGrid(
                 columns = GridCells.Fixed(columnCount),

@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -61,7 +60,7 @@ import com.hippo.ehviewer.ui.widget.EhPreviewItem
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
-import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
+import com.hippo.widget.recyclerview.calculateSuitableSpanCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
@@ -78,9 +77,7 @@ class GalleryPreviewScreen : Fragment() {
                 fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
                 val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
                 val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
-                // Padding is not subtracted here to have the same column count as gallery list and preview
-                val totalSpace = LocalConfiguration.current.screenWidthDp
-                val columnCount = getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
+                val columnCount = calculateSuitableSpanCount()
                 val state = rememberLazyGridState()
                 val dialogState = rememberDialogState()
                 dialogState.Handler()

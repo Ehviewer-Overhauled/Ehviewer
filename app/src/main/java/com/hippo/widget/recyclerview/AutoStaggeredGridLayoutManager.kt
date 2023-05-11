@@ -16,8 +16,11 @@
 package com.hippo.widget.recyclerview
 
 import android.view.View
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.hippo.ehviewer.Settings
 import kotlin.math.roundToInt
 
 class AutoStaggeredGridLayoutManager(columnSize: Int, orientation: Int) :
@@ -96,6 +99,12 @@ const val STRATEGY_MIN_SIZE = 0
 const val STRATEGY_SUITABLE_SIZE = 1
 fun getSpanCountForSuitableSize(total: Int, single: Int): Int {
     return (total / single.toFloat()).roundToInt().coerceAtLeast(1)
+}
+
+@Composable
+fun calculateSuitableSpanCount(): Int {
+    val totalSpace = LocalConfiguration.current.screenWidthDp
+    return getSpanCountForSuitableSize(totalSpace, Settings.thumbSizeDp)
 }
 
 fun getSpanCountForMinSize(total: Int, single: Int): Int {
