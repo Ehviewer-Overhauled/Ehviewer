@@ -56,6 +56,7 @@ class ListGalleryHolder(
                 onLongClick = onLongClick,
                 info = galleryInfo,
                 modifier = Modifier.height(height),
+                isInFavScene = !showFavourited,
             )
         }
     }
