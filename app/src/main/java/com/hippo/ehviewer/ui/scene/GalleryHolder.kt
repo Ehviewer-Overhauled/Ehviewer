@@ -48,6 +48,7 @@ class ListGalleryHolder(
 ) : GalleryHolder(composeView) {
 
     private val height = (Settings.listThumbSize * 3).pxToDp.dp
+    private val showPages = Settings.showGalleryPages
 
     override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
         composeView.setMD3Content {
@@ -57,6 +58,7 @@ class ListGalleryHolder(
                 info = galleryInfo,
                 modifier = Modifier.height(height),
                 isInFavScene = !showFavourited,
+                showPages = showPages,
             )
         }
     }

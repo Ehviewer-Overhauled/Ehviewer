@@ -2,6 +2,7 @@ package com.hippo.ehviewer.ui.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ fun ListInfoCard(
     info: GalleryInfo,
     modifier: Modifier = Modifier,
     isInFavScene: Boolean = false,
+    showPages: Boolean = false,
 ) {
     CrystalCard(modifier = Modifier.padding(6.dp)) {
         Row(
@@ -82,7 +84,10 @@ fun ListInfoCard(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Column(horizontalAlignment = Alignment.End) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 if (DownloadManager.containDownloadInfo(info.gid)) {
                                     Icon(
                                         Icons.Default.Download,
@@ -98,6 +103,9 @@ fun ListInfoCard(
                                     )
                                 }
                                 Text(text = info.simpleLanguage.orEmpty())
+                                if (info.pages != 0 && showPages) {
+                                    Text(text = "${info.pages}P")
+                                }
                             }
                             Text(text = info.posted.orEmpty())
                         }
