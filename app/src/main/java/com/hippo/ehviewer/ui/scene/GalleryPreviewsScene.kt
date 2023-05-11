@@ -60,9 +60,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import arrow.core.partially1
+import arrow.fx.coroutines.parMap
 import coil.imageLoader
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -77,12 +76,14 @@ import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.withIOContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
 import kotlin.math.roundToInt
+
+typealias PreviewPage = List<GalleryPreview>
 
 class GalleryPreviewsScene : BaseScene() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -101,6 +102,7 @@ class GalleryPreviewsScene : BaseScene() {
                 val coroutineScope = rememberCoroutineScope()
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
+                var initialKey by rememberSaveable { mutableStateOf(1) }
 
                 suspend fun showGoToDialog() {
                     val goto = dialogState.show(initial = 1, title = R.string.go_to) {
@@ -120,28 +122,33 @@ class GalleryPreviewsScene : BaseScene() {
                             Text(text = String.format(Locale.US, "%d", pages), modifier = Modifier.padding(12.dp))
                         }
                     }
-                    state.scrollToItem((goto - 1) * pgSize)
+                    initialKey = goto
                 }
 
+                val previewPagesMap = rememberSaveable { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
+
                 // No Refresh support
-                fun pageSource() = object : PagingSource<Int, GalleryPreview>() {
-                    override fun getRefreshKey(state: PagingState<Int, GalleryPreview>) = null
-                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryPreview> {
-                        val key = params.key
-                        if (key == null) {
-                            return LoadResult.Page(galleryDetail.previewList, null, if (galleryDetail.previewPages == 1) null else pgSize, 0, pages - pgSize)
-                        } else {
-                            val page = key / pgSize
-                            val result = runSuspendCatching { withIOContext { getPreviewListByPage(galleryDetail, page) } }.onFailure { return LoadResult.Error(it) }.getOrThrow()
-                            val more = pages - result.size - key
-                            return LoadResult.Page(result, key - 1, if (more == 0) null else key + result.size, 0, more)
+                fun pageSource() = object : PagingSource<Int, PreviewPage>() {
+                    override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2).coerceAtLeast(0)
+                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
+                        val up = params.key ?: 1
+                        val end = up + params.loadSize - 1
+                        runSuspendCatching {
+                            (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
+                                .parMap(Dispatchers.IO) { getPreviewListByPage(galleryDetail, it - 1).apply { previewPagesMap[it] = this } }
+                        }.onFailure {
+                            return LoadResult.Error(it)
                         }
+                        val r = (up..end).map { previewPagesMap[it]!! }
+                        val prevK = if (up == 1) null else up - 1
+                        val nextK = if (end == galleryDetail.previewPages) null else end + 1
+                        return LoadResult.Page(r, prevK, nextK)
                     }
                     override val jumpingSupported = true
                     override val keyReuseSupported = true
                 }
 
-                val data = remember { Pager(PagingConfig(pgSize, jumpThreshold = 3 * pgSize)) { pageSource() }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
+                val data = remember(initialKey) { Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1, jumpThreshold = 3), initialKey) { pageSource() }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -176,13 +183,14 @@ class GalleryPreviewsScene : BaseScene() {
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
                         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
                     ) {
+                        val readList = data.itemSnapshotList.items.flatten()
                         items(
-                            count = data.itemCount,
-                            key = data.itemKey { item -> item.position },
-                            contentType = data.itemContentType(),
+                            count = readList.size,
+                            key = { readList[it].position },
                         ) { index ->
-                            val item = data[index]
-                            item?.position?.let { ::onPreviewCLick.partially1(it) }?.let { EhPreviewItem(item, it) }
+                            data[index / pgSize] // Trigger item preload
+                            val item = readList[index]
+                            item.position.let { ::onPreviewCLick.partially1(it) }.let { EhPreviewItem(item, it) }
                         }
                     }
                 }
