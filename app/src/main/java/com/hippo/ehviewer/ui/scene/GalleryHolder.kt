@@ -30,7 +30,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.widget.EhAsyncThumb
-import com.hippo.ehviewer.ui.widget.ListInfoCard
+import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.util.system.pxToDp
 
@@ -52,7 +52,7 @@ class ListGalleryHolder(
 
     override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
         composeView.setMD3Content {
-            ListInfoCard(
+            GalleryInfoListItem(
                 onClick = onClick,
                 onLongClick = onLongClick,
                 info = galleryInfo,

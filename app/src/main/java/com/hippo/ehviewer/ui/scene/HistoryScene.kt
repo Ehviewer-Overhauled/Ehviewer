@@ -73,8 +73,8 @@ import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.Deferred
+import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
 import com.hippo.ehviewer.ui.widget.LazyColumnWithScrollBar
-import com.hippo.ehviewer.ui.widget.ListInfoCard
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
@@ -153,7 +153,7 @@ class HistoryScene : BaseScene() {
                                     dismissContent = {
                                         // TODO: item delete & add animation
                                         // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                        ListInfoCard(
+                                        GalleryInfoListItem(
                                             onClick = ::onItemClick.partially1(it),
                                             onLongClick = ::onItemLongClick.partially1(it),
                                             info = it,

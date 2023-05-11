@@ -31,7 +31,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
 
 @Composable
-fun ListInfoCard(
+fun GalleryInfoListItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     info: GalleryInfo,
