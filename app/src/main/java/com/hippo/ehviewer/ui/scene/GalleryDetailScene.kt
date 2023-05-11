@@ -1273,8 +1273,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun navigateToPreview(nextPage: Boolean = false) {
         composeBindingGD?.let {
             val args = Bundle()
-            args.putParcelable(GalleryPreviewsScene.KEY_GALLERY_DETAIL, it)
-            args.putBoolean(GalleryPreviewsScene.KEY_NEXT_PAGE, nextPage)
+            args.putParcelable(KEY_GALLERY_DETAIL, it)
+            args.putBoolean(KEY_NEXT_PAGE, nextPage)
             navigate(R.id.galleryPreviewsScene, args)
         }
     }

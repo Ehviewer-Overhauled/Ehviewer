@@ -1,18 +1,3 @@
-/*
- * Copyright 2016 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.hippo.ehviewer.ui.scene
 
 import android.os.Bundle
@@ -77,16 +62,14 @@ import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.util.getParcelableCompat
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
-import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
-import java.util.Locale
 import kotlin.math.roundToInt
 
 typealias PreviewPage = List<GalleryPreview>
 
-class GalleryPreviewsScene : Fragment() {
+class GalleryPreviewsScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
@@ -101,16 +84,27 @@ class GalleryPreviewsScene : Fragment() {
                 val state = rememberLazyGridState()
                 val dialogState = rememberDialogState()
                 dialogState.Handler()
-                val coroutineScope = rememberCoroutineScope()
+                val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
                 var initialKey by rememberSaveable { mutableStateOf(if (toNextPage) 2 else 1) }
+
+                suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
+                    val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
+                    val result = EhEngine.getPreviewList(url)
+                    if (Settings.preloadThumbAggressively) {
+                        coroutineScope.launch {
+                            context.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it)) } }
+                        }
+                    }
+                    result.first.first
+                }
 
                 suspend fun showGoToDialog() {
                     val goto = dialogState.show(initial = 1, title = R.string.go_to) {
                         var jumpTo by remember { mutableStateOf(1f) }
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 18.dp)) {
-                            Text(text = String.format(Locale.US, "%d", 1), modifier = Modifier.padding(12.dp))
+                            Text(text = "1", modifier = Modifier.padding(12.dp))
                             Slider(
                                 value = jumpTo,
                                 onValueChange = { jumpTo = it },
@@ -121,7 +115,7 @@ class GalleryPreviewsScene : Fragment() {
                                     this@show shouldReturn jumpTo.roundToInt()
                                 },
                             )
-                            Text(text = String.format(Locale.US, "%d", pages), modifier = Modifier.padding(12.dp))
+                            Text(text = pages.toString(), modifier = Modifier.padding(12.dp))
                         }
                     }
                     initialKey = goto
@@ -137,7 +131,7 @@ class GalleryPreviewsScene : Fragment() {
                                 val end = up + params.loadSize - 1
                                 runSuspendCatching {
                                     (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
-                                        .parMap(Dispatchers.IO) { getPreviewListByPage(galleryDetail, it - 1).apply { previewPagesMap[it] = this } }
+                                        .parMap(Dispatchers.IO) { getPreviewListByPage(it - 1).apply { previewPagesMap[it] = this } }
                                 }.onFailure {
                                     return LoadResult.Error(it)
                                 }
@@ -195,20 +189,7 @@ class GalleryPreviewsScene : Fragment() {
             }
         }
     }
-
-    private suspend fun getPreviewListByPage(galleryDetail: GalleryDetail, page: Int): List<GalleryPreview> {
-        galleryDetail.run {
-            val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
-            val result = EhEngine.getPreviewList(url)
-            if (Settings.preloadThumbAggressively) {
-                lifecycleScope.launchIO { context?.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it)) } } }
-            }
-            return result.first.first
-        }
-    }
-
-    companion object {
-        const val KEY_GALLERY_DETAIL = "gallery_detail"
-        const val KEY_NEXT_PAGE = "next_page"
-    }
 }
+
+const val KEY_GALLERY_DETAIL = "gallery_detail"
+const val KEY_NEXT_PAGE = "next_page"
