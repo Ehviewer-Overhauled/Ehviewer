@@ -17,24 +17,20 @@ package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
+import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.databinding.ItemGalleryGridBinding
-import com.hippo.ehviewer.databinding.ItemGalleryListBinding
 import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 
-internal abstract class GalleryAdapter(
-    private val mInflater: LayoutInflater,
+abstract class GalleryAdapter(
     private val mResources: Resources,
     private val mRecyclerView: RecyclerView,
     type: Int,
@@ -125,24 +121,17 @@ internal abstract class GalleryAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryHolder {
         val holder = when (viewType) {
             TYPE_LIST -> ListGalleryHolder(
-                ItemGalleryListBinding.inflate(mInflater, parent, false),
+                ComposeView(parent.context),
                 mShowFavourited,
             )
-
-            TYPE_GRID -> GridGalleryHolder(ItemGalleryGridBinding.inflate(mInflater, parent, false))
+            TYPE_GRID -> GridGalleryHolder(ComposeView(parent.context))
             else -> throw IllegalStateException("Unexpected value: $viewType")
-        }
-        holder.itemView.setOnClickListener {
-            onItemClick(holder.itemView, holder.bindingAdapterPosition)
-        }
-        holder.itemView.setOnLongClickListener {
-            onItemLongClick(holder.itemView, holder.bindingAdapterPosition)
         }
         return holder
     }
 
-    abstract fun onItemClick(view: View, position: Int)
-    abstract fun onItemLongClick(view: View, position: Int): Boolean
+    abstract fun onItemClick(position: Int)
+    abstract fun onItemLongClick(position: Int): Boolean
     override fun getItemViewType(position: Int): Int {
         return mType
     }
@@ -151,7 +140,11 @@ internal abstract class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryHolder, position: Int) {
         val gi = getDataAt(position) ?: return
-        holder.bind(gi)
+        holder.bind(
+            gi,
+            { onItemClick(position) },
+            { onItemLongClick(position) },
+        )
     }
 
     @IntDef(TYPE_LIST, TYPE_GRID)

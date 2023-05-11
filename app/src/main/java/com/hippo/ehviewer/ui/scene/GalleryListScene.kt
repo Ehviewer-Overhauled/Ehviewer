@@ -1257,16 +1257,16 @@ class GalleryListScene :
         resources: Resources,
         recyclerView: RecyclerView,
         type: Int,
-    ) : GalleryAdapter(inflater, resources, recyclerView, type, true) {
+    ) : GalleryAdapter(resources, recyclerView, type, true) {
         override fun getItemCount(): Int {
             return if (null != mHelper) mHelper!!.size() else 0
         }
 
-        override fun onItemClick(view: View, position: Int) {
+        override fun onItemClick(position: Int) {
             this@GalleryListScene.onItemClick(position)
         }
 
-        override fun onItemLongClick(view: View, position: Int): Boolean {
+        override fun onItemLongClick(position: Int): Boolean {
             return this@GalleryListScene.onItemLongClick(position)
         }
 
