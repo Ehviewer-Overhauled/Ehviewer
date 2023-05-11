@@ -125,7 +125,7 @@ class GalleryPreviewsScene : BaseScene() {
 
                 val previewPagesMap = rememberSaveable { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
                 val data = remember(initialKey) {
-                    Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
+                    Pager(PagingConfig(1, prefetchDistance = 4, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
                         object : PagingSource<Int, PreviewPage>() {
                             override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
                             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
@@ -177,13 +177,13 @@ class GalleryPreviewsScene : BaseScene() {
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_h)),
                         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.gallery_grid_margin_v)),
                     ) {
-                        val readList = data.itemSnapshotList.items.flatten()
+                        val realList = data.itemSnapshotList.items.flatten()
                         items(
-                            count = readList.size,
-                            key = { readList[it].position },
+                            count = realList.size,
+                            key = { realList[it].position },
                         ) { index ->
                             data[index / pgSize] // Trigger item preload
-                            val item = readList[index]
+                            val item = realList[index]
                             item.position.let { ::onPreviewCLick.partially1(it) }.let { EhPreviewItem(item, it) }
                         }
                     }
