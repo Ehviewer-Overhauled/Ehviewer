@@ -38,7 +38,7 @@ abstract class GalleryHolder(composeView: ComposeView) : RecyclerView.ViewHolder
 
 class ListGalleryHolder(
     private val composeView: ComposeView,
-    private val showFavourited: Boolean,
+    private val showFavourite: Boolean,
 ) : GalleryHolder(composeView) {
 
     private val height = (Settings.listThumbSize * 3).pxToDp.dp
@@ -51,7 +51,7 @@ class ListGalleryHolder(
                 onLongClick = onLongClick,
                 info = galleryInfo,
                 modifier = Modifier.height(height),
-                isInFavScene = !showFavourited,
+                isInFavScene = !showFavourite,
                 showPages = showPages,
             )
         }
