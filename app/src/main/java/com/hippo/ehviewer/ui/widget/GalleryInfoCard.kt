@@ -63,11 +63,13 @@ fun ListInfoCard(
                 ProvideTextStyle(MaterialTheme.typography.labelLarge) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Column {
-                            Text(
-                                text = info.uploader ?: "(DISOWNED)",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
+                            if (!isInFavScene) {
+                                Text(
+                                    text = info.uploader ?: "(DISOWNED)",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                             GalleryListCardRating(rating = info.rating)
                             val categoryColor = EhUtils.getCategoryColor(info.category)
                             val categoryText = EhUtils.getCategory(info.category).uppercase()
