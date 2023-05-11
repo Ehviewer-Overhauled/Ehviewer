@@ -26,9 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.SoftwareKeyboardControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
@@ -38,7 +36,6 @@ import com.hippo.ehviewer.ui.MainActivity
 import rikka.core.res.resolveDrawable
 
 abstract class BaseScene : Fragment() {
-    private var insetsController: WindowInsetsControllerCompat? = null
     private var drawerView: View? = null
     private var drawerViewState: SparseArray<Parcelable?>? = null
     fun addAboveSnackView(view: View?) {
@@ -163,6 +160,7 @@ abstract class BaseScene : Fragment() {
         } else {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
         }
+        hideSoftInput()
         mainActivity!!.createDrawerView(this)
     }
 
@@ -186,37 +184,7 @@ abstract class BaseScene : Fragment() {
             }
         }
 
-    fun hideSoftInput() {
-        val insetsController = getInsetsController()
-        insetsController?.hide(WindowInsetsCompat.Type.ime())
-    }
-
-    fun showSoftInput(view: View?) {
-        if (view != null) {
-            view.requestFocus()
-            view.post(
-                Runnable {
-                    val insetsController = getInsetsController()
-                    insetsController?.show(WindowInsetsCompat.Type.ime())
-                },
-            )
-        }
-    }
-
-    private fun getInsetsController(): WindowInsetsControllerCompat? {
-        if (insetsController == null) {
-            val activity = activity
-            if (activity != null) {
-                insetsController = ViewCompat.getWindowInsetsController(activity.window.decorView)
-            }
-        }
-        return insetsController
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        insetsController = null
-    }
+    fun hideSoftInput() = activity?.window?.decorView?.run { SoftwareKeyboardControllerCompat(this) }?.hide()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
