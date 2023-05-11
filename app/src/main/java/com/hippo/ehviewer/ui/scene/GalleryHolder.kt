@@ -15,28 +15,15 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Badge
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.GalleryInfoGridItem
 import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.util.system.pxToDp
@@ -73,30 +60,13 @@ class ListGalleryHolder(
 
 class GridGalleryHolder(private val composeView: ComposeView) : GalleryHolder(composeView) {
     override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
-        val aspect = (galleryInfo.thumbWidth.toFloat() / galleryInfo.thumbHeight).coerceIn(0.33F, 1.5F)
-        val color = EhUtils.getCategoryColor(galleryInfo.category)
-        val simpleLang = galleryInfo.simpleLanguage
         composeView.setMD3Content {
-            ElevatedCard(modifier = Modifier.padding(2.dp)) {
-                Box {
-                    EhAsyncThumb(
-                        model = galleryInfo.thumb,
-                        modifier = Modifier.aspectRatio(aspect).fillMaxWidth().combinedClickable(
-                            onClick = onClick,
-                            onLongClick = onLongClick,
-                        ),
-                        contentScale = ContentScale.Crop,
-                    )
-                    val container = Color(color)
-                    Badge(
-                        modifier = Modifier.align(Alignment.TopEnd).width(32.dp).height(24.dp),
-                        containerColor = container,
-                        contentColor = contentColorFor(container),
-                    ) {
-                        Text(text = simpleLang?.uppercase().orEmpty())
-                    }
-                }
-            }
+            GalleryInfoGridItem(
+                onClick = onClick,
+                onLongClick = onLongClick,
+                info = galleryInfo,
+                modifier = Modifier.padding(2.dp),
+            )
         }
     }
 }
