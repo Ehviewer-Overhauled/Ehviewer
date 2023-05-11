@@ -31,10 +31,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
+import eu.kanade.tachiyomi.util.lang.launchUI
+import kotlinx.coroutines.delay
 import rikka.core.res.resolveDrawable
 
 abstract class BaseScene : Fragment() {
@@ -164,8 +167,12 @@ abstract class BaseScene : Fragment() {
             setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
         }
 
-        // Hide soft ime
-        hideSoftInput()
+        lifecycleScope.launchUI {
+            delay(500)
+            // Hide soft ime
+            hideSoftInput()
+        }
+
         mainActivity!!.createDrawerView(this)
     }
 
