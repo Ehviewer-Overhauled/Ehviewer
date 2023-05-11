@@ -37,7 +37,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,7 +76,6 @@ import com.hippo.util.getParcelableCompat
 import com.hippo.widget.recyclerview.getSpanCountForSuitableSize
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
 import java.util.Locale
@@ -102,7 +100,7 @@ class GalleryPreviewsScene : BaseScene() {
                 val coroutineScope = rememberCoroutineScope()
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
-                var initialKey by rememberSaveable { mutableStateOf(1) }
+                var initialKey by rememberSaveable { mutableStateOf(if (toNextPage) 2 else 1) }
 
                 suspend fun showGoToDialog() {
                     val goto = dialogState.show(initial = 1, title = R.string.go_to) {
@@ -126,29 +124,29 @@ class GalleryPreviewsScene : BaseScene() {
                 }
 
                 val previewPagesMap = rememberSaveable { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
-
-                // No Refresh support
-                fun pageSource() = object : PagingSource<Int, PreviewPage>() {
-                    override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2).coerceAtLeast(0)
-                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
-                        val up = params.key ?: 1
-                        val end = up + params.loadSize - 1
-                        runSuspendCatching {
-                            (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
-                                .parMap(Dispatchers.IO) { getPreviewListByPage(galleryDetail, it - 1).apply { previewPagesMap[it] = this } }
-                        }.onFailure {
-                            return LoadResult.Error(it)
+                val data = remember(initialKey) {
+                    Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
+                        object : PagingSource<Int, PreviewPage>() {
+                            override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
+                            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
+                                val up = params.key ?: 1
+                                val end = up + params.loadSize - 1
+                                runSuspendCatching {
+                                    (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
+                                        .parMap(Dispatchers.IO) { getPreviewListByPage(galleryDetail, it - 1).apply { previewPagesMap[it] = this } }
+                                }.onFailure {
+                                    return LoadResult.Error(it)
+                                }
+                                val r = (up..end).map { previewPagesMap[it]!! }
+                                val prevK = if (up == 1) null else up - 1
+                                val nextK = if (end == galleryDetail.previewPages) null else end + 1
+                                return LoadResult.Page(r, prevK, nextK)
+                            }
+                            override val keyReuseSupported = true
                         }
-                        val r = (up..end).map { previewPagesMap[it]!! }
-                        val prevK = if (up == 1) null else up - 1
-                        val nextK = if (end == galleryDetail.previewPages) null else end + 1
-                        return LoadResult.Page(r, prevK, nextK)
-                    }
-                    override val jumpingSupported = true
-                    override val keyReuseSupported = true
-                }
+                    }.flow.cachedIn(lifecycleScope)
+                }.collectAsLazyPagingItems()
 
-                val data = remember(initialKey) { Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1, jumpThreshold = 3), initialKey) { pageSource() }.flow.cachedIn(lifecycleScope) }.collectAsLazyPagingItems()
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -171,10 +169,6 @@ class GalleryPreviewsScene : BaseScene() {
                         )
                     },
                 ) { paddingValues ->
-                    LaunchedEffect(toNextPage) {
-                        delay(500) // Should we wait this animation?
-                        if (toNextPage) state.scrollToItem(pgSize)
-                    }
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(columnCount),
                         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
