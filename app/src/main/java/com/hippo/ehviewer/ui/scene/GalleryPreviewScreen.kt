@@ -69,7 +69,7 @@ import kotlin.math.roundToInt
 
 typealias PreviewPage = List<GalleryPreview>
 
-class GalleryPreviewsScreen : Fragment() {
+class GalleryPreviewScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
