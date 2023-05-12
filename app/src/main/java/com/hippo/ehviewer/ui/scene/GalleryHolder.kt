@@ -68,5 +68,9 @@ class GridGalleryHolder(private val composeView: ComposeView) : GalleryHolder(co
                 modifier = Modifier.padding(2.dp),
             )
         }
+
+        // Workaround https://github.com/Ehviewer-Overhauled/Ehviewer/issues/1023
+        // See https://issuetracker.google.com/issues/240449681
+        composeView.getChildAt(0)?.requestLayout()
     }
 }
