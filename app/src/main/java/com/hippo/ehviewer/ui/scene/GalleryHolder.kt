@@ -15,8 +15,16 @@
  */
 package com.hippo.ehviewer.ui.scene
 
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.Checkable
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
@@ -70,5 +78,52 @@ class GridGalleryHolder(private val composeView: ComposeView) : GalleryHolder(co
         // Workaround https://github.com/Ehviewer-Overhauled/Ehviewer/issues/1023
         // See https://issuetracker.google.com/issues/240449681
         composeView.getChildAt(0)?.requestLayout()
+    }
+}
+
+class CheckableComposeView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : AbstractComposeView(context, attrs, defStyleAttr), Checkable {
+
+    private val content = mutableStateOf<(@Composable (Boolean) -> Unit)?>(null)
+
+    private var checked by mutableStateOf(false)
+
+    @Suppress("RedundantVisibilityModifier")
+    protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
+        private set
+
+    @Composable
+    override fun Content() {
+        content.value?.invoke(checked)
+    }
+
+    override fun getAccessibilityClassName(): CharSequence {
+        return javaClass.name
+    }
+
+    /**
+     * Set the Jetpack Compose UI content for this view.
+     * Initial composition will occur when the view becomes attached to a window or when
+     * [createComposition] is called, whichever comes first.
+     */
+    fun setContent(content: @Composable (Boolean) -> Unit) {
+        shouldCreateCompositionOnAttachedToWindow = true
+        this.content.value = content
+        if (isAttachedToWindow) {
+            createComposition()
+        }
+    }
+
+    override fun setChecked(value: Boolean) {
+        checked = value
+    }
+
+    override fun isChecked() = checked
+
+    override fun toggle() {
+        checked = !checked
     }
 }
