@@ -20,7 +20,6 @@ import android.util.AttributeSet
 import android.widget.Checkable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
@@ -116,7 +115,7 @@ class CheckableComposeView @JvmOverloads constructor(
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = null,
-                            modifier = Modifier.align(Alignment.TopEnd).size(48.dp),
+                            modifier = Modifier.align(Alignment.TopEnd),
                         )
                     }
                 }
