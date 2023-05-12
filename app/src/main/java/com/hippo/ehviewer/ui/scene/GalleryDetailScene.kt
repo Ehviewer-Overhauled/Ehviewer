@@ -539,8 +539,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                     LocalPinnableContainer.current!!.run { remember { pin() } }
                     Column {
                         GalleryDetailHeaderCard(
-                            galleryInfo = galleryInfo,
-                            galleryDetail = galleryDetail,
+                            info = galleryDetail ?: galleryInfo,
                             onInfoCardClick = ::onGalleryInfoCardClick,
                             onCategoryChipClick = ::onCategoryChipClick,
                             onUploaderChipClick = ::onUploaderChipClick,
@@ -598,8 +597,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             GalleryDetailHeaderCard(
-                                galleryInfo = galleryInfo,
-                                galleryDetail = galleryDetail,
+                                info = galleryDetail ?: galleryInfo,
                                 onInfoCardClick = ::onGalleryInfoCardClick,
                                 onCategoryChipClick = ::onCategoryChipClick,
                                 onUploaderChipClick = ::onUploaderChipClick,

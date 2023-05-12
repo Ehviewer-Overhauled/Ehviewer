@@ -91,8 +91,7 @@ fun GalleryDetailHeaderInfoCard(
 
 @Composable
 fun GalleryDetailHeaderCard(
-    galleryInfo: GalleryInfo,
-    galleryDetail: GalleryDetail?,
+    info: GalleryInfo,
     onInfoCardClick: () -> Unit,
     onUploaderChipClick: () -> Unit,
     onBlockUploaderIconClick: () -> Unit,
@@ -102,7 +101,7 @@ fun GalleryDetailHeaderCard(
     Row {
         Card {
             EhAsyncCropThumb(
-                model = galleryInfo.thumb,
+                model = info.thumb,
                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)).width(dimensionResource(id = R.dimen.gallery_detail_thumb_width)),
             )
         }
@@ -111,7 +110,7 @@ fun GalleryDetailHeaderCard(
             modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)),
             horizontalAlignment = Alignment.End,
         ) {
-            galleryDetail?.let {
+            (info as? GalleryDetail)?.let {
                 GalleryDetailHeaderInfoCard(
                     detail = it,
                     onClick = onInfoCardClick,
@@ -119,7 +118,7 @@ fun GalleryDetailHeaderCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1F))
-            val categoryText = EhUtils.getCategory(galleryInfo.category).uppercase()
+            val categoryText = EhUtils.getCategory(info.category).uppercase()
             AssistChip(
                 onClick = onCategoryChipClick,
                 label = { Text(text = categoryText, maxLines = 1) },
@@ -131,7 +130,7 @@ fun GalleryDetailHeaderCard(
                     )
                 },
             )
-            val uploaderText = galleryInfo.uploader.orEmpty().uppercase()
+            val uploaderText = info.uploader.orEmpty().uppercase()
             AssistChip(
                 onClick = onUploaderChipClick,
                 label = { Text(text = uploaderText, maxLines = 1) },
