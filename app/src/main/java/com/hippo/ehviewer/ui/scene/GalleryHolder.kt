@@ -18,24 +18,29 @@ package com.hippo.ehviewer.ui.scene
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.Checkable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.widget.GalleryInfoGridItem
 import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
-import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.util.system.pxToDp
 
-abstract class GalleryHolder(composeView: ComposeView) : RecyclerView.ViewHolder(composeView) {
+abstract class GalleryHolder(composeView: CheckableComposeView) : RecyclerView.ViewHolder(composeView) {
     abstract fun bind(
         galleryInfo: GalleryInfo,
         onClick: () -> Unit,
@@ -43,10 +48,7 @@ abstract class GalleryHolder(composeView: ComposeView) : RecyclerView.ViewHolder
     )
 }
 
-class ListGalleryHolder(
-    private val composeView: ComposeView,
-    private val showFavourite: Boolean,
-) : GalleryHolder(composeView) {
+class ListGalleryHolder(private val composeView: CheckableComposeView, private val showFavourite: Boolean) : GalleryHolder(composeView) {
 
     private val height = (Settings.listThumbSize * 3).pxToDp.dp
     private val showPages = Settings.showGalleryPages
@@ -65,7 +67,7 @@ class ListGalleryHolder(
     }
 }
 
-class GridGalleryHolder(private val composeView: ComposeView) : GalleryHolder(composeView) {
+class GridGalleryHolder(private val composeView: CheckableComposeView) : GalleryHolder(composeView) {
     override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {
         composeView.setMD3Content {
             GalleryInfoGridItem(
@@ -104,9 +106,22 @@ class CheckableComposeView @JvmOverloads constructor(
         return javaClass.name
     }
 
-    fun setContent(content: @Composable (Boolean) -> Unit) {
+    private fun setContent(content: @Composable () -> Unit) {
         shouldCreateCompositionOnAttachedToWindow = true
-        this.content.value = content
+        this.content.value = { selected ->
+            Mdc3Theme {
+                Box {
+                    content()
+                    if (selected) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.TopEnd).size(48.dp),
+                        )
+                    }
+                }
+            }
+        }
         if (isAttachedToWindow) {
             createComposition()
         }
@@ -121,4 +136,6 @@ class CheckableComposeView @JvmOverloads constructor(
     override fun toggle() {
         mChecked = !mChecked
     }
+
+    fun setMD3Content(content: @Composable () -> Unit) = setContent(content)
 }

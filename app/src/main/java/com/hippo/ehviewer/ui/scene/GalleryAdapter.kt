@@ -21,7 +21,6 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
-import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -147,11 +146,8 @@ abstract class GalleryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryHolder {
         val holder = when (viewType) {
-            TYPE_LIST -> ListGalleryHolder(
-                ComposeView(parent.context),
-                mShowFavourited,
-            )
-            TYPE_GRID -> GridGalleryHolder(ComposeView(parent.context))
+            TYPE_LIST -> ListGalleryHolder(CheckableComposeView(parent.context), mShowFavourited)
+            TYPE_GRID -> GridGalleryHolder(CheckableComposeView(parent.context))
             else -> throw IllegalStateException("Unexpected value: $viewType")
         }
         return holder
