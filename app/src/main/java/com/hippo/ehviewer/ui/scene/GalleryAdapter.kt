@@ -39,10 +39,8 @@ abstract class GalleryAdapter(
     type: Int,
     showFavourited: Boolean,
 ) : RecyclerView.Adapter<GalleryHolder>() {
-    private val mLayoutManager: AutoStaggeredGridLayoutManager =
-        AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-    private val mPaddingTopSB: Int =
-        mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
+    private val mLayoutManager: AutoStaggeredGridLayoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
+    private val mPaddingTopSB: Int = mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private val mShowFavourited: Boolean
     private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
@@ -64,6 +62,15 @@ abstract class GalleryAdapter(
                     mLayoutManager.setStrategy(STRATEGY_MIN_SIZE)
                     if (null != mGirdDecoration) {
                         recyclerView.removeItemDecoration(mGirdDecoration!!)
+                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
+                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
+                        recyclerView.setPadding(
+                            recyclerView.paddingLeft - paddingH,
+                            recyclerView.paddingTop - paddingV,
+                            recyclerView.paddingRight - paddingH,
+                            recyclerView.paddingBottom - paddingV,
+                        )
+                        mGirdDecoration = null
                     }
                     if (null == mListDecoration) {
                         val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
@@ -80,8 +87,8 @@ abstract class GalleryAdapter(
                             recyclerView.paddingRight + paddingH,
                             recyclerView.paddingBottom + paddingV,
                         )
+                        recyclerView.addItemDecoration(mListDecoration!!)
                     }
-                    recyclerView.addItemDecoration(mListDecoration!!)
                     notifyDataSetChanged()
                 }
 
@@ -91,6 +98,15 @@ abstract class GalleryAdapter(
                     mLayoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
                     if (null != mListDecoration) {
                         recyclerView.removeItemDecoration(mListDecoration!!)
+                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+                        recyclerView.setPadding(
+                            recyclerView.paddingLeft - paddingH,
+                            recyclerView.paddingTop - paddingV,
+                            recyclerView.paddingRight - paddingH,
+                            recyclerView.paddingBottom - paddingV,
+                        )
+                        mListDecoration = null
                     }
                     if (null == mGirdDecoration) {
                         val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
@@ -103,8 +119,8 @@ abstract class GalleryAdapter(
                             recyclerView.paddingRight + paddingH,
                             recyclerView.paddingBottom + paddingV,
                         )
+                        recyclerView.addItemDecoration(mGirdDecoration!!)
                     }
-                    recyclerView.addItemDecoration(mGirdDecoration!!)
                     notifyDataSetChanged()
                 }
             }
