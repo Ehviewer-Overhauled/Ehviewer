@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.widget
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -19,7 +18,6 @@ fun LazyColumnWithScrollBar(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical,
     content: LazyListScope.() -> Unit,
 ) = Box(
     modifier = modifier,
@@ -28,7 +26,6 @@ fun LazyColumnWithScrollBar(
         modifier = Modifier,
         state = state,
         contentPadding = contentPadding,
-        verticalArrangement = verticalArrangement,
         content = content,
     )
     Box(modifier = Modifier.padding(contentPadding)) {

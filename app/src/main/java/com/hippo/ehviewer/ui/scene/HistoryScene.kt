@@ -126,7 +126,6 @@ class HistoryScene : BaseScene() {
                 ) { paddingValues ->
                     LazyColumnWithScrollBar(
                         contentPadding = paddingValues,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(
                             count = historyData.itemCount,
