@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.widget
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -46,13 +44,12 @@ fun GalleryInfoListItem(
     isInFavScene: Boolean = false,
     showPages: Boolean = false,
 ) {
-    CrystalCard(modifier = modifier) {
-        Row(
-            modifier = Modifier.combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-            ),
-        ) {
+    CrystalCard(
+        modifier = modifier,
+        onClick = onClick,
+        onLongClick = onLongClick,
+    ) {
+        Row {
             Card {
                 EhAsyncCropThumb(
                     model = info.thumb,
@@ -132,14 +129,15 @@ fun GalleryInfoGridItem(
     val aspect = (info.thumbWidth.toFloat() / info.thumbHeight).coerceIn(0.33F, 1.5F)
     val color = EhUtils.getCategoryColor(info.category)
     val simpleLang = info.simpleLanguage
-    ElevatedCard(modifier = modifier) {
+    ElevatedCard(
+        modifier = modifier,
+        onClick = onClick,
+        onLongClick = onLongClick,
+    ) {
         Box {
             EhAsyncThumb(
                 model = info.thumb,
-                modifier = Modifier.aspectRatio(aspect).fillMaxWidth().combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                ),
+                modifier = Modifier.aspectRatio(aspect).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
             val container = Color(color)

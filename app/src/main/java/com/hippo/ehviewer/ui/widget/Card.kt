@@ -19,10 +19,12 @@ private fun crystalCardBorder(): BorderStroke {
 @Composable
 fun CrystalCard(
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) = OutlinedCard(
     onClick = onClick,
+    onLongClick = onLongClick,
     modifier = modifier,
     border = crystalCardBorder(),
     content = content,
@@ -30,9 +32,11 @@ fun CrystalCard(
 
 @Composable
 fun CrystalCard(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) = OutlinedCard(
+    onClick = onClick,
     modifier = modifier,
     border = crystalCardBorder(),
     content = content,
