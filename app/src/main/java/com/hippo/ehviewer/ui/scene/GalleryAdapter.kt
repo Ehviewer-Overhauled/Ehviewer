@@ -17,10 +17,13 @@ package com.hippo.ehviewer.ui.scene
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.graphics.Rect
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
@@ -41,7 +44,7 @@ abstract class GalleryAdapter(
     private val mPaddingTopSB: Int =
         mResources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
     private val mShowFavourited: Boolean
-    private var mListDecoration: MarginItemDecoration? = null
+    private var mListDecoration: ItemDecoration? = null
     private var mGirdDecoration: MarginItemDecoration? = null
     private var mType = TYPE_INVALID
 
@@ -66,7 +69,17 @@ abstract class GalleryAdapter(
                         val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
                         val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
                         val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
-                        mListDecoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+                        mListDecoration = object : ItemDecoration() {
+                            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                                outRect.set(0, interval / 2, 0, interval / 2)
+                            }
+                        }
+                        recyclerView.setPadding(
+                            recyclerView.paddingLeft + paddingH,
+                            recyclerView.paddingTop + paddingV,
+                            recyclerView.paddingRight + paddingH,
+                            recyclerView.paddingBottom + paddingV,
+                        )
                     }
                     recyclerView.addItemDecoration(mListDecoration!!)
                     notifyDataSetChanged()

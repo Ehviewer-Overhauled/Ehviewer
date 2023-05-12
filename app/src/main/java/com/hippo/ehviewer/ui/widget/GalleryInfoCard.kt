@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,9 +46,9 @@ fun GalleryInfoListItem(
     isInFavScene: Boolean = false,
     showPages: Boolean = false,
 ) {
-    CrystalCard(modifier = Modifier.padding(6.dp)) {
+    CrystalCard(modifier = modifier) {
         Row(
-            modifier = modifier.combinedClickable(
+            modifier = Modifier.combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,
             ),
@@ -55,7 +56,7 @@ fun GalleryInfoListItem(
             Card {
                 EhAsyncCropThumb(
                     model = info.thumb,
-                    modifier = modifier.aspectRatio(0.6666667F),
+                    modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
             }
             Column(modifier = Modifier.padding(8.dp, 4.dp)) {

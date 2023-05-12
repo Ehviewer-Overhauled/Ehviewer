@@ -23,10 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Menu
@@ -48,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -74,7 +78,6 @@ import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.widget.Deferred
 import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
-import com.hippo.ehviewer.ui.widget.LazyColumnWithScrollBar
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
@@ -82,6 +85,7 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
+import my.nanihadesuka.compose.InternalLazyColumnScrollbar
 
 class HistoryScene : BaseScene() {
     override fun onCreateView(
@@ -124,45 +128,58 @@ class HistoryScene : BaseScene() {
                         )
                     },
                 ) { paddingValues ->
-                    LazyColumnWithScrollBar(
-                        contentPadding = paddingValues,
-                    ) {
-                        items(
-                            count = historyData.itemCount,
-                            key = historyData.itemKey(key = { item -> item.gid }),
-                            contentType = historyData.itemContentType(),
-                        ) { index ->
-                            val info = historyData[index]
-                            // TODO: item delete & add animation
-                            // Bug tracker: https://issuetracker.google.com/issues/150812265
-                            info?.let {
-                                val dismissState = rememberDismissState(
-                                    confirmValueChange = {
-                                        if (it == DismissValue.DismissedToStart) {
-                                            coroutineScope.launchIO {
-                                                EhDB.deleteHistoryInfo(info)
+                    val state = rememberLazyListState()
+                    Box {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
+                            state = state,
+                            contentPadding = paddingValues,
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
+                        ) {
+                            items(
+                                count = historyData.itemCount,
+                                key = historyData.itemKey(key = { item -> item.gid }),
+                                contentType = historyData.itemContentType(),
+                            ) { index ->
+                                val info = historyData[index]
+                                // TODO: item delete & add animation
+                                // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                info?.let {
+                                    val dismissState = rememberDismissState(
+                                        confirmValueChange = {
+                                            if (it == DismissValue.DismissedToStart) {
+                                                coroutineScope.launchIO {
+                                                    EhDB.deleteHistoryInfo(info)
+                                                }
                                             }
-                                        }
-                                        true
-                                    },
-                                )
+                                            true
+                                        },
+                                    )
 
-                                SwipeToDismiss(
-                                    state = dismissState,
-                                    background = {},
-                                    dismissContent = {
-                                        // TODO: item delete & add animation
-                                        // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                        GalleryInfoListItem(
-                                            onClick = ::onItemClick.partially1(it),
-                                            onLongClick = ::onItemLongClick.partially1(it),
-                                            info = it,
-                                            modifier = Modifier.height(cardHeight),
-                                        )
-                                    },
-                                    directions = setOf(DismissDirection.EndToStart),
-                                )
+                                    SwipeToDismiss(
+                                        state = dismissState,
+                                        background = {},
+                                        dismissContent = {
+                                            // TODO: item delete & add animation
+                                            // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                            GalleryInfoListItem(
+                                                onClick = ::onItemClick.partially1(it),
+                                                onLongClick = ::onItemLongClick.partially1(it),
+                                                info = it,
+                                                modifier = Modifier.height(cardHeight),
+                                            )
+                                        },
+                                        directions = setOf(DismissDirection.EndToStart),
+                                    )
+                                }
                             }
+                        }
+                        Box(modifier = Modifier.padding(paddingValues = paddingValues)) {
+                            InternalLazyColumnScrollbar(
+                                listState = state,
+                                thumbColor = MaterialTheme.colorScheme.primary,
+                                thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                            )
                         }
                     }
                     Deferred({ delay(200) }) {

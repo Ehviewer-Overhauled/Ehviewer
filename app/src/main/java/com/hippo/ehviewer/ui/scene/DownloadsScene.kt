@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -51,7 +52,6 @@ import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.easyrecyclerview.HandlerDrawable
-import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -254,8 +254,7 @@ class DownloadsScene :
             mAdapter = DownloadAdapter()
             mAdapter!!.setHasStableIds(true)
             recyclerView.adapter = mAdapter
-            val layoutManager =
-                AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
+            val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
             layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
             layoutManager.setStrategy(STRATEGY_MIN_SIZE)
             layoutManager.supportsPredictiveItemAnimations = false
@@ -270,9 +269,11 @@ class DownloadsScene :
                 itemAnimator.supportsChangeAnimations = false
             }
             val interval = resources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
-            val paddingH = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-            val paddingV = resources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
-            val decoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+            val decoration = object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                    outRect.set(0, interval / 2, 0, interval / 2)
+                }
+            }
             recyclerView.addItemDecoration(decoration)
             if (mInitPosition >= 0) {
                 recyclerView.scrollToPosition(mInitPosition)

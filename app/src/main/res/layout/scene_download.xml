@@ -29,6 +29,8 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingHorizontal="@dimen/gallery_list_margin_h"
+            android:paddingVertical="@dimen/gallery_list_margin_v"
             app:fitsSystemWindowsInsets="bottom" />
 
         <com.hippo.easyrecyclerview.FastScroller
