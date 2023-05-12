@@ -63,14 +63,10 @@ abstract class GalleryAdapter(
                         recyclerView.removeItemDecoration(mGirdDecoration!!)
                     }
                     if (null == mListDecoration) {
-                        val interval =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
-                        val paddingH =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
-                        val paddingV =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
-                        mListDecoration =
-                            MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+                        val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_list_interval)
+                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_h)
+                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_list_margin_v)
+                        mListDecoration = MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
                     }
                     recyclerView.addItemDecoration(mListDecoration!!)
                     notifyDataSetChanged()
@@ -84,14 +80,16 @@ abstract class GalleryAdapter(
                         recyclerView.removeItemDecoration(mListDecoration!!)
                     }
                     if (null == mGirdDecoration) {
-                        val interval =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
-                        val paddingH =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
-                        val paddingV =
-                            mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
-                        mGirdDecoration =
-                            MarginItemDecoration(interval, paddingH, paddingV, paddingH, paddingV)
+                        val interval = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_interval)
+                        val paddingH = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_h)
+                        val paddingV = mResources.getDimensionPixelOffset(R.dimen.gallery_grid_margin_v)
+                        mGirdDecoration = MarginItemDecoration(interval, 0, 0, 0, 0)
+                        recyclerView.setPadding(
+                            recyclerView.paddingLeft + paddingH,
+                            recyclerView.paddingTop + paddingV,
+                            recyclerView.paddingRight + paddingH,
+                            recyclerView.paddingBottom + paddingV,
+                        )
                     }
                     recyclerView.addItemDecoration(mGirdDecoration!!)
                     notifyDataSetChanged()

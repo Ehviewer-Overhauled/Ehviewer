@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.scene
 
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
@@ -65,7 +64,6 @@ class GridGalleryHolder(private val composeView: ComposeView) : GalleryHolder(co
                 onClick = onClick,
                 onLongClick = onLongClick,
                 info = galleryInfo,
-                modifier = Modifier.padding(2.dp),
             )
         }
 

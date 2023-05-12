@@ -43,9 +43,9 @@
     <dimen name="gallery_list_margin_v">4dp</dimen>
 
     <!-- 4dp - 4dp, 4dp for card padding -->
-    <dimen name="gallery_grid_interval">0dp</dimen>
+    <dimen name="gallery_grid_interval">4dp</dimen>
     <!-- 8dp - 4dp, 4dp for card padding -->
-    <dimen name="gallery_grid_margin_h">4dp</dimen>
+    <dimen name="gallery_grid_margin_h">12dp</dimen>
     <!-- 8dp - 4dp, 4dp for card padding -->
     <dimen name="gallery_grid_margin_v">4dp</dimen>
 
