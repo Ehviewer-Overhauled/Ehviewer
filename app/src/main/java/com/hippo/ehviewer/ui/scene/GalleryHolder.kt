@@ -89,7 +89,7 @@ class CheckableComposeView @JvmOverloads constructor(
 
     private val content = mutableStateOf<(@Composable (Boolean) -> Unit)?>(null)
 
-    private var checked by mutableStateOf(false)
+    private var mChecked by mutableStateOf(false)
 
     @Suppress("RedundantVisibilityModifier")
     protected override var shouldCreateCompositionOnAttachedToWindow: Boolean = false
@@ -97,18 +97,13 @@ class CheckableComposeView @JvmOverloads constructor(
 
     @Composable
     override fun Content() {
-        content.value?.invoke(checked)
+        content.value?.invoke(mChecked)
     }
 
     override fun getAccessibilityClassName(): CharSequence {
         return javaClass.name
     }
 
-    /**
-     * Set the Jetpack Compose UI content for this view.
-     * Initial composition will occur when the view becomes attached to a window or when
-     * [createComposition] is called, whichever comes first.
-     */
     fun setContent(content: @Composable (Boolean) -> Unit) {
         shouldCreateCompositionOnAttachedToWindow = true
         this.content.value = content
@@ -118,12 +113,12 @@ class CheckableComposeView @JvmOverloads constructor(
     }
 
     override fun setChecked(value: Boolean) {
-        checked = value
+        mChecked = value
     }
 
-    override fun isChecked() = checked
+    override fun isChecked() = mChecked
 
     override fun toggle() {
-        checked = !checked
+        mChecked = !mChecked
     }
 }
