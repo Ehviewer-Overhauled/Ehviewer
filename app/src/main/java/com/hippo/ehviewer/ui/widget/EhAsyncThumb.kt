@@ -52,6 +52,29 @@ fun EhAsyncThumb(
     contentScale = contentScale,
 )
 
+@Composable
+fun EhAsyncCropThumb(
+    model: String?,
+    modifier: Modifier = Modifier,
+) {
+    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+    AsyncImage(
+        model = requestOf(model),
+        contentDescription = null,
+        modifier = modifier,
+        onState = {
+            if (it is AsyncImagePainter.State.Success) {
+                it.result.drawable.run {
+                    if (intrinsicWidth.toFloat() / intrinsicHeight in 0.5..0.8) {
+                        if (contentScale == ContentScale.Fit) contentScale = ContentScale.Crop
+                    }
+                }
+            }
+        },
+        contentScale = contentScale,
+    )
+}
+
 /**
  * Show a part of the original drawable, non-animated only implementation.
  */

@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -67,7 +66,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
-import com.hippo.ehviewer.ui.widget.EhAsyncThumb
+import com.hippo.ehviewer.ui.widget.EhAsyncCropThumb
 import com.hippo.ehviewer.ui.widget.setMD3Content
 import com.hippo.unifile.UniFile
 import com.hippo.view.ViewTransition
@@ -865,9 +864,8 @@ class DownloadsScene :
                 Card(
                     onClick = ::onClick.partially1(binding.thumb),
                 ) {
-                    EhAsyncThumb(
+                    EhAsyncCropThumb(
                         model = info.thumb,
-                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .height(height)
                             .aspectRatio(0.6666667F),

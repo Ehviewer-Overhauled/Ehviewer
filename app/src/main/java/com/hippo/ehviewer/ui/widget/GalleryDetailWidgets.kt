@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -128,9 +127,8 @@ fun GalleryDetailHeaderCard(
     ) {
         Row {
             Card {
-                EhAsyncThumb(
+                EhAsyncCropThumb(
                     model = galleryInfo.thumb,
-                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .height(dimensionResource(id = R.dimen.gallery_detail_thumb_height))
                         .width(dimensionResource(id = R.dimen.gallery_detail_thumb_width)),

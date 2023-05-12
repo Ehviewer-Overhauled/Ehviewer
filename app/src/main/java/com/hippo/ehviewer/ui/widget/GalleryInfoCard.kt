@@ -53,9 +53,8 @@ fun GalleryInfoListItem(
             ),
         ) {
             Card {
-                EhAsyncThumb(
+                EhAsyncCropThumb(
                     model = info.thumb,
-                    contentScale = ContentScale.Crop,
                     modifier = modifier.aspectRatio(0.6666667F),
                 )
             }
