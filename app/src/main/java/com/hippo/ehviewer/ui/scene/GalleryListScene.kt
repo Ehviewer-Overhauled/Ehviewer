@@ -994,28 +994,29 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
 
     private fun onApplySearch(query: String?) {
         _binding ?: return
-        if (null == mHelper) {
-            return
-        }
-        if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
-            try {
-                binding.searchLayout.formatListUrlBuilder(mUrlBuilder, query)
-            } catch (e: EhException) {
-                showTip(e.message, LENGTH_LONG)
-                return
+        mHelper ?: return
+        lifecycleScope.launchIO {
+            if (mState == STATE_SEARCH || mState == STATE_SEARCH_SHOW_LIST) {
+                try {
+                    binding.searchLayout.formatListUrlBuilder(mUrlBuilder, query)
+                } catch (e: EhException) {
+                    showTip(e.message, LENGTH_LONG)
+                    return@launchIO
+                }
+            } else {
+                val oldMode = mUrlBuilder.mode
+                // If it's MODE_SUBSCRIPTION, keep it
+                val newMode = if (oldMode == MODE_SUBSCRIPTION) MODE_SUBSCRIPTION else MODE_NORMAL
+                mUrlBuilder.reset()
+                mUrlBuilder.mode = newMode
+                mUrlBuilder.keyword = query
             }
-        } else {
-            val oldMode = mUrlBuilder.mode
-            // If it's MODE_SUBSCRIPTION, keep it
-            val newMode =
-                if (oldMode == MODE_SUBSCRIPTION) MODE_SUBSCRIPTION else MODE_NORMAL
-            mUrlBuilder.reset()
-            mUrlBuilder.mode = newMode
-            mUrlBuilder.keyword = query
+            withUIContext {
+                onUpdateUrlBuilder()
+                mHelper!!.refresh()
+                setState(STATE_NORMAL)
+            }
         }
-        onUpdateUrlBuilder()
-        mHelper!!.refresh()
-        setState(STATE_NORMAL)
     }
 
     override fun onStartDragHandler() {
