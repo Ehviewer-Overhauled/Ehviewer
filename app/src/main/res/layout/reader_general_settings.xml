@@ -36,6 +36,15 @@
             android:textColor="?android:attr/textColorSecondary" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/double_tap_to_zoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/pref_double_tap_to_zoom"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/fullscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

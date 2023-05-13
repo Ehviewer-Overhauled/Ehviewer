@@ -15,6 +15,7 @@ class ReaderPreferences(private val preferenceStore: PreferenceStore) {
     fun showPageNumber() = preferenceStore.getBoolean("pref_show_page_number_key", true)
 
     fun showReaderSeekbar() = preferenceStore.getBoolean("pref_show_reader_seekbar", true)
+    fun doubleTapToZoom() = preferenceStore.getBoolean("pref_double_tap_to_zoom", true)
 
     fun trueColor() = preferenceStore.getBoolean("pref_true_color_key", false)
 

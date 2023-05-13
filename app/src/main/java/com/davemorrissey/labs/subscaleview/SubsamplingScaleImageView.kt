@@ -22,6 +22,7 @@ import androidx.annotation.IntDef
 import com.davemorrissey.labs.subscaleview.decoder.Decoder
 import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -462,6 +463,7 @@ open class SubsamplingScaleImageView @JvmOverloads constructor(
                 }
 
                 override fun onDoubleTap(e: MotionEvent): Boolean {
+                    if (!ReaderActivity.readerPreferences.doubleTapToZoom().get()) return false
                     if (isZoomEnabled && isReady && vTranslate != null) {
                         // Hacky solution for #15 - after a double tap the GestureDetector gets in a state
                         // where the next fling is ignored, so here we replace it with a new one.

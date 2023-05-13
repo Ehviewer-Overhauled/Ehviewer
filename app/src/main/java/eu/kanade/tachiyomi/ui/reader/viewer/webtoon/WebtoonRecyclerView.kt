@@ -11,6 +11,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.viewer.GestureDetectorWithLongTap
 import kotlin.math.abs
 
@@ -208,7 +209,7 @@ class WebtoonRecyclerView @JvmOverloads constructor(
         }
 
         override fun onDoubleTap(ev: MotionEvent): Boolean {
-            detector.isDoubleTapping = true
+            if (ReaderActivity.readerPreferences.doubleTapToZoom().get()) detector.isDoubleTapping = true
             return false
         }
 

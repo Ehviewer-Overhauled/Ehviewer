@@ -36,6 +36,7 @@ class ReaderGeneralSettings @JvmOverloads constructor(context: Context, attrs: A
         binding.backgroundColor.bindToIntPreference(readerPreferences.readerTheme(), R.array.reader_themes_values)
         binding.showPageNumber.bindToPreference(readerPreferences.showPageNumber())
         binding.showReaderSeekbar.bindToPreference(readerPreferences.showReaderSeekbar())
+        binding.doubleTapToZoom.bindToPreference(readerPreferences.doubleTapToZoom())
         binding.fullscreen.bindToPreference(readerPreferences.fullscreen())
         readerPreferences.fullscreen()
             .asHotFlow {
