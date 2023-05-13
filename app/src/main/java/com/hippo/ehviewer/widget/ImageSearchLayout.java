@@ -123,9 +123,6 @@ public final class ImageSearchLayout extends LinearLayout implements View.OnClic
         try {
             var src = ImageDecoder.createSource(context.getContentResolver(), imageUri);
             Bitmap bitmap = ImageDecoder.decodeBitmap(src, Image.getImageSearchDecoderSampleListener());
-            if (null == bitmap) {
-                return;
-            }
             File temp = AppConfig.createTempFile();
             if (null == temp) {
                 return;

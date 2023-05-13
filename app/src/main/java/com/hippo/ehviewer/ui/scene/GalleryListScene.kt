@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Resources
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.text.Spannable
@@ -35,9 +34,6 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.IntDef
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -117,12 +113,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-class GalleryListScene :
-    SearchBarScene(),
-    OnDragHandlerListener,
-    SearchLayout.Helper,
-    OnClickFabListener,
-    OnExpandListener {
+class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.Helper, OnClickFabListener, OnExpandListener {
     private val mCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             when (mState) {
@@ -135,9 +126,6 @@ class GalleryListScene :
     private lateinit var mUrlBuilder: ListUrlBuilder
     private var _binding: SceneGalleryListBinding? = null
     private val binding get() = _binding!!
-    private val selectImageLauncher = registerForActivityResult<PickVisualMediaRequest, Uri>(
-        ActivityResultContracts.PickVisualMedia(),
-    ) { result: Uri? -> binding.searchLayout.setImageUri(result) }
     private var mSearchFab: View? = null
     private val mSearchFabAnimatorListener: Animator.AnimatorListener =
         object : SimpleAnimatorListener() {
@@ -1054,12 +1042,6 @@ class GalleryListScene :
 
     override fun onChangeSearchMode() {
         showSearchBar()
-    }
-
-    override fun onSelectImage() {
-        val builder = PickVisualMediaRequest.Builder()
-        builder.setMediaType(ImageOnly)
-        selectImageLauncher.launch(builder.build())
     }
 
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {

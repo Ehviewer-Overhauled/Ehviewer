@@ -21,7 +21,6 @@ package com.hippo.ehviewer.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -31,9 +30,12 @@ import android.widget.CompoundButton
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
 import androidx.annotation.IntDef
 import androidx.core.content.edit
 import androidx.core.view.forEach
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,9 +51,11 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.util.pickVisualMedia
 import com.hippo.widget.RadioGridGroup
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.ViewUtils
+import kotlinx.coroutines.launch
 
 @SuppressLint("InflateParams")
 class SearchLayout @JvmOverloads constructor(
@@ -60,7 +64,6 @@ class SearchLayout @JvmOverloads constructor(
 ) : EasyRecyclerView(context, attrs),
     CompoundButton.OnCheckedChangeListener,
     View.OnClickListener,
-    ImageSearchLayout.Helper,
     OnTabSelectedListener {
 
     @SearchMode
@@ -145,7 +148,12 @@ class SearchLayout @JvmOverloads constructor(
         mTableAdvanceSearch = mAdvanceView.findViewById(R.id.search_advance_search_table)
         // Create image view
         mImageView = mInflater.inflate(R.layout.search_image, null) as ImageSearchLayout
-        mImageView.setHelper(this)
+        mImageView.setHelper {
+            findViewTreeLifecycleOwner()!!.lifecycleScope.launch {
+                val uri = pickVisualMedia(ImageOnly)
+                mImageView.setImageUri(uri)
+            }
+        }
         // Create action view
         mActionView = mInflater.inflate(R.layout.search_action, null)
         mActionView.layoutParams = LayoutParams(
@@ -164,10 +172,6 @@ class SearchLayout @JvmOverloads constructor(
         (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
     }
 
-    fun setImageUri(imageUri: Uri?) {
-        mImageView.setImageUri(imageUri)
-    }
-
     fun setNormalSearchMode(id: Int) {
         mNormalSearchMode.check(id)
     }
@@ -177,12 +181,6 @@ class SearchLayout @JvmOverloads constructor(
             (it as IdentifiedChip).apply {
                 isChecked = idt and category != 0
             }
-        }
-    }
-
-    override fun onSelectImage() {
-        if (mHelper != null) {
-            mHelper!!.onSelectImage()
         }
     }
 
@@ -285,7 +283,6 @@ class SearchLayout @JvmOverloads constructor(
     private annotation class SearchMode
     interface Helper {
         fun onChangeSearchMode()
-        fun onSelectImage()
     }
 
     internal class SearchLayoutManager(context: Context?) : LinearLayoutManager(context!!) {
