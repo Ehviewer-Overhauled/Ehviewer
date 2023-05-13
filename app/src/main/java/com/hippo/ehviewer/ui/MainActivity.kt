@@ -73,7 +73,7 @@ import com.hippo.util.addTextToClipboard
 import com.hippo.util.getClipboardManager
 import com.hippo.util.getParcelableExtraCompat
 import com.hippo.util.getUrlFromClipboard
-import com.hippo.util.initPermission
+import com.hippo.util.initLauncher
 import com.hippo.yorozuya.IOUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -92,7 +92,7 @@ class MainActivity : EhActivity() {
     private val availableNetworks = mutableListOf<Network>()
 
     init {
-        initPermission()
+        initLauncher()
     }
 
     private fun saveImageToTempFile(uri: Uri): File? {

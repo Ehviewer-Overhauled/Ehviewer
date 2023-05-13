@@ -9,42 +9,25 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType
 import androidx.core.content.ContextCompat
+import arrow.atomic.Atomic
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-private lateinit var pickVisualMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
-private lateinit var callback: (Boolean) -> Unit
-private lateinit var callback2: (Uri?) -> Unit
+// Fuck off the silly Android launcher and callback :)
 
-fun ComponentActivity.initPermission() {
-    requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission(), ::permissionCallback)
-    pickVisualMediaLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia(), ::pickVisualMediaCallback)
-}
+private typealias LauncherAndCallback<K, V> = Atomic<Pair<ActivityResultLauncher<K>, (V) -> Unit>>
+private lateinit var requestPermission: LauncherAndCallback<String, Boolean>
+private lateinit var pickVisualMedia: LauncherAndCallback<PickVisualMediaRequest, Uri?>
+private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = suspendCancellableCoroutine { cont -> updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key) }
 
-private fun permissionCallback(v: Boolean) {
-    callback(v)
-}
-
-private fun pickVisualMediaCallback(v: Uri?) {
-    callback2(v)
+fun ComponentActivity.initLauncher() {
+    requestPermission = Atomic(registerForActivityResult(ActivityResultContracts.RequestPermission()) { requestPermission.get().second(it) } to {})
+    pickVisualMedia = Atomic(registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { pickVisualMedia.get().second(it) } to {})
 }
 
 suspend fun Context.requestPermission(key: String): Boolean {
     if (ContextCompat.checkSelfPermission(this, key) == PackageManager.PERMISSION_GRANTED) return true
-    return suspendCancellableCoroutine { cont ->
-        callback = {
-            cont.resume(it)
-        }
-        requestPermissionLauncher.launch(key)
-    }
+    return requestPermission.await(key)
 }
 
-suspend fun pickVisualMedia(type: VisualMediaType): Uri? {
-    return suspendCancellableCoroutine { cont ->
-        callback2 = {
-            cont.resume(it)
-        }
-        pickVisualMediaLauncher.launch(PickVisualMediaRequest.Builder().setMediaType(type).build())
-    }
-}
+suspend fun pickVisualMedia(type: VisualMediaType): Uri? = pickVisualMedia.await(PickVisualMediaRequest.Builder().setMediaType(type).build())
