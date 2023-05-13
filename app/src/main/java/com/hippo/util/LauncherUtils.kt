@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.core.content.ContextCompat
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -20,10 +21,12 @@ private typealias LauncherAndCallback<K, V> = Atomic<Pair<ActivityResultLauncher
 private fun <K, V> LauncherAndCallback<K, V>.cleanup() = update { it.copy {} }
 private lateinit var requestPermission: LauncherAndCallback<String, Boolean>
 private lateinit var pickVisualMedia: LauncherAndCallback<PickVisualMediaRequest, Uri?>
-private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = suspendCancellableCoroutine { cont ->
-    updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key)
-    cont.invokeOnCancellation { cleanup() } // Drop continuation when cancelled
-}.apply { cleanup() } // Drop continuation when completed
+private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = withUIContext {
+    suspendCancellableCoroutine { cont ->
+        updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key)
+        cont.invokeOnCancellation { cleanup() } // Drop continuation when cancelled
+    }.apply { cleanup() } // Drop continuation when completed
+}
 
 fun ComponentActivity.initLauncher() {
     requestPermission = Atomic(registerForActivityResult(ActivityResultContracts.RequestPermission()) { requestPermission.get().second(it) } to {})
