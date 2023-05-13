@@ -10,15 +10,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType
 import androidx.core.content.ContextCompat
 import arrow.atomic.Atomic
+import arrow.atomic.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 // Fuck off the silly Android launcher and callback :)
 
 private typealias LauncherAndCallback<K, V> = Atomic<Pair<ActivityResultLauncher<K>, (V) -> Unit>>
+private fun <K, V> LauncherAndCallback<K, V>.cleanup() = update { it.copy {} }
 private lateinit var requestPermission: LauncherAndCallback<String, Boolean>
 private lateinit var pickVisualMedia: LauncherAndCallback<PickVisualMediaRequest, Uri?>
-private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = suspendCancellableCoroutine { cont -> updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key) }
+private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = suspendCancellableCoroutine { cont ->
+    updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key)
+    cont.invokeOnCancellation { cleanup() } // Drop continuation when cancelled
+}.apply { cleanup() } // Drop continuation when completed
 
 fun ComponentActivity.initLauncher() {
     requestPermission = Atomic(registerForActivityResult(ActivityResultContracts.RequestPermission()) { requestPermission.get().second(it) } to {})
