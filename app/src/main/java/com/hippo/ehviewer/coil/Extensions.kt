@@ -1,7 +1,12 @@
 package com.hippo.ehviewer.coil
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import coil.decode.DecodeResult
+import coil.decode.Decoder
 import coil.disk.DiskCache
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.hippo.ehviewer.client.data.GalleryPreview
@@ -23,6 +28,11 @@ fun ImageRequest.Builder.ehPreviewKey(key: GalleryPreview) = apply {
     memoryCacheKey(key.imageKey)
     diskCacheKey(key.imageKey)
     size(Size.ORIGINAL)
+}
+
+fun ImageRequest.Builder.justDownload() = apply {
+    memoryCachePolicy(CachePolicy.DISABLED)
+    decoderFactory { _, _, _ -> Decoder { DecodeResult(ColorDrawable(Color.BLACK), false) } }
 }
 
 inline fun Context.imageRequest(key: GalleryPreview, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehPreviewKey(key).apply(builder).build()

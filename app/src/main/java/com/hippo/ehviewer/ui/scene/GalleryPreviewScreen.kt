@@ -54,6 +54,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
@@ -90,7 +91,7 @@ class GalleryPreviewScreen : Fragment() {
                     val result = EhEngine.getPreviewList(url)
                     if (Settings.preloadThumbAggressively) {
                         coroutineScope.launch {
-                            context.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it)) } }
+                            context.run { result.first.first.forEach { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
                         }
                     }
                     result.first.first

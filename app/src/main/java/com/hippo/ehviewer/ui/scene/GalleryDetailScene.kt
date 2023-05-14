@@ -139,6 +139,7 @@ import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
 import com.hippo.ehviewer.client.parser.TorrentParser
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
@@ -892,11 +893,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 EhDB.putHistoryInfo(galleryDetail)
                 if (Settings.preloadThumbAggressively) {
                     lifecycleScope.launchIO {
-                        galleryDetail.previewList.forEach {
-                            context?.run {
-                                imageLoader.enqueue(imageRequest(it))
-                            }
-                        }
+                        galleryDetail.previewList.forEach { context?.run { imageLoader.enqueue(imageRequest(it) { justDownload() }) } }
                     }
                 }
                 composeBindingGD = galleryDetail

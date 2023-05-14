@@ -71,6 +71,7 @@ import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryListParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
@@ -1052,11 +1053,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
         if (Settings.preloadThumbAggressively) {
             lifecycleScope.launchIO {
-                result.galleryInfoList.forEach {
-                    context?.run {
-                        imageLoader.enqueue(imageRequest(it.thumb))
-                    }
-                }
+                result.galleryInfoList.forEach { context?.run { imageLoader.enqueue(imageRequest(it.thumb) { justDownload() }) } }
             }
         }
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
