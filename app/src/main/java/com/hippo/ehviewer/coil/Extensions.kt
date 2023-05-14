@@ -30,9 +30,12 @@ fun ImageRequest.Builder.ehPreviewKey(key: GalleryPreview) = apply {
     size(Size.ORIGINAL)
 }
 
+private val stubResult = DecodeResult(ColorDrawable(Color.BLACK), false)
+private val stubFactory = Decoder { stubResult }
+
 fun ImageRequest.Builder.justDownload() = apply {
     memoryCachePolicy(CachePolicy.DISABLED)
-    decoderFactory { _, _, _ -> Decoder { DecodeResult(ColorDrawable(Color.BLACK), false) } }
+    decoderFactory { _, _, _ -> stubFactory }
 }
 
 inline fun Context.imageRequest(key: GalleryPreview, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehPreviewKey(key).apply(builder).build()
