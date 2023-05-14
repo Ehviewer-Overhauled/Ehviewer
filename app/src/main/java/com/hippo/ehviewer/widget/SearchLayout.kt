@@ -40,15 +40,13 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
-import com.hippo.app.BaseDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
-import com.hippo.easyrecyclerview.MarginItemDecoration
-import com.hippo.easyrecyclerview.SimpleHolder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.widget.RadioGridGroup
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+import com.hippo.ehviewer.widget.easyrecyclerview.MarginItemDecoration
+import com.hippo.ehviewer.widget.easyrecyclerview.SimpleHolder
 import com.hippo.yorozuya.NumberUtils
 import com.hippo.yorozuya.ViewUtils
 

@@ -21,7 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.SettingsActivity
-import com.hippo.preference.DialogPreference
+import com.hippo.ehviewer.widget.preference.DialogPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

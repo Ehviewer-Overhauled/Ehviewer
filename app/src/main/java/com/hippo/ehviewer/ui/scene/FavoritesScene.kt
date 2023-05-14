@@ -41,11 +41,6 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.hippo.app.BaseDialogBuilder
-import com.hippo.drawable.AddDeleteDrawable
-import com.hippo.easyrecyclerview.EasyRecyclerView
-import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
-import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -56,12 +51,17 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.widget.AddDeleteDrawable
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.ContentLayout
+import com.hippo.ehviewer.widget.FabLayout
+import com.hippo.ehviewer.widget.FabLayout.OnClickFabListener
+import com.hippo.ehviewer.widget.FabLayout.OnExpandListener
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
+import com.hippo.ehviewer.widget.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.util.getParcelableCompat
-import com.hippo.widget.ContentLayout
-import com.hippo.widget.FabLayout
-import com.hippo.widget.FabLayout.OnClickFabListener
-import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.SimpleHandler
 import com.hippo.yorozuya.ViewUtils
@@ -229,7 +229,8 @@ class FavoritesScene :
         updateSearchBar()
         updateJumpFab()
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-        mActionFabDrawable = AddDeleteDrawable(context, colorID)
+        mActionFabDrawable =
+            AddDeleteDrawable(context, colorID)
         mFabLayout!!.primaryFab!!.setImageDrawable(mActionFabDrawable)
         mFabLayout!!.setExpanded(expanded = false, animation = false)
         mFabLayout!!.setAutoCancel(true)

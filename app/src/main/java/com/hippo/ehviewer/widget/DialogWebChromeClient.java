@@ -26,7 +26,6 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.hippo.app.BaseDialogBuilder;
 import com.hippo.ehviewer.R;
 
 public class DialogWebChromeClient extends WebChromeClient {

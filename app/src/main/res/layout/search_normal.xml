@@ -27,7 +27,7 @@
         android:layout_marginBottom="@dimen/search_item_interval"
         app:chipSpacingHorizontal="24dp" />
 
-    <com.hippo.widget.RadioGridGroup
+    <com.hippo.ehviewer.widget.RadioGridGroup
         android:id="@+id/normal_search_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             android:minHeight="0dp"
             android:text="@string/search_specify_tag" />
 
-    </com.hippo.widget.RadioGridGroup>
+    </com.hippo.ehviewer.widget.RadioGridGroup>
 
     <LinearLayout
         android:layout_width="match_parent"

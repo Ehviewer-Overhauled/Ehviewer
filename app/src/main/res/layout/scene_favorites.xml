@@ -22,13 +22,13 @@
     android:paddingTop="16dp"
     app:layout_behavior="@string/searchbar_scrolling_view_behavior">
 
-    <com.hippo.widget.ContentLayout
+    <com.hippo.ehviewer.widget.ContentLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:fitsSystemWindowsInsets="top|bottom" />
 
-    <com.hippo.widget.FabLayout
+    <com.hippo.ehviewer.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -86,5 +86,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-    </com.hippo.widget.FabLayout>
+    </com.hippo.ehviewer.widget.FabLayout>
 </FrameLayout>

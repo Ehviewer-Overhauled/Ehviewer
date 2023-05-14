@@ -25,8 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.widget.ViewTransition
 import com.hippo.util.ExceptionUtils
-import com.hippo.view.ViewTransition
 import com.hippo.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -153,7 +153,8 @@ class ProgressScene : BaseScene(), View.OnClickListener {
         mTip!!.setCompoundDrawables(null, drawable, null, null)
         mTip!!.setOnClickListener(this)
         mTip!!.text = mError
-        mViewTransition = ViewTransition(progress, mTip)
+        mViewTransition =
+            ViewTransition(progress, mTip)
         if (mValid) {
             mViewTransition!!.showView(0, false)
         } else {

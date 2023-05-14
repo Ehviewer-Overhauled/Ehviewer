@@ -34,7 +34,7 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.image.Image
+import com.hippo.ehviewer.image.Image
 import com.hippo.unifile.UniFile
 import com.hippo.util.pickVisualMedia
 import kotlinx.coroutines.launch

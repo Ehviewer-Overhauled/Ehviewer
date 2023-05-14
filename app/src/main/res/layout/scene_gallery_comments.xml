@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.hippo.easyrecyclerview.EasyRecyclerView
+        <com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -91,7 +91,7 @@
         </LinearLayout>
     </FrameLayout>
 
-    <com.hippo.widget.FabLayout
+    <com.hippo.ehviewer.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -105,5 +105,5 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_reply_dark_x24" />
 
-    </com.hippo.widget.FabLayout>
+    </com.hippo.ehviewer.widget.FabLayout>
 </FrameLayout>

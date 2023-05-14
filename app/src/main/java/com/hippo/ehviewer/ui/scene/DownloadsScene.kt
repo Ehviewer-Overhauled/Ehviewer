@@ -45,13 +45,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import arrow.core.partially1
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.hippo.app.BaseDialogBuilder
-import com.hippo.app.CheckBoxDialogBuilder
-import com.hippo.app.EditTextDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
-import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
-import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
-import com.hippo.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -68,13 +61,20 @@ import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.ui.widget.EhAsyncCropThumb
 import com.hippo.ehviewer.ui.widget.setMD3Content
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.CheckBoxDialogBuilder
+import com.hippo.ehviewer.widget.EditTextDialogBuilder
+import com.hippo.ehviewer.widget.FabLayout
+import com.hippo.ehviewer.widget.FabLayout.OnClickFabListener
+import com.hippo.ehviewer.widget.FabLayout.OnExpandListener
+import com.hippo.ehviewer.widget.ViewTransition
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
+import com.hippo.ehviewer.widget.easyrecyclerview.FastScroller.OnDragHandlerListener
+import com.hippo.ehviewer.widget.easyrecyclerview.HandlerDrawable
+import com.hippo.ehviewer.widget.recyclerview.AutoStaggeredGridLayoutManager
+import com.hippo.ehviewer.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.unifile.UniFile
-import com.hippo.view.ViewTransition
-import com.hippo.widget.FabLayout
-import com.hippo.widget.FabLayout.OnClickFabListener
-import com.hippo.widget.FabLayout.OnExpandListener
-import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.yorozuya.FileUtils
 import com.hippo.yorozuya.ObjectUtils
 import com.hippo.yorozuya.collect.LongList
@@ -247,7 +247,8 @@ class DownloadsScene :
             // Workaround
             (fabLayout.parent as ViewGroup).removeView(fabLayout)
             container!!.addView(fabLayout)
-            mViewTransition = ViewTransition(content, tip)
+            mViewTransition =
+                ViewTransition(content, tip)
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_download)
             drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             tip.setCompoundDrawables(null, drawable, null, null)

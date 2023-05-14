@@ -29,8 +29,8 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhProxySelector
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.widget.preference.DialogPreference
 import com.hippo.network.InetValidator
-import com.hippo.preference.DialogPreference
 import com.hippo.yorozuya.MathUtils
 import com.hippo.yorozuya.ViewUtils
 

@@ -147,7 +147,7 @@
         android:title="@string/settings_eh_show_tag_translations"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.preference.UrlPreference
+    <com.hippo.ehviewer.widget.preference.UrlPreference
         android:key="tag_translations_source"
         android:title="@string/settings_eh_tag_translations_source"
         app:iconSpaceReserved="false"

@@ -13,7 +13,7 @@ import androidx.core.graphics.red
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import com.hippo.ehviewer.databinding.ReaderColorFilterSettingsBinding
-import com.hippo.image.Image
+import com.hippo.ehviewer.image.Image
 import eu.kanade.tachiyomi.core.preference.getAndSet
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.preference.asHotFlow

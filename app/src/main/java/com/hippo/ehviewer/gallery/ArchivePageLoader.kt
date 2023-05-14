@@ -21,8 +21,8 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.hippo.ehviewer.Settings
-import com.hippo.image.Image
-import com.hippo.image.rewriteGifSource
+import com.hippo.ehviewer.image.Image
+import com.hippo.ehviewer.image.rewriteGifSource
 import com.hippo.unifile.UniFile
 import com.hippo.yorozuya.FileUtils
 import kotlinx.coroutines.CoroutineScope

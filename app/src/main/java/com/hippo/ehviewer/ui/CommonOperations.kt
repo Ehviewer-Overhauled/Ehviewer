@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import com.hippo.app.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
@@ -31,6 +30,7 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.ehviewer.widget.ListCheckBoxDialogBuilder
 import com.hippo.unifile.UniFile
 import com.hippo.util.requestPermission
 import com.hippo.yorozuya.collect.LongList

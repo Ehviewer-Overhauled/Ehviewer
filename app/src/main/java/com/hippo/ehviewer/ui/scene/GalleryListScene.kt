@@ -52,11 +52,6 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.hippo.app.BaseDialogBuilder
-import com.hippo.app.EditTextDialogBuilder
-import com.hippo.drawable.AddDeleteDrawable
-import com.hippo.easyrecyclerview.EasyRecyclerView
-import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.FavouriteStatusRouter
@@ -88,14 +83,19 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.removeFromFavorites
+import com.hippo.ehviewer.widget.AddDeleteDrawable
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.BringOutTransition
+import com.hippo.ehviewer.widget.EditTextDialogBuilder
+import com.hippo.ehviewer.widget.FabLayout
+import com.hippo.ehviewer.widget.FabLayout.OnClickFabListener
+import com.hippo.ehviewer.widget.FabLayout.OnExpandListener
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.SearchLayout
+import com.hippo.ehviewer.widget.ViewTransition
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+import com.hippo.ehviewer.widget.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.util.getParcelableCompat
-import com.hippo.view.BringOutTransition
-import com.hippo.view.ViewTransition
-import com.hippo.widget.FabLayout
-import com.hippo.widget.FabLayout.OnClickFabListener
-import com.hippo.widget.FabLayout.OnExpandListener
 import com.hippo.yorozuya.AnimationUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 import com.hippo.yorozuya.StringUtils
@@ -359,7 +359,10 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         container!!.addView(binding.fabLayout)
         val paddingTopSB = resources.getDimensionPixelOffset(R.dimen.gallery_padding_top_search_bar)
         val paddingBottomFab = resources.getDimensionPixelOffset(R.dimen.gallery_padding_bottom_fab)
-        mViewTransition = BringOutTransition(binding.contentLayout, binding.searchLayout)
+        mViewTransition = BringOutTransition(
+            binding.contentLayout,
+            binding.searchLayout,
+        )
         mHelper = GalleryListHelper()
         binding.contentLayout.setHelper(mHelper!!)
         binding.contentLayout.fastScroller.setOnDragHandlerListener(this)
@@ -397,7 +400,8 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.fabLayout.addOnExpandListener(this)
         addAboveSnackView(binding.fabLayout)
         val colorID = theme.resolveColor(com.google.android.material.R.attr.colorOnSurface)
-        mActionFabDrawable = AddDeleteDrawable(context, colorID)
+        mActionFabDrawable =
+            AddDeleteDrawable(context, colorID)
         binding.fabLayout.primaryFab!!.setImageDrawable(mActionFabDrawable)
         mSearchFab!!.setOnClickListener { onApplySearch() }
 

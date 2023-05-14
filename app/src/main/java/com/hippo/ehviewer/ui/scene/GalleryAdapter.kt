@@ -24,13 +24,13 @@ import androidx.annotation.IntDef
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.hippo.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.widget.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.widget.recyclerview.STRATEGY_MIN_SIZE
-import com.hippo.widget.recyclerview.STRATEGY_SUITABLE_SIZE
+import com.hippo.ehviewer.widget.easyrecyclerview.MarginItemDecoration
+import com.hippo.ehviewer.widget.recyclerview.AutoStaggeredGridLayoutManager
+import com.hippo.ehviewer.widget.recyclerview.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.widget.recyclerview.STRATEGY_SUITABLE_SIZE
 
 abstract class GalleryAdapter(
     private val mResources: Resources,

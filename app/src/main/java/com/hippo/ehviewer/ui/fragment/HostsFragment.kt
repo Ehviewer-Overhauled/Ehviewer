@@ -30,11 +30,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.Hosts
 import com.hippo.ehviewer.R
-import com.hippo.view.ViewTransition
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.ViewTransition
 
 class HostsFragment : BaseFragment(), View.OnClickListener {
     private var hosts: Hosts? = null
@@ -56,7 +56,8 @@ class HostsFragment : BaseFragment(), View.OnClickListener {
     ): View {
         val recyclerView = inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
         val tip = getTipView(R.string.hosts)
-        mViewTransition = ViewTransition(recyclerView, tip)
+        mViewTransition =
+            ViewTransition(recyclerView, tip)
         val fab = getFabViewAndShow()
         adapter = HostsAdapter()
         recyclerView.adapter = adapter

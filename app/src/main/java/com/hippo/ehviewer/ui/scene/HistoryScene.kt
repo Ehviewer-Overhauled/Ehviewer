@@ -64,7 +64,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import arrow.core.partially1
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -80,6 +79,7 @@ import com.hippo.ehviewer.ui.widget.Deferred
 import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
 import com.hippo.ehviewer.ui.widget.rememberDialogState
 import com.hippo.ehviewer.ui.widget.setMD3Content
+import com.hippo.ehviewer.widget.BaseDialogBuilder
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp

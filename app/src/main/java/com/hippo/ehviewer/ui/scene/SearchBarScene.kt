@@ -19,11 +19,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.search.SearchView
 import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
+import com.hippo.ehviewer.widget.BaseDialogBuilder
 import com.hippo.ehviewer.widget.SearchDatabase
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow

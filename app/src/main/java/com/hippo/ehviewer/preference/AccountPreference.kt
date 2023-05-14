@@ -26,7 +26,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.preference.MessagePreference
+import com.hippo.ehviewer.widget.preference.MessagePreference
 import com.hippo.util.addTextToClipboard
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl

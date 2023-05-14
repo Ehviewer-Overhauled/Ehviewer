@@ -27,7 +27,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.EhDB
@@ -36,6 +35,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.ehviewer.widget.BaseDialogBuilder
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.LogCat
 import com.hippo.util.ReadableTime

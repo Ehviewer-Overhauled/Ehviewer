@@ -60,9 +60,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.hippo.app.BaseDialogBuilder
-import com.hippo.app.EditTextDialogBuilder
-import com.hippo.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.client.EhEngine
@@ -78,17 +75,20 @@ import com.hippo.ehviewer.ui.jumpToReaderByPage
 import com.hippo.ehviewer.ui.navWithUrl
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
-import com.hippo.text.URLImageGetter
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.EditTextDialogBuilder
+import com.hippo.ehviewer.widget.FabLayout
+import com.hippo.ehviewer.widget.LinkifyTextView
+import com.hippo.ehviewer.widget.ObservedTextView
+import com.hippo.ehviewer.widget.URLImageGetter
+import com.hippo.ehviewer.widget.ViewTransition
+import com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.ReadableTime
 import com.hippo.util.TextUrl
 import com.hippo.util.addTextToClipboard
 import com.hippo.util.getParcelableCompat
 import com.hippo.util.toBBCode
-import com.hippo.view.ViewTransition
-import com.hippo.widget.FabLayout
-import com.hippo.widget.LinkifyTextView
-import com.hippo.widget.ObservedTextView
 import com.hippo.yorozuya.AnimationUtils
 import com.hippo.yorozuya.SimpleAnimatorListener
 import com.hippo.yorozuya.StringUtils
@@ -276,7 +276,8 @@ class GalleryCommentsScene : BaseToolbarScene(), View.OnClickListener, OnRefresh
         mFab!!.setOnClickListener(this)
         addAboveSnackView(mEditPanel)
         addAboveSnackView(mFabLayout)
-        mViewTransition = ViewTransition(mRecyclerView, tip)
+        mViewTransition =
+            ViewTransition(mRecyclerView, tip)
         updateView(false)
         return view
     }

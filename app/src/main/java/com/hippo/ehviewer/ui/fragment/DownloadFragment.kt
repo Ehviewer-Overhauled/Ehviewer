@@ -21,12 +21,12 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.scene.BaseScene
+import com.hippo.ehviewer.widget.BaseDialogBuilder
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable

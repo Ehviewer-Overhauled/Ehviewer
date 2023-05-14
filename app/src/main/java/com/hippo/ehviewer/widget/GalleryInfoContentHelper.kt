@@ -21,7 +21,7 @@ import android.os.Parcelable
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.widget.ContentLayout.ContentHelper
+import com.hippo.ehviewer.widget.ContentLayout.ContentHelper
 import com.hippo.yorozuya.IntIdGenerator
 import java.time.Instant
 import java.time.ZoneOffset

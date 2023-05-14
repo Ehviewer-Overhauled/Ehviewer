@@ -60,7 +60,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.slider.Slider
 import com.google.android.material.transition.MaterialContainerTransform
-import com.hippo.app.EditTextDialogBuilder
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.EhApplication
@@ -71,8 +70,9 @@ import com.hippo.ehviewer.databinding.ReaderActivityBinding
 import com.hippo.ehviewer.gallery.ArchivePageLoader
 import com.hippo.ehviewer.gallery.EhPageLoader
 import com.hippo.ehviewer.gallery.PageLoader2
+import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.image.Image
+import com.hippo.ehviewer.widget.EditTextDialogBuilder
 import com.hippo.unifile.UniFile
 import com.hippo.util.ExceptionUtils
 import com.hippo.util.getParcelableCompat

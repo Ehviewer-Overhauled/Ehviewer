@@ -37,11 +37,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputLayout
-import com.hippo.app.BaseDialogBuilder
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
-import com.hippo.view.ViewTransition
+import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.widget.ViewTransition
 import com.hippo.yorozuya.ViewUtils
 
 class FilterFragment : BaseFragment() {
@@ -73,7 +73,8 @@ class FilterFragment : BaseFragment() {
         val recyclerView =
             inflater.inflate(R.layout.rv_layout, container, false) as RecyclerView
         val tip = getTipView(R.string.filter)
-        mViewTransition = ViewTransition(recyclerView, tip)
+        mViewTransition =
+            ViewTransition(recyclerView, tip)
         val fab = getFabViewAndShow()
         val drawable = ContextCompat.getDrawable(requireActivity(), R.drawable.big_filter)
         drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)

@@ -28,8 +28,8 @@ import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
-import com.hippo.image.Image.CloseableSource
-import com.hippo.image.rewriteGifSource2
+import com.hippo.ehviewer.image.Image.CloseableSource
+import com.hippo.ehviewer.image.rewriteGifSource2
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import com.hippo.util.sendTo
