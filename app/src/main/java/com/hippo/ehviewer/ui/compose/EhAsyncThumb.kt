@@ -45,7 +45,7 @@ fun EhAsyncCropThumb(
         onState = {
             if (it is AsyncImagePainter.State.Success) {
                 it.result.drawable.run {
-                    if (intrinsicWidth.toFloat() / intrinsicHeight in 0.5..0.8) {
+                    if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
                         contentScale = ContentScale.Crop
                     }
                 }
