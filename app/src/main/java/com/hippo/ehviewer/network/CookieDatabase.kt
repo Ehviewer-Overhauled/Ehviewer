@@ -16,76 +16,11 @@
 package com.hippo.ehviewer.network
 
 import android.content.Context
-import androidx.room.AutoMigration
-import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Delete
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.Update
+import com.hippo.ehviewer.dao.Cookie
+import com.hippo.ehviewer.dao.buildCookiesDB
 import okhttp3.Cookie as OkHttpCookie
 
-@Entity(tableName = "OK_HTTP_3_COOKIE")
-class Cookie(
-    @ColumnInfo(name = "NAME")
-    var name: String,
-    @ColumnInfo(name = "VALUE")
-    var value: String,
-    @ColumnInfo(name = "EXPIRES_AT")
-    var expiresAt: Long,
-    @ColumnInfo(name = "DOMAIN")
-    var domain: String,
-    @ColumnInfo(name = "PATH")
-    var path: String,
-    @ColumnInfo(name = "SECURE")
-    var secure: Boolean,
-    @ColumnInfo(name = "HTTP_ONLY")
-    var httpOnly: Boolean,
-    @ColumnInfo(name = "PERSISTENT")
-    var persistent: Boolean,
-    @ColumnInfo(name = "HOST_ONLY")
-    var hostOnly: Boolean,
-    @PrimaryKey
-    @ColumnInfo(name = "_id")
-    var id: Long?,
-)
-
-@Dao
-interface CookiesDao {
-    @Query("SELECT * FROM OK_HTTP_3_COOKIE")
-    fun list(): List<Cookie>
-
-    @Delete
-    fun delete(cookie: Cookie)
-
-    @Insert
-    fun insert(cookie: Cookie): Long
-
-    @Update
-    fun update(cookie: Cookie)
-}
-
-// 1 -> 2 some nullability changes
-@Database(
-    entities = [Cookie::class],
-    version = 2,
-    autoMigrations = [
-        AutoMigration(
-            from = 1,
-            to = 2,
-        ),
-    ],
-)
-abstract class CookiesDatabase : RoomDatabase() {
-    abstract fun cookiesDao(): CookiesDao
-}
-
-internal class CookieDatabase(context: Context, name: String) {
+class CookieDatabase(context: Context) {
     private val cookiesList by lazy {
         val now = System.currentTimeMillis()
         db.cookiesDao().list().mapNotNull {
@@ -95,7 +30,7 @@ internal class CookieDatabase(context: Context, name: String) {
             }
         }.toMutableList()
     }
-    private val db = Room.databaseBuilder(context, CookiesDatabase::class.java, name).build()
+    private val db = buildCookiesDB(context)
 
     val allCookies by lazy {
         hashMapOf<String, CookieSet>().also { map ->

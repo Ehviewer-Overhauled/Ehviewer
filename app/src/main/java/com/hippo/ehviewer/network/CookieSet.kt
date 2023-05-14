@@ -18,7 +18,7 @@ package com.hippo.ehviewer.network
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 
-internal class CookieSet {
+class CookieSet {
     private val map: MutableMap<Key, Cookie> = HashMap()
 
     /**

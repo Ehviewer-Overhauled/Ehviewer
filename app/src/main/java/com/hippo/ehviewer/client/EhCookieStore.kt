@@ -27,7 +27,7 @@ import java.util.Collections
 import java.util.regex.Pattern
 
 object EhCookieStore : CookieJar {
-    private val db: CookieDatabase = CookieDatabase(EhApplication.application, "okhttp3-cookie.db")
+    private val db: CookieDatabase = CookieDatabase(EhApplication.application)
     private val map: MutableMap<String, CookieSet> = db.allCookies
 
     fun signOut() {
