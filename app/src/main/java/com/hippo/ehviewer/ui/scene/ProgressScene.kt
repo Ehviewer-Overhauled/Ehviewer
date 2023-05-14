@@ -25,9 +25,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.widget.ViewTransition
-import com.hippo.util.ExceptionUtils
-import com.hippo.yorozuya.ViewUtils
+import com.hippo.ehviewer.ui.legacy.ViewTransition
+import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.yorozuya.ViewUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import moe.tarsin.coroutines.runSuspendCatching

@@ -21,11 +21,11 @@ import androidx.annotation.IntDef
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.dao.QuickSearch
-import com.hippo.ehviewer.widget.AdvanceSearchTable
-import com.hippo.network.UrlBuilder
-import com.hippo.util.encodeUTF8
-import com.hippo.yorozuya.NumberUtils
-import com.hippo.yorozuya.StringUtils
+import com.hippo.ehviewer.network.UrlBuilder
+import com.hippo.ehviewer.ui.legacy.AdvanceSearchTable
+import com.hippo.ehviewer.util.encodeUTF8
+import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.StringUtils
 import kotlinx.parcelize.Parcelize
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder

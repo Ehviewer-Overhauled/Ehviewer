@@ -29,14 +29,14 @@
         app:enableCopying="true"
         app:iconSpaceReserved="false" />
 
-    <com.hippo.ehviewer.widget.preference.UrlPreference
+    <com.hippo.ehviewer.ui.legacy.preference.UrlPreference
         android:key="latest_release"
         android:title="@string/settings_about_latest_release"
         app:enableCopying="true"
         app:iconSpaceReserved="false"
         app:url="https://github.com/Ehviewer-Overhauled/Ehviewer/releases" />
 
-    <com.hippo.ehviewer.widget.preference.UrlPreference
+    <com.hippo.ehviewer.ui.legacy.preference.UrlPreference
         android:key="source"
         android:title="@string/settings_about_source"
         app:enableCopying="true"

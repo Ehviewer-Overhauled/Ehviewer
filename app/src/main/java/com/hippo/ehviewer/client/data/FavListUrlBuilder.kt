@@ -17,8 +17,8 @@ package com.hippo.ehviewer.client.data
 
 import android.os.Parcelable
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.network.UrlBuilder
-import com.hippo.util.encodeUTF8
+import com.hippo.ehviewer.network.UrlBuilder
+import com.hippo.ehviewer.util.encodeUTF8
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

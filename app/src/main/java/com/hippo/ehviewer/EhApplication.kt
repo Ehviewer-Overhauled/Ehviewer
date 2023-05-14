@@ -38,8 +38,8 @@ import com.hippo.ehviewer.dao.buildMainDB
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
-import com.hippo.util.ReadableTime
-import com.hippo.yorozuya.FileUtils
+import com.hippo.ehviewer.util.ReadableTime
+import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO

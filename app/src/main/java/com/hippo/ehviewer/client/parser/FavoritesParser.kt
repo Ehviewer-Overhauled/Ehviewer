@@ -19,8 +19,8 @@ import com.hippo.ehviewer.GetText.getString
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.util.ExceptionUtils
-import com.hippo.util.JsoupUtils
+import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.JsoupUtils
 import org.jsoup.Jsoup
 
 object FavoritesParser {

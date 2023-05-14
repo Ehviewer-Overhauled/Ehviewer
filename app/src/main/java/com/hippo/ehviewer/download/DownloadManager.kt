@@ -29,11 +29,11 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.spider.write
-import com.hippo.yorozuya.ConcurrentPool
-import com.hippo.yorozuya.MathUtils
-import com.hippo.yorozuya.ObjectUtils
-import com.hippo.yorozuya.SimpleHandler
-import com.hippo.yorozuya.collect.LongList
+import com.hippo.ehviewer.yorozuya.ConcurrentPool
+import com.hippo.ehviewer.yorozuya.MathUtils
+import com.hippo.ehviewer.yorozuya.ObjectUtils
+import com.hippo.ehviewer.yorozuya.SimpleHandler
+import com.hippo.ehviewer.yorozuya.collect.LongList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.LinkedList

@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         app:fitsSystemWindowsInsets="start|end">
 
-        <com.hippo.ehviewer.widget.AboveSnackerLayout
+        <com.hippo.ehviewer.ui.legacy.AboveSnackerLayout
             android:id="@+id/absnacker"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:defaultNavHost="true" />
-        </com.hippo.ehviewer.widget.AboveSnackerLayout>
+        </com.hippo.ehviewer.ui.legacy.AboveSnackerLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -51,7 +51,7 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/nav_drawer_main" />
 
-    <com.hippo.ehviewer.widget.DrawerView
+    <com.hippo.ehviewer.ui.legacy.DrawerView
         android:id="@+id/right_drawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

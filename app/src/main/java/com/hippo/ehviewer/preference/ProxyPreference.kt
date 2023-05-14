@@ -29,10 +29,10 @@ import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhProxySelector
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.widget.preference.DialogPreference
-import com.hippo.network.InetValidator
-import com.hippo.yorozuya.MathUtils
-import com.hippo.yorozuya.ViewUtils
+import com.hippo.ehviewer.network.InetValidator
+import com.hippo.ehviewer.ui.legacy.preference.DialogPreference
+import com.hippo.ehviewer.yorozuya.MathUtils
+import com.hippo.ehviewer.yorozuya.ViewUtils
 
 class ProxyPreference @JvmOverloads constructor(
     context: Context,

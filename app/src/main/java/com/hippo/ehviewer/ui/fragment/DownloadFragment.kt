@@ -25,10 +25,10 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.widget.BaseDialogBuilder
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.unifile.UniFile
-import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 class DownloadFragment : BasePreferenceFragment() {

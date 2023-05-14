@@ -18,7 +18,7 @@ package com.hippo.ehviewer.client.parser
 import com.hippo.ehviewer.client.EhUtils.getCategory
 import com.hippo.ehviewer.client.EhUtils.handleThumbUrlResolution
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.NumberUtils
 import org.json.JSONObject
 
 object GalleryApiParser {

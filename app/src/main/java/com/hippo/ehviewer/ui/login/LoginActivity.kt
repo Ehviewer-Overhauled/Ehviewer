@@ -18,7 +18,7 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.EhActivity
-import com.hippo.ehviewer.ui.widget.setMD3Content
+import com.hippo.ehviewer.ui.compose.setMD3Content
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 

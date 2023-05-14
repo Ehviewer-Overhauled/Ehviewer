@@ -31,7 +31,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.databinding.ActivityWebviewBinding
-import com.hippo.ehviewer.widget.DialogWebChromeClient
+import com.hippo.ehviewer.ui.legacy.DialogWebChromeClient
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import rikka.core.res.resolveColor
 

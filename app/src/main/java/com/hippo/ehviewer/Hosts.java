@@ -29,8 +29,8 @@ import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
-import com.hippo.database.MSQLiteBuilder;
-import com.hippo.util.SqlUtils;
+import com.hippo.ehviewer.database.MSQLiteBuilder;
+import com.hippo.ehviewer.util.SqlUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

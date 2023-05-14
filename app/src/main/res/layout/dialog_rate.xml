@@ -29,7 +29,7 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/text_little_small" />
 
-    <com.hippo.ehviewer.widget.GalleryRatingBar
+    <com.hippo.ehviewer.ui.legacy.GalleryRatingBar
         android:id="@+id/rating_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -35,8 +35,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.widget.GalleryInfoGridItem
-import com.hippo.ehviewer.ui.widget.GalleryInfoListItem
+import com.hippo.ehviewer.ui.compose.GalleryInfoGridItem
+import com.hippo.ehviewer.ui.compose.GalleryInfoListItem
 import eu.kanade.tachiyomi.util.system.pxToDp
 
 abstract class GalleryHolder(composeView: CheckableComposeView) : RecyclerView.ViewHolder(composeView) {

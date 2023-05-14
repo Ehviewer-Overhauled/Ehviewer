@@ -23,9 +23,9 @@ import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.scene.GalleryListScene
+import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
+import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.unifile.UniFile
-import com.hippo.yorozuya.LayoutUtils.dp2pix
-import com.hippo.yorozuya.NumberUtils
 import java.util.Locale
 
 object Settings {

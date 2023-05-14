@@ -23,8 +23,8 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
-import com.hippo.ehviewer.widget.BaseDialogBuilder
-import com.hippo.ehviewer.widget.SearchDatabase
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.legacy.SearchDatabase
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

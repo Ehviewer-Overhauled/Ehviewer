@@ -30,10 +30,10 @@ import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
 import com.hippo.ehviewer.image.rewriteGifSource2
+import com.hippo.ehviewer.util.sendTo
+import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
-import com.hippo.util.sendTo
-import com.hippo.yorozuya.FileUtils
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import moe.tarsin.coroutines.runSuspendCatching

@@ -38,8 +38,8 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhCookieStore.KEY_SETTINGS_PROFILE
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.databinding.ActivityWebviewBinding
+import com.hippo.ehviewer.ui.legacy.DialogWebChromeClient
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.widget.DialogWebChromeClient
 import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl

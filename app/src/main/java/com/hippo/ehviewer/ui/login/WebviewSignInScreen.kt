@@ -13,7 +13,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.widget.DialogWebChromeClient
+import com.hippo.ehviewer.ui.legacy.DialogWebChromeClient
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext

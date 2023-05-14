@@ -33,8 +33,8 @@ import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.Hosts
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.widget.BaseDialogBuilder
-import com.hippo.ehviewer.widget.ViewTransition
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.legacy.ViewTransition
 
 class HostsFragment : BaseFragment(), View.OnClickListener {
     private var hosts: Hosts? = null

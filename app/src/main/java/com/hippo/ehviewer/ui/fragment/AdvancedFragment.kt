@@ -34,12 +34,12 @@ import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.widget.BaseDialogBuilder
-import com.hippo.util.ExceptionUtils
-import com.hippo.util.LogCat
-import com.hippo.util.ReadableTime
-import com.hippo.yorozuya.IOUtils
+import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.LogCat
+import com.hippo.ehviewer.util.ReadableTime
+import com.hippo.ehviewer.yorozuya.IOUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay

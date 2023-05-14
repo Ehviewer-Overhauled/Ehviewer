@@ -61,9 +61,9 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.openBrowser
-import com.hippo.ehviewer.ui.widget.rememberDialogState
-import com.hippo.util.ExceptionUtils
+import com.hippo.ehviewer.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext
 import eu.kanade.tachiyomi.util.lang.withUIContext

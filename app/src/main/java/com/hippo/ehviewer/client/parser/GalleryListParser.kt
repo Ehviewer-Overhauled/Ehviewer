@@ -21,9 +21,9 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.util.ExceptionUtils
-import com.hippo.util.JsoupUtils
-import com.hippo.yorozuya.NumberUtils
+import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.JsoupUtils
+import com.hippo.ehviewer.yorozuya.NumberUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element

@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.EhUrl
-import com.hippo.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.NumberUtils
 import java.util.regex.Pattern
 
 /**

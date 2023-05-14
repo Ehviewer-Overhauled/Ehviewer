@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+        <com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,7 +33,7 @@
             android:paddingVertical="@dimen/gallery_list_margin_v"
             app:fitsSystemWindowsInsets="bottom" />
 
-        <com.hippo.ehviewer.widget.easyrecyclerview.FastScroller
+        <com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller
             android:id="@+id/fast_scroller"
             android:layout_width="30dp"
             android:layout_height="match_parent"
@@ -55,7 +55,7 @@
         android:gravity="center_horizontal"
         android:text="@string/no_download_info" />
 
-    <com.hippo.ehviewer.widget.FabLayout
+    <com.hippo.ehviewer.ui.legacy.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -98,6 +98,6 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/v_close_dark_x24" />
 
-    </com.hippo.ehviewer.widget.FabLayout>
+    </com.hippo.ehviewer.ui.legacy.FabLayout>
 
 </FrameLayout>

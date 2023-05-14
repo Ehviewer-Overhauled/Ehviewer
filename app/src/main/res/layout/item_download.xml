@@ -53,7 +53,7 @@
             android:layout_alignStart="@id/title"
             android:layout_marginTop="2dp" />
 
-        <com.hippo.ehviewer.widget.SimpleRatingView
+        <com.hippo.ehviewer.ui.legacy.SimpleRatingView
             android:id="@+id/rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

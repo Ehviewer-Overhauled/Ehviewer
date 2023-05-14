@@ -24,9 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.util.ReadableTime;
-import com.hippo.yorozuya.FileUtils;
-import com.hippo.yorozuya.IOUtils;
+import com.hippo.ehviewer.util.ReadableTime;
+import com.hippo.ehviewer.yorozuya.FileUtils;
+import com.hippo.ehviewer.yorozuya.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

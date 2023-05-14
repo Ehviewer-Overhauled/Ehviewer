@@ -18,7 +18,7 @@ package com.hippo.ehviewer.client.parser
 import android.util.Log
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.util.ExceptionUtils
+import com.hippo.ehviewer.util.ExceptionUtils
 import org.jsoup.Jsoup
 
 object ProfileParser {

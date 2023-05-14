@@ -29,11 +29,11 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.ui.legacy.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.widget.ListCheckBoxDialogBuilder
+import com.hippo.ehviewer.util.requestPermission
+import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
-import com.hippo.util.requestPermission
-import com.hippo.yorozuya.collect.LongList
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchNow
 import eu.kanade.tachiyomi.util.lang.withUIContext

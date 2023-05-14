@@ -1,8 +1,8 @@
 package com.hippo.ehviewer.spider
 
 import coil.disk.DiskCache
-import com.hippo.compat.readLegacySpiderInfo
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.legacy.readLegacySpiderInfo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openInputStream
 import com.hippo.unifile.openOutputStream

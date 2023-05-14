@@ -20,7 +20,7 @@ import android.os.Build
 import android.text.TextUtils
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.ListUrlBuilder
-import com.hippo.yorozuya.Utilities
+import com.hippo.ehviewer.yorozuya.Utilities
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL

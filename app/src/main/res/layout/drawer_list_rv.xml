@@ -44,7 +44,7 @@
                 android:layout_gravity="center"
                 android:visibility="gone" />
 
-            <com.hippo.ehviewer.widget.easyrecyclerview.EasyRecyclerView
+            <com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
                 android:id="@+id/recycler_view_drawer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

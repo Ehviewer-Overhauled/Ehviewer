@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true" />
 
-            <com.hippo.ehviewer.widget.LinkifyTextView
+            <com.hippo.ehviewer.ui.legacy.LinkifyTextView
                 android:id="@+id/comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

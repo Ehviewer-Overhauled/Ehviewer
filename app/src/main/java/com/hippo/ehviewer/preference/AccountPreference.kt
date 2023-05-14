@@ -25,9 +25,9 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.SettingsActivity
+import com.hippo.ehviewer.ui.legacy.preference.MessagePreference
 import com.hippo.ehviewer.ui.scene.BaseScene
-import com.hippo.ehviewer.widget.preference.MessagePreference
-import com.hippo.util.addTextToClipboard
+import com.hippo.ehviewer.util.addTextToClipboard
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.LinkedList

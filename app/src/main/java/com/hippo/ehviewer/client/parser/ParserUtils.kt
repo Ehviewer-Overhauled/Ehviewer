@@ -15,8 +15,8 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import com.hippo.yorozuya.NumberUtils
-import com.hippo.yorozuya.StringUtils
+import com.hippo.ehviewer.yorozuya.NumberUtils
+import com.hippo.ehviewer.yorozuya.StringUtils
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

@@ -20,8 +20,8 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.R
-import com.hippo.yorozuya.FileUtils
-import com.hippo.yorozuya.copyToFile
+import com.hippo.ehviewer.yorozuya.FileUtils
+import com.hippo.ehviewer.yorozuya.copyToFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

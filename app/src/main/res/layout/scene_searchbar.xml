@@ -47,7 +47,7 @@
 
     </com.google.android.material.search.SearchView>
 
-    <com.hippo.ehviewer.widget.FabLayout
+    <com.hippo.ehviewer.ui.legacy.FabLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="6dp"
@@ -64,6 +64,6 @@
             android:visibility="invisible"
             app:srcCompat="@drawable/v_magnify_x24" />
 
-    </com.hippo.ehviewer.widget.FabLayout>
+    </com.hippo.ehviewer.ui.legacy.FabLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

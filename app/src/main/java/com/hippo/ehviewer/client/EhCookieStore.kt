@@ -16,8 +16,8 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.EhApplication
-import com.hippo.network.CookieDatabase
-import com.hippo.network.CookieSet
+import com.hippo.ehviewer.network.CookieDatabase
+import com.hippo.ehviewer.network.CookieSet
 import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import okhttp3.CookieJar

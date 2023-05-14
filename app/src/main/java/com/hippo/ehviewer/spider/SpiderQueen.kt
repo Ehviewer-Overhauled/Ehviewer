@@ -38,8 +38,8 @@ import com.hippo.ehviewer.client.parser.GalleryDetailParser.parsePreviewPages
 import com.hippo.ehviewer.client.parser.GalleryMultiPageViewerPTokenParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.image.Image
+import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.unifile.UniFile
-import com.hippo.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

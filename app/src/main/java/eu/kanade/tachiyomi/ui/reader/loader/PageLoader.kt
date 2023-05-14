@@ -3,8 +3,8 @@ package eu.kanade.tachiyomi.ui.reader.loader
 import androidx.annotation.CallSuper
 import androidx.collection.lruCache
 import com.hippo.ehviewer.image.Image
-import com.hippo.yorozuya.MathUtils
-import com.hippo.yorozuya.OSUtils
+import com.hippo.ehviewer.yorozuya.MathUtils
+import com.hippo.ehviewer.yorozuya.OSUtils
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 

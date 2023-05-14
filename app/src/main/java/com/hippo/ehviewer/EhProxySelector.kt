@@ -19,8 +19,8 @@ import android.text.TextUtils
 import com.hippo.ehviewer.Settings.proxyIp
 import com.hippo.ehviewer.Settings.proxyPort
 import com.hippo.ehviewer.Settings.proxyType
-import com.hippo.network.InetValidator.isValidInetPort
-import com.hippo.util.ExceptionUtils
+import com.hippo.ehviewer.network.InetValidator.isValidInetPort
+import com.hippo.ehviewer.util.ExceptionUtils
 import java.io.IOException
 import java.net.InetAddress
 import java.net.InetSocketAddress

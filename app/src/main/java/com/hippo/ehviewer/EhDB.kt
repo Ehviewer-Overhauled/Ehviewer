@@ -33,7 +33,7 @@ import com.hippo.ehviewer.dao.HistoryInfo
 import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.util.sendTo
+import com.hippo.ehviewer.util.sendTo
 
 object EhDB {
     private const val CUR_DB_VER = 4

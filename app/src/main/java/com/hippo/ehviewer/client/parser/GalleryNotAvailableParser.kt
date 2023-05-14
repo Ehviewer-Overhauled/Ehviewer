@@ -17,8 +17,8 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import com.hippo.util.ExceptionUtils
-import com.hippo.util.JsoupUtils
+import com.hippo.ehviewer.util.ExceptionUtils
+import com.hippo.ehviewer.util.JsoupUtils
 import org.jsoup.Jsoup
 
 object GalleryNotAvailableParser {

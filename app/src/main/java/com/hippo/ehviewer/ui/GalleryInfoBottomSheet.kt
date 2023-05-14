@@ -40,7 +40,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.ui.login.LocalNavController
-import com.hippo.util.tellClipboardWithToast
+import com.hippo.ehviewer.util.tellClipboardWithToast
 
 private const val INDEX_URL = 2
 private const val INDEX_PARENT = 9

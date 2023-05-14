@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.util.ExceptionUtils
+import com.hippo.ehviewer.util.ExceptionUtils
 import org.json.JSONObject
 
 object GalleryTokenApiParser {

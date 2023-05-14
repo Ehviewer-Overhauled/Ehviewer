@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.Settings
-import com.hippo.network.UrlBuilder
+import com.hippo.ehviewer.network.UrlBuilder
 
 object EhUrl {
     const val SITE_E = 0

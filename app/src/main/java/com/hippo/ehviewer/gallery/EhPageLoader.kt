@@ -21,8 +21,8 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.obtainSpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.releaseSpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.OnSpiderListener
+import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.unifile.UniFile
-import com.hippo.yorozuya.SimpleHandler
 import java.util.Locale
 
 class EhPageLoader(private val mGalleryInfo: GalleryInfo) : PageLoader2(), OnSpiderListener {

@@ -40,9 +40,9 @@ import com.google.android.material.textfield.TextInputLayout
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
-import com.hippo.ehviewer.widget.BaseDialogBuilder
-import com.hippo.ehviewer.widget.ViewTransition
-import com.hippo.yorozuya.ViewUtils
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.legacy.ViewTransition
+import com.hippo.ehviewer.yorozuya.ViewUtils
 
 class FilterFragment : BaseFragment() {
     private var mViewTransition: ViewTransition? = null

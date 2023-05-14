@@ -23,8 +23,8 @@ import android.util.Log
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.image.rewriteGifSource
+import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
-import com.hippo.yorozuya.FileUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers

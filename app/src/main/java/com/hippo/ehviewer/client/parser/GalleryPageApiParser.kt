@@ -16,7 +16,7 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.yorozuya.StringUtils
+import com.hippo.ehviewer.yorozuya.StringUtils
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.regex.Matcher
