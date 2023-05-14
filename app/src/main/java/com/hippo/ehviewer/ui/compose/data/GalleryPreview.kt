@@ -68,14 +68,12 @@ fun EhAsyncPreview(
                 model.run {
                     if (this is NormalGalleryPreview) {
                         if (clipWidth.toFloat() / clipHeight in 0.5..0.8) {
-                            if (contentScale == ContentScale.Fit) contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop
                         }
                     } else {
                         it.result.drawable.run {
                             if (intrinsicWidth.toFloat() / intrinsicHeight in 0.5..0.8) {
-                                if (contentScale == ContentScale.Fit) {
-                                    contentScale = ContentScale.Crop
-                                }
+                                contentScale = ContentScale.Crop
                             }
                         }
                     }
