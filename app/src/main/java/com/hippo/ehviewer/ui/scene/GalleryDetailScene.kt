@@ -47,7 +47,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -151,9 +150,9 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.CrystalCard
-import com.hippo.ehviewer.ui.compose.EhAsyncPreview
-import com.hippo.ehviewer.ui.compose.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.compose.GalleryDetailRating
+import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
+import com.hippo.ehviewer.ui.compose.data.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
@@ -654,26 +653,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private fun LazyGridScope.galleryDetailPreview(gd: GalleryDetail) {
         val previewList = gd.previewList
         items(previewList) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    CrystalCard(
-                        onClick = {
-                            mainActivity?.startReaderActivity(gd, it.position)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(0.6666667F),
-                    ) {
-                        EhAsyncPreview(
-                            model = it,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-                }
-                Text((it.position + 1).toString())
-            }
+            EhPreviewItem(
+                galleryPreview = it,
+                onClick = { mainActivity?.startReaderActivity(gd, it.position) },
+            )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             val footerText = if (gd.previewPages <= 0 || previewList.isEmpty()) {

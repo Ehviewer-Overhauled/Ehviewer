@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.compose.data
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.ui.compose.CrystalCard
+import com.hippo.ehviewer.ui.compose.EhAsyncCropThumb
+import com.hippo.ehviewer.ui.compose.EhAsyncThumb
+import com.hippo.ehviewer.ui.compose.ElevatedCard
+import com.hippo.ehviewer.ui.compose.GalleryListCardRating
 
 @Composable
 fun GalleryInfoListItem(

@@ -74,7 +74,7 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.Deferred
-import com.hippo.ehviewer.ui.compose.GalleryInfoListItem
+import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter

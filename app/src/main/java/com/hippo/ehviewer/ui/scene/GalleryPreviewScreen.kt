@@ -54,7 +54,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.ui.compose.EhPreviewItem
+import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.recyclerview.calculateSuitableSpanCount
