@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.GetText
@@ -353,7 +354,7 @@ object EhEngine {
         }
     }.executeAndParsingWith(RateGalleryParser::parse)
 
-    suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).forEach {
+    suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).parMap {
         ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
             jsonBody {
                 put("method", "gdata")
