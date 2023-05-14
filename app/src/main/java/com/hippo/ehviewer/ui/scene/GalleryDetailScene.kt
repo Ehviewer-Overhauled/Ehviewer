@@ -653,22 +653,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private fun LazyGridScope.galleryDetailPreview(gd: GalleryDetail) {
         val previewList = gd.previewList
-        item {
-            Column {
-                Box(
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CrystalCard(
-                        onClick = ::navigateToPreview,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(0.6666667F),
-                    ) {}
-                    Text(stringResource(R.string.more_previews))
-                }
-                Text("")
-            }
-        }
         items(previewList) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
