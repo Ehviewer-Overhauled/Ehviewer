@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.AttributeSet
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,9 +60,9 @@ class ImageSearchLayout @JvmOverloads constructor(
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                Card(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    val maxSize = dimensionResource(id = R.dimen.image_search_max_size)
-                    if (path.isNotBlank()) {
+                AnimatedVisibility(visible = path.isNotBlank(), modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Card {
+                        val maxSize = dimensionResource(id = R.dimen.image_search_max_size)
                         AsyncImage(
                             model = path,
                             contentDescription = null,
