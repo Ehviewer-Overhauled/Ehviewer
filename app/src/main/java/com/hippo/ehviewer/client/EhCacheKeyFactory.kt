@@ -24,7 +24,7 @@ import com.hippo.ehviewer.client.data.NormalGalleryPreview
 // EHentai Large Preview: https://ehgt.org/***
 
 private const val URL_PREFIX_THUMB_E = "https://ehgt.org/"
-private const val URL_PREFIX_THUMB_EX = "https://exhentai.org/"
+private const val URL_PREFIX_THUMB_EX = "https://s.exhentai.org/"
 
 fun getImageKey(gid: Long, index: Int): String {
     return "image:$gid:$index"
