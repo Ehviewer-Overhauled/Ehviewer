@@ -876,7 +876,7 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
-            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid)?.takeIf { it.isDirectory }
+            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid)?.takeIf { it.ensureDir() }
             check(downloadDir != null)
             val thumbLocation = downloadDir.subFile(".thumb")!!
             val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
