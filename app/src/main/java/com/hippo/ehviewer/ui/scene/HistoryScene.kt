@@ -21,12 +21,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -132,7 +130,7 @@ class HistoryScene : BaseScene() {
                             modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.gallery_list_margin_h), vertical = dimensionResource(id = R.dimen.gallery_list_margin_v)),
                             state = state,
                             contentPadding = paddingValues,
-                            // verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.gallery_list_interval)),
                         ) {
                             items(
                                 count = historyData.itemCount,
@@ -140,39 +138,35 @@ class HistoryScene : BaseScene() {
                                 contentType = historyData.itemContentType(),
                             ) { index ->
                                 val info = historyData[index]
+                                // TODO: item delete & add animation
+                                // Bug tracker: https://issuetracker.google.com/issues/150812265
                                 info?.let {
                                     val dismissState = rememberDismissState(
                                         confirmValueChange = {
                                             if (it == DismissValue.DismissedToStart) {
                                                 coroutineScope.launchIO {
-                                                    delay(1000)
                                                     EhDB.deleteHistoryInfo(info)
                                                 }
                                             }
                                             true
                                         },
                                     )
-                                    AnimatedVisibility(visible = !dismissState.isDismissed(DismissDirection.EndToStart)) {
-                                        SwipeToDismiss(
-                                            state = dismissState,
-                                            background = {},
-                                            dismissContent = {
-                                                // TODO: item delete & add animation
-                                                // Bug tracker: https://issuetracker.google.com/issues/150812265
-                                                Column {
-                                                    GalleryInfoListItem(
-                                                        onClick = ::onItemClick.partially1(it),
-                                                        onLongClick = ::onItemLongClick.partially1(it),
-                                                        info = it,
-                                                        modifier = Modifier.height(cardHeight),
-                                                    )
-                                                    // Trick, since item remove animation not available, we can't set spacer with Arrangement.spacedBy
-                                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.gallery_list_interval)))
-                                                }
-                                            },
-                                            directions = setOf(DismissDirection.EndToStart),
-                                        )
-                                    }
+
+                                    SwipeToDismiss(
+                                        state = dismissState,
+                                        background = {},
+                                        dismissContent = {
+                                            // TODO: item delete & add animation
+                                            // Bug tracker: https://issuetracker.google.com/issues/150812265
+                                            GalleryInfoListItem(
+                                                onClick = ::onItemClick.partially1(it),
+                                                onLongClick = ::onItemLongClick.partially1(it),
+                                                info = it,
+                                                modifier = Modifier.height(cardHeight),
+                                            )
+                                        },
+                                        directions = setOf(DismissDirection.EndToStart),
+                                    )
                                 }
                             }
                         }
