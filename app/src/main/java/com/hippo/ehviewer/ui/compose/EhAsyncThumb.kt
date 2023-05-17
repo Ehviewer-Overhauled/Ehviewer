@@ -12,17 +12,18 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
+import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.imageRequest
 
 @Composable
 @ReadOnlyComposable
-fun requestOf(model: String): ImageRequest {
+fun requestOf(model: GalleryInfo): ImageRequest {
     return LocalContext.current.imageRequest(model)
 }
 
 @Composable
 fun EhAsyncThumb(
-    model: String,
+    model: GalleryInfo,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) = AsyncImage(
@@ -34,7 +35,7 @@ fun EhAsyncThumb(
 
 @Composable
 fun EhAsyncCropThumb(
-    key: String,
+    key: GalleryInfo,
     modifier: Modifier = Modifier,
 ) {
     var contentScale by remember { mutableStateOf(ContentScale.Fit) }

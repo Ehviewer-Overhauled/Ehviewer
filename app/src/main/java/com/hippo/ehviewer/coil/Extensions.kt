@@ -9,21 +9,23 @@ import coil.disk.DiskCache
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
+import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryPreview
-import com.hippo.ehviewer.client.getUrlByThumbKey
+import com.hippo.ehviewer.client.thumbUrl
 import com.hippo.ehviewer.client.url
 
-fun ImageRequest.Builder.ehUrl(key: String) = apply {
-    data(getUrlByThumbKey(key))
+fun ImageRequest.Builder.ehUrl(info: GalleryInfo) = apply {
+    val key = info.thumbKey!!
+    data(info.thumbUrl)
     memoryCacheKey(key)
     diskCacheKey(key)
     size(Size.ORIGINAL)
 }
 
-fun ImageRequest.Builder.ehPreviewKey(key: GalleryPreview) = apply {
-    data(key.url)
-    memoryCacheKey(key.imageKey)
-    diskCacheKey(key.imageKey)
+fun ImageRequest.Builder.ehPreview(preview: GalleryPreview) = apply {
+    data(preview.url)
+    memoryCacheKey(preview.imageKey)
+    diskCacheKey(preview.imageKey)
     size(Size.ORIGINAL)
 }
 
@@ -35,6 +37,7 @@ fun ImageRequest.Builder.justDownload() = apply {
     decoderFactory { _, _, _ -> stubFactory }
 }
 
-inline fun Context.imageRequest(key: GalleryPreview, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehPreviewKey(key).apply(builder).build()
-inline fun Context.imageRequest(key: String, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehUrl(key).apply(builder).build()
+inline fun Context.imageRequest(preview: GalleryPreview, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehPreview(preview).apply(builder).build()
+inline fun Context.imageRequest(info: GalleryInfo, builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).ehUrl(info).apply(builder).build()
+inline fun Context.imageRequest(builder: ImageRequest.Builder.() -> Unit = {}) = ImageRequest.Builder(this).apply(builder).build()
 inline fun diskCache(builder: DiskCache.Builder.() -> Unit) = DiskCache.Builder().apply(builder).build()

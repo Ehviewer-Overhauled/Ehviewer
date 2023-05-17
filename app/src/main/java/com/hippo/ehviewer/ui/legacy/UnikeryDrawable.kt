@@ -19,6 +19,7 @@ import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import coil.imageLoader
 import coil.request.ImageRequest
+import coil.size.Size
 import com.hippo.ehviewer.coil.imageRequest
 
 class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
@@ -28,8 +29,10 @@ class UnikeryDrawable(private val mTextView: ObservedTextView, url: String) :
 
     init {
         mTextView.setOnWindowAttachListener(this)
-        mImageRequest = mTextView.context.imageRequest(url) {
+        mImageRequest = mTextView.context.imageRequest {
             target(onSuccess = { onGetValue(it) })
+            size(Size.ORIGINAL)
+            data(url)
         }
         load()
     }

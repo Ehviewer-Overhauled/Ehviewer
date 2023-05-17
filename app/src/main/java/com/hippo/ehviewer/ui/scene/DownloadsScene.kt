@@ -867,10 +867,8 @@ class DownloadsScene :
                     onClick = ::onClick.partially1(binding.thumb),
                 ) {
                     EhAsyncCropThumb(
-                        key = info.thumbKey!!,
-                        modifier = Modifier
-                            .height(height)
-                            .aspectRatio(0.6666667F),
+                        key = info,
+                        modifier = Modifier.height(height).aspectRatio(0.6666667F),
                     )
                 }
             }
