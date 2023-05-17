@@ -906,13 +906,15 @@ class DownloadsScene :
                                     }
                                 }
                                 coroutineScope.launch {
-                                    if (!thumbLocation.exists()) {
-                                        thumbLocation.ensureFile()
-                                        val key = info.thumbKey!!
-                                        imageCache[key]?.use {
-                                            UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
-                                                thumbLocation.openFileDescriptor("w").use { dst ->
-                                                    src sendTo dst
+                                    runCatching {
+                                        if (!thumbLocation.exists()) {
+                                            thumbLocation.ensureFile()
+                                            val key = info.thumbKey!!
+                                            imageCache[key]?.use {
+                                                UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
+                                                    thumbLocation.openFileDescriptor("w").use { dst ->
+                                                        src sendTo dst
+                                                    }
                                                 }
                                             }
                                         }
