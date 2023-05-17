@@ -141,6 +141,7 @@ object GalleryListParser {
         }
 
         // Thumb
+        var thumbUrl: String? = null
         val glthumb = JsoupUtils.getElementByClass(e, "glthumb")
         if (glthumb != null) {
             val img = glthumb.select("div:nth-child(1)>img").first()
@@ -161,7 +162,7 @@ object GalleryListParser {
                     url = img.attr("src")
                 }
                 if (url.isNotEmpty()) {
-                    gi.thumbKey = EhUtils.handleThumbUrlResolution(url)
+                    thumbUrl = EhUtils.handleThumbUrlResolution(url)!!
                 }
             }
 
@@ -175,7 +176,7 @@ object GalleryListParser {
             }
         }
         // Try extended and thumbnail version
-        if (gi.thumbKey == null) {
+        if (thumbUrl == null) {
             var gl = JsoupUtils.getElementByClass(e, "gl1e")
             if (gl == null) {
                 gl = JsoupUtils.getElementByClass(e, "gl3t")
@@ -193,12 +194,12 @@ object GalleryListParser {
                         gi.thumbWidth = 0
                         gi.thumbHeight = 0
                     }
-                    gi.thumbKey = EhUtils.handleThumbUrlResolution(img.attr("src"))
+                    thumbUrl = EhUtils.handleThumbUrlResolution(img.attr("src"))
                 }
             }
         }
 
-        gi.thumbKey = getThumbKey(gi.thumbKey!!)
+        gi.thumbKey = getThumbKey(thumbUrl!!)
 
         // Posted
         val posted = e.getElementById("posted_" + gi.gid)
