@@ -876,8 +876,12 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
-            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid)?.takeIf { it.ensureDir() }
-            check(downloadDir != null)
+            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
+                val title = EhUtils.getSuitableTitle(info)
+                val dirname = FileUtils.sanitizeFilename("${info.gid}-$title")
+                EhDB.putDownloadDirname(info.gid, dirname)
+                SpiderDen.getGalleryDownloadDir(info.gid)!!
+            }
             val thumbLocation = downloadDir.subFile(".thumb")!!
             val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
                 context?.imageRequest {
