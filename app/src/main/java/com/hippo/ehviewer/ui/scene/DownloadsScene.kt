@@ -918,7 +918,9 @@ class DownloadsScene :
                                 if (thumbLocation.exists()) {
                                     coroutineScope.launch {
                                         thumbLocation.delete()
-                                        bind(info)
+                                        withUIContext {
+                                            bind(info)
+                                        }
                                     }
                                 }
                             }
