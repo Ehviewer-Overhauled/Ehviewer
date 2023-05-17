@@ -27,6 +27,7 @@ import com.hippo.ehviewer.dao.BasicDao
 import com.hippo.ehviewer.dao.DownloadDirname
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
+import com.hippo.ehviewer.dao.EHDB_MIGRATION_4_5
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.dao.HistoryInfo
@@ -399,7 +400,9 @@ object EhDB {
     fun importDB(context: Context, uri: Uri): String? {
         runCatching {
             val oldDB = databaseBuilder(context, EhDatabase::class.java, "tmp.db")
-                .createFromInputStream { context.contentResolver.openInputStream(uri) }.build()
+                .createFromInputStream { context.contentResolver.openInputStream(uri) }
+                .addMigrations(EHDB_MIGRATION_4_5)
+                .build()
 
             // Download label
             val manager = DownloadManager

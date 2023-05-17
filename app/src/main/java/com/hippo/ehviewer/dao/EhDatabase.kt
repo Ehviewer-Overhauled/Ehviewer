@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-private val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
+val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
     override fun migrate(db: SupportSQLiteDatabase) {
         val needMigrationTables = arrayOf(
             "DOWNLOADS",
