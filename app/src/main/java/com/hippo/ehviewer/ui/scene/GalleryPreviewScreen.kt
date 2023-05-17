@@ -125,7 +125,7 @@ class GalleryPreviewScreen : Fragment() {
                             override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
                             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
                                 val up = params.key ?: 1
-                                val end = up + params.loadSize - 1
+                                val end = (up + params.loadSize - 1).coerceAtMost(galleryDetail.previewPages)
                                 runSuspendCatching {
                                     (up..end).mapNotNull { it.takeUnless { previewPagesMap.contains(it) } }
                                         .parMap(Dispatchers.IO) { getPreviewListByPage(it - 1).apply { previewPagesMap[it] = this } }
