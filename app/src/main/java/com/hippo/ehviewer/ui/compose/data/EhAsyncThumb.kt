@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.compose.data
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -14,6 +14,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.ui.compose.CropDefaults
 
 @Composable
 @ReadOnlyComposable

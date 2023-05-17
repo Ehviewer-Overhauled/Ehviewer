@@ -59,7 +59,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
-import com.hippo.ehviewer.ui.compose.EhAsyncCropThumb
+import com.hippo.ehviewer.ui.compose.data.EhAsyncCropThumb
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder

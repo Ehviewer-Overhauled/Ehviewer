@@ -30,7 +30,6 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.compose.EhAsyncCropThumb
 
 @Composable
 fun GalleryDetailHeaderInfoCard(
