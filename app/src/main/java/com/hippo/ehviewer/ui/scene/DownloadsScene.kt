@@ -876,64 +876,68 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
-            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
-                val title = EhUtils.getSuitableTitle(info)
-                val dirname = FileUtils.sanitizeFilename("${info.gid}-$title")
-                EhDB.putDownloadDirname(info.gid, dirname)
-                SpiderDen.getGalleryDownloadDir(info.gid)!!
-            }
-            check(downloadDir.ensureDir())
-            val thumbLocation = downloadDir.subFile(".thumb")!!
-            val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
-                context?.imageRequest {
-                    data(it.toString())
-                    memoryCacheKey(info.thumbKey)
+            lifecycleScope.launchIO {
+                val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
+                    val title = EhUtils.getSuitableTitle(info)
+                    val dirname = FileUtils.sanitizeFilename("${info.gid}-$title")
+                    EhDB.putDownloadDirname(info.gid, dirname)
+                    SpiderDen.getGalleryDownloadDir(info.gid)!!
                 }
-            }
-            binding.thumb.setMD3Content {
-                Card(onClick = ::onClick.partially1(binding.thumb)) {
-                    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
-                    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-                    AsyncImage(
-                        model = localReq ?: requestOf(info),
-                        contentDescription = null,
-                        modifier = Modifier.height(height).aspectRatio(0.6666667F),
-                        onState = { state ->
-                            if (state is AsyncImagePainter.State.Success) {
-                                state.result.drawable.run {
-                                    if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
-                                        contentScale = ContentScale.Crop
-                                    }
-                                }
-                                coroutineScope.launch {
-                                    runCatching {
-                                        if (!thumbLocation.exists()) {
-                                            thumbLocation.ensureFile()
-                                            val key = info.thumbKey!!
-                                            imageCache[key]?.use {
-                                                UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
-                                                    thumbLocation.openFileDescriptor("w").use { dst ->
-                                                        src sendTo dst
+                check(downloadDir.ensureDir())
+                val thumbLocation = downloadDir.subFile(".thumb")!!
+                val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
+                    context?.imageRequest {
+                        data(it.toString())
+                        memoryCacheKey(info.thumbKey)
+                    }
+                }
+                withUIContext {
+                    binding.thumb.setMD3Content {
+                        Card(onClick = ::onClick.partially1(binding.thumb)) {
+                            var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+                            val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+                            AsyncImage(
+                                model = localReq ?: requestOf(info),
+                                contentDescription = null,
+                                modifier = Modifier.height(height).aspectRatio(0.6666667F),
+                                onState = { state ->
+                                    if (state is AsyncImagePainter.State.Success) {
+                                        state.result.drawable.run {
+                                            if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
+                                                contentScale = ContentScale.Crop
+                                            }
+                                        }
+                                        coroutineScope.launch {
+                                            runCatching {
+                                                if (!thumbLocation.exists()) {
+                                                    thumbLocation.ensureFile()
+                                                    val key = info.thumbKey!!
+                                                    imageCache[key]?.use {
+                                                        UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
+                                                            thumbLocation.openFileDescriptor("w").use { dst ->
+                                                                src sendTo dst
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                            }
-                            if (state is AsyncImagePainter.State.Error) {
-                                if (thumbLocation.exists()) {
-                                    coroutineScope.launch {
-                                        thumbLocation.delete()
-                                        withUIContext {
-                                            bind(info)
+                                    if (state is AsyncImagePainter.State.Error) {
+                                        if (thumbLocation.exists()) {
+                                            coroutineScope.launch {
+                                                thumbLocation.delete()
+                                                withUIContext {
+                                                    bind(info)
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
-                        },
-                        contentScale = contentScale,
-                    )
+                                },
+                                contentScale = contentScale,
+                            )
+                        }
+                    }
                 }
             }
             binding.title.text = EhUtils.getSuitableTitle(info)
