@@ -882,6 +882,7 @@ class DownloadsScene :
                 EhDB.putDownloadDirname(info.gid, dirname)
                 SpiderDen.getGalleryDownloadDir(info.gid)!!
             }
+            check(downloadDir.ensureDir())
             val thumbLocation = downloadDir.subFile(".thumb")!!
             val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
                 context?.imageRequest {
