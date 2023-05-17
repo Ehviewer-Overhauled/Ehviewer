@@ -32,7 +32,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -44,11 +50,15 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import arrow.core.partially1
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.hippo.ehviewer.EhApplication.Companion.imageCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDownloadBinding
@@ -59,7 +69,8 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
-import com.hippo.ehviewer.ui.compose.data.EhAsyncCropThumb
+import com.hippo.ehviewer.ui.compose.CropDefaults
+import com.hippo.ehviewer.ui.compose.data.requestOf
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
@@ -74,6 +85,7 @@ import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerL
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.collect.LongList
@@ -84,6 +96,8 @@ import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import rikka.core.res.resolveColor
 import java.util.LinkedList
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
@@ -862,13 +876,54 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
+            val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid)?.takeIf { it.isDirectory }
+            check(downloadDir != null)
+            val thumbLocation = downloadDir.subFile(".thumb")!!
+            val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
+                context?.imageRequest {
+                    data(it.toString())
+                    memoryCacheKey(info.thumbKey)
+                }
+            }
             binding.thumb.setMD3Content {
-                Card(
-                    onClick = ::onClick.partially1(binding.thumb),
-                ) {
-                    EhAsyncCropThumb(
-                        key = info,
+                Card(onClick = ::onClick.partially1(binding.thumb)) {
+                    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+                    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+                    AsyncImage(
+                        model = localReq ?: requestOf(info),
+                        contentDescription = null,
                         modifier = Modifier.height(height).aspectRatio(0.6666667F),
+                        onState = { state ->
+                            if (state is AsyncImagePainter.State.Success) {
+                                state.result.drawable.run {
+                                    if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
+                                        contentScale = ContentScale.Crop
+                                    }
+                                }
+                                coroutineScope.launch {
+                                    if (!thumbLocation.exists()) {
+                                        thumbLocation.ensureFile()
+                                        val key = info.thumbKey!!
+                                        imageCache[key]?.use {
+                                            UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
+                                                thumbLocation.openFileDescriptor("w").use { dst ->
+                                                    src sendTo dst
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (state is AsyncImagePainter.State.Error) {
+                                if (thumbLocation.exists()) {
+                                    coroutineScope.launch {
+                                        thumbLocation.delete()
+                                        bind(info)
+                                    }
+                                }
+                            }
+                        },
+                        contentScale = contentScale,
                     )
                 }
             }
