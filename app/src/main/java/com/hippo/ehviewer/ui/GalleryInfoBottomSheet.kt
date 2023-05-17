@@ -39,6 +39,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.getUrlByThumbKey
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.tellClipboardWithToast
 
@@ -82,7 +83,7 @@ fun GalleryInfoBottomSheet(
                 EhUrl.getGalleryDetailUrl(gid, token),
                 title,
                 titleJpn,
-                thumb,
+                getUrlByThumbKey(thumbKey!!),
                 EhUtils.getCategory(category),
                 uploader,
                 posted,

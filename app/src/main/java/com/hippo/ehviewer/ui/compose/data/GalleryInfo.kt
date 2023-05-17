@@ -57,7 +57,7 @@ fun GalleryInfoListItem(
         Row {
             Card {
                 EhAsyncCropThumb(
-                    model = info.thumb,
+                    key = info.thumbKey!!,
                     modifier = Modifier.aspectRatio(0.6666667F).fillMaxSize(),
                 )
             }
@@ -141,7 +141,7 @@ fun GalleryInfoGridItem(
     ) {
         Box {
             EhAsyncThumb(
-                model = info.thumb,
+                model = info.thumbKey!!,
                 modifier = Modifier.aspectRatio(aspect).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )

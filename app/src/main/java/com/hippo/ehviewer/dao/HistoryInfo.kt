@@ -27,7 +27,7 @@ class HistoryInfo() : BaseGalleryInfo() {
         token = galleryInfo.token
         title = galleryInfo.title
         titleJpn = galleryInfo.titleJpn
-        thumb = galleryInfo.thumb
+        thumbKey = galleryInfo.thumbKey
         this.category = galleryInfo.category
         posted = galleryInfo.posted
         uploader = galleryInfo.uploader

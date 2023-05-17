@@ -133,7 +133,6 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryTagGroup
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
-import com.hippo.ehviewer.client.getPreviewThumbKey
 import com.hippo.ehviewer.client.parser.ArchiveParser
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.client.parser.ParserUtils
@@ -1217,7 +1216,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
             return
         }
         try {
-            val key = getPreviewThumbKey(composeBindingGI!!.thumb!!)
+            val key = composeBindingGI!!.thumbKey!!
             val path = imageLoader(context).diskCache!![key]!!.use { it.data }
             val lub = ListUrlBuilder()
             lub.mode = ListUrlBuilder.MODE_IMAGE_SEARCH

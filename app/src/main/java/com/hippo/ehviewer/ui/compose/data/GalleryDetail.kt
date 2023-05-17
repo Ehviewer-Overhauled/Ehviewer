@@ -103,7 +103,7 @@ fun GalleryDetailHeaderCard(
     Row {
         Card {
             EhAsyncCropThumb(
-                model = remember(info.thumb) { info.thumb },
+                key = remember(info.thumbKey!!) { info.thumbKey!! },
                 modifier = Modifier.height(dimensionResource(id = R.dimen.gallery_detail_thumb_height)).width(dimensionResource(id = R.dimen.gallery_detail_thumb_width)),
             )
         }

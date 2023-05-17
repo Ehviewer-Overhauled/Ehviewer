@@ -5,7 +5,7 @@ interface AbstractGalleryInfo {
     var token: String?
     var title: String?
     var titleJpn: String?
-    var thumb: String?
+    var thumbKey: String?
     var category: Int
     var posted: String?
     var uploader: String?

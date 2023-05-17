@@ -5,10 +5,32 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+
+private val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val needMigrationTables = arrayOf(
+            "DOWNLOADS",
+            "HISTORY",
+            "LOCAL_FAVORITES",
+        )
+        val prefixToRemove = arrayOf(
+            "https://ehgt.org/",
+            "https://s.exhentai.org/t/",
+            "https://exhentai.org/t/",
+        )
+        needMigrationTables.forEach { table ->
+            prefixToRemove.forEach { prefix ->
+                db.execSQL("UPDATE $table SET thumb = SUBSTR(thumb ,LENGTH('$prefix') + 1) WHERE thumb LIKE '$prefix%'")
+            }
+        }
+    }
+}
 
 @Database(
     entities = [BookmarkInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class EhDatabase : RoomDatabase() {
@@ -40,6 +62,7 @@ abstract class CookiesDatabase : RoomDatabase() {
 fun buildMainDB(context: Context): EhDatabase {
     // TODO: Remove allowMainThreadQueries
     return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries()
+        .addMigrations(EHDB_MIGRATION_4_5)
         .build()
 }
 

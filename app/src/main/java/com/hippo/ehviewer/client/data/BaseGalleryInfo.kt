@@ -36,7 +36,7 @@ open class BaseGalleryInfo(
     override var titleJpn: String? = null,
 
     @ColumnInfo(name = "THUMB")
-    override var thumb: String? = null,
+    override var thumbKey: String? = null,
 
     @ColumnInfo(name = "CATEGORY")
     override var category: Int = 0,

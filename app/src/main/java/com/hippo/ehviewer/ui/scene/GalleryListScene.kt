@@ -1053,7 +1053,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     private fun onGetGalleryListSuccess(result: GalleryListParser.Result, taskId: Int) {
         if (Settings.preloadThumbAggressively) {
             lifecycleScope.launchIO {
-                result.galleryInfoList.forEach { context?.run { imageLoader.enqueue(imageRequest(it.thumb) { justDownload() }) } }
+                result.galleryInfoList.forEach { context?.run { imageLoader.enqueue(imageRequest(it.thumbKey!!) { justDownload() }) } }
             }
         }
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {

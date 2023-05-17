@@ -21,6 +21,7 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.JsoupUtils
 import com.hippo.ehviewer.yorozuya.NumberUtils
@@ -160,7 +161,7 @@ object GalleryListParser {
                     url = img.attr("src")
                 }
                 if (url.isNotEmpty()) {
-                    gi.thumb = EhUtils.handleThumbUrlResolution(url)
+                    gi.thumbKey = EhUtils.handleThumbUrlResolution(url)
                 }
             }
 
@@ -174,7 +175,7 @@ object GalleryListParser {
             }
         }
         // Try extended and thumbnail version
-        if (gi.thumb == null) {
+        if (gi.thumbKey == null) {
             var gl = JsoupUtils.getElementByClass(e, "gl1e")
             if (gl == null) {
                 gl = JsoupUtils.getElementByClass(e, "gl3t")
@@ -192,10 +193,12 @@ object GalleryListParser {
                         gi.thumbWidth = 0
                         gi.thumbHeight = 0
                     }
-                    gi.thumb = EhUtils.handleThumbUrlResolution(img.attr("src"))
+                    gi.thumbKey = EhUtils.handleThumbUrlResolution(img.attr("src"))
                 }
             }
         }
+
+        gi.thumbKey = getThumbKey(gi.thumbKey!!)
 
         // Posted
         val posted = e.getElementById("posted_" + gi.gid)

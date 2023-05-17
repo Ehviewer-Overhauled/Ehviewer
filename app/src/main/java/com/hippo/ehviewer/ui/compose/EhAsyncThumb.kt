@@ -16,13 +16,13 @@ import com.hippo.ehviewer.coil.imageRequest
 
 @Composable
 @ReadOnlyComposable
-fun requestOf(model: String?): ImageRequest {
+fun requestOf(model: String): ImageRequest {
     return LocalContext.current.imageRequest(model)
 }
 
 @Composable
 fun EhAsyncThumb(
-    model: String?,
+    model: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) = AsyncImage(
@@ -34,12 +34,12 @@ fun EhAsyncThumb(
 
 @Composable
 fun EhAsyncCropThumb(
-    model: String?,
+    key: String,
     modifier: Modifier = Modifier,
 ) {
     var contentScale by remember { mutableStateOf(ContentScale.Fit) }
     AsyncImage(
-        model = requestOf(model),
+        model = requestOf(key),
         contentDescription = null,
         modifier = modifier,
         onState = {
