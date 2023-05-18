@@ -95,6 +95,8 @@ android {
         freeCompilerArgs = listOf(
             // https://kotlinlang.org/docs/compiler-reference.html#progressive
             "-progressive",
+            "-Xjvm-default=all",
+            "-Xlambdas=indy",
 
             "-opt-in=coil.annotation.ExperimentalCoilApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
