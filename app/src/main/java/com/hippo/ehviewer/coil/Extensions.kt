@@ -11,6 +11,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.GalleryPreview
+import com.hippo.ehviewer.client.data.NormalGalleryPreview
 import com.hippo.ehviewer.client.thumbUrl
 import com.hippo.ehviewer.client.url
 
@@ -19,14 +20,13 @@ fun ImageRequest.Builder.ehUrl(info: GalleryInfo) = apply {
     data(info.thumbUrl)
     memoryCacheKey(key)
     diskCacheKey(key)
-    size(Size.ORIGINAL)
 }
 
 fun ImageRequest.Builder.ehPreview(preview: GalleryPreview) = apply {
     data(preview.url)
     memoryCacheKey(preview.imageKey)
     diskCacheKey(preview.imageKey)
-    size(Size.ORIGINAL)
+    if (preview is NormalGalleryPreview) size(Size.ORIGINAL)
 }
 
 private val stubResult = DecodeResult(ColorDrawable(Color.BLACK), false)
