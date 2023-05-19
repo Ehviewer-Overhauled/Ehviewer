@@ -118,7 +118,7 @@ class GalleryPreviewScreen : Fragment() {
                     initialKey = goto
                 }
 
-                val previewPagesMap = rememberSaveable { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
+                val previewPagesMap = remember { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
                 val data = remember(initialKey) {
                     Pager(PagingConfig(1, prefetchDistance = 4, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
                         object : PagingSource<Int, PreviewPage>() {
