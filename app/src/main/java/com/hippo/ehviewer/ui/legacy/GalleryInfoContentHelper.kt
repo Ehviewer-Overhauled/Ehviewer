@@ -28,7 +28,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-abstract class GalleryInfoContentHelper : ContentHelper<GalleryInfo>() {
+abstract class GalleryInfoContentHelper : ContentHelper() {
     @JvmField
     var jumpTo: String? = null
     private val listener: FavouriteStatusRouter.Listener

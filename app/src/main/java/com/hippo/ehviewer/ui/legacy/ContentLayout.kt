@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.WidgetContentLayoutBinding
 import com.hippo.ehviewer.ui.legacy.ViewTransition.OnShowViewListener
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.HandlerDrawable
@@ -41,7 +42,7 @@ import com.hippo.ehviewer.yorozuya.collect.IntList
 import rikka.core.res.resolveColor
 
 class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
-    private lateinit var mContentHelper: ContentHelper<*>
+    private lateinit var mContentHelper: ContentHelper
     private val mRecyclerViewOriginBottom: Int
     private val mFastScrollerOriginBottom: Int
     private val binding: WidgetContentLayoutBinding
@@ -64,7 +65,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
     val fastScroller
         get() = binding.fastScroller
 
-    fun setHelper(helper: ContentHelper<*>) {
+    fun setHelper(helper: ContentHelper) {
         mContentHelper = helper
         helper.init(this)
     }
@@ -128,7 +129,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         super.onRestoreInstanceState(mContentHelper.restoreInstanceState(state))
     }
 
-    abstract class ContentHelper<E : Parcelable> : OnShowViewListener {
+    abstract class ContentHelper : OnShowViewListener {
         /**
          * Generate task id
          */
@@ -143,7 +144,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         /**
          * Store data
          */
-        private var mData = ArrayList<E>()
+        private var mData = ArrayList<GalleryInfo>()
 
         /**
          * Store the page divider index
@@ -287,10 +288,10 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             mEmptyString = str
         }
 
-        val data: List<E>
+        val data: List<GalleryInfo>
             get() = mData
 
-        fun getDataAtEx(location: Int): E? {
+        fun getDataAtEx(location: Int): GalleryInfo? {
             return if (location >= 0 && location < mData.size) {
                 mData[location]
             } else {
@@ -298,7 +299,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         }
 
-        val firstVisibleItem: E?
+        val firstVisibleItem: GalleryInfo?
             get() = getDataAtEx(LayoutManagerUtils.getFirstVisibleItemPosition(binding.recyclerView.layoutManager))
 
         fun size(): Int {
@@ -309,8 +310,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             return mCurrentTaskId == taskId
         }
 
-        protected abstract fun isDuplicate(d1: E, d2: E): Boolean
-        private fun removeDuplicateData(data: List<E>, start: Int, end: Int) {
+        protected abstract fun isDuplicate(d1: GalleryInfo, d2: GalleryInfo): Boolean
+        private fun removeDuplicateData(data: List<GalleryInfo>, start: Int, end: Int) {
             val slicedData = mData.slice(start.coerceAtLeast(0) until end.coerceAtMost(mData.size))
             data.dropWhile { d1 ->
                 slicedData.any { d2 ->
@@ -319,8 +320,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             }
         }
 
-        protected open fun onAddData(data: List<E>) {}
-        protected open fun onRemoveData(data: List<E>) {}
+        protected open fun onAddData(data: List<GalleryInfo>) {}
+        protected open fun onRemoveData(data: List<GalleryInfo>) {}
         protected open fun onClearData() {}
         fun onGetPageData(
             taskId: Int,
@@ -328,7 +329,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             nextPage: Int,
             prev: String?,
             next: String?,
-            data: List<E>,
+            data: List<GalleryInfo>,
         ) {
             if (mCurrentTaskId == taskId) {
                 val dataSize: Int
@@ -731,19 +732,21 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             if (mData.isNotEmpty()) cancelCurrentTask()
             val bundle = Bundle()
             bundle.putParcelable(KEY_SUPER, superState)
-            if (mData.size < 200) {
-                val shownView = mViewTransition.shownViewIndex
-                bundle.putInt(KEY_SHOWN_VIEW, shownView)
-                bundle.putString(KEY_TIP, binding.tip.text.toString())
-                bundle.putParcelableArrayList(KEY_DATA, mData)
-                bundle.putInt(KEY_NEXT_ID, mIdGenerator.nextId())
-                bundle.putParcelable(KEY_PAGE_DIVIDER, mPageDivider)
-                bundle.putInt(KEY_START_PAGE, mStartPage)
-                bundle.putInt(KEY_END_PAGE, mEndPage)
-                bundle.putInt(KEY_PAGES, pages)
-                bundle.putString(KEY_PREV, mPrev)
-                bundle.putString(KEY_NEXT, mNext)
+            val shownView = mViewTransition.shownViewIndex
+            bundle.putInt(KEY_SHOWN_VIEW, shownView)
+            bundle.putString(KEY_TIP, binding.tip.text.toString())
+            synchronized(contentMap) {
+                val size = contentMap.keys.takeIf { it.isNotEmpty() }?.max()?.inc() ?: 0
+                contentMap[size] = mData
+                bundle.putInt(KEY_DATA, size)
             }
+            bundle.putInt(KEY_NEXT_ID, mIdGenerator.nextId())
+            bundle.putParcelable(KEY_PAGE_DIVIDER, mPageDivider)
+            bundle.putInt(KEY_START_PAGE, mStartPage)
+            bundle.putInt(KEY_END_PAGE, mEndPage)
+            bundle.putInt(KEY_PAGES, pages)
+            bundle.putString(KEY_PREV, mPrev)
+            bundle.putString(KEY_NEXT, mNext)
             return bundle
         }
 
@@ -751,9 +754,10 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             return if (state is Bundle) {
                 mViewTransition.showView(state.getInt(KEY_SHOWN_VIEW), false)
                 binding.tip.text = state.getString(KEY_TIP)
-                @Suppress("DEPRECATION")
-                val newData = state.getParcelableArrayList<E>(KEY_DATA)
-                newData?.let { mData = it }
+                val data = state.getInt(KEY_DATA)
+                synchronized(contentMap) {
+                    mData = contentMap.remove(data) ?: ArrayList()
+                }
                 mIdGenerator.setNextId(state.getInt(KEY_NEXT_ID))
                 mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER) ?: IntList()
                 mStartPage = state.getInt(KEY_START_PAGE)
@@ -763,7 +767,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                 mNext = state.getString(KEY_NEXT)
                 notifyDataSetChanged()
                 notifyDataSetChanged {}
-                if (newData == null) {
+                if (mData.size == 0) {
                     mPageDivider.clear()
                     mStartPage = 0
                     mEndPage = 0
@@ -805,3 +809,8 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
         }
     }
 }
+
+// data "ArrayList<GalleryInfo>" is too large, we cannot put it as Parcelable otherwise TransactionTooLargeException would occur
+// TODO: convert to paging3 source then keep it in a proper window
+// @see PagingConfig.maxSize
+private val contentMap = hashMapOf<Int, ArrayList<GalleryInfo>>()
