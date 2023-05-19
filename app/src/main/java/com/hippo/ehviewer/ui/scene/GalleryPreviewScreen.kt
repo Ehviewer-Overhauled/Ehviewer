@@ -57,6 +57,7 @@ import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
+import com.hippo.ehviewer.ui.compose.rememberGlobally
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.recyclerview.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.navToReader
@@ -118,7 +119,7 @@ class GalleryPreviewScreen : Fragment() {
                     initialKey = goto
                 }
 
-                val previewPagesMap = remember { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
+                val previewPagesMap = rememberGlobally { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
                 val data = remember(initialKey) {
                     Pager(PagingConfig(1, prefetchDistance = 4, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
                         object : PagingSource<Int, PreviewPage>() {
