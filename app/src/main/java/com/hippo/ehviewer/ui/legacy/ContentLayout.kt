@@ -731,17 +731,19 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
             if (mData.isNotEmpty()) cancelCurrentTask()
             val bundle = Bundle()
             bundle.putParcelable(KEY_SUPER, superState)
-            val shownView = mViewTransition.shownViewIndex
-            bundle.putInt(KEY_SHOWN_VIEW, shownView)
-            bundle.putString(KEY_TIP, binding.tip.text.toString())
-            bundle.putParcelableArrayList(KEY_DATA, mData)
-            bundle.putInt(KEY_NEXT_ID, mIdGenerator.nextId())
-            bundle.putParcelable(KEY_PAGE_DIVIDER, mPageDivider)
-            bundle.putInt(KEY_START_PAGE, mStartPage)
-            bundle.putInt(KEY_END_PAGE, mEndPage)
-            bundle.putInt(KEY_PAGES, pages)
-            bundle.putString(KEY_PREV, mPrev)
-            bundle.putString(KEY_NEXT, mNext)
+            if (mData.size < 200) {
+                val shownView = mViewTransition.shownViewIndex
+                bundle.putInt(KEY_SHOWN_VIEW, shownView)
+                bundle.putString(KEY_TIP, binding.tip.text.toString())
+                bundle.putParcelableArrayList(KEY_DATA, mData)
+                bundle.putInt(KEY_NEXT_ID, mIdGenerator.nextId())
+                bundle.putParcelable(KEY_PAGE_DIVIDER, mPageDivider)
+                bundle.putInt(KEY_START_PAGE, mStartPage)
+                bundle.putInt(KEY_END_PAGE, mEndPage)
+                bundle.putInt(KEY_PAGES, pages)
+                bundle.putString(KEY_PREV, mPrev)
+                bundle.putString(KEY_NEXT, mNext)
+            }
             return bundle
         }
 
@@ -753,7 +755,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
                 val newData = state.getParcelableArrayList<E>(KEY_DATA)
                 newData?.let { mData = it }
                 mIdGenerator.setNextId(state.getInt(KEY_NEXT_ID))
-                mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER)!!
+                mPageDivider = state.getParcelableCompat(KEY_PAGE_DIVIDER) ?: IntList()
                 mStartPage = state.getInt(KEY_START_PAGE)
                 mEndPage = state.getInt(KEY_END_PAGE)
                 pages = state.getInt(KEY_PAGES)
