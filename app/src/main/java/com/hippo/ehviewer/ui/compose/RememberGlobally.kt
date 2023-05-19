@@ -1,15 +1,17 @@
 package com.hippo.ehviewer.ui.compose
 
-import androidx.collection.lruCache
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 
-private val remembered = lruCache<String, Any>(1)
+private val remembered = hashMapOf<String, Any>()
 
+// This works mostly like [rememberSaveable], but saves data in global hashmap, to avoid [TransactionTooLargeException]
 @Composable
-fun <T : Any> rememberGlobally(
+fun <T : Any> rememberMemorized(
     vararg inputs: Any?,
     key: String? = null,
     init: () -> T,
@@ -20,15 +22,33 @@ fun <T : Any> rememberGlobally(
     } else {
         currentCompositeKeyHash.toString(36)
     }
+
+    val registry = LocalSaveableStateRegistry.current
     // value is restored using the registry or created via [init] lambda
     val value = remember(*inputs) {
         @Suppress("UNCHECKED_CAST")
-        val restored = remembered[finalKey] as? T
+        val restored = registry?.consumeRestored(finalKey)?.let {
+            remembered.remove(it as String)
+        } as? T
         restored ?: init()
     }
 
-    LaunchedEffect(finalKey) {
-        remembered.put(finalKey, value)
+    // re-register if the registry or key has been changed
+    if (registry != null) {
+        // we want to use the latest instances of saver and value in the valueProvider lambda
+        // without restarting DisposableEffect as it would cause re-registering the provider in
+        // the different order. so we use rememberUpdatedState.
+        val valueState = rememberUpdatedState(value)
+
+        DisposableEffect(registry, finalKey) {
+            val valueProvider = {
+                finalKey.also { remembered[it] = valueState.value }
+            }
+            val entry = registry.registerProvider(finalKey, valueProvider)
+            onDispose {
+                entry.unregister()
+            }
+        }
     }
     return value
 }
