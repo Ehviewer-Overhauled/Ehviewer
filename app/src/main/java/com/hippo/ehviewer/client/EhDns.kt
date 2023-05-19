@@ -49,12 +49,10 @@ object EhDns : Dns {
         put(
             builtInHosts,
             "exhentai.org",
-            Pair("178.175.128.252", false),
-            Pair("178.175.129.252", false),
-            Pair("178.175.129.254", false),
-            Pair("178.175.128.254", false),
-            Pair("178.175.132.20", false),
-            Pair("178.175.132.22", false),
+            Pair("172.64.96.13", false),
+            Pair("172.64.97.13", false),
+            Pair("2606:4700:e0::ac40:600d", false),
+            Pair("2606:4700:e0::ac40:610d", false),
         )
         put(
             builtInHosts,
