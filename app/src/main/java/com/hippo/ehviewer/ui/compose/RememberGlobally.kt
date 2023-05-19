@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
@@ -20,7 +19,10 @@ fun <T : Any> rememberMemorized(
     val finalKey = if (!key.isNullOrEmpty()) {
         key
     } else {
-        currentCompositeKeyHash.toString(36)
+        // currentCompositeKeyHash is unreliable here
+        // Is this Composable inlined or its groups elided?
+        // Or a compose compiler bug?
+        init.javaClass.toString()
     }
 
     val registry = LocalSaveableStateRegistry.current
