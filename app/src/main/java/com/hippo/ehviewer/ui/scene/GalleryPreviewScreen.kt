@@ -106,11 +106,7 @@ class GalleryPreviewScreen : Fragment() {
                             Slider(
                                 value = jumpTo,
                                 onValueChange = { jumpTo = it },
-                                modifier = Modifier
-                                    .height(48.dp)
-                                    .width(0.dp)
-                                    .weight(1F)
-                                    .align(Alignment.CenterVertically),
+                                modifier = Modifier.height(48.dp).width(0.dp).weight(1F).align(Alignment.CenterVertically),
                                 valueRange = 1f..galleryDetail.previewPages.toFloat(),
                                 steps = galleryDetail.previewPages - 2,
                                 onValueChangeFinished = {
