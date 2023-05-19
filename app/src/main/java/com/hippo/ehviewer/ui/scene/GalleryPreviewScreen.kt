@@ -73,7 +73,7 @@ class GalleryPreviewScreen : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(inflater.context).apply {
             setMD3Content {
-                val galleryDetail = rememberSaveable { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
+                val galleryDetail = remember { requireArguments().getParcelableCompat<GalleryDetail>(KEY_GALLERY_DETAIL)!! }
                 val context = LocalContext.current
                 fun onPreviewCLick(index: Int) = context.navToReader(galleryDetail, index)
                 val toNextPage = rememberSaveable { requireArguments().getBoolean(KEY_NEXT_PAGE) }
@@ -106,7 +106,11 @@ class GalleryPreviewScreen : Fragment() {
                             Slider(
                                 value = jumpTo,
                                 onValueChange = { jumpTo = it },
-                                modifier = Modifier.height(48.dp).width(0.dp).weight(1F).align(Alignment.CenterVertically),
+                                modifier = Modifier
+                                    .height(48.dp)
+                                    .width(0.dp)
+                                    .weight(1F)
+                                    .align(Alignment.CenterVertically),
                                 valueRange = 1f..galleryDetail.previewPages.toFloat(),
                                 steps = galleryDetail.previewPages - 2,
                                 onValueChangeFinished = {

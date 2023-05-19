@@ -29,7 +29,7 @@ fun <T : Any> rememberMemorized(
         @Suppress("UNCHECKED_CAST")
         val restored = registry?.consumeRestored(finalKey)?.let {
             remembered.remove(it as String)
-        } as? T
+        } as T?
         restored ?: init()
     }
 
