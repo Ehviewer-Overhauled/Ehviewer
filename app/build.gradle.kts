@@ -219,8 +219,7 @@ dependencies {
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
     implementation("dev.rikka.rikkax.material:material-preference:2.0.0")
 
-    implementation(platform("io.arrow-kt:arrow-stack:2.0.0-SNAPSHOT"))
-    implementation("io.arrow-kt:arrow-functions")
+    implementation(platform("io.arrow-kt:arrow-stack:1.2.0-RC"))
     implementation("io.arrow-kt:arrow-fx-coroutines")
 
     // https://coil-kt.github.io/coil/changelog/
