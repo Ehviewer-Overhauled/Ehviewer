@@ -23,6 +23,8 @@ import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
+private const val EXCEPTIONAL_DOMAIN = "hath.network"
+
 object EhSSLSocketFactory : SSLSocketFactory() {
     private val sslSocketFactory = getDefault() as SSLSocketFactory
     override fun getDefaultCipherSuites(): Array<String> {
@@ -34,7 +36,7 @@ object EhSSLSocketFactory : SSLSocketFactory() {
     }
 
     override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket {
-        val address = s.inetAddress.hostAddress.takeIf { EhDns.isInHosts(host) }
+        val address = s.inetAddress.hostAddress.takeIf { EhDns.isInHosts(host) || EXCEPTIONAL_DOMAIN in host }
         val socket = sslSocketFactory.createSocket(s, address ?: host, port, autoClose) as SSLSocket
         val sslSession = socket.session
         Log.d(
