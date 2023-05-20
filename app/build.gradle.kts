@@ -166,7 +166,7 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/releases/compose-material3
     // api(platform("androidx.compose:compose-bom:2023.05.00"))
-    api(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-alpha04"))
+    api(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-SNAPSHOT"))
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-window-size-class")
