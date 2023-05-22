@@ -59,6 +59,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.coil.imageRequest
+import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.databinding.DrawerListRvBinding
 import com.hippo.ehviewer.databinding.ItemDownloadBinding
@@ -912,8 +913,8 @@ class DownloadsScene :
                                                 if (!thumbLocation.exists()) {
                                                     thumbLocation.ensureFile()
                                                     val key = info.thumbKey!!
-                                                    imageCache[key]?.use {
-                                                        UniFile.fromFile(it.data.toFile())!!.openFileDescriptor("r").use { src ->
+                                                    imageCache.read(key) {
+                                                        UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use { src ->
                                                             thumbLocation.openFileDescriptor("w").use { dst ->
                                                                 src sendTo dst
                                                             }

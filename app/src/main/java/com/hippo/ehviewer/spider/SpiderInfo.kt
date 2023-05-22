@@ -2,6 +2,8 @@ package com.hippo.ehviewer.spider
 
 import coil.disk.DiskCache
 import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.coil.edit
+import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.legacy.readLegacySpiderInfo
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openInputStream
@@ -10,6 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
+import moe.tarsin.coroutines.runSuspendCatching
 import java.io.File
 
 @Serializable
@@ -35,15 +38,13 @@ fun SpiderInfo.write(file: UniFile) {
     }
 }
 
-fun SpiderInfo.saveToCache() {
-    val entry = spiderInfoCache.edit(gid.toString()) ?: return
-    runCatching {
-        entry.data.toFile().writeBytes(Cbor.encodeToByteArray(this))
+suspend fun SpiderInfo.saveToCache() {
+    runSuspendCatching {
+        spiderInfoCache.edit(gid.toString()) {
+            data.toFile().writeBytes(Cbor.encodeToByteArray(this))
+        }
     }.onFailure {
         it.printStackTrace()
-        entry.abort()
-    }.onSuccess {
-        entry.commit()
     }
 }
 
@@ -54,14 +55,13 @@ private val spiderInfoCache by lazy {
 }
 
 fun readFromCache(gid: Long): SpiderInfo? {
-    val snapshot = spiderInfoCache[gid.toString()] ?: return null
-    return runCatching {
-        snapshot.use {
-            return Cbor.decodeFromByteArray(it.data.toFile().readBytes())
-        }
-    }.onFailure {
-        it.printStackTrace()
-    }.getOrNull()
+    return spiderInfoCache.read(gid.toString()) {
+        runCatching {
+            Cbor.decodeFromByteArray<SpiderInfo>(data.toFile().readBytes())
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrNull()
+    }
 }
 
 fun readCompatFromUniFile(file: UniFile): SpiderInfo? {

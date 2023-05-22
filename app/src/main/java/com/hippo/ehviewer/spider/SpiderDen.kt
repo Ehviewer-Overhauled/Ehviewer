@@ -64,7 +64,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     private fun containInCache(index: Int): Boolean {
         val key = getImageKey(mGid, index)
-        return sCache[key]?.use { true } ?: false
+        return sCache.read(key) { true } ?: false
     }
 
     private fun containInDownloadDir(index: Int): Boolean {
@@ -84,11 +84,11 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
                         it sendTo outFd
                     }
                 }
-            }
-        }.getOrElse {
+                true
+            } ?: false
+        }.onFailure {
             it.printStackTrace()
-            false
-        }
+        }.getOrDefault(false)
     }
 
     operator fun contains(index: Int): Boolean {
@@ -199,12 +199,11 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             val key = getImageKey(mGid, index)
 
             // Read from diskCache first
-            sCache[key]?.use { snapshot ->
+            sCache.read(key) {
                 runCatching {
-                    UniFile.fromFile(snapshot.data.toFile())!!.openFileDescriptor("r").use {
+                    UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use {
                         it sendTo toFd
                     }
-                }.onSuccess {
                     return true
                 }.onFailure {
                     it.printStackTrace()
@@ -235,15 +234,14 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     fun getExtension(index: Int): String? {
         val key = getImageKey(mGid, index)
-        return sCache[key]?.use { it.metadata.toNioPath().readText() }
-            ?: downloadDir?.let { findImageFile(it, index) }
-                ?.name.let { FileUtils.getExtensionFromFilename(it) }
+        return sCache.read(key) { metadata.toNioPath().readText() }
+            ?: downloadDir?.let { findImageFile(it, index) }?.name.let { FileUtils.getExtensionFromFilename(it) }
     }
 
     fun getImageSource(index: Int): CloseableSource? {
         if (mode == SpiderQueen.MODE_READ) {
             val key = getImageKey(mGid, index)
-            val snapshot = sCache[key]
+            val snapshot = sCache.openSnapshot(key)
             if (snapshot != null) {
                 val source = ImageDecoder.createSource(snapshot.data.toFile())
                 return object : CloseableSource, AutoCloseable by snapshot {
