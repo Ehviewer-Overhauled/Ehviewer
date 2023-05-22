@@ -25,6 +25,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
@@ -137,7 +138,10 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this).apply {
             okHttpClient(nonCacheOkHttpClient)
-            components { add(MergeInterceptor) }
+            components {
+                add { result, options, _ -> ImageDecoderDecoder(result.source, options, false) }
+                add(MergeInterceptor)
+            }
             diskCache(imageCache)
             crossfade(300)
             error(R.drawable.image_failed)
