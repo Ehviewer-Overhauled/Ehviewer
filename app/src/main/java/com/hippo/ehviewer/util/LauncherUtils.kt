@@ -24,19 +24,19 @@ import kotlin.coroutines.suspendCoroutine
 
 private val atomicInteger = AtomicInt()
 
-private fun Context.getLifecycle(): Lifecycle {
-    var context: Context? = this
-    while (true) {
-        when (context) {
-            is LifecycleOwner -> return context.lifecycle
-            !is ContextWrapper -> TODO()
-            else -> context = context.baseContext
+private val Context.lifecycle: Lifecycle
+    get() {
+        var context: Context? = this
+        while (true) {
+            when (context) {
+                is LifecycleOwner -> return context.lifecycle
+                !is ContextWrapper -> error("This should never happen!")
+                else -> context = context.baseContext
+            }
         }
     }
-}
 
-private suspend fun <I, O> Context.registerForActivityResultAndLaunchAndAwaitResult(contract: ActivityResultContract<I, O>, input: I): O {
-    val lifecycle = getLifecycle()
+private suspend fun <I, O> Context.awaitActivityResult(contract: ActivityResultContract<I, O>, input: I): O {
     val key = "activity_rq#${atomicInteger.getAndIncrement()}"
     var launcher: ActivityResultLauncher<I>? = null
     var observer: LifecycleEventObserver? = null
@@ -51,7 +51,8 @@ private suspend fun <I, O> Context.registerForActivityResultAndLaunchAndAwaitRes
     lifecycle.addObserver(observer)
     return withUIContext {
         suspendCoroutine { cont -> // No cancellation support here since we cannot cancel a launched Intent
-            launcher = requireActivity<ComponentActivity>(this@registerForActivityResultAndLaunchAndAwaitResult).activityResultRegistry.register(key, contract) {
+            val activity = requireActivity<ComponentActivity>(this@awaitActivityResult)
+            launcher = activity.activityResultRegistry.register(key, contract) {
                 launcher?.unregister()
                 lifecycle.removeObserver(observer)
                 cont.resume(it)
@@ -62,7 +63,7 @@ private suspend fun <I, O> Context.registerForActivityResultAndLaunchAndAwaitRes
 
 suspend fun Context.requestPermission(key: String): Boolean {
     if (ContextCompat.checkSelfPermission(this, key) == PackageManager.PERMISSION_GRANTED) return true
-    return registerForActivityResultAndLaunchAndAwaitResult(ActivityResultContracts.RequestPermission(), key)
+    return awaitActivityResult(ActivityResultContracts.RequestPermission(), key)
 }
 
-suspend fun Context.pickVisualMedia(type: VisualMediaType): Uri? = registerForActivityResultAndLaunchAndAwaitResult(ActivityResultContracts.PickVisualMedia(), PickVisualMediaRequest.Builder().setMediaType(type).build())
+suspend fun Context.pickVisualMedia(type: VisualMediaType): Uri? = awaitActivityResult(ActivityResultContracts.PickVisualMedia(), PickVisualMediaRequest.Builder().setMediaType(type).build())
