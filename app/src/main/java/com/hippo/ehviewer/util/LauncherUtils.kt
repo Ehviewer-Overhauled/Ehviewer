@@ -1,41 +1,68 @@
 package com.hippo.ehviewer.util
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType
 import androidx.core.content.ContextCompat
-import arrow.atomic.Atomic
-import arrow.atomic.update
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import arrow.atomic.AtomicInt
 import eu.kanade.tachiyomi.util.lang.withUIContext
-import kotlinx.coroutines.suspendCancellableCoroutine
+import rikka.core.util.ContextUtils.requireActivity
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 // Fuck off the silly Android launcher and callback :)
 
-private typealias LauncherAndCallback<K, V> = Atomic<Pair<ActivityResultLauncher<K>, (V) -> Unit>>
-private fun <K, V> LauncherAndCallback<K, V>.cleanup() = update { it.copy {} }
-private lateinit var requestPermission: LauncherAndCallback<String, Boolean>
-private lateinit var pickVisualMedia: LauncherAndCallback<PickVisualMediaRequest, Uri?>
-private suspend fun <K, V> LauncherAndCallback<K, V>.await(key: K) = withUIContext {
-    suspendCancellableCoroutine { cont ->
-        updateAndGet { prev -> prev.copy { cont.resume(it) } }.first.launch(key)
-        cont.invokeOnCancellation { cleanup() } // Drop continuation when cancelled
-    }.apply { cleanup() } // Drop continuation when completed
+private val atomicInteger = AtomicInt()
+
+private fun Context.getLifecycle(): Lifecycle {
+    var context: Context? = this
+    while (true) {
+        when (context) {
+            is LifecycleOwner -> return context.lifecycle
+            !is ContextWrapper -> TODO()
+            else -> context = context.baseContext
+        }
+    }
 }
 
-fun ComponentActivity.initLauncher() {
-    requestPermission = Atomic(registerForActivityResult(ActivityResultContracts.RequestPermission()) { requestPermission.get().second(it) } to {})
-    pickVisualMedia = Atomic(registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { pickVisualMedia.get().second(it) } to {})
+private suspend fun <I, O> Context.registerForActivityResultAndLaunchAndAwaitResult(contract: ActivityResultContract<I, O>, input: I): O {
+    val lifecycle = getLifecycle()
+    val key = "activity_rq#${atomicInteger.getAndIncrement()}"
+    var launcher: ActivityResultLauncher<I>? = null
+    var observer: LifecycleEventObserver? = null
+    observer = LifecycleEventObserver { _, event ->
+        if (Lifecycle.Event.ON_DESTROY == event) {
+            launcher?.unregister()
+            if (observer != null) {
+                lifecycle.removeObserver(observer!!)
+            }
+        }
+    }
+    lifecycle.addObserver(observer)
+    return withUIContext {
+        suspendCoroutine { cont -> // No cancellation support here since we cannot cancel a launched Intent
+            launcher = requireActivity<ComponentActivity>(this@registerForActivityResultAndLaunchAndAwaitResult).activityResultRegistry.register(key, contract) {
+                launcher?.unregister()
+                lifecycle.removeObserver(observer)
+                cont.resume(it)
+            }.apply { launch(input) }
+        }
+    }
 }
 
 suspend fun Context.requestPermission(key: String): Boolean {
     if (ContextCompat.checkSelfPermission(this, key) == PackageManager.PERMISSION_GRANTED) return true
-    return requestPermission.await(key)
+    return registerForActivityResultAndLaunchAndAwaitResult(ActivityResultContracts.RequestPermission(), key)
 }
 
-suspend fun pickVisualMedia(type: VisualMediaType): Uri? = pickVisualMedia.await(PickVisualMediaRequest.Builder().setMediaType(type).build())
+suspend fun Context.pickVisualMedia(type: VisualMediaType): Uri? = registerForActivityResultAndLaunchAndAwaitResult(ActivityResultContracts.PickVisualMedia(), PickVisualMediaRequest.Builder().setMediaType(type).build())

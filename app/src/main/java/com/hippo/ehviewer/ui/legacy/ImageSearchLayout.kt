@@ -54,7 +54,7 @@ class ImageSearchLayout @JvmOverloads constructor(
         Mdc3Theme {
             val coroutineScope = rememberCoroutineScope()
             fun selectImage() = coroutineScope.launch {
-                pickVisualMedia(ImageOnly)?.let {
+                context.pickVisualMedia(ImageOnly)?.let {
                     path = it.toString()
                 }
             }

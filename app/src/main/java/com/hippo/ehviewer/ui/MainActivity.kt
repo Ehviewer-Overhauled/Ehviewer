@@ -73,7 +73,6 @@ import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getClipboardManager
 import com.hippo.ehviewer.util.getParcelableExtraCompat
 import com.hippo.ehviewer.util.getUrlFromClipboard
-import com.hippo.ehviewer.util.initLauncher
 import com.hippo.ehviewer.yorozuya.IOUtils
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -90,10 +89,6 @@ class MainActivity : EhActivity() {
     private lateinit var navController: NavController
     private val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
     private val availableNetworks = mutableListOf<Network>()
-
-    init {
-        initLauncher()
-    }
 
     private fun saveImageToTempFile(uri: Uri): File? {
         val src = ImageDecoder.createSource(contentResolver, uri)
