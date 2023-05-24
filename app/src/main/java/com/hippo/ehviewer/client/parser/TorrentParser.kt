@@ -15,16 +15,15 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.util.regex.Pattern
 
 object TorrentParser {
     private val PATTERN_TORRENT =
         Pattern.compile("</span> ([0-9-]+) [0-9:]+</td>[\\s\\S]+</span> ([0-9.]+ [KMGT]B)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span> ([0-9]+)</td>[\\s\\S]+</span>([^<]+)</td>[\\s\\S]+onclick=\"document.location='([^\"]+)'[^<]+>([^<]+)</a>")
 
-    fun parse(body: String): List<Result> {
+    fun parse(d: Document): List<Result> {
         val torrentList = ArrayList<Result>()
-        val d = Jsoup.parse(body)
         val es = d.select("form>div>table")
         for (e in es) {
             val m = PATTERN_TORRENT.matcher(e.html())

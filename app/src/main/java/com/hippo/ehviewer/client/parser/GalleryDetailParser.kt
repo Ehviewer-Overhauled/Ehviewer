@@ -40,7 +40,6 @@ import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.ehviewer.yorozuya.StringUtils
 import com.hippo.ehviewer.yorozuya.trimAnd
 import com.hippo.ehviewer.yorozuya.unescapeXml
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -83,7 +82,7 @@ object GalleryDetailParser {
     private const val PINING_STRING = "<p>This gallery is pining for the fjords.</p>"
 
     @Throws(EhException::class)
-    fun parse(body: String): GalleryDetail {
+    fun parse(body: String, document: Document): GalleryDetail {
         if (body.contains(OFFENSIVE_STRING)) {
             throw OffensiveException()
         }
@@ -93,8 +92,6 @@ object GalleryDetailParser {
 
         // Error info
         PATTERN_ERROR.find(body)?.run { throw EhException(groupValues[1]) }
-        // Temporary workaround, see https://github.com/jhy/jsoup/issues/1850
-        val document = Jsoup.parse(body.replace("del>", "s>"))
         val galleryDetail = GalleryDetail(
             tags = parseTagGroups(document),
             comments = parseComments(document),

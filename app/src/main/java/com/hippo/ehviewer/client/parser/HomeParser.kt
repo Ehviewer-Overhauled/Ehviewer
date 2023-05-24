@@ -1,15 +1,15 @@
 package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.ParseException
-import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 object HomeParser {
     private val PATTERN_FUNDS =
         Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
     private const val RESET_SUCCEED = "Image limit was successfully reset."
 
-    fun parse(body: String): Limits {
-        Jsoup.parse(body).selectFirst("div.homebox")?.let {
+    fun parse(doc: Document): Limits {
+        doc.selectFirst("div.homebox")?.let {
             val es = it.select("p > strong")
             if (es.size == 3) {
                 val current = ParserUtils.parseInt(es[0].text(), 0)
@@ -18,14 +18,14 @@ object HomeParser {
                 return Limits(current, maximum, resetCost)
             }
         }
-        throw ParseException("Parse image limits error", body)
+        throw ParseException("Parse image limits error", doc.html())
     }
 
-    fun parseResetLimits(body: String): Limits? {
+    fun parseResetLimits(body: String, doc: Document): Limits? {
         return if (body.contains(RESET_SUCCEED)) {
             null
         } else {
-            parse(body)
+            parse(doc)
         }
     }
 
