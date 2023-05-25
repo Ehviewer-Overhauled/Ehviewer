@@ -53,7 +53,6 @@ abstract class GalleryAdapter(
             }
             mType = type
             val recyclerView = mRecyclerView
-            @SuppressLint("NotifyDataSetChanged")
             when (type) {
                 TYPE_LIST -> {
                     val columnWidth = mResources.getDimensionPixelOffset(Settings.detailSizeResId)
