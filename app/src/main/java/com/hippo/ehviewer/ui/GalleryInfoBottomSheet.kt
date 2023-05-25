@@ -19,13 +19,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -122,7 +120,7 @@ fun GalleryInfoBottomSheet(
             Text(text = stringResource(id = R.string.gallery_info), style = MaterialTheme.typography.titleLarge)
         }
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
-            LazyColumn(contentPadding = BottomSheetDefaults.windowInsets.asPaddingValues()) {
+            LazyColumn {
                 itemsIndexed(keys) { index, i ->
                     val key = stringResource(i)
                     Row(
