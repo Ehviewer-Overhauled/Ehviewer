@@ -18,9 +18,14 @@ package com.hippo.ehviewer.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -103,7 +108,10 @@ fun GalleryInfoBottomSheet(
         }
     }
 
-    ModalBottomSheet(onDismissRequest) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        windowInsets = WindowInsets(0),
+    ) {
         check(data.size == keys.size)
         val context = LocalContext.current
         val navController = LocalNavController.current
@@ -114,23 +122,25 @@ fun GalleryInfoBottomSheet(
             Text(text = stringResource(id = R.string.gallery_info), style = MaterialTheme.typography.titleLarge)
         }
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
-            keys.forEachIndexed { index, i ->
-                val key = stringResource(i)
-                Row(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)).clickable {
-                        if (index == INDEX_PARENT) {
-                            data[index]?.let { navController.navWithUrl(it) }
-                        } else {
-                            context tellClipboardWithToast data[index]
-                            if (index == INDEX_URL) {
-                                // Save it to avoid detect the gallery
-                                Settings.putClipboardTextHashCode(data[index].hashCode())
+            LazyColumn(contentPadding = BottomSheetDefaults.windowInsets.asPaddingValues()) {
+                itemsIndexed(keys) { index, i ->
+                    val key = stringResource(i)
+                    Row(
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.keyline_margin)).clickable {
+                            if (index == INDEX_PARENT) {
+                                data[index]?.let { navController.navWithUrl(it) }
+                            } else {
+                                context tellClipboardWithToast data[index]
+                                if (index == INDEX_URL) {
+                                    // Save it to avoid detect the gallery
+                                    Settings.putClipboardTextHashCode(data[index].hashCode())
+                                }
                             }
-                        }
-                    }.fillMaxWidth(),
-                ) {
-                    Text(key, modifier = Modifier.width(90.dp).padding(8.dp))
-                    Text(data[index].orEmpty(), modifier = Modifier.padding(8.dp))
+                        }.fillMaxWidth(),
+                    ) {
+                        Text(key, modifier = Modifier.width(90.dp).padding(8.dp))
+                        Text(data[index].orEmpty(), modifier = Modifier.padding(8.dp))
+                    }
                 }
             }
         }
