@@ -136,7 +136,7 @@ private fun resolveEmailProtected(origin: String): String {
                             if (EMAIL_PROTECTED in node.text()) {
                                 val encoded = attr("data-cfemail").chunked(2).toMutableList()
                                 val k = encoded.removeFirst().decodeHex()[0]
-                                val email = encoded.map { it.decodeHex()[0] xor k }.toByteArray().decodeToString()
+                                val email = encoded.map { it.decodeHex()[0] xor k }.fold("") { s, c -> s + c.toInt().toChar() }
                                 resolvedEmailList.add(email)
                             }
                         }
