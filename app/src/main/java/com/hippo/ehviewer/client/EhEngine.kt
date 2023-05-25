@@ -57,10 +57,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONArray
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.TextNode
 import java.io.File
-import java.util.function.Consumer
 import kotlin.math.ceil
 
 private const val TAG = "EhEngine"
@@ -119,41 +116,10 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     throw e
 }
 
-private const val EMAIL_PROTECTED = "email protected"
-private const val RAW_EMAIL_PROTECTED = "[email&#160;protected]"
-
-private fun resolveEmailProtected(origin: String): String {
-    if (RAW_EMAIL_PROTECTED !in origin) return origin
-    val resolvedEmailList = mutableListOf<String>()
-    fun Element.decodeProtectedEmail() {
-        if (EMAIL_PROTECTED in text()) {
-            if (EMAIL_PROTECTED in ownText()) {
-                forEachNode(
-                    Consumer {
-                        if (it is TextNode) {
-                            if (EMAIL_PROTECTED in it.text()) {
-                                val encoded = attr("data-cfemail")
-                                resolvedEmailList.add(encoded)
-                            }
-                        }
-                    },
-                )
-            }
-            children().forEach {
-                it.decodeProtectedEmail()
-            }
-        }
-    }
-    Jsoup.parse(origin).decodeProtectedEmail()
-    var ret = origin
-    resolvedEmailList.forEach { ret = ret.replaceFirst(RAW_EMAIL_PROTECTED, it) }
-    return ret
-}
-
 private suspend inline fun <T> Request.executeAndParsingWith(block: String.() -> T): T {
     Log.d(TAG, url.toString())
     return execute {
-        val body = resolveEmailProtected(body.string())
+        val body = body.string()
         try {
             block(body)
         } catch (e: Exception) {
