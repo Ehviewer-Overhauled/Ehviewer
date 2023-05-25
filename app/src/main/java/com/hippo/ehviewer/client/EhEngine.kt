@@ -55,14 +55,12 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import okio.ByteString.Companion.decodeHex
 import org.json.JSONArray
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import java.io.File
 import java.util.function.Consumer
-import kotlin.experimental.xor
 import kotlin.math.ceil
 
 private const val TAG = "EhEngine"
@@ -131,13 +129,11 @@ private fun resolveEmailProtected(origin: String): String {
         if (EMAIL_PROTECTED in text()) {
             if (EMAIL_PROTECTED in ownText()) {
                 forEachNode(
-                    Consumer { node ->
-                        if (node is TextNode) {
-                            if (EMAIL_PROTECTED in node.text()) {
-                                val encoded = attr("data-cfemail").chunked(2).toMutableList()
-                                val k = encoded.removeFirst().decodeHex()[0]
-                                val email = encoded.map { it.decodeHex()[0] xor k }.fold("") { s, c -> s + c.toInt().toChar() }
-                                resolvedEmailList.add(email)
+                    Consumer {
+                        if (it is TextNode) {
+                            if (EMAIL_PROTECTED in it.text()) {
+                                val encoded = attr("data-cfemail")
+                                resolvedEmailList.add(encoded)
                             }
                         }
                     },
