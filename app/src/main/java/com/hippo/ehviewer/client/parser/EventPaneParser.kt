@@ -17,10 +17,10 @@
  */
 package com.hippo.ehviewer.client.parser
 
-import org.jsoup.nodes.Document
+import org.jsoup.Jsoup
 
 object EventPaneParser {
-    fun parse(doc: Document): String? {
-        return doc.getElementById("eventpane")?.html()
+    fun parse(body: String): String? {
+        return Jsoup.parse(body).getElementById("eventpane")?.html()
     }
 }

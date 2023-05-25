@@ -17,7 +17,6 @@ package com.hippo.ehviewer.client.parser
 
 import com.hippo.ehviewer.client.exception.NoHAtHClientException
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 
 object ArchiveParser {
     private val PATTERN_ARCHIVE_URL =
@@ -31,11 +30,11 @@ object ArchiveParser {
     private val PATTERN_NEED_HATH_CLIENT =
         Regex("You must have a H@H client assigned to your account to use this feature\\.")
 
-    fun parse(body: String, doc: Document): Result {
+    fun parse(body: String): Result {
         val m = PATTERN_HATH_FORM.find(body)!!
         val paramOr = m.groupValues[1]
         val archiveList = ArrayList<Archive>()
-        doc.select("#db>div>div").forEach { element ->
+        Jsoup.parse(body).select("#db>div>div").forEach { element ->
             if (element.childrenSize() > 0 && !element.attr("style").contains("color:#CCCCCC")) {
                 runCatching {
                     val res = element.selectFirst("form>input")!!.attr("value")

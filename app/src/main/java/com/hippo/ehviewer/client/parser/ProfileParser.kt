@@ -19,12 +19,13 @@ import android.util.Log
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
-import org.jsoup.nodes.Document
+import org.jsoup.Jsoup
 
 object ProfileParser {
     private val TAG = ProfileParser::class.java.simpleName
-    fun parse(d: Document): Result {
+    fun parse(body: String): Result {
         return runCatching {
+            val d = Jsoup.parse(body)
             val profilename = d.getElementById("profilename")
             val displayName = profilename!!.child(0).text()
             val avatar = runCatching {
@@ -45,7 +46,7 @@ object ProfileParser {
             Result(displayName, avatar)
         }.getOrElse {
             ExceptionUtils.throwIfFatal(it)
-            throw ParseException("Parse forums error", d.html())
+            throw ParseException("Parse forums error", body)
         }
     }
 

@@ -58,7 +58,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okio.ByteString.Companion.decodeHex
 import org.json.JSONArray
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import java.io.File
@@ -122,14 +121,12 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
     throw e
 }
 
-private const val EMAIL_PROTECTED = "[email protected]"
+private const val EMAIL_PROTECTED = "email protected"
 private const val RAW_EMAIL_PROTECTED = "[email&#160;protected]"
 
-private fun resolveEmailProtected(origin: String): Document {
-    // Temporary workaround, see https://github.com/jhy/jsoup/issues/1850
-    val doc = Jsoup.parse(origin.replace("del>", "s>"))
-
-    if (RAW_EMAIL_PROTECTED !in origin) return doc
+private fun resolveEmailProtected(origin: String): String {
+    if (RAW_EMAIL_PROTECTED !in origin) return origin
+    val resolvedEmailList = mutableListOf<String>()
     fun Element.decodeProtectedEmail() {
         if (EMAIL_PROTECTED in text()) {
             if (EMAIL_PROTECTED in ownText()) {
@@ -140,8 +137,7 @@ private fun resolveEmailProtected(origin: String): Document {
                                 val encoded = attr("data-cfemail").chunked(2).toMutableList()
                                 val k = encoded.removeFirst().decodeHex()[0]
                                 val email = encoded.map { it.decodeHex()[0] xor k }.toByteArray().decodeToString()
-                                val text = node.text()
-                                node.text(text.replace(EMAIL_PROTECTED, email))
+                                resolvedEmailList.add(email)
                             }
                         }
                     },
@@ -152,18 +148,16 @@ private fun resolveEmailProtected(origin: String): Document {
             }
         }
     }
-    return doc.apply { decodeProtectedEmail() }
+    Jsoup.parse(origin).decodeProtectedEmail()
+    var ret = origin
+    resolvedEmailList.forEach { ret = ret.replaceFirst(RAW_EMAIL_PROTECTED, it) }
+    return ret
 }
 
-private suspend inline fun <T> Request.executeParsingDocument(block: (String, Document) -> T) = executeParsing {
-    val doc = resolveEmailProtected(this)
-    block(this, doc)
-}
-
-private suspend inline fun <T> Request.executeParsing(block: String.() -> T): T {
+private suspend inline fun <T> Request.executeAndParsingWith(block: String.() -> T): T {
     Log.d(TAG, url.toString())
     return execute {
-        val body = body.string()
+        val body = resolveEmailProtected(body.string())
         try {
             block(body)
         } catch (e: Exception) {
@@ -175,35 +169,35 @@ private suspend inline fun <T> Request.executeParsing(block: String.() -> T): T 
 object EhEngine {
     suspend fun getTorrentList(url: String, gid: Long, token: String?): List<TorrentParser.Result> {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeParsingDocument { _, d -> TorrentParser.parse(d) }
+        return ehRequest(url, referer).executeAndParsingWith(TorrentParser::parse)
     }
 
     suspend fun getArchiveList(url: String, gid: Long, token: String?) = ehRequest(url, EhUrl.getGalleryDetailUrl(gid, token))
-        .executeParsingDocument(ArchiveParser::parse)
-        .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeParsingDocument { s, _ -> HomeParser.parseFunds(s) } }
+        .executeAndParsingWith(ArchiveParser::parse)
+        .apply { funds = funds ?: ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) }
 
     suspend fun getImageLimits() = parZip(
-        { ehRequest(EhUrl.URL_HOME).executeParsingDocument { _, d -> HomeParser.parse(d) } },
-        { ehRequest(EhUrl.URL_FUNDS).executeParsingDocument { s, _ -> HomeParser.parseFunds(s) } },
+        { ehRequest(EhUrl.URL_HOME).executeAndParsingWith(HomeParser::parse) },
+        { ehRequest(EhUrl.URL_FUNDS).executeAndParsingWith(HomeParser::parseFunds) },
         { limits, funds -> HomeParser.Result(limits, funds) },
     )
 
     suspend fun getNews(parse: Boolean) = ehRequest(EhUrl.URL_NEWS, EhUrl.REFERER_E)
-        .executeParsingDocument { _, d -> if (parse) EventPaneParser.parse(d) else null }
+        .executeAndParsingWith { if (parse) EventPaneParser.parse(this) else null }
 
     suspend fun getProfile(): ProfileParser.Result {
-        val url = ehRequest(EhUrl.URL_FORUMS).executeParsing(ForumsParser::parse)
-        return ehRequest(url, EhUrl.URL_FORUMS).executeParsingDocument { _, d -> ProfileParser.parse(d) }
+        val url = ehRequest(EhUrl.URL_FORUMS).executeAndParsingWith(ForumsParser::parse)
+        return ehRequest(url, EhUrl.URL_FORUMS).executeAndParsingWith(ProfileParser::parse)
     }
 
     suspend fun getUConfig(url: String = EhUrl.uConfigUrl) {
         runSuspendCatching {
-            ehRequest(url).executeParsing { check(U_CONFIG_TEXT in this) { "U_CONFIG_TEXT not found!" } }
+            ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
         }.onFailure {
             // It may get redirected when accessing ex for the first time
             if (EhUtils.isExHentai) {
                 it.printStackTrace()
-                ehRequest(url).executeParsing { check(U_CONFIG_TEXT in this) { "U_CONFIG_TEXT not found!" } }
+                ehRequest(url).executeAndParsingWith { check(contains(U_CONFIG_TEXT)) { "U_CONFIG_TEXT not found!" } }
             } else {
                 throw it
             }
@@ -216,27 +210,27 @@ object EhEngine {
         token: String?,
     ): GalleryPageParser.Result {
         val referer = EhUrl.getGalleryDetailUrl(gid, token)
-        return ehRequest(url, referer).executeParsing(GalleryPageParser::parse)
+        return ehRequest(url, referer).executeAndParsingWith(GalleryPageParser::parse)
     }
 
     suspend fun getGalleryList(url: String) = ehRequest(url, EhUrl.referer)
-        .executeParsingDocument(GalleryListParser::parse)
+        .executeAndParsingWith(GalleryListParser::parse)
         .apply { fillGalleryList(galleryInfoList, url, true) }
 
-    suspend fun getGalleryDetail(url: String) = ehRequest(url, EhUrl.referer).executeParsingDocument { s, d ->
-        EventPaneParser.parse(d)?.let {
+    suspend fun getGalleryDetail(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
+        EventPaneParser.parse(this)?.let {
             Settings.lastDawnDay = today
             showEventNotification(it)
         }
-        GalleryDetailParser.parse(s, d)
+        GalleryDetailParser.parse(this)
     }
 
-    suspend fun getPreviewList(url: String) = ehRequest(url, EhUrl.referer).executeParsing {
+    suspend fun getPreviewList(url: String) = ehRequest(url, EhUrl.referer).executeAndParsingWith {
         GalleryDetailParser.parsePreviewList(this) to GalleryDetailParser.parsePreviewPages(this)
     }
 
     suspend fun getFavorites(url: String) = ehRequest(url, EhUrl.referer)
-        .executeParsingDocument(FavoritesParser::parse)
+        .executeAndParsingWith(FavoritesParser::parse)
         .apply { fillGalleryList(galleryInfoList, url, false) }
 
     suspend fun signIn(username: String, password: String): String {
@@ -252,7 +246,7 @@ object EhEngine {
                 add("PassWord", password)
                 add("CookieDate", "1")
             }
-        }.executeParsing(SignInParser::parse)
+        }.executeAndParsingWith(SignInParser::parse)
     }
 
     suspend fun commentGallery(url: String, comment: String, id: String?) = ehRequest(url, url, EhUrl.origin) {
@@ -264,12 +258,13 @@ object EhEngine {
                 add("edit_comment", id)
             }
         }
-    }.executeParsingDocument { _, d ->
-        val elements = d.select("#chd + p")
+    }.executeAndParsingWith {
+        val document = Jsoup.parse(this)
+        val elements = document.select("#chd + p")
         if (elements.size > 0) {
             throw EhException(elements[0].text())
         }
-        GalleryDetailParser.parseComments(d)
+        GalleryDetailParser.parseComments(document)
     }
 
     /**
@@ -296,7 +291,7 @@ object EhEngine {
                 add("submit", "Apply Changes")
                 add("update", "1")
             }
-        }.executeParsing { }
+        }.executeAndParsingWith { }
     }
 
     suspend fun downloadArchive(
@@ -328,12 +323,12 @@ object EhEngine {
                 }
             }
         }
-        var result = request.executeParsing(ArchiveParser::parseArchiveUrl)
+        var result = request.executeAndParsingWith(ArchiveParser::parseArchiveUrl)
         if (!isHAtH) {
             if (result == null) {
                 // Wait for the server to prepare archives
                 delay(1000)
-                result = request.executeParsing(ArchiveParser::parseArchiveUrl)
+                result = request.executeAndParsingWith(ArchiveParser::parseArchiveUrl)
                 if (result == null) {
                     throw EhException("Archive unavailable")
                 }
@@ -349,7 +344,7 @@ object EhEngine {
                 add("act", "limits")
                 add("reset", "Reset Limit")
             }
-        }.executeParsingDocument(HomeParser::parseResetLimits)
+        }.executeAndParsingWith(HomeParser::parseResetLimits)
     }
 
     suspend fun modifyFavorites(url: String, gidArray: LongArray, dstCat: Int): FavoritesParser.Result {
@@ -364,7 +359,7 @@ object EhEngine {
                 gidArray.forEach { add("modifygids[]", it.toString()) }
                 add("apply", "Apply")
             }
-        }.executeParsingDocument(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
+        }.executeAndParsingWith(FavoritesParser::parse).apply { fillGalleryList(galleryInfoList, url, false) }
     }
 
     suspend fun getGalleryPageApi(
@@ -383,7 +378,7 @@ object EhEngine {
                 put("imgkey", pToken)
                 put("showkey", showKey)
             }
-        }.executeParsing(GalleryPageApiParser::parse)
+        }.executeAndParsingWith(GalleryPageApiParser::parse)
     }
 
     suspend fun rateGallery(apiUid: Long, apiKey: String?, gid: Long, token: String?, rating: Float) = ehRequest(EhUrl.apiUrl, EhUrl.getGalleryDetailUrl(gid, token), EhUrl.origin) {
@@ -395,7 +390,7 @@ object EhEngine {
             put("token", token)
             put("rating", ceil((rating * 2).toDouble()).toInt())
         }
-    }.executeParsing(RateGalleryParser::parse)
+    }.executeAndParsingWith(RateGalleryParser::parse)
 
     suspend fun fillGalleryListByApi(galleryInfoList: List<GalleryInfo>, referer: String) = galleryInfoList.chunked(MAX_REQUEST_SIZE).parMap {
         ehRequest(EhUrl.apiUrl, referer, EhUrl.origin) {
@@ -404,7 +399,7 @@ object EhEngine {
                 array("gidlist") { it.forEach { put(jsonArrayOf(it.gid, it.token)) } }
                 put("namespace", 1)
             }
-        }.executeParsing { GalleryApiParser.parse(this, it) }
+        }.executeAndParsingWith { GalleryApiParser.parse(this, it) }
     }
 
     suspend fun voteComment(
@@ -424,7 +419,7 @@ object EhEngine {
             put("comment_id", commentId)
             put("comment_vote", commentVote)
         }
-    }.executeParsing { VoteCommentParser.parse(this, commentVote) }
+    }.executeAndParsingWith { VoteCommentParser.parse(this, commentVote) }
 
     suspend fun voteTag(
         apiUid: Long,
@@ -443,14 +438,14 @@ object EhEngine {
             put("tags", tags)
             put("vote", vote)
         }
-    }.executeParsing(VoteTagParser::parse)
+    }.executeAndParsingWith(VoteTagParser::parse)
 
     suspend fun getGalleryToken(gid: Long, gtoken: String?, page: Int) = ehRequest(EhUrl.apiUrl, EhUrl.referer, EhUrl.origin) {
         jsonBody {
             put("method", "gtoken")
             put("pagelist", JSONArray().put(JSONArray().put(gid).put(gtoken).put(page + 1)))
         }
-    }.executeParsing(GalleryTokenApiParser::parse)
+    }.executeAndParsingWith(GalleryTokenApiParser::parse)
 
     /**
      * @param image Must be jpeg
@@ -463,7 +458,7 @@ object EhEngine {
             if (osc) addFormDataPart("fs_covers", "on")
             addFormDataPart("f_sfile", "File Search")
         }
-    }.executeParsingDocument(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
+    }.executeAndParsingWith(GalleryListParser::parse).apply { fillGalleryList(galleryInfoList, EhUrl.imageSearchUrl, true) }
 
     private suspend fun fillGalleryList(list: MutableList<GalleryInfo>, url: String, filter: Boolean) {
         // Filter title and uploader

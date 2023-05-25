@@ -25,6 +25,7 @@ import com.hippo.ehviewer.client.getThumbKey
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.JsoupUtils
 import com.hippo.ehviewer.yorozuya.NumberUtils
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.util.regex.Pattern
@@ -260,7 +261,12 @@ object GalleryListParser {
         return gi
     }
 
-    fun parse(body: String, d: Document): Result {
+    fun parse(body: String): Result {
+        val d = Jsoup.parse(body)
+        return parse(d, body)
+    }
+
+    fun parse(d: Document, body: String): Result {
         val result = Result()
         try {
             val prev = d.getElementById("uprev")

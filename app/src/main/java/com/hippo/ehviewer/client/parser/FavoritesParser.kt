@@ -21,15 +21,16 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.JsoupUtils
-import org.jsoup.nodes.Document
+import org.jsoup.Jsoup
 
 object FavoritesParser {
-    fun parse(body: String, d: Document): Result {
+    fun parse(body: String): Result {
         if (body.contains("This page requires you to log on.</p>")) {
             throw EhException(getString(R.string.need_sign_in))
         }
         val catArray = arrayOfNulls<String>(10)
         val countArray = IntArray(10)
+        val d = Jsoup.parse(body)
         runCatching {
             val ido = JsoupUtils.getElementByClass(d, "ido")
             val fps = ido!!.getElementsByClass("fp")
@@ -45,7 +46,7 @@ object FavoritesParser {
             it.printStackTrace()
             throw ParseException("Parse favorites error", body)
         }
-        val result = GalleryListParser.parse(body, d)
+        val result = GalleryListParser.parse(d, body)
         return Result(catArray, countArray, result)
     }
 
