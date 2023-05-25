@@ -1,3 +1,5 @@
+import com.google.devtools.ksp.gradle.KspTaskJvm
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.ZoneOffset
@@ -150,7 +152,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.4.7-dev-k1.9.0-Beta-bb7dc8b44eb"
     }
 
     namespace = "com.hippo.ehviewer"
@@ -240,4 +242,8 @@ configurations.all {
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.generateKotlin", "true")
+}
+
+tasks.withType<KspTaskJvm>().configureEach {
+    compilerOptions.jvmTarget.set(JVM_17)
 }
