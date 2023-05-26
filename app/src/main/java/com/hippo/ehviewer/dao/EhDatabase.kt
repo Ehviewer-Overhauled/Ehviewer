@@ -31,7 +31,7 @@ val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
 @Database(
     entities = [BookmarkInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
     version = 5,
-    exportSchema = false,
+    exportSchema = true,
 )
 abstract class EhDatabase : RoomDatabase() {
     abstract fun bookmarksBao(): BookmarksDao
