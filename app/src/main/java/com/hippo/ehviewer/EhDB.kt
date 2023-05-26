@@ -401,16 +401,15 @@ object EhDB {
             context.deleteDatabase(tempDBName)
         } use { oldDB ->
             // Download label
-            val manager = DownloadManager
             runCatching {
                 val downloadLabelList = oldDB.downloadLabelDao().list()
-                manager.addDownloadLabel(downloadLabelList)
+                DownloadManager.addDownloadLabel(downloadLabelList)
             }
 
             // Downloads
             runCatching {
                 val downloadInfoList = oldDB.downloadsDao().list()
-                manager.addDownload(downloadInfoList, false)
+                DownloadManager.addDownload(downloadInfoList, false)
             }
 
             // Download dirname
@@ -430,8 +429,8 @@ object EhDB {
             runCatching {
                 val quickSearchList = oldDB.quickSearchDao().list()
                 val currentQuickSearchList = db.quickSearchDao().list()
-                val importList = quickSearchList.mapNotNull { newQS ->
-                    newQS.takeIf { currentQuickSearchList.find { it.name == newQS.name } == null }
+                val importList = quickSearchList.filter { newQS ->
+                    currentQuickSearchList.none { it.name == newQS.name }
                 }
                 importQuickSearch(importList)
             }
