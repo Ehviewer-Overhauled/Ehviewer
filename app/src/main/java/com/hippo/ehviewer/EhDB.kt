@@ -79,12 +79,11 @@ object EhDB {
     }
 
     @Synchronized
-    fun putDownloadDirname(gid: Long, dirname: String?) {
+    fun putDownloadDirname(gid: Long, dirname: String) {
         val dao = db.downloadDirnameDao()
         var raw = dao.load(gid)
         if (raw != null) {
-            raw.dirname = dirname
-            dao.update(raw)
+            dao.update(raw.copy(dirname = dirname))
         } else {
             raw = DownloadDirname(gid, dirname)
             dao.insert(raw)

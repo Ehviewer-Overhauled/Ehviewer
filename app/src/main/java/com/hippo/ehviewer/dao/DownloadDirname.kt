@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 data class DownloadDirname(
     @PrimaryKey
     @ColumnInfo(name = "GID")
-    var gid: Long = 0,
+    val gid: Long,
 
     @ColumnInfo(name = "DIRNAME")
-    var dirname: String? = null,
+    val dirname: String,
 )

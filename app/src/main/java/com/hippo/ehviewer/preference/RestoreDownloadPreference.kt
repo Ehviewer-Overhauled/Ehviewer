@@ -53,7 +53,7 @@ class RestoreDownloadPreference @JvmOverloads constructor(
         return runCatching {
             val spiderInfo = readCompatFromUniFile(siFile) ?: return null
             val gid = spiderInfo.gid
-            val dirname = file.name
+            val dirname = file.name ?: return null
             if (mManager.containDownloadInfo(gid)) {
                 // Restore download dir to avoid redownload
                 val dbdirname = EhDB.getDownloadDirname(gid)
@@ -63,10 +63,9 @@ class RestoreDownloadPreference @JvmOverloads constructor(
                 }
                 return null
             }
-            RestoreItem().also {
+            RestoreItem(dirname).also {
                 it.gid = spiderInfo.gid
                 it.token = spiderInfo.token
-                it.dirname = file.name
             }
         }.onFailure {
             it.printStackTrace()
@@ -85,9 +84,9 @@ class RestoreDownloadPreference @JvmOverloads constructor(
         }
     }
 
-    private class RestoreItem : BaseGalleryInfo() {
-        var dirname: String? = null
-    }
+    private class RestoreItem(
+        val dirname: String,
+    ) : BaseGalleryInfo()
 
     override fun launchJob() {
         if (singletonJob?.isActive == true) {
