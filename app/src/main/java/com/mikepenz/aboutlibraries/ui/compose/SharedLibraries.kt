@@ -141,6 +141,7 @@ internal fun Library(
                 library.licenses.forEach {
                     Badge(
                         modifier = Modifier.padding(padding.badgePadding),
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     ) {
                         Text(
                             modifier = Modifier.padding(padding.badgeContentPadding),
