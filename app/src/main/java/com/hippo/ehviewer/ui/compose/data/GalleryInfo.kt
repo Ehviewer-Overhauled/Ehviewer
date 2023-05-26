@@ -129,7 +129,8 @@ fun GalleryInfoGridItem(
     info: GalleryInfo,
     modifier: Modifier = Modifier,
 ) {
-    val aspect = (info.thumbWidth.toFloat() / info.thumbHeight).coerceIn(0.33F, 1.5F)
+    var aspect = (info.thumbWidth.toFloat() / info.thumbHeight).coerceIn(0.33F, 1.5F)
+    if (aspect.isNaN()) aspect = 1F
     val color = EhUtils.getCategoryColor(info.category)
     val simpleLang = info.simpleLanguage
     ElevatedCard(
