@@ -57,7 +57,7 @@ fun LibrariesContainer(
         }
     }
 
-    val libs = libraries.value?.libraries
+    val libs = libraries.value?.libraries?.sortedBy { it.name }
     if (libs != null) {
         val openDialog = remember { mutableStateOf<Library?>(null) }
 
