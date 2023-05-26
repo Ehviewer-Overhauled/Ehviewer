@@ -30,7 +30,6 @@ import androidx.preference.Preference
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
@@ -75,20 +74,18 @@ class AdvancedFragment : BasePreferenceFragment() {
                     .setView(R.layout.preference_dialog_task)
                     .show()
                 lifecycleScope.launchIO {
-                    val success = EhDB.exportDB(requireActivity(), uri)
+                    val e = runSuspendCatching {
+                        EhDB.exportDB(requireActivity(), uri)
+                    }.exceptionOrNull()?.run {
+                        printStackTrace()
+                        getString(R.string.settings_advanced_export_data_failed)
+                    }
                     withUIContext {
                         if (alertDialog.isShowing) {
                             alertDialog.dismiss()
                         }
                         showTip(
-                            if (success) {
-                                GetText.getString(
-                                    R.string.settings_advanced_export_data_to,
-                                    uri.toString(),
-                                )
-                            } else {
-                                GetText.getString(R.string.settings_advanced_export_data_failed)
-                            },
+                            e ?: getString(R.string.settings_advanced_export_data_to, uri.toString()),
                             BaseScene.LENGTH_SHORT,
                         )
                     }

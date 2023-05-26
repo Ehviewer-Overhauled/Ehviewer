@@ -38,7 +38,6 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.util.sendTo
 
 object EhDB {
-    private const val CUR_DB_VER = 4
     private val db = ehDatabase
 
     // Fix state
@@ -366,12 +365,15 @@ object EhDB {
         for (item in list) to.insert(item)
     }
 
-    @Synchronized
-    fun exportDB(context: Context, uri: Uri): Boolean {
+    suspend fun exportDB(context: Context, uri: Uri) {
         val ehExportName = "eh.export.db"
-        runCatching {
+        resource {
             context.deleteDatabase(ehExportName)
-            val newDb = databaseBuilder(context, EhDatabase::class.java, ehExportName).build()
+            databaseBuilder(context, EhDatabase::class.java, ehExportName).build()
+        } release {
+            it.close()
+            context.deleteDatabase(ehExportName)
+        } use { newDb ->
             copyDao(db.downloadsDao(), newDb.downloadsDao())
             copyDao(db.downloadLabelDao(), newDb.downloadLabelDao())
             copyDao(db.downloadDirnameDao(), newDb.downloadDirnameDao())
@@ -386,11 +388,7 @@ object EhDB {
                     fromFd sendTo toFd
                 }
             }
-            return true
-        }.onFailure {
-            it.printStackTrace()
         }
-        return false
     }
 
     suspend fun importDB(context: Context, uri: Uri) {
