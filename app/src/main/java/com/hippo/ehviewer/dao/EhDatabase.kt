@@ -7,11 +7,13 @@ import androidx.room.DeleteTable
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
-    override fun migrate(db: SupportSQLiteDatabase) {
+@DeleteTable(tableName = "BOOKMARKS")
+class DropBookMarkDao : AutoMigrationSpec
+
+class ThumbKeyMigration : AutoMigrationSpec {
+    override fun onPostMigrate(db: SupportSQLiteDatabase) {
         val needMigrationTables = arrayOf(
             "DOWNLOADS",
             "HISTORY",
@@ -30,14 +32,16 @@ val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
-@DeleteTable(tableName = "BOOKMARKS")
-class A : AutoMigrationSpec
-
 @Database(
     entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
     version = 7,
     exportSchema = true,
     autoMigrations = [
+        AutoMigration(
+            from = 4,
+            to = 5,
+            spec = ThumbKeyMigration::class,
+        ),
         AutoMigration(
             from = 5,
             to = 6,
@@ -45,7 +49,7 @@ class A : AutoMigrationSpec
         AutoMigration(
             from = 6,
             to = 7,
-            spec = A::class,
+            spec = DropBookMarkDao::class,
         ),
     ],
 )
@@ -76,9 +80,7 @@ abstract class CookiesDatabase : RoomDatabase() {
 
 fun buildMainDB(context: Context): EhDatabase {
     // TODO: Remove allowMainThreadQueries
-    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries()
-        .addMigrations(EHDB_MIGRATION_4_5)
-        .build()
+    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build()
 }
 
 fun buildCookiesDB(context: Context): CookiesDatabase {
