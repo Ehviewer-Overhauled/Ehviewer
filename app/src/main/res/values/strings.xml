@@ -463,6 +463,7 @@
     <string name="settings_about_version">Build version</string>
     <string name="settings_about_build_time">Built at %s</string>
     <string name="settings_about_check_for_updates">Check for updates</string>
+    <string name="license">License</string>
     <string name="proxy_direct">Direct</string>
     <string name="proxy_system">System Proxy</string>
     <string name="proxy_host_or_ip">Host or IP</string>

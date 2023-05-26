@@ -59,6 +59,7 @@ open class BasePreferenceFragment :
             "mytags" -> MyTagsFragment()
             "uconfig" -> UConfigFragment()
             "hosts" -> HostsFragment()
+            "license" -> LicenseFragment()
             else -> null
         }
         fragment?.let {

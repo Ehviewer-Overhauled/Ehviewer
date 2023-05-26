@@ -43,6 +43,11 @@
         app:iconSpaceReserved="false"
         app:url="https://github.com/Ehviewer-Overhauled/Ehviewer" />
 
+    <Preference
+        android:key="license"
+        android:title="@string/license"
+        android:iconSpaceReserved="false"/>
+
     <com.hippo.ehviewer.preference.VersionPreference
         android:key="version"
         app:iconSpaceReserved="false" />

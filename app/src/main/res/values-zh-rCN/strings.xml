@@ -414,6 +414,7 @@
     <string name="settings_about_author">作者</string>
     <string name="settings_about_latest_release">最新版本</string>
     <string name="settings_about_source">源码</string>
+    <string name="license">许可证</string>
     <string name="settings_about_version">版本号</string>
     <string name="settings_about_build_time">于 %s 构建</string>
     <string name="settings_about_check_for_updates">检查更新</string>
