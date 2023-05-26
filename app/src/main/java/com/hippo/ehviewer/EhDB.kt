@@ -397,7 +397,9 @@ object EhDB {
     @Synchronized
     fun importDB(context: Context, uri: Uri): String? {
         runCatching {
-            val oldDB = databaseBuilder(context, EhDatabase::class.java, "tmp.db")
+            val tempDBName = "tmp.db"
+            context.deleteDatabase(tempDBName)
+            val oldDB = databaseBuilder(context, EhDatabase::class.java, tempDBName)
                 .createFromInputStream { context.contentResolver.openInputStream(uri) }
                 .build()
 
