@@ -55,9 +55,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         set(value) {
             field = value
             if (field == SpiderQueen.MODE_DOWNLOAD && downloadDir == null) {
-                val title = getSuitableTitle(mGalleryInfo)
-                val dirname = FileUtils.sanitizeFilename("$mGid-$title")
-                EhDB.putDownloadDirname(mGid, dirname)
+                mGalleryInfo.putToDownloadDir()
                 downloadDir = getGalleryDownloadDir(mGid)!!.apply { check(ensureDir()) { "Download directory $uri is not valid directory!" } }
             }
         }
@@ -285,4 +283,10 @@ private fun fixExtension(extension: String): String {
 
 private fun findImageFile(dir: UniFile, index: Int): UniFile? {
     return COMPAT_IMAGE_EXTENSIONS.firstNotNullOfOrNull { dir.findFile(perFilename(index, it)) }
+}
+
+fun GalleryInfo.putToDownloadDir() {
+    val title = getSuitableTitle(this)
+    val dirname = FileUtils.sanitizeFilename("$gid-$title")
+    EhDB.putDownloadDirname(gid, dirname)
 }
