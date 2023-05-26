@@ -39,7 +39,7 @@ fun EhAsyncCropThumb(
     key: GalleryInfo,
     modifier: Modifier = Modifier,
 ) {
-    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+    var contentScale by remember(key.gid) { mutableStateOf(ContentScale.Fit) }
     AsyncImage(
         model = requestOf(key),
         contentDescription = null,

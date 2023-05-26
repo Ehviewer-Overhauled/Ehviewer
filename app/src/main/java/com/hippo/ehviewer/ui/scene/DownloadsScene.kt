@@ -1253,7 +1253,7 @@ private fun CompanionAsyncThumb(
     path: UniFile,
     modifier: Modifier = Modifier,
 ) {
-    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+    var contentScale by remember(info.gid) { mutableStateOf(ContentScale.Fit) }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val context = LocalContext.current
     var localReq by remember(info.gid) {
