@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.coil
 
 import coil.intercept.Interceptor
-import coil.request.ImageRequest
 import coil.request.ImageResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -21,31 +20,8 @@ object MergeInterceptor : Interceptor {
     private val notifyScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val EMPTY_LIST = mutableListOf<Continuation<Unit>>()
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
-        val originRequest = chain.request
-        val originListener = originRequest.listener
-        val key = originRequest.data as String
-        val newRequest = ImageRequest.Builder(originRequest).listener(
-            { originListener?.onStart(it) },
-            { originListener?.onCancel(it) },
-            { request, result ->
-                originListener?.onError(request, result)
-                // Wake all pending continuations since this request is to be failed
-                notifyScope.launch {
-                    pendingContinuationMapLock.withLock {
-                        pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
-                    }
-                }
-            },
-            { request, result ->
-                originListener?.onSuccess(request, result)
-                // Wake all pending continuations shared with the same memory key since we have written it to memory cache
-                notifyScope.launch {
-                    pendingContinuationMapLock.withLock {
-                        pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
-                    }
-                }
-            },
-        ).build()
+        val req = chain.request
+        val key = req.data as String
 
         pendingContinuationMapLock.lock()
         val existPendingContinuations = pendingContinuationMap[key]
@@ -64,7 +40,14 @@ object MergeInterceptor : Interceptor {
         }
 
         try {
-            return withContext(originRequest.interceptorDispatcher) { chain.proceed(newRequest) }
+            return withContext(req.interceptorDispatcher) { chain.proceed(req) }.apply {
+                // Wake all pending continuations shared with the same memory key since we have written it to memory cache
+                notifyScope.launch {
+                    pendingContinuationMapLock.withLock {
+                        pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
+                    }
+                }
+            }
         } catch (e: CancellationException) {
             notifyScope.launch {
                 pendingContinuationMapLock.withLock {
@@ -72,6 +55,14 @@ object MergeInterceptor : Interceptor {
                     val successor = pendingContinuationMap[key]?.removeFirstOrNull()?.apply { resume(Unit) }
                     // If no successor, delete this entry from hashmap
                     successor ?: pendingContinuationMap.remove(key)
+                }
+            }
+            throw e
+        } catch (e: Throwable) {
+            // Wake all pending continuations since this request is to be failed
+            notifyScope.launch {
+                pendingContinuationMapLock.withLock {
+                    pendingContinuationMap.remove(key)?.forEach { it.resume(Unit) }
                 }
             }
             throw e
