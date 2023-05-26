@@ -207,16 +207,18 @@ class AdvancedFragment : BasePreferenceFragment() {
                     .setView(R.layout.preference_dialog_task)
                     .show()
                 lifecycleScope.launchIO {
-                    val error = EhDB.importDB(requireActivity(), uri)
+                    val error = runSuspendCatching {
+                        EhDB.importDB(requireActivity(), uri)
+                    }.exceptionOrNull()?.run {
+                        printStackTrace()
+                        getString(R.string.cant_read_the_file)
+                    }
                     withUIContext {
                         if (alertDialog.isShowing) {
                             alertDialog.dismiss()
                         }
                         if (null == error) {
-                            showTip(
-                                getString(R.string.settings_advanced_import_data_successfully),
-                                BaseScene.LENGTH_SHORT,
-                            )
+                            showTip(getString(R.string.settings_advanced_import_data_successfully), BaseScene.LENGTH_SHORT)
                         } else {
                             showTip(error, BaseScene.LENGTH_SHORT)
                         }

@@ -21,6 +21,8 @@ import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.paging.PagingSource
 import androidx.room.Room.databaseBuilder
+import arrow.fx.coroutines.release
+import arrow.fx.coroutines.resource
 import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.BasicDao
@@ -391,18 +393,15 @@ object EhDB {
         return false
     }
 
-    /**
-     * @return error string, null for no error
-     */
-    @Synchronized
-    fun importDB(context: Context, uri: Uri): String? {
-        runCatching {
-            val tempDBName = "tmp.db"
+    suspend fun importDB(context: Context, uri: Uri) {
+        val tempDBName = "tmp.db"
+        resource {
             context.deleteDatabase(tempDBName)
-            val oldDB = databaseBuilder(context, EhDatabase::class.java, tempDBName)
-                .createFromInputStream { context.contentResolver.openInputStream(uri) }
-                .build()
-
+            databaseBuilder(context, EhDatabase::class.java, tempDBName).createFromInputStream { context.contentResolver.openInputStream(uri) }.build()
+        } release {
+            it.close()
+            context.deleteDatabase(tempDBName)
+        } use { oldDB ->
             // Download label
             val manager = DownloadManager
             runCatching {
@@ -454,11 +453,6 @@ object EhDB {
                     if (it !in currentFilterList) addFilter(it)
                 }
             }
-            oldDB.close()
-        }.onFailure {
-            it.printStackTrace()
-            return context.getString(R.string.cant_read_the_file)
         }
-        return null
     }
 }
