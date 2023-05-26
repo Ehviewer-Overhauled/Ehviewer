@@ -21,7 +21,7 @@ object MergeInterceptor : Interceptor {
     private val EMPTY_LIST = mutableListOf<Continuation<Unit>>()
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
         val req = chain.request
-        val key = req.data as String
+        val key = req.memoryCacheKey?.key?.takeIf { it.startsWith("m/") } ?: return withContext(req.interceptorDispatcher) { chain.proceed(req) }
 
         pendingContinuationMapLock.lock()
         val existPendingContinuations = pendingContinuationMap[key]
