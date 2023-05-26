@@ -1256,7 +1256,7 @@ private fun CompanionAsyncThumb(
     var contentScale by remember { mutableStateOf(ContentScale.Fit) }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val context = LocalContext.current
-    var localReq by remember {
+    var localReq by remember(info.gid) {
         path.takeIf { it.isFile }?.uri?.let {
             context.imageRequest {
                 data(it.toString())
