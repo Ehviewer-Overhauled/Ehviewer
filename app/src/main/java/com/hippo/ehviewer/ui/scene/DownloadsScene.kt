@@ -32,6 +32,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -58,6 +60,7 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.dao.DownloadInfo
@@ -70,6 +73,7 @@ import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
+import com.hippo.ehviewer.spider.putToDownloadDir
 import com.hippo.ehviewer.ui.compose.CropDefaults
 import com.hippo.ehviewer.ui.compose.data.requestOf
 import com.hippo.ehviewer.ui.compose.setMD3Content
@@ -879,63 +883,18 @@ class DownloadsScene :
         fun bind(info: DownloadInfo) {
             lifecycleScope.launchIO {
                 val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
-                    val title = EhUtils.getSuitableTitle(info)
-                    val dirname = FileUtils.sanitizeFilename("${info.gid}-$title")
-                    EhDB.putDownloadDirname(info.gid, dirname)
+                    info.putToDownloadDir()
                     SpiderDen.getGalleryDownloadDir(info.gid)!!
                 }
-                check(downloadDir.ensureDir())
+                downloadDir.ensureDir()
                 val thumbLocation = downloadDir.subFile(".thumb")!!
-                val localReq = thumbLocation.takeIf { it.exists() }?.uri?.let {
-                    context?.imageRequest {
-                        data(it.toString())
-                        memoryCacheKey(info.thumbKey)
-                    }
-                }
                 withUIContext {
                     binding.thumb.setMD3Content {
                         Card(onClick = ::onClick.partially1(binding.thumb)) {
-                            var contentScale by remember { mutableStateOf(ContentScale.Fit) }
-                            val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
-                            AsyncImage(
-                                model = localReq ?: requestOf(info),
-                                contentDescription = null,
+                            CompanionAsyncThumb(
+                                info = info,
+                                path = thumbLocation,
                                 modifier = Modifier.height(height).aspectRatio(0.6666667F),
-                                onState = { state ->
-                                    if (state is AsyncImagePainter.State.Success) {
-                                        state.result.drawable.run {
-                                            if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
-                                                contentScale = ContentScale.Crop
-                                            }
-                                        }
-                                        coroutineScope.launch {
-                                            runCatching {
-                                                if (!thumbLocation.exists()) {
-                                                    thumbLocation.ensureFile()
-                                                    val key = info.thumbKey!!
-                                                    imageCache.read(key) {
-                                                        UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use { src ->
-                                                            thumbLocation.openFileDescriptor("w").use { dst ->
-                                                                src sendTo dst
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (state is AsyncImagePainter.State.Error) {
-                                        if (thumbLocation.exists()) {
-                                            coroutineScope.launch {
-                                                thumbLocation.delete()
-                                                withUIContext {
-                                                    bind(info)
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                contentScale = contentScale,
                             )
                         }
                     }
@@ -1286,4 +1245,62 @@ class DownloadsScene :
         private const val LABEL_OFFSET = 2
         private const val PAYLOAD_STATE = 0
     }
+}
+
+@Composable
+private fun CompanionAsyncThumb(
+    info: GalleryInfo,
+    path: UniFile,
+    modifier: Modifier = Modifier,
+) {
+    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val context = LocalContext.current
+    var localReq by remember {
+        path.takeIf { it.isFile }?.uri?.let {
+            context.imageRequest {
+                data(it.toString())
+                memoryCacheKey(info.thumbKey)
+            }
+        }.let { mutableStateOf(it) }
+    }
+    AsyncImage(
+        model = localReq ?: requestOf(info),
+        contentDescription = null,
+        modifier = modifier,
+        onState = { state ->
+            if (state is AsyncImagePainter.State.Success) {
+                state.result.drawable.run {
+                    if (CropDefaults.shouldCrop(intrinsicWidth, intrinsicHeight)) {
+                        contentScale = ContentScale.Crop
+                    }
+                }
+                coroutineScope.launch {
+                    runCatching {
+                        if (!path.exists() && path.ensureFile()) {
+                            val key = info.thumbKey!!
+                            imageCache.read(key) {
+                                UniFile.fromFile(data.toFile())!!.openFileDescriptor("r").use { src ->
+                                    path.openFileDescriptor("w").use { dst ->
+                                        src sendTo dst
+                                    }
+                                }
+                            }
+                        }
+                    }.onFailure {
+                        it.printStackTrace()
+                    }
+                }
+            }
+            if (state is AsyncImagePainter.State.Error) {
+                coroutineScope.launch {
+                    if (path.exists()) {
+                        path.delete()
+                        localReq = null
+                    }
+                }
+            }
+        },
+        contentScale = contentScale,
+    )
 }
