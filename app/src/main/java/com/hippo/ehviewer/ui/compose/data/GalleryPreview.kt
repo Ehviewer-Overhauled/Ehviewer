@@ -44,7 +44,7 @@ fun EhAsyncPreview(
     model: GalleryPreview,
     modifier: Modifier = Modifier,
 ) {
-    var contentScale by remember { mutableStateOf(ContentScale.Fit) }
+    var contentScale by remember(model.imageKey) { mutableStateOf(ContentScale.Fit) }
     AsyncImage(
         model = requestOf(model),
         contentDescription = null,
