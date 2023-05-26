@@ -3,8 +3,10 @@ package com.hippo.ehviewer.dao
 import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.DeleteTable
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -28,19 +30,26 @@ val EHDB_MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
+@DeleteTable(tableName = "BOOKMARKS")
+class A : AutoMigrationSpec
+
 @Database(
-    entities = [BookmarkInfo::class, DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
-    version = 6,
+    entities = [DownloadInfo::class, DownloadLabel::class, DownloadDirname::class, Filter::class, HistoryInfo::class, LocalFavoriteInfo::class, QuickSearch::class],
+    version = 7,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(
             from = 5,
             to = 6,
         ),
+        AutoMigration(
+            from = 6,
+            to = 7,
+            spec = A::class,
+        ),
     ],
 )
 abstract class EhDatabase : RoomDatabase() {
-    abstract fun bookmarksBao(): BookmarksDao
     abstract fun downloadDirnameDao(): DownloadDirnameDao
     abstract fun downloadLabelDao(): DownloadLabelDao
     abstract fun downloadsDao(): DownloadsDao
