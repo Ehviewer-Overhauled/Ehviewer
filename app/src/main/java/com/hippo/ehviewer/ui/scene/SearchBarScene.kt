@@ -22,13 +22,13 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
+import com.hippo.ehviewer.dao.searchDatabase
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.legacy.SearchDatabase
+import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
@@ -37,7 +37,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var mSuggestionAdapter: SuggestionAdapter? = null
     private var mSuggestionProvider: SuggestionProvider? = null
     private var mAllowEmptySearch = true
-    private val mSearchDatabase by lazy { SearchDatabase.getInstance(context) }
+    private val mSearchDatabase by lazy { searchDatabase.searchDao() }
     private var onApplySearch: (String) -> Unit = {}
 
     override fun onCreateView(
@@ -296,7 +296,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSuggestions(scrollToTop: Boolean = true) {
         _binding ?: return
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launchIO {
             val suggestions = mutableListOf<Suggestion>()
             mergedSuggestionFlow().collect {
                 suggestions.add(it)
@@ -314,7 +314,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private fun mergedSuggestionFlow(): Flow<Suggestion> = flow {
         binding.searchview.editText.text?.toString()?.let { text ->
             mSuggestionProvider?.run { providerSuggestions(text)?.forEach { emit(it) } }
-            mSearchDatabase.getSuggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
+            mSearchDatabase.suggestions(text, 128).forEach { emit(KeywordSuggestion(it)) }
             EhTagDatabase.takeIf { it.isInitialized() }?.run {
                 if (text.isNotEmpty() && !text.endsWith(' ')) {
                     val keyword = text.substringAfterLast(' ')

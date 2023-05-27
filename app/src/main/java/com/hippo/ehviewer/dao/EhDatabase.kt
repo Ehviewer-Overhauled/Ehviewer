@@ -8,6 +8,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.hippo.ehviewer.EhApplication
 
 @DeleteTable(tableName = "BOOKMARKS")
 class DropBookMarkDao : AutoMigrationSpec
@@ -85,4 +86,23 @@ fun buildMainDB(context: Context): EhDatabase {
 
 fun buildCookiesDB(context: Context): CookiesDatabase {
     return Room.databaseBuilder(context, CookiesDatabase::class.java, "okhttp3-cookie.db").build()
+}
+
+@Database(
+    entities = [Search::class],
+    version = 2,
+    autoMigrations = [
+        AutoMigration(
+            from = 1,
+            to = 2,
+        ),
+    ],
+)
+abstract class SearchDatabase : RoomDatabase() {
+    abstract fun searchDao(): SearchDao
+}
+
+val searchDatabase by lazy {
+    val context = EhApplication.application
+    Room.databaseBuilder(context, SearchDatabase::class.java, "search_database.db").build()
 }
