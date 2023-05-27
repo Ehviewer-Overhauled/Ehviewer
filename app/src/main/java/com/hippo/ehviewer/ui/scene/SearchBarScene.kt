@@ -162,7 +162,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
         if (!mAllowEmptySearch && query.isEmpty()) {
             return
         }
-        mSearchDatabase.addQuery(query)
+        lifecycleScope.launchIO { mSearchDatabase.addQuery(query) }
         onApplySearch(query)
     }
 
@@ -285,8 +285,12 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
                 .setMessage(requireContext().getString(R.string.delete_search_history, mKeyword))
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.delete) { _, _ ->
-                    mSearchDatabase.deleteQuery(mKeyword)
-                    updateSuggestions(false)
+                    lifecycleScope.launchIO {
+                        mSearchDatabase.deleteQuery(mKeyword)
+                        withUIContext {
+                            updateSuggestions(false)
+                        }
+                    }
                 }
                 .show()
             return true

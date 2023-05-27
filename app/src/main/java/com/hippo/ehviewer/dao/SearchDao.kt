@@ -20,6 +20,7 @@ interface SearchDao {
 
     fun addQuery(query: String) {
         deleteQuery(query)
+        if (query.isBlank()) return
         val search = Search(System.currentTimeMillis(), query)
         insert(search)
     }
