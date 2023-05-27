@@ -16,19 +16,26 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import com.google.android.material.search.SearchView
 import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
-import com.hippo.ehviewer.dao.searchDatabase
+import com.hippo.ehviewer.dao.SearchDatabase
 import com.hippo.ehviewer.databinding.SceneSearchbarBinding
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+
+private val searchDatabase by lazy {
+    val context = EhApplication.application
+    Room.databaseBuilder(context, SearchDatabase::class.java, "search_database.db").build()
+}
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null
@@ -37,7 +44,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var mSuggestionAdapter: SuggestionAdapter? = null
     private var mSuggestionProvider: SuggestionProvider? = null
     private var mAllowEmptySearch = true
-    private val mSearchDatabase by lazy { searchDatabase.searchDao() }
+    private val mSearchDatabase = searchDatabase.searchDao()
     private var onApplySearch: (String) -> Unit = {}
 
     override fun onCreateView(
