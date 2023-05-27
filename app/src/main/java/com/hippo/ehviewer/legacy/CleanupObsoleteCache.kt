@@ -15,6 +15,7 @@ private val OBSOLETE_CACHE_DIRS = arrayOf(
 @OptIn(DelicateCoroutinesApi::class)
 fun cleanObsoleteCache(application: Application) {
     launchIO {
+        application.deleteDatabase("hosts.db")
         val dir = application.cacheDir
         for (subdir in OBSOLETE_CACHE_DIRS) {
             val file = File(dir, subdir)
