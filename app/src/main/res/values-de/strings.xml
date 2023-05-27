@@ -239,16 +239,6 @@
     <string name="u_config">EHentai-Einstellungen</string>
     <string name="apply">Übernehmen</string>
     <string name="apply_tip">Zum Speichern der Einstellungen auf Häkchen tippen</string>
-    <string name="hosts">Angepasstes hosts.txt</string>
-    <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
-    <string name="add_host">Host hinzufügen</string>
-    <string name="add_host_add">Hinzufügen</string>
-    <string name="edit_host">Host bearbeiten</string>
-    <string name="edit_host_confirm">Übernehmen</string>
-    <string name="edit_host_delete">Entfernen</string>
-    <string name="invalid_host">Ungültiger Host</string>
-    <string name="invalid_ip">Ungültige IP</string>
     <string name="share_image">Das Bild teilen</string>
     <string name="image_saved">Das Bild wurde zu %s gespeichert</string>
     <string name="settings_eh">EH</string>
@@ -367,8 +357,6 @@
     <string name="settings_about_author">Entwickler</string>
     <string name="settings_about_latest_release">Aktuelle Version</string>
     <string name="settings_advanced_built_in_hosts_summary">Host auf die IP, die nach die App festgelegt werden, umstellen\nKann von angepasstem hosts.txt überschrieben werden</string>
-    <string name="settings_advanced_custom_hosts_title">Angepasstes hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">Hostname auf die angepassten IP umstellen\nDie Regeln können die von der App festgelegt überschreiben</string>
     <string name="download_reset_reading_progress">Lesefortschritte zurücksetzen</string>
     <string name="reset_reading_progress_message">Lesefortschritte aus allen heruntergeladenen Galerie zurücksetzen?</string>
     <string name="settings_eh_identity_cookies_signed">Wenn jemand die folgenden Informationen hat, kann er sich als du anmelden. &lt;br&gt;&lt;b&gt;ALSO GEHEIM HALTEN!&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>

@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.Hosts
 import com.hippo.ehviewer.Settings
 import okhttp3.Dns
@@ -23,7 +22,6 @@ import java.net.InetAddress
 import java.net.UnknownHostException
 
 object EhDns : Dns {
-    private val hosts = EhApplication.hosts
     private val builtInHosts: MutableMap<String, List<InetAddress>> = mutableMapOf()
 
     init {
@@ -127,11 +125,10 @@ object EhDns : Dns {
 
     @Throws(UnknownHostException::class)
     override fun lookup(hostname: String): List<InetAddress> {
-        return hosts[hostname] ?: builtInHosts[hostname].takeIf { Settings.builtInHosts }
-            ?: Dns.SYSTEM.lookup(hostname)
+        return builtInHosts[hostname].takeIf { Settings.builtInHosts } ?: Dns.SYSTEM.lookup(hostname)
     }
 
     fun isInHosts(hostname: String): Boolean {
-        return hosts.contains(hostname) || (builtInHosts.contains(hostname) && Settings.builtInHosts)
+        return builtInHosts.contains(hostname) && Settings.builtInHosts
     }
 }

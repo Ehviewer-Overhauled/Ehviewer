@@ -20,43 +20,12 @@ package com.hippo.ehviewer;
  * Created by Hippo on 2018/3/21.
  */
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Pair;
-
 import androidx.annotation.Nullable;
-
-import com.hippo.ehviewer.database.MSQLiteBuilder;
-import com.hippo.ehviewer.util.SqlUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Hosts {
-
-    private static final int VERSION_1 = 1;
-    private static final String TABLE_HOSTS = "HOSTS";
-    private static final String COLUMN_HOST = "HOST";
-    private static final String COLUMN_IP = "IP";
-
-    private static final int DB_VERSION = VERSION_1;
-
-    private final SQLiteDatabase db;
-
-    public Hosts(Context context, String name) {
-        SQLiteOpenHelper helper = new MSQLiteBuilder()
-                .version(VERSION_1)
-                .createTable(TABLE_HOSTS)
-                .insertColumn(TABLE_HOSTS, COLUMN_HOST, String.class)
-                .insertColumn(TABLE_HOSTS, COLUMN_IP, String.class)
-                .build(context, name, DB_VERSION);
-        db = helper.getWritableDatabase();
-    }
 
     @Nullable
     public static InetAddress toInetAddress(String host, String ip) {
@@ -114,22 +83,6 @@ public class Hosts {
         }
 
         return labelLength >= 1 && labelLength <= 63;
-    }
-
-    /**
-     * Returns true if ips are valid.
-     */
-    public static boolean isValidIp(String ips) {
-        if (ips == null) {
-            return false;
-        }
-        String[] list = ips.split("\\+");
-        for (String ip : list) {
-            if (parseV4(ip) == null && parseV6(ip) == null) {
-                return false;
-            }
-        }
-        return true;
     }
 
     // org.xbill.DNS.Address.parseV4
@@ -267,77 +220,5 @@ public class Hosts {
         }
 
         return data;
-    }
-
-    /**
-     * Gets a InetAddress with the host.
-     */
-    @Nullable
-    public List<InetAddress> get(String host) {
-        if (!isValidHost(host)) {
-            return null;
-        }
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
-            if (cursor.moveToNext()) {
-                String[] ips = SqlUtils.getString(cursor, COLUMN_IP, null).split("\\+");
-                List<InetAddress> addresses = new ArrayList<>();
-                for (String ip : ips) {
-                    addresses.add(toInetAddress(host, ip));
-                }
-                return addresses;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public boolean contains(String host) {
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + " WHERE " + COLUMN_HOST + " = ?;", new String[]{host})) {
-            return cursor.moveToNext();
-        }
-    }
-
-    /**
-     * Puts the host-ip pair into this hosts.
-     */
-    public boolean put(String host, String ip) {
-        if (!isValidHost(host) || !isValidIp(ip)) {
-            return false;
-        }
-
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_HOST, host);
-        values.put(COLUMN_IP, ip);
-
-        if (contains(host)) {
-            db.update(TABLE_HOSTS, values, COLUMN_HOST + " = ?", new String[]{host});
-        } else {
-            db.insert(TABLE_HOSTS, null, values);
-        }
-
-        return true;
-    }
-
-    /**
-     * Puts delete the entry with the host.
-     */
-    public void delete(String host) {
-        db.delete(TABLE_HOSTS, COLUMN_HOST + " = ?", new String[]{host});
-    }
-
-    /**
-     * Get all data from this host.
-     */
-    public List<Pair<String, String>> getAll() {
-        List<Pair<String, String>> result = new ArrayList<>();
-
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HOSTS + ";", null)) {
-            while (cursor.moveToNext()) {
-                String host = SqlUtils.getString(cursor, COLUMN_HOST, null);
-                String ip = SqlUtils.getString(cursor, COLUMN_IP, null);
-                result.add(new Pair<>(host, ip));
-            }
-        }
-        return result;
     }
 }

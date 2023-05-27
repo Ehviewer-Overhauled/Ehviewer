@@ -96,7 +96,6 @@
     <string name="rating6">OK</string>
     <string name="rating2">Pinlig</string>
     <string name="key_pages">Sider</string>
-    <string name="invalid_ip">Ugyldig IP</string>
     <string name="share_image">Del bilde</string>
     <string name="settings_eh_sign_out">Logg ut</string>
     <string name="settings_eh_identity_cookies_tourist">Turistmodus</string>
@@ -119,7 +118,6 @@
     <string name="rating1">Utolererbar</string>
     <string name="rating0">Katastrofe</string>
     <string name="gallery_info">Galleri-info</string>
-    <string name="add_host">Legg til en vert</string>
     <string name="settings_eh_list_mode">Listemodus</string>
     <string name="copied_to_clipboard">Kopiert til utklippstavlen</string>
     <string name="key_title">Navn</string>
@@ -153,15 +151,10 @@
     <string name="download_state_downloaded">Nedlastet</string>
     <string name="download_state_finish">Ferdig</string>
     <string name="download_remove_dialog_check_text">Slett bildefiler</string>
-    <string name="add_host_add">Legg til</string>
     <string name="settings_eh_gallery_site">Galleriside</string>
     <string name="download_stop_all">Stopp alle</string>
-    <string name="invalid_host">Ugyldig vert</string>
     <string name="image_saved">Bilde lagret i %s</string>
     <string name="settings_download_download_origin_image">Last ned opprinnelig bilde</string>
-    <string name="edit_host">Rediger verten</string>
-    <string name="edit_host_confirm">Bekreft</string>
-    <string name="edit_host_delete">Slett</string>
     <string name="settings_privacy_secure">Forhindre skjermavbildninger</string>
     <string name="download_service">Nedlastingstjeneste</string>
     <string name="proxy_type_name">Mellomtjenertype</string>

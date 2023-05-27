@@ -461,22 +461,10 @@
     <string name="settings_advanced_proxy">プロキシ</string>
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s：%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
-    <string name="hosts">カスタムhosts.txt</string>
-    <string name="hosts_host">ホスト</string>
-    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
-    <string name="add_host">ホストを追加</string>
-    <string name="add_host_add">追加</string>
-    <string name="edit_host">ホストを編集</string>
-    <string name="edit_host_confirm">適用</string>
-    <string name="edit_host_delete">削除</string>
-    <string name="invalid_host">無効なホストです</string>
-    <string name="invalid_ip">無効なIPです</string>
     <string name="settings_advanced_built_in_hosts_title">既定hosts.txt</string>
     <string name="app_language_system">システム言語（既定）</string>
     <string name="download_service">ダウンロードサービス</string>
     <string name="settings_advanced_built_in_hosts_summary">ホストをアプリ既定のIPにマッピング\nカスタムhosts.txtに上書きされます。</string>
-    <string name="settings_advanced_custom_hosts_title">カスタムhosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">ホスト名をIPにマッピング\n既定のhosts.txtを上書きできます。</string>
 
     <string name="settings_eh_identity_cookies_signed">下記の情報を持つ誰でもこのアカウントにログインできますので&lt;br&gt;&lt;b&gt;絶対に他人に渡さないように！&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">まだログインしていません</string>

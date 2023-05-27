@@ -300,16 +300,6 @@
     <!-- My Tags Activity -->
     <string name="my_tags">我的标签</string>
     <!-- Hosts Activity -->
-    <string name="hosts">自定义 hosts.txt</string>
-    <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
-    <string name="add_host">添加 host</string>
-    <string name="add_host_add">添加</string>
-    <string name="edit_host">编辑 host</string>
-    <string name="edit_host_confirm">确认</string>
-    <string name="edit_host_delete">删除</string>
-    <string name="invalid_host">无效的 host</string>
-    <string name="invalid_ip">无效的 IP</string>
     <!-- Gallery Activity -->
     <string name="share_image">分享图片</string>
     <string name="image_saved">图片已保存至 %s</string>
@@ -390,8 +380,6 @@
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">内置 hosts.txt</string>
     <string name="settings_advanced_built_in_hosts_summary">应用提供的主机到IP的映射\n可被自定义 hosts.txt 覆盖</string>
-    <string name="settings_advanced_custom_hosts_title">自定义 hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">将主机名称映射到相应的IP地址\n可覆盖内置 hosts.txt</string>
     <string name="settings_advanced_domain_fronting_title">域名前置（重启应用后生效）</string>
     <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁\n启用时会禁用代理设置</string>
     <string name="settings_advanced_bypass_vpn_title">绕过VPN</string>

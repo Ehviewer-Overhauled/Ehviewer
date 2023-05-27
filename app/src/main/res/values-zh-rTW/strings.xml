@@ -300,16 +300,6 @@
     <!-- My Tags Activity -->
     <string name="my_tags">我的標籤</string>
     <!-- Hosts Activity -->
-    <string name="hosts">自訂 hosts.txt</string>
-    <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
-    <string name="add_host">加入 host</string>
-    <string name="add_host_add">加入</string>
-    <string name="edit_host">編輯 host</string>
-    <string name="edit_host_confirm">確認</string>
-    <string name="edit_host_delete">刪除</string>
-    <string name="invalid_host">無效的 host</string>
-    <string name="invalid_ip">無效的 IP</string>
     <!-- Gallery Activity -->
     <string name="share_image">分享圖片</string>
     <string name="image_saved">已將圖片儲存至 %s</string>
@@ -390,8 +380,6 @@
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">內建 hosts.txt</string>
     <string name="settings_advanced_built_in_hosts_summary">應用程式提供的主機到 IP 的對映\n可覆蓋自訂 hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_title">自訂 hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">將主機名稱對映到相應的 IP 位址\n可覆蓋內建 hosts.txt</string>
     <string name="settings_advanced_domain_fronting_title">域名前綴</string>
     <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
     <string name="settings_advanced_bypass_vpn_title">繞過 VPN</string>

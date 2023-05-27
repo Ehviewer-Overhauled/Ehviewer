@@ -446,15 +446,5 @@
     <string name="u_config">Ajustes EHentai</string>
     <string name="apply">Aplicar</string>
     <string name="apply_tip">Toca la marca de verificación para guardar los cambios</string>
-    <string name="hosts">hosts.txt personalizado </string>
-    <string name="hosts_host">Anfitrión</string>
-    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
-    <string name="add_host">Añadir una anfitrión</string>
-    <string name="add_host_add">Añadir</string>
-    <string name="edit_host">Anfitrión</string>
-    <string name="edit_host_confirm">Aplicar</string>
-    <string name="edit_host_delete">Borrar</string>
-    <string name="invalid_host">Anfitrión inválida</string>
-    <string name="invalid_ip">IP inválida</string>
 
 </resources>

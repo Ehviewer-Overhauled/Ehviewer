@@ -195,8 +195,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
         }
 
-        val hosts by lazy { Hosts(application, "hosts.db") }
-
         val favouriteStatusRouter by lazy { FavouriteStatusRouter() }
 
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }

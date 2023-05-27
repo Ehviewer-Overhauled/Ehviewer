@@ -271,16 +271,6 @@
     <string name="apply_tip">설정을 저장하려면 체크 표시를 누르세요.</string>
 
     <!-- Hosts Activity -->
-    <string name="hosts">사용자 지정 hosts.txt</string>
-    <string name="hosts_host">호스트</string>
-    <string name="hosts_ip">IP1(+IP2+IP3&#8230;)</string>
-    <string name="add_host">호스트 추가</string>
-    <string name="add_host_add">추가</string>
-    <string name="edit_host">호스트 편집</string>
-    <string name="edit_host_confirm">확인</string>
-    <string name="edit_host_delete">삭제</string>
-    <string name="invalid_host">잘못된 호스트</string>
-    <string name="invalid_ip">잘못된 IP</string>
 
     <!-- Gallery Activity -->
     <string name="share_image">이미지 공유</string>
@@ -354,8 +344,6 @@
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">앱 내장 hosts.txt</string>
     <string name="settings_advanced_built_in_hosts_summary">앱에 내장된 호스트-IP 지정 규칙을 사용합니다.\n대신 사용자 지정 hosts.txt 파일을 사용할 수도 있습니다.</string>
-    <string name="settings_advanced_custom_hosts_title">사용자 지정 hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">호스트 이름을 IP 주소에 지정합니다.\n앱에 내장된 규칙은 무시됩니다.</string>
     <string name="settings_advanced_export_data">데이터 내보내기</string>
     <string name="settings_advanced_export_data_summary">다운로드 목록, 빠른 검색 목록 등의 데이터를 외부 저장소에 저장</string>
     <string name="settings_advanced_export_data_to">%s 경로에 데이터를 내보냈습니다.</string>

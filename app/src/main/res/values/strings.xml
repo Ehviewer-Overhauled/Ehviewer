@@ -343,16 +343,6 @@
     <!-- My Tags Activity -->
     <string name="my_tags">My tags</string>
     <!-- Hosts Activity -->
-    <string name="hosts">Custom hosts.txt</string>
-    <string name="hosts_host">Host</string>
-    <string name="hosts_ip">IP1(+IP2+IP3…)</string>
-    <string name="add_host">Add a host</string>
-    <string name="add_host_add">Add</string>
-    <string name="edit_host">Edit the host</string>
-    <string name="edit_host_confirm">Confirm</string>
-    <string name="edit_host_delete">Delete</string>
-    <string name="invalid_host">Invalid host</string>
-    <string name="invalid_ip">Invalid IP</string>
     <!-- Gallery Activity -->
     <string name="share_image">Share image</string>
     <string name="image_saved">Image saved to %s</string>
@@ -438,8 +428,6 @@
     <string name="settings_advanced_domain_fronting_summary">Bypass SNI blocking.</string>
     <string name="settings_advanced_bypass_vpn_title">Bypass VPN</string>
     <string name="settings_advanced_bypass_vpn_summary">Try to bypass VPN when domain fronting is enabled</string>
-    <string name="settings_advanced_custom_hosts_title">Custom hosts.txt</string>
-    <string name="settings_advanced_custom_hosts_summary">Map hostnames to IP addresses.\nIt can override built-in hosts.txt.</string>
     <string name="settings_advanced_export_data">Export data</string>
     <string name="settings_advanced_export_data_summary">Save data like download list, quick search list, to external storage</string>
     <string name="settings_advanced_export_data_to">Exported data to %s</string>

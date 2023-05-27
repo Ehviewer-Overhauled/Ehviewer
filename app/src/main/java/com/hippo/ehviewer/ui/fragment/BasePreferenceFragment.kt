@@ -58,7 +58,6 @@ open class BasePreferenceFragment :
             "filter" -> FilterFragment()
             "mytags" -> MyTagsFragment()
             "uconfig" -> UConfigFragment()
-            "hosts" -> HostsFragment()
             "license" -> LicenseFragment()
             else -> null
         }

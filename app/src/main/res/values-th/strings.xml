@@ -286,16 +286,6 @@
     <string name="apply_tip">แตะเครื่องหมายถูกเพื่อบันทึกการตั้งค่าแล้ว</string>
 
     <!-- Hosts Activity -->
-    <string name="hosts">ปรับแต่ง hosts.txt เอง</string>
-    <string name="hosts_host">โฮสต์</string>
-    <string name="hosts_ip">ไอพี</string>
-    <string name="add_host">เพิ่มโฮสต์</string>
-    <string name="add_host_add">เพิ่ม</string>
-    <string name="edit_host">แก้ไขโฮสต์</string>
-    <string name="edit_host_confirm">ยืนยัน</string>
-    <string name="edit_host_delete">ลบ</string>
-    <string name="invalid_host">โฮสต์ไม่ถูกต้อง</string>
-    <string name="invalid_ip">ไอพีไม่ถูกต้อง</string>
 
     <!-- Gallery Activity -->
     <string name="share_image">แชร์รูปภาพ</string>
@@ -369,8 +359,6 @@
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">ใช้ hosts.txt ของตัวแอป</string>
     <string name="settings_advanced_built_in_hosts_summary">ใช้ host-to-IP mapping แบบภายในที่จัดทำโดยตัวแอปเอง\nมันอาจจะเกิดการทับซ้อนกันจากการปรับแต่งไฟล์ hosts.txt เอง</string>
-    <string name="settings_advanced_custom_hosts_title">ปรับแต่งไฟล์ hosts.txt เอง</string>
-    <string name="settings_advanced_custom_hosts_summary">ทำแผนผัง hostnames ถึง ที่อยู่ของ IP\nมันอาจจะเกิดการทับซ้อนกันกับการใช้ hosts.txt ของตัวแอป</string>
     <string name="settings_advanced_export_data">สำเนาข้อมูล</string>
     <string name="settings_advanced_export_data_summary">บันทึกข้อมูลต่างๆเช่นรายการดาวน์โหลด และค้นหาอย่างด่วนลงพื้นที่จัดเก็บภายนอก</string>
     <string name="settings_advanced_export_data_to">ได้สำเนาข้อมูลแล้วจัดเก็บที่ %s</string>
