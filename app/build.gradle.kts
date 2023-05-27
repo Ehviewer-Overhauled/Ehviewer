@@ -251,3 +251,8 @@ ksp {
 tasks.withType<KspTaskJvm>().configureEach {
     compilerOptions.jvmTarget.set(JVM_17)
 }
+
+aboutLibraries {
+    duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.GROUP
+}

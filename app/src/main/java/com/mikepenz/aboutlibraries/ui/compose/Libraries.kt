@@ -45,7 +45,7 @@ fun LibrariesContainer(
         }
     }
 
-    val libs = libraries.value?.libraries?.sortedBy { it.name }
+    val libs = libraries.value?.libraries?.sortedBy { it.name.lowercase() }
     if (libs != null) {
         Libraries(
             libraries = libs,
