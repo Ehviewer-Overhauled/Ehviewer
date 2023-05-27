@@ -1,10 +1,8 @@
 package com.hippo.ehviewer.dao
 
-import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -76,11 +74,6 @@ abstract class EhDatabase : RoomDatabase() {
 )
 abstract class CookiesDatabase : RoomDatabase() {
     abstract fun cookiesDao(): CookiesDao
-}
-
-fun buildMainDB(context: Context): EhDatabase {
-    // TODO: Remove allowMainThreadQueries
-    return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build()
 }
 
 @Database(

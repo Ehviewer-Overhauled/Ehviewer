@@ -23,6 +23,7 @@ import androidx.collection.LruCache
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.room.Room
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
@@ -35,7 +36,7 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.dailycheck.checkDawn
-import com.hippo.ehviewer.dao.buildMainDB
+import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
@@ -200,7 +201,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }
 
-        val ehDatabase by lazy { buildMainDB(application) }
+        val ehDatabase by lazy { Room.databaseBuilder(application, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build() }
 
         val imageCache by lazy {
             diskCache {
