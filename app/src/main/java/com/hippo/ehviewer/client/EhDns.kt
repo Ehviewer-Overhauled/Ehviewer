@@ -28,10 +28,11 @@ private fun interface HostMapBuilder {
 
 private fun HostsMap.hosts(vararg hosts: String, builder: HostMapBuilder.() -> Unit) = apply {
     hosts.forEach { host ->
-        val list = mutableListOf<InetAddress>()
         fun String.toInetAddress() = InetAddress.getByName(this).let { InetAddress.getByAddress(host, it.address) }
-        HostMapBuilder { if (!(Settings.dF && it)) list.add(toInetAddress()) }.apply(builder)
-        put(host, list)
+        mutableListOf<InetAddress>().apply {
+            HostMapBuilder { if (!(Settings.dF && it)) add(toInetAddress()) }.apply(builder)
+            put(host, this)
+        }
     }
 }
 
