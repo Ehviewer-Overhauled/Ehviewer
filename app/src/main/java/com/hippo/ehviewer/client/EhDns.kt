@@ -20,106 +20,68 @@ import okhttp3.Dns
 import java.net.InetAddress
 import java.net.UnknownHostException
 
-object EhDns : Dns {
-    private val builtInHosts: MutableMap<String, List<InetAddress>> = mutableMapOf()
+private typealias HostsMap = MutableMap<String, List<InetAddress>>
+private fun hostsDsl(builder: HostsMap.() -> Unit): HostsMap = mutableMapOf<String, List<InetAddress>>().apply(builder)
+private fun interface HostMapBuilder {
+    infix fun String.availableInCN(boolean: Boolean)
+}
 
-    init {
-        // Pair(ip: String!, blockedByCCP: Boolean!)
-        val ehgtHosts = arrayOf(
-            Pair("37.48.89.44", false),
-            Pair("81.171.10.48", false),
-            Pair("178.162.139.24", false),
-            Pair("178.162.140.212", false),
-            Pair("2001:1af8:4700:a062:8::47de", false),
-            Pair("2001:1af8:4700:a062:9::47de", true),
-            Pair("2001:1af8:4700:a0c9:4::47de", false),
-            Pair("2001:1af8:4700:a0c9:3::47de", true),
-        )
-
-        put(
-            builtInHosts,
-            "e-hentai.org",
-            Pair("104.20.134.21", false),
-            Pair("104.20.135.21", false),
-            Pair("172.67.0.127", false),
-        )
-        put(
-            builtInHosts,
-            "exhentai.org",
-            Pair("178.175.128.252", false),
-            Pair("178.175.129.252", false),
-            Pair("178.175.129.254", false),
-            Pair("178.175.128.254", false),
-            Pair("178.175.132.20", false),
-            Pair("178.175.132.22", false),
-        )
-        put(
-            builtInHosts,
-            "s.exhentai.org",
-            Pair("178.175.129.254", false),
-            Pair("178.175.128.254", false),
-            Pair("178.175.132.22", false),
-        )
-        put(
-            builtInHosts,
-            "repo.e-hentai.org",
-            Pair("94.100.28.57", true),
-            Pair("94.100.29.73", true),
-        )
-        put(
-            builtInHosts,
-            "forums.e-hentai.org",
-            Pair("94.100.18.243", false),
-        )
-        put(
-            builtInHosts,
-            "ehgt.org",
-            *ehgtHosts,
-        )
-        put(
-            builtInHosts,
-            "gt0.ehgt.org",
-            *ehgtHosts,
-        )
-        put(
-            builtInHosts,
-            "gt1.ehgt.org",
-            *ehgtHosts,
-        )
-        put(
-            builtInHosts,
-            "gt2.ehgt.org",
-            *ehgtHosts,
-        )
-        put(
-            builtInHosts,
-            "gt3.ehgt.org",
-            *ehgtHosts,
-        )
-        put(
-            builtInHosts,
-            "ul.ehgt.org",
-            Pair("94.100.24.82", true),
-            Pair("94.100.24.72", true),
-        )
-        put(
-            builtInHosts,
-            "raw.githubusercontent.com",
-            Pair("151.101.0.133", false),
-            Pair("151.101.64.133", false),
-            Pair("151.101.128.133", false),
-            Pair("151.101.192.133", false),
-        )
+private fun HostsMap.hosts(vararg hosts: String, builder: HostMapBuilder.() -> Unit) = apply {
+    hosts.forEach { host ->
+        val list = mutableListOf<InetAddress>()
+        fun String.toInetAddress() = InetAddress.getByName(this).let { InetAddress.getByAddress(host, it.address) }
+        HostMapBuilder { if (!(Settings.dF && it)) list.add(toInetAddress()) }.apply(builder)
+        put(host, list)
     }
+}
 
-    private fun put(
-        map: MutableMap<String, List<InetAddress>>,
-        host: String,
-        vararg ips: Pair<String, Boolean>,
-    ) {
-        map[host] = ips.mapNotNull { pair ->
-            fun String.toInetAddress() = InetAddress.getByName(this).let { InetAddress.getByAddress(host, it.address) }
-            pair.first.toInetAddress().takeUnless { Settings.dF && pair.second }
+object EhDns : Dns {
+    private val builtInHosts = hostsDsl {
+        // ip: String!, blockedByCCP: Boolean!
+        hosts("ehgt.org", "gt0.ehgt.org", "gt1.ehgt.org", "gt2.ehgt.org", "gt3.ehgt.org") {
+            "37.48.89.44" availableInCN false
+            "81.171.10.48" availableInCN false
+            "178.162.139.24" availableInCN false
+            "178.162.140.212" availableInCN false
+            "2001:1af8:4700:a062:8::47de" availableInCN false
+            "2001:1af8:4700:a062:9::47de" availableInCN true
+            "2001:1af8:4700:a0c9:4::47de" availableInCN false
+            "2001:1af8:4700:a0c9:3::47de" availableInCN true
+        }
+        hosts("e-hentai.org") {
+            "104.20.134.21" availableInCN false
+            "104.20.135.21" availableInCN false
+            "172.67.0.127" availableInCN false
+        }
+        hosts("exhentai.org") {
+            "178.175.128.252" availableInCN false
+            "178.175.129.252" availableInCN false
+            "178.175.129.254" availableInCN false
+            "178.175.128.254" availableInCN false
+            "178.175.132.20" availableInCN false
+            "178.175.132.22" availableInCN false
+        }
+        hosts("s.exhentai.org") {
+            "178.175.129.254" availableInCN false
+            "178.175.128.254" availableInCN false
+            "178.175.132.22" availableInCN false
+        }
+        hosts("repo.e-hentai.org") {
+            "94.100.28.57" availableInCN true
+            "94.100.29.73" availableInCN true
+        }
+        hosts("forums.e-hentai.org") {
+            "94.100.18.243" availableInCN false
+        }
+        hosts("ul.ehgt.org") {
+            "94.100.24.82" availableInCN true
+            "94.100.24.72" availableInCN true
+        }
+        hosts("raw.githubusercontent.com") {
+            "151.101.0.133" availableInCN false
+            "151.101.64.133" availableInCN false
+            "151.101.128.133" availableInCN false
+            "151.101.192.133" availableInCN false
         }
     }
 
