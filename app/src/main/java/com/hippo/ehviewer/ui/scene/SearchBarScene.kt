@@ -318,8 +318,7 @@ abstract class SearchBarScene : BaseScene(), ToolBarScene {
             EhTagDatabase.takeIf { it.isInitialized() }?.run {
                 if (text.isNotEmpty() && !text.endsWith(' ')) {
                     val keyword = text.substringAfterLast(' ')
-                    val translate =
-                        Settings.showTagTranslations && isTranslatable(requireContext())
+                    val translate = Settings.showTagTranslations && isTranslatable(requireContext())
                     suggestFlow(keyword, translate, true).collect {
                         emit(TagSuggestion(it.first, it.second))
                     }

@@ -6,11 +6,14 @@ import androidx.room.Query
 
 @Dao
 interface SearchDao {
-    @Query("DELETE FROM suggestions WHERE query = :query")
+    @Query("DELETE FROM suggestions WHERE `query` = :query")
     fun deleteQuery(query: String)
 
-    @Query("SELECT * FROM suggestions")
-    fun rawSuggestions(): Array<Search>
+    @Query("SELECT * FROM suggestions WHERE `query` LIKE :prefix || '%' ORDER BY date DESC LIMIT :limit")
+    fun rawSuggestions(prefix: String, limit: Int): Array<Search>
+
+    @Query("SELECT * FROM suggestions ORDER BY date DESC LIMIT :limit")
+    fun list(limit: Int): Array<Search>
 
     @Insert
     fun insert(search: Search)
@@ -21,5 +24,5 @@ interface SearchDao {
         insert(search)
     }
 
-    fun suggestions(prefix: String, limit: Int) = rawSuggestions().map { it.query }.toTypedArray()
+    fun suggestions(prefix: String, limit: Int) = (if (prefix.isBlank()) list(limit) else rawSuggestions(prefix, limit)).map { it.query }
 }
