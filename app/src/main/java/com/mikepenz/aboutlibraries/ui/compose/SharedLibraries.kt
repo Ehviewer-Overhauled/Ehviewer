@@ -16,8 +16,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
@@ -158,17 +158,10 @@ internal fun Library(
         if (showLicenseBadges && library.licenses.isNotEmpty()) {
             Row {
                 library.licenses.forEach {
-                    Badge(
-                        modifier = Modifier
-                            .padding(padding.badgePadding)
-                            .clickable { openDialog = true },
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(padding.badgeContentPadding),
-                            text = it.name,
-                        )
-                    }
+                    SuggestionChip(
+                        onClick = { openDialog = true },
+                        label = { Text(text = it.name) },
+                    )
                 }
             }
         }
@@ -242,7 +235,7 @@ object LibraryDefaults {
             top = LibraryBadgePaddingTop,
             end = LibraryBadgePaddingEnd,
         ),
-        badgeContentPadding: PaddingValues = PaddingValues(0.dp),
+        badgeContentPadding: PaddingValues = PaddingValues(4.dp),
     ): LibraryPadding = DefaultLibraryPadding(
         namePadding = namePadding,
         versionPadding = versionPadding,
