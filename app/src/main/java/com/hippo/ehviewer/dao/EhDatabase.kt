@@ -83,10 +83,6 @@ fun buildMainDB(context: Context): EhDatabase {
     return Room.databaseBuilder(context, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build()
 }
 
-fun buildCookiesDB(context: Context): CookiesDatabase {
-    return Room.databaseBuilder(context, CookiesDatabase::class.java, "okhttp3-cookie.db").build()
-}
-
 @Database(
     entities = [Search::class],
     version = 2,
