@@ -113,21 +113,14 @@ internal fun Library(
     typography: Typography = MaterialTheme.typography,
     onClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick.invoke() }
-            .padding(contentPadding),
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().clickable { onClick.invoke() }.padding(contentPadding)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = library.name,
-                modifier = Modifier
-                    .padding(padding.namePadding)
-                    .weight(1f),
+                modifier = Modifier.padding(padding.namePadding).weight(1f),
                 style = typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -182,12 +175,8 @@ fun LicenseDialog(
             }
         },
         text = {
-            Column(
-                modifier = Modifier.verticalScroll(scrollState),
-            ) {
-                HtmlText(
-                    html = library.licenses.firstOrNull()?.htmlReadyLicenseContent.orEmpty(),
-                )
+            Column(modifier = Modifier.verticalScroll(scrollState)) {
+                HtmlText(html = library.licenses.firstOrNull()?.htmlReadyLicenseContent.orEmpty())
             }
         },
     )
@@ -198,9 +187,11 @@ fun HtmlText(
     html: String,
     modifier: Modifier = Modifier,
 ) {
-    AndroidView(modifier = modifier, factory = { context ->
-        TextView(context)
-    }, update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) })
+    AndroidView(
+        modifier = modifier,
+        factory = { context -> TextView(context) },
+        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) },
+    )
 }
 
 /**
