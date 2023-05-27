@@ -1,5 +1,6 @@
 package com.mikepenz.aboutlibraries.ui.compose
 
+import android.widget.TextView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,21 +13,33 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.util.author
+import com.mikepenz.aboutlibraries.ui.compose.util.htmlReadyLicenseContent
 
 /**
  * Displays all provided libraries in a simple list.
@@ -136,11 +149,19 @@ internal fun Library(
                 style = typography.bodyMedium,
             )
         }
+        var openDialog by remember { mutableStateOf(false) }
+        if (openDialog) {
+            LicenseDialog(library = library) {
+                openDialog = false
+            }
+        }
         if (showLicenseBadges && library.licenses.isNotEmpty()) {
             Row {
                 library.licenses.forEach {
                     Badge(
-                        modifier = Modifier.padding(padding.badgePadding),
+                        modifier = Modifier
+                            .padding(padding.badgePadding)
+                            .clickable { openDialog = true },
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     ) {
                         Text(
@@ -152,6 +173,41 @@ internal fun Library(
             }
         }
     }
+}
+
+@Composable
+fun LicenseDialog(
+    library: Library,
+    onDismiss: () -> Unit,
+) {
+    val scrollState = rememberScrollState()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(id = android.R.string.ok))
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(scrollState),
+            ) {
+                HtmlText(
+                    html = library.licenses.firstOrNull()?.htmlReadyLicenseContent.orEmpty(),
+                )
+            }
+        },
+    )
+}
+
+@Composable
+fun HtmlText(
+    html: String,
+    modifier: Modifier = Modifier,
+) {
+    AndroidView(modifier = modifier, factory = { context ->
+        TextView(context)
+    }, update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT) })
 }
 
 /**
