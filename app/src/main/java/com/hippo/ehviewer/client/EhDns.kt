@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.ehviewer.Hosts
 import com.hippo.ehviewer.Settings
 import okhttp3.Dns
 import java.net.InetAddress
@@ -119,7 +118,8 @@ object EhDns : Dns {
         vararg ips: Pair<String, Boolean>,
     ) {
         map[host] = ips.mapNotNull { pair ->
-            Hosts.toInetAddress(host, pair.first).takeUnless { Settings.dF && pair.second }
+            fun String.toInetAddress() = InetAddress.getByName(this).let { InetAddress.getByAddress(host, it.address) }
+            pair.first.toInetAddress().takeUnless { Settings.dF && pair.second }
         }
     }
 
