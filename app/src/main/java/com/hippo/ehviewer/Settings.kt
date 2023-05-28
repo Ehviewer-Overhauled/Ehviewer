@@ -29,9 +29,7 @@ import com.hippo.unifile.UniFile
 import java.util.Locale
 
 object Settings {
-    /********************
-     * Eh
-     */
+    // Eh
     const val KEY_THEME = "theme"
     const val KEY_ACCOUNT = "account"
     const val KEY_IMAGE_LIMITS = "image_limits"
@@ -64,27 +62,20 @@ object Settings {
         KEY_HIDE_HV_EVENTS,
     )
 
-    /********************
-     * Privacy and Security
-     */
+    // Privacy and Security
     const val KEY_SEC_SECURITY = "enable_secure"
     const val VALUE_SEC_SECURITY = false
 
-    /********************
-     * Download
-     */
+    // Download
     const val KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme"
     const val KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority"
     const val KEY_DOWNLOAD_SAVE_PATH = "image_path"
-    const val KEY_NOTIFICATION_REQUIRED = "notification_required"
     const val KEY_DOWNLOAD_SAVE_QUERY = "image_query"
     const val KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment"
     const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
 
-    /********************
-     * Advanced
-     */
+    // Advanced
     const val KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body"
     const val KEY_SECURITY = "require_unlock"
     const val KEY_SECURITY_DELAY = "require_unlock_delay"
@@ -139,9 +130,7 @@ object Settings {
     private const val KEY_DOWNLOAD_ORIGIN_IMAGE = "download_origin_image"
     private const val DEFAULT_DOWNLOAD_ORIGIN_IMAGE = false
 
-    /********************
-     * Favorites
-     */
+    // Favorites
     private const val KEY_FAV_CAT_0 = "fav_cat_0"
     private const val KEY_FAV_CAT_1 = "fav_cat_1"
     private const val KEY_FAV_CAT_2 = "fav_cat_2"
@@ -275,8 +264,7 @@ object Settings {
     private fun putStringToStringSet(key: String, value: String) {
         var set = getStringSet(key)
         if (set == null) {
-            set =
-                mutableSetOf(value)
+            set = mutableSetOf(value)
         } else if (set.contains(value)) return else set.add(value)
         sSettingsPre.edit().putStringSet(key, set).apply()
     }
@@ -629,12 +617,6 @@ object Settings {
             LIST_THUMB_SIZE_INITED = true
             return size
         }
-    val notificationRequired: Boolean
-        get() = getBoolean(KEY_NOTIFICATION_REQUIRED, false)
-
-    fun putNotificationRequired() {
-        putBoolean(KEY_NOTIFICATION_REQUIRED, true)
-    }
 
     val preloadThumbAggressively: Boolean
         get() = getBoolean(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
