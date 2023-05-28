@@ -1,7 +1,10 @@
 package com.hippo.ehviewer.client
 
+import android.os.Build
 import com.hippo.ehviewer.Settings
+import okhttp3.AsyncDns
 import okhttp3.Dns
+import okhttp3.android.AndroidAsyncDns
 import java.net.InetAddress
 
 private typealias HostsMap = MutableMap<String, List<InetAddress>>
@@ -20,8 +23,10 @@ private fun HostsMap.hosts(vararg hosts: String, builder: HostMapBuilder.() -> U
     }
 }
 
+private val dnsSystem = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) AsyncDns.toDns(AndroidAsyncDns.IPv4, AndroidAsyncDns.IPv6) else Dns.SYSTEM
+
 object EhDns : Dns {
-    override fun lookup(hostname: String): List<InetAddress> = builtInHosts[hostname].takeIf { Settings.builtInHosts } ?: Dns.SYSTEM.lookup(hostname)
+    override fun lookup(hostname: String): List<InetAddress> = builtInHosts[hostname].takeIf { Settings.builtInHosts } ?: dnsSystem.lookup(hostname)
 
     operator fun contains(hostname: String) = builtInHosts.contains(hostname) && Settings.builtInHosts
 }

@@ -212,6 +212,7 @@ dependencies {
 
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))
+    implementation("com.squareup.okhttp3:okhttp-android")
     implementation("com.squareup.okhttp3:okhttp-coroutines")
 
     implementation("com.squareup.okio:okio-jvm:3.3.0")
