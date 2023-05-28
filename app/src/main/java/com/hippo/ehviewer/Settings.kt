@@ -83,6 +83,7 @@ object Settings {
     const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
+    const val KEY_DOH_URL = "doh_url"
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
     private const val KEY_LAST_DAWN_DAY = "last_dawn_day"
@@ -565,6 +566,11 @@ object Settings {
     private fun putDF(value: Boolean) {
         putBoolean(KEY_DOMAIN_FRONTING, value)
     }
+
+    val dohUrl: String
+        get() = getString(KEY_DOH_URL, "")!!
+
+    fun putDohUrl(url: String) = putString(KEY_DOH_URL, url)
 
     val bypassVpn: Boolean
         get() = getBoolean(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
