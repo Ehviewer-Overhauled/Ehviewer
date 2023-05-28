@@ -26,7 +26,7 @@ class DohPreference @JvmOverloads constructor(
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             val text = builder.text.trim()
             runCatching {
-                if (text.isNotBlank()) text.toHttpUrl()
+                doh = if (text.isNotBlank()) buildDoHDNS(text) else null
             }.onFailure {
                 builder.setError("Invalid URL!")
             }.onSuccess {
@@ -41,7 +41,6 @@ private fun buildDoHDNS(url: String): DnsOverHttps {
     return DnsOverHttps.Builder().apply {
         client(EhApplication.okHttpClient)
         url(url.toHttpUrl())
-        post(true)
         systemDns(systemDns)
     }.build()
 }
