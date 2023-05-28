@@ -68,7 +68,7 @@ private val builtInHosts = hostsDsl {
         "94.100.24.72" blockedInCN true
     }
     hosts("raw.githubusercontent.com") {
-        "151.101.0.133" blockedInCN false
+        "151.101.0.133" blockedInCN true
         "151.101.64.133" blockedInCN false
         "151.101.128.133" blockedInCN false
         "151.101.192.133" blockedInCN false
