@@ -28,11 +28,9 @@ val systemDns = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) AsyncDns.toD
 
 object EhDns : Dns {
     override fun lookup(hostname: String): List<InetAddress> = builtInHosts[hostname].takeIf { Settings.builtInHosts } ?: EhDoH.lookup(hostname) ?: systemDns.lookup(hostname)
-
-    operator fun contains(hostname: String) = builtInHosts.contains(hostname) && Settings.builtInHosts
 }
 
-private val builtInHosts = hostsDsl {
+val builtInHosts = hostsDsl {
     // ip: String!, blockedByCCP: Boolean!
     hosts("ehgt.org", "gt0.ehgt.org", "gt1.ehgt.org", "gt2.ehgt.org", "gt3.ehgt.org") {
         "37.48.89.44" blockedInCN false

@@ -18,6 +18,7 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import com.hippo.ehviewer.Settings
 import java.net.InetAddress
 import java.net.Socket
 import javax.net.ssl.SSLSocket
@@ -36,7 +37,7 @@ object EhSSLSocketFactory : SSLSocketFactory() {
     }
 
     override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket {
-        val address = s.inetAddress.hostAddress.takeIf { host in EhDns || EXCEPTIONAL_DOMAIN in host }
+        val address = s.inetAddress.hostAddress.takeIf { host in builtInHosts || EXCEPTIONAL_DOMAIN in host || host in Settings.dohUrl }
         val socket = sslSocketFactory.createSocket(s, address ?: host, port, autoClose) as SSLSocket
         val sslSession = socket.session
         Log.d(
