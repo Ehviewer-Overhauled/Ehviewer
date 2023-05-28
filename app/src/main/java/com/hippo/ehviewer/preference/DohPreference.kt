@@ -41,6 +41,7 @@ private fun buildDoHDNS(url: String): DnsOverHttps {
     return DnsOverHttps.Builder().apply {
         client(EhApplication.okHttpClient)
         url(url.toHttpUrl())
+        post(true)
         systemDns(systemDns)
     }.build()
 }
@@ -48,5 +49,8 @@ private fun buildDoHDNS(url: String): DnsOverHttps {
 private var doh: DnsOverHttps? = Settings.dohUrl.runCatching { buildDoHDNS(this) }.getOrNull()
 
 object EhDoH {
-    fun lookup(hostname: String): List<InetAddress>? = doh?.runCatching { lookup(hostname).takeIf { it.isNotEmpty() } }?.getOrNull()
+    fun lookup(hostname: String): List<InetAddress>? = doh
+        ?.runCatching { lookup(hostname).takeIf { it.isNotEmpty() } }
+        ?.onFailure { it.printStackTrace() }
+        ?.getOrNull()
 }
