@@ -423,6 +423,8 @@
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">Built-in hosts.txt</string>
+    <string name="settings_advanced_dns_over_http_title">DNS Over HTTPS</string>
+    <string name="settings_advanced_dns_over_http_hint">Server URL, blank: disable</string>
     <string name="settings_advanced_built_in_hosts_summary">Apply the built-in host-to-IP mapping provided by the app.\nIt can be overridden by custom hosts.txt.</string>
     <string name="settings_advanced_domain_fronting_title">Domain fronting</string>
     <string name="settings_advanced_domain_fronting_summary">Bypass SNI blocking.</string>

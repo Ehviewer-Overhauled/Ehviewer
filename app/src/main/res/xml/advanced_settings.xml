@@ -63,9 +63,12 @@
     <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
         android:key="built_in_hosts_2"
-        android:summary="@string/settings_advanced_built_in_hosts_summary"
         android:title="@string/settings_advanced_built_in_hosts_title"
         app:iconSpaceReserved="false" />
+
+    <com.hippo.ehviewer.preference.DohPreference
+        android:title="@string/settings_advanced_dns_over_http_title"
+        android:iconSpaceReserved="false"/>
 
     <rikka.material.preference.MaterialSwitchPreference
         android:defaultValue="false"
