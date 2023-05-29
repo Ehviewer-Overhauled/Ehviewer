@@ -2,7 +2,7 @@ package com.hippo.ehviewer.coil
 
 import coil.disk.DiskCache
 
-suspend inline fun DiskCache.edit(key: String, crossinline block: suspend DiskCache.Editor.() -> Unit): Boolean {
+inline fun DiskCache.edit(key: String, crossinline block: DiskCache.Editor.() -> Unit): Boolean {
     val editor = openEditor(key) ?: return false
     editor.runCatching {
         block(this)

@@ -17,6 +17,10 @@ package com.hippo.ehviewer.client
 
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.Call
 import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,6 +33,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 inline fun ehRequest(url: String, referer: String? = null, origin: String? = null, builder: Request.Builder.() -> Unit = {}) = Request.Builder().url(url).apply {
     addHeader("User-Agent", CHROME_USER_AGENT)
@@ -50,18 +56,33 @@ fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { pu
 
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
-suspend inline fun <R> Request.execute(block: Response.() -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R): R = executeAsync().use {
+    coroutineScope {
+        suspendCancellableCoroutine { cont ->
+            launch {
+                val r = runCatching { block(it) }
+                if (!isCanceled() && cont.isActive) {
+                    r.exceptionOrNull()?.let { cont.resumeWithException(it) }
+                    r.getOrNull()?.let { cont.resume(it) }
+                }
+            }
+            cont.invokeOnCancellation { cancel() }
+        }
     }
-    return okHttpClient.newCall(this).executeAsync().use(block)
 }
 
-suspend inline fun <R> Request.executeNonCache(block: Response.() -> R): R {
+suspend inline fun <R> Request.execute(crossinline block: Response.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return nonCacheOkHttpClient.newCall(this).executeAsync().use(block)
+    return okHttpClient.newCall(this).usingCancellable(block)
+}
+
+suspend inline fun <R> Request.executeNonCache(crossinline block: Response.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return nonCacheOkHttpClient.newCall(this).usingCancellable(block)
 }
 
 const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"

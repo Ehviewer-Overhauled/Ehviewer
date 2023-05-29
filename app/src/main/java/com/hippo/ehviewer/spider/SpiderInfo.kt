@@ -38,7 +38,7 @@ fun SpiderInfo.write(file: UniFile) {
     }
 }
 
-suspend fun SpiderInfo.saveToCache() {
+fun SpiderInfo.saveToCache() {
     runSuspendCatching {
         spiderInfoCache.edit(gid.toString()) {
             data.toFile().writeBytes(Cbor.encodeToByteArray(this@saveToCache))

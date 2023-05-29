@@ -34,7 +34,6 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
-import moe.tarsin.coroutines.runInterruptibleOkio
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Response
 import okio.buffer
@@ -132,35 +131,36 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
     ): Boolean {
         // TODO: Use HttpEngine[https://developer.android.com/reference/android/net/http/HttpEngine] directly here if available
         // Since we don't want unnecessary copy between jvm heap & native heap
-        ehRequest(url, referer).executeNonCache {
-            if (code >= 400) return false
-            return saveFromHttpResponse(index, this, notifyProgress)
+        return ehRequest(url, referer).executeNonCache {
+            if (code >= 400) {
+                false
+            } else {
+                saveFromHttpResponse(index, this, notifyProgress)
+            }
         }
     }
 
-    private suspend fun saveFromHttpResponse(index: Int, response: Response, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
+    private fun saveFromHttpResponse(index: Int, response: Response, notifyProgress: (Long, Long, Int) -> Unit): Boolean {
         val contentType = response.body.contentType()
         val extension = contentType?.subtype ?: "jpg"
         val length = response.body.contentLength()
 
-        suspend fun doSave(outFile: UniFile): Long {
+        fun doSave(outFile: UniFile): Long {
             var ret = 0L
-            runInterruptibleOkio {
-                outFile.openOutputStream().sink().buffer().use { sink ->
-                    response.body.source().use { source ->
-                        while (true) {
-                            val bytesRead = source.read(sink.buffer, 8192)
-                            if (bytesRead == -1L) break
-                            ret += bytesRead
-                            sink.emitCompleteSegments()
-                            notifyProgress(length, ret, bytesRead.toInt())
-                        }
+            outFile.openOutputStream().sink().buffer().use { sink ->
+                response.body.source().use { source ->
+                    while (true) {
+                        val bytesRead = source.read(sink.buffer, 8192)
+                        if (bytesRead == -1L) break
+                        ret += bytesRead
+                        sink.emitCompleteSegments()
+                        notifyProgress(length, ret, bytesRead.toInt())
                     }
                 }
-                if (extension.lowercase() == "gif") {
-                    outFile.openFileDescriptor("rw").use {
-                        rewriteGifSource2(it.fd)
-                    }
+            }
+            if (extension.lowercase() == "gif") {
+                outFile.openFileDescriptor("rw").use {
+                    rewriteGifSource2(it.fd)
                 }
             }
             return ret
