@@ -57,40 +57,48 @@ fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { pu
 
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
+const val TAG_CALL = "CancellableCallReadingScope"
+
+// This scoped response reading scope suspend function aimed at cancelling the call immediately once coroutine is cancelled.
+// i.e., bind a call with a suspended coroutine, and launch another coroutine to execute reading
+// Once origin coroutine is cancelled, then call cancelled, socket is closed, the reading coroutine will encounter [IOException]
+// Since Okio is not suspendable/cancellable, also okhttp, [executeAsync] only make [Request -> Response] cancellable, reading a Response is still not cancellable
+// Considering interrupting is not safe and performant, See https://github.com/Kotlin/kotlinx.coroutines/issues/3551#issuecomment-1353245978, we have such [usingCancellable]
+// TODO: Remove logging after this function stable
 suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R): R = executeAsync().use {
     val call = this
-    Log.d("usingCancellable", "Dispatching call$call")
+    Log.d(TAG_CALL, "Got response of call$call")
     coroutineScope {
         suspendCancellableCoroutine<R> { cont ->
             launch {
                 val r = runCatching {
-                    Log.d("usingCancellable", "Reading call$call")
+                    Log.d(TAG_CALL, "Reading response of call$call")
                     block(it)
                 }
                 if (!isCanceled() && cont.isActive) {
                     r.exceptionOrNull()?.let {
-                        Log.e("usingCancellable", "Processing call$call failed!")
+                        Log.e(TAG_CALL, "Reading response of call$call failed!")
                         cont.resumeWithException(it)
                     }
                     r.getOrNull()?.let {
-                        Log.d("usingCancellable", "Processing call$call succeed!")
+                        Log.d(TAG_CALL, "Reading response of call$call succeed!")
                         cont.resume(it)
                     }
                 } else if (isCanceled() && cont.isActive) {
-                    Log.e("usingCancellable", "call$call cancelled but coroutine is Active!")
+                    Log.e(TAG_CALL, "call$call cancelled but coroutine is Active!")
                 } else if (!isCanceled() && !cont.isActive) {
-                    Log.e("usingCancellable", "call$call not cancelled but coroutine is Dead!")
+                    Log.e(TAG_CALL, "call$call not cancelled but coroutine is Dead!")
                 } else {
-                    Log.d("usingCancellable", "Cancelled reading call$call")
+                    Log.d(TAG_CALL, "Reading response of call$call cancelled")
                 }
             }
             cont.invokeOnCancellation {
-                Log.d("usingCancellable", "Cancelling call$call")
+                Log.d(TAG_CALL, "Cancelling call$call")
                 cancel()
             }
         }
     }.apply {
-        Log.d("usingCancellable", "Processing call$call finished!")
+        Log.d(TAG_CALL, "Reading response of call$call finished!")
     }
 }
 
