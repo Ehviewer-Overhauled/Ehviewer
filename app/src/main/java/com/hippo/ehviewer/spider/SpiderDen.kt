@@ -34,7 +34,7 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
-import kotlinx.coroutines.runInterruptible
+import moe.tarsin.coroutines.runInterruptibleOkio
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Response
 import okio.buffer
@@ -145,7 +145,7 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
         suspend fun doSave(outFile: UniFile): Long {
             var ret = 0L
-            runInterruptible {
+            runInterruptibleOkio {
                 outFile.openOutputStream().sink().buffer().use { sink ->
                     response.body.source().use { source ->
                         while (true) {
