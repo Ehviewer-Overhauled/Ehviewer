@@ -34,8 +34,7 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.runInterruptible
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Response
 import okio.buffer
@@ -146,21 +145,22 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
         suspend fun doSave(outFile: UniFile): Long {
             var ret = 0L
-            outFile.openOutputStream().sink().buffer().use { sink ->
-                response.body.source().use { source ->
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val bytesRead = source.read(sink.buffer, 8192)
-                        if (bytesRead == -1L) break
-                        ret += bytesRead
-                        sink.emitCompleteSegments()
-                        notifyProgress(length, ret, bytesRead.toInt())
+            runInterruptible {
+                outFile.openOutputStream().sink().buffer().use { sink ->
+                    response.body.source().use { source ->
+                        while (true) {
+                            val bytesRead = source.read(sink.buffer, 8192)
+                            if (bytesRead == -1L) break
+                            ret += bytesRead
+                            sink.emitCompleteSegments()
+                            notifyProgress(length, ret, bytesRead.toInt())
+                        }
                     }
                 }
-            }
-            if (extension.lowercase() == "gif") {
-                outFile.openFileDescriptor("rw").use {
-                    rewriteGifSource2(it.fd)
+                if (extension.lowercase() == "gif") {
+                    outFile.openFileDescriptor("rw").use {
+                        rewriteGifSource2(it.fd)
+                    }
                 }
             }
             return ret
