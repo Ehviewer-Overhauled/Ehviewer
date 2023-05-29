@@ -34,7 +34,6 @@ import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
-import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.Response
 import okio.buffer
 import okio.sink
@@ -166,27 +165,19 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
             return ret
         }
 
-        findDownloadFileForIndex(index, extension)?.runSuspendCatching {
+        findDownloadFileForIndex(index, extension)?.run {
             return doSave(this) == length
-        }?.onFailure {
-            it.printStackTrace()
-            return false
         }
 
         // Read Mode, allow save to cache
         if (mode == SpiderQueen.MODE_READ) {
             val key = getImageKey(mGid, index)
             var received: Long = 0
-            runSuspendCatching {
-                sCache.edit(key) {
-                    metadata.toFile().writeText(extension)
-                    received = doSave(UniFile.fromFile(data.toFile())!!)
-                }
-            }.onFailure {
-                it.printStackTrace()
-            }.onSuccess {
-                return received == length
+            sCache.edit(key) {
+                metadata.toFile().writeText(extension)
+                received = doSave(UniFile.fromFile(data.toFile())!!)
             }
+            return received == length
         }
 
         return false

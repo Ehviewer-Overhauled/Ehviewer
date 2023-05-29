@@ -15,6 +15,7 @@
  */
 package com.hippo.ehviewer.client
 
+import android.util.Log
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.EhApplication.Companion.okHttpClient
 import kotlinx.coroutines.coroutineScope
@@ -57,17 +58,39 @@ fun jsonArrayOf(vararg element: Any?) = JSONArray().apply { element.forEach { pu
 inline fun Request.Builder.jsonBody(builder: JSONObject.() -> Unit) = post(JSONObject().apply(builder).toString().toRequestBody(MEDIA_TYPE_JSON))
 
 suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R): R = executeAsync().use {
+    val call = this
+    Log.d("usingCancellable", "Dispatching call$call")
     coroutineScope {
-        suspendCancellableCoroutine { cont ->
+        suspendCancellableCoroutine<R> { cont ->
             launch {
-                val r = runCatching { block(it) }
+                val r = runCatching {
+                    Log.d("usingCancellable", "Reading call$call")
+                    block(it)
+                }
                 if (!isCanceled() && cont.isActive) {
-                    r.exceptionOrNull()?.let { cont.resumeWithException(it) }
-                    r.getOrNull()?.let { cont.resume(it) }
+                    r.exceptionOrNull()?.let {
+                        Log.e("usingCancellable", "Processing call$call failed!")
+                        cont.resumeWithException(it)
+                    }
+                    r.getOrNull()?.let {
+                        Log.d("usingCancellable", "Processing call$call succeed!")
+                        cont.resume(it)
+                    }
+                } else if (isCanceled() && cont.isActive) {
+                    Log.e("usingCancellable", "call$call cancelled but coroutine is Active!")
+                } else if (!isCanceled() && !cont.isActive) {
+                    Log.e("usingCancellable", "call$call not cancelled but coroutine is Dead!")
+                } else {
+                    Log.d("usingCancellable", "Cancelled reading call$call")
                 }
             }
-            cont.invokeOnCancellation { cancel() }
+            cont.invokeOnCancellation {
+                Log.d("usingCancellable", "Cancelling call$call")
+                cancel()
+            }
         }
+    }.apply {
+        Log.d("usingCancellable", "Processing call$call finished!")
     }
 }
 
