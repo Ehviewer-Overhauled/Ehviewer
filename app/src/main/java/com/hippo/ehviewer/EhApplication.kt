@@ -33,6 +33,7 @@ import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhSSLSocketFactory
 import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.data.GalleryDetail
+import com.hippo.ehviewer.client.install
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.dailycheck.checkDawn
@@ -50,9 +51,6 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okio.Path.Companion.toOkioPath
 import java.net.Proxy
-import java.security.KeyStore
-import javax.net.ssl.TrustManagerFactory
-import javax.net.ssl.X509TrustManager
 
 class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
     @OptIn(DelicateCoroutinesApi::class)
@@ -164,11 +162,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
                 dns(EhDns)
                 proxySelector(ehProxySelector)
                 if (Settings.dF) {
-                    val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
-                    factory.init(null as KeyStore?)
-                    val manager = factory.trustManagers!!
-                    val trustManager = manager.filterIsInstance<X509TrustManager>().first()
-                    sslSocketFactory(EhSSLSocketFactory, trustManager)
+                    install(EhSSLSocketFactory)
                     proxy(Proxy.NO_PROXY)
                 }
             }

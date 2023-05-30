@@ -20,10 +20,14 @@ package com.hippo.ehviewer.client
 import android.util.Log
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.builtInHosts
+import okhttp3.OkHttpClient
 import java.net.InetAddress
 import java.net.Socket
+import java.security.KeyStore
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 
 private const val EXCEPTIONAL_DOMAIN = "hath.network"
 private val sslSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
@@ -40,4 +44,12 @@ object EhSSLSocketFactory : SSLSocketFactory() {
     override fun createSocket(host: String, port: Int, localHost: InetAddress, localPort: Int): Socket = sslSocketFactory.createSocket(host, port, localHost, localPort)
     override fun createSocket(host: InetAddress, port: Int): Socket = sslSocketFactory.createSocket(host, port)
     override fun createSocket(address: InetAddress, port: Int, localAddress: InetAddress, localPort: Int): Socket = sslSocketFactory.createSocket(address, port, localAddress, localPort)
+}
+
+fun OkHttpClient.Builder.install(sslSocketFactory: SSLSocketFactory) = apply {
+    val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
+    factory.init(null as KeyStore?)
+    val manager = factory.trustManagers!!
+    val trustManager = manager.filterIsInstance<X509TrustManager>().first()
+    sslSocketFactory(sslSocketFactory, trustManager)
 }
