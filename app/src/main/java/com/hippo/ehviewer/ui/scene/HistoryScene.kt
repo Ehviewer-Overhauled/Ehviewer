@@ -183,7 +183,7 @@ class HistoryScene : BaseScene() {
                                                             selected = dialogState.showSelectItemWithIcon(
                                                                 Icons.Default.MenuBook to R.string.read,
                                                                 Icons.Default.Delete to R.string.delete_downloads,
-                                                                if (favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+                                                                if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
                                                                 Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
                                                                 title = EhUtils.getSuitableTitle(info),
                                                             )
