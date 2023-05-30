@@ -78,16 +78,17 @@ import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.Deferred
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
-import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.removeFromFavorites
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.delay
 import moe.tarsin.coroutines.runSuspendCatching
@@ -170,15 +171,16 @@ class HistoryScene : BaseScene() {
                                                     coroutineScope.launchIO {
                                                         val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
                                                         val favourite = info.favoriteSlot != -2
+                                                        val selected: Int
                                                         if (!downloaded) {
-                                                            val selected = dialogState.showSelectItemWithIcon(
+                                                            selected = dialogState.showSelectItemWithIcon(
                                                                 Icons.Default.MenuBook to R.string.read,
                                                                 Icons.Default.Download to R.string.download,
                                                                 if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
                                                                 title = EhUtils.getSuitableTitle(info),
                                                             )
                                                         } else {
-                                                            val selected = dialogState.showSelectItemWithIcon(
+                                                            selected = dialogState.showSelectItemWithIcon(
                                                                 Icons.Default.MenuBook to R.string.read,
                                                                 Icons.Default.Delete to R.string.delete_downloads,
                                                                 if (favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
@@ -186,6 +188,7 @@ class HistoryScene : BaseScene() {
                                                                 title = EhUtils.getSuitableTitle(info),
                                                             )
                                                         }
+                                                        withUIContext { handleLongClick(selected, info) }
                                                     }
                                                 },
                                                 info = it,
@@ -247,112 +250,69 @@ class HistoryScene : BaseScene() {
         navigate(R.id.galleryDetailScene, args)
     }
 
-    private fun onItemLongClick(gi: GalleryInfo) {
-        val context = requireContext()
-        val activity = mainActivity ?: return
+    private fun handleLongClick(which: Int, gi: GalleryInfo) {
         val downloaded = DownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourite = gi.favoriteSlot != -2
-        val items = if (downloaded) {
-            arrayOf<CharSequence>(
-                context.getString(R.string.read),
-                context.getString(R.string.delete_downloads),
-                context.getString(if (favourite) R.string.remove_from_favourites else R.string.add_to_favourites),
-                context.getString(R.string.download_move_dialog_title),
-            )
-        } else {
-            arrayOf<CharSequence>(
-                context.getString(R.string.read),
-                context.getString(R.string.download),
-                context.getString(if (favourite) R.string.remove_from_favourites else R.string.add_to_favourites),
-            )
-        }
-        val icons = if (downloaded) {
-            intArrayOf(
-                R.drawable.v_book_open_x24,
-                R.drawable.v_delete_x24,
-                if (favourite) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
-                R.drawable.v_folder_move_x24,
-            )
-        } else {
-            intArrayOf(
-                R.drawable.v_book_open_x24,
-                R.drawable.v_download_x24,
-                if (favourite) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
-            )
-        }
-        BaseDialogBuilder(context)
-            .setTitle(EhUtils.getSuitableTitle(gi))
-            .setAdapter(
-                SelectItemWithIconAdapter(
-                    context,
-                    items,
-                    icons,
-                ),
-            ) { _: DialogInterface?, which: Int ->
-                when (which) {
-                    0 -> {
-                        val intent = Intent(activity, ReaderActivity::class.java)
-                        intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
-                        startActivity(intent)
-                    }
+        when (which) {
+            0 -> {
+                val intent = Intent(activity, ReaderActivity::class.java)
+                intent.action = ReaderActivity.ACTION_EH
+                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
+                startActivity(intent)
+            }
 
-                    1 -> if (downloaded) {
-                        BaseDialogBuilder(context)
-                            .setTitle(R.string.download_remove_dialog_title)
-                            .setMessage(
-                                getString(
-                                    R.string.download_remove_dialog_message,
-                                    gi.title,
-                                ),
-                            )
-                            .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                                DownloadManager.deleteDownload(gi.gid)
-                            }
-                            .show()
-                    } else {
-                        CommonOperations.startDownload(activity, gi, false)
+            1 -> if (downloaded) {
+                BaseDialogBuilder(requireContext())
+                    .setTitle(R.string.download_remove_dialog_title)
+                    .setMessage(
+                        getString(
+                            R.string.download_remove_dialog_message,
+                            gi.title,
+                        ),
+                    )
+                    .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
+                        DownloadManager.deleteDownload(gi.gid)
                     }
+                    .show()
+            } else {
+                CommonOperations.startDownload(activity as MainActivity, gi, false)
+            }
 
-                    2 -> if (favourite) {
-                        lifecycleScope.launchIO {
-                            runSuspendCatching {
-                                removeFromFavorites(gi)
-                                showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-                            }.onFailure {
-                                showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
-                            }
-                        }
-                    } else {
-                        lifecycleScope.launchIO {
-                            runSuspendCatching {
-                                requireContext().addToFavorites(gi)
-                                showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-                            }.onFailure {
-                                showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-                            }
-                        }
-                    }
-
-                    3 -> {
-                        val labelRawList = DownloadManager.labelList
-                        val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
-                        labelList.add(getString(R.string.default_download_label_name))
-                        var i = 0
-                        val n = labelRawList.size
-                        while (i < n) {
-                            labelRawList[i].label?.let { labelList.add(it) }
-                            i++
-                        }
-                        val labels = labelList.toTypedArray()
-                        val helper = MoveDialogHelper(labels, gi)
-                        BaseDialogBuilder(context)
-                            .setTitle(R.string.download_move_dialog_title)
-                            .setItems(labels, helper)
-                            .show()
+            2 -> if (favourite) {
+                lifecycleScope.launchIO {
+                    runSuspendCatching {
+                        removeFromFavorites(gi)
+                        showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
+                    }.onFailure {
+                        showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
                     }
                 }
-            }.show()
+            } else {
+                lifecycleScope.launchIO {
+                    runSuspendCatching {
+                        requireContext().addToFavorites(gi)
+                        showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
+                    }.onFailure {
+                        showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
+                    }
+                }
+            }
+
+            3 -> {
+                val labelRawList = DownloadManager.labelList
+                val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
+                labelList.add(getString(R.string.default_download_label_name))
+                var i = 0
+                val n = labelRawList.size
+                while (i < n) {
+                    labelRawList[i].label?.let { labelList.add(it) }
+                    i++
+                }
+                val labels = labelList.toTypedArray()
+                val helper = MoveDialogHelper(labels, gi)
+                BaseDialogBuilder(requireContext()).setTitle(R.string.download_move_dialog_title).setItems(labels, helper).show()
+            }
+        }
     }
 
     private inner class MoveDialogHelper(
