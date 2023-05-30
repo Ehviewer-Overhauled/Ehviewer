@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer.shortcuts
 
-package com.hippo.ehviewer.shortcuts;
-
-import android.content.Intent;
-import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
-import com.hippo.ehviewer.download.DownloadService;
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.hippo.ehviewer.download.DownloadService
 
 /**
  * Created by onlymash on 3/25/18.
  */
-
-public class ShortcutsActivity extends AppCompatActivity {
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        String action;
-        Intent intent = getIntent();
-        if (intent != null) {
-            action = intent.getAction();
-            if (action != null && (action.equals(DownloadService.ACTION_START_ALL) ||
-                    action.equals(DownloadService.ACTION_STOP_ALL))) {
-                ContextCompat.startForegroundService(this, new Intent(this, DownloadService.class).setAction(action));
-            }
-        }
-        finish();
+class ShortcutsActivity : AppCompatActivity() {
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        when (intent?.action) { DownloadService.ACTION_START_ALL, DownloadService.ACTION_STOP_ALL -> ContextCompat.startForegroundService(this, Intent(this, DownloadService::class.java).setAction(intent.action)) }
+        finish()
     }
 }
