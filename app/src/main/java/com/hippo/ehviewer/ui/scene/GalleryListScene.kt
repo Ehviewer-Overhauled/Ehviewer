@@ -35,13 +35,6 @@ import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IntDef
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.DriveFileMove
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.HeartBroken
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -729,23 +722,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         lifecycleScope.launchIO {
             val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
             val favourite = info.favoriteSlot != -2
-            val selected: Int
-            if (!downloaded) {
-                selected = dialogState.showSelectItemWithIcon(
-                    Icons.Default.MenuBook to R.string.read,
-                    Icons.Default.Download to R.string.download,
-                    if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
-                    title = EhUtils.getSuitableTitle(info),
-                )
-            } else {
-                selected = dialogState.showSelectItemWithIcon(
-                    Icons.Default.MenuBook to R.string.read,
-                    Icons.Default.Delete to R.string.delete_downloads,
-                    if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
-                    Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
-                    title = EhUtils.getSuitableTitle(info),
-                )
-            }
+            val selected = dialogState.selectGalleryInfoAction(info)
             withUIContext {
                 when (selected) {
                     0 -> {
