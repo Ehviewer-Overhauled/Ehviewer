@@ -379,7 +379,6 @@
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">內建 hosts.txt</string>
-    <string name="settings_advanced_built_in_hosts_summary">應用程式提供的主機到 IP 的對映\n可覆蓋自訂 hosts.txt</string>
     <string name="settings_advanced_domain_fronting_title">域名前綴</string>
     <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
     <string name="settings_advanced_bypass_vpn_title">繞過 VPN</string>

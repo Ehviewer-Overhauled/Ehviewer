@@ -343,7 +343,6 @@
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">앱 내장 hosts.txt</string>
-    <string name="settings_advanced_built_in_hosts_summary">앱에 내장된 호스트-IP 지정 규칙을 사용합니다.\n대신 사용자 지정 hosts.txt 파일을 사용할 수도 있습니다.</string>
     <string name="settings_advanced_export_data">데이터 내보내기</string>
     <string name="settings_advanced_export_data_summary">다운로드 목록, 빠른 검색 목록 등의 데이터를 외부 저장소에 저장</string>
     <string name="settings_advanced_export_data_to">%s 경로에 데이터를 내보냈습니다.</string>

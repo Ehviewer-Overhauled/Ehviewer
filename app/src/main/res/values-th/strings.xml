@@ -358,7 +358,6 @@
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">ใช้ hosts.txt ของตัวแอป</string>
-    <string name="settings_advanced_built_in_hosts_summary">ใช้ host-to-IP mapping แบบภายในที่จัดทำโดยตัวแอปเอง\nมันอาจจะเกิดการทับซ้อนกันจากการปรับแต่งไฟล์ hosts.txt เอง</string>
     <string name="settings_advanced_export_data">สำเนาข้อมูล</string>
     <string name="settings_advanced_export_data_summary">บันทึกข้อมูลต่างๆเช่นรายการดาวน์โหลด และค้นหาอย่างด่วนลงพื้นที่จัดเก็บภายนอก</string>
     <string name="settings_advanced_export_data_to">ได้สำเนาข้อมูลแล้วจัดเก็บที่ %s</string>

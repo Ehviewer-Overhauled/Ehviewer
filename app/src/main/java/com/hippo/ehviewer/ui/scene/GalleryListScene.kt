@@ -35,6 +35,14 @@ import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IntDef
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DriveFileMove
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -80,8 +88,10 @@ import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
 import com.hippo.ehviewer.ui.CommonOperations
+import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
-import com.hippo.ehviewer.ui.dialog.SelectItemWithIconAdapter
+import com.hippo.ehviewer.ui.compose.DialogState
+import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.BringOutTransition
@@ -338,12 +348,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         setSearchBarHint(title)
     }
 
+    private val dialogState = DialogState()
+
     override fun onCreateViewWithToolbar(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = SceneGalleryListBinding.inflate(inflater, container, false)
+        binding.root.addView(ComposeView(inflater.context).apply { setMD3Content { dialogState.Handler() } })
         requireActivity().onBackPressedDispatcher.addCallback(mCallback)
         mHideActionFabSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
         mShowActionFab = true
@@ -369,7 +382,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         binding.contentLayout.fastScroller.setOnDragHandlerListener(this)
         binding.contentLayout.setFitPaddingTop(paddingTopSB)
         mAdapter = GalleryListAdapter(
-            inflater,
             resources,
             binding.contentLayout.recyclerView,
             Settings.listMode,
@@ -712,56 +724,34 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     fun onItemLongClick(position: Int): Boolean {
-        val context = context
-        val activity = mainActivity
-        if (null == context || null == activity || null == mHelper) {
-            return false
-        }
-        val gi = mHelper!!.getDataAtEx(position) ?: return true
-        val downloaded = mDownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
-        val favourited = gi.favoriteSlot != -2
-        val items = if (downloaded) {
-            arrayOf<CharSequence>(
-                context.getString(R.string.read),
-                context.getString(R.string.delete_downloads),
-                context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites),
-                context.getString(R.string.download_move_dialog_title),
-            )
-        } else {
-            arrayOf<CharSequence>(
-                context.getString(R.string.read),
-                context.getString(R.string.download),
-                context.getString(if (favourited) R.string.remove_from_favourites else R.string.add_to_favourites),
-            )
-        }
-        val icons = if (downloaded) {
-            intArrayOf(
-                R.drawable.v_book_open_x24,
-                R.drawable.v_delete_x24,
-                if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
-                R.drawable.v_folder_move_x24,
-            )
-        } else {
-            intArrayOf(
-                R.drawable.v_book_open_x24,
-                R.drawable.v_download_x24,
-                if (favourited) R.drawable.v_heart_broken_x24 else R.drawable.v_heart_x24,
-            )
-        }
-        BaseDialogBuilder(context)
-            .setTitle(EhUtils.getSuitableTitle(gi))
-            .setAdapter(
-                SelectItemWithIconAdapter(
-                    context,
-                    items,
-                    icons,
-                ),
-            ) { _: DialogInterface?, which: Int ->
-                when (which) {
+        val context = context ?: return true
+        val info = mHelper?.getDataAtEx(position) ?: return true
+        lifecycleScope.launchIO {
+            val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
+            val favourite = info.favoriteSlot != -2
+            val selected: Int
+            if (!downloaded) {
+                selected = dialogState.showSelectItemWithIcon(
+                    Icons.Default.MenuBook to R.string.read,
+                    Icons.Default.Download to R.string.download,
+                    if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+                    title = EhUtils.getSuitableTitle(info),
+                )
+            } else {
+                selected = dialogState.showSelectItemWithIcon(
+                    Icons.Default.MenuBook to R.string.read,
+                    Icons.Default.Delete to R.string.delete_downloads,
+                    if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+                    Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
+                    title = EhUtils.getSuitableTitle(info),
+                )
+            }
+            withUIContext {
+                when (selected) {
                     0 -> {
                         val intent = Intent(activity, ReaderActivity::class.java)
                         intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
+                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
                         startActivity(intent)
                     }
 
@@ -771,23 +761,23 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                             .setMessage(
                                 getString(
                                     R.string.download_remove_dialog_message,
-                                    gi.title,
+                                    info.title,
                                 ),
                             )
                             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                                 mDownloadManager.deleteDownload(
-                                    gi.gid,
+                                    info.gid,
                                 )
                             }
                             .show()
                     } else {
-                        CommonOperations.startDownload(activity, gi, false)
+                        CommonOperations.startDownload(activity as MainActivity, info, false)
                     }
 
-                    2 -> if (favourited) {
+                    2 -> if (favourite) {
                         lifecycleScope.launchIO {
                             runSuspendCatching {
-                                removeFromFavorites(gi)
+                                removeFromFavorites(info)
                                 showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
                             }.onFailure {
                                 showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
@@ -796,7 +786,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     } else {
                         lifecycleScope.launchIO {
                             runSuspendCatching {
-                                requireContext().addToFavorites(gi)
+                                context.addToFavorites(info)
                                 showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
                             }.onFailure {
                                 showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
@@ -815,14 +805,15 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                             i++
                         }
                         val labels = labelList.toTypedArray()
-                        val helper = MoveDialogHelper(labels, gi)
+                        val helper = MoveDialogHelper(labels, info)
                         BaseDialogBuilder(context)
                             .setTitle(R.string.download_move_dialog_title)
                             .setItems(labels, helper)
                             .show()
                     }
                 }
-            }.show()
+            }
+        }
         return true
     }
 
@@ -1237,7 +1228,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     }
 
     private inner class GalleryListAdapter(
-        inflater: LayoutInflater,
         resources: Resources,
         recyclerView: RecyclerView,
         type: Int,

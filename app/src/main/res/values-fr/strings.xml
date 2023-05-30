@@ -466,7 +466,6 @@
     <string name="settings_advanced_proxy">Serveur proxy</string>
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s：%3$d</string>
     <string name="settings_advanced_proxy_summary_2">%1$s</string>
-    <string name="settings_advanced_built_in_hosts_summary">Mapper l\'hôte à l\'adresse IP selon les règles de l\'app\nIls pouvent être redéfinits par hosts.txt personnalisé</string>
     <string name="app_language_system">Langue du système (défaut)</string>
     <string name="settings_eh_identity_cookies_signed">Tout le monde peut utiliser les cookies de ce compte pour s\'y connecter.&lt;br&gt;&lt;b&gt;GARDEZ-LES BIEN !&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">Vous ne vous êtes pas connecté.</string>
