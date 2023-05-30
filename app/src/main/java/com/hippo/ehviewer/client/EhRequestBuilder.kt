@@ -79,11 +79,10 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R
                     r.exceptionOrNull()?.let {
                         Log.e(TAG_CALL, "Reading response of call$call failed!")
                         cont.resumeWithException(it)
-                    } ?: run {
+                    }
+                    r.getOrNull()?.let {
                         Log.d(TAG_CALL, "Reading response of call$call succeed!")
-                        // R maybe null
-                        @Suppress("UNCHECKED_CAST")
-                        cont.resume(r.getOrNull() as R)
+                        cont.resume(it)
                     }
                 } else if (isCanceled() && cont.isActive) {
                     Log.e(TAG_CALL, "call$call cancelled but coroutine is Active!")
