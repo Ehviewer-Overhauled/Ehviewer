@@ -19,27 +19,6 @@ package com.hippo.ehviewer.yorozuya;
 import androidx.annotation.Nullable;
 
 public final class Utilities {
-
-    /**
-     * Whether the array contain the element
-     *
-     * @param array the array
-     * @param obj   the element
-     * @return true for the array contain the element
-     */
-    public static boolean contain(@Nullable Object[] array, @Nullable Object obj) {
-        if (null == array) {
-            return false;
-        }
-
-        for (Object o : array) {
-            if (ObjectUtils.equal(o, obj)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Whether the array contain the element
      *

@@ -105,10 +105,4 @@ public final class IOUtils {
 
         return sb.toString();
     }
-
-    public static byte[] getAllByte(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copy(is, baos);
-        return baos.toByteArray();
-    }
 }

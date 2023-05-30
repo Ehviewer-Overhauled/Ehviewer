@@ -124,15 +124,6 @@ public final class StringUtils {
         return buf.toString();
     }
 
-    public static boolean endsWith(String string, String[] suffixs) {
-        for (int i = 0, n = suffixs.length; i < n; i++) {
-            if (string.endsWith(suffixs[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * <p>Splits the provided text into an array, separator specified.
      * This is an alternative to using StringTokenizer.</p>
@@ -217,20 +208,6 @@ public final class StringUtils {
         return value == null ? defaultValue : value;
     }
 
-    public static boolean isAllDigit(String str) {
-        if (TextUtils.isEmpty(str)) {
-            return false;
-        } else {
-            for (int i = 0, n = str.length(); i < n; i++) {
-                char ch = str.charAt(i);
-                if (ch < '0' || ch > '9') {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
     public static int length(String str) {
         return null == str ? 0 : str.length();
     }
@@ -241,19 +218,6 @@ public final class StringUtils {
     public static boolean equals(String str1, String str2) {
         return (TextUtils.isEmpty(str1) && TextUtils.isEmpty(str2)) ||
                 (!TextUtils.isEmpty(str1) && !TextUtils.isEmpty(str2) && str1.equals(str2));
-    }
-
-    public static int ordinalIndexOf(String str, char c, int n) {
-        if (null == str || n < 0) {
-            return -1;
-        }
-
-        int pos = -1;
-        do {
-            pos = str.indexOf(c, pos + 1);
-        } while (n-- > 0 && pos != -1);
-
-        return pos;
     }
 
     /**

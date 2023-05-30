@@ -20,7 +20,6 @@ import android.os.Build
 import android.text.TextUtils
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.ListUrlBuilder
-import com.hippo.ehviewer.yorozuya.Utilities
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URL
@@ -39,7 +38,7 @@ object GalleryListUrlParser {
         } catch (e: MalformedURLException) {
             return null
         }
-        if (!Utilities.contain(VALID_HOSTS, url.host)) {
+        if (url.host !in VALID_HOSTS) {
             return null
         }
         val path = url.path ?: return null
