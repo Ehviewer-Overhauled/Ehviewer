@@ -102,11 +102,11 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R
     }
 }
 
-suspend inline fun <R> Request.execute(crossinline block: Response.() -> R): R {
+suspend inline fun <R> Request.execute(block: Response.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return okHttpClient.newCall(this).usingCancellable(block)
+    return okHttpClient.newCall(this).executeAsync().use(block)
 }
 
 suspend inline fun <R> Request.executeNonCache(crossinline block: Response.() -> R): R {
