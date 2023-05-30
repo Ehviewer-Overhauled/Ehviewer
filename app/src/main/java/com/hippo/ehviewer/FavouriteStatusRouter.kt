@@ -13,62 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer
 
-package com.hippo.ehviewer;
+import android.annotation.SuppressLint
+import com.hippo.ehviewer.Settings.getInt
+import com.hippo.ehviewer.Settings.putInt
+import com.hippo.ehviewer.client.data.GalleryInfo
+import com.hippo.ehviewer.yorozuya.IntIdGenerator
 
-import android.annotation.SuppressLint;
+class FavouriteStatusRouter {
+    private val idGenerator = IntIdGenerator(getInt(KEY_DATA_MAP_NEXT_ID, 0))
 
-import com.hippo.ehviewer.client.data.GalleryInfo;
-import com.hippo.ehviewer.yorozuya.IntIdGenerator;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class FavouriteStatusRouter {
-
-    private static final String KEY_DATA_MAP_NEXT_ID = "data_map_next_id";
-
-    private final IntIdGenerator idGenerator = new IntIdGenerator(Settings.getInt(KEY_DATA_MAP_NEXT_ID, 0));
     @SuppressLint("UseSparseArrays")
-    private final HashMap<Integer, Map<Long, GalleryInfo>> maps = new HashMap<>();
-
-    private final List<Listener> listeners = new ArrayList<>();
-
-    public int saveDataMap(Map<Long, GalleryInfo> map) {
-        int id = idGenerator.nextId();
-        maps.put(id, map);
-        Settings.putInt(KEY_DATA_MAP_NEXT_ID, idGenerator.nextId());
-        return id;
+    private val maps = HashMap<Int, MutableMap<Long, GalleryInfo>>()
+    private val listeners: MutableList<Listener> = ArrayList()
+    fun saveDataMap(map: MutableMap<Long, GalleryInfo>): Int {
+        val id = idGenerator.nextId()
+        maps[id] = map
+        putInt(KEY_DATA_MAP_NEXT_ID, idGenerator.nextId())
+        return id
     }
 
-    public Map<Long, GalleryInfo> restoreDataMap(int id) {
-        return maps.remove(id);
+    fun restoreDataMap(id: Int): MutableMap<Long, GalleryInfo> {
+        return maps.remove(id)!!
     }
 
-    public void modifyFavourites(long gid, int slot) {
-        for (Map<Long, GalleryInfo> map : maps.values()) {
-            GalleryInfo info = map.get(gid);
+    fun modifyFavourites(gid: Long, slot: Int) {
+        for (map in maps.values) {
+            val info = map[gid]
             if (info != null) {
-                info.setFavoriteSlot(slot);
+                info.favoriteSlot = slot
             }
         }
-
-        for (Listener listener : listeners) {
-            listener.onModifyFavourites(gid, slot);
+        for (listener in listeners) {
+            listener.onModifyFavourites(gid, slot)
         }
     }
 
-    public void addListener(Listener listener) {
-        listeners.add(listener);
+    fun addListener(listener: Listener) {
+        listeners.add(listener)
     }
 
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
+    fun removeListener(listener: Listener) {
+        listeners.remove(listener)
     }
 
-    public interface Listener {
-        void onModifyFavourites(long gid, int slot);
+    fun interface Listener {
+        fun onModifyFavourites(gid: Long, slot: Int)
+    }
+
+    companion object {
+        private const val KEY_DATA_MAP_NEXT_ID = "data_map_next_id"
     }
 }

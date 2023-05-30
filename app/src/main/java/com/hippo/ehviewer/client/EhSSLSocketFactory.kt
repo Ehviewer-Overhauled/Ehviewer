@@ -19,6 +19,7 @@ package com.hippo.ehviewer.client
 
 import android.util.Log
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.builtInHosts
 import java.net.InetAddress
 import java.net.Socket
 import javax.net.ssl.SSLSocket
