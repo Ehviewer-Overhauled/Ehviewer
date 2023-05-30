@@ -28,7 +28,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
@@ -845,6 +847,9 @@ class DownloadsScene :
         private val height = (Settings.listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
+            binding.thumb.setMD3Content {
+                Spacer(modifier = Modifier.height(height).fillMaxWidth())
+            }
             lifecycleScope.launchIO {
                 val downloadDir = SpiderDen.getGalleryDownloadDir(info.gid) ?: run {
                     info.putToDownloadDir()
