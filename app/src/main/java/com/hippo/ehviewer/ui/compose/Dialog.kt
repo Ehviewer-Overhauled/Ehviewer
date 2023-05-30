@@ -4,8 +4,11 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
@@ -124,12 +127,13 @@ class DialogState {
                     },
                     content = {
                         Surface(
+                            modifier = Modifier.width(280.dp),
                             shape = AlertDialogDefaults.shape,
                             color = AlertDialogDefaults.containerColor,
                             tonalElevation = AlertDialogDefaults.TonalElevation,
                         ) {
                             Column {
-                                Text(text = title, modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+                                Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
                                 items.forEachIndexed { index, (icon, text) ->
                                     Row(
                                         modifier = Modifier.clickable {
@@ -138,10 +142,11 @@ class DialogState {
                                         }.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp))
-                                        Text(text = stringResource(id = text))
+                                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
+                                        Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
                                     }
                                 }
+                                Spacer(modifier = Modifier.size(8.dp))
                             }
                         }
                     },
