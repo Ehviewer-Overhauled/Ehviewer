@@ -50,7 +50,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDismissState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -210,32 +209,25 @@ class HistoryScene : BaseScene() {
                     }
                     Deferred({ delay(200) }) {
                         if (historyData.itemCount == 0) {
-                            NoHistory(modifier = Modifier.padding(paddingValues))
+                            Column(
+                                modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.big_history),
+                                    contentDescription = null,
+                                    Modifier.padding(16.dp),
+                                )
+                                Text(
+                                    text = stringResource(id = R.string.no_history),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun NoHistory(
-        modifier: Modifier = Modifier,
-    ) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.big_history),
-                contentDescription = null,
-                Modifier.padding(16.dp),
-            )
-            Text(
-                text = stringResource(id = R.string.no_history),
-                style = MaterialTheme.typography.headlineMedium,
-            )
         }
     }
 
