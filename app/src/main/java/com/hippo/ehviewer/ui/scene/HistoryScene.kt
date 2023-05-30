@@ -16,7 +16,6 @@
 package com.hippo.ehviewer.ui.scene
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -85,8 +84,8 @@ import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
@@ -229,13 +228,7 @@ class HistoryScene : BaseScene() {
         val downloaded = DownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourite = gi.favoriteSlot != -2
         when (which) {
-            0 -> {
-                val intent = Intent(activity, ReaderActivity::class.java)
-                intent.action = ReaderActivity.ACTION_EH
-                intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, gi)
-                startActivity(intent)
-            }
-
+            0 -> context?.navToReader(gi)
             1 -> if (downloaded) {
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.download_remove_dialog_title)

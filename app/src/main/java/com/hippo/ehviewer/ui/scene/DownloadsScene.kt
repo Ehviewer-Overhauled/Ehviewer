@@ -91,12 +91,12 @@ import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerL
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import eu.kanade.tachiyomi.util.lang.launchUI
@@ -482,7 +482,7 @@ class DownloadsScene :
     }
 
     fun onItemClick(position: Int): Boolean {
-        val activity = mainActivity ?: return false
+        val context = context ?: return false
         return if (binding.recyclerView.isInCustomChoice) {
             binding.recyclerView.toggleItemChecked(position)
             true
@@ -491,10 +491,7 @@ class DownloadsScene :
             if (position < 0 || position >= list.size) {
                 return false
             }
-            val intent = Intent(activity, ReaderActivity::class.java)
-            intent.action = ReaderActivity.ACTION_EH
-            intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, list[position])
-            startActivity(intent)
+            context.navToReader(list[position])
             true
         }
     }

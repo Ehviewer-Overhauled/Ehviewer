@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui.scene
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.text.InputType
@@ -98,13 +97,13 @@ import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerListener
+import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
 import com.hippo.ehviewer.yorozuya.StringUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -725,13 +724,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
             val selected = dialogState.selectGalleryInfoAction(info)
             withUIContext {
                 when (selected) {
-                    0 -> {
-                        val intent = Intent(activity, ReaderActivity::class.java)
-                        intent.action = ReaderActivity.ACTION_EH
-                        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
-                        startActivity(intent)
-                    }
-
+                    0 -> context.navToReader(info)
                     1 -> if (downloaded) {
                         BaseDialogBuilder(context)
                             .setTitle(R.string.download_remove_dialog_title)

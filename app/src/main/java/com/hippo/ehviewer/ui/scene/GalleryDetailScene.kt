@@ -22,7 +22,6 @@ import android.app.Dialog
 import android.app.DownloadManager
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -165,6 +164,7 @@ import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.recyclerview.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.login.LocalNavController
+import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
@@ -177,7 +177,6 @@ import com.hippo.ehviewer.util.getSystemService
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CancellationException
@@ -657,7 +656,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         items(previewList) {
             EhPreviewItem(
                 galleryPreview = it,
-                onClick = { mainActivity?.startReaderActivity(gd, it.position) },
+                onClick = { context?.navToReader(gd, it.position) },
             )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -856,13 +855,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         }
     }
 
-    private fun onReadButtonClick() {
-        val galleryDetail = composeBindingGD ?: return
-        val intent = Intent(activity, ReaderActivity::class.java)
-        intent.action = ReaderActivity.ACTION_EH
-        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryDetail)
-        startActivity(intent)
-    }
+    private fun onReadButtonClick() = composeBindingGI?.let { context?.navToReader(it) }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -1011,15 +1004,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 requireActivity().findViewById(R.id.snackbar),
                 getString(R.string.read_from, mPage),
                 Snackbar.LENGTH_LONG,
-            )
-                .setAction(R.string.read) {
-                    val intent = Intent(requireContext(), ReaderActivity::class.java)
-                    intent.action = ReaderActivity.ACTION_EH
-                    intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, composeBindingGD)
-                    intent.putExtra(ReaderActivity.KEY_PAGE, mPage)
-                    startActivity(intent)
-                }
-                .show()
+            ).setAction(R.string.read) { context?.navToReader(gd, mPage) }.show()
         }
         composeBindingGI = gd
         composeBindingGD = gd

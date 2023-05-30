@@ -54,7 +54,6 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
-import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
@@ -74,7 +73,6 @@ import com.hippo.ehviewer.util.getClipboardManager
 import com.hippo.ehviewer.util.getParcelableExtraCompat
 import com.hippo.ehviewer.util.getUrlFromClipboard
 import com.hippo.ehviewer.yorozuya.IOUtils
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
@@ -106,14 +104,6 @@ class MainActivity : EhActivity() {
         } finally {
             IOUtils.closeQuietly(os)
         }
-    }
-
-    fun startReaderActivity(galleryInfo: GalleryInfo, page: Int) {
-        val intent = Intent(this, ReaderActivity::class.java)
-        intent.action = ReaderActivity.ACTION_EH
-        intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, galleryInfo)
-        intent.putExtra(ReaderActivity.KEY_PAGE, page)
-        startActivity(intent)
     }
 
     @Suppress("OVERRIDE_DEPRECATION")

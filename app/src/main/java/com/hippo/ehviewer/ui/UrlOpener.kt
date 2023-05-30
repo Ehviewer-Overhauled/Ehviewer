@@ -17,7 +17,6 @@ package com.hippo.ehviewer.ui
 
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -32,7 +31,6 @@ import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.ProgressScene
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 
 private val intent = CustomTabsIntent.Builder().apply { setShowTitle(true) }.build()
 
@@ -47,23 +45,15 @@ fun Context.openBrowser(url: String) {
 
 @MainThread
 fun Context.jumpToReaderByPage(url: String, detail: GalleryDetail): Boolean {
-    fun jump(page: Int) {
-        Intent(this, ReaderActivity::class.java).apply {
-            action = ReaderActivity.ACTION_EH
-            putExtra(ReaderActivity.KEY_GALLERY_INFO, detail)
-            putExtra(ReaderActivity.KEY_PAGE, page)
-            startActivity(this)
-        }
-    }
     GalleryPageUrlParser.parse(url)?.let {
         if (it.gid == detail.gid) {
-            jump(it.page)
+            navToReader(detail, it.page)
             return true
         }
     }
     if (url.startsWith("#c")) {
         runCatching {
-            jump(url.replace("#c", "").toInt() - 1)
+            navToReader(detail, url.replace("#c", "").toInt() - 1)
             return true
         }
     }

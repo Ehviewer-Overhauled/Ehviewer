@@ -236,7 +236,7 @@ suspend fun removeFromFavorites(galleryInfo: GalleryInfo) {
     }
 }
 
-fun Context.navToReader(info: GalleryInfo, page: Int) {
+fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
     val intent = Intent(this, ReaderActivity::class.java)
     intent.action = ReaderActivity.ACTION_EH
     intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
