@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application") version "8.1.0-beta04" apply false
+    id("com.android.application") version "8.1.0-beta03" apply false
     kotlin("android") version "1.9.0-Beta" apply false
     kotlin("plugin.serialization") version "1.9.0-Beta" apply false
     id("com.google.devtools.ksp") version "1.9.0-Beta-1.0.11" apply false
@@ -16,6 +16,6 @@ tasks.register("Delete", Delete::class) {
 
 buildscript {
     dependencies {
-        classpath("com.android.tools:r8:8.2.7-dev")
+        classpath("com.android.tools:r8:8.2.9-dev")
     }
 }
