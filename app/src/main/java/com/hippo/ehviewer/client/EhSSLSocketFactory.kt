@@ -25,51 +25,18 @@ import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
 private const val EXCEPTIONAL_DOMAIN = "hath.network"
+private val sslSocketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
 
 object EhSSLSocketFactory : SSLSocketFactory() {
-    private val sslSocketFactory = getDefault() as SSLSocketFactory
-    override fun getDefaultCipherSuites(): Array<String> {
-        return sslSocketFactory.defaultCipherSuites
-    }
-
-    override fun getSupportedCipherSuites(): Array<String> {
-        return sslSocketFactory.supportedCipherSuites
-    }
-
+    override fun getDefaultCipherSuites(): Array<String> = sslSocketFactory.defaultCipherSuites
+    override fun getSupportedCipherSuites(): Array<String> = sslSocketFactory.supportedCipherSuites
     override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket {
         val address = s.inetAddress.hostAddress.takeIf { host in builtInHosts || EXCEPTIONAL_DOMAIN in host || host in Settings.dohUrl }
-        val socket = sslSocketFactory.createSocket(s, address ?: host, port, autoClose) as SSLSocket
-        val sslSession = socket.session
-        Log.d(
-            "EhSSLSocketFactory",
-            "Host: " + host + " Address: " + address + " Protocol:" + sslSession.protocol + " CipherSuite:" + sslSession.cipherSuite,
-        )
-        return socket
+        Log.d("EhSSLSocketFactory", "Host: $host Address: $address")
+        return sslSocketFactory.createSocket(s, address ?: host, port, autoClose) as SSLSocket
     }
-
-    override fun createSocket(host: String, port: Int): Socket {
-        return sslSocketFactory.createSocket(host, port)
-    }
-
-    override fun createSocket(
-        host: String,
-        port: Int,
-        localHost: InetAddress,
-        localPort: Int,
-    ): Socket {
-        return sslSocketFactory.createSocket(host, port, localHost, localPort)
-    }
-
-    override fun createSocket(host: InetAddress, port: Int): Socket {
-        return sslSocketFactory.createSocket(host, port)
-    }
-
-    override fun createSocket(
-        address: InetAddress,
-        port: Int,
-        localAddress: InetAddress,
-        localPort: Int,
-    ): Socket {
-        return sslSocketFactory.createSocket(address, port, localAddress, localPort)
-    }
+    override fun createSocket(host: String, port: Int): Socket = sslSocketFactory.createSocket(host, port)
+    override fun createSocket(host: String, port: Int, localHost: InetAddress, localPort: Int): Socket = sslSocketFactory.createSocket(host, port, localHost, localPort)
+    override fun createSocket(host: InetAddress, port: Int): Socket = sslSocketFactory.createSocket(host, port)
+    override fun createSocket(address: InetAddress, port: Int, localAddress: InetAddress, localPort: Int): Socket = sslSocketFactory.createSocket(address, port, localAddress, localPort)
 }
