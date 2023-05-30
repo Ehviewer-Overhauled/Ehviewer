@@ -62,6 +62,22 @@ android {
         targetSdk = 33
         versionCode = 180042
         versionName = "1.8.9.0-SNAPSHOT"
+        resourceConfigurations.addAll(
+            listOf(
+                "zh",
+                "zh-rCN",
+                "zh-rHK",
+                "zh-rTW",
+                "es",
+                "ja",
+                "ko",
+                "fr",
+                "de",
+                "th",
+                "tr",
+                "nb-rNO",
+            ),
+        )
         buildConfigField("String", "COMMIT_SHA", "\"$commitSha\"")
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
     }
