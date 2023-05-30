@@ -2,6 +2,7 @@ package com.hippo.ehviewer.coil
 
 import coil.intercept.Interceptor
 import coil.request.ImageResult
+import com.hippo.ehviewer.Settings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ object MergeInterceptor : Interceptor {
     private val EMPTY_LIST = mutableListOf<Continuation<Unit>>()
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
         val req = chain.request
-        val key = req.memoryCacheKey?.key?.takeIf { it.startsWith("m/") } ?: return withContext(req.interceptorDispatcher) { chain.proceed(req) }
+        val key = req.memoryCacheKey?.key?.takeIf { it.startsWith("m/") || Settings.preloadThumbAggressively } ?: return withContext(req.interceptorDispatcher) { chain.proceed(req) }
 
         pendingContinuationMapLock.lock()
         val existPendingContinuations = pendingContinuationMap[key]
