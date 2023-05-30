@@ -24,7 +24,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.room.Room
-import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
@@ -36,6 +35,7 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.install
 import com.hippo.ehviewer.coil.MergeInterceptor
 import com.hippo.ehviewer.coil.diskCache
+import com.hippo.ehviewer.coil.imageLoader
 import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
@@ -133,18 +133,16 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         locked = true
     }
 
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this).apply {
-            okHttpClient(nonCacheOkHttpClient)
-            components {
-                add { result, options, _ -> ImageDecoderDecoder(result.source, options, false) }
-                add(MergeInterceptor)
-            }
-            diskCache(imageCache)
-            crossfade(300)
-            error(R.drawable.image_failed)
-            if (BuildConfig.DEBUG) logger(DebugLogger())
-        }.build()
+    override fun newImageLoader() = imageLoader {
+        okHttpClient(nonCacheOkHttpClient)
+        components {
+            add { result, options, _ -> ImageDecoderDecoder(result.source, options, false) }
+            add(MergeInterceptor)
+        }
+        diskCache(imageCache)
+        crossfade(300)
+        error(R.drawable.image_failed)
+        if (BuildConfig.DEBUG) logger(DebugLogger())
     }
 
     companion object {
