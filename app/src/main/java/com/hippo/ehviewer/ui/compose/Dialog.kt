@@ -1,7 +1,14 @@
 package com.hippo.ehviewer.ui.compose
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -9,7 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -92,6 +102,47 @@ class DialogState {
                     },
                     title = title?.let { { Text(text = stringResource(id = title)) } },
                     text = text,
+                )
+            }
+        }
+    }
+
+    suspend fun showSelectItemWithIcon(
+        vararg items: Pair<ImageVector, Int>,
+        title: String,
+    ): Int {
+        return suspendCancellableCoroutine { cont ->
+            cont.invokeOnCancellation { dismiss() }
+            content = {
+                AlertDialog(
+                    onDismissRequest = {
+                        cont.cancel()
+                        dismiss()
+                    },
+                    content = {
+                        Surface(
+                            shape = AlertDialogDefaults.shape,
+                            color = AlertDialogDefaults.containerColor,
+                            tonalElevation = AlertDialogDefaults.TonalElevation,
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(24.dp),
+                            ) {
+                                Text(text = title)
+                                items.forEachIndexed { index, (icon, text) ->
+                                    Row(
+                                        modifier = Modifier.clickable {
+                                            dismiss()
+                                            cont.resume(index)
+                                        },
+                                    ) {
+                                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp))
+                                        Text(text = stringResource(id = text))
+                                    }
+                                }
+                            }
+                        }
+                    },
                 )
             }
         }

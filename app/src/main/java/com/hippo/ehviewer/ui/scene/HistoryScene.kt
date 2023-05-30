@@ -32,7 +32,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DriveFileMove
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Icon
@@ -160,7 +166,28 @@ class HistoryScene : BaseScene() {
                                             // Bug tracker: https://issuetracker.google.com/issues/150812265
                                             GalleryInfoListItem(
                                                 onClick = ::onItemClick.partially1(it),
-                                                onLongClick = ::onItemLongClick.partially1(it),
+                                                onLongClick = {
+                                                    coroutineScope.launchIO {
+                                                        val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
+                                                        val favourite = info.favoriteSlot != -2
+                                                        if (!downloaded) {
+                                                            val selected = dialogState.showSelectItemWithIcon(
+                                                                Icons.Default.MenuBook to R.string.read,
+                                                                Icons.Default.Download to R.string.download,
+                                                                if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+                                                                title = EhUtils.getSuitableTitle(info),
+                                                            )
+                                                        } else {
+                                                            val selected = dialogState.showSelectItemWithIcon(
+                                                                Icons.Default.MenuBook to R.string.read,
+                                                                Icons.Default.Delete to R.string.delete_downloads,
+                                                                if (favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+                                                                Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
+                                                                title = EhUtils.getSuitableTitle(info),
+                                                            )
+                                                        }
+                                                    }
+                                                },
                                                 info = it,
                                                 modifier = Modifier.height(cardHeight),
                                             )
