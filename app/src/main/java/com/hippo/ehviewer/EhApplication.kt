@@ -39,6 +39,8 @@ import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
+import com.hippo.ehviewer.okhttp.cache
+import com.hippo.ehviewer.okhttp.httpClient
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.yorozuya.FileUtils
@@ -46,9 +48,6 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.net.Proxy
 import java.security.KeyStore
@@ -160,31 +159,29 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val ehProxySelector by lazy { EhProxySelector() }
 
         val nonCacheOkHttpClient by lazy {
-            OkHttpClient.Builder().apply {
+            httpClient {
                 cookieJar(EhCookieStore)
                 dns(EhDns)
                 proxySelector(ehProxySelector)
                 if (Settings.dF) {
-                    val factory =
-                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
+                    val factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())!!
                     factory.init(null as KeyStore?)
                     val manager = factory.trustManagers!!
                     val trustManager = manager.filterIsInstance<X509TrustManager>().first()
                     sslSocketFactory(EhSSLSocketFactory, trustManager)
                     proxy(Proxy.NO_PROXY)
                 }
-            }.build()
+            }
         }
 
         // Never use this okhttp client to download large blobs!!!
         val okHttpClient by lazy {
-            nonCacheOkHttpClient.newBuilder().cache(
-                Cache(
+            httpClient(nonCacheOkHttpClient) {
+                cache(
                     application.cacheDir.toOkioPath() / "http_cache",
                     20L * 1024L * 1024L,
-                    FileSystem.SYSTEM,
-                ),
-            ).build()
+                )
+            }
         }
 
         val galleryDetailCache by lazy {
