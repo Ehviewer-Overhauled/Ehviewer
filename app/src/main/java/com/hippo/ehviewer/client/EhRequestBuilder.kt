@@ -32,8 +32,6 @@ import okhttp3.Response
 import okhttp3.executeAsync
 import org.json.JSONArray
 import org.json.JSONObject
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -102,19 +100,8 @@ suspend inline fun <R> Call.usingCancellable(crossinline block: Response.() -> R
     }
 }
 
-suspend inline fun <R> Request.execute(block: Response.() -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return okHttpClient.newCall(this).executeAsync().use(block)
-}
-
-suspend inline fun <R> Request.executeNonCache(crossinline block: Response.() -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return nonCacheOkHttpClient.newCall(this).usingCancellable(block)
-}
+suspend inline fun <R> Request.execute(block: Response.() -> R) = okHttpClient.newCall(this).executeAsync().use(block)
+suspend inline fun <R> Request.executeNonCache(crossinline block: Response.() -> R) = nonCacheOkHttpClient.newCall(this).usingCancellable(block)
 
 const val CHROME_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
 const val CHROME_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
