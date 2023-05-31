@@ -99,24 +99,19 @@ class GalleryPreviewScreen : Fragment() {
                 }
 
                 suspend fun showGoToDialog() {
-                    val goto = dialogState.show(initial = 1, title = R.string.go_to) {
-                        var jumpTo by remember { mutableStateOf(1f) }
+                    initialKey = dialogState.show(initial = 1F, title = R.string.go_to) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 18.dp)) {
                             Text(text = "1", modifier = Modifier.padding(12.dp))
                             Slider(
-                                value = jumpTo,
-                                onValueChange = { jumpTo = it },
+                                value = expectedValue,
+                                onValueChange = { expectedValue = it },
                                 modifier = Modifier.height(48.dp).width(0.dp).weight(1F).align(Alignment.CenterVertically),
                                 valueRange = 1f..galleryDetail.previewPages.toFloat(),
                                 steps = galleryDetail.previewPages - 2,
-                                onValueChangeFinished = {
-                                    this@show shouldReturn jumpTo.roundToInt()
-                                },
                             )
                             Text(text = pages.toString(), modifier = Modifier.padding(12.dp))
                         }
-                    }
-                    initialKey = goto
+                    }.roundToInt()
                 }
 
                 val previewPagesMap = rememberMemorized { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }

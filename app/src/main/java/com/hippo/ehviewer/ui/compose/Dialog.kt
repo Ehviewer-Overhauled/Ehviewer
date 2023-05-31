@@ -30,7 +30,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 interface DialogScope<R> {
-    infix fun shouldReturn(value: R)
+    var expectedValue: R
 }
 
 class DialogState {
@@ -47,7 +47,8 @@ class DialogState {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation { dismiss() }
             content = {
-                var result by remember { mutableStateOf(initial) }
+                val state = remember(cont) { mutableStateOf(initial) }
+                val impl = remember(cont) { object : DialogScope<R> { override var expectedValue by state } }
                 AlertDialog(
                     onDismissRequest = {
                         cont.cancel()
@@ -56,19 +57,13 @@ class DialogState {
                     confirmButton = {
                         TextButton(onClick = {
                             dismiss()
-                            cont.resume(result)
+                            cont.resume(state.value)
                         }) {
                             Text(text = stringResource(id = android.R.string.ok))
                         }
                     },
                     title = title?.let { { Text(text = stringResource(id = title)) } },
-                    text = {
-                        block(object : DialogScope<R> {
-                            override infix fun shouldReturn(value: R) {
-                                result = value
-                            }
-                        })
-                    },
+                    text = { block(impl) },
                 )
             }
         }
@@ -133,13 +128,21 @@ class DialogState {
                             tonalElevation = AlertDialogDefaults.TonalElevation,
                         ) {
                             Column {
-                                Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    text = title,
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .padding(top = 16.dp),
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
                                 items.forEachIndexed { index, (icon, text) ->
                                     Row(
-                                        modifier = Modifier.clickable {
-                                            dismiss()
-                                            cont.resume(index)
-                                        }.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .clickable {
+                                                dismiss()
+                                                cont.resume(index)
+                                            }
+                                            .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
