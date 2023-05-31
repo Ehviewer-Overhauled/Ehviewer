@@ -77,8 +77,7 @@ abstract class GalleryInfoContentHelper : ContentHelper() {
         val id = bundle.getInt(KEY_DATA_MAP, IntIdGenerator.INVALID_ID)
         if (id != IntIdGenerator.INVALID_ID) {
             val router = EhApplication.favouriteStatusRouter
-            val map = router.restoreDataMap(id)
-            this.map = map
+            router.restoreDataMap(id)?.let { this.map = it }
         }
         return super.restoreInstanceState(state)
     }

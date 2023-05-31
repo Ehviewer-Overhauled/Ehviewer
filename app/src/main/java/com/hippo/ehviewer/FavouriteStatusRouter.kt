@@ -34,8 +34,8 @@ class FavouriteStatusRouter {
         return id
     }
 
-    fun restoreDataMap(id: Int): MutableMap<Long, GalleryInfo> {
-        return maps.remove(id)!!
+    fun restoreDataMap(id: Int): MutableMap<Long, GalleryInfo>? {
+        return maps.remove(id)
     }
 
     fun modifyFavourites(gid: Long, slot: Int) {
