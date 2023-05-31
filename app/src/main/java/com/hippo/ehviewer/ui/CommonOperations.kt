@@ -280,10 +280,12 @@ suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context)
     with(requireActivity<MainActivity>(context)) {
         when (selected) {
             0 -> navToReader(info)
-            1 -> if (downloaded) {
-                if (confirmRemoveDownload(info)) DownloadManager.deleteDownload(info.gid)
-            } else {
-                CommonOperations.startDownload(this, info, false)
+            1 -> withUIContext {
+                if (downloaded) {
+                    if (confirmRemoveDownload(info)) DownloadManager.deleteDownload(info.gid)
+                } else {
+                    CommonOperations.startDownload(this@with, info, false)
+                }
             }
             2 -> if (favourite) {
                 runSuspendCatching {
