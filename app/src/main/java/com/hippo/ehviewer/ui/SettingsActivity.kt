@@ -45,8 +45,8 @@ class SettingsActivity : EhActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (EhCookieStore.hasSignedIn()) {
-            lifecycleScope.launchIO {
+        lifecycleScope.launchIO {
+            if (EhCookieStore.hasSignedIn()) {
                 runCatching {
                     getImageLimits()
                 }.exceptionOrNull()?.printStackTrace()
