@@ -72,9 +72,11 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.Deferred
+import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
+import com.hippo.ehviewer.ui.confirmRemoveDownload
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
@@ -162,7 +164,7 @@ class HistoryScene : BaseScene() {
                                                 onLongClick = {
                                                     coroutineScope.launchIO {
                                                         val selected = dialogState.selectGalleryInfoAction(info)
-                                                        withUIContext { handleLongClick(selected, info) }
+                                                        withUIContext { handleLongClick(selected, info, dialogState) }
                                                     }
                                                 },
                                                 info = it,
@@ -217,24 +219,13 @@ class HistoryScene : BaseScene() {
         navigate(R.id.galleryDetailScene, args)
     }
 
-    private fun handleLongClick(which: Int, gi: GalleryInfo) {
+    private suspend fun handleLongClick(which: Int, gi: GalleryInfo, dialogState: DialogState) {
         val downloaded = DownloadManager.getDownloadState(gi.gid) != DownloadInfo.STATE_INVALID
         val favourite = gi.favoriteSlot != -2
         when (which) {
             0 -> context?.navToReader(gi)
             1 -> if (downloaded) {
-                BaseDialogBuilder(requireContext())
-                    .setTitle(R.string.download_remove_dialog_title)
-                    .setMessage(
-                        getString(
-                            R.string.download_remove_dialog_message,
-                            gi.title,
-                        ),
-                    )
-                    .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                        DownloadManager.deleteDownload(gi.gid)
-                    }
-                    .show()
+                if (dialogState.confirmRemoveDownload(gi)) DownloadManager.deleteDownload(gi.gid)
             } else {
                 CommonOperations.startDownload(activity as MainActivity, gi, false)
             }

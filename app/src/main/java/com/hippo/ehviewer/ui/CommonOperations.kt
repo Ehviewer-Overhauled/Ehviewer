@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
@@ -277,3 +279,10 @@ suspend fun DialogState.selectGalleryInfoAction(info: GalleryInfo): Int {
     }
     return selected
 }
+
+suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show(
+    confirmText = android.R.string.ok,
+    dismissText = android.R.string.cancel,
+    title = R.string.download_remove_dialog_title,
+    text = { Text(text = stringResource(id = R.string.download_remove_dialog_message, info.title.orEmpty())) },
+)

@@ -84,6 +84,7 @@ import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
+import com.hippo.ehviewer.ui.confirmRemoveDownload
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.BringOutTransition
@@ -727,20 +728,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 when (selected) {
                     0 -> context.navToReader(info)
                     1 -> if (downloaded) {
-                        BaseDialogBuilder(context)
-                            .setTitle(R.string.download_remove_dialog_title)
-                            .setMessage(
-                                getString(
-                                    R.string.download_remove_dialog_message,
-                                    info.title,
-                                ),
-                            )
-                            .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
-                                mDownloadManager.deleteDownload(
-                                    info.gid,
-                                )
-                            }
-                            .show()
+                        if (dialogState.confirmRemoveDownload(info)) mDownloadManager.deleteDownload(info.gid)
                     } else {
                         CommonOperations.startDownload(activity as MainActivity, info, false)
                     }
