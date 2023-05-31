@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,6 +139,21 @@ class DialogState {
                         )
                     },
                 )
+            }
+        }
+    }
+
+    suspend fun showSelectItem(
+        vararg items: String,
+        @StringRes title: Int,
+    ): Int = showNoButton {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Text(text = stringResource(id = title), style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.size(16.dp))
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiary) {
+                items.forEachIndexed { index, text ->
+                    Text(text = text, modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth().padding(vertical = 8.dp), style = MaterialTheme.typography.titleMedium)
+                }
             }
         }
     }

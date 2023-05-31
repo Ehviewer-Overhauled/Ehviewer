@@ -101,6 +101,7 @@ import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerL
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.selectGalleryInfoAction
+import com.hippo.ehviewer.ui.showMoveDownloadLabel
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
@@ -732,7 +733,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                     } else {
                         CommonOperations.startDownload(activity as MainActivity, info, false)
                     }
-
                     2 -> if (favourite) {
                         lifecycleScope.launchIO {
                             runSuspendCatching {
@@ -752,24 +752,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                             }
                         }
                     }
-
-                    3 -> {
-                        val labelRawList = downloadManager.labelList
-                        val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
-                        labelList.add(getString(R.string.default_download_label_name))
-                        var i = 0
-                        val n = labelRawList.size
-                        while (i < n) {
-                            labelRawList[i].label?.let { labelList.add(it) }
-                            i++
-                        }
-                        val labels = labelList.toTypedArray()
-                        val helper = MoveDialogHelper(labels, info)
-                        BaseDialogBuilder(context)
-                            .setTitle(R.string.download_move_dialog_title)
-                            .setItems(labels, helper)
-                            .show()
-                    }
+                    3 -> dialogState.showMoveDownloadLabel(info)
                 }
             }
         }
@@ -1036,23 +1019,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     @Retention(AnnotationRetention.SOURCE)
     private annotation class State
 
-    private class QsDrawerHolder(val binding: ItemDrawerListBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    private inner class MoveDialogHelper(
-        private val mLabels: Array<String>,
-        private val mGi: GalleryInfo,
-    ) : DialogInterface.OnClickListener {
-        override fun onClick(dialog: DialogInterface, which: Int) {
-            // Cancel check mode
-            _binding ?: return
-            binding.contentLayout.recyclerView.outOfCustomChoiceMode()
-            val downloadManager = downloadManager
-            val downloadInfo = downloadManager.getDownloadInfo(mGi.gid) ?: return
-            val label = if (which == 0) null else mLabels[which]
-            downloadManager.changeLabel(listOf(downloadInfo), label)
-        }
-    }
+    private class QsDrawerHolder(val binding: ItemDrawerListBinding) : RecyclerView.ViewHolder(binding.root)
 
     private inner class QsDrawerAdapter(private val mInflater: LayoutInflater) :
         RecyclerView.Adapter<QsDrawerHolder>() {

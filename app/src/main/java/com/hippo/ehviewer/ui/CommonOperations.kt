@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -54,7 +55,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
 object CommonOperations {
     fun startDownload(activity: MainActivity?, galleryInfo: GalleryInfo, forceDefault: Boolean) {
@@ -79,11 +79,10 @@ object CommonOperations {
         galleryInfos: List<GalleryInfo>,
         forceDefault: Boolean,
     ) {
-        val dm = downloadManager
         val toStart = LongList()
         val toAdd: MutableList<GalleryInfo> = ArrayList()
         for (gi in galleryInfos) {
-            if (dm.containDownloadInfo(gi.gid)) {
+            if (DownloadManager.containDownloadInfo(gi.gid)) {
                 toStart.add(gi.gid)
             } else {
                 toAdd.add(gi)
@@ -104,10 +103,10 @@ object CommonOperations {
         // Get default download label
         if (!justStart && Settings.hasDefaultDownloadLabel) {
             label = Settings.defaultDownloadLabel
-            justStart = label == null || dm.containLabel(label)
+            justStart = label == null || DownloadManager.containLabel(label)
         }
         // If there is no other label, just use null label
-        if (!justStart && dm.labelList.isEmpty()) {
+        if (!justStart && DownloadManager.labelList.isEmpty()) {
             justStart = true
             label = null
         }
@@ -124,7 +123,7 @@ object CommonOperations {
             activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT)
         } else {
             // Let use chose label
-            val list = dm.labelList
+            val list = DownloadManager.labelList
             val items = mutableListOf<String>()
             items.add(activity.getString(R.string.default_download_label_name))
             items.addAll(list.mapNotNull { it.label })
@@ -137,7 +136,7 @@ object CommonOperations {
                         label1 = null
                     } else {
                         label1 = items[position]
-                        if (!dm.containLabel(label1)) {
+                        if (!DownloadManager.containLabel(label1)) {
                             label1 = null
                         }
                     }
@@ -286,3 +285,12 @@ suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show
     title = R.string.download_remove_dialog_title,
     text = { Text(text = stringResource(id = R.string.download_remove_dialog_message, info.title.orEmpty())) },
 )
+
+suspend fun DialogState.showMoveDownloadLabel(info: GalleryInfo) {
+    val defaultLabel = GetText.getString(R.string.default_download_label_name)
+    val labels = DownloadManager.labelList.mapNotNull { it.label }.toTypedArray()
+    val selected = showSelectItem(defaultLabel, *labels, title = R.string.download_move_dialog_title)
+    val downloadInfo = DownloadManager.getDownloadInfo(info.gid) ?: return
+    val label = if (selected == 0) null else labels[selected - 1]
+    withUIContext { DownloadManager.changeLabel(listOf(downloadInfo), label) }
+}

@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui.scene
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -77,10 +76,10 @@ import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.confirmRemoveDownload
-import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.selectGalleryInfoAction
+import com.hippo.ehviewer.ui.showMoveDownloadLabel
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
@@ -229,7 +228,6 @@ class HistoryScene : BaseScene() {
             } else {
                 CommonOperations.startDownload(activity as MainActivity, gi, false)
             }
-
             2 -> if (favourite) {
                 lifecycleScope.launchIO {
                     runSuspendCatching {
@@ -249,33 +247,7 @@ class HistoryScene : BaseScene() {
                     }
                 }
             }
-
-            3 -> {
-                val labelRawList = DownloadManager.labelList
-                val labelList: MutableList<String> = ArrayList(labelRawList.size + 1)
-                labelList.add(getString(R.string.default_download_label_name))
-                var i = 0
-                val n = labelRawList.size
-                while (i < n) {
-                    labelRawList[i].label?.let { labelList.add(it) }
-                    i++
-                }
-                val labels = labelList.toTypedArray()
-                val helper = MoveDialogHelper(labels, gi)
-                BaseDialogBuilder(requireContext()).setTitle(R.string.download_move_dialog_title).setItems(labels, helper).show()
-            }
-        }
-    }
-
-    private inner class MoveDialogHelper(
-        private val mLabels: Array<String>,
-        private val mGi: GalleryInfo,
-    ) : DialogInterface.OnClickListener {
-        override fun onClick(dialog: DialogInterface, which: Int) {
-            val downloadManager = DownloadManager
-            val downloadInfo = downloadManager.getDownloadInfo(mGi.gid) ?: return
-            val label = if (which == 0) null else mLabels[which]
-            downloadManager.changeLabel(listOf(downloadInfo), label)
+            3 -> dialogState.showMoveDownloadLabel(gi)
         }
     }
 
