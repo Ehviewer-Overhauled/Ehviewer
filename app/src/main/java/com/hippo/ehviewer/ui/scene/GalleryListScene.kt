@@ -79,12 +79,9 @@ import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
-import com.hippo.ehviewer.ui.CommonOperations
-import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
-import com.hippo.ehviewer.ui.confirmRemoveDownload
+import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.BringOutTransition
@@ -98,10 +95,6 @@ import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerListener
-import com.hippo.ehviewer.ui.navToReader
-import com.hippo.ehviewer.ui.removeFromFavorites
-import com.hippo.ehviewer.ui.selectGalleryInfoAction
-import com.hippo.ehviewer.ui.showMoveDownloadLabel
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
@@ -722,39 +715,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         val context = context ?: return true
         val info = mHelper?.getDataAtEx(position) ?: return true
         lifecycleScope.launchIO {
-            val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
-            val favourite = info.favoriteSlot != -2
-            val selected = dialogState.selectGalleryInfoAction(info)
-            withUIContext {
-                when (selected) {
-                    0 -> context.navToReader(info)
-                    1 -> if (downloaded) {
-                        if (dialogState.confirmRemoveDownload(info)) mDownloadManager.deleteDownload(info.gid)
-                    } else {
-                        CommonOperations.startDownload(activity as MainActivity, info, false)
-                    }
-                    2 -> if (favourite) {
-                        lifecycleScope.launchIO {
-                            runSuspendCatching {
-                                removeFromFavorites(info)
-                                showTip(R.string.remove_from_favorite_success, LENGTH_SHORT)
-                            }.onFailure {
-                                showTip(R.string.remove_from_favorite_failure, LENGTH_LONG)
-                            }
-                        }
-                    } else {
-                        lifecycleScope.launchIO {
-                            runSuspendCatching {
-                                context.addToFavorites(info)
-                                showTip(R.string.add_to_favorite_success, LENGTH_SHORT)
-                            }.onFailure {
-                                showTip(R.string.add_to_favorite_failure, LENGTH_LONG)
-                            }
-                        }
-                    }
-                    3 -> dialogState.showMoveDownloadLabel(info)
-                }
-            }
+            dialogState.doGalleryInfoAction(info, context)
         }
         return true
     }

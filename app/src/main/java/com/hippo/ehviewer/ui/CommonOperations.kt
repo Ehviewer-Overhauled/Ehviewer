@@ -54,6 +54,8 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import moe.tarsin.coroutines.runSuspendCatching
+import rikka.core.util.ContextUtils.requireActivity
 import kotlin.coroutines.resume
 
 object CommonOperations {
@@ -256,19 +258,18 @@ fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
     startActivity(intent)
 }
 
-suspend fun DialogState.selectGalleryInfoAction(info: GalleryInfo): Int {
+suspend fun DialogState.doGalleryInfoAction(info: GalleryInfo, context: Context) {
     val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
     val favourite = info.favoriteSlot != -2
-    val selected: Int
-    if (!downloaded) {
-        selected = showSelectItemWithIcon(
+    val selected = if (!downloaded) {
+        showSelectItemWithIcon(
             Icons.Default.MenuBook to R.string.read,
             Icons.Default.Download to R.string.download,
             if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
             title = EhUtils.getSuitableTitle(info),
         )
     } else {
-        selected = showSelectItemWithIcon(
+        showSelectItemWithIcon(
             Icons.Default.MenuBook to R.string.read,
             Icons.Default.Delete to R.string.delete_downloads,
             if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
@@ -276,7 +277,33 @@ suspend fun DialogState.selectGalleryInfoAction(info: GalleryInfo): Int {
             title = EhUtils.getSuitableTitle(info),
         )
     }
-    return selected
+    with(requireActivity<MainActivity>(context)) {
+        when (selected) {
+            0 -> navToReader(info)
+            1 -> if (downloaded) {
+                if (confirmRemoveDownload(info)) DownloadManager.deleteDownload(info.gid)
+            } else {
+                CommonOperations.startDownload(this, info, false)
+            }
+            2 -> if (favourite) {
+                runSuspendCatching {
+                    removeFromFavorites(info)
+                    showTip(R.string.remove_from_favorite_success, BaseScene.LENGTH_SHORT)
+                }.onFailure {
+                    showTip(R.string.remove_from_favorite_failure, BaseScene.LENGTH_LONG)
+                }
+            } else {
+                runSuspendCatching {
+                    addToFavorites(info)
+                    showTip(R.string.add_to_favorite_success, BaseScene.LENGTH_SHORT)
+                }.onFailure {
+                    showTip(R.string.add_to_favorite_failure, BaseScene.LENGTH_LONG)
+                }
+            }
+            3 -> showMoveDownloadLabel(info)
+        }
+        true
+    }
 }
 
 suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show(
