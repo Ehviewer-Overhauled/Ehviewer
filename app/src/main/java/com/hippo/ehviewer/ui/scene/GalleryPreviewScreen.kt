@@ -23,7 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -85,7 +85,7 @@ class GalleryPreviewScreen : Fragment() {
                 val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
-                var initialKey by rememberSaveable { mutableStateOf(if (toNextPage) 2 else 1) }
+                var initialKey by rememberSaveable { mutableIntStateOf(if (toNextPage) 2 else 1) }
 
                 suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
                     val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
@@ -116,7 +116,7 @@ class GalleryPreviewScreen : Fragment() {
 
                 val previewPagesMap = rememberMemorized { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
                 val data = remember(initialKey) {
-                    Pager(PagingConfig(1, prefetchDistance = 4, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
+                    Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1, maxSize = 3), initialKey) {
                         object : PagingSource<Int, PreviewPage>() {
                             override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
                             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
