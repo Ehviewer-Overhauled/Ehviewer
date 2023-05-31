@@ -1525,7 +1525,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 if (mArchiveList == null) {
                     mErrorText!!.visibility = View.GONE
                     mListView!!.visibility = View.GONE
-                    lifecycleScope.launchIO {
+                    mJob = lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.getArchiveList(url!!, mGid, mToken)
                         }.onSuccess { result ->
@@ -1543,6 +1543,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 mErrorText?.text = ExceptionUtils.getReadableString(it)
                             }
                         }
+                        mJob = null
                     }
                 } else {
                     bind(mArchiveList, mCurrentFunds)
@@ -1611,7 +1612,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 val res = mArchiveList!![position].res
                 val isHAtH = mArchiveList!![position].isHAtH
                 composeBindingGD?.run {
-                    mJob = lifecycleScope.launchIO {
+                    lifecycleScope.launchIO {
                         runSuspendCatching {
                             EhEngine.downloadArchive(gid, token, mArchiveFormParamOr, res, isHAtH)
                         }.onSuccess { result ->
@@ -1632,7 +1633,6 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 showTip(R.string.download_archive_failure, LENGTH_LONG)
                             }
                         }
-                        mJob = null
                     }
                 }
             }
