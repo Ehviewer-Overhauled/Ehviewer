@@ -18,7 +18,6 @@ android {
     compileSdk = 33
     buildToolsVersion = "33.0.2"
     ndkVersion = "25.2.9519653"
-    androidResources.generateLocaleConfig = true
 
     splits {
         abi {
