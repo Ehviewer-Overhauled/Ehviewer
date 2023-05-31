@@ -128,21 +128,13 @@ class DialogState {
                             tonalElevation = AlertDialogDefaults.TonalElevation,
                         ) {
                             Column {
-                                Text(
-                                    text = title,
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp)
-                                        .padding(top = 16.dp),
-                                    style = MaterialTheme.typography.titleMedium,
-                                )
+                                Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
                                 items.forEachIndexed { index, (icon, text) ->
                                     Row(
-                                        modifier = Modifier
-                                            .clickable {
-                                                dismiss()
-                                                cont.resume(index)
-                                            }
-                                            .fillMaxWidth(),
+                                        modifier = Modifier.clickable {
+                                            dismiss()
+                                            cont.resume(index)
+                                        }.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
