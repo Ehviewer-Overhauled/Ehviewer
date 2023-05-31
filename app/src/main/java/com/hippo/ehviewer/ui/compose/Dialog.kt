@@ -33,6 +33,10 @@ interface DialogScope<R> {
     var expectedValue: R
 }
 
+fun interface DismissDialogScope<R> {
+    fun dismissWith(value: R)
+}
+
 class DialogState {
     private var content: (@Composable () -> Unit)? by mutableStateOf(null)
 
@@ -108,13 +112,16 @@ class DialogState {
         }
     }
 
-    suspend fun showSelectItemWithIcon(
-        vararg items: Pair<ImageVector, Int>,
-        title: String,
-    ): Int {
+    private suspend fun <R> showNoButton(block: @Composable DismissDialogScope<R>.() -> Unit): R {
         return suspendCancellableCoroutine { cont ->
             cont.invokeOnCancellation { dismiss() }
             content = {
+                val impl = remember(cont) {
+                    DismissDialogScope<R> {
+                        dismiss()
+                        cont.resume(it)
+                    }
+                }
                 AlertDialog(
                     onDismissRequest = {
                         cont.cancel()
@@ -126,27 +133,30 @@ class DialogState {
                             shape = AlertDialogDefaults.shape,
                             color = AlertDialogDefaults.containerColor,
                             tonalElevation = AlertDialogDefaults.TonalElevation,
-                        ) {
-                            Column {
-                                Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
-                                items.forEachIndexed { index, (icon, text) ->
-                                    Row(
-                                        modifier = Modifier.clickable {
-                                            dismiss()
-                                            cont.resume(index)
-                                        }.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
-                                        Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
-                                    }
-                                }
-                                Spacer(modifier = Modifier.size(8.dp))
-                            }
-                        }
+                            content = { block(impl) },
+                        )
                     },
                 )
             }
+        }
+    }
+
+    suspend fun showSelectItemWithIcon(
+        vararg items: Pair<ImageVector, Int>,
+        title: String,
+    ): Int = showNoButton {
+        Column {
+            Text(text = title, modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp), style = MaterialTheme.typography.titleMedium)
+            items.forEachIndexed { index, (icon, text) ->
+                Row(
+                    modifier = Modifier.clickable { dismissWith(index) }.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(imageVector = icon, contentDescription = null, modifier = Modifier.padding(16.dp), tint = AlertDialogDefaults.iconContentColor)
+                    Text(text = stringResource(id = text), style = MaterialTheme.typography.titleMedium)
+                }
+            }
+            Spacer(modifier = Modifier.size(8.dp))
         }
     }
 }
