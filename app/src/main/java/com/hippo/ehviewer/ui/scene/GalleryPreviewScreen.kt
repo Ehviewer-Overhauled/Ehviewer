@@ -86,6 +86,7 @@ class GalleryPreviewScreen : Fragment() {
                 val pages = galleryDetail.pages
                 val pgSize = galleryDetail.previewList.size
                 var initialKey by rememberSaveable { mutableIntStateOf(if (toNextPage) 2 else 1) }
+                val prefetchDistance = PREFETCH_THUMBS / pgSize
 
                 suspend fun getPreviewListByPage(page: Int) = galleryDetail.run {
                     val url = EhUrl.getGalleryDetailUrl(gid, token, page, false)
@@ -116,7 +117,7 @@ class GalleryPreviewScreen : Fragment() {
 
                 val previewPagesMap = rememberMemorized { mutableMapOf<Int, PreviewPage>().apply { put(1, galleryDetail.previewList) } }
                 val data = remember(initialKey) {
-                    Pager(PagingConfig(1, enablePlaceholders = false, initialLoadSize = 1, maxSize = 3), initialKey) {
+                    Pager(PagingConfig(1, prefetchDistance = prefetchDistance, enablePlaceholders = false, initialLoadSize = 1), initialKey) {
                         object : PagingSource<Int, PreviewPage>() {
                             override fun getRefreshKey(state: PagingState<Int, PreviewPage>) = null
                             override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PreviewPage> {
@@ -186,3 +187,4 @@ class GalleryPreviewScreen : Fragment() {
 
 const val KEY_GALLERY_DETAIL = "gallery_detail"
 const val KEY_NEXT_PAGE = "next_page"
+private const val PREFETCH_THUMBS = 200
