@@ -31,13 +31,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.DriveFileMove
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Icon
@@ -71,7 +65,6 @@ import arrow.core.partially1
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.download.DownloadManager
@@ -79,13 +72,13 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.Deferred
-import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
+import com.hippo.ehviewer.ui.selectGalleryInfoAction
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.system.pxToDp
@@ -296,27 +289,4 @@ class HistoryScene : BaseScene() {
     }
 
     private val cardHeight = (Settings.listThumbSize * 3).pxToDp.dp
-}
-
-suspend fun DialogState.selectGalleryInfoAction(info: GalleryInfo): Int {
-    val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
-    val favourite = info.favoriteSlot != -2
-    val selected: Int
-    if (!downloaded) {
-        selected = showSelectItemWithIcon(
-            Icons.Default.MenuBook to R.string.read,
-            Icons.Default.Download to R.string.download,
-            if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
-            title = EhUtils.getSuitableTitle(info),
-        )
-    } else {
-        selected = showSelectItemWithIcon(
-            Icons.Default.MenuBook to R.string.read,
-            Icons.Default.Delete to R.string.delete_downloads,
-            if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
-            Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
-            title = EhUtils.getSuitableTitle(info),
-        )
-    }
-    return selected
 }

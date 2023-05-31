@@ -20,15 +20,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DriveFileMove
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.exception.EhException
+import com.hippo.ehviewer.dao.DownloadInfo
+import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.legacy.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.util.requestPermission
@@ -242,4 +253,27 @@ fun Context.navToReader(info: GalleryInfo, page: Int = -1) {
     intent.putExtra(ReaderActivity.KEY_GALLERY_INFO, info)
     intent.putExtra(ReaderActivity.KEY_PAGE, page)
     startActivity(intent)
+}
+
+suspend fun DialogState.selectGalleryInfoAction(info: GalleryInfo): Int {
+    val downloaded = DownloadManager.getDownloadState(info.gid) != DownloadInfo.STATE_INVALID
+    val favourite = info.favoriteSlot != -2
+    val selected: Int
+    if (!downloaded) {
+        selected = showSelectItemWithIcon(
+            Icons.Default.MenuBook to R.string.read,
+            Icons.Default.Download to R.string.download,
+            if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+            title = EhUtils.getSuitableTitle(info),
+        )
+    } else {
+        selected = showSelectItemWithIcon(
+            Icons.Default.MenuBook to R.string.read,
+            Icons.Default.Delete to R.string.delete_downloads,
+            if (!favourite) Icons.Default.Favorite to R.string.add_to_favourites else Icons.Default.HeartBroken to R.string.remove_from_favourites,
+            Icons.Default.DriveFileMove to R.string.download_move_dialog_title,
+            title = EhUtils.getSuitableTitle(info),
+        )
+    }
+    return selected
 }

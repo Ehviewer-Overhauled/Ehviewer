@@ -99,6 +99,7 @@ import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.removeFromFavorites
+import com.hippo.ehviewer.ui.selectGalleryInfoAction
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener
