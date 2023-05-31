@@ -126,7 +126,7 @@ class ContentLayout(context: Context, attrs: AttributeSet? = null) : FrameLayout
     }
 
     override fun onRestoreInstanceState(state: Parcelable) {
-        if (::mContentHelper.isInitialized) super.onRestoreInstanceState(mContentHelper.restoreInstanceState(state))
+        super.onRestoreInstanceState(mContentHelper.restoreInstanceState(state))
     }
 
     abstract class ContentHelper : OnShowViewListener {
