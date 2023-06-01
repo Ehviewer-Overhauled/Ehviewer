@@ -28,7 +28,9 @@ import com.hippo.unifile.UniFile
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.init.appCtx
 import splitties.preferences.DefaultPreferences
+import splitties.preferences.StringPref
 import java.util.Locale
+import kotlin.reflect.KProperty
 
 @OptIn(ExperimentalSplittiesApi::class)
 object Settings : DefaultPreferences() {
@@ -124,8 +126,6 @@ object Settings : DefaultPreferences() {
     private const val KEY_FAV_COUNT_8 = "fav_count_8"
     private const val KEY_FAV_COUNT_9 = "fav_count_9"
 
-    private const val KEY_DOWNLOAD_DELAY = "download_delay"
-    private const val DEFAULT_DOWNLOAD_DELAY = 0
     private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
     private lateinit var sSettingsPre: SharedPreferences
     private var LIST_THUMB_SIZE = 40
@@ -257,8 +257,7 @@ object Settings : DefaultPreferences() {
 
     val multiThreadDownload: Int
         get() = getIntFromStr(KEY_MULTI_THREAD_DOWNLOAD, DEFAULT_MULTI_THREAD_DOWNLOAD)
-    val downloadDelay: Int
-        get() = getIntFromStr(KEY_DOWNLOAD_DELAY, DEFAULT_DOWNLOAD_DELAY)
+
     val preloadImage: Int
         get() = getIntFromStr(KEY_PRELOAD_IMAGE, DEFAULT_PRELOAD_IMAGE)
 
@@ -335,6 +334,8 @@ object Settings : DefaultPreferences() {
     val listThumbSize: Int
         get() = 3 * _listThumbSize
 
+    val downloadDelay by intFromStrPref(0) { stringPref("download_delay", it) }
+
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
     val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, false)
@@ -378,4 +379,15 @@ object Settings : DefaultPreferences() {
 
     var dohUrl by stringPref("doh_url", "")
     var lastDawnDay by longPref("last_dawn_day", 0)
+}
+
+interface Delegate<R> {
+    operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
+    operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
+}
+
+fun intFromStrPref(defValue: Int, getter: (String) -> StringPref) = object : Delegate<Int> {
+    private var _value by getter(defValue.toString())
+    override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
+    override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }
 }
