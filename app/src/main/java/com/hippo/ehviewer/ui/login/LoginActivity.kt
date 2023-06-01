@@ -83,11 +83,11 @@ suspend fun postLogin() = coroutineScope {
             EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
 
             // Sad panda check
-            Settings.putGallerySite(EhUrl.SITE_EX)
+            Settings.gallerySite = EhUrl.SITE_EX
             EhEngine.getUConfig()
         }.onFailure {
             Settings.selectSite = false
-            Settings.putGallerySite(EhUrl.SITE_E)
+            Settings.gallerySite = EhUrl.SITE_E
             launch {
                 runCatching {
                     EhEngine.getUConfig()

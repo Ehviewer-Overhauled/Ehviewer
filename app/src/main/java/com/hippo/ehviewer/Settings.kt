@@ -34,14 +34,12 @@ import kotlin.reflect.KProperty
 
 @OptIn(ExperimentalSplittiesApi::class)
 object Settings : DefaultPreferences() {
-    // Eh
     const val KEY_THEME = "theme"
     const val KEY_ACCOUNT = "account"
     const val KEY_IMAGE_LIMITS = "image_limits"
     const val KEY_U_CONFIG = "uconfig"
     const val KEY_MY_TAGS = "mytags"
     const val KEY_BLACK_DARK_THEME = "black_dark_theme"
-    const val THEME_SYSTEM = -1
     const val KEY_GALLERY_SITE = "gallery_site"
     const val KEY_LIST_MODE = "list_mode"
     const val KEY_DETAIL_SIZE = "detail_size"
@@ -65,8 +63,6 @@ object Settings : DefaultPreferences() {
         KEY_REQUEST_NEWS_TIMER,
         KEY_HIDE_HV_EVENTS,
     )
-
-    // Download
     const val KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme"
     const val KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority"
     const val KEY_DOWNLOAD_SAVE_PATH = "image_path"
@@ -74,7 +70,6 @@ object Settings : DefaultPreferences() {
     const val KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment"
     const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
-
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
     const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
@@ -82,19 +77,8 @@ object Settings : DefaultPreferences() {
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
     private val TAG = Settings::class.java.simpleName
-    private const val DEFAULT_THEME = THEME_SYSTEM
-    private const val DEFAULT_GALLERY_SITE = 0
     private const val KEY_LAUNCH_PAGE = "launch_page"
     private const val DEFAULT_LAUNCH_PAGE = 0
-    private const val DEFAULT_LIST_MODE = 0
-    private const val DEFAULT_DETAIL_SIZE = 0
-    private const val DEFAULT_THUMB_RESOLUTION = 0
-    private const val KEY_MULTI_THREAD_DOWNLOAD = "download_thread"
-    private const val DEFAULT_MULTI_THREAD_DOWNLOAD = 3
-    private const val KEY_PRELOAD_IMAGE = "preload_image"
-    private const val DEFAULT_PRELOAD_IMAGE = 5
-
-    // Favorites
     private const val KEY_FAV_CAT_0 = "fav_cat_0"
     private const val KEY_FAV_CAT_1 = "fav_cat_1"
     private const val KEY_FAV_CAT_2 = "fav_cat_2"
@@ -125,10 +109,9 @@ object Settings : DefaultPreferences() {
     private const val KEY_FAV_COUNT_7 = "fav_count_7"
     private const val KEY_FAV_COUNT_8 = "fav_count_8"
     private const val KEY_FAV_COUNT_9 = "fav_count_9"
-
     private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
     private lateinit var sSettingsPre: SharedPreferences
-    private var LIST_THUMB_SIZE = 40
+
     fun initialize() {
         sSettingsPre = PreferenceManager.getDefaultSharedPreferences(appCtx)
         fixDefaultValue()
@@ -190,20 +173,6 @@ object Settings : DefaultPreferences() {
         }
     }
 
-    private fun putIntToStr(key: String, value: Int) {
-        sSettingsPre.edit().putString(key, value.toString()).apply()
-    }
-
-    val theme: Int
-        get() = getIntFromStr(KEY_THEME, DEFAULT_THEME)
-
-    val gallerySite: Int
-        get() = getIntFromStr(KEY_GALLERY_SITE, DEFAULT_GALLERY_SITE)
-
-    fun putGallerySite(value: Int) {
-        putIntToStr(KEY_GALLERY_SITE, value)
-    }
-
     val launchPageGalleryListSceneAction: String
         get() {
             return when (val value = getIntFromStr(KEY_LAUNCH_PAGE, DEFAULT_LAUNCH_PAGE)) {
@@ -214,10 +183,6 @@ object Settings : DefaultPreferences() {
                 else -> throw IllegalStateException("Unexpected value: $value")
             }
         }
-    val listMode: Int
-        get() = getIntFromStr(KEY_LIST_MODE, DEFAULT_LIST_MODE)
-    private val detailSize: Int
-        get() = getIntFromStr(KEY_DETAIL_SIZE, DEFAULT_DETAIL_SIZE)
 
     @get:DimenRes
     val detailSizeResId: Int
@@ -229,9 +194,6 @@ object Settings : DefaultPreferences() {
 
     val thumbSize: Int
         get() = dp2pix(appCtx, thumbSizeDp.toFloat())
-
-    val thumbResolution: Int
-        get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
 
     val downloadLocation: UniFile?
         get() {
@@ -254,12 +216,6 @@ object Settings : DefaultPreferences() {
         putString(KEY_DOWNLOAD_SAVE_QUERY, uri.encodedQuery)
         putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
     }
-
-    val multiThreadDownload: Int
-        get() = getIntFromStr(KEY_MULTI_THREAD_DOWNLOAD, DEFAULT_MULTI_THREAD_DOWNLOAD)
-
-    val preloadImage: Int
-        get() = getIntFromStr(KEY_PRELOAD_IMAGE, DEFAULT_PRELOAD_IMAGE)
 
     val favCat: Array<String>
         get() = arrayOf(
@@ -321,9 +277,6 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    val readCacheSize: Int
-        get() = getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE)
-
     var archivePasswds by stringSetOrNullPref(KEY_ARCHIVE_PASSWDS)
 
     fun putPasswdToArchivePasswds(value: String) {
@@ -334,7 +287,15 @@ object Settings : DefaultPreferences() {
     val listThumbSize: Int
         get() = 3 * _listThumbSize
 
-    val downloadDelay by intFromStrPref(0) { stringPref("download_delay", it) }
+    val downloadDelay by intFrom(0) { stringPref("download_delay", it) }
+    var gallerySite by intFrom(0) { stringPref(KEY_GALLERY_SITE, it) }
+    val multiThreadDownload by intFrom(3) { stringPref("download_thread", it) }
+    val preloadImage by intFrom(5) { stringPref("preload_image", it) }
+    val theme by intFrom(-1) { stringPref(KEY_THEME, it) }
+    val listMode by intFrom(0) { stringPref(KEY_LIST_MODE, it) }
+    val detailSize by intFrom(0) { stringPref(KEY_DETAIL_SIZE, it) }
+    val thumbResolution by intFrom(0) { stringPref(KEY_THUMB_RESOLUTION, it) }
+    val readCacheSize by intFrom(DEFAULT_READ_CACHE_SIZE) { stringPref(KEY_READ_CACHE_SIZE, it) }
 
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
@@ -386,7 +347,7 @@ interface Delegate<R> {
     operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
 }
 
-fun intFromStrPref(defValue: Int, getter: (String) -> StringPref) = object : Delegate<Int> {
+private inline fun intFrom(defValue: Int, crossinline getter: (String) -> StringPref) = object : Delegate<Int> {
     private var _value by getter(defValue.toString())
     override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
     override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }

@@ -243,7 +243,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                     TextButton(
                         onClick = {
                             Settings.selectSite = false
-                            Settings.putGallerySite(EhUrl.SITE_E)
+                            Settings.gallerySite = EhUrl.SITE_E
                             navController.navigate(SELECT_SITE_ROUTE_NAME)
                         },
                     ) {
@@ -334,7 +334,7 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                         TextButton(
                             onClick = {
                                 Settings.selectSite = false
-                                Settings.putGallerySite(EhUrl.SITE_E)
+                                Settings.gallerySite = EhUrl.SITE_E
                                 navController.navigate(SELECT_SITE_ROUTE_NAME)
                             },
                             modifier = Modifier.padding(horizontal = 4.dp),

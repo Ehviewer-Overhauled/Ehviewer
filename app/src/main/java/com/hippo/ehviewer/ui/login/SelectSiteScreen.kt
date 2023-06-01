@@ -123,7 +123,7 @@ fun SelectSiteScreen() {
                 coroutineScope.launchNonCancellable {
                     runCatching {
                         if (!siteEx) {
-                            Settings.putGallerySite(EhUrl.SITE_E)
+                            Settings.gallerySite = EhUrl.SITE_E
                             EhEngine.getUConfig()
                         } else {
                             // Get cookies for image limits

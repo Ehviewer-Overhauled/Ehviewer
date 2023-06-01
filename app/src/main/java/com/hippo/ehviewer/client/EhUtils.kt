@@ -114,7 +114,7 @@ object EhUtils {
         EhCookieStore.signOut()
         Settings.avatar = null
         Settings.displayName = null
-        Settings.putGallerySite(EhUrl.SITE_E)
+        Settings.gallerySite = EhUrl.SITE_E
         Settings.needSignIn = true
         Settings.selectSite = true
     }
