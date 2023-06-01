@@ -152,10 +152,10 @@ object CommonOperations {
                     }
                     // Save settings
                     if (builder?.isChecked == true) {
-                        Settings.putHasDefaultDownloadLabel(true)
-                        Settings.putDefaultDownloadLabel(label1)
+                        Settings.hasDefaultDownloadLabel = true
+                        Settings.defaultDownloadLabel = label1
                     } else {
-                        Settings.putHasDefaultDownloadLabel(false)
+                        Settings.hasDefaultDownloadLabel = false
                     }
                     // Notify
                     activity.showTip(R.string.added_to_download_list, BaseScene.LENGTH_SHORT)

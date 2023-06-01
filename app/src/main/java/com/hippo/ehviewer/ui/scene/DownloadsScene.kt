@@ -212,7 +212,7 @@ class DownloadsScene :
         if (mAdapter != null) {
             mAdapter!!.notifyDataSetChanged()
         }
-        Settings.putRecentDownloadLabel(mLabel)
+        Settings.recentDownloadLabel = mLabel
     }
 
     private fun updateTitle() {
@@ -444,15 +444,15 @@ class DownloadsScene :
                     .setTitle(R.string.default_download_label)
                     .setItems(items) { _: DialogInterface?, which: Int ->
                         if (which == 0) {
-                            Settings.putHasDefaultDownloadLabel(false)
+                            Settings.hasDefaultDownloadLabel = false
                         } else {
-                            Settings.putHasDefaultDownloadLabel(true)
+                            Settings.hasDefaultDownloadLabel = true
                             val label: String? = if (which == 1) {
                                 null
                             } else {
                                 items[which]
                             }
-                            Settings.putDefaultDownloadLabel(label)
+                            Settings.defaultDownloadLabel = label
                         }
                     }.show()
                 return@setOnMenuItemClickListener true

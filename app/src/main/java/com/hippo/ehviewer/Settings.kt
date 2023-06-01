@@ -220,19 +220,6 @@ object Settings : DefaultPreferences() {
         }
     }
 
-    private fun getBoolean(key: String, defValue: Boolean): Boolean {
-        return try {
-            sSettingsPre.getBoolean(key, defValue)
-        } catch (e: ClassCastException) {
-            Log.d(TAG, "Get ClassCastException when get $key value", e)
-            defValue
-        }
-    }
-
-    private fun putBoolean(key: String, value: Boolean) {
-        sSettingsPre.edit().putBoolean(key, value).apply()
-    }
-
     @JvmStatic
     fun getInt(key: String, defValue: Int): Int {
         return try {
@@ -289,14 +276,6 @@ object Settings : DefaultPreferences() {
         sSettingsPre.edit().putString(key, value.toString()).apply()
     }
 
-    var lastDawnDay by longPref(KEY_LAST_DAWN_DAY, 0)
-    var displayName by stringOrNullPref(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
-    var avatar by stringOrNullPref(KEY_AVATAR, null)
-    var removeImageFiles by boolPref(KEY_REMOVE_IMAGE_FILES, DEFAULT_REMOVE_IMAGE_FILES)
-    var needSignIn by boolPref(KEY_NEED_SIGN_IN, DEFAULT_NEED_SIGN_IN)
-    var selectSite by boolPref(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
-    val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
-
     val theme: Int
         get() = getIntFromStr(KEY_THEME, DEFAULT_THEME)
 
@@ -329,22 +308,12 @@ object Settings : DefaultPreferences() {
             1 -> R.dimen.gallery_list_column_width_short
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
+
     val thumbSize: Int
         get() = dp2pix(appCtx, thumbSizeDp.toFloat())
 
     val thumbResolution: Int
         get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
-
-    val thumbSizeDp by intPref(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
-    val showComments by boolPref(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS)
-    val requestNews by boolPref(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS)
-    val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS)
-    val showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, DEFAULT_SHOW_JPN_TITLE)
-    val showGalleryPages by boolPref(KEY_SHOW_GALLERY_PAGES, DEFAULT_SHOW_GALLERY_PAGES)
-    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS)
-    val meteredNetworkWarning by boolPref(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING)
-    var appLinkVerifyTip by boolPref(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP)
-    val enabledSecurity by boolPref(KEY_SEC_SECURITY, VALUE_SEC_SECURITY)
 
     val downloadLocation: UniFile?
         get() {
@@ -368,37 +337,13 @@ object Settings : DefaultPreferences() {
         putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
     }
 
-    val mediaScan: Boolean
-        get() = getBoolean(KEY_MEDIA_SCAN, DEFAULT_MEDIA_SCAN)
-    val recentDownloadLabel: String?
-        get() = getString(KEY_RECENT_DOWNLOAD_LABEL, DEFAULT_RECENT_DOWNLOAD_LABEL)
-
-    fun putRecentDownloadLabel(value: String?) {
-        putString(KEY_RECENT_DOWNLOAD_LABEL, value)
-    }
-
-    val hasDefaultDownloadLabel: Boolean
-        get() = getBoolean(KEY_HAS_DEFAULT_DOWNLOAD_LABEL, DEFAULT_HAS_DOWNLOAD_LABEL)
-
-    fun putHasDefaultDownloadLabel(hasDefaultDownloadLabel: Boolean) {
-        putBoolean(KEY_HAS_DEFAULT_DOWNLOAD_LABEL, hasDefaultDownloadLabel)
-    }
-
-    val defaultDownloadLabel: String?
-        get() = getString(KEY_DEFAULT_DOWNLOAD_LABEL, DEFAULT_DOWNLOAD_LABEL)
-
-    fun putDefaultDownloadLabel(value: String?) {
-        putString(KEY_DEFAULT_DOWNLOAD_LABEL, value)
-    }
-
     val multiThreadDownload: Int
         get() = getIntFromStr(KEY_MULTI_THREAD_DOWNLOAD, DEFAULT_MULTI_THREAD_DOWNLOAD)
     val downloadDelay: Int
         get() = getIntFromStr(KEY_DOWNLOAD_DELAY, DEFAULT_DOWNLOAD_DELAY)
     val preloadImage: Int
         get() = getIntFromStr(KEY_PRELOAD_IMAGE, DEFAULT_PRELOAD_IMAGE)
-    val downloadOriginImage: Boolean
-        get() = getBoolean(KEY_DOWNLOAD_ORIGIN_IMAGE, DEFAULT_DOWNLOAD_ORIGIN_IMAGE)
+
     val favCat: Array<String>
         get() = arrayOf(
             sSettingsPre.getString(KEY_FAV_CAT_0, DEFAULT_FAV_CAT_0)!!,
@@ -459,27 +404,8 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    var favLocalCount by intPref(KEY_FAV_LOCAL, DEFAULT_FAV_COUNT)
-    var favCloudCount by intPref(KEY_FAV_CLOUD, DEFAULT_FAV_COUNT)
-    var recentFavCat by intPref(KEY_RECENT_FAV_CAT, DEFAULT_RECENT_FAV_CAT)
-    var defaultFavSlot by intPref(KEY_DEFAULT_FAV_SLOT, DEFAULT_DEFAULT_FAV_SLOT)
-    var qSSaveProgress by boolPref(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS)
-    val saveParseErrorBody by boolPref(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY)
-    val saveCrashLog by boolPref(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG)
-    var security by boolPref(KEY_SECURITY, false)
-    val securityDelay by intPref(KEY_SECURITY_DELAY, 0)
-
     val readCacheSize: Int
         get() = getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE)
-
-    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, DEFAULT_BUILT_IN_HOSTS)
-    var dF by boolPref(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING)
-    var dohUrl by stringPref(KEY_DOH_URL, "")
-    val bypassVpn by boolPref(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
-    var proxyType by intPref(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE)
-    var proxyIp by stringOrNullPref(KEY_PROXY_IP, DEFAULT_PROXY_IP)
-    var proxyPort by intPref(KEY_PROXY_PORT, DEFAULT_PROXY_PORT)
-    var clipboardTextHashCode by intPref(KEY_CLIPBOARD_TEXT_HASH_CODE, DEFAULT_CLIPBOARD_TEXT_HASH_CODE)
 
     val archivePasswds: Set<String>?
         get() = getStringSet(KEY_ARCHIVE_PASSWDS)
@@ -499,5 +425,44 @@ object Settings : DefaultPreferences() {
             return size
         }
 
+    val thumbSizeDp by intPref(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
+    val showComments by boolPref(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS)
+    val requestNews by boolPref(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS)
+    val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS)
+    val showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, DEFAULT_SHOW_JPN_TITLE)
+    val showGalleryPages by boolPref(KEY_SHOW_GALLERY_PAGES, DEFAULT_SHOW_GALLERY_PAGES)
+    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS)
+    val meteredNetworkWarning by boolPref(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING)
+    var appLinkVerifyTip by boolPref(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP)
+    val enabledSecurity by boolPref(KEY_SEC_SECURITY, VALUE_SEC_SECURITY)
+    val mediaScan by boolPref(KEY_MEDIA_SCAN, DEFAULT_MEDIA_SCAN)
+    var recentDownloadLabel by stringOrNullPref(KEY_RECENT_DOWNLOAD_LABEL, DEFAULT_RECENT_DOWNLOAD_LABEL)
+    var hasDefaultDownloadLabel by boolPref(KEY_HAS_DEFAULT_DOWNLOAD_LABEL, DEFAULT_HAS_DOWNLOAD_LABEL)
+    var defaultDownloadLabel by stringOrNullPref(KEY_DEFAULT_DOWNLOAD_LABEL, DEFAULT_DOWNLOAD_LABEL)
+    val downloadOriginImage by boolPref(KEY_DOWNLOAD_ORIGIN_IMAGE, DEFAULT_DOWNLOAD_ORIGIN_IMAGE)
+    var favLocalCount by intPref(KEY_FAV_LOCAL, DEFAULT_FAV_COUNT)
+    var favCloudCount by intPref(KEY_FAV_CLOUD, DEFAULT_FAV_COUNT)
+    var recentFavCat by intPref(KEY_RECENT_FAV_CAT, DEFAULT_RECENT_FAV_CAT)
+    var defaultFavSlot by intPref(KEY_DEFAULT_FAV_SLOT, DEFAULT_DEFAULT_FAV_SLOT)
+    var qSSaveProgress by boolPref(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS)
+    val saveParseErrorBody by boolPref(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY)
+    val saveCrashLog by boolPref(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG)
+    var security by boolPref(KEY_SECURITY, false)
+    val securityDelay by intPref(KEY_SECURITY_DELAY, 0)
+    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, DEFAULT_BUILT_IN_HOSTS)
+    var dF by boolPref(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING)
+    var dohUrl by stringPref(KEY_DOH_URL, "")
+    val bypassVpn by boolPref(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
+    var proxyType by intPref(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE)
+    var proxyIp by stringOrNullPref(KEY_PROXY_IP, DEFAULT_PROXY_IP)
+    var proxyPort by intPref(KEY_PROXY_PORT, DEFAULT_PROXY_PORT)
+    var clipboardTextHashCode by intPref(KEY_CLIPBOARD_TEXT_HASH_CODE, DEFAULT_CLIPBOARD_TEXT_HASH_CODE)
+    var lastDawnDay by longPref(KEY_LAST_DAWN_DAY, 0)
+    var displayName by stringOrNullPref(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
+    var avatar by stringOrNullPref(KEY_AVATAR, null)
+    var removeImageFiles by boolPref(KEY_REMOVE_IMAGE_FILES, DEFAULT_REMOVE_IMAGE_FILES)
+    var needSignIn by boolPref(KEY_NEED_SIGN_IN, DEFAULT_NEED_SIGN_IN)
+    var selectSite by boolPref(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
+    val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
     val preloadThumbAggressively by boolPref(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
 }
