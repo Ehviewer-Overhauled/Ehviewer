@@ -16,13 +16,14 @@
 package com.hippo.ehviewer
 
 import androidx.annotation.StringRes
+import splitties.init.appCtx
 
 object GetText {
     fun getString(@StringRes id: Int): String {
-        return EhApplication.application.getString(id)
+        return appCtx.getString(id)
     }
 
     fun getString(@StringRes id: Int, vararg formatArgs: Any?): String {
-        return EhApplication.application.getString(id, *formatArgs)
+        return appCtx.getString(id, *formatArgs)
     }
 }

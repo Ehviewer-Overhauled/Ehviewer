@@ -50,13 +50,13 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okio.Path.Companion.toOkioPath
+import splitties.init.appCtx
 import java.net.Proxy
 
 class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        application = this
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
@@ -149,9 +149,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         var locked = true
         var locked_last_leave_time: Long = 0
 
-        lateinit var application: EhApplication
-            private set
-
         val ehProxySelector by lazy { EhProxySelector() }
 
         val nonCacheOkHttpClient by lazy {
@@ -170,7 +167,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         val okHttpClient by lazy {
             httpClient(nonCacheOkHttpClient) {
                 cache(
-                    application.cacheDir.toOkioPath() / "http_cache",
+                    appCtx.cacheDir.toOkioPath() / "http_cache",
                     20L * 1024L * 1024L,
                 )
             }
@@ -186,13 +183,13 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
         val favouriteStatusRouter by lazy { FavouriteStatusRouter() }
 
-        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(application)) }
+        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(appCtx)) }
 
-        val ehDatabase by lazy { Room.databaseBuilder(application, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build() }
+        val ehDatabase by lazy { Room.databaseBuilder(appCtx, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build() }
 
         val imageCache by lazy {
             diskCache {
-                directory(application.cacheDir.toOkioPath() / "image_cache")
+                directory(appCtx.cacheDir.toOkioPath() / "image_cache")
                 maxSizeBytes(Settings.readCacheSize.coerceIn(320, 5120).toLong() * 1024 * 1024)
             }
         }

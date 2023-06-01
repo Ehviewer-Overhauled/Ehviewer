@@ -20,12 +20,12 @@ import android.net.Uri
 import android.util.Log
 import androidx.annotation.DimenRes
 import androidx.preference.PreferenceManager
-import com.hippo.ehviewer.EhApplication.Companion.application
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.unifile.UniFile
+import splitties.init.appCtx
 import java.util.Locale
 
 object Settings {
@@ -197,7 +197,7 @@ object Settings {
     private lateinit var sSettingsPre: SharedPreferences
     private var LIST_THUMB_SIZE = 40
     fun initialize() {
-        sSettingsPre = PreferenceManager.getDefaultSharedPreferences(application)
+        sSettingsPre = PreferenceManager.getDefaultSharedPreferences(appCtx)
         fixDefaultValue()
     }
 
@@ -355,7 +355,7 @@ object Settings {
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
     val thumbSize: Int
-        get() = dp2pix(application, thumbSizeDp.toFloat())
+        get() = dp2pix(appCtx, thumbSizeDp.toFloat())
 
     val thumbSizeDp: Int
         get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
@@ -399,7 +399,7 @@ object Settings {
             builder.encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null))
             builder.encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null))
             builder.encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null))
-            dir = UniFile.fromUri(application, builder.build())
+            dir = UniFile.fromUri(appCtx, builder.build())
             return dir ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())
         }
 

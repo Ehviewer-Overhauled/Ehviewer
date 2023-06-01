@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.network.CookieDatabase
 import com.hippo.ehviewer.network.CookieSet
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -23,11 +22,12 @@ import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import splitties.init.appCtx
 import java.util.Collections
 import java.util.regex.Pattern
 
 object EhCookieStore : CookieJar {
-    private val db: CookieDatabase = CookieDatabase(EhApplication.application)
+    private val db: CookieDatabase = CookieDatabase(appCtx)
     private val map: MutableMap<String, CookieSet> = db.allCookies
 
     fun signOut() {

@@ -209,6 +209,8 @@ dependencies {
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.30.1")
     implementation("com.google.android.material:material:1.9.0")
 
+    implementation("com.louiscad.splitties:splitties-appctx:3.0.0")
+
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))
     implementation("com.squareup.okhttp3:okhttp-android")

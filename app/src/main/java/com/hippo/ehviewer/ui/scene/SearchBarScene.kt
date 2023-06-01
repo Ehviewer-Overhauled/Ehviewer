@@ -20,7 +20,6 @@ import androidx.room.Room
 import com.google.android.material.search.SearchView
 import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -31,10 +30,10 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import splitties.init.appCtx
 
 private val searchDatabase by lazy {
-    val context = EhApplication.application
-    Room.databaseBuilder(context, SearchDatabase::class.java, "search_database.db").build()
+    Room.databaseBuilder(appCtx, SearchDatabase::class.java, "search_database.db").build()
 }
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {

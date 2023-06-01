@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.spider
 
-import coil.disk.DiskCache
-import com.hippo.ehviewer.EhApplication
+import com.hippo.ehviewer.coil.diskCache
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
 import com.hippo.ehviewer.legacy.readLegacySpiderInfo
@@ -13,6 +12,7 @@ import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import moe.tarsin.coroutines.runSuspendCatching
+import splitties.init.appCtx
 import java.io.File
 
 @Serializable
@@ -49,9 +49,10 @@ fun SpiderInfo.saveToCache() {
 }
 
 private val spiderInfoCache by lazy {
-    DiskCache.Builder()
-        .directory(File(EhApplication.application.cacheDir, "spider_info_v2_1"))
-        .maxSizeBytes(20 * 1024 * 1024).build()
+    diskCache {
+        directory(File(appCtx.cacheDir, "spider_info_v2_1"))
+        maxSizeBytes(20 * 1024 * 1024)
+    }
 }
 
 fun readFromCache(gid: Long): SpiderInfo? {

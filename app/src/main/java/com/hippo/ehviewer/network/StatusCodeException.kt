@@ -16,8 +16,8 @@
 package com.hippo.ehviewer.network
 
 import android.util.SparseArray
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
+import splitties.init.appCtx
 
 class StatusCodeException(val responseCode: Int) : Exception() {
     override val message: String = ERROR_MESSAGE_ARRAY[responseCode, DEFAULT_ERROR_MESSAGE]
@@ -34,7 +34,7 @@ class StatusCodeException(val responseCode: Int) : Exception() {
         private const val DEFAULT_ERROR_MESSAGE = "Error response code"
 
         init {
-            val resources = EhApplication.application.resources
+            val resources = appCtx.resources
             ERROR_MESSAGE_ARRAY.append(400, resources.getString(R.string.error_status_code_400))
             ERROR_MESSAGE_ARRAY.append(401, resources.getString(R.string.error_status_code_401))
             ERROR_MESSAGE_ARRAY.append(402, resources.getString(R.string.error_status_code_402))

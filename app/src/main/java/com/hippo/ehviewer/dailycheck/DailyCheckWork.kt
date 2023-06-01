@@ -14,12 +14,12 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import eu.kanade.tachiyomi.util.lang.withIOContext
+import splitties.init.appCtx
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -98,14 +98,13 @@ fun showEventNotification(html: String) {
     if (Settings.hideHvEvents && html.contains("You have encountered a monster!")) {
         return
     }
-    val context = EhApplication.application
-    val notificationManager = NotificationManagerCompat.from(context)
+    val notificationManager = NotificationManagerCompat.from(appCtx)
     val chan = NotificationChannelCompat
         .Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
         .setName(CHANNEL_ID)
         .build()
     notificationManager.createNotificationChannel(chan)
-    val msg = NotificationCompat.Builder(context, CHANNEL_ID)
+    val msg = NotificationCompat.Builder(appCtx, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_launcher_monochrome)
         .setContentText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY))
         .setStyle(NotificationCompat.BigTextStyle())

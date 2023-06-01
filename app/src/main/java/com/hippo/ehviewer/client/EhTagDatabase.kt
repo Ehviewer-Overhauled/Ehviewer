@@ -17,7 +17,6 @@ package com.hippo.ehviewer.client
 
 import android.content.Context
 import com.hippo.ehviewer.AppConfig
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhApplication.Companion.nonCacheOkHttpClient
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.yorozuya.FileUtils
@@ -39,6 +38,7 @@ import okio.blackholeSink
 import okio.buffer
 import okio.source
 import org.json.JSONObject
+import splitties.init.appCtx
 import java.io.File
 import java.nio.charset.StandardCharsets
 
@@ -204,7 +204,7 @@ object EhTagDatabase : CoroutineScope {
 
     private suspend fun issueUpdateInMemoryData() {
         dbLock.withLock {
-            getMetadata(EhApplication.application)?.let { urls ->
+            getMetadata(appCtx)?.let { urls ->
                 val dataName = urls[2]
                 val dir = AppConfig.getFilesDir("tag-translations")
                 val dataFile = File(dir, dataName).takeIf { it.exists() } ?: return
@@ -224,7 +224,7 @@ object EhTagDatabase : CoroutineScope {
     }
 
     private suspend fun updateInternal() {
-        val urls = getMetadata(EhApplication.application)
+        val urls = getMetadata(appCtx)
         urls?.let {
             val sha1Name = urls[0]
             val sha1Url = urls[1]

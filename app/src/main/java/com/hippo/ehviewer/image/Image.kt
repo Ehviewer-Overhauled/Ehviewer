@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
+import splitties.init.appCtx
 import java.nio.ByteBuffer
 import kotlin.math.min
 
@@ -66,8 +67,7 @@ class Image private constructor(private val src: CloseableSource) {
             ).coerceAtLeast(1)
         }
 
-        private val imageSearchMaxSize =
-            EhApplication.application.resources.getDimensionPixelOffset(R.dimen.image_search_max_size)
+        private val imageSearchMaxSize = appCtx.resources.getDimensionPixelOffset(R.dimen.image_search_max_size)
 
         @JvmStatic
         val imageSearchDecoderSampleListener =
@@ -76,14 +76,11 @@ class Image private constructor(private val src: CloseableSource) {
                     calculateSampleSize(info, imageSearchMaxSize, imageSearchMaxSize),
                 )
             }
-        val screenWidth = EhApplication.application.resources.displayMetrics.widthPixels
-        val screenHeight = EhApplication.application.resources.displayMetrics.heightPixels
-        val isWideColorGamut =
-            EhApplication.application.resources.configuration.isScreenWideColorGamut
+        val screenWidth = appCtx.resources.displayMetrics.widthPixels
+        val screenHeight = appCtx.resources.displayMetrics.heightPixels
+        val isWideColorGamut = appCtx.resources.configuration.isScreenWideColorGamut
         var colorSpace = ColorSpace.get(
-            if (isWideColorGamut && EhApplication.readerPreferences.wideColorGamut()
-                    .get()
-            ) {
+            if (isWideColorGamut && EhApplication.readerPreferences.wideColorGamut().get()) {
                 ColorSpace.Named.DISPLAY_P3
             } else {
                 ColorSpace.Named.SRGB
