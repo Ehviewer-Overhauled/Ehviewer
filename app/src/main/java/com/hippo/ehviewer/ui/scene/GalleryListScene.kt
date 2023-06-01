@@ -504,9 +504,9 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
                 }
                 if (checked[0] && next != null) {
                     text += next
-                    Settings.putQSSaveProgress(true)
+                    Settings.qSSaveProgress = true
                 } else {
-                    Settings.putQSSaveProgress(false)
+                    Settings.qSSaveProgress = false
                 }
 
                 // Check name duplicate

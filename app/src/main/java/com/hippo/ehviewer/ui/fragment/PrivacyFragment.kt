@@ -50,7 +50,7 @@ class PrivacyFragment : BasePreferenceFragment() {
     override fun onStart() {
         super.onStart()
         if (!requireContext().isAuthenticationSupported()) {
-            Settings.putSecurity(false)
+            Settings.security = false
             requireUnlock.isEnabled = false
             requireUnlock.isChecked = false
             unlockDelay.isEnabled = false

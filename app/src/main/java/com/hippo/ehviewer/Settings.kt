@@ -506,54 +506,16 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    val favLocalCount: Int
-        get() = sSettingsPre.getInt(KEY_FAV_LOCAL, DEFAULT_FAV_COUNT)
+    var favLocalCount by intPref(KEY_FAV_LOCAL, DEFAULT_FAV_COUNT)
+    var favCloudCount by intPref(KEY_FAV_CLOUD, DEFAULT_FAV_COUNT)
+    var recentFavCat by intPref(KEY_RECENT_FAV_CAT, DEFAULT_RECENT_FAV_CAT)
+    var defaultFavSlot by intPref(KEY_DEFAULT_FAV_SLOT, DEFAULT_DEFAULT_FAV_SLOT)
+    var qSSaveProgress by boolPref(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS)
+    val saveParseErrorBody by boolPref(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY)
+    val saveCrashLog by boolPref(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG)
+    var security by boolPref(KEY_SECURITY, false)
+    val securityDelay by intPref(KEY_SECURITY_DELAY, 0)
 
-    fun putFavLocalCount(count: Int) {
-        sSettingsPre.edit().putInt(KEY_FAV_LOCAL, count).apply()
-    }
-
-    val favCloudCount: Int
-        get() = sSettingsPre.getInt(KEY_FAV_CLOUD, DEFAULT_FAV_COUNT)
-
-    fun putFavCloudCount(count: Int) {
-        sSettingsPre.edit().putInt(KEY_FAV_CLOUD, count).apply()
-    }
-
-    val recentFavCat: Int
-        get() = getInt(KEY_RECENT_FAV_CAT, DEFAULT_RECENT_FAV_CAT)
-
-    fun putRecentFavCat(value: Int) {
-        putInt(KEY_RECENT_FAV_CAT, value)
-    }
-
-    val defaultFavSlot: Int
-        get() = getInt(KEY_DEFAULT_FAV_SLOT, DEFAULT_DEFAULT_FAV_SLOT)
-
-    fun putDefaultFavSlot(value: Int) {
-        putInt(KEY_DEFAULT_FAV_SLOT, value)
-    }
-
-    val qSSaveProgress: Boolean
-        get() = getBoolean(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS)
-
-    fun putQSSaveProgress(value: Boolean) {
-        putBoolean(KEY_QS_SAVE_PROGRESS, value)
-    }
-
-    val saveParseErrorBody: Boolean
-        get() = getBoolean(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY)
-    val saveCrashLog: Boolean
-        get() = getBoolean(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG)
-    val security: Boolean
-        get() = getBoolean(KEY_SECURITY, false)
-
-    fun putSecurity(value: Boolean) {
-        putBoolean(KEY_SECURITY, value)
-    }
-
-    val securityDelay: Int
-        get() = getInt(KEY_SECURITY_DELAY, 0)
     val readCacheSize: Int
         get() = getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE)
 

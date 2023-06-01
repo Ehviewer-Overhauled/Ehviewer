@@ -233,9 +233,9 @@ suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = f
         val newFavoriteName = if (slot1 in 0..9) items[slot1 + 1] else null
         doAddToFavorites(slot1, newFavoriteName)
         if (checked) {
-            Settings.putDefaultFavSlot(slot1)
+            Settings.defaultFavSlot = slot1
         } else {
-            Settings.putDefaultFavSlot(Settings.INVALID_DEFAULT_FAV_SLOT)
+            Settings.defaultFavSlot = Settings.INVALID_DEFAULT_FAV_SLOT
         }
     }
 }

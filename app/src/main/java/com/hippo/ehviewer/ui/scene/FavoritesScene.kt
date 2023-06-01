@@ -214,7 +214,7 @@ class FavoritesScene :
         mContentLayout.setHelper(mHelper!!)
         mContentLayout.fastScroller.setOnDragHandlerListener(this)
         mContentLayout.setFitPaddingTop(paddingTopSB)
-        mAdapter = FavoritesAdapter(inflater, resources, mRecyclerView!!, Settings.listMode)
+        mAdapter = FavoritesAdapter(resources, mRecyclerView!!, Settings.listMode)
         mRecyclerView!!.clipToPadding = false
         mRecyclerView!!.clipChildren = false
         mRecyclerView!!.setChoiceMode(EasyRecyclerView.CHOICE_MODE_MULTIPLE_CUSTOM)
@@ -292,7 +292,7 @@ class FavoritesScene :
         mOldKeyword = keyword
 
         // Save recent fav cat
-        Settings.putRecentFavCat(mUrlBuilder!!.favCat)
+        Settings.recentFavCat = mUrlBuilder!!.favCat
     }
 
     // Hide jump fab on local fav cat
@@ -351,9 +351,7 @@ class FavoritesScene :
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.default_favorites_collection)
                     .setItems(items) { _: DialogInterface?, which: Int ->
-                        Settings.putDefaultFavSlot(
-                            which - 2,
-                        )
+                        Settings.defaultFavSlot = which - 2
                     }
                     .show()
                 return@setOnMenuItemClickListener true
@@ -641,7 +639,7 @@ class FavoritesScene :
             for (i in 0..9) {
                 mFavCountSum += mFavCountArray!![i]
             }
-            Settings.putFavCloudCount(mFavCountSum)
+            Settings.favCloudCount = mFavCountSum
             updateSearchBar()
             mHelper!!.onGetPageData(taskId, 0, 0, result.prev, result.next, result.galleryInfoList)
             if (mDrawerAdapter != null) {
@@ -670,7 +668,7 @@ class FavoritesScene :
             }
             if (TextUtils.isEmpty(keyword)) {
                 mFavLocalCount = list.size
-                Settings.putFavLocalCount(mFavLocalCount)
+                Settings.favLocalCount = mFavLocalCount
                 if (mDrawerAdapter != null) {
                     mDrawerAdapter!!.notifyDataSetChanged()
                 }
@@ -819,7 +817,6 @@ class FavoritesScene :
     }
 
     private inner class FavoritesAdapter(
-        inflater: LayoutInflater,
         resources: Resources,
         recyclerView: RecyclerView,
         type: Int,
