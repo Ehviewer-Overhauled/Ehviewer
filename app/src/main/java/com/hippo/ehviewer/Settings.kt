@@ -39,7 +39,6 @@ object Settings : DefaultPreferences() {
     const val KEY_U_CONFIG = "uconfig"
     const val KEY_MY_TAGS = "mytags"
     const val KEY_BLACK_DARK_THEME = "black_dark_theme"
-    const val DEFAULT_BLACK_DARK_THEME = false
     const val THEME_SYSTEM = -1
     const val KEY_GALLERY_SITE = "gallery_site"
     const val KEY_LIST_MODE = "list_mode"
@@ -65,10 +64,6 @@ object Settings : DefaultPreferences() {
         KEY_HIDE_HV_EVENTS,
     )
 
-    // Privacy and Security
-    const val KEY_SEC_SECURITY = "enable_secure"
-    const val VALUE_SEC_SECURITY = false
-
     // Download
     const val KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme"
     const val KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority"
@@ -78,26 +73,14 @@ object Settings : DefaultPreferences() {
     const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
 
-    // Advanced
-    const val KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body"
-    const val KEY_SECURITY = "require_unlock"
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
     const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
-    private const val DEFAULT_HIDE_HV_EVENTS = false
-    private const val KEY_SHOW_COMMENTS = "show_gallery_comments"
-    private const val DEFAULT_SHOW_COMMENTS = true
     private val TAG = Settings::class.java.simpleName
     private const val DEFAULT_LIST_THUMB_SIZE = 40
-    private const val KEY_REMOVE_IMAGE_FILES = "include_pic"
-    private const val DEFAULT_REMOVE_IMAGE_FILES = true
-    private const val KEY_NEED_SIGN_IN = "need_sign_in"
-    private const val DEFAULT_NEED_SIGN_IN = true
-    private const val KEY_SELECT_SITE = "select_site"
-    private const val DEFAULT_SELECT_SITE = true
     private const val DEFAULT_THEME = THEME_SYSTEM
     private const val DEFAULT_GALLERY_SITE = 0
     private const val KEY_LAUNCH_PAGE = "launch_page"
@@ -105,17 +88,6 @@ object Settings : DefaultPreferences() {
     private const val DEFAULT_LIST_MODE = 0
     private const val DEFAULT_DETAIL_SIZE = 0
     private const val DEFAULT_THUMB_RESOLUTION = 0
-    private const val DEFAULT_SHOW_JPN_TITLE = false
-    private const val KEY_SHOW_GALLERY_PAGES = "show_gallery_pages"
-    private const val DEFAULT_SHOW_GALLERY_PAGES = false
-    private const val DEFAULT_SHOW_TAG_TRANSLATIONS = false
-    private const val KEY_METERED_NETWORK_WARNING = "cellular_network_warning"
-    private const val DEFAULT_METERED_NETWORK_WARNING = false
-    private const val KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip"
-    private const val DEFAULT_APP_LINK_VERIFY_TIP = false
-    private const val DEFAULT_MEDIA_SCAN = false
-    private const val KEY_HAS_DEFAULT_DOWNLOAD_LABEL = "has_default_download_label"
-    private const val DEFAULT_HAS_DOWNLOAD_LABEL = false
     private const val KEY_MULTI_THREAD_DOWNLOAD = "download_thread"
     private const val DEFAULT_MULTI_THREAD_DOWNLOAD = 3
     private const val KEY_PRELOAD_IMAGE = "preload_image"
@@ -153,18 +125,9 @@ object Settings : DefaultPreferences() {
     private const val KEY_FAV_COUNT_8 = "fav_count_8"
     private const val KEY_FAV_COUNT_9 = "fav_count_9"
 
-    private const val DEFAULT_SAVE_PARSE_ERROR_BODY = true
-    private const val KEY_SAVE_CRASH_LOG = "save_crash_log"
-    private const val DEFAULT_SAVE_CRASH_LOG = true
-    private const val DEFAULT_BUILT_IN_HOSTS = false
     private const val KEY_DOWNLOAD_DELAY = "download_delay"
     private const val DEFAULT_DOWNLOAD_DELAY = 0
-    private const val DEFAULT_REQUEST_NEWS = false
     private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
-    private const val KEY_QS_SAVE_PROGRESS = "qs_save_progress"
-    private const val DEFAULT_QS_SAVE_PROGRESS = true
-    private const val KEY_PRELOAD_THUMB_AGGRESIVELY = "preload_thumb_aggressively"
-    private const val DEFAULT_PRELOAD_THUMB_AGGRESIVELY = false
     var LIST_THUMB_SIZE_INITED = false
     private lateinit var sSettingsPre: SharedPreferences
     private var LIST_THUMB_SIZE = 40
@@ -394,27 +357,27 @@ object Settings : DefaultPreferences() {
             return size
         }
 
-    val showComments by boolPref(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS)
-    val requestNews by boolPref(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS)
-    val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS)
-    val showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, DEFAULT_SHOW_JPN_TITLE)
-    val showGalleryPages by boolPref(KEY_SHOW_GALLERY_PAGES, DEFAULT_SHOW_GALLERY_PAGES)
-    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS)
-    val meteredNetworkWarning by boolPref(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING)
-    var appLinkVerifyTip by boolPref(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP)
-    val enabledSecurity by boolPref(KEY_SEC_SECURITY, VALUE_SEC_SECURITY)
-    val mediaScan by boolPref(KEY_MEDIA_SCAN, DEFAULT_MEDIA_SCAN)
-    var hasDefaultDownloadLabel by boolPref(KEY_HAS_DEFAULT_DOWNLOAD_LABEL, DEFAULT_HAS_DOWNLOAD_LABEL)
-    var qSSaveProgress by boolPref(KEY_QS_SAVE_PROGRESS, DEFAULT_QS_SAVE_PROGRESS)
-    val saveParseErrorBody by boolPref(KEY_SAVE_PARSE_ERROR_BODY, DEFAULT_SAVE_PARSE_ERROR_BODY)
-    val saveCrashLog by boolPref(KEY_SAVE_CRASH_LOG, DEFAULT_SAVE_CRASH_LOG)
-    var security by boolPref(KEY_SECURITY, false)
-    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, DEFAULT_BUILT_IN_HOSTS)
-    var removeImageFiles by boolPref(KEY_REMOVE_IMAGE_FILES, DEFAULT_REMOVE_IMAGE_FILES)
-    var needSignIn by boolPref(KEY_NEED_SIGN_IN, DEFAULT_NEED_SIGN_IN)
-    var selectSite by boolPref(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
-    val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
-    val preloadThumbAggressively by boolPref(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
+    val showComments by boolPref("show_gallery_comments", true)
+    val requestNews by boolPref(KEY_REQUEST_NEWS, false)
+    val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, false)
+    val showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, false)
+    val showGalleryPages by boolPref("show_gallery_pages", false)
+    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, false)
+    val meteredNetworkWarning by boolPref("cellular_network_warning", false)
+    var appLinkVerifyTip by boolPref("app_link_verify_tip", false)
+    val enabledSecurity by boolPref("enable_secure", false)
+    val mediaScan by boolPref(KEY_MEDIA_SCAN, false)
+    var hasDefaultDownloadLabel by boolPref("has_default_download_label", false)
+    var qSSaveProgress by boolPref("qs_save_progress", true)
+    val saveParseErrorBody by boolPref("save_parse_error_body", true)
+    val saveCrashLog by boolPref("save_crash_log", true)
+    var security by boolPref("require_unlock", false)
+    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, false)
+    var removeImageFiles by boolPref("include_pic", true)
+    var needSignIn by boolPref("need_sign_in", true)
+    var selectSite by boolPref("select_site", true)
+    val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, false)
+    val preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var dF by boolPref(KEY_DOMAIN_FRONTING, false)
     val downloadOriginImage by boolPref("download_origin_image", false)
     val bypassVpn by boolPref(KEY_BYPASS_VPN, true)
