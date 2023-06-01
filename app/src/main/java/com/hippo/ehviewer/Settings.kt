@@ -71,7 +71,6 @@ object Settings : DefaultPreferences() {
     const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
-    const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
     const val KEY_BYPASS_VPN = "bypass_vpn"
@@ -287,15 +286,15 @@ object Settings : DefaultPreferences() {
     val listThumbSize: Int
         get() = 3 * _listThumbSize
 
-    val downloadDelay by intFrom(0) { stringPref("download_delay", it) }
-    var gallerySite by intFrom(0) { stringPref(KEY_GALLERY_SITE, it) }
-    val multiThreadDownload by intFrom(3) { stringPref("download_thread", it) }
-    val preloadImage by intFrom(5) { stringPref("preload_image", it) }
-    val theme by intFrom(-1) { stringPref(KEY_THEME, it) }
-    val listMode by intFrom(0) { stringPref(KEY_LIST_MODE, it) }
-    val detailSize by intFrom(0) { stringPref(KEY_DETAIL_SIZE, it) }
-    val thumbResolution by intFrom(0) { stringPref(KEY_THUMB_RESOLUTION, it) }
-    val readCacheSize by intFrom(DEFAULT_READ_CACHE_SIZE) { stringPref(KEY_READ_CACHE_SIZE, it) }
+    val downloadDelay by intFromStrPref("download_delay", 0)
+    var gallerySite by intFromStrPref(KEY_GALLERY_SITE, 0)
+    val multiThreadDownload by intFromStrPref("download_thread", 3)
+    val preloadImage by intFromStrPref("preload_image", 5)
+    val theme by intFromStrPref(KEY_THEME, -1)
+    val listMode by intFromStrPref(KEY_LIST_MODE, 0)
+    val detailSize by intFromStrPref(KEY_DETAIL_SIZE, 0)
+    val thumbResolution by intFromStrPref(KEY_THUMB_RESOLUTION, 0)
+    val readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
 
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
@@ -340,6 +339,8 @@ object Settings : DefaultPreferences() {
 
     var dohUrl by stringPref("doh_url", "")
     var lastDawnDay by longPref("last_dawn_day", 0)
+
+    private fun intFromStrPref(key: String, defValue: Int) = intFrom(defValue) { stringPref(key, it) }
 }
 
 interface Delegate<R> {
