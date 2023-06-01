@@ -20,7 +20,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.archivePasswds
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.image.rewriteGifSource
 import com.hippo.ehviewer.yorozuya.FileUtils
@@ -51,13 +51,13 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
             return@launch
         }
         if (needPassword()) {
-            Settings.archivePasswds?.forEach {
+            archivePasswds?.forEach {
                 it ?: return@forEach
                 if (providePassword(it)) return@launch
             }
             passwdFlow.collect {
                 if (providePassword(it)) {
-                    Settings.putPasswdToArchivePasswds(it)
+                    archivePasswds = archivePasswds?.toMutableSet()?.apply { add(it) } ?: setOf(it)
                     currentCoroutineContext().cancel()
                 }
             }

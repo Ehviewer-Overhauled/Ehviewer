@@ -107,7 +107,6 @@ object Settings : DefaultPreferences() {
     private const val KEY_FAV_COUNT_7 = "fav_count_7"
     private const val KEY_FAV_COUNT_8 = "fav_count_8"
     private const val KEY_FAV_COUNT_9 = "fav_count_9"
-    private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
     private lateinit var sSettingsPre: SharedPreferences
 
     fun initialize() {
@@ -275,15 +274,11 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    var archivePasswds by stringSetOrNullPref(KEY_ARCHIVE_PASSWDS)
-
-    fun putPasswdToArchivePasswds(value: String) {
-        archivePasswds = archivePasswds?.toMutableSet()?.apply { add(value) } ?: setOf(value)
-    }
-
     private val _listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
     val listThumbSize: Int
         get() = 3 * _listThumbSize
+
+    var archivePasswds by stringSetOrNullPref("archive_passwds")
 
     val downloadDelay by intFromStrPref("download_delay", 0)
     var gallerySite by intFromStrPref(KEY_GALLERY_SITE, 0)
