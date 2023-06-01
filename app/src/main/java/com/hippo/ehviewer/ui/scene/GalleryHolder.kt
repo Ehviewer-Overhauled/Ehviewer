@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoGridItem
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
@@ -49,7 +50,7 @@ abstract class GalleryHolder(composeView: CheckableComposeView) : RecyclerView.V
 
 class ListGalleryHolder(private val composeView: CheckableComposeView, private val showFavourite: Boolean) : GalleryHolder(composeView) {
 
-    private val height = (Settings.listThumbSize * 3).pxToDp.dp
+    private val height = (3 * listThumbSize * 3).pxToDp.dp
     private val showPages = Settings.showGalleryPages
 
     override fun bind(galleryInfo: GalleryInfo, onClick: () -> Unit, onLongClick: () -> Unit) {

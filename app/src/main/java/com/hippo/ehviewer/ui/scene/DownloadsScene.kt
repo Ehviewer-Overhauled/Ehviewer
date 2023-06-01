@@ -60,6 +60,7 @@ import com.hippo.ehviewer.EhApplication.Companion.imageCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.imageRequest
@@ -841,7 +842,7 @@ class DownloadsScene :
             }
         }
 
-        private val height = (Settings.listThumbSize * 3).pxToDp.dp
+        private val height = (3 * listThumbSize * 3).pxToDp.dp
 
         fun bind(info: DownloadInfo) {
             binding.thumb.setMD3Content {

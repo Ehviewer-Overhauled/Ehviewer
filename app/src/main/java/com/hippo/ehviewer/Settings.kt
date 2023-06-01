@@ -274,10 +274,6 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    private val _listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
-    val listThumbSize: Int
-        get() = 3 * _listThumbSize
-
     var archivePasswds by stringSetOrNullPref("archive_passwds")
 
     val downloadDelay by intFromStrPref("download_delay", 0)
@@ -324,6 +320,7 @@ object Settings : DefaultPreferences() {
     var proxyType by intPref("proxy_type", EhProxySelector.TYPE_SYSTEM)
     var proxyPort by intPref("proxy_port", -1)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
+    val listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
 
     var recentDownloadLabel by stringOrNullPref("recent_download_label", null)
     var defaultDownloadLabel by stringOrNullPref("default_download_label", null)

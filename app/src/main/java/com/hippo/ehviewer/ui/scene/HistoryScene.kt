@@ -63,7 +63,7 @@ import androidx.paging.compose.itemKey
 import arrow.core.partially1
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.compose.Deferred
 import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
@@ -205,5 +205,5 @@ class HistoryScene : BaseScene() {
         navigate(R.id.galleryDetailScene, args)
     }
 
-    private val cardHeight = (Settings.listThumbSize * 3).pxToDp.dp
+    private val cardHeight = (3 * listThumbSize * 3).pxToDp.dp
 }
