@@ -81,23 +81,17 @@ object Settings : DefaultPreferences() {
     // Advanced
     const val KEY_SAVE_PARSE_ERROR_BODY = "save_parse_error_body"
     const val KEY_SECURITY = "require_unlock"
-    const val KEY_SECURITY_DELAY = "require_unlock_delay"
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
     const val DEFAULT_READ_CACHE_SIZE = 640
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
-    const val KEY_DOH_URL = "doh_url"
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
-    private const val KEY_LAST_DAWN_DAY = "last_dawn_day"
     private const val DEFAULT_HIDE_HV_EVENTS = false
     private const val KEY_SHOW_COMMENTS = "show_gallery_comments"
     private const val DEFAULT_SHOW_COMMENTS = true
     private val TAG = Settings::class.java.simpleName
-    private const val KEY_DISPLAY_NAME = "display_name"
-    private val DEFAULT_DISPLAY_NAME: String? = null
     private const val DEFAULT_LIST_THUMB_SIZE = 40
-    private const val KEY_AVATAR = "avatar"
     private const val KEY_REMOVE_IMAGE_FILES = "include_pic"
     private const val DEFAULT_REMOVE_IMAGE_FILES = true
     private const val KEY_NEED_SIGN_IN = "need_sign_in"
@@ -110,7 +104,6 @@ object Settings : DefaultPreferences() {
     private const val DEFAULT_LAUNCH_PAGE = 0
     private const val DEFAULT_LIST_MODE = 0
     private const val DEFAULT_DETAIL_SIZE = 0
-    private const val DEFAULT_THUMB_SIZE = 120
     private const val DEFAULT_THUMB_RESOLUTION = 0
     private const val DEFAULT_SHOW_JPN_TITLE = false
     private const val KEY_SHOW_GALLERY_PAGES = "show_gallery_pages"
@@ -121,18 +114,12 @@ object Settings : DefaultPreferences() {
     private const val KEY_APP_LINK_VERIFY_TIP = "app_link_verify_tip"
     private const val DEFAULT_APP_LINK_VERIFY_TIP = false
     private const val DEFAULT_MEDIA_SCAN = false
-    private const val KEY_RECENT_DOWNLOAD_LABEL = "recent_download_label"
-    private val DEFAULT_RECENT_DOWNLOAD_LABEL: String? = null
     private const val KEY_HAS_DEFAULT_DOWNLOAD_LABEL = "has_default_download_label"
     private const val DEFAULT_HAS_DOWNLOAD_LABEL = false
-    private const val KEY_DEFAULT_DOWNLOAD_LABEL = "default_download_label"
-    private val DEFAULT_DOWNLOAD_LABEL: String? = null
     private const val KEY_MULTI_THREAD_DOWNLOAD = "download_thread"
     private const val DEFAULT_MULTI_THREAD_DOWNLOAD = 3
     private const val KEY_PRELOAD_IMAGE = "preload_image"
     private const val DEFAULT_PRELOAD_IMAGE = 5
-    private const val KEY_DOWNLOAD_ORIGIN_IMAGE = "download_origin_image"
-    private const val DEFAULT_DOWNLOAD_ORIGIN_IMAGE = false
 
     // Favorites
     private const val KEY_FAV_CAT_0 = "fav_cat_0"
@@ -165,29 +152,11 @@ object Settings : DefaultPreferences() {
     private const val KEY_FAV_COUNT_7 = "fav_count_7"
     private const val KEY_FAV_COUNT_8 = "fav_count_8"
     private const val KEY_FAV_COUNT_9 = "fav_count_9"
-    private const val KEY_FAV_LOCAL = "fav_local"
-    private const val KEY_FAV_CLOUD = "fav_cloud"
-    private const val DEFAULT_FAV_COUNT = 0
-    private const val KEY_RECENT_FAV_CAT = "recent_fav_cat"
-    private const val DEFAULT_RECENT_FAV_CAT = FavListUrlBuilder.FAV_CAT_ALL
 
-    // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
-    private const val KEY_DEFAULT_FAV_SLOT = "default_favorite_2"
-    private const val DEFAULT_DEFAULT_FAV_SLOT = INVALID_DEFAULT_FAV_SLOT
     private const val DEFAULT_SAVE_PARSE_ERROR_BODY = true
     private const val KEY_SAVE_CRASH_LOG = "save_crash_log"
     private const val DEFAULT_SAVE_CRASH_LOG = true
     private const val DEFAULT_BUILT_IN_HOSTS = false
-    private const val DEFAULT_FRONTING = false
-    private const val DEFAULT_BYPASS_VPN = true
-    private const val KEY_PROXY_TYPE = "proxy_type"
-    private const val DEFAULT_PROXY_TYPE = EhProxySelector.TYPE_SYSTEM
-    private const val KEY_PROXY_IP = "proxy_ip"
-    private val DEFAULT_PROXY_IP: String? = null
-    private const val KEY_PROXY_PORT = "proxy_port"
-    private const val DEFAULT_PROXY_PORT = -1
-    private const val KEY_CLIPBOARD_TEXT_HASH_CODE = "clipboard_text_hash_code"
-    private const val DEFAULT_CLIPBOARD_TEXT_HASH_CODE = 0
     private const val KEY_DOWNLOAD_DELAY = "download_delay"
     private const val DEFAULT_DOWNLOAD_DELAY = 0
     private const val DEFAULT_REQUEST_NEWS = false
@@ -376,16 +345,16 @@ object Settings : DefaultPreferences() {
 
     val favCount: IntArray
         get() = intArrayOf(
-            sSettingsPre.getInt(KEY_FAV_COUNT_0, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_1, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_2, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_3, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_4, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_5, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_6, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_7, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_8, DEFAULT_FAV_COUNT),
-            sSettingsPre.getInt(KEY_FAV_COUNT_9, DEFAULT_FAV_COUNT),
+            sSettingsPre.getInt(KEY_FAV_COUNT_0, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_1, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_2, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_3, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_4, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_5, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_6, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_7, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_8, 0),
+            sSettingsPre.getInt(KEY_FAV_COUNT_9, 0),
         )
 
     fun putFavCount(count: IntArray) {
@@ -446,26 +415,26 @@ object Settings : DefaultPreferences() {
     var selectSite by boolPref(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
     val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
     val preloadThumbAggressively by boolPref(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
-    var dF by boolPref(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING)
-    val downloadOriginImage by boolPref(KEY_DOWNLOAD_ORIGIN_IMAGE, DEFAULT_DOWNLOAD_ORIGIN_IMAGE)
-    val bypassVpn by boolPref(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
+    var dF by boolPref(KEY_DOMAIN_FRONTING, false)
+    val downloadOriginImage by boolPref("download_origin_image", false)
+    val bypassVpn by boolPref(KEY_BYPASS_VPN, true)
 
-    val thumbSizeDp by intPref(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
-    var favLocalCount by intPref(KEY_FAV_LOCAL, DEFAULT_FAV_COUNT)
-    var favCloudCount by intPref(KEY_FAV_CLOUD, DEFAULT_FAV_COUNT)
-    var recentFavCat by intPref(KEY_RECENT_FAV_CAT, DEFAULT_RECENT_FAV_CAT)
-    var defaultFavSlot by intPref(KEY_DEFAULT_FAV_SLOT, DEFAULT_DEFAULT_FAV_SLOT)
-    val securityDelay by intPref(KEY_SECURITY_DELAY, 0)
-    var proxyType by intPref(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE)
-    var proxyPort by intPref(KEY_PROXY_PORT, DEFAULT_PROXY_PORT)
-    var clipboardTextHashCode by intPref(KEY_CLIPBOARD_TEXT_HASH_CODE, DEFAULT_CLIPBOARD_TEXT_HASH_CODE)
+    val thumbSizeDp by intPref(KEY_THUMB_SIZE, 120)
+    var favLocalCount by intPref("fav_local", 0)
+    var favCloudCount by intPref("fav_cloud", 0)
+    var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
+    var defaultFavSlot by intPref("default_favorite_2", INVALID_DEFAULT_FAV_SLOT) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
+    val securityDelay by intPref("require_unlock_delay", 0)
+    var proxyType by intPref("proxy_type", EhProxySelector.TYPE_SYSTEM)
+    var proxyPort by intPref("proxy_port", -1)
+    var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
 
-    var recentDownloadLabel by stringOrNullPref(KEY_RECENT_DOWNLOAD_LABEL, DEFAULT_RECENT_DOWNLOAD_LABEL)
-    var defaultDownloadLabel by stringOrNullPref(KEY_DEFAULT_DOWNLOAD_LABEL, DEFAULT_DOWNLOAD_LABEL)
-    var displayName by stringOrNullPref(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
-    var avatar by stringOrNullPref(KEY_AVATAR, null)
-    var proxyIp by stringOrNullPref(KEY_PROXY_IP, DEFAULT_PROXY_IP)
+    var recentDownloadLabel by stringOrNullPref("recent_download_label", null)
+    var defaultDownloadLabel by stringOrNullPref("default_download_label", null)
+    var displayName by stringOrNullPref("display_name", null)
+    var avatar by stringOrNullPref("avatar", null)
+    var proxyIp by stringOrNullPref("proxy_ip", null)
 
-    var dohUrl by stringPref(KEY_DOH_URL, "")
-    var lastDawnDay by longPref(KEY_LAST_DAWN_DAY, 0)
+    var dohUrl by stringPref("doh_url", "")
+    var lastDawnDay by longPref("last_dawn_day", 0)
 }
