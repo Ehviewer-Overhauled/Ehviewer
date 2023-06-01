@@ -25,10 +25,13 @@ import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.unifile.UniFile
+import splitties.experimental.ExperimentalSplittiesApi
 import splitties.init.appCtx
+import splitties.preferences.DefaultPreferences
 import java.util.Locale
 
-object Settings {
+@OptIn(ExperimentalSplittiesApi::class)
+object Settings : DefaultPreferences() {
     // Eh
     const val KEY_THEME = "theme"
     const val KEY_ACCOUNT = "account"
