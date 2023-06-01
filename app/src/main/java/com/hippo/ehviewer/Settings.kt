@@ -28,7 +28,6 @@ import com.hippo.unifile.UniFile
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.init.appCtx
 import splitties.preferences.DefaultPreferences
-import splitties.preferences.StringPref
 import java.util.Locale
 import kotlin.reflect.KProperty
 
@@ -340,16 +339,14 @@ object Settings : DefaultPreferences() {
     var dohUrl by stringPref("doh_url", "")
     var lastDawnDay by longPref("last_dawn_day", 0)
 
-    private fun intFromStrPref(key: String, defValue: Int) = intFrom(defValue) { stringPref(key, it) }
+    private fun intFromStrPref(key: String, defValue: Int) = object : Delegate<Int> {
+        private var _value by stringPref(key, defValue.toString())
+        override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
+        override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }
+    }
 }
 
 interface Delegate<R> {
     operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
     operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
-}
-
-private inline fun intFrom(defValue: Int, crossinline getter: (String) -> StringPref) = object : Delegate<Int> {
-    private var _value by getter(defValue.toString())
-    override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
-    override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }
 }
