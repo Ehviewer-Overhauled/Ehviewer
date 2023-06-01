@@ -37,7 +37,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.customview.widget.Openable
 import androidx.drawerlayout.widget.DrawerLayout
@@ -69,7 +68,6 @@ import com.hippo.ehviewer.ui.scene.GalleryListScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
 import com.hippo.ehviewer.ui.scene.ProgressScene
 import com.hippo.ehviewer.util.addTextToClipboard
-import com.hippo.ehviewer.util.getClipboardManager
 import com.hippo.ehviewer.util.getParcelableExtraCompat
 import com.hippo.ehviewer.util.getUrlFromClipboard
 import com.hippo.ehviewer.yorozuya.IOUtils
@@ -77,6 +75,8 @@ import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import splitties.systemservices.clipboardManager
+import splitties.systemservices.connectivityManager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -85,7 +85,6 @@ import java.io.OutputStream
 class MainActivity : EhActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
     private val availableNetworks = mutableListOf<Network>()
 
     private fun saveImageToTempFile(uri: Uri): File? {
@@ -354,7 +353,7 @@ class MainActivity : EhActivity() {
     }
 
     private suspend fun checkClipboardUrl() {
-        val text = this.getClipboardManager().getUrlFromClipboard(this)
+        val text = clipboardManager.getUrlFromClipboard(this)
         val hashCode = text?.hashCode() ?: 0
         if (text != null && hashCode != 0 && Settings.clipboardTextHashCode != hashCode) {
             val result1 = GalleryDetailUrlParser.parse(text, false)

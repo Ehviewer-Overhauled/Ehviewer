@@ -29,14 +29,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
-
-fun Context.getClipboardManager(): ClipboardManager {
-    return getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-}
-
-infix fun Context.tellClipboard(text: String?) {
-    addTextToClipboard(text, false)
-}
+import splitties.systemservices.clipboardManager
 
 infix fun Context.tellClipboardWithToast(text: String?) {
     addTextToClipboard(text, false, true)
@@ -44,7 +37,7 @@ infix fun Context.tellClipboardWithToast(text: String?) {
 
 @JvmOverloads
 fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToast: Boolean = false) {
-    getClipboardManager().apply {
+    clipboardManager.apply {
         setPrimaryClip(
             ClipData.newPlainText(null, text).apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && isSensitive) {
@@ -65,21 +58,9 @@ fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToa
     }
 }
 
-fun ClipboardManager.getTextFromClipboard(context: Context): String? {
-    val item = primaryClip?.getItemAt(0)
-    val string = item?.coerceToText(context).toString()
-    return if (!TextUtils.isEmpty(string)) string else null
-}
-
 fun ClipboardManager.getUrlFromClipboard(context: Context): String? {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && primaryClipDescription?.classificationStatus == ClipDescription.CLASSIFICATION_COMPLETE) {
-        if ((
-                primaryClipDescription?.getConfidenceScore(TextClassifier.TYPE_URL)
-                    ?.let { it <= 0 }
-                ) == true
-        ) {
-            return null
-        }
+        if ((primaryClipDescription?.getConfidenceScore(TextClassifier.TYPE_URL)?.let { it <= 0 }) == true) return null
     }
     val item = primaryClip?.getItemAt(0)
     val string = item?.coerceToText(context).toString()

@@ -20,7 +20,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.assist.AssistContent
 import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -104,6 +103,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.suspendCancellableCoroutine
+import splitties.systemservices.clipboardManager
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicReference
@@ -458,12 +458,9 @@ class ReaderActivity : EhActivity() {
             File(dir, filename),
         )
 
-        val clipboardManager = getSystemService(ClipboardManager::class.java)
-        if (clipboardManager != null) {
-            val clipData = ClipData.newUri(contentResolver, "ehviewer", uri)
-            clipboardManager.setPrimaryClip(clipData)
-            Toast.makeText(this, getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
-        }
+        val clipData = ClipData.newUri(contentResolver, "ehviewer", uri)
+        clipboardManager.setPrimaryClip(clipData)
+        Toast.makeText(this, getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
     }
 
     fun saveImage(page: Int) {

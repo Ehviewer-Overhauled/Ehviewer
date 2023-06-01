@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.DownloadManager
-import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -109,7 +108,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import arrow.core.partially1
-import coil.Coil.imageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -173,7 +171,6 @@ import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.util.addTextToClipboard
 import com.hippo.ehviewer.util.getParcelableCompat
-import com.hippo.ehviewer.util.getSystemService
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
 import com.hippo.ehviewer.yorozuya.collect.IntList
@@ -183,8 +180,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import splitties.systemservices.downloadManager
 import kotlin.math.roundToInt
-import com.hippo.ehviewer.download.DownloadManager as downloadManager
+import com.hippo.ehviewer.download.DownloadManager as ehDownloadManager
 
 class GalleryDetailScene : BaseScene(), DownloadInfoListener {
     private var mDownloadState = 0
@@ -385,7 +383,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         // Get download state
         val gid = gid
         mDownloadState = if (gid != -1L) {
-            downloadManager.getDownloadState(gid)
+            ehDownloadManager.getDownloadState(gid)
         } else {
             DownloadInfo.STATE_INVALID
         }
@@ -403,7 +401,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
         } else {
             getDetailError = getString(R.string.error_cannot_find_gallery)
         }
-        downloadManager.addDownloadInfoListener(this)
+        ehDownloadManager.addDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = galleryDetailUrl
         return ComposeView(requireContext()).apply {
             setMD3Content {
@@ -828,7 +826,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     private fun onDownloadButtonClick() {
         val galleryDetail = composeBindingGD ?: return
-        if (downloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
+        if (ehDownloadManager.getDownloadState(galleryDetail.gid) == DownloadInfo.STATE_INVALID) {
             CommonOperations.startDownload(
                 activity as MainActivity,
                 galleryDetail,
@@ -845,7 +843,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 Settings.removeImageFiles,
             )
             val helper = DeleteDialogHelper(
-                downloadManager,
+                ehDownloadManager,
                 galleryDetail,
                 builder,
             )
@@ -859,7 +857,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        downloadManager.removeDownloadInfoListener(this)
+        ehDownloadManager.removeDownloadInfoListener(this)
         (requireActivity() as MainActivity).mShareUrl = null
     }
 
@@ -1197,7 +1195,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
     @OptIn(ExperimentalCoilApi::class)
     private fun showCoverGalleryList() {
-        val context = context ?: return
+        context ?: return
         val gid = gid
         if (-1L == gid) {
             return
@@ -1621,7 +1619,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, FileUtils.sanitizeFilename(name))
                             r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                             runCatching {
-                                requireContext().getSystemService<DownloadManager>()!!.enqueue(r)
+                                downloadManager.enqueue(r)
                             }.onFailure {
                                 it.printStackTrace()
                             }
@@ -1726,9 +1724,8 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                 )
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 r.addRequestHeader("Cookie", EhCookieStore.getCookieHeader(url.toHttpUrl()))
-                val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 try {
-                    dm.enqueue(r)
+                    downloadManager.enqueue(r)
                     showTip(R.string.download_torrent_started, LENGTH_SHORT)
                 } catch (e: Throwable) {
                     e.printStackTrace()
