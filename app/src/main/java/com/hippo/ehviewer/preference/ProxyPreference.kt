@@ -161,9 +161,9 @@ class ProxyPreference @JvmOverloads constructor(
             }
         }
         mPortInputLayout!!.error = null
-        Settings.putProxyType(type)
-        Settings.putProxyIp(ip)
-        Settings.putProxyPort(port)
+        Settings.proxyType = type
+        Settings.proxyIp = ip
+        Settings.proxyPort = port
         updateSummary(type, ip, port)
         EhApplication.ehProxySelector.updateProxy()
         dialog.dismiss()

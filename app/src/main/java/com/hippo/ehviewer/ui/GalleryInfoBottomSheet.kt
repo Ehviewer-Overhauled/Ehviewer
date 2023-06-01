@@ -131,7 +131,7 @@ fun GalleryInfoBottomSheet(
                                 context tellClipboardWithToast data[index]
                                 if (index == INDEX_URL) {
                                     // Save it to avoid detect the gallery
-                                    Settings.putClipboardTextHashCode(data[index].hashCode())
+                                    Settings.clipboardTextHashCode = data[index].hashCode()
                                 }
                             }
                         }.fillMaxWidth(),

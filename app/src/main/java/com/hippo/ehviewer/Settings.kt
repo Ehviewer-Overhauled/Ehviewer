@@ -208,10 +208,10 @@ object Settings : DefaultPreferences() {
         if ("CN" == Locale.getDefault().country) {
             // Enable domain fronting if the country is CN
             if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
-                putBuiltInHosts(true)
+                builtInHosts = true
             }
             if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
-                putDF(true)
+                dF = true
             }
             // Enable show tag translations if the country is CN
             if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
@@ -556,58 +556,15 @@ object Settings : DefaultPreferences() {
         get() = getInt(KEY_SECURITY_DELAY, 0)
     val readCacheSize: Int
         get() = getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE)
-    val builtInHosts: Boolean
-        get() = getBoolean(KEY_BUILT_IN_HOSTS, DEFAULT_BUILT_IN_HOSTS)
 
-    private fun putBuiltInHosts(value: Boolean) {
-        putBoolean(KEY_BUILT_IN_HOSTS, value)
-    }
-
-    val dF: Boolean
-        get() = getBoolean(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING)
-
-    private fun putDF(value: Boolean) {
-        putBoolean(KEY_DOMAIN_FRONTING, value)
-    }
-
-    val dohUrl: String
-        get() = getString(KEY_DOH_URL, "")!!
-
-    fun putDohUrl(url: String) = putString(KEY_DOH_URL, url)
-
-    val bypassVpn: Boolean
-        get() = getBoolean(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
-
-    @JvmStatic
-    val proxyType: Int
-        get() = getInt(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE)
-
-    fun putProxyType(value: Int) {
-        putInt(KEY_PROXY_TYPE, value)
-    }
-
-    @JvmStatic
-    val proxyIp: String?
-        get() = getString(KEY_PROXY_IP, DEFAULT_PROXY_IP)
-
-    fun putProxyIp(value: String?) {
-        putString(KEY_PROXY_IP, value)
-    }
-
-    @JvmStatic
-    val proxyPort: Int
-        get() = getInt(KEY_PROXY_PORT, DEFAULT_PROXY_PORT)
-
-    fun putProxyPort(value: Int) {
-        putInt(KEY_PROXY_PORT, value)
-    }
-
-    val clipboardTextHashCode: Int
-        get() = getInt(KEY_CLIPBOARD_TEXT_HASH_CODE, DEFAULT_CLIPBOARD_TEXT_HASH_CODE)
-
-    fun putClipboardTextHashCode(value: Int) {
-        putInt(KEY_CLIPBOARD_TEXT_HASH_CODE, value)
-    }
+    var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, DEFAULT_BUILT_IN_HOSTS)
+    var dF by boolPref(KEY_DOMAIN_FRONTING, DEFAULT_FRONTING)
+    var dohUrl by stringPref(KEY_DOH_URL, "")
+    val bypassVpn by boolPref(KEY_BYPASS_VPN, DEFAULT_BYPASS_VPN)
+    var proxyType by intPref(KEY_PROXY_TYPE, DEFAULT_PROXY_TYPE)
+    var proxyIp by stringOrNullPref(KEY_PROXY_IP, DEFAULT_PROXY_IP)
+    var proxyPort by intPref(KEY_PROXY_PORT, DEFAULT_PROXY_PORT)
+    var clipboardTextHashCode by intPref(KEY_CLIPBOARD_TEXT_HASH_CODE, DEFAULT_CLIPBOARD_TEXT_HASH_CODE)
 
     val archivePasswds: Set<String>?
         get() = getStringSet(KEY_ARCHIVE_PASSWDS)
@@ -627,6 +584,5 @@ object Settings : DefaultPreferences() {
             return size
         }
 
-    val preloadThumbAggressively: Boolean
-        get() = getBoolean(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
+    val preloadThumbAggressively by boolPref(KEY_PRELOAD_THUMB_AGGRESIVELY, DEFAULT_PRELOAD_THUMB_AGGRESIVELY)
 }

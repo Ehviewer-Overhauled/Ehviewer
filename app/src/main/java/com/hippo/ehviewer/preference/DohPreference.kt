@@ -30,7 +30,7 @@ class DohPreference @JvmOverloads constructor(
             }.onFailure {
                 builder.setError("Invalid URL!")
             }.onSuccess {
-                Settings.putDohUrl(text)
+                Settings.dohUrl = text
                 dialog.dismiss()
             }
         }

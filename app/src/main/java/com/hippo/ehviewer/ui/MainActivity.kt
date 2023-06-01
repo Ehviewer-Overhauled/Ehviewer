@@ -388,7 +388,7 @@ class MainActivity : EhActivity() {
                 }
             }
         }
-        Settings.putClipboardTextHashCode(hashCode)
+        Settings.clipboardTextHashCode = hashCode
     }
 
     @SuppressLint("RtlHardcoded")
