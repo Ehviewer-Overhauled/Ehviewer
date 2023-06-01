@@ -96,9 +96,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -1071,8 +1073,10 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                                 lub.keyword = tag
                                 navigate(R.id.galleryListScene, lub.toStartArgs(), true)
                             }
+                            val hapticFeedback = LocalHapticFeedback.current
 
                             fun onLongClick() {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                 showTagDialog(translated, tag)
                             }
                             baseRoundText(

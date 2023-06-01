@@ -12,6 +12,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 
 // This file holds widgets ** Compose Material 3 ** library SHOULD but NOT implemented yet.
 
@@ -32,10 +34,14 @@ fun OutlinedCard(
     elevation = elevation,
     border = border,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     Column(
         modifier = Modifier.combinedClickable(
             onClick = onClick,
-            onLongClick = onLongClick,
+            onLongClick = {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongClick()
+            },
         ),
         content = content,
     )
@@ -56,10 +62,14 @@ fun ElevatedCard(
     colors = colors,
     elevation = elevation,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     Column(
         modifier = Modifier.combinedClickable(
             onClick = onClick,
-            onLongClick = onLongClick,
+            onLongClick = {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                onLongClick()
+            },
         ),
         content = content,
     )
