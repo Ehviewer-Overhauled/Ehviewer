@@ -178,18 +178,6 @@ object Settings : DefaultPreferences() {
         sSettingsPre.edit().putString(key, value).apply()
     }
 
-    private fun getStringSet(key: String): MutableSet<String>? {
-        return sSettingsPre.getStringSet(key, null)
-    }
-
-    private fun putStringToStringSet(key: String, value: String) {
-        var set = getStringSet(key)
-        if (set == null) {
-            set = mutableSetOf(value)
-        } else if (set.contains(value)) return else set.add(value)
-        sSettingsPre.edit().putStringSet(key, set).apply()
-    }
-
     private fun getIntFromStr(key: String, defValue: Int): Int {
         return try {
             NumberUtils.parseIntSafely(
@@ -337,11 +325,10 @@ object Settings : DefaultPreferences() {
     val readCacheSize: Int
         get() = getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE)
 
-    val archivePasswds: Set<String>?
-        get() = getStringSet(KEY_ARCHIVE_PASSWDS)
+    var archivePasswds by stringSetOrNullPref(KEY_ARCHIVE_PASSWDS)
 
     fun putPasswdToArchivePasswds(value: String) {
-        putStringToStringSet(KEY_ARCHIVE_PASSWDS, value)
+        archivePasswds = archivePasswds?.toMutableSet()?.apply { add(value) } ?: setOf(value)
     }
 
     private val _listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)

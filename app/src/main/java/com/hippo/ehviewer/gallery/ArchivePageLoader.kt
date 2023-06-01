@@ -52,6 +52,7 @@ class ArchivePageLoader(context: Context, private val uri: Uri, passwdFlow: Flow
         }
         if (needPassword()) {
             Settings.archivePasswds?.forEach {
+                it ?: return@forEach
                 if (providePassword(it)) return@launch
             }
             passwdFlow.collect {
