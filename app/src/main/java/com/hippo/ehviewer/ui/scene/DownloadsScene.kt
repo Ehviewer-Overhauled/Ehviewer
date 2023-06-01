@@ -762,7 +762,7 @@ class DownloadsScene :
 
             // Delete image files
             val checked = mBuilder.isChecked
-            Settings.putRemoveImageFiles(checked)
+            Settings.removeImageFiles = checked
             if (checked) {
                 val files = arrayOfNulls<UniFile>(mDownloadInfoList.size)
                 for ((i, info) in mDownloadInfoList.withIndex()) {

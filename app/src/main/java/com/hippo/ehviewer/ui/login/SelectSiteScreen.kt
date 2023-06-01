@@ -119,7 +119,7 @@ fun SelectSiteScreen() {
                 .fillMaxWidth(),
         ) {
             Button(onClick = {
-                Settings.putSelectSite(false)
+                Settings.selectSite = false
                 coroutineScope.launchNonCancellable {
                     runCatching {
                         if (!siteEx) {

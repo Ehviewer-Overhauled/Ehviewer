@@ -1497,7 +1497,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
 
             // Delete image files
             val checked = mBuilder.isChecked
-            Settings.putRemoveImageFiles(checked)
+            Settings.removeImageFiles = checked
             if (checked) {
                 val file = SpiderDen.getGalleryDownloadDir(mGalleryInfo.gid)
                 EhDB.removeDownloadDirname(mGalleryInfo.gid)

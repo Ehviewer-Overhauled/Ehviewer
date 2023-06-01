@@ -60,7 +60,7 @@ class LoginActivity : EhActivity() {
 
     override fun finish() {
         super.finish()
-        Settings.putNeedSignIn(false)
+        Settings.needSignIn = false
         ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 }
@@ -69,8 +69,8 @@ suspend fun postLogin() = coroutineScope {
     launch {
         runCatching {
             EhEngine.getProfile().run {
-                Settings.putDisplayName(displayName)
-                Settings.putAvatar(avatar)
+                Settings.displayName = displayName
+                Settings.avatar = avatar
             }
         }.onFailure {
             it.printStackTrace()
@@ -86,7 +86,7 @@ suspend fun postLogin() = coroutineScope {
             Settings.putGallerySite(EhUrl.SITE_EX)
             EhEngine.getUConfig()
         }.onFailure {
-            Settings.putSelectSite(false)
+            Settings.selectSite = false
             Settings.putGallerySite(EhUrl.SITE_E)
             launch {
                 runCatching {

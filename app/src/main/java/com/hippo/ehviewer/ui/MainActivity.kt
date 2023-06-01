@@ -291,9 +291,7 @@ class MainActivity : EhActivity() {
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .setNeutralButton(R.string.dont_show_again) { _: DialogInterface?, _: Int ->
-                    Settings.putAppLinkVerifyTip(
-                        true,
-                    )
+                    Settings.appLinkVerifyTip = true
                 }
                 .show()
         }

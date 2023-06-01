@@ -112,11 +112,11 @@ object EhUtils {
 
     fun signOut() {
         EhCookieStore.signOut()
-        Settings.putAvatar(null)
-        Settings.putDisplayName(null)
+        Settings.avatar = null
+        Settings.displayName = null
         Settings.putGallerySite(EhUrl.SITE_E)
-        Settings.putNeedSignIn(true)
-        Settings.putSelectSite(true)
+        Settings.needSignIn = true
+        Settings.selectSite = true
     }
 
     fun needSignedIn(): Boolean {

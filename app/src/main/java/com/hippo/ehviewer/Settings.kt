@@ -215,7 +215,7 @@ object Settings : DefaultPreferences() {
             }
             // Enable show tag translations if the country is CN
             if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
-                putShowTagTranslations(true)
+                showTagTranslations = true
             }
         }
     }
@@ -289,45 +289,17 @@ object Settings : DefaultPreferences() {
         sSettingsPre.edit().putString(key, value.toString()).apply()
     }
 
-    var lastDawnDay: Long
-        get() = sSettingsPre.getLong(KEY_LAST_DAWN_DAY, 0)
-        set(value) = sSettingsPre.edit().putLong(KEY_LAST_DAWN_DAY, value).apply()
-    val displayName: String?
-        get() = getString(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
-
-    fun putDisplayName(value: String?) {
-        putString(KEY_DISPLAY_NAME, value)
-    }
-
-    fun putAvatar(value: String?) {
-        putString(KEY_AVATAR, value)
-    }
-
-    val removeImageFiles: Boolean
-        get() = getBoolean(KEY_REMOVE_IMAGE_FILES, DEFAULT_REMOVE_IMAGE_FILES)
-
-    fun putRemoveImageFiles(value: Boolean) {
-        putBoolean(KEY_REMOVE_IMAGE_FILES, value)
-    }
-
-    val needSignIn: Boolean
-        get() = getBoolean(KEY_NEED_SIGN_IN, DEFAULT_NEED_SIGN_IN)
-
-    fun putNeedSignIn(value: Boolean) {
-        putBoolean(KEY_NEED_SIGN_IN, value)
-    }
-
-    val selectSite: Boolean
-        get() = getBoolean(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
-
-    fun putSelectSite(value: Boolean) {
-        putBoolean(KEY_SELECT_SITE, value)
-    }
+    var lastDawnDay by longPref(KEY_LAST_DAWN_DAY, 0)
+    var displayName by stringOrNullPref(KEY_DISPLAY_NAME, DEFAULT_DISPLAY_NAME)
+    var avatar by stringOrNullPref(KEY_AVATAR, null)
+    var removeImageFiles by boolPref(KEY_REMOVE_IMAGE_FILES, DEFAULT_REMOVE_IMAGE_FILES)
+    var needSignIn by boolPref(KEY_NEED_SIGN_IN, DEFAULT_NEED_SIGN_IN)
+    var selectSite by boolPref(KEY_SELECT_SITE, DEFAULT_SELECT_SITE)
+    val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
 
     val theme: Int
         get() = getIntFromStr(KEY_THEME, DEFAULT_THEME)
-    val blackDarkTheme
-        get() = getBoolean(KEY_BLACK_DARK_THEME, DEFAULT_BLACK_DARK_THEME)
+
     val gallerySite: Int
         get() = getIntFromStr(KEY_GALLERY_SITE, DEFAULT_GALLERY_SITE)
 
@@ -360,39 +332,20 @@ object Settings : DefaultPreferences() {
     val thumbSize: Int
         get() = dp2pix(appCtx, thumbSizeDp.toFloat())
 
-    val thumbSizeDp: Int
-        get() = getInt(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
-
     val thumbResolution: Int
         get() = getIntFromStr(KEY_THUMB_RESOLUTION, DEFAULT_THUMB_RESOLUTION)
-    val showComments: Boolean
-        get() = getBoolean(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS)
-    val requestNews: Boolean
-        get() = getBoolean(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS)
-    val hideHvEvents: Boolean
-        get() = getBoolean(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS)
-    val showJpnTitle: Boolean
-        get() = getBoolean(KEY_SHOW_JPN_TITLE, DEFAULT_SHOW_JPN_TITLE)
-    val showGalleryPages: Boolean
-        get() = getBoolean(KEY_SHOW_GALLERY_PAGES, DEFAULT_SHOW_GALLERY_PAGES)
-    val showTagTranslations: Boolean
-        get() = getBoolean(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS)
 
-    private fun putShowTagTranslations(value: Boolean) {
-        putBoolean(KEY_SHOW_TAG_TRANSLATIONS, value)
-    }
+    val thumbSizeDp by intPref(KEY_THUMB_SIZE, DEFAULT_THUMB_SIZE)
+    val showComments by boolPref(KEY_SHOW_COMMENTS, DEFAULT_SHOW_COMMENTS)
+    val requestNews by boolPref(KEY_REQUEST_NEWS, DEFAULT_REQUEST_NEWS)
+    val hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, DEFAULT_HIDE_HV_EVENTS)
+    val showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, DEFAULT_SHOW_JPN_TITLE)
+    val showGalleryPages by boolPref(KEY_SHOW_GALLERY_PAGES, DEFAULT_SHOW_GALLERY_PAGES)
+    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, DEFAULT_SHOW_TAG_TRANSLATIONS)
+    val meteredNetworkWarning by boolPref(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING)
+    var appLinkVerifyTip by boolPref(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP)
+    val enabledSecurity by boolPref(KEY_SEC_SECURITY, VALUE_SEC_SECURITY)
 
-    val meteredNetworkWarning: Boolean
-        get() = getBoolean(KEY_METERED_NETWORK_WARNING, DEFAULT_METERED_NETWORK_WARNING)
-    val appLinkVerifyTip: Boolean
-        get() = getBoolean(KEY_APP_LINK_VERIFY_TIP, DEFAULT_APP_LINK_VERIFY_TIP)
-
-    fun putAppLinkVerifyTip(value: Boolean) {
-        putBoolean(KEY_APP_LINK_VERIFY_TIP, value)
-    }
-
-    val enabledSecurity: Boolean
-        get() = getBoolean(KEY_SEC_SECURITY, VALUE_SEC_SECURITY)
     val downloadLocation: UniFile?
         get() {
             val dir: UniFile?
