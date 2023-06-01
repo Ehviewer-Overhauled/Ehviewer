@@ -80,7 +80,6 @@ object Settings : DefaultPreferences() {
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
     private val TAG = Settings::class.java.simpleName
-    private const val DEFAULT_LIST_THUMB_SIZE = 40
     private const val DEFAULT_THEME = THEME_SYSTEM
     private const val DEFAULT_GALLERY_SITE = 0
     private const val KEY_LAUNCH_PAGE = "launch_page"
@@ -128,7 +127,6 @@ object Settings : DefaultPreferences() {
     private const val KEY_DOWNLOAD_DELAY = "download_delay"
     private const val DEFAULT_DOWNLOAD_DELAY = 0
     private const val KEY_ARCHIVE_PASSWDS = "archive_passwds"
-    var LIST_THUMB_SIZE_INITED = false
     private lateinit var sSettingsPre: SharedPreferences
     private var LIST_THUMB_SIZE = 40
     fun initialize() {
@@ -346,16 +344,9 @@ object Settings : DefaultPreferences() {
         putStringToStringSet(KEY_ARCHIVE_PASSWDS, value)
     }
 
+    private val _listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
     val listThumbSize: Int
-        get() {
-            if (LIST_THUMB_SIZE_INITED) {
-                return LIST_THUMB_SIZE
-            }
-            val size = 3 * getInt(KEY_LIST_THUMB_SIZE, DEFAULT_LIST_THUMB_SIZE)
-            LIST_THUMB_SIZE = size
-            LIST_THUMB_SIZE_INITED = true
-            return size
-        }
+        get() = 3 * _listThumbSize
 
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
