@@ -35,7 +35,8 @@ import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.unifile.UniFile
 import com.hippo.unifile.openOutputStream
 import okhttp3.Response
-import okio.buffer
+import okio.Buffer
+import okio.ForwardingSink
 import okio.sink
 import java.io.IOException
 import java.util.Locale
@@ -145,24 +146,18 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
         val length = response.body.contentLength()
 
         fun doSave(outFile: UniFile): Long {
-            var ret = 0L
-            outFile.openOutputStream().sink().buffer().use { sink ->
-                response.body.source().use { source ->
-                    while (true) {
-                        val bytesRead = source.read(sink.buffer, 8192)
-                        if (bytesRead == -1L) break
-                        ret += bytesRead
-                        sink.emitCompleteSegments()
-                        notifyProgress(length, ret, bytesRead.toInt())
-                    }
+            return object : ForwardingSink(outFile.openOutputStream().sink()) {
+                var totalBytesRead = 0L
+                override fun write(source: Buffer, byteCount: Long) {
+                    super.write(source, byteCount)
+                    totalBytesRead += byteCount
+                    notifyProgress(length, totalBytesRead, byteCount.toInt())
+                }
+            }.use { sink -> response.body.source().use { source -> source.readAll(sink) } }.also {
+                if (extension.lowercase() == "gif") {
+                    outFile.openFileDescriptor("rw").use { rewriteGifSource2(it.fd) }
                 }
             }
-            if (extension.lowercase() == "gif") {
-                outFile.openFileDescriptor("rw").use {
-                    rewriteGifSource2(it.fd)
-                }
-            }
-            return ret
         }
 
         findDownloadFileForIndex(index, extension)?.run {
