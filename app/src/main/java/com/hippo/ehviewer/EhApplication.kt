@@ -68,7 +68,6 @@ class EhApplication : Application(), ImageLoaderFactory {
         }
         super.onCreate()
         System.loadLibrary("ehviewer")
-        Settings.initialize()
         ReadableTime.initialize(this)
         AppConfig.initialize(this)
         AppCompatDelegate.setDefaultNightMode(Settings.theme)

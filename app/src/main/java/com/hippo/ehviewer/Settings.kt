@@ -44,14 +44,6 @@ object Settings : DefaultPreferences() {
         KEY_HIDE_HV_EVENTS,
     )
 
-    fun initialize() {
-        if ("CN" == Locale.getDefault().country) {
-            if (KEY_BUILT_IN_HOSTS !in prefs) builtInHosts = true
-            if (KEY_DOMAIN_FRONTING !in prefs) dF = true
-            if (KEY_SHOW_TAG_TRANSLATIONS !in prefs) showTagTranslations = true
-        }
-    }
-
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)
     var downloadPath by stringOrNullPref("image_path", null)
@@ -120,6 +112,16 @@ object Settings : DefaultPreferences() {
 
     var dohUrl by stringPref("doh_url", "")
     var lastDawnDay by longPref("last_dawn_day", 0)
+
+    init {
+        if ("CN" == Locale.getDefault().country) {
+            edit {
+                if (KEY_BUILT_IN_HOSTS !in prefs) builtInHosts = true
+                if (KEY_DOMAIN_FRONTING !in prefs) dF = true
+                if (KEY_SHOW_TAG_TRANSLATIONS !in prefs) showTagTranslations = true
+            }
+        }
+    }
 
     private interface Delegate<R> {
         operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
