@@ -182,6 +182,11 @@ object Settings : DefaultPreferences() {
     var dohUrl by stringPref("doh_url", "")
     var lastDawnDay by longPref("last_dawn_day", 0)
 
+    private interface Delegate<R> {
+        operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
+        operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
+    }
+
     private fun intFromStrPref(key: String, defValue: Int) = object : Delegate<Int> {
         private var _value by stringPref(key, defValue.toString())
         override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
@@ -205,9 +210,4 @@ object Settings : DefaultPreferences() {
             edit { value.zip(_value) { v, d -> d.value = v } }
         }
     }
-}
-
-interface Delegate<R> {
-    operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
-    operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
 }
