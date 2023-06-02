@@ -87,8 +87,8 @@ class EhFragment : BasePreferenceFragment() {
                         .build()
                         .apply {
                             addOnPositiveButtonClickListener {
-                                Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, hour)
-                                Settings.putInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, minute)
+                                Settings.requestNewsTimerHour = hour
+                                Settings.requestNewsTimerMinute = minute
                                 updateDailyCheckWork(requireContext())
                             }
                         }

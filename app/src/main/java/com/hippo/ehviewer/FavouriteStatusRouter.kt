@@ -16,13 +16,11 @@
 package com.hippo.ehviewer
 
 import android.annotation.SuppressLint
-import com.hippo.ehviewer.Settings.getInt
-import com.hippo.ehviewer.Settings.putInt
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
 
 class FavouriteStatusRouter {
-    private val idGenerator = IntIdGenerator(getInt(KEY_DATA_MAP_NEXT_ID, 0))
+    private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
 
     @SuppressLint("UseSparseArrays")
     private val maps = HashMap<Int, MutableMap<Long, GalleryInfo>>()
@@ -30,7 +28,7 @@ class FavouriteStatusRouter {
     fun saveDataMap(map: MutableMap<Long, GalleryInfo>): Int {
         val id = idGenerator.nextId()
         maps[id] = map
-        putInt(KEY_DATA_MAP_NEXT_ID, idGenerator.nextId())
+        Settings.dataMapNextId = idGenerator.nextId()
         return id
     }
 
@@ -60,9 +58,5 @@ class FavouriteStatusRouter {
 
     fun interface Listener {
         fun onModifyFavourites(gid: Long, slot: Int)
-    }
-
-    companion object {
-        private const val KEY_DATA_MAP_NEXT_ID = "data_map_next_id"
     }
 }

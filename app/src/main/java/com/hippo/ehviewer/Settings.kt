@@ -47,8 +47,6 @@ object Settings : DefaultPreferences() {
     const val KEY_TAG_TRANSLATIONS_SOURCE = "tag_translations_source"
     const val KEY_REQUEST_NEWS = "request_news"
     const val KEY_REQUEST_NEWS_TIMER = "request_news_timer"
-    const val KEY_REQUEST_NEWS_TIMER_HOUR = "request_news_timer_hour"
-    const val KEY_REQUEST_NEWS_TIMER_MINUTE = "request_news_timer_minute"
     const val KEY_HIDE_HV_EVENTS = "hide_hv_events"
     val SIGN_IN_REQUIRED = arrayOf(
         KEY_IMAGE_LIMITS,
@@ -96,21 +94,6 @@ object Settings : DefaultPreferences() {
                 showTagTranslations = true
             }
         }
-    }
-
-    @JvmStatic
-    fun getInt(key: String, defValue: Int): Int {
-        return try {
-            sSettingsPre.getInt(key, defValue)
-        } catch (e: ClassCastException) {
-            Log.d(TAG, "Get ClassCastException when get $key value", e)
-            defValue
-        }
-    }
-
-    @JvmStatic
-    fun putInt(key: String, value: Int) {
-        sSettingsPre.edit().putInt(key, value).apply()
     }
 
     private fun getString(key: String, defValue: String?): String? {
@@ -201,6 +184,9 @@ object Settings : DefaultPreferences() {
     var proxyPort by intPref("proxy_port", -1)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     val listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
+    var requestNewsTimerHour by intPref("request_news_timer_hour", -1)
+    var requestNewsTimerMinute by intPref("request_news_timer_minute", -1)
+    var dataMapNextId by intPref("data_map_next_id", 0)
 
     var recentDownloadLabel by stringOrNullPref("recent_download_label", null)
     var defaultDownloadLabel by stringOrNullPref("default_download_label", null)

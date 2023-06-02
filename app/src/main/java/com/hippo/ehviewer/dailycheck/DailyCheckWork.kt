@@ -41,10 +41,10 @@ class DailyCheckWork(context: Context, workerParams: WorkerParameters) :
 }
 
 val schedHour
-    get() = Settings.getInt(Settings.KEY_REQUEST_NEWS_TIMER_HOUR, -1).takeUnless { it == -1 }
+    get() = Settings.requestNewsTimerHour.takeUnless { it == -1 }
 
 val schedMinute
-    get() = Settings.getInt(Settings.KEY_REQUEST_NEWS_TIMER_MINUTE, -1).takeUnless { it == -1 }
+    get() = Settings.requestNewsTimerMinute.takeUnless { it == -1 }
 
 private val whenToWork
     get() = LocalDateTime.now()
