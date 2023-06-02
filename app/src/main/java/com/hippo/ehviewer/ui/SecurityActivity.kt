@@ -32,8 +32,7 @@ import com.hippo.ehviewer.R
 
 fun Context.isAuthenticationSupported(): Boolean {
     val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
-    return BiometricManager.from(this)
-        .canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+    return BiometricManager.from(this).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
 }
 
 class SecurityActivity : AppCompatActivity() {
@@ -60,9 +59,9 @@ class SecurityActivity : AppCompatActivity() {
             confirmationRequired = confirmationRequired,
             executor = ContextCompat.getMainExecutor(this),
             callback = callback(
-                { _, _, _ -> onFailed() },
+                { _, _, _ -> onError() },
                 { _, _ -> onSuccess() },
-                { onFailed() },
+                { },
             ),
         )
     }
@@ -102,7 +101,7 @@ class SecurityActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun onFailed() {
+    private fun onError() {
         moveTaskToBack(true)
         isAuthenticating = false
     }
