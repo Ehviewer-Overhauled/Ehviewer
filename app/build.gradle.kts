@@ -213,6 +213,7 @@ dependencies {
     implementation("com.louiscad.splitties:splitties-appctx:$splitties")
     implementation("com.louiscad.splitties:splitties-systemservices:$splitties")
     implementation("com.louiscad.splitties:splitties-preferences:$splitties")
+    implementation("com.louiscad.splitties:splitties-arch-room:$splitties")
 
     // https://square.github.io/okhttp/changelogs/changelog/
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.11"))

@@ -23,7 +23,6 @@ import androidx.collection.LruCache
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.room.Room
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
@@ -50,6 +49,7 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okio.Path.Companion.toOkioPath
+import splitties.arch.room.roomDb
 import splitties.init.appCtx
 import java.net.Proxy
 
@@ -185,7 +185,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
 
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(appCtx)) }
 
-        val ehDatabase by lazy { Room.databaseBuilder(appCtx, EhDatabase::class.java, "eh.db").allowMainThreadQueries().build() }
+        val ehDatabase by lazy { roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() } }
 
         val imageCache by lazy {
             diskCache {

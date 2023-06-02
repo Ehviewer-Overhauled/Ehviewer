@@ -16,7 +16,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.google.android.material.search.SearchView
 import com.google.android.material.search.SearchView.TransitionListener
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -30,11 +29,9 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import splitties.init.appCtx
+import splitties.arch.room.roomDb
 
-private val searchDatabase by lazy {
-    Room.databaseBuilder(appCtx, SearchDatabase::class.java, "search_database.db").build()
-}
+private val searchDatabase by lazy { roomDb<SearchDatabase>("search_database.db") }
 
 abstract class SearchBarScene : BaseScene(), ToolBarScene {
     private var _binding: SceneSearchbarBinding? = null

@@ -16,9 +16,9 @@
 package com.hippo.ehviewer.network
 
 import android.content.Context
-import androidx.room.Room
 import com.hippo.ehviewer.dao.Cookie
 import com.hippo.ehviewer.dao.CookiesDatabase
+import splitties.arch.room.roomDb
 import okhttp3.Cookie as OkHttpCookie
 
 class CookieDatabase(context: Context) {
@@ -31,7 +31,7 @@ class CookieDatabase(context: Context) {
             }
         }.toMutableList()
     }
-    private val db = Room.databaseBuilder(context, CookiesDatabase::class.java, "okhttp3-cookie.db").build()
+    private val db = roomDb<CookiesDatabase>("okhttp3-cookie.db")
 
     val allCookies by lazy {
         hashMapOf<String, CookieSet>().also { map ->

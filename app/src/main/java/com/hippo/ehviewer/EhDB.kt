@@ -20,7 +20,6 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.paging.PagingSource
-import androidx.room.Room.databaseBuilder
 import arrow.fx.coroutines.release
 import arrow.fx.coroutines.resource
 import com.hippo.ehviewer.EhApplication.Companion.ehDatabase
@@ -36,6 +35,7 @@ import com.hippo.ehviewer.dao.LocalFavoriteInfo
 import com.hippo.ehviewer.dao.QuickSearch
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.util.sendTo
+import splitties.arch.room.roomDb
 
 object EhDB {
     private val db = ehDatabase
@@ -369,7 +369,7 @@ object EhDB {
         val ehExportName = "eh.export.db"
         resource {
             context.deleteDatabase(ehExportName)
-            databaseBuilder(context, EhDatabase::class.java, ehExportName).build()
+            roomDb<EhDatabase>(ehExportName)
         } release {
             it.close()
             context.deleteDatabase(ehExportName)
@@ -395,7 +395,7 @@ object EhDB {
         val tempDBName = "tmp.db"
         resource {
             context.deleteDatabase(tempDBName)
-            databaseBuilder(context, EhDatabase::class.java, tempDBName).createFromInputStream { context.contentResolver.openInputStream(uri) }.build()
+            roomDb<EhDatabase>(tempDBName) { createFromInputStream { context.contentResolver.openInputStream(uri) } }
         } release {
             it.close()
             context.deleteDatabase(tempDBName)
