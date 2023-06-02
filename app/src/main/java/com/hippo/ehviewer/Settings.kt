@@ -71,22 +71,23 @@ object Settings : DefaultPreferences() {
     private var downloadFragment by stringOrNullPref("image_fragment", null)
 
     var downloadLocation: UniFile
-        get() = Uri.Builder().apply {
-            scheme(downloadScheme)
-            encodedAuthority(downloadAuthority)
-            encodedPath(downloadPath)
-            encodedQuery(downloadQuery)
-            encodedFragment(downloadFragment)
-        }.build().let { UniFile.fromUri(appCtx, it) } ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
-        set(value) {
-            with(value.uri) {
-                edit {
-                    downloadScheme = scheme
-                    downloadAuthority = encodedAuthority
-                    downloadPath = encodedPath
-                    downloadQuery = encodedQuery
-                    downloadFragment = encodedFragment
-                }
+        get() = UniFile.fromUri(
+            appCtx,
+            Uri.Builder().apply {
+                scheme(downloadScheme)
+                encodedAuthority(downloadAuthority)
+                encodedPath(downloadPath)
+                encodedQuery(downloadQuery)
+                encodedFragment(downloadFragment)
+            }.build(),
+        ) ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
+        set(value) = with(value.uri) {
+            edit {
+                downloadScheme = scheme
+                downloadAuthority = encodedAuthority
+                downloadPath = encodedPath
+                downloadQuery = encodedQuery
+                downloadFragment = encodedFragment
             }
         }
 
