@@ -30,11 +30,6 @@ object Settings : DefaultPreferences() {
     const val KEY_REQUEST_NEWS = "request_news"
     const val KEY_REQUEST_NEWS_TIMER = "request_news_timer"
     const val KEY_HIDE_HV_EVENTS = "hide_hv_events"
-    const val KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme"
-    const val KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority"
-    const val KEY_DOWNLOAD_SAVE_PATH = "image_path"
-    const val KEY_DOWNLOAD_SAVE_QUERY = "image_query"
-    const val KEY_DOWNLOAD_SAVE_FRAGMENT = "image_fragment"
     const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
     const val KEY_READ_CACHE_SIZE = "read_cache_size"
@@ -61,18 +56,6 @@ object Settings : DefaultPreferences() {
         }
     }
 
-    private fun getString(key: String, defValue: String?): String? {
-        return try {
-            prefs.getString(key, defValue)
-        } catch (e: ClassCastException) {
-            defValue
-        }
-    }
-
-    private fun putString(key: String, value: String?) {
-        prefs.edit().putString(key, value).apply()
-    }
-
     @get:DimenRes
     val detailSizeResId: Int
         get() = when (detailSize) {
@@ -81,21 +64,30 @@ object Settings : DefaultPreferences() {
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
 
+    private var downloadScheme by stringOrNullPref("image_scheme", null)
+    private var downloadAuthority by stringOrNullPref("image_authority", null)
+    private var downloadPath by stringOrNullPref("image_path", null)
+    private var downloadQuery by stringOrNullPref("image_query", null)
+    private var downloadFragment by stringOrNullPref("image_fragment", null)
+
     var downloadLocation: UniFile
         get() = Uri.Builder().apply {
-            scheme(getString(KEY_DOWNLOAD_SAVE_SCHEME, null))
-            encodedAuthority(getString(KEY_DOWNLOAD_SAVE_AUTHORITY, null))
-            encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null))
-            encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null))
-            encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null))
+            scheme(downloadScheme)
+            encodedAuthority(downloadAuthority)
+            encodedPath(downloadPath)
+            encodedQuery(downloadQuery)
+            encodedFragment(downloadFragment)
         }.build().let { UniFile.fromUri(appCtx, it) } ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
         set(value) {
-            val uri = value.uri
-            putString(KEY_DOWNLOAD_SAVE_SCHEME, uri.scheme)
-            putString(KEY_DOWNLOAD_SAVE_AUTHORITY, uri.encodedAuthority)
-            putString(KEY_DOWNLOAD_SAVE_PATH, uri.encodedPath)
-            putString(KEY_DOWNLOAD_SAVE_QUERY, uri.encodedQuery)
-            putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
+            with(value.uri) {
+                edit {
+                    downloadScheme = scheme
+                    downloadAuthority = encodedAuthority
+                    downloadPath = encodedPath
+                    downloadQuery = encodedQuery
+                    downloadFragment = encodedFragment
+                }
+            }
         }
 
     var favCat by stringArrayPref("fav_cat", 10, "Favorites")
