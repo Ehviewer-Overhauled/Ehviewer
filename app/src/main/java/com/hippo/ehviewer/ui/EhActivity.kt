@@ -15,7 +15,6 @@
  */
 package com.hippo.ehviewer.ui
 
-import android.content.Intent
 import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.annotation.StyleRes
@@ -48,13 +47,7 @@ abstract class EhActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        val lockedResumeTime = System.currentTimeMillis() / 1000
-        val lockedDelayTime = lockedResumeTime - locked_last_leave_time
-        if (lockedDelayTime < Settings.securityDelay * 60) {
-            locked = false
-        } else if (Settings.security && isAuthenticationSupported() && locked) {
-            startActivity(Intent(this, SecurityActivity::class.java))
-        }
+        interceptSecurityOrReturn()
         super.onResume()
         window.setSecureScreen(Settings.enabledSecurity)
     }

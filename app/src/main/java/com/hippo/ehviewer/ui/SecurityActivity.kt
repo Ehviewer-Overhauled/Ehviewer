@@ -19,6 +19,7 @@
 package com.hippo.ehviewer.ui
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -30,6 +31,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 
 fun Context.isAuthenticationSupported(): Boolean {
     val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or DEVICE_CREDENTIAL
@@ -118,5 +120,15 @@ val lockObserver = object : DefaultLifecycleObserver {
             locked_last_leave_time = System.currentTimeMillis() / 1000
         }
         locked = true
+    }
+}
+
+fun Context.interceptSecurityOrReturn() {
+    val lockedResumeTime = System.currentTimeMillis() / 1000
+    val lockedDelayTime = lockedResumeTime - locked_last_leave_time
+    if (lockedDelayTime < Settings.securityDelay * 60) {
+        locked = false
+    } else if (Settings.security && isAuthenticationSupported() && locked) {
+        startActivity(Intent(this, SecurityActivity::class.java))
     }
 }
