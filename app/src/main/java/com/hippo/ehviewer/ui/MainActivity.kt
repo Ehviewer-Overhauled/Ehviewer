@@ -52,6 +52,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.launchPage
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
@@ -181,7 +182,15 @@ class MainActivity : EhActivity() {
     private fun setNavGraph() {
         navController.apply {
             graph = navInflater.inflate(R.navigation.nav_graph).apply {
-                when (Settings.launchPageGalleryListSceneAction) {
+                when (
+                    when (val value = launchPage) {
+                        0 -> GalleryListScene.ACTION_HOMEPAGE
+                        1 -> GalleryListScene.ACTION_SUBSCRIPTION
+                        2 -> GalleryListScene.ACTION_WHATS_HOT
+                        3 -> GalleryListScene.ACTION_TOP_LIST
+                        else -> throw IllegalStateException("Unexpected value: $value")
+                    }
+                ) {
                     GalleryListScene.ACTION_HOMEPAGE -> setStartDestination(R.id.nav_homepage)
                     GalleryListScene.ACTION_SUBSCRIPTION -> setStartDestination(R.id.nav_subscription)
                     GalleryListScene.ACTION_WHATS_HOT -> setStartDestination(R.id.nav_whats_hot)

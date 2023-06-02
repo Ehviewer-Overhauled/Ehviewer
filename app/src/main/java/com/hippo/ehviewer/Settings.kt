@@ -21,8 +21,6 @@ import android.util.Log
 import androidx.annotation.DimenRes
 import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.ehviewer.ui.scene.GalleryListScene
-import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.unifile.UniFile
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.init.appCtx
@@ -128,29 +126,6 @@ object Settings : DefaultPreferences() {
         sSettingsPre.edit().putString(key, value).apply()
     }
 
-    private fun getIntFromStr(key: String, defValue: Int): Int {
-        return try {
-            NumberUtils.parseIntSafely(
-                sSettingsPre.getString(key, defValue.toString()),
-                defValue,
-            )
-        } catch (e: ClassCastException) {
-            Log.d(TAG, "Get ClassCastException when get $key value", e)
-            defValue
-        }
-    }
-
-    val launchPageGalleryListSceneAction: String
-        get() {
-            return when (val value = getIntFromStr(KEY_LAUNCH_PAGE, DEFAULT_LAUNCH_PAGE)) {
-                0 -> GalleryListScene.ACTION_HOMEPAGE
-                1 -> GalleryListScene.ACTION_SUBSCRIPTION
-                2 -> GalleryListScene.ACTION_WHATS_HOT
-                3 -> GalleryListScene.ACTION_TOP_LIST
-                else -> throw IllegalStateException("Unexpected value: $value")
-            }
-        }
-
     @get:DimenRes
     val detailSizeResId: Int
         get() = when (detailSize) {
@@ -189,6 +164,7 @@ object Settings : DefaultPreferences() {
     val detailSize by intFromStrPref(KEY_DETAIL_SIZE, 0)
     val thumbResolution by intFromStrPref(KEY_THUMB_RESOLUTION, 0)
     val readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
+    var launchPage by intFromStrPref(KEY_LAUNCH_PAGE, DEFAULT_LAUNCH_PAGE)
 
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
