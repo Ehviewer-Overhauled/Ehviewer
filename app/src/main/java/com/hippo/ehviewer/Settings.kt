@@ -3,7 +3,6 @@
 package com.hippo.ehviewer
 
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.DimenRes
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.unifile.UniFile
@@ -31,16 +30,6 @@ object Settings : DefaultPreferences() {
     const val KEY_REQUEST_NEWS = "request_news"
     const val KEY_REQUEST_NEWS_TIMER = "request_news_timer"
     const val KEY_HIDE_HV_EVENTS = "hide_hv_events"
-    val SIGN_IN_REQUIRED = arrayOf(
-        KEY_IMAGE_LIMITS,
-        KEY_GALLERY_SITE,
-        KEY_U_CONFIG,
-        KEY_MY_TAGS,
-        KEY_SHOW_JPN_TITLE,
-        KEY_REQUEST_NEWS,
-        KEY_REQUEST_NEWS_TIMER,
-        KEY_HIDE_HV_EVENTS,
-    )
     const val KEY_DOWNLOAD_SAVE_SCHEME = "image_scheme"
     const val KEY_DOWNLOAD_SAVE_AUTHORITY = "image_authority"
     const val KEY_DOWNLOAD_SAVE_PATH = "image_path"
@@ -53,9 +42,16 @@ object Settings : DefaultPreferences() {
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
     const val KEY_BYPASS_VPN = "bypass_vpn"
     const val KEY_LIST_THUMB_SIZE = "list_tile_size"
-    private val TAG = Settings::class.java.simpleName
-    private const val KEY_LAUNCH_PAGE = "launch_page"
-    private const val DEFAULT_LAUNCH_PAGE = 0
+    val SIGN_IN_REQUIRED = arrayOf(
+        KEY_IMAGE_LIMITS,
+        KEY_GALLERY_SITE,
+        KEY_U_CONFIG,
+        KEY_MY_TAGS,
+        KEY_SHOW_JPN_TITLE,
+        KEY_REQUEST_NEWS,
+        KEY_REQUEST_NEWS_TIMER,
+        KEY_HIDE_HV_EVENTS,
+    )
 
     fun initialize() {
         if ("CN" == Locale.getDefault().country) {
@@ -69,7 +65,6 @@ object Settings : DefaultPreferences() {
         return try {
             prefs.getString(key, defValue)
         } catch (e: ClassCastException) {
-            Log.d(TAG, "Get ClassCastException when get $key value", e)
             defValue
         }
     }
@@ -116,7 +111,7 @@ object Settings : DefaultPreferences() {
     val detailSize by intFromStrPref(KEY_DETAIL_SIZE, 0)
     val thumbResolution by intFromStrPref(KEY_THUMB_RESOLUTION, 0)
     val readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
-    var launchPage by intFromStrPref(KEY_LAUNCH_PAGE, DEFAULT_LAUNCH_PAGE)
+    var launchPage by intFromStrPref("launch_page", 0)
 
     val showComments by boolPref("show_gallery_comments", true)
     val requestNews by boolPref(KEY_REQUEST_NEWS, false)
