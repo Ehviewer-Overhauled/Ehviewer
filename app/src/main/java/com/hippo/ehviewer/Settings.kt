@@ -2,11 +2,9 @@
 
 package com.hippo.ehviewer
 
-import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.DimenRes
-import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.unifile.UniFile
 import splitties.init.appCtx
@@ -58,32 +56,18 @@ object Settings : DefaultPreferences() {
     private val TAG = Settings::class.java.simpleName
     private const val KEY_LAUNCH_PAGE = "launch_page"
     private const val DEFAULT_LAUNCH_PAGE = 0
-    private lateinit var sSettingsPre: SharedPreferences
 
     fun initialize() {
-        sSettingsPre = PreferenceManager.getDefaultSharedPreferences(appCtx)
-        fixDefaultValue()
-    }
-
-    private fun fixDefaultValue() {
         if ("CN" == Locale.getDefault().country) {
-            // Enable domain fronting if the country is CN
-            if (!sSettingsPre.contains(KEY_BUILT_IN_HOSTS)) {
-                builtInHosts = true
-            }
-            if (!sSettingsPre.contains(KEY_DOMAIN_FRONTING)) {
-                dF = true
-            }
-            // Enable show tag translations if the country is CN
-            if (!sSettingsPre.contains(KEY_SHOW_TAG_TRANSLATIONS)) {
-                showTagTranslations = true
-            }
+            if (KEY_BUILT_IN_HOSTS !in prefs) builtInHosts = true
+            if (KEY_DOMAIN_FRONTING !in prefs) dF = true
+            if (KEY_SHOW_TAG_TRANSLATIONS !in prefs) showTagTranslations = true
         }
     }
 
     private fun getString(key: String, defValue: String?): String? {
         return try {
-            sSettingsPre.getString(key, defValue)
+            prefs.getString(key, defValue)
         } catch (e: ClassCastException) {
             Log.d(TAG, "Get ClassCastException when get $key value", e)
             defValue
@@ -91,7 +75,7 @@ object Settings : DefaultPreferences() {
     }
 
     private fun putString(key: String, value: String?) {
-        sSettingsPre.edit().putString(key, value).apply()
+        prefs.edit().putString(key, value).apply()
     }
 
     @get:DimenRes
