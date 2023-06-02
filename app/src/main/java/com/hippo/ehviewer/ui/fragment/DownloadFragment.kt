@@ -24,6 +24,7 @@ import androidx.preference.Preference
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
@@ -43,7 +44,7 @@ class DownloadFragment : BasePreferenceFragment() {
             )
             val uniFile = UniFile.fromTreeUri(activity, treeUri)
             if (uniFile != null) {
-                Settings.downloadLocation = uniFile
+                downloadLocation = uniFile
                 lifecycleScope.launchNonCancellable {
                     keepNoMediaFileStatus()
                 }
@@ -74,24 +75,14 @@ class DownloadFragment : BasePreferenceFragment() {
     }
 
     private fun onUpdateDownloadLocation() {
-        val file = Settings.downloadLocation
-        if (mDownloadLocation != null) {
-            if (file != null) {
-                mDownloadLocation!!.summary = file.uri.toString()
-            } else {
-                mDownloadLocation!!.setSummary(R.string.settings_download_invalid_download_location)
-            }
-        }
+        mDownloadLocation?.summary = downloadLocation.uri.toString()
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {
         val key = preference.key
         if (KEY_DOWNLOAD_LOCATION == key) {
-            val file = Settings.downloadLocation
-            if (file != null && !UniFile.isFileUri(
-                    Settings.downloadLocation!!.uri,
-                )
-            ) {
+            val file = downloadLocation
+            if (!UniFile.isFileUri(downloadLocation.uri)) {
                 BaseDialogBuilder(requireContext())
                     .setTitle(R.string.settings_download_download_location)
                     .setMessage(file.uri.toString())
@@ -99,7 +90,7 @@ class DownloadFragment : BasePreferenceFragment() {
                     .setNeutralButton(R.string.reset_download_location) { _, _ ->
                         val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
                         if (uniFile != null) {
-                            Settings.downloadLocation = uniFile
+                            downloadLocation = uniFile
                             lifecycleScope.launchNonCancellable {
                                 keepNoMediaFileStatus()
                             }

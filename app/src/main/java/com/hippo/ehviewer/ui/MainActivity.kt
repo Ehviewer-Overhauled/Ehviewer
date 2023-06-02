@@ -59,6 +59,7 @@ import com.hippo.ehviewer.client.parser.GalleryDetailUrlParser
 import com.hippo.ehviewer.client.parser.GalleryPageUrlParser
 import com.hippo.ehviewer.databinding.ActivityMainBinding
 import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
@@ -307,9 +308,9 @@ class MainActivity : EhActivity() {
     }
 
     private fun checkDownloadLocation() {
-        val uniFile = Settings.downloadLocation
+        val uniFile = downloadLocation
         // null == uniFile for first start
-        if (null == uniFile || uniFile.ensureDir()) {
+        if (uniFile.ensureDir()) {
             return
         }
         BaseDialogBuilder(this)

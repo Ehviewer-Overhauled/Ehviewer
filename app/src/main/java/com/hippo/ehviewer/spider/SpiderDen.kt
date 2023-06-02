@@ -19,7 +19,6 @@ import android.graphics.ImageDecoder
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils.getSuitableTitle
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.client.ehRequest
@@ -27,6 +26,7 @@ import com.hippo.ehviewer.client.executeNonCache
 import com.hippo.ehviewer.client.getImageKey
 import com.hippo.ehviewer.coil.edit
 import com.hippo.ehviewer.coil.read
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.gallery.SUPPORT_IMAGE_EXTENSIONS
 import com.hippo.ehviewer.image.Image.CloseableSource
 import com.hippo.ehviewer.image.rewriteGifSource2
@@ -244,9 +244,8 @@ class SpiderDen(private val mGalleryInfo: GalleryInfo) {
 
     companion object {
         fun getGalleryDownloadDir(gid: Long): UniFile? {
-            val dir = Settings.downloadLocation ?: return null
             val dirname = EhDB.getDownloadDirname(gid) ?: return null
-            return dir.subFile(dirname)
+            return downloadLocation.subFile(dirname)
         }
     }
 }

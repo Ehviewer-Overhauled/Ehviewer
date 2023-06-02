@@ -20,12 +20,12 @@ import android.util.AttributeSet
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.BaseGalleryInfo
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.unifile.UniFile
@@ -73,8 +73,7 @@ class RestoreDownloadPreference @JvmOverloads constructor(
     }
 
     private suspend fun doRealWork(): List<GalleryInfo>? {
-        val dir = Settings.downloadLocation ?: return null
-        val files = dir.listFiles() ?: return null
+        val files = downloadLocation.listFiles() ?: return null
         return files.mapNotNull { getRestoreItem(it) }.apply {
             runSuspendCatching {
                 fillGalleryListByApi(this, EhUrl.referer)

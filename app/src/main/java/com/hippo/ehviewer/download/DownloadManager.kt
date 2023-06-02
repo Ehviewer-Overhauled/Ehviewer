@@ -15,11 +15,14 @@
  */
 package com.hippo.ehviewer.download
 
+import android.net.Uri
 import android.util.Log
 import android.util.SparseLongArray
 import androidx.collection.LongSparseArray
 import androidx.collection.keyIterator
+import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.dao.DownloadLabel
@@ -34,8 +37,11 @@ import com.hippo.ehviewer.yorozuya.MathUtils
 import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
+import com.hippo.unifile.UniFile
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import splitties.init.appCtx
+import splitties.preferences.edit
 import java.util.LinkedList
 import kotlin.contracts.contract
 
@@ -1230,3 +1236,26 @@ object DownloadManager : OnSpiderListener {
         sortByDescending { it.time }
     }
 }
+
+var downloadLocation: UniFile
+    get() = with(Settings) {
+        UniFile.fromUri(
+            appCtx,
+            Uri.Builder().apply {
+                scheme(downloadScheme)
+                encodedAuthority(downloadAuthority)
+                encodedPath(downloadPath)
+                encodedQuery(downloadQuery)
+                encodedFragment(downloadFragment)
+            }.build(),
+        ) ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
+    }
+    set(value) = with(value.uri) {
+        Settings.edit {
+            downloadScheme = scheme
+            downloadAuthority = encodedAuthority
+            downloadPath = encodedPath
+            downloadQuery = encodedQuery
+            downloadFragment = encodedFragment
+        }
+    }

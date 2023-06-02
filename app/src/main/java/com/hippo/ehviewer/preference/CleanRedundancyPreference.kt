@@ -19,7 +19,7 @@ import android.content.Context
 import android.util.AttributeSet
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
@@ -53,7 +53,7 @@ class CleanRedundancyPreference @JvmOverloads constructor(
     }
 
     private fun doRealWork(): Int {
-        return Settings.downloadLocation?.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
+        return downloadLocation.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
     }
 
     override fun launchJob() {

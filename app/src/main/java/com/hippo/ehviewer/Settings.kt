@@ -2,11 +2,8 @@
 
 package com.hippo.ehviewer
 
-import android.net.Uri
 import androidx.annotation.DimenRes
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import com.hippo.unifile.UniFile
-import splitties.init.appCtx
 import splitties.preferences.DefaultPreferences
 import splitties.preferences.edit
 import java.util.Locale
@@ -64,32 +61,11 @@ object Settings : DefaultPreferences() {
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
 
-    private var downloadScheme by stringOrNullPref("image_scheme", null)
-    private var downloadAuthority by stringOrNullPref("image_authority", null)
-    private var downloadPath by stringOrNullPref("image_path", null)
-    private var downloadQuery by stringOrNullPref("image_query", null)
-    private var downloadFragment by stringOrNullPref("image_fragment", null)
-
-    var downloadLocation: UniFile
-        get() = UniFile.fromUri(
-            appCtx,
-            Uri.Builder().apply {
-                scheme(downloadScheme)
-                encodedAuthority(downloadAuthority)
-                encodedPath(downloadPath)
-                encodedQuery(downloadQuery)
-                encodedFragment(downloadFragment)
-            }.build(),
-        ) ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
-        set(value) = with(value.uri) {
-            edit {
-                downloadScheme = scheme
-                downloadAuthority = encodedAuthority
-                downloadPath = encodedPath
-                downloadQuery = encodedQuery
-                downloadFragment = encodedFragment
-            }
-        }
+    var downloadScheme by stringOrNullPref("image_scheme", null)
+    var downloadAuthority by stringOrNullPref("image_authority", null)
+    var downloadPath by stringOrNullPref("image_path", null)
+    var downloadQuery by stringOrNullPref("image_query", null)
+    var downloadFragment by stringOrNullPref("image_fragment", null)
 
     var favCat by stringArrayPref("fav_cat", 10, "Favorites")
     var favCount by intArrayPref("fav_count", 10)

@@ -42,6 +42,7 @@ import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.dao.DownloadInfo
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadService
+import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.compose.DialogState
 import com.hippo.ehviewer.ui.legacy.ListCheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.scene.BaseScene
@@ -182,7 +183,6 @@ private val lck = Mutex()
 
 suspend fun keepNoMediaFileStatus() {
     lck.withLock {
-        val downloadLocation = Settings.downloadLocation ?: return
         if (Settings.mediaScan) {
             removeNoMediaFile(downloadLocation)
         } else {
