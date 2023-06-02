@@ -29,7 +29,7 @@ import java.net.ProxySelector
 import java.net.SocketAddress
 import java.net.URI
 
-class EhProxySelector internal constructor() : ProxySelector() {
+object EhProxySelector : ProxySelector() {
     private var delegation: ProxySelector? = null
     private var alternative: ProxySelector?
 
@@ -83,10 +83,8 @@ class EhProxySelector internal constructor() : ProxySelector() {
         override fun connectFailed(uri: URI, sa: SocketAddress, ioe: IOException) {}
     }
 
-    companion object {
-        const val TYPE_DIRECT = 0
-        const val TYPE_SYSTEM = 1
-        const val TYPE_HTTP = 2
-        const val TYPE_SOCKS = 3
-    }
+    const val TYPE_DIRECT = 0
+    const val TYPE_SYSTEM = 1
+    const val TYPE_HTTP = 2
+    const val TYPE_SOCKS = 3
 }

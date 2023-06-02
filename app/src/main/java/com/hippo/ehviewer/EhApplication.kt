@@ -138,13 +138,11 @@ class EhApplication : Application(), ImageLoaderFactory {
     }
 
     companion object {
-        val ehProxySelector by lazy { EhProxySelector() }
-
         val nonCacheOkHttpClient by lazy {
             httpClient {
                 cookieJar(EhCookieStore)
                 dns(EhDns)
-                proxySelector(ehProxySelector)
+                proxySelector(EhProxySelector)
                 if (Settings.dF) {
                     install(EhSSLSocketFactory)
                     proxy(Proxy.NO_PROXY)

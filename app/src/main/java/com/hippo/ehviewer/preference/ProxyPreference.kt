@@ -25,7 +25,6 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.textfield.TextInputLayout
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhProxySelector
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -165,7 +164,7 @@ class ProxyPreference @JvmOverloads constructor(
         Settings.proxyIp = ip
         Settings.proxyPort = port
         updateSummary(type, ip, port)
-        EhApplication.ehProxySelector.updateProxy()
+        EhProxySelector.updateProxy()
         dialog.dismiss()
     }
 }
