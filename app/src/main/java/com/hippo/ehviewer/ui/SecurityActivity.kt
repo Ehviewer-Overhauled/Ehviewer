@@ -27,7 +27,8 @@ import androidx.biometric.auth.AuthPromptCallback
 import androidx.biometric.auth.startClass2BiometricOrCredentialAuthentication
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.hippo.ehviewer.EhApplication
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.hippo.ehviewer.R
 
 fun Context.isAuthenticationSupported(): Boolean {
@@ -97,7 +98,7 @@ class SecurityActivity : AppCompatActivity() {
 
     private fun onSuccess() {
         isAuthenticating = false
-        EhApplication.locked = false
+        locked = false
         finish()
     }
 
@@ -105,8 +106,17 @@ class SecurityActivity : AppCompatActivity() {
         moveTaskToBack(true)
         isAuthenticating = false
     }
+}
 
-    companion object {
-        private var isAuthenticating = false
+private var isAuthenticating = false
+var locked = true
+var locked_last_leave_time: Long = 0
+
+val lockObserver = object : DefaultLifecycleObserver {
+    override fun onPause(owner: LifecycleOwner) {
+        if (!locked) {
+            locked_last_leave_time = System.currentTimeMillis() / 1000
+        }
+        locked = true
     }
 }

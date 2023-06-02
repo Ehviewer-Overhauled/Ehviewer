@@ -20,7 +20,6 @@ import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import eu.kanade.tachiyomi.util.system.isNightMode
@@ -44,17 +43,16 @@ abstract class EhActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        layoutInflater.factory2 =
-            LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
+        layoutInflater.factory2 = LayoutInflaterFactory(delegate).addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
         super.onCreate(savedInstanceState)
     }
 
     override fun onResume() {
         val lockedResumeTime = System.currentTimeMillis() / 1000
-        val lockedDelayTime = lockedResumeTime - EhApplication.locked_last_leave_time
+        val lockedDelayTime = lockedResumeTime - locked_last_leave_time
         if (lockedDelayTime < Settings.securityDelay * 60) {
-            EhApplication.locked = false
-        } else if (Settings.security && isAuthenticationSupported() && EhApplication.locked) {
+            locked = false
+        } else if (Settings.security && isAuthenticationSupported() && locked) {
             startActivity(Intent(this, SecurityActivity::class.java))
         }
         super.onResume()

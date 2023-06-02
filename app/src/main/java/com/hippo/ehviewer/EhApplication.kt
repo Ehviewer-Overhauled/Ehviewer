@@ -20,8 +20,6 @@ import android.app.Application
 import android.content.ComponentCallbacks2
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.LruCache
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
@@ -42,6 +40,7 @@ import com.hippo.ehviewer.legacy.cleanObsoleteCache
 import com.hippo.ehviewer.okhttp.cache
 import com.hippo.ehviewer.okhttp.httpClient
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
+import com.hippo.ehviewer.ui.lockObserver
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
@@ -53,10 +52,10 @@ import splitties.arch.room.roomDb
 import splitties.init.appCtx
 import java.net.Proxy
 
-class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
+class EhApplication : Application(), ImageLoaderFactory {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(lockObserver)
         val handler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {
@@ -67,7 +66,7 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
             }
             handler?.uncaughtException(t, e)
         }
-        super<Application>.onCreate()
+        super.onCreate()
         System.loadLibrary("ehviewer")
         Settings.initialize()
         ReadableTime.initialize(this)
@@ -126,13 +125,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
         }
     }
 
-    override fun onPause(owner: LifecycleOwner) {
-        if (!locked) {
-            locked_last_leave_time = System.currentTimeMillis() / 1000
-        }
-        locked = true
-    }
-
     override fun newImageLoader() = imageLoader {
         okHttpClient(nonCacheOkHttpClient)
         components {
@@ -146,9 +138,6 @@ class EhApplication : Application(), DefaultLifecycleObserver, ImageLoaderFactor
     }
 
     companion object {
-        var locked = true
-        var locked_last_leave_time: Long = 0
-
         val ehProxySelector by lazy { EhProxySelector() }
 
         val nonCacheOkHttpClient by lazy {
