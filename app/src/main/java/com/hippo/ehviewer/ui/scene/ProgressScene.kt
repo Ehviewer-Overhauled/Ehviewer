@@ -1,181 +1,92 @@
-/*
- * Copyright 2016 Hippo Seven
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.hippo.ehviewer.ui.scene
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.ui.legacy.ViewTransition
+import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.yorozuya.ViewUtils
-import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import moe.tarsin.coroutines.runSuspendCatching
 
-/**
- * Only show a progress with jobs in background
- */
-class ProgressScene : BaseScene(), View.OnClickListener {
-    private var mValid = false
-    private var mError: String? = null
-    private var mAction: String? = null
-    private var mGid: Long = 0
-    private var mPToken: String? = null
-    private var mPage = 0
-    private var mTip: TextView? = null
-    private var mViewTransition: ViewTransition? = null
+class ProgressScene : BaseScene() {
     override fun needShowLeftDrawer(): Boolean {
         return false
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            onInit()
-        } else {
-            onRestore(savedInstanceState)
-        }
-    }
-
-    private fun doJobs(): Boolean {
-        val context = context
-        val activity = mainActivity
-        if (null == context || null == activity) {
-            return false
-        }
-        if (ACTION_GALLERY_TOKEN == mAction) {
-            if (mGid == -1L || mPToken == null || mPage == -1) {
-                return false
-            }
-            lifecycleScope.launchIO {
-                runSuspendCatching {
-                    EhEngine.getGalleryToken(mGid, mPToken, mPage)
-                }.onSuccess {
-                    val arg = Bundle()
-                    arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
-                    arg.putLong(GalleryDetailScene.KEY_GID, mGid)
-                    arg.putString(GalleryDetailScene.KEY_TOKEN, it)
-                    arg.putInt(GalleryDetailScene.KEY_PAGE, mPage)
-                    withUIContext {
-                        findNavController().popBackStack()
-                        navigate(R.id.galleryDetailScene, arg)
-                    }
-                }.onFailure {
-                    mValid = false
-                    if (null != mViewTransition && null != mTip) {
-                        // Show tip
-                        mError = ExceptionUtils.getReadableString(it)
-                        withUIContext {
-                            mViewTransition!!.showView(1)
-                            mTip!!.text = mError
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(inflater.context).apply {
+            setMD3Content {
+                val action = rememberSaveable { requireArguments().getString(KEY_ACTION, INVALID) }
+                val gid = rememberSaveable { requireArguments().getLong(KEY_GID, -1) }
+                val token = rememberSaveable { requireArguments().getString(KEY_PTOKEN, INVALID) }
+                val page = rememberSaveable { requireArguments().getInt(KEY_PAGE, -1) }
+                val wrong = stringResource(id = R.string.error_something_wrong_happened)
+                var error by rememberSaveable { mutableStateOf("") }
+                LaunchedEffect(error) {
+                    if (error.isEmpty()) {
+                        if (action != ACTION_GALLERY_TOKEN || gid == -1L || token == INVALID || page == -1) {
+                            error = wrong
+                        } else {
+                            runSuspendCatching {
+                                EhEngine.getGalleryToken(gid, token, page)
+                            }.onSuccess {
+                                val arg = Bundle()
+                                arg.putString(GalleryDetailScene.KEY_ACTION, GalleryDetailScene.ACTION_GID_TOKEN)
+                                arg.putLong(GalleryDetailScene.KEY_GID, gid)
+                                arg.putString(GalleryDetailScene.KEY_TOKEN, it)
+                                arg.putInt(GalleryDetailScene.KEY_PAGE, page)
+                                withUIContext {
+                                    findNavController().popBackStack()
+                                    navigate(R.id.galleryDetailScene, arg)
+                                }
+                            }.onFailure {
+                                error = ExceptionUtils.getReadableString(it)
+                            }
                         }
                     }
                 }
-            }
-            return true
-        }
-        return false
-    }
-
-    private fun handleArgs(args: Bundle?): Boolean {
-        if (args == null) {
-            return false
-        }
-        mAction = args.getString(KEY_ACTION)
-        if (ACTION_GALLERY_TOKEN == mAction) {
-            mGid = args.getLong(KEY_GID, -1)
-            mPToken = args.getString(KEY_PTOKEN, null)
-            mPage = args.getInt(KEY_PAGE, -1)
-            return mGid != -1L && mPToken != null && mPage != -1
-        }
-        return false
-    }
-
-    private fun onInit() {
-        mValid = handleArgs(arguments)
-        if (mValid) {
-            mValid = doJobs()
-        }
-        if (!mValid) {
-            mError = getString(R.string.error_something_wrong_happened)
-        }
-    }
-
-    private fun onRestore(savedInstanceState: Bundle) {
-        mValid = savedInstanceState.getBoolean(KEY_VALID)
-        mError = savedInstanceState.getString(KEY_ERROR)
-        mAction = savedInstanceState.getString(KEY_ACTION)
-        mGid = savedInstanceState.getLong(KEY_GID, -1)
-        mPToken = savedInstanceState.getString(KEY_PTOKEN, null)
-        mPage = savedInstanceState.getInt(KEY_PAGE, -1)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_VALID, mValid)
-        outState.putString(KEY_ERROR, mError)
-        outState.putString(KEY_ACTION, mAction)
-        outState.putLong(KEY_GID, mGid)
-        outState.putString(KEY_PTOKEN, mPToken)
-        outState.putInt(KEY_PAGE, mPage)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        val view = inflater.inflate(R.layout.scene_progress, container, false)
-        val progress = ViewUtils.`$$`(view, R.id.progress)
-        mTip = ViewUtils.`$$`(view, R.id.tip) as TextView
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.big_sad_pandroid)
-        drawable!!.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-        mTip!!.setCompoundDrawables(null, drawable, null, null)
-        mTip!!.setOnClickListener(this)
-        mTip!!.text = mError
-        mViewTransition =
-            ViewTransition(progress, mTip)
-        if (mValid) {
-            mViewTransition!!.showView(0, false)
-        } else {
-            mViewTransition!!.showView(1, false)
-        }
-        return view
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mTip = null
-        mViewTransition = null
-    }
-
-    override fun onClick(v: View) {
-        if (mTip === v) {
-            if (doJobs()) {
-                mValid = true
-                // Show progress
-                if (null != mViewTransition) {
-                    mViewTransition!!.showView(0, true)
+                Box(contentAlignment = Alignment.Center) {
+                    if (error.isNotBlank()) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.big_sad_pandroid),
+                                contentDescription = null,
+                                modifier = Modifier.padding(16.dp),
+                            )
+                            Text(
+                                text = wrong,
+                                style = MaterialTheme.typography.headlineMedium,
+                            )
+                        }
+                    } else {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
@@ -187,7 +98,6 @@ class ProgressScene : BaseScene(), View.OnClickListener {
         const val KEY_GID = "gid"
         const val KEY_PTOKEN = "ptoken"
         const val KEY_PAGE = "page"
-        private const val KEY_VALID = "valid"
-        private const val KEY_ERROR = "error"
+        const val INVALID = "invalid"
     }
 }
