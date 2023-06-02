@@ -2,7 +2,6 @@
 
 package com.hippo.ehviewer
 
-import androidx.annotation.DimenRes
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import splitties.preferences.DefaultPreferences
 import splitties.preferences.edit
@@ -52,14 +51,6 @@ object Settings : DefaultPreferences() {
             if (KEY_SHOW_TAG_TRANSLATIONS !in prefs) showTagTranslations = true
         }
     }
-
-    @get:DimenRes
-    val detailSizeResId: Int
-        get() = when (detailSize) {
-            0 -> R.dimen.gallery_list_column_width_long
-            1 -> R.dimen.gallery_list_column_width_short
-            else -> throw IllegalStateException("Unexpected value: $detailSize")
-        }
 
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)

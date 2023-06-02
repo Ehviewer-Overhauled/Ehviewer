@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.detailSize
 import com.hippo.ehviewer.Settings.thumbSizeDp
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.MarginItemDecoration
@@ -58,7 +58,13 @@ abstract class GalleryAdapter(
             val recyclerView = mRecyclerView
             when (type) {
                 TYPE_LIST -> {
-                    val columnWidth = mResources.getDimensionPixelOffset(Settings.detailSizeResId)
+                    val columnWidth = mResources.getDimensionPixelOffset(
+                        when (detailSize) {
+                            0 -> R.dimen.gallery_list_column_width_long
+                            1 -> R.dimen.gallery_list_column_width_short
+                            else -> throw IllegalStateException("Unexpected value: $detailSize")
+                        },
+                    )
                     mLayoutManager.setColumnSize(columnWidth)
                     mLayoutManager.setStrategy(STRATEGY_MIN_SIZE)
                     if (null != mGirdDecoration) {

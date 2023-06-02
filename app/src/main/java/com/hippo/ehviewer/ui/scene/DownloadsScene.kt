@@ -60,6 +60,7 @@ import com.hippo.ehviewer.EhApplication.Companion.imageCache
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.detailSize
 import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -262,7 +263,15 @@ class DownloadsScene :
             mAdapter!!.setHasStableIds(true)
             recyclerView.adapter = mAdapter
             val layoutManager = AutoStaggeredGridLayoutManager(0, StaggeredGridLayoutManager.VERTICAL)
-            layoutManager.setColumnSize(resources.getDimensionPixelOffset(Settings.detailSizeResId))
+            layoutManager.setColumnSize(
+                resources.getDimensionPixelOffset(
+                    when (detailSize) {
+                        0 -> R.dimen.gallery_list_column_width_long
+                        1 -> R.dimen.gallery_list_column_width_short
+                        else -> throw IllegalStateException("Unexpected value: $detailSize")
+                    },
+                ),
+            )
             layoutManager.setStrategy(STRATEGY_MIN_SIZE)
             layoutManager.supportsPredictiveItemAnimations = false
             recyclerView.layoutManager = layoutManager
