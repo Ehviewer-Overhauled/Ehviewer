@@ -28,6 +28,7 @@ import com.hippo.unifile.UniFile
 import splitties.experimental.ExperimentalSplittiesApi
 import splitties.init.appCtx
 import splitties.preferences.DefaultPreferences
+import splitties.preferences.edit
 import java.util.Locale
 import kotlin.reflect.KProperty
 
@@ -97,16 +98,6 @@ object Settings : DefaultPreferences() {
     private const val DEFAULT_FAV_CAT_7 = "Favorites 7"
     private const val DEFAULT_FAV_CAT_8 = "Favorites 8"
     private const val DEFAULT_FAV_CAT_9 = "Favorites 9"
-    private const val KEY_FAV_COUNT_0 = "fav_count_0"
-    private const val KEY_FAV_COUNT_1 = "fav_count_1"
-    private const val KEY_FAV_COUNT_2 = "fav_count_2"
-    private const val KEY_FAV_COUNT_3 = "fav_count_3"
-    private const val KEY_FAV_COUNT_4 = "fav_count_4"
-    private const val KEY_FAV_COUNT_5 = "fav_count_5"
-    private const val KEY_FAV_COUNT_6 = "fav_count_6"
-    private const val KEY_FAV_COUNT_7 = "fav_count_7"
-    private const val KEY_FAV_COUNT_8 = "fav_count_8"
-    private const val KEY_FAV_COUNT_9 = "fav_count_9"
     private lateinit var sSettingsPre: SharedPreferences
 
     fun initialize() {
@@ -244,35 +235,7 @@ object Settings : DefaultPreferences() {
             .apply()
     }
 
-    val favCount: IntArray
-        get() = intArrayOf(
-            sSettingsPre.getInt(KEY_FAV_COUNT_0, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_1, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_2, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_3, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_4, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_5, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_6, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_7, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_8, 0),
-            sSettingsPre.getInt(KEY_FAV_COUNT_9, 0),
-        )
-
-    fun putFavCount(count: IntArray) {
-        check(count.size == 10)
-        sSettingsPre.edit()
-            .putInt(KEY_FAV_COUNT_0, count[0])
-            .putInt(KEY_FAV_COUNT_1, count[1])
-            .putInt(KEY_FAV_COUNT_2, count[2])
-            .putInt(KEY_FAV_COUNT_3, count[3])
-            .putInt(KEY_FAV_COUNT_4, count[4])
-            .putInt(KEY_FAV_COUNT_5, count[5])
-            .putInt(KEY_FAV_COUNT_6, count[6])
-            .putInt(KEY_FAV_COUNT_7, count[7])
-            .putInt(KEY_FAV_COUNT_8, count[8])
-            .putInt(KEY_FAV_COUNT_9, count[9])
-            .apply()
-    }
+    var favCount by intArrayPref("fav_count", 10)
 
     var archivePasswds by stringSetOrNullPref("archive_passwds")
 
@@ -335,6 +298,15 @@ object Settings : DefaultPreferences() {
         private var _value by stringPref(key, defValue.toString())
         override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }
+    }
+
+    private fun intArrayPref(key: String, count: Int) = object : Delegate<IntArray> {
+        private var _value = (0 until count).map { intPref("${key}_$it", 0) }.toTypedArray()
+        override fun getValue(thisRef: Any?, prop: KProperty<*>?): IntArray = _value.map { it.value }.toIntArray()
+        override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: IntArray) {
+            check(value.size == count)
+            edit { value.zip(_value) { v, d -> d.value = v } }
+        }
     }
 }
 

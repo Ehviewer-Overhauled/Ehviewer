@@ -909,7 +909,7 @@ class FavoritesScene :
                         }.onSuccess { result ->
                             // Put fav cat
                             Settings.putFavCat(result.catArray)
-                            Settings.putFavCount(result.countArray)
+                            Settings.favCount = result.countArray
                             withUIContext {
                                 if (local) {
                                     onGetFavoritesLocal(mUrlBuilder?.keyword, taskId)
@@ -941,7 +941,7 @@ class FavoritesScene :
                         EhEngine.getFavorites(url)
                     }.onSuccess { result ->
                         Settings.putFavCat(result.catArray)
-                        Settings.putFavCount(result.countArray)
+                        Settings.favCount = result.countArray
                         withUIContext {
                             onGetFavoritesSuccess(result, taskId)
                         }
