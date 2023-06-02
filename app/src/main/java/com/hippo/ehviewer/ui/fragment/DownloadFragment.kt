@@ -43,7 +43,7 @@ class DownloadFragment : BasePreferenceFragment() {
             )
             val uniFile = UniFile.fromTreeUri(activity, treeUri)
             if (uniFile != null) {
-                Settings.putDownloadLocation(uniFile)
+                Settings.downloadLocation = uniFile
                 lifecycleScope.launchNonCancellable {
                     keepNoMediaFileStatus()
                 }
@@ -99,7 +99,7 @@ class DownloadFragment : BasePreferenceFragment() {
                     .setNeutralButton(R.string.reset_download_location) { _, _ ->
                         val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
                         if (uniFile != null) {
-                            Settings.putDownloadLocation(uniFile)
+                            Settings.downloadLocation = uniFile
                             lifecycleScope.launchNonCancellable {
                                 keepNoMediaFileStatus()
                             }

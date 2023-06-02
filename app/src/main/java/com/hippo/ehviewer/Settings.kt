@@ -163,27 +163,22 @@ object Settings : DefaultPreferences() {
     val thumbSize: Int
         get() = dp2pix(appCtx, thumbSizeDp.toFloat())
 
-    val downloadLocation: UniFile?
-        get() {
-            val dir: UniFile?
-            val builder = Uri.Builder()
-            builder.scheme(getString(KEY_DOWNLOAD_SAVE_SCHEME, null))
-            builder.encodedAuthority(getString(KEY_DOWNLOAD_SAVE_AUTHORITY, null))
-            builder.encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null))
-            builder.encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null))
-            builder.encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null))
-            dir = UniFile.fromUri(appCtx, builder.build())
-            return dir ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())
+    var downloadLocation: UniFile
+        get() = Uri.Builder().apply {
+            scheme(getString(KEY_DOWNLOAD_SAVE_SCHEME, null))
+            encodedAuthority(getString(KEY_DOWNLOAD_SAVE_AUTHORITY, null))
+            encodedPath(getString(KEY_DOWNLOAD_SAVE_PATH, null))
+            encodedQuery(getString(KEY_DOWNLOAD_SAVE_QUERY, null))
+            encodedFragment(getString(KEY_DOWNLOAD_SAVE_FRAGMENT, null))
+        }.build().let { UniFile.fromUri(appCtx, it) } ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
+        set(value) {
+            val uri = value.uri
+            putString(KEY_DOWNLOAD_SAVE_SCHEME, uri.scheme)
+            putString(KEY_DOWNLOAD_SAVE_AUTHORITY, uri.encodedAuthority)
+            putString(KEY_DOWNLOAD_SAVE_PATH, uri.encodedPath)
+            putString(KEY_DOWNLOAD_SAVE_QUERY, uri.encodedQuery)
+            putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
         }
-
-    fun putDownloadLocation(location: UniFile) {
-        val uri = location.uri
-        putString(KEY_DOWNLOAD_SAVE_SCHEME, uri.scheme)
-        putString(KEY_DOWNLOAD_SAVE_AUTHORITY, uri.encodedAuthority)
-        putString(KEY_DOWNLOAD_SAVE_PATH, uri.encodedPath)
-        putString(KEY_DOWNLOAD_SAVE_QUERY, uri.encodedQuery)
-        putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
-    }
 
     var favCat by stringArrayPref("fav_cat", 10, "Favorites")
     var favCount by intArrayPref("fav_count", 10)
