@@ -78,26 +78,6 @@ object Settings : DefaultPreferences() {
     private val TAG = Settings::class.java.simpleName
     private const val KEY_LAUNCH_PAGE = "launch_page"
     private const val DEFAULT_LAUNCH_PAGE = 0
-    private const val KEY_FAV_CAT_0 = "fav_cat_0"
-    private const val KEY_FAV_CAT_1 = "fav_cat_1"
-    private const val KEY_FAV_CAT_2 = "fav_cat_2"
-    private const val KEY_FAV_CAT_3 = "fav_cat_3"
-    private const val KEY_FAV_CAT_4 = "fav_cat_4"
-    private const val KEY_FAV_CAT_5 = "fav_cat_5"
-    private const val KEY_FAV_CAT_6 = "fav_cat_6"
-    private const val KEY_FAV_CAT_7 = "fav_cat_7"
-    private const val KEY_FAV_CAT_8 = "fav_cat_8"
-    private const val KEY_FAV_CAT_9 = "fav_cat_9"
-    private const val DEFAULT_FAV_CAT_0 = "Favorites 0"
-    private const val DEFAULT_FAV_CAT_1 = "Favorites 1"
-    private const val DEFAULT_FAV_CAT_2 = "Favorites 2"
-    private const val DEFAULT_FAV_CAT_3 = "Favorites 3"
-    private const val DEFAULT_FAV_CAT_4 = "Favorites 4"
-    private const val DEFAULT_FAV_CAT_5 = "Favorites 5"
-    private const val DEFAULT_FAV_CAT_6 = "Favorites 6"
-    private const val DEFAULT_FAV_CAT_7 = "Favorites 7"
-    private const val DEFAULT_FAV_CAT_8 = "Favorites 8"
-    private const val DEFAULT_FAV_CAT_9 = "Favorites 9"
     private lateinit var sSettingsPre: SharedPreferences
 
     fun initialize() {
@@ -205,38 +185,8 @@ object Settings : DefaultPreferences() {
         putString(KEY_DOWNLOAD_SAVE_FRAGMENT, uri.encodedFragment)
     }
 
-    val favCat: Array<String>
-        get() = arrayOf(
-            sSettingsPre.getString(KEY_FAV_CAT_0, DEFAULT_FAV_CAT_0)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_1, DEFAULT_FAV_CAT_1)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_2, DEFAULT_FAV_CAT_2)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_3, DEFAULT_FAV_CAT_3)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_4, DEFAULT_FAV_CAT_4)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_5, DEFAULT_FAV_CAT_5)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_6, DEFAULT_FAV_CAT_6)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_7, DEFAULT_FAV_CAT_7)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_8, DEFAULT_FAV_CAT_8)!!,
-            sSettingsPre.getString(KEY_FAV_CAT_9, DEFAULT_FAV_CAT_9)!!,
-        )
-
-    fun putFavCat(value: Array<String?>) {
-        check(value.size == 10)
-        sSettingsPre.edit()
-            .putString(KEY_FAV_CAT_0, value[0])
-            .putString(KEY_FAV_CAT_1, value[1])
-            .putString(KEY_FAV_CAT_2, value[2])
-            .putString(KEY_FAV_CAT_3, value[3])
-            .putString(KEY_FAV_CAT_4, value[4])
-            .putString(KEY_FAV_CAT_5, value[5])
-            .putString(KEY_FAV_CAT_6, value[6])
-            .putString(KEY_FAV_CAT_7, value[7])
-            .putString(KEY_FAV_CAT_8, value[8])
-            .putString(KEY_FAV_CAT_9, value[9])
-            .apply()
-    }
-
+    var favCat by stringArrayPref("fav_cat", 10, "Favorites")
     var favCount by intArrayPref("fav_count", 10)
-
     var archivePasswds by stringSetOrNullPref("archive_passwds")
 
     val downloadDelay by intFromStrPref("download_delay", 0)
@@ -304,6 +254,15 @@ object Settings : DefaultPreferences() {
         private var _value = (0 until count).map { intPref("${key}_$it", 0) }.toTypedArray()
         override fun getValue(thisRef: Any?, prop: KProperty<*>?): IntArray = _value.map { it.value }.toIntArray()
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: IntArray) {
+            check(value.size == count)
+            edit { value.zip(_value) { v, d -> d.value = v } }
+        }
+    }
+
+    private fun stringArrayPref(key: String, count: Int, defMetaValue: String) = object : Delegate<Array<String>> {
+        private var _value = (0 until count).map { stringPref("${key}_$it", "$defMetaValue $it") }.toTypedArray()
+        override fun getValue(thisRef: Any?, prop: KProperty<*>?): Array<String> = _value.map { it.value }.toTypedArray()
+        override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Array<String>) {
             check(value.size == count)
             edit { value.zip(_value) { v, d -> d.value = v } }
         }

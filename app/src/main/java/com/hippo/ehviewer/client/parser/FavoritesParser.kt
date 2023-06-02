@@ -47,11 +47,11 @@ object FavoritesParser {
             throw ParseException("Parse favorites error", body)
         }
         val result = GalleryListParser.parse(d, body)
-        return Result(catArray, countArray, result)
+        return Result(catArray.requireNoNulls(), countArray, result)
     }
 
     class Result(
-        val catArray: Array<String?>,
+        val catArray: Array<String>,
         val countArray: IntArray,
         galleryListResult: GalleryListParser.Result,
     ) {

@@ -908,7 +908,7 @@ class FavoritesScene :
                             EhEngine.modifyFavorites(url, gidArray, mModifyFavCat)
                         }.onSuccess { result ->
                             // Put fav cat
-                            Settings.putFavCat(result.catArray)
+                            Settings.favCat = result.catArray
                             Settings.favCount = result.countArray
                             withUIContext {
                                 if (local) {
@@ -940,7 +940,7 @@ class FavoritesScene :
                     runSuspendCatching {
                         EhEngine.getFavorites(url)
                     }.onSuccess { result ->
-                        Settings.putFavCat(result.catArray)
+                        Settings.favCat = result.catArray
                         Settings.favCount = result.countArray
                         withUIContext {
                             onGetFavoritesSuccess(result, taskId)
