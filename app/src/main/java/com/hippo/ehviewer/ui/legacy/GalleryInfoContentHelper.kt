@@ -18,7 +18,6 @@ package com.hippo.ehviewer.ui.legacy
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.legacy.ContentLayout.ContentHelper
@@ -43,11 +42,11 @@ abstract class GalleryInfoContentHelper : ContentHelper() {
                 info.favoriteSlot = slot
             }
         }
-        EhApplication.favouriteStatusRouter.addListener(listener)
+        FavouriteStatusRouter.addListener(listener)
     }
 
     fun destroy() {
-        EhApplication.favouriteStatusRouter.removeListener(listener)
+        FavouriteStatusRouter.removeListener(listener)
     }
 
     override fun onAddData(data: List<GalleryInfo>) {
@@ -66,8 +65,7 @@ abstract class GalleryInfoContentHelper : ContentHelper() {
         val bundle = super.saveInstanceState(superState) as Bundle
 
         // TODO It's a bad design
-        val router = EhApplication.favouriteStatusRouter
-        val id = router.saveDataMap(map)
+        val id = FavouriteStatusRouter.saveDataMap(map)
         bundle.putInt(KEY_DATA_MAP, id)
         return bundle
     }
@@ -76,8 +74,7 @@ abstract class GalleryInfoContentHelper : ContentHelper() {
         val bundle = state as Bundle
         val id = bundle.getInt(KEY_DATA_MAP, IntIdGenerator.INVALID_ID)
         if (id != IntIdGenerator.INVALID_ID) {
-            val router = EhApplication.favouriteStatusRouter
-            router.restoreDataMap(id)?.let { this.map = it }
+            FavouriteStatusRouter.restoreDataMap(id)?.let { this.map = it }
         }
         return super.restoreInstanceState(state)
     }

@@ -52,7 +52,6 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.R
@@ -187,8 +186,6 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
         override fun onUpdateLabels() {}
     }
 
-    private val mFavouriteStatusRouter: FavouriteStatusRouter = favouriteStatusRouter
-
     @SuppressLint("NotifyDataSetChanged")
     private val mFavouriteStatusRouterListener: FavouriteStatusRouter.Listener =
         FavouriteStatusRouter.Listener { _: Long, _: Int ->
@@ -225,7 +222,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mDownloadManager.addDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
+        FavouriteStatusRouter.addListener(mFavouriteStatusRouterListener)
         if (savedInstanceState == null) {
             onInit()
         } else {
@@ -263,7 +260,7 @@ class GalleryListScene : SearchBarScene(), OnDragHandlerListener, SearchLayout.H
     override fun onDestroy() {
         super.onDestroy()
         mDownloadManager.removeDownloadInfoListener(mDownloadInfoListener)
-        mFavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
+        FavouriteStatusRouter.removeListener(mFavouriteStatusRouterListener)
     }
 
     private fun setSearchBarHint() {

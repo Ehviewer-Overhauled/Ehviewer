@@ -19,7 +19,7 @@ import android.annotation.SuppressLint
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.yorozuya.IntIdGenerator
 
-class FavouriteStatusRouter {
+object FavouriteStatusRouter {
     private val idGenerator = IntIdGenerator(Settings.dataMapNextId)
 
     @SuppressLint("UseSparseArrays")

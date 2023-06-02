@@ -30,8 +30,8 @@ import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import com.hippo.ehviewer.EhApplication.Companion.favouriteStatusRouter
 import com.hippo.ehviewer.EhDB
+import com.hippo.ehviewer.FavouriteStatusRouter
 import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -212,7 +212,7 @@ suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = f
         galleryInfo.favoriteName = newFavoriteName
         galleryInfo.favoriteSlot = slot
         withUIContext {
-            favouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
+            FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, slot)
         }
     }
     if (!select && slot >= -1 && slot <= 9) {
@@ -246,7 +246,7 @@ suspend fun removeFromFavorites(galleryInfo: GalleryInfo) {
     galleryInfo.favoriteName = null
     galleryInfo.favoriteSlot = -2
     withUIContext {
-        favouriteStatusRouter.modifyFavourites(galleryInfo.gid, -2)
+        FavouriteStatusRouter.modifyFavourites(galleryInfo.gid, -2)
     }
 }
 

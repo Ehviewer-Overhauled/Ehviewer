@@ -164,13 +164,11 @@ class EhApplication : Application(), ImageLoaderFactory {
 
         val galleryDetailCache by lazy {
             LruCache<Long, GalleryDetail>(25).also {
-                favouriteStatusRouter.addListener { gid, slot ->
+                FavouriteStatusRouter.addListener { gid, slot ->
                     it[gid]?.favoriteSlot = slot
                 }
             }
         }
-
-        val favouriteStatusRouter by lazy { FavouriteStatusRouter() }
 
         val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(appCtx)) }
 
