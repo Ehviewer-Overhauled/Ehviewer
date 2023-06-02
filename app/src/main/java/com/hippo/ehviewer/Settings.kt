@@ -22,7 +22,6 @@ import androidx.annotation.DimenRes
 import androidx.preference.PreferenceManager
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.ui.scene.GalleryListScene
-import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.unifile.UniFile
 import splitties.experimental.ExperimentalSplittiesApi
@@ -159,9 +158,6 @@ object Settings : DefaultPreferences() {
             1 -> R.dimen.gallery_list_column_width_short
             else -> throw IllegalStateException("Unexpected value: $detailSize")
         }
-
-    val thumbSize: Int
-        get() = dp2pix(appCtx, thumbSizeDp.toFloat())
 
     var downloadLocation: UniFile
         get() = Uri.Builder().apply {

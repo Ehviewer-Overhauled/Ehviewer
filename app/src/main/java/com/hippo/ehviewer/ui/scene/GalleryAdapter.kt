@@ -26,11 +26,14 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.Settings.thumbSizeDp
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.ui.legacy.easyrecyclerview.MarginItemDecoration
 import com.hippo.ehviewer.ui.legacy.recyclerview.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_SUITABLE_SIZE
+import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
+import splitties.init.appCtx
 
 abstract class GalleryAdapter(
     private val mResources: Resources,
@@ -91,7 +94,7 @@ abstract class GalleryAdapter(
                 }
 
                 TYPE_GRID -> {
-                    val columnWidth = Settings.thumbSize
+                    val columnWidth = dp2pix(appCtx, thumbSizeDp.toFloat())
                     mLayoutManager.setColumnSize(columnWidth)
                     mLayoutManager.setStrategy(STRATEGY_SUITABLE_SIZE)
                     if (null != mListDecoration) {
