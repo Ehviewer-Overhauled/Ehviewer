@@ -3,8 +3,6 @@ package com.hippo.ehviewer
 import com.hippo.ehviewer.client.hosts
 import com.hippo.ehviewer.client.hostsDsl
 
-// TODO: Documentation
-
 val builtInHosts = hostsDsl {
     hosts("ehgt.org", "gt0.ehgt.org", "gt1.ehgt.org", "gt2.ehgt.org", "gt3.ehgt.org") {
         "37.48.89.44" blockedInCN false

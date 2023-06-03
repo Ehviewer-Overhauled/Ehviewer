@@ -88,7 +88,7 @@ class DownloadFragment : BasePreferenceFragment() {
                     .setMessage(file.uri.toString())
                     .setPositiveButton(R.string.pick_new_download_location) { _, _ -> openDirPickerL() }
                     .setNeutralButton(R.string.reset_download_location) { _, _ ->
-                        val uniFile = UniFile.fromFile(AppConfig.getDefaultDownloadDir())
+                        val uniFile = UniFile.fromFile(AppConfig.defaultDownloadDir)
                         if (uniFile != null) {
                             downloadLocation = uniFile
                             lifecycleScope.launchNonCancellable {

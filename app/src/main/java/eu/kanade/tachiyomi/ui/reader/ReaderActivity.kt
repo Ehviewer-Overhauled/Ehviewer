@@ -131,7 +131,7 @@ class ReaderActivity : EhActivity() {
         CreateDocument("todo/todo"),
     ) { uri ->
         if (uri != null) {
-            val filepath = AppConfig.getExternalTempDir().toString() + File.separator + mCacheFileName
+            val filepath = AppConfig.externalTempDir.toString() + File.separator + mCacheFileName
             val cachefile = File(filepath)
             lifecycleScope.launchIO {
                 try {
@@ -374,7 +374,7 @@ class ReaderActivity : EhActivity() {
             return
         }
 
-        val dir = AppConfig.getExternalTempDir()
+        val dir = AppConfig.externalTempDir
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show()
             return
@@ -432,7 +432,7 @@ class ReaderActivity : EhActivity() {
             return
         }
 
-        val dir = AppConfig.getExternalCopyTempDir()
+        val dir = AppConfig.externalCopyTempDir
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show()
             return
@@ -542,7 +542,7 @@ class ReaderActivity : EhActivity() {
         if (null == mGalleryProvider) {
             return
         }
-        val dir = AppConfig.getExternalTempDir()
+        val dir = AppConfig.externalTempDir
         if (null == dir) {
             Toast.makeText(this, R.string.error_cant_create_temp_file, Toast.LENGTH_SHORT).show()
             return

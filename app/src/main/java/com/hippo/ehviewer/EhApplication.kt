@@ -69,7 +69,6 @@ class EhApplication : Application(), ImageLoaderFactory {
         super.onCreate()
         System.loadLibrary("ehviewer")
         ReadableTime.initialize(this)
-        AppConfig.initialize(this)
         AppCompatDelegate.setDefaultNightMode(Settings.theme)
         launchIO {
             launchIO {
@@ -107,11 +106,11 @@ class EhApplication : Application(), ImageLoaderFactory {
     }
 
     private fun clearTempDir() {
-        var dir = AppConfig.getTempDir()
+        var dir = AppConfig.tempDir
         if (null != dir) {
             FileUtils.deleteContent(dir)
         }
-        dir = AppConfig.getExternalTempDir()
+        dir = AppConfig.externalTempDir
         if (null != dir) {
             FileUtils.deleteContent(dir)
         }

@@ -111,13 +111,13 @@ class AdvancedFragment : BasePreferenceFragment() {
                 e.printStackTrace()
             }
             try {
-                val zipFile = File(AppConfig.getExternalTempDir(), "logs.zip")
+                val zipFile = File(AppConfig.externalTempDir, "logs.zip")
                 if (zipFile.exists()) {
                     zipFile.delete()
                 }
                 val files = ArrayList<File>()
-                AppConfig.getExternalParseErrorDir()?.listFiles()?.let { files.addAll(it) }
-                AppConfig.getExternalCrashDir()?.listFiles()?.let { files.addAll(it) }
+                AppConfig.externalParseErrorDir?.listFiles()?.let { files.addAll(it) }
+                AppConfig.externalCrashDir?.listFiles()?.let { files.addAll(it) }
                 var finished = false
                 var origin: BufferedInputStream? = null
                 var out: ZipOutputStream? = null

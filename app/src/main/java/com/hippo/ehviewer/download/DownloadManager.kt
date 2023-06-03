@@ -1248,7 +1248,7 @@ var downloadLocation: UniFile
                 encodedQuery(downloadQuery)
                 encodedFragment(downloadFragment)
             }.build(),
-        ) ?: UniFile.fromFile(AppConfig.getDefaultDownloadDir())!!
+        ) ?: UniFile.fromFile(AppConfig.defaultDownloadDir)!!
     }
     set(value) = with(value.uri) {
         Settings.edit {

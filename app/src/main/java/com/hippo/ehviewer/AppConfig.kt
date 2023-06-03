@@ -13,165 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hippo.ehviewer
 
-package com.hippo.ehviewer;
+import android.os.Environment
+import com.hippo.ehviewer.client.exception.ParseException
+import com.hippo.ehviewer.util.ReadableTime
+import com.hippo.ehviewer.yorozuya.FileUtils
+import splitties.init.appCtx
+import java.io.File
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Environment;
+fun File.ensureDirectory() = if (exists()) isDirectory else mkdirs()
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+object AppConfig {
+    const val APP_DIRNAME = "EhViewer"
+    private const val DOWNLOAD = "download"
+    private const val TEMP = "temp"
+    private const val COPY = "copy"
+    private const val PARSE_ERROR = "parse_error"
+    private const val CRASH = "crash"
 
-import com.hippo.ehviewer.client.exception.ParseException;
-import com.hippo.ehviewer.util.ReadableTime;
-import com.hippo.ehviewer.yorozuya.FileUtils;
-import com.hippo.ehviewer.yorozuya.IOUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-
-public class AppConfig {
-
-    public static final String APP_DIRNAME = "EhViewer";
-
-    private static final String DOWNLOAD = "download";
-    private static final String TEMP = "temp";
-    private static final String PARSE_ERROR = "parse_error";
-    private static final String CRASH = "crash";
-
-    @SuppressLint("StaticFieldLeak")
-    private static Context sContext;
-
-    public static void initialize(Context context) {
-        sContext = context.getApplicationContext();
-    }
-
-    @Nullable
-    public static File getExternalAppDir() {
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = sContext.getExternalFilesDir(null);
-            return FileUtils.ensureDirectory(dir) ? dir : null;
-        }
-        return null;
-    }
-
-    /**
-     * mkdirs and get
-     */
-    @Nullable
-    public static File getDirInExternalAppDir(String filename) {
-        File appFolder = getExternalAppDir();
-        if (appFolder != null) {
-            File dir = new File(appFolder, filename);
-            return FileUtils.ensureDirectory(dir) ? dir : null;
-        }
-        return null;
-    }
-
-    @Nullable
-    public static File getFileInExternalAppDir(String filename) {
-        File appFolder = getExternalAppDir();
-        if (appFolder != null) {
-            File file = new File(appFolder, filename);
-            return FileUtils.ensureFile(file) ? file : null;
-        }
-        return null;
-    }
-
-    @Nullable
-    public static File getDefaultDownloadDir() {
-        return getDirInExternalAppDir(DOWNLOAD);
-    }
-
-    @Nullable
-    public static File getExternalTempDir() {
-        File dir = sContext.getExternalCacheDir();
-        File file;
-        if (null != dir && FileUtils.ensureDirectory(file = new File(dir, TEMP))) {
-            return file;
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static File getExternalCopyTempDir() {
-        File dir = sContext.getExternalCacheDir();
-        File file;
-        if (null != dir && FileUtils.ensureDirectory(file = new File(dir, "copy"))) {
-            return file;
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static File getExternalParseErrorDir() {
-        return getDirInExternalAppDir(PARSE_ERROR);
-    }
-
-    @Nullable
-    public static File getExternalCrashDir() {
-        return getDirInExternalAppDir(CRASH);
-    }
-
-    @Nullable
-    public static File getTempDir() {
-        File dir = sContext.getCacheDir();
-        File file;
-        if (null != dir && FileUtils.ensureDirectory(file = new File(dir, TEMP))) {
-            return file;
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static File createTempFile() {
-        return FileUtils.createTempFile(getTempDir(), null);
-    }
-
-    public static void saveParseErrorBody(@NonNull ParseException e) {
-        File dir = getExternalParseErrorDir();
-        if (null == dir) {
-            return;
-        }
-
-        File file = new File(dir, ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt");
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(file);
-            String message = e.getMessage();
-            String body = e.getBody();
-            if (null != message) {
-                os.write(message.getBytes(StandardCharsets.UTF_8));
-                os.write('\n');
+    private val externalAppDir: File?
+        get() {
+            if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
+                return appCtx.getExternalFilesDir(null)?.takeIf { it.ensureDirectory() }
             }
-            os.write(body.getBytes(StandardCharsets.UTF_8));
-            os.flush();
-        } catch (IOException e1) {
-            // Ignore
-        } finally {
-            IOUtils.closeQuietly(os);
+            return null
+        }
+
+    private fun getDirInExternalAppDir(filename: String) = externalAppDir?.run { File(this, filename).takeIf { it.ensureDirectory() } }
+
+    val defaultDownloadDir: File?
+        get() = getDirInExternalAppDir(DOWNLOAD)
+
+    val externalTempDir: File?
+        get() = appCtx.externalCacheDir?.run { File(this, TEMP).takeIf { it.ensureDirectory() } }
+
+    val externalCopyTempDir: File?
+        get() = appCtx.externalCacheDir?.run { File(this, COPY).takeIf { it.ensureDirectory() } }
+
+    val externalParseErrorDir: File?
+        get() = getDirInExternalAppDir(PARSE_ERROR)
+    val externalCrashDir: File?
+        get() = getDirInExternalAppDir(CRASH)
+    val tempDir: File?
+        get() = appCtx.cacheDir.run { File(this, TEMP).takeIf { it.ensureDirectory() } }
+
+    fun createTempFile(): File? {
+        return FileUtils.createTempFile(tempDir, null)
+    }
+
+    fun saveParseErrorBody(e: ParseException) {
+        val dir = externalParseErrorDir ?: return
+        File(dir, ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt").writer().use {
+            it.write(e.message)
+            it.appendLine()
+            it.append(e.body)
         }
     }
 
-    @Nullable
-    public static File getFilesDir(String name) {
-        File dir = sContext.getFilesDir();
-        if (dir == null) {
-            return null;
-        }
-
-        dir = new File(dir, name);
-        if (dir.isDirectory() || dir.mkdirs()) {
-            return dir;
-        } else {
-            return null;
-        }
-    }
+    fun getFilesDir(name: String) = File(appCtx.filesDir, name).takeIf { it.ensureDirectory() }
 }
