@@ -268,7 +268,6 @@
     <string name="settings_read_volume_page">Seiten mit Lautstärketaste umblättern</string>
     <string name="settings_download">Download</string>
     <string name="settings_download_download_location">Downloadziel</string>
-    <string name="settings_download_invalid_download_location">Ungültiges Downloadziel</string>
     <string name="settings_download_cant_get_download_location">Downloadziel konnte nicht geladen werden</string>
     <string name="settings_download_media_scan">Medienscan erlauben</string>
     <string name="settings_download_media_scan_summary_on">Du solltest deine Galerie-Apps verstecken</string>

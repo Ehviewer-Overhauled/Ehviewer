@@ -386,7 +386,6 @@
     <string name="settings_read_reverse_volume">Reverse volume key</string>
     <string name="settings_download">Download</string>
     <string name="settings_download_download_location">Download location</string>
-    <string name="settings_download_invalid_download_location">Invalid download location</string>
     <string name="settings_download_cant_get_download_location">Can\'t get download location</string>
     <string name="settings_download_media_scan">Allow media scan</string>
     <string name="settings_download_media_scan_summary_on">Please hide your gallery apps away from other people</string>

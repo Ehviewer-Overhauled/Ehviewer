@@ -299,7 +299,6 @@
 
     <string name="settings_download">Descargas</string>
     <string name="settings_download_download_location">Ruta de descargas</string>
-    <string name="settings_download_invalid_download_location">Ruta de descarga invalida</string>
     <string name="settings_download_cant_get_download_location">No se puede obtener ruta de descargas</string>
     <string name="settings_download_media_scan">Permitir escaneo de medios</string>
     <string name="settings_download_media_scan_summary_on">Las galerías de imágenes mostrarán los doujinshis/mangas descargados. ¡Cuidado con prestar tu móvil o tablet!</string>

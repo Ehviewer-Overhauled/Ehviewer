@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +72,7 @@ class ProgressScene : BaseScene() {
                 Box(contentAlignment = Alignment.Center) {
                     if (error.isNotBlank()) {
                         Column(
+                            modifier = Modifier.clickable { error = "" },
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {

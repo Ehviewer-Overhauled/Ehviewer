@@ -307,7 +307,6 @@
 
     <string name="settings_download">다운로드</string>
     <string name="settings_download_download_location">다운로드 위치</string>
-    <string name="settings_download_invalid_download_location">다운로드 위치가 잘못되었습니다.</string>
     <string name="settings_download_cant_get_download_location">다운로드 위치를 가져올 수 없습니다.</string>
     <string name="settings_download_media_scan">미디어 스캔 허용</string>
     <string name="settings_download_media_scan_summary_on">다른 사람들에게 갤러리 앱을 들키지 마세요.</string>

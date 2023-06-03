@@ -336,7 +336,6 @@
 
     <string name="settings_download">Téléchargement</string>
     <string name="settings_download_download_location">Destination de téléchargement</string>
-    <string name="settings_download_invalid_download_location">Destination de téléchargement invalide</string>
     <string name="settings_download_cant_get_download_location">Impossible d\'obtenir la destination de téléchargement</string>
     <string name="settings_download_media_scan">Permettre le scannage multimédia</string>
     <string name="settings_download_media_scan_summary_on">Ne montrez jamais vos applications galerie à personne</string>
