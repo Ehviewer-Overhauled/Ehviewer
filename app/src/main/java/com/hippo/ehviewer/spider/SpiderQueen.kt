@@ -20,7 +20,6 @@ import android.util.Log
 import androidx.annotation.IntDef
 import androidx.collection.LongSparseArray
 import androidx.collection.set
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -54,6 +53,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import moe.tarsin.coroutines.runSuspendCatching
+import splitties.init.appCtx
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -459,7 +459,7 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
 
             // Get default error
             if (state == STATE_FAILED) {
-                mPageErrorMap[index] = error ?: GetText.getString(R.string.error_unknown)
+                mPageErrorMap[index] = error ?: appCtx.getString(R.string.error_unknown)
             }
         }
 
@@ -815,10 +815,10 @@ class SpiderQueen private constructor(val galleryInfo: GalleryInfo) : CoroutineS
     }
 }
 
-private val PTOKEN_FAILED_MESSAGE = GetText.getString(R.string.error_get_ptoken_error)
-private val ERROR_509 = GetText.getString(R.string.error_509)
-private val NETWORK_ERROR = GetText.getString(R.string.error_socket)
-private val DECODE_ERROR = GetText.getString(R.string.error_decoding_failed)
+private val PTOKEN_FAILED_MESSAGE = appCtx.getString(R.string.error_get_ptoken_error)
+private val ERROR_509 = appCtx.getString(R.string.error_509)
+private val NETWORK_ERROR = appCtx.getString(R.string.error_socket)
+private val DECODE_ERROR = appCtx.getString(R.string.error_decoding_failed)
 private val URL_509_ARRAY = arrayOf(
     "https://ehgt.org/g/509.gif",
     "https://ehgt.org/g/509s.gif",

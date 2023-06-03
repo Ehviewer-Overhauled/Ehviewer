@@ -19,7 +19,6 @@ import android.util.Log
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import com.hippo.ehviewer.AppConfig
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -57,6 +56,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONArray
 import org.jsoup.Jsoup
+import splitties.init.appCtx
 import java.io.File
 import kotlin.math.ceil
 
@@ -85,7 +85,7 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 
     // Check kokomade
     if (body.contains(KOKOMADE_URL)) {
-        throw EhException("今回はここまで ${GetText.getString(R.string.kokomade_tip)}".trimIndent())
+        throw EhException("今回はここまで ${appCtx.getString(R.string.kokomade_tip)}".trimIndent())
     }
 
     // Check Gallery Not Available
@@ -103,12 +103,12 @@ private fun rethrowExactly(code: Int, headers: Headers, body: String, e: Throwab
 
     if (e is ParseException) {
         if (body.isEmpty()) {
-            throw EhException(GetText.getString(R.string.error_empty_html))
+            throw EhException(appCtx.getString(R.string.error_empty_html))
         } else if ("<" !in body) {
             throw EhException(body)
         } else {
             if (Settings.saveParseErrorBody) AppConfig.saveParseErrorBody(e)
-            throw EhException(GetText.getString(R.string.error_parse_error))
+            throw EhException(appCtx.getString(R.string.error_parse_error))
         }
     }
 

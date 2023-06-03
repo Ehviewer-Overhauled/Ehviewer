@@ -32,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.FavouriteStatusRouter
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
@@ -57,6 +56,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import moe.tarsin.coroutines.runSuspendCatching
 import rikka.core.util.ContextUtils.requireActivity
+import splitties.init.appCtx
 import kotlin.coroutines.resume
 
 object CommonOperations {
@@ -316,7 +316,7 @@ suspend fun DialogState.confirmRemoveDownload(info: GalleryInfo): Boolean = show
 )
 
 suspend fun DialogState.showMoveDownloadLabel(info: GalleryInfo) {
-    val defaultLabel = GetText.getString(R.string.default_download_label_name)
+    val defaultLabel = appCtx.getString(R.string.default_download_label_name)
     val labels = DownloadManager.labelList.mapNotNull { it.label }.toTypedArray()
     val selected = showSelectItem(defaultLabel, *labels, title = R.string.download_move_dialog_title)
     val downloadInfo = DownloadManager.getDownloadInfo(info.gid) ?: return

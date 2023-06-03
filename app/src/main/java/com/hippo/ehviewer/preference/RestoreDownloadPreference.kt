@@ -18,7 +18,6 @@ package com.hippo.ehviewer.preference
 import android.content.Context
 import android.util.AttributeSet
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
 import com.hippo.ehviewer.client.EhUrl
@@ -34,12 +33,12 @@ import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
+import splitties.init.appCtx
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-private val RESTORE_NOT_FOUND = GetText.getString(R.string.settings_download_restore_not_found)
-private val RESTORE_FAILED = GetText.getString(R.string.settings_download_restore_failed)
-private val RESTORE_COUNT_MSG =
-    { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else GetText.getString(R.string.settings_download_restore_successfully, cnt) }
+private val RESTORE_NOT_FOUND = appCtx.getString(R.string.settings_download_restore_not_found)
+private val RESTORE_FAILED = appCtx.getString(R.string.settings_download_restore_failed)
+private val RESTORE_COUNT_MSG = { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else appCtx.getString(R.string.settings_download_restore_successfully, cnt) }
 
 class RestoreDownloadPreference @JvmOverloads constructor(
     context: Context,

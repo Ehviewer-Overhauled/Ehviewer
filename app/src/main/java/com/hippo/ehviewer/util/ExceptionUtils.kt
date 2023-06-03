@@ -15,10 +15,10 @@
  */
 package com.hippo.ehviewer.util
 
-import com.hippo.ehviewer.GetText.getString
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.network.StatusCodeException
+import splitties.init.appCtx
 import java.net.MalformedURLException
 import java.net.ProtocolException
 import java.net.SocketException
@@ -30,26 +30,26 @@ object ExceptionUtils {
     fun getReadableString(e: Throwable): String {
         e.printStackTrace()
         return if (e is MalformedURLException) {
-            getString(R.string.error_invalid_url)
+            appCtx.getString(R.string.error_invalid_url)
         } else if (e is SocketTimeoutException) {
-            getString(R.string.error_timeout)
+            appCtx.getString(R.string.error_timeout)
         } else if (e is UnknownHostException) {
-            getString(R.string.error_unknown_host)
+            appCtx.getString(R.string.error_unknown_host)
         } else if (e is StatusCodeException) {
             val sb = StringBuilder()
-            sb.append(getString(R.string.error_bad_status_code, e.responseCode))
+            sb.append(appCtx.getString(R.string.error_bad_status_code, e.responseCode))
             if (e.isIdentifiedResponseCode) {
                 sb.append(", ").append(e.message)
             }
             sb.toString()
         } else if (e is ProtocolException && e.message!!.startsWith("Too many follow-up requests:")) {
-            getString(R.string.error_redirection)
+            appCtx.getString(R.string.error_redirection)
         } else if (e is ProtocolException || e is SocketException || e is SSLException) {
-            getString(R.string.error_socket)
+            appCtx.getString(R.string.error_socket)
         } else if (e is EhException) {
             e.message!!
         } else {
-            getString(R.string.error_unknown)
+            appCtx.getString(R.string.error_unknown)
         }
     }
 

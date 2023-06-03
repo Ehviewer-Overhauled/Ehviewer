@@ -17,7 +17,6 @@ package com.hippo.ehviewer.preference
 
 import android.content.Context
 import android.util.AttributeSet
-import com.hippo.ehviewer.GetText
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.unifile.UniFile
@@ -25,14 +24,12 @@ import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import splitties.init.appCtx
 import com.hippo.ehviewer.download.DownloadManager as downloadManager
 
-private val NO_REDUNDANCY =
-    GetText.getString(R.string.settings_download_clean_redundancy_no_redundancy)
-private val CLEAR_REDUNDANCY_DONE =
-    { cnt: Int -> GetText.getString(R.string.settings_download_clean_redundancy_done, cnt) }
-private val FINAL_CLEAR_REDUNDANCY_MSG =
-    { cnt: Int -> if (cnt == 0) NO_REDUNDANCY else CLEAR_REDUNDANCY_DONE(cnt) }
+private val NO_REDUNDANCY = appCtx.getString(R.string.settings_download_clean_redundancy_no_redundancy)
+private val CLEAR_REDUNDANCY_DONE = { cnt: Int -> appCtx.getString(R.string.settings_download_clean_redundancy_done, cnt) }
+private val FINAL_CLEAR_REDUNDANCY_MSG = { cnt: Int -> if (cnt == 0) NO_REDUNDANCY else CLEAR_REDUNDANCY_DONE(cnt) }
 
 class CleanRedundancyPreference @JvmOverloads constructor(
     context: Context,
