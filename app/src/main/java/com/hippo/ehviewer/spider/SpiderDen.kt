@@ -275,3 +275,6 @@ fun GalleryInfo.putToDownloadDir() {
     val dirname = FileUtils.sanitizeFilename("$gid-$title")
     EhDB.putDownloadDirname(gid, dirname)
 }
+
+private external fun makeHttpsCallAndSaveToFd(url: String, doSni: Boolean, fd: Int): Long
+private external fun kernelSupportKTLS(): Boolean
