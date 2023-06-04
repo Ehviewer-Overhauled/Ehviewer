@@ -34,6 +34,12 @@ class SettingsActivity : EhActivity() {
                     composable(ADVANCED_SETTINGS_SCREEN) {
                         AdvancedScreen()
                     }
+                    composable(DOWNLOAD_SETTINGS_SCREEN) {
+                        DownloadScreen()
+                    }
+                    composable(EH_SETTINGS_SCREEN) {
+                        EhScreen()
+                    }
                 }
             }
         }
