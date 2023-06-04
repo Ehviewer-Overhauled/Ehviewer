@@ -2,18 +2,14 @@ package com.hippo.ehviewer.ui.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,18 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
-import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceMinHeight
-import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferencePadding
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
+import com.jamal.composeprefs3.ui.prefs.SwitchPref
+import com.jamal.composeprefs3.ui.prefs.TextPref
 import kotlin.reflect.KMutableProperty0
 
 @Composable
 fun PreferenceHeader(icon: Painter, @StringRes title: Int, childRouteName: String) {
     val navController = LocalNavController.current
     Row(
-        modifier = Modifier.clickable { navController.navigate(childRouteName) }.fillMaxWidth().height(
-            PreferenceTokens.PreferenceHeaderHeight,
-        ),
+        modifier = Modifier.clickable { navController.navigate(childRouteName) }.fillMaxWidth().height(PreferenceTokens.PreferenceHeaderHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.size(PreferenceTokens.PreferenceIconPadding))
@@ -56,38 +50,14 @@ fun PreferenceHeader(icon: ImageVector, @StringRes title: Int, childRouteName: S
 
 @Composable
 fun Preference(title: String, summary: String? = null, onClick: () -> Unit = {}) {
-    Column(
-        modifier = Modifier.defaultMinSize(minHeight = PreferenceMinHeight).fillMaxWidth().clickable(onClick = onClick).padding(PreferencePadding),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(text = title, style = MaterialTheme.typography.bodyLarge)
-        summary?.let {
-            Spacer(modifier = Modifier.size(PreferenceTextPadding))
-            Text(text = summary, style = MaterialTheme.typography.bodyMedium)
-        }
-    }
+    TextPref(title = title, summary = summary, onClick = onClick)
 }
 
 @Composable
 fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<Boolean>) {
     var v by remember { mutableStateOf(value.get()) }
     fun mutate() = value.set((!value.get()).also { v = it })
-    Row(
-        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = PreferenceMinHeight).padding(PreferencePadding).clickable { mutate() },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier.weight(1F),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge)
-            summary?.let {
-                Spacer(modifier = Modifier.size(PreferenceTextPadding))
-                Text(text = summary, style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-        Switch(checked = v, onCheckedChange = null)
-    }
+    SwitchPref(checked = v, onMutate = ::mutate, title = title, summary = summary)
 }
 
 @Composable
@@ -98,14 +68,5 @@ fun UrlPreference(title: String, url: String) {
 
 @Composable
 fun HtmlPreference(title: String, summary: AnnotatedString? = null, onClick: () -> Unit = {}) {
-    Column(
-        modifier = Modifier.defaultMinSize(minHeight = PreferenceMinHeight).fillMaxWidth().clickable(onClick = onClick).padding(PreferencePadding),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(text = title, style = MaterialTheme.typography.bodyLarge)
-        summary?.let {
-            Spacer(modifier = Modifier.size(PreferenceTextPadding))
-            Text(text = summary, style = MaterialTheme.typography.bodyMedium)
-        }
-    }
+    TextPref(title = title, summary = summary, onClick = onClick)
 }
