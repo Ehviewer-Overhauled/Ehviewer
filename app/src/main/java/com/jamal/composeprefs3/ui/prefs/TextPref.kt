@@ -53,7 +53,7 @@ fun TextPref(
 }
 
 @Composable
-fun TextPref(
+fun SpannedTextPref(
     title: String,
     modifier: Modifier = Modifier,
     summary: AnnotatedString? = null,

@@ -13,9 +13,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.ui.isAuthenticationSupported
 import com.hippo.ehviewer.ui.login.LocalNavController
 
 @Composable
@@ -36,6 +38,12 @@ fun SecurityScreen() {
         },
     ) {
         Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_privacy_require_unlock),
+                summary = null,
+                value = Settings::security,
+                enabled = LocalContext.current.isAuthenticationSupported(),
+            )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_privacy_secure),
                 summary = stringResource(id = R.string.settings_privacy_secure_summary),

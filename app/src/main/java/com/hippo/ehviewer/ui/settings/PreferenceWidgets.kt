@@ -27,6 +27,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
+import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
 import kotlin.reflect.KMutableProperty0
@@ -54,10 +55,10 @@ fun Preference(title: String, summary: String? = null, onClick: () -> Unit = {})
 }
 
 @Composable
-fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<Boolean>) {
+fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<Boolean>, enabled: Boolean = true) {
     var v by remember { mutableStateOf(value.get()) }
     fun mutate() = value.set((!value.get()).also { v = it })
-    SwitchPref(checked = v, onMutate = ::mutate, title = title, summary = summary)
+    SwitchPref(checked = v, onMutate = ::mutate, title = title, summary = summary, enabled = enabled)
 }
 
 @Composable
@@ -68,5 +69,5 @@ fun UrlPreference(title: String, url: String) {
 
 @Composable
 fun HtmlPreference(title: String, summary: AnnotatedString? = null, onClick: () -> Unit = {}) {
-    TextPref(title = title, summary = summary, onClick = onClick)
+    SpannedTextPref(title = title, summary = summary, onClick = onClick)
 }
