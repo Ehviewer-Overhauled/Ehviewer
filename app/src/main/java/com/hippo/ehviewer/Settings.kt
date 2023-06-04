@@ -111,7 +111,7 @@ object Settings : DefaultPreferences() {
     var proxyIp by stringOrNullPref("proxy_ip", null)
 
     var dohUrl by stringPref("doh_url", "")
-    var language by stringPref("app_language", "system").apply { changesFlow().observe { updateWhenLocaleChanges() } }
+    var language by stringPref("app_language", "system").observed { updateWhenLocaleChanges() }
     var lastDawnDay by longPref("last_dawn_day", 0)
 
     init {

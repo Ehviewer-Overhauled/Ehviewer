@@ -5,12 +5,11 @@ import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import splitties.preferences.PrefDelegate
 
 val collectScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
-fun Flow<Unit>.observe(func: (Unit) -> Unit) = collectScope.launch { collect(func) }
+fun <T, R : PrefDelegate<T>> R.observed(func: (Unit) -> Unit) = apply { collectScope.launch { changesFlow().collect(func) } }
 
 fun updateWhenLocaleChanges() {
     val newValue = Settings.language
