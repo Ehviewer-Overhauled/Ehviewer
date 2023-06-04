@@ -7,7 +7,4 @@ object PreferenceTokens {
     val PreferenceIconSize = 24.dp
     val PreferenceIconPadding = 16.dp
     val PreferenceTextPadding = 8.dp
-
-    val PreferenceMinHeight = 56.dp
-    val PreferencePadding = 16.dp
 }

@@ -19,22 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jamal.composeprefs3.ui.roundToDP
 
-/**
- * Preference which shows a slider just below the [title]
- *
- * @param key Key used to identify this Pref in the DataStore
- * @param title Main text which describes the Pref
- * @param modifier Modifier applied to the Text aspect of this Pref
- * @param defaultValue Default value of the slider. Used if this key is not found in the DataStore
- * @param onValueChangeFinished Same as onValueChangeFinished parameter in [Slider]
- * @param valueRange Same as valueRange parameter in [Slider]
- * @param showValue If the current slider value should be shown on the side of the slider.
- * @param enabled If false, this slider cannot be interacted with.
- * @param steps Same as steps parameter in [Slider]
- * @param textColor Text colour of the [title] and shown value if [showValue] is true.
- * @param enabled If [enabled] is not true, this Pref cannot be checked/unchecked
- * @param leadingIcon Icon which is positioned at the start of the Pref
- */
 @Composable
 fun SliderPref(
     title: String,
@@ -58,6 +42,7 @@ fun SliderPref(
             textColor = textColor,
             minimalHeight = true,
             leadingIcon = leadingIcon,
+            enabled = enabled,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
