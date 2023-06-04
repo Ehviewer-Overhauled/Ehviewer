@@ -44,6 +44,12 @@ fun SecurityScreen() {
                 value = Settings::security,
                 enabled = LocalContext.current.isAuthenticationSupported(),
             )
+            IntSliderPreference(
+                maxValue = 30,
+                title = stringResource(id = R.string.settings_privacy_require_unlock_delay),
+                value = Settings::securityDelay,
+                enabled = LocalContext.current.isAuthenticationSupported(),
+            )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_privacy_secure),
                 summary = stringResource(id = R.string.settings_privacy_secure_summary),

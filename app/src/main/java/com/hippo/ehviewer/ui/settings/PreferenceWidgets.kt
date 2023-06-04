@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,9 +28,11 @@ import androidx.compose.ui.text.AnnotatedString
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
+import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
+import kotlin.math.roundToInt
 import kotlin.reflect.KMutableProperty0
 
 @Composable
@@ -59,6 +62,13 @@ fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<B
     var v by remember { mutableStateOf(value.get()) }
     fun mutate() = value.set((!value.get()).also { v = it })
     SwitchPref(checked = v, onMutate = ::mutate, title = title, summary = summary, enabled = enabled)
+}
+
+@Composable
+fun IntSliderPreference(maxValue: Int, minValue: Int = 0, step: Int = maxValue - minValue - 1, title: String, value: KMutableProperty0<Int>, enabled: Boolean = true) {
+    var v by remember { mutableIntStateOf(value.get()) }
+    fun set(float: Float) = value.set(float.roundToInt().also { v = it })
+    SliderPref(title = title, defaultValue = v.toFloat(), onValueChangeFinished = ::set, valueRange = minValue.toFloat()..maxValue.toFloat(), showValue = true, steps = step, enabled = enabled)
 }
 
 @Composable
