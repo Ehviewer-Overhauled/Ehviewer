@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -35,6 +34,6 @@ fun LicenseScreen() {
             )
         },
     ) {
-        LibrariesContainer(modifier = Modifier.fillMaxSize().padding(it).nestedScroll(scrollBehavior.nestedScrollConnection))
+        LibrariesContainer(modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = it)
     }
 }
