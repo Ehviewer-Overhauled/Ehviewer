@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
+import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -23,11 +24,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
+import com.jamal.composeprefs3.ui.prefs.DropDownPref
 import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
@@ -80,4 +83,18 @@ fun UrlPreference(title: String, url: String) {
 @Composable
 fun HtmlPreference(title: String, summary: AnnotatedString? = null, onClick: () -> Unit = {}) {
     SpannedTextPref(title = title, summary = summary, onClick = onClick)
+}
+
+@Composable
+fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: KMutableProperty0<Int>) {
+    val entryArray = stringArrayResource(id = entry)
+    val valuesArray = stringArrayResource(id = entryValueRes)
+    val map = remember {
+        val iter = entryArray.iterator()
+        valuesArray.associateWith { iter.next() }
+    }
+    var v by remember { mutableIntStateOf(value.get()) }
+    fun set(new: String) = value.set(new.toInt().also { v = it })
+    check(entryArray.size == valuesArray.size)
+    DropDownPref(title = title, defaultValue = v.toString(), onValueChange = ::set, useSelectedAsSummary = true, entries = map)
 }

@@ -62,7 +62,7 @@ object Settings : DefaultPreferences() {
     val listMode by intFromStrPref(KEY_LIST_MODE, 0)
     val detailSize by intFromStrPref(KEY_DETAIL_SIZE, 0)
     val thumbResolution by intFromStrPref(KEY_THUMB_RESOLUTION, 0)
-    val readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
+    var readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
     var launchPage by intFromStrPref("launch_page", 0)
 
     val showComments by boolPref("show_gallery_comments", true)

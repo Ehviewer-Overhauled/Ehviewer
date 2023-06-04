@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DropDownPref(
-    key: String,
     title: String,
     modifier: Modifier = Modifier,
     summary: String? = null,
