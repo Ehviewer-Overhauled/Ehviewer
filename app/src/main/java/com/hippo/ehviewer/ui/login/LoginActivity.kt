@@ -8,7 +8,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.navigation.ActivityNavigator
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,7 +60,6 @@ class LoginActivity : EhActivity() {
     override fun finish() {
         super.finish()
         Settings.needSignIn = false
-        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 }
 

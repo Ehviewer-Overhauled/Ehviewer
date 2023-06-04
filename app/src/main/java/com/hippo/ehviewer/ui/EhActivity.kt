@@ -19,6 +19,7 @@ import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.ActivityNavigator
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import eu.kanade.tachiyomi.util.system.isNightMode
@@ -50,5 +51,10 @@ abstract class EhActivity : AppCompatActivity() {
         interceptSecurityOrReturn()
         super.onResume()
         window.setSecureScreen(Settings.enabledSecurity)
+    }
+
+    override fun finish() {
+        super.finish()
+        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 }

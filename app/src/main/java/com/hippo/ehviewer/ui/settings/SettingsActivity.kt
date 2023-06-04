@@ -3,7 +3,6 @@ package com.hippo.ehviewer.ui.settings
 import android.os.Bundle
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.WindowCompat
-import androidx.navigation.ActivityNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,11 +37,6 @@ class SettingsActivity : EhActivity() {
                 }
             }
         }
-    }
-
-    override fun finish() {
-        super.finish()
-        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 }
 
