@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.login.LocalNavController
 
 @Composable
@@ -35,6 +36,20 @@ fun AdvancedScreen() {
         },
     ) {
         Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_save_parse_error_body),
+                summary = stringResource(id = R.string.settings_advanced_save_parse_error_body_summary),
+                value = Settings::saveParseErrorBody,
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_save_crash_log),
+                summary = stringResource(id = R.string.settings_advanced_save_crash_log_summary),
+                value = Settings::saveCrashLog,
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_dump_logcat),
+                summary = stringResource(id = R.string.settings_advanced_dump_logcat_summary),
+            )
         }
     }
 }
