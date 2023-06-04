@@ -33,3 +33,8 @@ class SettingsActivity : EhActivity() {
 }
 
 const val BASE_SETTINGS_SCREEN = "Base"
+const val EH_SETTINGS_SCREEN = "Eh"
+const val DOWNLOAD_SETTINGS_SCREEN = "Download"
+const val SECURITY_SETTINGS_SCREEN = "Security"
+const val ADVANCED_SETTINGS_SCREEN = "Advanced"
+const val ABOUT_SETTINGS_SCREEN = "About"
