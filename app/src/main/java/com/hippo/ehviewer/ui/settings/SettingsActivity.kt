@@ -2,6 +2,7 @@ package com.hippo.ehviewer.ui.settings
 
 import android.os.Bundle
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.view.WindowCompat
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +14,7 @@ import com.hippo.ehviewer.ui.login.LocalNavController
 class SettingsActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setMD3Content {
             val navController = rememberNavController()
 

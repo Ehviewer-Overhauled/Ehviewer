@@ -12,9 +12,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -27,6 +29,7 @@ import com.hippo.ehviewer.ui.login.LocalNavController
 @Composable
 fun AboutScreen() {
     val navController = LocalNavController.current
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -36,10 +39,11 @@ fun AboutScreen() {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             Preference(title = stringResource(id = R.string.settings_about_declaration), summary = stringResource(id = R.string.settings_about_declaration_summary))
             val author = stringResource(R.string.settings_about_author_summary).replace('$', '@').let {
                 fun Spanned.toAnnotatedString(): AnnotatedString = buildAnnotatedString {

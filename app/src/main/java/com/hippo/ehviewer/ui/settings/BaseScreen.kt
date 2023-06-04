@@ -14,8 +14,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +26,7 @@ import com.hippo.ehviewer.R
 @Composable
 fun BaseScreen() {
     val activity = LocalContext.current as Activity
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -33,10 +36,11 @@ fun BaseScreen() {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
     ) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             PreferenceHeader(
                 icon = painterResource(id = R.drawable.v_sad_panda_primary_x24),
                 title = R.string.settings_eh,
