@@ -21,6 +21,9 @@ class SettingsActivity : EhActivity() {
                     composable(BASE_SETTINGS_SCREEN) {
                         BaseScreen()
                     }
+                    composable(ABOUT_SETTINGS_SCREEN) {
+                        AboutScreen()
+                    }
                 }
             }
         }
