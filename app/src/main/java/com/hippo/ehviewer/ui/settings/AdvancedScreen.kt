@@ -50,11 +50,17 @@ fun AdvancedScreen() {
                 title = stringResource(id = R.string.settings_advanced_dump_logcat),
                 summary = stringResource(id = R.string.settings_advanced_dump_logcat_summary),
             )
-            SimpleMenuPreference(
+            SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_advanced_read_cache_size),
                 entry = R.array.read_cache_size_entries,
                 entryValueRes = R.array.read_cache_size_entry_values,
                 value = Settings::readCacheSize,
+            )
+            SimpleMenuPreference(
+                title = stringResource(id = R.string.settings_advanced_app_language_title),
+                entry = R.array.app_language_entries,
+                entryValueRes = R.array.app_language_entry_values,
+                value = Settings::language,
             )
         }
     }

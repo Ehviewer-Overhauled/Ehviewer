@@ -86,7 +86,7 @@ fun HtmlPreference(title: String, summary: AnnotatedString? = null, onClick: () 
 }
 
 @Composable
-fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: KMutableProperty0<Int>) {
+fun SimpleMenuPreferenceInt(title: String, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: KMutableProperty0<Int>) {
     val entryArray = stringArrayResource(id = entry)
     val valuesArray = stringArrayResource(id = entryValueRes)
     val map = remember {
@@ -97,4 +97,18 @@ fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryVal
     fun set(new: String) = value.set(new.toInt().also { v = it })
     check(entryArray.size == valuesArray.size)
     DropDownPref(title = title, defaultValue = v.toString(), onValueChange = ::set, useSelectedAsSummary = true, entries = map)
+}
+
+@Composable
+fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: KMutableProperty0<String>) {
+    val entryArray = stringArrayResource(id = entry)
+    val valuesArray = stringArrayResource(id = entryValueRes)
+    val map = remember {
+        val iter = entryArray.iterator()
+        valuesArray.associateWith { iter.next() }
+    }
+    var v by remember { mutableStateOf(value.get()) }
+    fun set(new: String) = value.set(new.also { v = it })
+    check(entryArray.size == valuesArray.size)
+    DropDownPref(title = title, defaultValue = v, onValueChange = ::set, useSelectedAsSummary = true, entries = map)
 }
