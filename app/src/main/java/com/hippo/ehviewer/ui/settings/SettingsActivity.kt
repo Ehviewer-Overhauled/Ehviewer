@@ -19,6 +19,7 @@ class SettingsActivity : EhActivity() {
             CompositionLocalProvider(LocalNavController provides navController) {
                 NavHost(navController = navController, startDestination = BASE_SETTINGS_SCREEN) {
                     composable(BASE_SETTINGS_SCREEN) {
+                        BaseScreen()
                     }
                 }
             }
