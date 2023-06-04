@@ -48,9 +48,7 @@ fun PreferenceHeader(icon: Painter, @StringRes title: Int, childRouteName: Strin
         Spacer(modifier = Modifier.size(PreferenceIconPadding))
         Icon(painter = icon, contentDescription = null, modifier = Modifier.size(PreferenceIconSize), tint = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.size(PreferenceIconPadding))
-        Spacer(modifier = Modifier.size(PreferenceTextPadding))
-        Text(text = stringResource(id = title))
-        Spacer(modifier = Modifier.size(PreferenceTextPadding))
+        Text(text = stringResource(id = title), modifier = Modifier.padding(PreferenceTextPadding))
     }
 }
 
