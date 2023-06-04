@@ -13,8 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -28,6 +33,7 @@ import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceMinHeight
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferencePadding
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
+import kotlin.reflect.KMutableProperty0
 
 @Composable
 fun PreferenceHeader(icon: Painter, @StringRes title: Int, childRouteName: String) {
@@ -59,6 +65,28 @@ fun Preference(title: String, summary: String? = null, onClick: () -> Unit = {})
             Spacer(modifier = Modifier.size(PreferenceTextPadding))
             Text(text = summary, style = MaterialTheme.typography.bodyMedium)
         }
+    }
+}
+
+@Composable
+fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<Boolean>) {
+    var v by remember { mutableStateOf(value.get()) }
+    fun mutate() = value.set((!value.get()).also { v = it })
+    Row(
+        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = PreferenceMinHeight).padding(PreferencePadding).clickable { mutate() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1F),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            summary?.let {
+                Spacer(modifier = Modifier.size(PreferenceTextPadding))
+                Text(text = summary, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+        Switch(checked = v, onCheckedChange = null)
     }
 }
 
