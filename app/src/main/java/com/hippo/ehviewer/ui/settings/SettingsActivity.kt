@@ -32,6 +32,9 @@ class SettingsActivity : EhActivity() {
                     composable(SECURITY_SETTINGS_SCREEN) {
                         SecurityScreen()
                     }
+                    composable(ADVANCED_SETTINGS_SCREEN) {
+                        AdvancedScreen()
+                    }
                 }
             }
         }
