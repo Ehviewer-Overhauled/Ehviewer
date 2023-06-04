@@ -29,6 +29,9 @@ class SettingsActivity : EhActivity() {
                     composable(LICENSE_SCREEN) {
                         LicenseScreen()
                     }
+                    composable(SECURITY_SETTINGS_SCREEN) {
+                        SecurityScreen()
+                    }
                 }
             }
         }
