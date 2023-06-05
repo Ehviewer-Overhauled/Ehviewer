@@ -3,12 +3,14 @@
 package com.hippo.ehviewer
 
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
-import splitties.preferences.DefaultPreferences
+import splitties.preferences.DataStorePreferences
+import splitties.preferences.DataStorePreferencesPreview
 import splitties.preferences.edit
 import java.util.Locale
 import kotlin.reflect.KProperty
 
-object Settings : DefaultPreferences() {
+@OptIn(DataStorePreferencesPreview::class)
+object Settings : DataStorePreferences(null) {
     const val KEY_THEME = "theme"
     const val KEY_ACCOUNT = "account"
     const val KEY_IMAGE_LIMITS = "image_limits"

@@ -46,6 +46,7 @@ import com.hippo.ehviewer.yorozuya.FileUtils
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
@@ -69,7 +70,12 @@ class EhApplication : Application(), ImageLoaderFactory {
         super.onCreate()
         System.loadLibrary("ehviewer")
         ReadableTime.initialize(this)
-        AppCompatDelegate.setDefaultNightMode(Settings.theme)
+        launchIO {
+            val theme = Settings.theme
+            withUIContext {
+                AppCompatDelegate.setDefaultNightMode(theme)
+            }
+        }
         launchIO {
             launchIO {
                 EhTagDatabase.update()
