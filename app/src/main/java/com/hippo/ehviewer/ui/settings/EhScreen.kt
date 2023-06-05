@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.text.Html
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -11,22 +12,39 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.compose.observed
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
+import com.hippo.ehviewer.util.whisperClipboard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Composable
 fun EhScreen() {
     val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val context = LocalContext.current
+    fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -39,12 +57,45 @@ fun EhScreen() {
                 scrollBehavior = scrollBehavior,
             )
         },
-    ) {
-        Column(modifier = Modifier.padding(top = it.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { paddingValues ->
+        val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
+        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.account_name),
-                summary = stringResource(id = R.string.settings_eh_identity_cookies_tourist),
-            )
+                summary = Settings.displayName ?: stringResource(id = R.string.settings_eh_identity_cookies_tourist),
+            ) {
+                val builder = BaseDialogBuilder(context)
+                val eCookies = EhCookieStore.getCookies(EhUrl.HOST_E.toHttpUrl())
+                val exCookies = EhCookieStore.getCookies(EhUrl.HOST_EX.toHttpUrl())
+                var ipbMemberId: String? = null
+                var ipbPassHash: String? = null
+                var igneous: String? = null
+                (eCookies + exCookies).forEach {
+                    when (it.name) {
+                        EhCookieStore.KEY_IPB_MEMBER_ID -> ipbMemberId = it.value
+                        EhCookieStore.KEY_IPB_PASS_HASH -> ipbPassHash = it.value
+                        EhCookieStore.KEY_IGNEOUS -> igneous = it.value
+                    }
+                }
+                val message = if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
+                    val str = EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" + EhCookieStore.KEY_IGNEOUS + ": " + igneous
+                    val spanned = Html.fromHtml(context.getString(R.string.settings_eh_identity_cookies_signed, str), Html.FROM_HTML_MODE_LEGACY)
+                    builder.setMessage(spanned)
+                    str.replace("<br>", "\n")
+                } else {
+                    builder.setMessage(context.getString(R.string.settings_eh_identity_cookies_tourist))
+                    null
+                }
+                if (message != null) {
+                    builder.setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ -> context whisperClipboard message }
+                }
+                builder.setPositiveButton(R.string.settings_eh_sign_out) { _, _ ->
+                    EhUtils.signOut()
+                    launchSnackBar(signOutMessage)
+                }
+                builder.show()
+            }
             Preference(
                 title = stringResource(id = R.string.image_limits),
             )
@@ -139,7 +190,7 @@ fun EhScreen() {
                 title = stringResource(id = R.string.settings_eh_hide_hv_events),
                 value = Settings::requestNews,
             )
-            Spacer(modifier = Modifier.size(it.calculateBottomPadding()))
+            Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }
     }
 }
