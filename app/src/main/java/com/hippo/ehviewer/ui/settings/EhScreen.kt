@@ -65,7 +65,6 @@ fun EhScreen() {
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: stringResource(id = R.string.settings_eh_identity_cookies_tourist),
             ) {
-                val builder = BaseDialogBuilder(context)
                 val eCookies = EhCookieStore.getCookies(EhUrl.HOST_E.toHttpUrl())
                 val exCookies = EhCookieStore.getCookies(EhUrl.HOST_EX.toHttpUrl())
                 var ipbMemberId: String? = null
@@ -78,23 +77,20 @@ fun EhScreen() {
                         EhCookieStore.KEY_IGNEOUS -> igneous = it.value
                     }
                 }
-                val message = if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
-                    val str = EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" + EhCookieStore.KEY_IGNEOUS + ": " + igneous
-                    val spanned = Html.fromHtml(context.getString(R.string.settings_eh_identity_cookies_signed, str), Html.FROM_HTML_MODE_LEGACY)
-                    builder.setMessage(spanned)
-                    str.replace("<br>", "\n")
-                } else {
-                    builder.setMessage(context.getString(R.string.settings_eh_identity_cookies_tourist))
-                    null
-                }
-                if (message != null) {
-                    builder.setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ -> context whisperClipboard message }
-                }
-                builder.setPositiveButton(R.string.settings_eh_sign_out) { _, _ ->
-                    EhUtils.signOut()
-                    launchSnackBar(signOutMessage)
-                }
-                builder.show()
+                BaseDialogBuilder(context).apply {
+                    if (ipbMemberId != null || ipbPassHash != null || igneous != null) {
+                        val str = EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" + EhCookieStore.KEY_IGNEOUS + ": " + igneous
+                        val spanned = Html.fromHtml(context.getString(R.string.settings_eh_identity_cookies_signed, str), Html.FROM_HTML_MODE_LEGACY)
+                        setMessage(spanned)
+                        setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ -> context whisperClipboard str.replace("<br>", "\n") }
+                    } else {
+                        setMessage(context.getString(R.string.settings_eh_identity_cookies_tourist))
+                    }
+                    setPositiveButton(R.string.settings_eh_sign_out) { _, _ ->
+                        EhUtils.signOut()
+                        launchSnackBar(signOutMessage)
+                    }
+                }.show()
             }
             Preference(
                 title = stringResource(id = R.string.image_limits),
