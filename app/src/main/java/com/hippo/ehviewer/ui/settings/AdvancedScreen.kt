@@ -176,7 +176,7 @@ fun AdvancedScreen() {
 
             val importFailed = stringResource(id = R.string.cant_read_the_file)
             val importSucceed = stringResource(id = R.string.settings_advanced_import_data_successfully)
-            val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
                 uri?.let {
                     coroutineScope.launch {
                         context.runCatching {
@@ -197,7 +197,7 @@ fun AdvancedScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_advanced_import_data),
                 summary = stringResource(id = R.string.settings_advanced_import_data_summary),
-            ) { importLauncher.launch(arrayOf("application/vnd.sqlite3")) }
+            ) { importLauncher.launch("application/octet-stream") }
             Preference(
                 title = stringResource(id = R.string.settings_advanced_backup_favorite),
                 summary = stringResource(id = R.string.settings_advanced_backup_favorite_summary),
