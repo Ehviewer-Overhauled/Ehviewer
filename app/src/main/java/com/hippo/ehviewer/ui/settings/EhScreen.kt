@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.os.Build
 import android.text.Html
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -61,6 +62,7 @@ fun EhScreen() {
     ) { paddingValues ->
         val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
+        val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.account_name),
@@ -83,7 +85,11 @@ fun EhScreen() {
                         val str = EhCookieStore.KEY_IPB_MEMBER_ID + ": " + ipbMemberId + "<br>" + EhCookieStore.KEY_IPB_PASS_HASH + ": " + ipbPassHash + "<br>" + EhCookieStore.KEY_IGNEOUS + ": " + igneous
                         val spanned = Html.fromHtml(context.getString(R.string.settings_eh_identity_cookies_signed, str), Html.FROM_HTML_MODE_LEGACY)
                         setMessage(spanned)
-                        setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ -> context whisperClipboard str.replace("<br>", "\n") }
+                        setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ ->
+                            context whisperClipboard str.replace("<br>", "\n")
+                            // Avoid double notify user since system have done that on Tiramisu above
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) launchSnackBar(copiedToClipboard)
+                        }
                     } else {
                         setMessage(touristMode)
                     }
