@@ -24,6 +24,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.login.LocalNavController
@@ -76,6 +77,45 @@ fun DownloadScreen() {
                 title = stringResource(id = R.string.settings_download_download_location),
                 summary = downloadLocation.uri.toString(),
             ) { selectDownloadDirLauncher.launch(downloadLocation.uri) }
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_download_media_scan),
+                summary = if (Settings.mediaScan) stringResource(id = R.string.settings_download_media_scan_summary_on) else stringResource(id = R.string.settings_download_media_scan_summary_off),
+                value = Settings::mediaScan,
+            )
+            SimpleMenuPreferenceInt(
+                title = stringResource(id = R.string.settings_download_concurrency),
+                summary = stringResource(id = R.string.settings_download_concurrency_summary, Settings.multiThreadDownload),
+                entry = R.array.multi_thread_download_entries,
+                entryValueRes = R.array.multi_thread_download_entry_values,
+                value = Settings::multiThreadDownload,
+            )
+            SimpleMenuPreferenceInt(
+                title = stringResource(id = R.string.settings_download_download_delay),
+                summary = stringResource(id = R.string.settings_download_download_delay_summary, Settings.downloadDelay),
+                entry = R.array.download_delay_entries,
+                entryValueRes = R.array.download_delay_entry_values,
+                value = Settings::downloadDelay,
+            )
+            SimpleMenuPreferenceInt(
+                title = stringResource(id = R.string.settings_download_preload_image),
+                summary = stringResource(id = R.string.settings_download_preload_image_summary, Settings.preloadImage),
+                entry = R.array.preload_image_entries,
+                entryValueRes = R.array.preload_image_entry_values,
+                value = Settings::preloadImage,
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_download_download_origin_image),
+                summary = stringResource(id = R.string.settings_download_download_origin_image_summary),
+                value = Settings::downloadOriginImage,
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_download_restore_download_items),
+                summary = stringResource(id = R.string.settings_download_restore_download_items_summary),
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_download_clean_redundancy),
+                summary = stringResource(id = R.string.settings_download_clean_redundancy_summary),
+            )
         }
     }
 }
