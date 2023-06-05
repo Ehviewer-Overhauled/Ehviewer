@@ -62,7 +62,7 @@ fun Preference(title: String, summary: String? = null, onClick: () -> Unit = {})
 }
 
 @Composable
-fun SwitchPreference(title: String, summary: String?, value: KMutableProperty0<Boolean>, enabled: Boolean = true) {
+fun SwitchPreference(title: String, summary: String? = null, value: KMutableProperty0<Boolean>, enabled: Boolean = true) {
     var v by remember { mutableStateOf(value.get()) }
     fun mutate() = value.set((!value.get()).also { v = it })
     SwitchPref(checked = v, onMutate = ::mutate, title = title, summary = summary, enabled = enabled)

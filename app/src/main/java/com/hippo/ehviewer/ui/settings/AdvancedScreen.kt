@@ -139,12 +139,9 @@ fun AdvancedScreen() {
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_advanced_built_in_hosts_title),
-                summary = null,
                 value = Settings::builtInHosts,
             )
-            Preference(
-                title = stringResource(id = R.string.settings_advanced_dns_over_http_title),
-            ) {
+            Preference(title = stringResource(id = R.string.settings_advanced_dns_over_http_title)) {
                 val builder = EditTextDialogBuilder(context, Settings.dohUrl, context.getString(R.string.settings_advanced_dns_over_http_hint))
                 builder.setTitle(R.string.settings_advanced_dns_over_http_title)
                 builder.setPositiveButton(android.R.string.ok, null)
@@ -173,7 +170,6 @@ fun AdvancedScreen() {
             )
             SwitchPreference(
                 title = stringResource(id = R.string.preload_thumb_aggressively),
-                summary = null,
                 value = Settings::preloadThumbAggressively,
             )
             val exportFailed = stringResource(id = R.string.settings_advanced_export_data_failed)
@@ -258,10 +254,7 @@ fun AdvancedScreen() {
                     }
                 }
             }
-            Preference(
-                title = stringResource(id = R.string.open_by_default),
-                summary = null,
-            ) {
+            Preference(title = stringResource(id = R.string.open_by_default)) {
                 context.run {
                     try {
                         @SuppressLint("InlinedApi")

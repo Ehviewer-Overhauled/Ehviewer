@@ -70,7 +70,6 @@ fun EhScreen() {
             )
             SwitchPreference(
                 title = stringResource(id = R.string.black_dark_theme),
-                summary = null,
                 value = Settings::blackDarkTheme,
             )
             SimpleMenuPreferenceInt(
@@ -127,21 +126,17 @@ fun EhScreen() {
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_metered_network_warning),
-                summary = null,
                 value = Settings::meteredNetworkWarning,
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_request_news),
-                summary = null,
                 value = Settings::requestNews,
             )
             Preference(
                 title = stringResource(id = R.string.settings_eh_request_news_timepicker),
-                summary = null,
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_hide_hv_events),
-                summary = null,
                 value = Settings::requestNews,
             )
             Spacer(modifier = Modifier.size(it.calculateBottomPadding()))

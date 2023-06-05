@@ -40,7 +40,6 @@ fun SecurityScreen() {
         Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             SwitchPreference(
                 title = stringResource(id = R.string.settings_privacy_require_unlock),
-                summary = null,
                 value = Settings::security,
                 enabled = LocalContext.current.isAuthenticationSupported(),
             )
