@@ -11,30 +11,20 @@ import kotlin.reflect.KProperty
 
 @OptIn(DataStorePreferencesPreview::class)
 object Settings : DataStorePreferences(null) {
-    const val KEY_THEME = "theme"
     const val KEY_ACCOUNT = "account"
     const val KEY_IMAGE_LIMITS = "image_limits"
     const val KEY_U_CONFIG = "uconfig"
     const val KEY_MY_TAGS = "mytags"
-    const val KEY_BLACK_DARK_THEME = "black_dark_theme"
     const val KEY_GALLERY_SITE = "gallery_site"
-    const val KEY_LIST_MODE = "list_mode"
-    const val KEY_DETAIL_SIZE = "detail_size"
-    const val KEY_THUMB_SIZE = "thumb_size_"
-    const val KEY_THUMB_RESOLUTION = "thumb_resolution"
     const val KEY_SHOW_JPN_TITLE = "show_jpn_title"
     const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
     const val KEY_TAG_TRANSLATIONS_SOURCE = "tag_translations_source"
     const val KEY_REQUEST_NEWS = "request_news"
     const val KEY_REQUEST_NEWS_TIMER = "request_news_timer"
     const val KEY_HIDE_HV_EVENTS = "hide_hv_events"
-    const val KEY_MEDIA_SCAN = "media_scan"
     const val INVALID_DEFAULT_FAV_SLOT = -2
-    const val KEY_READ_CACHE_SIZE = "read_cache_size"
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
-    const val KEY_BYPASS_VPN = "bypass_vpn"
-    const val KEY_LIST_THUMB_SIZE = "list_tile_size"
     val SIGN_IN_REQUIRED = arrayOf(
         KEY_IMAGE_LIMITS,
         KEY_GALLERY_SITE,
@@ -58,11 +48,11 @@ object Settings : DataStorePreferences(null) {
     var gallerySite by intFromStrPref(KEY_GALLERY_SITE, 0)
     var multiThreadDownload by intFromStrPref("download_thread", 3)
     var preloadImage by intFromStrPref("preload_image", 5)
-    var theme by intFromStrPref(KEY_THEME, -1)
-    var listMode by intFromStrPref(KEY_LIST_MODE, 0)
-    var detailSize by intFromStrPref(KEY_DETAIL_SIZE, 0)
-    var thumbResolution by intFromStrPref(KEY_THUMB_RESOLUTION, 0)
-    var readCacheSize by intFromStrPref(KEY_READ_CACHE_SIZE, 640)
+    var theme by intFromStrPref("theme", -1)
+    var listMode by intFromStrPref("list_mode", 0)
+    var detailSize by intFromStrPref("detail_size", 0)
+    var thumbResolution by intFromStrPref("thumb_resolution", 0)
+    var readCacheSize by intFromStrPref("read_cache_size", 640)
     var launchPage by intFromStrPref("launch_page", 0)
     var showComments by boolPref("show_gallery_comments", true)
     var requestNews by boolPref(KEY_REQUEST_NEWS, false)
@@ -73,7 +63,7 @@ object Settings : DataStorePreferences(null) {
     var meteredNetworkWarning by boolPref("cellular_network_warning", false)
     var appLinkVerifyTip by boolPref("app_link_verify_tip", false)
     var enabledSecurity by boolPref("enable_secure", false)
-    var mediaScan by boolPref(KEY_MEDIA_SCAN, false).observed { updateWhenKeepMediaStatusChanges() }
+    var mediaScan by boolPref("media_scan", false).observed { updateWhenKeepMediaStatusChanges() }
     var hasDefaultDownloadLabel by boolPref("has_default_download_label", false)
     var qSSaveProgress by boolPref("qs_save_progress", true)
     var saveParseErrorBody by boolPref("save_parse_error_body", true)
@@ -83,19 +73,19 @@ object Settings : DataStorePreferences(null) {
     var removeImageFiles by boolPref("include_pic", true)
     var needSignIn by boolPref("need_sign_in", true)
     var selectSite by boolPref("select_site", true)
-    var blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, false)
+    var blackDarkTheme by boolPref("black_dark_theme", false)
     var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var dF by boolPref(KEY_DOMAIN_FRONTING, false)
     var downloadOriginImage by boolPref("download_origin_image", false)
-    var bypassVpn by boolPref(KEY_BYPASS_VPN, true)
-    var thumbSizeDp by intPref(KEY_THUMB_SIZE, 120)
+    var bypassVpn by boolPref("bypass_vpn", true)
+    var thumbSizeDp by intPref("thumb_size_", 120)
     var favLocalCount by intPref("fav_local", 0)
     var favCloudCount by intPref("fav_cloud", 0)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
     var defaultFavSlot by intPref("default_favorite_2", INVALID_DEFAULT_FAV_SLOT) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
-    var listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
+    var listThumbSize by intPref("list_tile_size", 40)
     var requestNewsTimerHour by intPref("request_news_timer_hour", -1)
     var requestNewsTimerMinute by intPref("request_news_timer_minute", -1)
     var dataMapNextId by intPref("data_map_next_id", 0)
