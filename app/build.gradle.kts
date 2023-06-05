@@ -185,7 +185,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.6.1")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    val nav_version = "2.5.3"
+    val nav_version = "2.7.0-alpha01"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
