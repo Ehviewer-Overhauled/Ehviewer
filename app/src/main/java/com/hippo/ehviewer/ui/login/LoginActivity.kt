@@ -2,9 +2,9 @@ package com.hippo.ehviewer.ui.login
 
 import android.os.Bundle
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -37,8 +37,8 @@ class LoginActivity : EhActivity() {
                     navController = navController,
                     startDestination = SIGN_IN_ROUTE_NAME,
                     enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(200)) },
-                    exitTransition = { fadeOut(tween(0)) },
-                    popEnterTransition = { fadeIn(tween(0)) },
+                    exitTransition = { ExitTransition.None },
+                    popEnterTransition = { EnterTransition.None },
                     popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(200)) },
                 ) {
                     composable(SIGN_IN_ROUTE_NAME) {
