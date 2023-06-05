@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
@@ -38,6 +39,13 @@ import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
 import kotlin.math.roundToInt
 import kotlin.reflect.KMutableProperty0
+
+object PreferenceTokens {
+    val PreferenceHeaderHeight = 56.dp
+    val PreferenceIconSize = 24.dp
+    val PreferenceIconPadding = 16.dp
+    val PreferenceTextPadding = 8.dp
+}
 
 @Composable
 fun PreferenceHeader(icon: Painter, @StringRes title: Int, childRouteName: String) {
