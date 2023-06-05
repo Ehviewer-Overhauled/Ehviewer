@@ -60,10 +60,11 @@ fun EhScreen() {
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
+        val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.account_name),
-                summary = Settings.displayName ?: stringResource(id = R.string.settings_eh_identity_cookies_tourist),
+                summary = Settings.displayName ?: touristMode,
             ) {
                 val eCookies = EhCookieStore.getCookies(EhUrl.HOST_E.toHttpUrl())
                 val exCookies = EhCookieStore.getCookies(EhUrl.HOST_EX.toHttpUrl())
@@ -84,7 +85,7 @@ fun EhScreen() {
                         setMessage(spanned)
                         setNeutralButton(R.string.settings_eh_identity_cookies_copy) { _, _ -> context whisperClipboard str.replace("<br>", "\n") }
                     } else {
-                        setMessage(context.getString(R.string.settings_eh_identity_cookies_tourist))
+                        setMessage(touristMode)
                     }
                     setPositiveButton(R.string.settings_eh_sign_out) { _, _ ->
                         EhUtils.signOut()
