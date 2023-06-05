@@ -3,6 +3,8 @@
 package com.hippo.ehviewer
 
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import splitties.preferences.DataStorePreferences
 import splitties.preferences.DataStorePreferencesPreview
 import splitties.preferences.edit
@@ -48,7 +50,7 @@ object Settings : DataStorePreferences(null) {
     var gallerySite by intFromStrPref(KEY_GALLERY_SITE, 0)
     var multiThreadDownload by intFromStrPref("download_thread", 3)
     var preloadImage by intFromStrPref("preload_image", 5)
-    var theme by intFromStrPref("theme", -1)
+    var theme by intFromStrPref("theme", -1).observed { updateWhenThemeChanges() }
     var listMode by intFromStrPref("list_mode", 0)
     var detailSize by intFromStrPref("detail_size", 0)
     var thumbResolution by intFromStrPref("thumb_resolution", 0)
@@ -73,7 +75,7 @@ object Settings : DataStorePreferences(null) {
     var removeImageFiles by boolPref("include_pic", true)
     var needSignIn by boolPref("need_sign_in", true)
     var selectSite by boolPref("select_site", true)
-    var blackDarkTheme by boolPref("black_dark_theme", false)
+    var blackDarkTheme by boolPref("black_dark_theme", false).observed { updateWhenThemeChanges() }
     var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var dF by boolPref(KEY_DOMAIN_FRONTING, false)
     var downloadOriginImage by boolPref("download_origin_image", false)
@@ -107,18 +109,21 @@ object Settings : DataStorePreferences(null) {
         }
     }
 
-    private interface Delegate<R> {
+    interface Delegate<R> {
+        val flowGetter: () -> Flow<Unit>
         operator fun getValue(thisRef: Any?, prop: KProperty<*>?): R
         operator fun setValue(thisRef: Any?, prop: KProperty<*>?, value: R)
     }
 
     private fun intFromStrPref(key: String, defValue: Int) = object : Delegate<Int> {
-        private var _value by stringPref(key, defValue.toString())
+        override val flowGetter: () -> Flow<Unit>
+        private var _value by stringPref(key, defValue.toString()).also { flowGetter = { it.changesFlow() } }
         override fun getValue(thisRef: Any?, prop: KProperty<*>?) = _value.toIntOrNull() ?: defValue
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Int) { _value = value.toString() }
     }
 
     private fun intArrayPref(key: String, count: Int) = object : Delegate<IntArray> {
+        override val flowGetter: () -> Flow<Unit> = { flow { } }
         private var _value = (0 until count).map { intPref("${key}_$it", 0) }.toTypedArray()
         override fun getValue(thisRef: Any?, prop: KProperty<*>?): IntArray = _value.map { it.value }.toIntArray()
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: IntArray) {
@@ -128,6 +133,7 @@ object Settings : DataStorePreferences(null) {
     }
 
     private fun stringArrayPref(key: String, count: Int, defMetaValue: String) = object : Delegate<Array<String>> {
+        override val flowGetter: () -> Flow<Unit> = { flow { } }
         private var _value = (0 until count).map { stringPref("${key}_$it", "$defMetaValue $it") }.toTypedArray()
         override fun getValue(thisRef: Any?, prop: KProperty<*>?): Array<String> = _value.map { it.value }.toTypedArray()
         override fun setValue(thisRef: Any?, prop: KProperty<*>?, value: Array<String>) {
