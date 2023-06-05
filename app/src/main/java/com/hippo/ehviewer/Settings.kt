@@ -76,7 +76,7 @@ object Settings : DataStorePreferences(null) {
     val meteredNetworkWarning by boolPref("cellular_network_warning", false)
     var appLinkVerifyTip by boolPref("app_link_verify_tip", false)
     var enabledSecurity by boolPref("enable_secure", false)
-    var mediaScan by boolPref(KEY_MEDIA_SCAN, false)
+    var mediaScan by boolPref(KEY_MEDIA_SCAN, false).observed { updateWhenKeepMediaStatusChanges() }
     var hasDefaultDownloadLabel by boolPref("has_default_download_label", false)
     var qSSaveProgress by boolPref("qs_save_progress", true)
     var saveParseErrorBody by boolPref("save_parse_error_body", true)

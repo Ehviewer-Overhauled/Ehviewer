@@ -2,6 +2,8 @@ package com.hippo.ehviewer
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.hippo.ehviewer.ui.keepNoMediaFileStatus
+import eu.kanade.tachiyomi.util.lang.launchIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,5 +19,13 @@ fun updateWhenLocaleChanges() {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
     } else {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(newValue))
+    }
+}
+
+fun updateWhenKeepMediaStatusChanges() {
+    collectScope.launchIO {
+        runCatching {
+            keepNoMediaFileStatus()
+        }
     }
 }
