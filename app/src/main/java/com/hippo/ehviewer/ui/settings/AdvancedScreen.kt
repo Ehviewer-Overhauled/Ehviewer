@@ -150,7 +150,7 @@ fun AdvancedScreen() {
                 summary = null,
                 value = Settings::preloadThumbAggressively,
             )
-            val importFailed = stringResource(id = R.string.settings_advanced_export_data_failed)
+            val exportFailed = stringResource(id = R.string.settings_advanced_export_data_failed)
             val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.sqlite3")) { uri ->
                 uri?.let {
                     coroutineScope.launch {
@@ -164,7 +164,7 @@ fun AdvancedScreen() {
                             snackbarHostState.showSnackbar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
                         }.onFailure {
                             it.printStackTrace()
-                            snackbarHostState.showSnackbar(importFailed)
+                            snackbarHostState.showSnackbar(exportFailed)
                         }
                     }
                 }
@@ -173,10 +173,31 @@ fun AdvancedScreen() {
                 title = stringResource(id = R.string.settings_advanced_export_data),
                 summary = stringResource(id = R.string.settings_advanced_export_data_summary),
             ) { exportLauncher.launch(ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db") }
+
+            val importFailed = stringResource(id = R.string.cant_read_the_file)
+            val importSucceed = stringResource(id = R.string.settings_advanced_import_data_successfully)
+            val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                uri?.let {
+                    coroutineScope.launch {
+                        context.runCatching {
+                            grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            val alertDialog = withUIContext {
+                                BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
+                            }
+                            EhDB.importDB(context, uri)
+                            if (alertDialog.isShowing) alertDialog.dismiss()
+                            snackbarHostState.showSnackbar(importSucceed)
+                        }.onFailure {
+                            it.printStackTrace()
+                            snackbarHostState.showSnackbar(importFailed)
+                        }
+                    }
+                }
+            }
             Preference(
                 title = stringResource(id = R.string.settings_advanced_import_data),
                 summary = stringResource(id = R.string.settings_advanced_import_data_summary),
-            )
+            ) { importLauncher.launch(arrayOf("application/vnd.sqlite3")) }
             Preference(
                 title = stringResource(id = R.string.settings_advanced_backup_favorite),
                 summary = stringResource(id = R.string.settings_advanced_backup_favorite_summary),
