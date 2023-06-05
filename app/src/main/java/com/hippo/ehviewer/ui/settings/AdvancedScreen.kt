@@ -135,9 +135,6 @@ fun AdvancedScreen() {
                 entryValueRes = R.array.app_language_entry_values,
                 value = Settings::language,
             )
-            Preference(
-                title = stringResource(id = R.string.settings_advanced_proxy),
-            )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_advanced_built_in_hosts_title),
                 summary = null,

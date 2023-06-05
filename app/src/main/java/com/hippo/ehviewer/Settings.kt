@@ -98,8 +98,6 @@ object Settings : DataStorePreferences(null) {
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
     var defaultFavSlot by intPref("default_favorite_2", INVALID_DEFAULT_FAV_SLOT) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
     var securityDelay by intPref("require_unlock_delay", 0)
-    var proxyType by intPref("proxy_type", EhProxySelector.TYPE_SYSTEM)
-    var proxyPort by intPref("proxy_port", -1)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     val listThumbSize by intPref(KEY_LIST_THUMB_SIZE, 40)
     var requestNewsTimerHour by intPref("request_news_timer_hour", -1)
@@ -110,7 +108,6 @@ object Settings : DataStorePreferences(null) {
     var defaultDownloadLabel by stringOrNullPref("default_download_label", null)
     var displayName by stringOrNullPref("display_name", null)
     var avatar by stringOrNullPref("avatar", null)
-    var proxyIp by stringOrNullPref("proxy_ip", null)
 
     var dohUrl by stringPref("doh_url", "")
     var language by stringPref("app_language", "system").observed { updateWhenLocaleChanges() }

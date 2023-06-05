@@ -51,7 +51,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import okio.Path.Companion.toOkioPath
 import splitties.arch.room.roomDb
 import splitties.init.appCtx
-import java.net.Proxy
 
 class EhApplication : Application(), ImageLoaderFactory {
     @OptIn(DelicateCoroutinesApi::class)
@@ -146,11 +145,7 @@ class EhApplication : Application(), ImageLoaderFactory {
             httpClient {
                 cookieJar(EhCookieStore)
                 dns(EhDns)
-                proxySelector(EhProxySelector)
-                if (Settings.dF) {
-                    install(EhSSLSocketFactory)
-                    proxy(Proxy.NO_PROXY)
-                }
+                if (Settings.dF) install(EhSSLSocketFactory)
             }
         }
 
