@@ -23,10 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
@@ -76,7 +78,27 @@ fun DownloadScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_download_download_location),
                 summary = downloadLocation.uri.toString(),
-            ) { selectDownloadDirLauncher.launch(downloadLocation.uri) }
+            ) {
+                val file = downloadLocation
+                if (!UniFile.isFileUri(downloadLocation.uri)) {
+                    BaseDialogBuilder(context)
+                        .setTitle(R.string.settings_download_download_location)
+                        .setMessage(file.uri.toString())
+                        .setPositiveButton(R.string.pick_new_download_location) { _, _ -> selectDownloadDirLauncher.launch(null) }
+                        .setNeutralButton(R.string.reset_download_location) { _, _ ->
+                            val uniFile = UniFile.fromFile(AppConfig.defaultDownloadDir)
+                            if (uniFile != null) {
+                                downloadLocation = uniFile
+                                coroutineScope.launchNonCancellable { keepNoMediaFileStatus() }
+                            } else {
+                                coroutineScope.launch { snackbarHostState.showSnackbar(cannotGetDownloadLocation) }
+                            }
+                        }
+                        .show()
+                } else {
+                    selectDownloadDirLauncher.launch(null)
+                }
+            }
             SwitchPreference(
                 title = stringResource(id = R.string.settings_download_media_scan),
                 summary = if (Settings.mediaScan) stringResource(id = R.string.settings_download_media_scan_summary_on) else stringResource(id = R.string.settings_download_media_scan_summary_off),
