@@ -108,26 +108,29 @@ fun DownloadScreen() {
                 summary = if (Settings.mediaScan) stringResource(id = R.string.settings_download_media_scan_summary_on) else stringResource(id = R.string.settings_download_media_scan_summary_off),
                 value = Settings::mediaScan,
             )
+            val multiThreadDownload = Settings::multiThreadDownload.observed
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_download_concurrency),
-                summary = stringResource(id = R.string.settings_download_concurrency_summary, Settings.multiThreadDownload),
+                summary = stringResource(id = R.string.settings_download_concurrency_summary, multiThreadDownload.value),
                 entry = R.array.multi_thread_download_entries,
                 entryValueRes = R.array.multi_thread_download_entry_values,
-                value = Settings::multiThreadDownload,
+                value = multiThreadDownload,
             )
+            val downloadDelay = Settings::downloadDelay.observed
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_download_download_delay),
-                summary = stringResource(id = R.string.settings_download_download_delay_summary, Settings.downloadDelay),
+                summary = stringResource(id = R.string.settings_download_download_delay_summary, downloadDelay.value),
                 entry = R.array.download_delay_entries,
                 entryValueRes = R.array.download_delay_entry_values,
-                value = Settings::downloadDelay,
+                value = downloadDelay,
             )
+            val preloadImage = Settings::preloadImage.observed
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_download_preload_image),
-                summary = stringResource(id = R.string.settings_download_preload_image_summary, Settings.preloadImage),
+                summary = stringResource(id = R.string.settings_download_preload_image_summary, preloadImage.value),
                 entry = R.array.preload_image_entries,
                 entryValueRes = R.array.preload_image_entry_values,
-                value = Settings::preloadImage,
+                value = preloadImage,
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_download_download_origin_image),

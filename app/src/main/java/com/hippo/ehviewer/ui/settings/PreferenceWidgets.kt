@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -86,15 +87,15 @@ fun HtmlPreference(title: String, summary: AnnotatedString? = null, onClick: () 
 }
 
 @Composable
-fun SimpleMenuPreferenceInt(title: String, summary: String? = null, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: KMutableProperty0<Int>) {
+fun SimpleMenuPreferenceInt(title: String, summary: String? = null, @ArrayRes entry: Int, @ArrayRes entryValueRes: Int, value: MutableState<Int>) {
     val entryArray = stringArrayResource(id = entry)
     val valuesArray = stringArrayResource(id = entryValueRes)
     val map = remember {
         val iter = entryArray.iterator()
         valuesArray.associateWith { iter.next() }
     }
-    var v by remember { mutableIntStateOf(value.get()) }
-    fun set(new: String) = value.set(new.toInt().also { v = it })
+    var v by value
+    fun set(new: String) { v = new.toInt() }
     check(entryArray.size == valuesArray.size)
     DropDownPref(title = title, summary = summary, defaultValue = v.toString(), onValueChange = ::set, useSelectedAsSummary = summary.isNullOrBlank(), entries = map)
 }

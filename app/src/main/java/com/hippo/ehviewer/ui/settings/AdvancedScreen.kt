@@ -40,6 +40,7 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.systemDns
+import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
@@ -127,7 +128,7 @@ fun AdvancedScreen() {
                 title = stringResource(id = R.string.settings_advanced_read_cache_size),
                 entry = R.array.read_cache_size_entries,
                 entryValueRes = R.array.read_cache_size_entry_values,
-                value = Settings::readCacheSize,
+                value = Settings::readCacheSize.observed,
             )
             SimpleMenuPreference(
                 title = stringResource(id = R.string.settings_advanced_app_language_title),
