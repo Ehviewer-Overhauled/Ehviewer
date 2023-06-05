@@ -32,11 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
+import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.LogCat
 import com.hippo.ehviewer.util.ReadableTime
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -147,10 +150,29 @@ fun AdvancedScreen() {
                 summary = null,
                 value = Settings::preloadThumbAggressively,
             )
+            val importFailed = stringResource(id = R.string.settings_advanced_export_data_failed)
+            val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.sqlite3")) { uri ->
+                uri?.let {
+                    coroutineScope.launch {
+                        context.runCatching {
+                            grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                            val alertDialog = withUIContext {
+                                BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
+                            }
+                            EhDB.exportDB(context, uri)
+                            if (alertDialog.isShowing) alertDialog.dismiss()
+                            snackbarHostState.showSnackbar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
+                        }.onFailure {
+                            it.printStackTrace()
+                            snackbarHostState.showSnackbar(importFailed)
+                        }
+                    }
+                }
+            }
             Preference(
                 title = stringResource(id = R.string.settings_advanced_export_data),
                 summary = stringResource(id = R.string.settings_advanced_export_data_summary),
-            )
+            ) { exportLauncher.launch(ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db") }
             Preference(
                 title = stringResource(id = R.string.settings_advanced_import_data),
                 summary = stringResource(id = R.string.settings_advanced_import_data_summary),
