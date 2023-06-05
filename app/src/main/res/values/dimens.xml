@@ -26,7 +26,6 @@
     <dimen name="strip_item_padding">8dp</dimen>
 
     <!-- Text size -->
-    <dimen name="text_super_large">24sp</dimen>
     <dimen name="text_little_small">16sp</dimen>
     <dimen name="text_small">14sp</dimen>
     <dimen name="text_super_small">12sp</dimen>
