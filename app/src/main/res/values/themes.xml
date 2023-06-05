@@ -18,7 +18,6 @@
 
     <style name="Base.AppTheme" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="dividerColor">@color/divider</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
         <item name="snackbarStyle">@style/Snackbar</item>
         <item name="snackbarButtonStyle">@style/SnackbarButton</item>
 

@@ -27,7 +27,6 @@ import android.text.TextUtils
 import android.view.textclassifier.TextClassifier
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.MainActivity
-import com.hippo.ehviewer.ui.SettingsActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import splitties.systemservices.clipboardManager
 
@@ -52,8 +51,6 @@ fun Context.addTextToClipboard(text: CharSequence?, isSensitive: Boolean, useToa
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
         if (this is MainActivity) {
             showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT, useToast)
-        } else if (this is SettingsActivity) {
-            showTip(R.string.copied_to_clipboard, BaseScene.LENGTH_SHORT)
         }
     }
 }

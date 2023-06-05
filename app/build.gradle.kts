@@ -1,4 +1,6 @@
 import com.google.devtools.ksp.gradle.KspTaskJvm
+import com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+import com.mikepenz.aboutlibraries.plugin.DuplicateRule.GROUP
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 import java.io.ByteArrayOutputStream
 import java.time.Instant
@@ -191,7 +193,6 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/paging
     implementation("androidx.paging:paging-common-ktx:3.2.0-alpha06")
     implementation("androidx.paging:paging-compose:1.0.0-alpha20")
-    implementation("androidx.preference:preference-ktx:1.2.0")
     implementation("androidx.recyclerview:recyclerview:1.3.0")
 
     // https://developer.android.com/jetpack/androidx/releases/room
@@ -229,8 +230,6 @@ dependencies {
     implementation("dev.rikka.rikkax.core:core-ktx:1.4.1")
     implementation("dev.rikka.rikkax.insets:insets:1.3.0")
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.3.0")
-    implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
-    implementation("dev.rikka.rikkax.material:material-preference:2.0.0")
 
     implementation(platform("io.arrow-kt:arrow-stack:1.2.0-RC"))
     implementation("io.arrow-kt:arrow-fx-coroutines")
@@ -245,11 +244,6 @@ dependencies {
     implementation("org.jsoup:jsoup:1.16.1")
 }
 
-configurations.all {
-    exclude("dev.rikka.rikkax.appcompat", "appcompat")
-    exclude("dev.rikka.rikkax.material", "material")
-}
-
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.generateKotlin", "true")
@@ -260,6 +254,6 @@ tasks.withType<KspTaskJvm>().configureEach {
 }
 
 aboutLibraries {
-    duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
-    duplicationRule = com.mikepenz.aboutlibraries.plugin.DuplicateRule.GROUP
+    duplicationMode = MERGE
+    duplicationRule = GROUP
 }

@@ -127,10 +127,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
-            android:configChanges="screenSize"
-            android:label="@string/settings" />
-        <activity
             android:name=".ui.settings.SettingsActivity"
             android:configChanges="screenSize"
             android:label="@string/settings" />

@@ -33,7 +33,6 @@ import android.widget.TextView
 import androidx.annotation.IntDef
 import androidx.core.content.edit
 import androidx.core.view.forEach
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
@@ -41,6 +40,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
@@ -74,11 +74,10 @@ class SearchLayout @JvmOverloads constructor(
     private var mAction: TabLayout
     private var mAdapter: SearchAdapter
     private var mHelper: Helper? = null
-    private val mSharePref: SharedPreferences
+    private val mSharePref: SharedPreferences = Settings.prefs
     private val mInflater: LayoutInflater
 
     init {
-        mSharePref = PreferenceManager.getDefaultSharedPreferences(context)
         mInflater = LayoutInflater.from(context)
         val resources = context.resources
         layoutManager = SearchLayoutManager(context)
@@ -213,7 +212,7 @@ class SearchLayout @JvmOverloads constructor(
                     }
                 }
                 urlBuilder.keyword = query
-                urlBuilder.category = PreferenceManager.getDefaultSharedPreferences(context).getInt(
+                urlBuilder.category = Settings.prefs.getInt(
                     SEARCH_CATEGORY_PREF,
                     0,
                 )
