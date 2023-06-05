@@ -210,7 +210,29 @@ fun DownloadScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_download_clean_redundancy),
                 summary = stringResource(id = R.string.settings_download_clean_redundancy_summary),
-            )
+            ) {
+                coroutineScope.launch {
+                    fun clearFile(file: UniFile): Boolean {
+                        var name = file.name ?: return false
+                        val index = name.indexOf('-')
+                        if (index >= 0) {
+                            name = name.substring(0, index)
+                        }
+                        val gid = name.toLongOrNull() ?: return false
+                        if (DownloadManager.containDownloadInfo(gid)) {
+                            return false
+                        }
+                        file.delete()
+                        return true
+                    }
+                    val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
+                    context.runCatching {
+                        val cnt = downloadLocation.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
+                        launchSnackBar(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
+                    }
+                    if (alertDialog.isShowing) alertDialog.dismiss()
+                }
+            }
         }
     }
 }
@@ -218,3 +240,6 @@ fun DownloadScreen() {
 private class RestoreItem(val dirname: String) : BaseGalleryInfo()
 private val RESTORE_NOT_FOUND = appCtx.getString(R.string.settings_download_restore_not_found)
 private val RESTORE_COUNT_MSG = { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else appCtx.getString(R.string.settings_download_restore_successfully, cnt) }
+private val NO_REDUNDANCY = appCtx.getString(R.string.settings_download_clean_redundancy_no_redundancy)
+private val CLEAR_REDUNDANCY_DONE = { cnt: Int -> appCtx.getString(R.string.settings_download_clean_redundancy_done, cnt) }
+private val FINAL_CLEAR_REDUNDANCY_MSG = { cnt: Int -> if (cnt == 0) NO_REDUNDANCY else CLEAR_REDUNDANCY_DONE(cnt) }
