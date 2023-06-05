@@ -1,6 +1,10 @@
 package com.hippo.ehviewer.ui.settings
 
 import android.os.Bundle
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
@@ -18,7 +22,14 @@ class SettingsActivity : EhActivity() {
             val navController = rememberNavController()
 
             CompositionLocalProvider(LocalNavController provides navController) {
-                NavHost(navController = navController, startDestination = BASE_SETTINGS_SCREEN) {
+                NavHost(
+                    navController = navController,
+                    startDestination = BASE_SETTINGS_SCREEN,
+                    enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(200)) },
+                    exitTransition = { fadeOut(tween(0)) },
+                    popEnterTransition = { fadeIn(tween(0)) },
+                    popExitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(200)) },
+                ) {
                     composable(BASE_SETTINGS_SCREEN) {
                         BaseScreen()
                     }
