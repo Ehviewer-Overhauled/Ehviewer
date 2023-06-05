@@ -26,9 +26,16 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.AppConfig
+import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
+import com.hippo.ehviewer.client.EhEngine.fillGalleryListByApi
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.client.data.BaseGalleryInfo
+import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.downloadLocation
+import com.hippo.ehviewer.spider.SpiderQueen
+import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
@@ -36,8 +43,11 @@ import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import moe.tarsin.coroutines.runSuspendCatching
+import splitties.init.appCtx
 
 @Composable
 fun DownloadScreen() {
@@ -46,6 +56,7 @@ fun DownloadScreen() {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val snackbarHostState = remember { SnackbarHostState() }
+    fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -59,8 +70,8 @@ fun DownloadScreen() {
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             var downloadLocationState by ::downloadLocation.observed
             val cannotGetDownloadLocation = stringResource(id = R.string.settings_download_cant_get_download_location)
             val selectDownloadDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { treeUri ->
@@ -75,7 +86,7 @@ fun DownloadScreen() {
                                 }
                             }
                         }.onFailure {
-                            snackbarHostState.showSnackbar(cannotGetDownloadLocation)
+                            launchSnackBar(cannotGetDownloadLocation)
                         }
                     }
                 }
@@ -96,7 +107,7 @@ fun DownloadScreen() {
                                 downloadLocationState = uniFile
                                 coroutineScope.launchNonCancellable { keepNoMediaFileStatus() }
                             } else {
-                                coroutineScope.launch { snackbarHostState.showSnackbar(cannotGetDownloadLocation) }
+                                launchSnackBar(cannotGetDownloadLocation)
                             }
                         }
                         .show()
@@ -139,10 +150,63 @@ fun DownloadScreen() {
                 summary = stringResource(id = R.string.settings_download_download_origin_image_summary),
                 value = Settings::downloadOriginImage,
             )
+            val restoreFailed = stringResource(id = R.string.settings_download_restore_failed)
             Preference(
                 title = stringResource(id = R.string.settings_download_restore_download_items),
                 summary = stringResource(id = R.string.settings_download_restore_download_items_summary),
-            )
+            ) {
+                var restoreDirCount = 0
+                fun getRestoreItem(file: UniFile): RestoreItem? {
+                    if (!file.isDirectory) return null
+                    val siFile = file.findFile(SpiderQueen.SPIDER_INFO_FILENAME) ?: return null
+                    return runCatching {
+                        val spiderInfo = readCompatFromUniFile(siFile) ?: return null
+                        val gid = spiderInfo.gid
+                        val dirname = file.name ?: return null
+                        if (DownloadManager.containDownloadInfo(gid)) {
+                            // Restore download dir to avoid redownload
+                            val dbdirname = EhDB.getDownloadDirname(gid)
+                            if (null == dbdirname || dirname != dbdirname) {
+                                EhDB.putDownloadDirname(gid, dirname)
+                                restoreDirCount++
+                            }
+                            return null
+                        }
+                        RestoreItem(dirname).also {
+                            it.gid = spiderInfo.gid
+                            it.token = spiderInfo.token
+                        }
+                    }.onFailure {
+                        it.printStackTrace()
+                    }.getOrNull()
+                }
+                coroutineScope.launch {
+                    val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
+                    context.runCatching {
+                        val result = downloadLocation.listFiles()?.mapNotNull { getRestoreItem(it) }?.apply {
+                            runSuspendCatching {
+                                fillGalleryListByApi(this, EhUrl.referer)
+                            }.onFailure {
+                                it.printStackTrace()
+                            }
+                        }
+                        if (result == null) {
+                            launchSnackBar(restoreFailed)
+                        } else {
+                            if (result.isEmpty()) {
+                                launchSnackBar(RESTORE_COUNT_MSG(restoreDirCount))
+                            } else {
+                                val count = result.filterNot { it.title.isNullOrBlank() }.map {
+                                    DownloadManager.addDownload(it, null)
+                                    EhDB.putDownloadDirname(it.gid, it.dirname)
+                                }.size
+                                launchSnackBar(RESTORE_COUNT_MSG(count + restoreDirCount))
+                            }
+                        }
+                    }
+                    if (alertDialog.isShowing) alertDialog.dismiss()
+                }
+            }
             Preference(
                 title = stringResource(id = R.string.settings_download_clean_redundancy),
                 summary = stringResource(id = R.string.settings_download_clean_redundancy_summary),
@@ -150,3 +214,7 @@ fun DownloadScreen() {
         }
     }
 }
+
+private class RestoreItem(val dirname: String) : BaseGalleryInfo()
+private val RESTORE_NOT_FOUND = appCtx.getString(R.string.settings_download_restore_not_found)
+private val RESTORE_COUNT_MSG = { cnt: Int -> if (cnt == 0) RESTORE_NOT_FOUND else appCtx.getString(R.string.settings_download_restore_successfully, cnt) }

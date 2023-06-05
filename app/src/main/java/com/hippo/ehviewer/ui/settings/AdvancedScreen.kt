@@ -65,6 +65,7 @@ fun AdvancedScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -111,10 +112,10 @@ fun AdvancedScreen() {
                                     zipOs.putNextEntry(logcatEntry)
                                     LogCat.save(zipOs)
                                 }
-                                snackbarHostState.showSnackbar(getString(R.string.settings_advanced_dump_logcat_to, uri.toString()))
+                                launchSnackBar(getString(R.string.settings_advanced_dump_logcat_to, uri.toString()))
                             }
                         }.onFailure {
-                            snackbarHostState.showSnackbar(dumpLogError)
+                            launchSnackBar(dumpLogError)
                             it.printStackTrace()
                         }
                     }
@@ -179,18 +180,16 @@ fun AdvancedScreen() {
             val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.sqlite3")) { uri ->
                 uri?.let {
                     coroutineScope.launch {
+                        val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
                         context.runCatching {
                             grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                            val alertDialog = withUIContext {
-                                BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
-                            }
                             EhDB.exportDB(context, uri)
-                            if (alertDialog.isShowing) alertDialog.dismiss()
-                            snackbarHostState.showSnackbar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
+                            launchSnackBar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
                         }.onFailure {
                             it.printStackTrace()
-                            snackbarHostState.showSnackbar(exportFailed)
+                            launchSnackBar(exportFailed)
                         }
+                        if (alertDialog.isShowing) alertDialog.dismiss()
                     }
                 }
             }
@@ -204,18 +203,16 @@ fun AdvancedScreen() {
             val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
                 uri?.let {
                     coroutineScope.launch {
+                        val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
                         context.runCatching {
                             grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            val alertDialog = withUIContext {
-                                BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
-                            }
                             EhDB.importDB(context, uri)
-                            if (alertDialog.isShowing) alertDialog.dismiss()
-                            snackbarHostState.showSnackbar(importSucceed)
+                            launchSnackBar(importSucceed)
                         }.onFailure {
                             it.printStackTrace()
-                            snackbarHostState.showSnackbar(importFailed)
+                            launchSnackBar(importFailed)
                         }
+                        if (alertDialog.isShowing) alertDialog.dismiss()
                     }
                 }
             }
@@ -236,13 +233,13 @@ fun AdvancedScreen() {
                 tailrec suspend fun doBackup() {
                     val result = EhEngine.getFavorites(favListUrlBuilder.build())
                     if (result.galleryInfoList.isEmpty()) {
-                        snackbarHostState.showSnackbar(backupNothing)
+                        launchSnackBar(backupNothing)
                     } else {
                         if (favTotal == 0) favTotal = result.countArray.sum()
                         favIndex += result.galleryInfoList.size
                         val status = "($favIndex/$favTotal)"
                         EhDB.putLocalFavorites(result.galleryInfoList)
-                        snackbarHostState.showSnackbar(context.getString(R.string.settings_advanced_backup_favorite_start, status))
+                        launchSnackBar(context.getString(R.string.settings_advanced_backup_favorite_start, status))
                         if (result.next != null) {
                             delay(Settings.downloadDelay.toLong())
                             favListUrlBuilder.setIndex(result.next, true)
@@ -254,10 +251,10 @@ fun AdvancedScreen() {
                     runSuspendCatching {
                         doBackup()
                     }.onSuccess {
-                        snackbarHostState.showSnackbar(backupSucceed)
+                        launchSnackBar(backupSucceed)
                     }.onFailure {
                         it.printStackTrace()
-                        snackbarHostState.showSnackbar(backupFailed)
+                        launchSnackBar(backupFailed)
                     }
                 }
             }

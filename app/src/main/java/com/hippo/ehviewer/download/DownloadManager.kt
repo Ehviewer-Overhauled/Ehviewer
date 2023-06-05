@@ -38,6 +38,7 @@ import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler
 import com.hippo.ehviewer.yorozuya.collect.LongList
 import com.hippo.unifile.UniFile
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import splitties.init.appCtx
@@ -395,7 +396,7 @@ object DownloadManager : OnSpiderListener {
         }
     }
 
-    fun addDownload(galleryInfo: GalleryInfo, label: String?) {
+    suspend fun addDownload(galleryInfo: GalleryInfo, label: String?) {
         if (containDownloadInfo(galleryInfo.gid)) {
             // Contain
             return
@@ -423,8 +424,10 @@ object DownloadManager : OnSpiderListener {
         EhDB.putDownloadInfo(info)
 
         // Notify
-        for (l in mDownloadInfoListeners) {
-            l!!.onAdd(info, list, list.size - 1)
+        withUIContext {
+            for (l in mDownloadInfoListeners) {
+                l!!.onAdd(info, list, list.size - 1)
+            }
         }
     }
 
