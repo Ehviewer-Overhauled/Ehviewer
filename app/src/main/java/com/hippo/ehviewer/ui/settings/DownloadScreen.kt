@@ -30,6 +30,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.ui.compose.observed
+import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
@@ -103,10 +104,11 @@ fun DownloadScreen() {
                     selectDownloadDirLauncher.launch(null)
                 }
             }
+            val mediaScan = Settings::mediaScan.observed
             SwitchPreference(
                 title = stringResource(id = R.string.settings_download_media_scan),
-                summary = if (Settings.mediaScan) stringResource(id = R.string.settings_download_media_scan_summary_on) else stringResource(id = R.string.settings_download_media_scan_summary_off),
-                value = Settings::mediaScan,
+                summary = if (mediaScan.value) stringResource(id = R.string.settings_download_media_scan_summary_on) else stringResource(id = R.string.settings_download_media_scan_summary_off),
+                value = mediaScan.rememberedAccessor,
             )
             val multiThreadDownload = Settings::multiThreadDownload.observed
             SimpleMenuPreferenceInt(
