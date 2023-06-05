@@ -1,7 +1,11 @@
 package com.hippo.ehviewer.ui.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -35,7 +39,7 @@ fun AdvancedScreen() {
             )
         },
     ) {
-        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+        Column(modifier = Modifier.padding(top = it.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             SwitchPreference(
                 title = stringResource(id = R.string.settings_advanced_save_parse_error_body),
                 summary = stringResource(id = R.string.settings_advanced_save_parse_error_body_summary),
@@ -62,6 +66,49 @@ fun AdvancedScreen() {
                 entryValueRes = R.array.app_language_entry_values,
                 value = Settings::language,
             )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_proxy),
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_built_in_hosts_title),
+                summary = null,
+                value = Settings::builtInHosts,
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_dns_over_http_title),
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_domain_fronting_title),
+                summary = stringResource(id = R.string.settings_advanced_domain_fronting_summary),
+                value = Settings::dF,
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.settings_advanced_bypass_vpn_title),
+                summary = stringResource(id = R.string.settings_advanced_bypass_vpn_summary),
+                value = Settings::bypassVpn,
+            )
+            SwitchPreference(
+                title = stringResource(id = R.string.preload_thumb_aggressively),
+                summary = null,
+                value = Settings::preloadThumbAggressively,
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_export_data),
+                summary = stringResource(id = R.string.settings_advanced_export_data_summary),
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_import_data),
+                summary = stringResource(id = R.string.settings_advanced_import_data_summary),
+            )
+            Preference(
+                title = stringResource(id = R.string.settings_advanced_backup_favorite),
+                summary = stringResource(id = R.string.settings_advanced_backup_favorite_summary),
+            )
+            Preference(
+                title = stringResource(id = R.string.open_by_default),
+                summary = null,
+            )
+            Spacer(modifier = Modifier.size(it.calculateBottomPadding()))
         }
     }
 }

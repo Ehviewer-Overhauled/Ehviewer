@@ -85,10 +85,10 @@ object Settings : DefaultPreferences() {
     var needSignIn by boolPref("need_sign_in", true)
     var selectSite by boolPref("select_site", true)
     val blackDarkTheme by boolPref(KEY_BLACK_DARK_THEME, false)
-    val preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
+    var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var dF by boolPref(KEY_DOMAIN_FRONTING, false)
     val downloadOriginImage by boolPref("download_origin_image", false)
-    val bypassVpn by boolPref(KEY_BYPASS_VPN, true)
+    var bypassVpn by boolPref(KEY_BYPASS_VPN, true)
 
     val thumbSizeDp by intPref(KEY_THUMB_SIZE, 120)
     var favLocalCount by intPref("fav_local", 0)
