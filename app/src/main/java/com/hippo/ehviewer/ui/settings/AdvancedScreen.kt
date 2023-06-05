@@ -1,6 +1,10 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -158,7 +162,24 @@ fun AdvancedScreen() {
             Preference(
                 title = stringResource(id = R.string.open_by_default),
                 summary = null,
-            )
+            ) {
+                context.run {
+                    try {
+                        @SuppressLint("InlinedApi")
+                        val intent = Intent(
+                            ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                            Uri.parse("package:$packageName"),
+                        )
+                        startActivity(intent)
+                    } catch (t: Throwable) {
+                        val intent = Intent(
+                            ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:$packageName"),
+                        )
+                        startActivity(intent)
+                    }
+                }
+            }
             Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }
     }
