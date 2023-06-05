@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,8 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
@@ -37,6 +40,9 @@ import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.reflect.KMutableProperty0
 
@@ -120,4 +126,14 @@ fun SimpleMenuPreference(title: String, @ArrayRes entry: Int, @ArrayRes entryVal
     fun set(new: String) = value.set(new.also { v = it })
     check(entryArray.size == valuesArray.size)
     DropDownPref(title = title, defaultValue = v, onValueChange = ::set, useSelectedAsSummary = true, entries = map)
+}
+
+@Composable
+fun WorkPreference(title: String, summary: String? = null, work: suspend CoroutineScope.() -> Unit) {
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val context = LocalContext.current
+    Preference(title = title, summary = summary) {
+        val alertDialog = BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
+        coroutineScope.launch(block = work).invokeOnCompletion { if (alertDialog.isShowing) alertDialog.dismiss() }
+    }
 }

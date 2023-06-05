@@ -43,7 +43,6 @@ import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moe.tarsin.coroutines.runSuspendCatching
@@ -151,7 +150,7 @@ fun DownloadScreen() {
                 value = Settings::downloadOriginImage,
             )
             val restoreFailed = stringResource(id = R.string.settings_download_restore_failed)
-            Preference(
+            WorkPreference(
                 title = stringResource(id = R.string.settings_download_restore_download_items),
                 summary = stringResource(id = R.string.settings_download_restore_download_items_summary),
             ) {
@@ -180,57 +179,53 @@ fun DownloadScreen() {
                         it.printStackTrace()
                     }.getOrNull()
                 }
-                coroutineScope.launch {
-                    val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
-                    context.runCatching {
-                        val result = downloadLocation.listFiles()?.mapNotNull { getRestoreItem(it) }?.apply {
-                            runSuspendCatching {
-                                fillGalleryListByApi(this, EhUrl.referer)
-                            }.onFailure {
-                                it.printStackTrace()
-                            }
-                        }
-                        if (result == null) {
-                            launchSnackBar(restoreFailed)
-                        } else {
-                            if (result.isEmpty()) {
-                                launchSnackBar(RESTORE_COUNT_MSG(restoreDirCount))
-                            } else {
-                                val count = result.filterNot { it.title.isNullOrBlank() }.map {
-                                    DownloadManager.addDownload(it, null)
-                                    EhDB.putDownloadDirname(it.gid, it.dirname)
-                                }.size
-                                launchSnackBar(RESTORE_COUNT_MSG(count + restoreDirCount))
-                            }
+                runCatching {
+                    val result = downloadLocation.listFiles()?.mapNotNull { getRestoreItem(it) }?.apply {
+                        runSuspendCatching {
+                            fillGalleryListByApi(this, EhUrl.referer)
+                        }.onFailure {
+                            it.printStackTrace()
                         }
                     }
-                    if (alertDialog.isShowing) alertDialog.dismiss()
+                    if (result == null) {
+                        launchSnackBar(restoreFailed)
+                    } else {
+                        if (result.isEmpty()) {
+                            launchSnackBar(RESTORE_COUNT_MSG(restoreDirCount))
+                        } else {
+                            val count = result.filterNot { it.title.isNullOrBlank() }.map {
+                                DownloadManager.addDownload(it, null)
+                                EhDB.putDownloadDirname(it.gid, it.dirname)
+                            }.size
+                            launchSnackBar(RESTORE_COUNT_MSG(count + restoreDirCount))
+                        }
+                    }
+                }.onFailure {
+                    it.printStackTrace()
                 }
             }
-            Preference(
+            WorkPreference(
                 title = stringResource(id = R.string.settings_download_clean_redundancy),
                 summary = stringResource(id = R.string.settings_download_clean_redundancy_summary),
             ) {
-                coroutineScope.launch {
-                    fun clearFile(file: UniFile): Boolean {
-                        var name = file.name ?: return false
-                        val index = name.indexOf('-')
-                        if (index >= 0) {
-                            name = name.substring(0, index)
-                        }
-                        val gid = name.toLongOrNull() ?: return false
-                        if (DownloadManager.containDownloadInfo(gid)) {
-                            return false
-                        }
-                        file.delete()
-                        return true
+                fun clearFile(file: UniFile): Boolean {
+                    var name = file.name ?: return false
+                    val index = name.indexOf('-')
+                    if (index >= 0) {
+                        name = name.substring(0, index)
                     }
-                    val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
-                    context.runCatching {
-                        val cnt = downloadLocation.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
-                        launchSnackBar(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
+                    val gid = name.toLongOrNull() ?: return false
+                    if (DownloadManager.containDownloadInfo(gid)) {
+                        return false
                     }
-                    if (alertDialog.isShowing) alertDialog.dismiss()
+                    file.delete()
+                    return true
+                }
+                runSuspendCatching {
+                    val cnt = downloadLocation.listFiles()?.sumOf { clearFile(it).compareTo(false) } ?: 0
+                    launchSnackBar(FINAL_CLEAR_REDUNDANCY_MSG(cnt))
+                }.onFailure {
+                    it.printStackTrace()
                 }
             }
         }
