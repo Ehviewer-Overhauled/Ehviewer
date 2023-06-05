@@ -17,8 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +29,7 @@ import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.download.downloadLocation
+import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
@@ -56,31 +59,32 @@ fun DownloadScreen() {
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        val cannotGetDownloadLocation = stringResource(id = R.string.settings_download_cant_get_download_location)
-        val selectDownloadDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { treeUri ->
-            treeUri?.run {
-                coroutineScope.launch {
-                    context.runCatching {
-                        contentResolver.takePersistableUriPermission(treeUri, FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION)
-                        UniFile.fromTreeUri(context, treeUri)!!.run {
-                            downloadLocation = this
-                            coroutineScope.launchNonCancellable {
-                                keepNoMediaFileStatus()
+        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
+            var downloadLocationState by ::downloadLocation.observed
+            val cannotGetDownloadLocation = stringResource(id = R.string.settings_download_cant_get_download_location)
+            val selectDownloadDirLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { treeUri ->
+                treeUri?.run {
+                    coroutineScope.launch {
+                        context.runCatching {
+                            contentResolver.takePersistableUriPermission(treeUri, FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION)
+                            UniFile.fromTreeUri(context, treeUri)!!.run {
+                                downloadLocationState = this
+                                coroutineScope.launchNonCancellable {
+                                    keepNoMediaFileStatus()
+                                }
                             }
+                        }.onFailure {
+                            snackbarHostState.showSnackbar(cannotGetDownloadLocation)
                         }
-                    }.onFailure {
-                        snackbarHostState.showSnackbar(cannotGetDownloadLocation)
                     }
                 }
             }
-        }
-        Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
             Preference(
                 title = stringResource(id = R.string.settings_download_download_location),
-                summary = downloadLocation.uri.toString(),
+                summary = downloadLocationState.uri.toString(),
             ) {
-                val file = downloadLocation
-                if (!UniFile.isFileUri(downloadLocation.uri)) {
+                val file = downloadLocationState
+                if (!UniFile.isFileUri(downloadLocationState.uri)) {
                     BaseDialogBuilder(context)
                         .setTitle(R.string.settings_download_download_location)
                         .setMessage(file.uri.toString())
@@ -88,7 +92,7 @@ fun DownloadScreen() {
                         .setNeutralButton(R.string.reset_download_location) { _, _ ->
                             val uniFile = UniFile.fromFile(AppConfig.defaultDownloadDir)
                             if (uniFile != null) {
-                                downloadLocation = uniFile
+                                downloadLocationState = uniFile
                                 coroutineScope.launchNonCancellable { keepNoMediaFileStatus() }
                             } else {
                                 coroutineScope.launch { snackbarHostState.showSnackbar(cannotGetDownloadLocation) }
