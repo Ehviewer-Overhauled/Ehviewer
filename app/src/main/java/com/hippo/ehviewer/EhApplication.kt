@@ -166,7 +166,7 @@ class EhApplication : Application(), ImageLoaderFactory {
             }
         }
 
-        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore(appCtx)) }
+        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore) }
 
         val ehDatabase by lazy { roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() } }
 

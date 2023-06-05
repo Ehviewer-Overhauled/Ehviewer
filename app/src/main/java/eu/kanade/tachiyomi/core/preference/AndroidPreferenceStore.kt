@@ -1,8 +1,7 @@
 package eu.kanade.tachiyomi.core.preference
 
-import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
+import com.hippo.ehviewer.Settings
 import eu.kanade.tachiyomi.core.preference.AndroidPreference.BooleanPrimitive
 import eu.kanade.tachiyomi.core.preference.AndroidPreference.FloatPrimitive
 import eu.kanade.tachiyomi.core.preference.AndroidPreference.IntPrimitive
@@ -13,11 +12,9 @@ import eu.kanade.tachiyomi.core.preference.AndroidPreference.StringSetPrimitive
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-class AndroidPreferenceStore(
-    context: Context,
-) : PreferenceStore {
+object AndroidPreferenceStore : PreferenceStore {
 
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val sharedPreferences = Settings.prefs
 
     private val keyFlow = sharedPreferences.keyFlow
 
