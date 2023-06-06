@@ -172,7 +172,7 @@ fun EhScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_my_tags),
                 summary = stringResource(id = R.string.settings_my_tags_summary),
-            )
+            ) { navController.navigate(MYTAGS_SCREEN) }
             SimpleMenuPreferenceInt(
                 title = stringResource(id = rikka.core.R.string.dark_theme),
                 entry = R.array.night_mode_entries,

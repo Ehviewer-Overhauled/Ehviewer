@@ -54,6 +54,9 @@ class SettingsActivity : EhActivity() {
                     composable(UCONFIG_SCREEN) {
                         UConfigScreen()
                     }
+                    composable(MYTAGS_SCREEN) {
+                        MyTagsScreen()
+                    }
                 }
             }
         }
@@ -68,3 +71,4 @@ const val ADVANCED_SETTINGS_SCREEN = "Advanced"
 const val ABOUT_SETTINGS_SCREEN = "About"
 const val LICENSE_SCREEN = "License"
 const val UCONFIG_SCREEN = "UConfig"
+const val MYTAGS_SCREEN = "Mytags"
