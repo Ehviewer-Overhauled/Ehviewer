@@ -18,8 +18,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,9 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.parser.HomeParser
+import com.hippo.ehviewer.dailycheck.schedHour
+import com.hippo.ehviewer.dailycheck.schedMinute
+import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -261,9 +266,26 @@ fun EhScreen() {
                 value = reqNews.rememberedAccessor,
             )
             AnimatedVisibility(visible = reqNews.value) {
-                Preference(
-                    title = stringResource(id = R.string.settings_eh_request_news_timepicker),
-                )
+                val pickerTitle = stringResource(id = R.string.settings_eh_request_news_timepicker)
+                var showPicker by rememberSaveable { mutableStateOf(false) }
+                val state = rememberTimePickerState(schedHour, schedMinute)
+                if (showPicker) {
+                    TimePickerDialog(
+                        title = pickerTitle,
+                        onCancel = { showPicker = false },
+                        onConfirm = {
+                            showPicker = false
+                            Settings.requestNewsTimerHour = state.hour
+                            Settings.requestNewsTimerMinute = state.minute
+                            updateDailyCheckWork(context)
+                        },
+                    ) {
+                        TimePicker(state = state)
+                    }
+                }
+                Preference(title = pickerTitle) {
+                    showPicker = true
+                }
             }
             AnimatedVisibility(visible = reqNews.value) {
                 SwitchPreference(
