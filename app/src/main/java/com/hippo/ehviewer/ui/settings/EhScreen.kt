@@ -248,7 +248,7 @@ fun EhScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_eh_filter),
                 summary = stringResource(id = R.string.settings_eh_filter_summary),
-            )
+            ) { navController.navigate(FILTER_SCREEN) }
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_metered_network_warning),
                 value = Settings::meteredNetworkWarning,
