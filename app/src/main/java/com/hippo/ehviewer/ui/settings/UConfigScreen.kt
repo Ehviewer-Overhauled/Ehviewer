@@ -3,6 +3,7 @@ package com.hippo.ehviewer.ui.settings
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import android.webkit.WebView
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -62,7 +63,7 @@ fun UConfigScreen() {
         val state = rememberWebViewState(url = url)
         WebView(
             state = state,
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).fillMaxSize(),
             onCreated = {
                 it.settings.run {
                     builtInZoomControls = true

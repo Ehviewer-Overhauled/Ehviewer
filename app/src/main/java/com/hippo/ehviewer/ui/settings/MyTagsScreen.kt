@@ -1,7 +1,67 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.annotation.SuppressLint
+import android.webkit.CookieManager
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.google.accompanist.web.WebView
+import com.google.accompanist.web.rememberWebViewState
+import com.hippo.ehviewer.R
+import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.ui.LocalNavController
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun MyTagsScreen() {
+    val navController = LocalNavController.current
+    val url = EhUrl.myTagsUrl
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.my_tags)) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                    }
+                },
+            )
+        },
+    ) { paddingValues ->
+        val state = rememberWebViewState(url = url)
+        WebView(
+            state = state,
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).fillMaxSize(),
+            onCreated = {
+                it.settings.run {
+                    builtInZoomControls = true
+                    displayZoomControls = false
+                    javaScriptEnabled = true
+                }
+            },
+        )
+        SideEffect {
+            CookieManager.getInstance().apply {
+                flush()
+                removeAllCookies(null)
+                removeSessionCookies(null)
+                // Copy cookies from okhttp cookie store to CookieManager
+                EhCookieStore.getCookies(url.toHttpUrl()).forEach {
+                    setCookie(url, it.toString())
+                }
+            }
+        }
+    }
 }

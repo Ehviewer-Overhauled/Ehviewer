@@ -3,10 +3,12 @@ package com.hippo.ehviewer.ui.login
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import android.webkit.WebView
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
@@ -105,6 +107,7 @@ fun WebviewSignInScreen() {
     }
     WebView(
         state = state,
+        modifier = Modifier.fillMaxSize(),
         onCreated = {
             it.settings.run {
                 builtInZoomControls = true
