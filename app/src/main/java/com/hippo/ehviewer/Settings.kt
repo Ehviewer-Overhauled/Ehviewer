@@ -57,7 +57,7 @@ object Settings : DataStorePreferences(null) {
     var readCacheSize by intFromStrPref("read_cache_size", 640)
     var launchPage by intFromStrPref("launch_page", 0)
     var showComments by boolPref("show_gallery_comments", true)
-    var requestNews by boolPref(KEY_REQUEST_NEWS, false)
+    var requestNews by boolPref(KEY_REQUEST_NEWS, false).observed { updateWhenRequestNewsChanges() }
     var hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, false)
     var showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, false)
     var showGalleryPages by boolPref("show_gallery_pages", false)
