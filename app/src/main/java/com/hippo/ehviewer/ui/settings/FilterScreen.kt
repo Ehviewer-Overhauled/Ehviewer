@@ -18,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,11 +29,14 @@ import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun FilterScreen() {
     val navController = LocalNavController.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -54,6 +59,7 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
+        val recomposer = currentRecomposeScope
         LazyColumn(contentPadding = paddingValues) {
             @Composable
             fun FilterItem(filter: Filter) {
@@ -61,10 +67,25 @@ fun FilterScreen() {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Checkbox(checked = filter.enable ?: false, onCheckedChange = { })
+                    Checkbox(
+                        checked = filter.enable ?: false,
+                        onCheckedChange = {
+                            coroutineScope.launch {
+                                EhFilter.triggerFilter(filter)
+                                recomposer.invalidate()
+                            }
+                        },
+                    )
                     Text(text = filter.text.orEmpty())
                     Spacer(modifier = Modifier.weight(1F))
-                    IconButton(onClick = { }) {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                EhFilter.deleteFilter(filter)
+                                recomposer.invalidate()
+                            }
+                        },
+                    ) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     }
                 }
