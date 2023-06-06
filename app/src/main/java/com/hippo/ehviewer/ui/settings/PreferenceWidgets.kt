@@ -1,7 +1,10 @@
 package com.hippo.ehviewer.ui.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +33,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import arrow.atomic.Atomic
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
@@ -40,9 +44,12 @@ import com.jamal.composeprefs3.ui.prefs.SliderPref
 import com.jamal.composeprefs3.ui.prefs.SpannedTextPref
 import com.jamal.composeprefs3.ui.prefs.SwitchPref
 import com.jamal.composeprefs3.ui.prefs.TextPref
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.roundToInt
 import kotlin.reflect.KMutableProperty0
 
@@ -135,5 +142,24 @@ fun WorkPreference(title: String, summary: String? = null, work: suspend Corouti
     Preference(title = title, summary = summary) {
         val alertDialog = BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show()
         coroutineScope.launch(block = work).invokeOnCompletion { if (alertDialog.isShowing) alertDialog.dismiss() }
+    }
+}
+
+@Composable
+fun <I, O> LauncherPreference(title: String, summary: String? = null, contract: ActivityResultContract<I, O>, key: I, work: suspend CoroutineScope.(O) -> Unit) {
+    val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val context = LocalContext.current
+    val callback = remember { Atomic<(O) -> Unit> {} }
+    val launcher = rememberLauncherForActivityResult(contract = contract) { callback.getAndSet { }.invoke(it) }
+    Preference(title = title, summary = summary) {
+        var alertDialog: AlertDialog? = null
+        coroutineScope.launch {
+            val o = suspendCoroutine { cont ->
+                callback.set { cont.resume(it) }
+                launcher.launch(key)
+            }
+            alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
+            work(o)
+        }.invokeOnCompletion { alertDialog?.dismiss() }
     }
 }

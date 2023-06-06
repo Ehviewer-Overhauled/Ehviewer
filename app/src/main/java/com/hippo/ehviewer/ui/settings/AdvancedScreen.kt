@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,12 +40,10 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.systemDns
 import com.hippo.ehviewer.ui.compose.observed
-import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.LogCat
 import com.hippo.ehviewer.util.ReadableTime
-import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -92,39 +89,38 @@ fun AdvancedScreen() {
                 value = Settings::saveCrashLog,
             )
             val dumpLogError = stringResource(id = R.string.settings_advanced_dump_logcat_failed)
-            val dumpLogcatLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+            LauncherPreference(
+                title = stringResource(id = R.string.settings_advanced_dump_logcat),
+                summary = stringResource(id = R.string.settings_advanced_dump_logcat_summary),
+                contract = ActivityResultContracts.CreateDocument("application/zip"),
+                key = "log-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".zip",
+            ) { uri ->
                 uri?.run {
-                    coroutineScope.launch {
-                        context.runCatching {
-                            grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                            contentResolver.openOutputStream(uri)?.use { outputStream ->
-                                val files = ArrayList<File>()
-                                AppConfig.externalParseErrorDir?.listFiles()?.let { files.addAll(it) }
-                                AppConfig.externalCrashDir?.listFiles()?.let { files.addAll(it) }
-                                ZipOutputStream(outputStream).use { zipOs ->
-                                    files.forEach { file ->
-                                        if (!file.isFile) return@forEach
-                                        val entry = ZipEntry(file.name)
-                                        zipOs.putNextEntry(entry)
-                                        file.inputStream().use { it.copyTo(zipOs) }
-                                    }
-                                    val logcatEntry = ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt")
-                                    zipOs.putNextEntry(logcatEntry)
-                                    LogCat.save(zipOs)
+                    context.runCatching {
+                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        contentResolver.openOutputStream(uri)?.use { outputStream ->
+                            val files = ArrayList<File>()
+                            AppConfig.externalParseErrorDir?.listFiles()?.let { files.addAll(it) }
+                            AppConfig.externalCrashDir?.listFiles()?.let { files.addAll(it) }
+                            ZipOutputStream(outputStream).use { zipOs ->
+                                files.forEach { file ->
+                                    if (!file.isFile) return@forEach
+                                    val entry = ZipEntry(file.name)
+                                    zipOs.putNextEntry(entry)
+                                    file.inputStream().use { it.copyTo(zipOs) }
                                 }
-                                launchSnackBar(getString(R.string.settings_advanced_dump_logcat_to, uri.toString()))
+                                val logcatEntry = ZipEntry("logcat-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".txt")
+                                zipOs.putNextEntry(logcatEntry)
+                                LogCat.save(zipOs)
                             }
-                        }.onFailure {
-                            launchSnackBar(dumpLogError)
-                            it.printStackTrace()
+                            launchSnackBar(getString(R.string.settings_advanced_dump_logcat_to, uri.toString()))
                         }
+                    }.onFailure {
+                        launchSnackBar(dumpLogError)
+                        it.printStackTrace()
                     }
                 }
             }
-            Preference(
-                title = stringResource(id = R.string.settings_advanced_dump_logcat),
-                summary = stringResource(id = R.string.settings_advanced_dump_logcat_summary),
-            ) { dumpLogcatLauncher.launch("log-" + ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".zip") }
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_advanced_read_cache_size),
                 entry = R.array.read_cache_size_entries,
@@ -173,49 +169,42 @@ fun AdvancedScreen() {
                 value = Settings::preloadThumbAggressively,
             )
             val exportFailed = stringResource(id = R.string.settings_advanced_export_data_failed)
-            val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.sqlite3")) { uri ->
-                uri?.let {
-                    coroutineScope.launch {
-                        val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
-                        context.runCatching {
-                            grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                            EhDB.exportDB(context, uri)
-                            launchSnackBar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
-                        }.onFailure {
-                            it.printStackTrace()
-                            launchSnackBar(exportFailed)
-                        }
-                        if (alertDialog.isShowing) alertDialog.dismiss()
-                    }
-                }
-            }
-            Preference(
+            LauncherPreference(
                 title = stringResource(id = R.string.settings_advanced_export_data),
                 summary = stringResource(id = R.string.settings_advanced_export_data_summary),
-            ) { exportLauncher.launch(ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db") }
-
-            val importFailed = stringResource(id = R.string.cant_read_the_file)
-            val importSucceed = stringResource(id = R.string.settings_advanced_import_data_successfully)
-            val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                contract = ActivityResultContracts.CreateDocument("application/vnd.sqlite3"),
+                key = ReadableTime.getFilenamableTime(System.currentTimeMillis()) + ".db",
+            ) { uri ->
                 uri?.let {
-                    coroutineScope.launch {
-                        val alertDialog = withUIContext { BaseDialogBuilder(context).setCancelable(false).setView(R.layout.preference_dialog_task).show() }
-                        context.runCatching {
-                            grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            EhDB.importDB(context, uri)
-                            launchSnackBar(importSucceed)
-                        }.onFailure {
-                            it.printStackTrace()
-                            launchSnackBar(importFailed)
-                        }
-                        if (alertDialog.isShowing) alertDialog.dismiss()
+                    context.runCatching {
+                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        EhDB.exportDB(context, uri)
+                        launchSnackBar(getString(R.string.settings_advanced_export_data_to, uri.toString()))
+                    }.onFailure {
+                        it.printStackTrace()
+                        launchSnackBar(exportFailed)
                     }
                 }
             }
-            Preference(
+            val importFailed = stringResource(id = R.string.cant_read_the_file)
+            val importSucceed = stringResource(id = R.string.settings_advanced_import_data_successfully)
+            LauncherPreference(
                 title = stringResource(id = R.string.settings_advanced_import_data),
                 summary = stringResource(id = R.string.settings_advanced_import_data_summary),
-            ) { importLauncher.launch("application/octet-stream") }
+                contract = ActivityResultContracts.GetContent(),
+                key = "application/octet-stream",
+            ) { uri ->
+                uri?.let {
+                    context.runCatching {
+                        grantUriPermission(BuildConfig.APPLICATION_ID, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        EhDB.importDB(context, uri)
+                        launchSnackBar(importSucceed)
+                    }.onFailure {
+                        it.printStackTrace()
+                        launchSnackBar(importFailed)
+                    }
+                }
+            }
             val backupNothing = stringResource(id = R.string.settings_advanced_backup_favorite_nothing)
             val backupFailed = stringResource(id = R.string.settings_advanced_backup_favorite_failed)
             val backupSucceed = stringResource(id = R.string.settings_advanced_backup_favorite_success)
