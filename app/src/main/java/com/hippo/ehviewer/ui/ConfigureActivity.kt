@@ -7,18 +7,13 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.login.CookieSignInScene
 import com.hippo.ehviewer.ui.login.SelectSiteScreen
@@ -42,11 +37,10 @@ class ConfigureActivity : EhActivity() {
         setMD3Content {
             val navController = rememberNavController()
             val windowSizeClass = calculateWindowSizeClass(this)
-            val login = EhCookieStore.hasSignedIn()
             CompositionLocalProvider(LocalNavController provides navController) {
                 NavHost(
                     navController = navController,
-                    startDestination = if (login) BASE_SETTINGS_SCREEN else SIGN_IN_ROUTE_NAME,
+                    startDestination = if (Settings.needSignIn) SIGN_IN_ROUTE_NAME else BASE_SETTINGS_SCREEN,
                     enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(200)) },
                     exitTransition = { ExitTransition.None },
                     popEnterTransition = { EnterTransition.None },
@@ -65,14 +59,7 @@ class ConfigureActivity : EhActivity() {
                     }
 
                     composable(SELECT_SITE_ROUTE_NAME) {
-                        val selectSite by remember { mutableStateOf(Settings.selectSite) }
-                        if (selectSite) {
-                            SelectSiteScreen()
-                        } else {
-                            SideEffect {
-                                finish()
-                            }
-                        }
+                        SelectSiteScreen()
                     }
                     composable(BASE_SETTINGS_SCREEN) {
                         BaseScreen()

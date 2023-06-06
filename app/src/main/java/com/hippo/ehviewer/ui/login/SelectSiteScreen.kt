@@ -22,6 +22,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,13 @@ fun SelectSiteScreen() {
     val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
     var siteEx by remember { mutableStateOf(true) }
+
+    if (!Settings.selectSite) {
+        SideEffect {
+            Settings.needSignIn = false
+            activity.finish()
+        }
+    }
 
     Column(
         Modifier
