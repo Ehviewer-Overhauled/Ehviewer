@@ -101,18 +101,30 @@ fun FilterScreen() {
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-            header(R.string.filter_title)
-            filterItems(EhFilter.titleFilterList)
-            header(R.string.filter_tag)
-            filterItems(EhFilter.tagFilterList)
-            header(R.string.filter_comment)
-            filterItems(EhFilter.commentFilterList)
-            header(R.string.filter_commenter)
-            filterItems(EhFilter.commenterFilterList)
-            header(R.string.filter_uploader)
-            filterItems(EhFilter.uploaderFilterList)
-            header(R.string.filter_tag_namespace)
-            filterItems(EhFilter.tagNamespaceFilterList)
+            EhFilter.titleFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_title)
+                filterItems(it)
+            }
+            EhFilter.tagFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_tag)
+                filterItems(it)
+            }
+            EhFilter.commentFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_comment)
+                filterItems(it)
+            }
+            EhFilter.commenterFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_commenter)
+                filterItems(it)
+            }
+            EhFilter.uploaderFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_uploader)
+                filterItems(it)
+            }
+            EhFilter.tagNamespaceFilterList.takeIf { it.isNotEmpty() }?.let {
+                header(R.string.filter_tag_namespace)
+                filterItems(it)
+            }
         }
     }
 }
