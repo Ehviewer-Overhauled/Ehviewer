@@ -1,8 +1,10 @@
 package com.hippo.ehviewer.ui.settings
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -14,6 +16,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -24,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
@@ -59,10 +63,9 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
-        val recomposer = currentRecomposeScope
+        val recompose = currentRecomposeScope
         LazyColumn(contentPadding = paddingValues) {
-            @Composable
-            fun FilterItem(filter: Filter) {
+            fun filterItems(list: List<Filter>) = items(list) { filter ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -72,7 +75,7 @@ fun FilterScreen() {
                         onCheckedChange = {
                             coroutineScope.launch {
                                 EhFilter.triggerFilter(filter)
-                                recomposer.invalidate()
+                                recompose.invalidate()
                             }
                         },
                     )
@@ -82,7 +85,7 @@ fun FilterScreen() {
                         onClick = {
                             coroutineScope.launch {
                                 EhFilter.deleteFilter(filter)
-                                recomposer.invalidate()
+                                recompose.invalidate()
                             }
                         },
                     ) {
@@ -90,30 +93,25 @@ fun FilterScreen() {
                     }
                 }
             }
-            fun filterItems(list: List<Filter>) = items(list) { FilterItem(filter = it) }
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_title))
+            fun header(@StringRes title: Int) = stickyHeader {
+                Text(
+                    text = stringResource(id = title),
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
+            header(R.string.filter_title)
             filterItems(EhFilter.titleFilterList)
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_tag))
-            }
+            header(R.string.filter_tag)
             filterItems(EhFilter.tagFilterList)
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_comment))
-            }
+            header(R.string.filter_comment)
             filterItems(EhFilter.commentFilterList)
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_commenter))
-            }
+            header(R.string.filter_commenter)
             filterItems(EhFilter.commenterFilterList)
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_uploader))
-            }
+            header(R.string.filter_uploader)
             filterItems(EhFilter.uploaderFilterList)
-            stickyHeader {
-                Text(text = stringResource(id = R.string.filter_tag_namespace))
-            }
+            header(R.string.filter_tag_namespace)
             filterItems(EhFilter.tagNamespaceFilterList)
         }
     }
