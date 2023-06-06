@@ -141,8 +141,22 @@ fun EhScreen() {
             IntSliderPreference(
                 maxValue = 60,
                 minValue = 20,
+                step = 7,
                 title = stringResource(id = R.string.list_tile_thumb_size),
                 value = Settings::listThumbSize,
+            )
+            SimpleMenuPreferenceInt(
+                title = stringResource(id = R.string.settings_eh_detail_size),
+                entry = R.array.detail_size_entries,
+                entryValueRes = R.array.detail_size_entry_values,
+                value = Settings::detailSize.observed,
+            )
+            IntSliderPreference(
+                maxValue = 400,
+                minValue = 80,
+                step = 3,
+                title = stringResource(id = R.string.settings_eh_thumb_size),
+                value = Settings::thumbSizeDp,
             )
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_eh_thumb_resolution),
