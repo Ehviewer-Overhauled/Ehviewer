@@ -20,11 +20,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ fun FilterScreen() {
     val navController = LocalNavController.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,6 +58,7 @@ fun FilterScreen() {
                         Icon(imageVector = Icons.Default.Help, contentDescription = null)
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
@@ -64,7 +68,10 @@ fun FilterScreen() {
         },
     ) { paddingValues ->
         val recompose = currentRecomposeScope
-        LazyColumn(contentPadding = paddingValues) {
+        LazyColumn(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
+        ) {
             fun filterItems(list: List<Filter>) = items(list) { filter ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
