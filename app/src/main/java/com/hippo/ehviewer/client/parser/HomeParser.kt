@@ -1,6 +1,8 @@
 package com.hippo.ehviewer.client.parser
 
+import android.os.Parcelable
 import com.hippo.ehviewer.client.exception.ParseException
+import kotlinx.parcelize.Parcelize
 import org.jsoup.Jsoup
 
 object HomeParser {
@@ -38,7 +40,10 @@ object HomeParser {
         throw ParseException("Parse funds error", body)
     }
 
-    data class Limits(val current: Int = 0, val maximum: Int, val resetCost: Int = 0)
-    data class Funds(val fundsGP: Int, val fundsC: Int)
+    @Parcelize
+    data class Limits(val current: Int = 0, val maximum: Int, val resetCost: Int = 0) : Parcelable
+
+    @Parcelize
+    data class Funds(val fundsGP: Int, val fundsC: Int) : Parcelable
     class Result(val limits: Limits, val funds: Funds)
 }

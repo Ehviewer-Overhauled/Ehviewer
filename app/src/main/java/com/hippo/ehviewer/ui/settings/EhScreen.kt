@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.content.DialogInterface
 import android.os.Build
 import android.text.Html
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -28,14 +33,19 @@ import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.whisperClipboard
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import moe.tarsin.coroutines.runSuspendCatching
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Composable
@@ -99,9 +109,56 @@ fun EhScreen() {
                     }
                 }.show()
             }
+            val placeholder = stringResource(id = R.string.please_wait)
+            val resetImageLimitSucceed = stringResource(id = R.string.reset_limits_succeed)
+            val noImageLimits = stringResource(id = R.string.image_limits_summary, 0, 0)
+            var summary by rememberSaveable { mutableStateOf(noImageLimits) }
+            suspend fun getImageLimits() = EhEngine.getImageLimits().also {
+                summary = context.getString(R.string.image_limits_summary, it.limits.current, it.limits.maximum)
+            }
+            val deferredResult = remember { coroutineScope.async { runSuspendCatching { getImageLimits() } } }
             Preference(
                 title = stringResource(id = R.string.image_limits),
-            )
+                summary = summary,
+            ) {
+                val builder = BaseDialogBuilder(context).setMessage(placeholder)
+                    .setPositiveButton(R.string.reset, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                val dialog = builder.show()
+                val resetButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                fun bind(result: HomeParser.Result) {
+                    val (current, maximum, resetCost) = result.limits
+                    val (fundsGP, fundsC) = result.funds
+                    val cost = if (fundsGP >= resetCost) "$resetCost GP" else "$resetCost Credits"
+                    val message = context.getString(R.string.current_limits, "$current / $maximum", cost) + "\n" + context.getString(R.string.current_funds, "$fundsGP+", fundsC)
+                    dialog.setMessage(message)
+                    resetButton.isEnabled = resetCost in 1..maxOf(fundsGP, fundsC)
+                }
+                coroutineScope.launch {
+                    runSuspendCatching {
+                        val result = deferredResult.await().getOrNull() ?: getImageLimits()
+                        withUIContext { bind(result) }
+                    }.onFailure {
+                        dialog.setMessage(it.localizedMessage)
+                    }
+                }
+                resetButton.isEnabled = false
+                resetButton.setOnClickListener { button ->
+                    button.isEnabled = false
+                    dialog.setMessage(placeholder)
+                    coroutineScope.launch {
+                        runSuspendCatching {
+                            EhEngine.resetImageLimits()
+                            getImageLimits()
+                        }.onSuccess {
+                            launchSnackBar(resetImageLimitSucceed)
+                            withUIContext { bind(it) }
+                        }.onFailure {
+                            dialog.setMessage(it.localizedMessage)
+                        }
+                    }
+                }
+            }
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_eh_gallery_site),
                 entry = R.array.gallery_site_entries,
