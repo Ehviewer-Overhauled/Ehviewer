@@ -154,7 +154,7 @@ fun EhScreen() {
             IntSliderPreference(
                 maxValue = 400,
                 minValue = 80,
-                step = 3,
+                step = 7,
                 title = stringResource(id = R.string.settings_eh_thumb_size),
                 value = Settings::thumbSizeDp,
             )

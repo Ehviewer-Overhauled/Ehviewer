@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jamal.composeprefs3.ui.roundToDP
+import kotlin.math.roundToInt
 
 @Composable
 fun SliderPref(
@@ -27,6 +28,7 @@ fun SliderPref(
     onValueChangeFinished: ((Float) -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     showValue: Boolean = false,
+    showInteger: Boolean = false,
     steps: Int = 0,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     enabled: Boolean = true,
@@ -60,7 +62,7 @@ fun SliderPref(
             )
             if (showValue) {
                 Text(
-                    text = roundToDP(value, 2).toString(),
+                    text = if (showInteger) value.roundToInt().toString() else roundToDP(value, 2).toString(),
                     color = textColor,
                     modifier = Modifier.weight(0.5f).padding(start = 8.dp),
                 )
