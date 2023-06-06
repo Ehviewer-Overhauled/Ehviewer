@@ -31,6 +31,8 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
+private val applyJs = "javascript:(function(){var apply = document.getElementById(\"apply\").children[0];apply.click();})();"
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun UConfigScreen() {
@@ -47,18 +49,7 @@ fun UConfigScreen() {
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            webview.get()?.loadUrl(
-                                """
-                                    javascript:(function() {
-                                    var apply = document.getElementById("apply").children[0];
-                                    apply.click();
-                                    })();
-                                    """,
-                            )
-                        },
-                    ) {
+                    IconButton(onClick = { webview.get()?.loadUrl(applyJs) }) {
                         Icon(imageVector = Icons.Default.Check, contentDescription = null)
                     }
                 },
