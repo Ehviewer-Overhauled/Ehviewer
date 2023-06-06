@@ -3,6 +3,7 @@ package com.hippo.ehviewer.ui.settings
 import android.content.DialogInterface
 import android.os.Build
 import android.text.Html
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.ui.compose.observed
+import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.whisperClipboard
@@ -73,7 +75,12 @@ fun EhScreen() {
         val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
-        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .padding(top = paddingValues.calculateTopPadding())
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .verticalScroll(rememberScrollState()),
+        ) {
             Preference(
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: touristMode,
@@ -253,17 +260,22 @@ fun EhScreen() {
                 title = stringResource(id = R.string.settings_eh_metered_network_warning),
                 value = Settings::meteredNetworkWarning,
             )
+            val reqNews = Settings::requestNews.observed
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_request_news),
-                value = Settings::requestNews,
+                value = reqNews.rememberedAccessor,
             )
-            Preference(
-                title = stringResource(id = R.string.settings_eh_request_news_timepicker),
-            )
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_eh_hide_hv_events),
-                value = Settings::requestNews,
-            )
+            AnimatedVisibility(visible = reqNews.value) {
+                Preference(
+                    title = stringResource(id = R.string.settings_eh_request_news_timepicker),
+                )
+            }
+            AnimatedVisibility(visible = reqNews.value) {
+                SwitchPreference(
+                    title = stringResource(id = R.string.settings_eh_hide_hv_events),
+                    value = Settings::requestNews,
+                )
+            }
             Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }
     }
