@@ -84,9 +84,8 @@ fun UConfigScreen() {
             }
             onDispose {
                 // Put cookies back to okhttp cookie store
-                val cookieManager = CookieManager.getInstance()
-                val cookiesString = cookieManager.getCookie(url)
-                if (!cookiesString.isNullOrEmpty()) {
+                val cookiesString = CookieManager.getInstance().getCookie(url)
+                if (cookiesString.isNotBlank()) {
                     val hostUrl = EhUrl.host.toHttpUrl()
                     launchIO {
                         EhCookieStore.deleteCookie(hostUrl, KEY_SETTINGS_PROFILE)
