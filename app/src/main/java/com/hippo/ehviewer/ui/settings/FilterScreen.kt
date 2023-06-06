@@ -67,7 +67,7 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
-        val recompose = currentRecomposeScope
+        val lazyListRecomposeScope = currentRecomposeScope
         LazyColumn(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentPadding = paddingValues,
@@ -77,12 +77,13 @@ fun FilterScreen() {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val filterCheckBoxRecomposeScope = currentRecomposeScope
                     Checkbox(
                         checked = filter.enable ?: false,
                         onCheckedChange = {
                             coroutineScope.launch {
                                 EhFilter.triggerFilter(filter)
-                                recompose.invalidate()
+                                filterCheckBoxRecomposeScope.invalidate()
                             }
                         },
                     )
@@ -92,7 +93,7 @@ fun FilterScreen() {
                         onClick = {
                             coroutineScope.launch {
                                 EhFilter.deleteFilter(filter)
-                                recompose.invalidate()
+                                lazyListRecomposeScope.invalidate()
                             }
                         },
                     ) {
