@@ -49,12 +49,29 @@ fun AboutScreen() {
         },
     ) {
         Column(modifier = Modifier.padding(it).nestedScroll(scrollBehavior.nestedScrollConnection)) {
-            Preference(title = stringResource(id = R.string.settings_about_declaration), summary = stringResource(id = R.string.settings_about_declaration_summary))
-            HtmlPreference(title = stringResource(id = R.string.settings_about_author), summary = author())
-            UrlPreference(title = stringResource(id = R.string.settings_about_latest_release), url = RELEASE_URL)
-            UrlPreference(title = stringResource(id = R.string.settings_about_source), url = REPO_URL)
-            Preference(title = stringResource(id = R.string.license)) { navController.navigate(LICENSE_SCREEN) }
-            Preference(title = stringResource(id = R.string.settings_about_version), summary = versionCode())
+            Preference(
+                title = stringResource(id = R.string.settings_about_declaration),
+                summary = stringResource(id = R.string.settings_about_declaration_summary),
+            )
+            HtmlPreference(
+                title = stringResource(id = R.string.settings_about_author),
+                summary = author(),
+            )
+            UrlPreference(
+                title = stringResource(id = R.string.settings_about_latest_release),
+                url = RELEASE_URL,
+            )
+            UrlPreference(
+                title = stringResource(id = R.string.settings_about_source),
+                url = REPO_URL,
+            )
+            Preference(title = stringResource(id = R.string.license)) {
+                navController.navigate(LICENSE_SCREEN)
+            }
+            Preference(
+                title = stringResource(id = R.string.settings_about_version),
+                summary = versionCode(),
+            )
             Preference(title = stringResource(id = R.string.settings_about_check_for_updates))
         }
     }
