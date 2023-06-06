@@ -75,12 +75,7 @@ fun EhScreen() {
         val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
-        Column(
-            modifier = Modifier
-                .padding(top = paddingValues.calculateTopPadding())
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState()),
-        ) {
+        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: touristMode,
