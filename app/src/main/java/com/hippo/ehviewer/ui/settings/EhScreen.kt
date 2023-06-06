@@ -168,7 +168,7 @@ fun EhScreen() {
             Preference(
                 title = stringResource(id = R.string.settings_u_config),
                 summary = stringResource(id = R.string.settings_u_config_summary),
-            )
+            ) { navController.navigate(UCONFIG_SCREEN) }
             Preference(
                 title = stringResource(id = R.string.settings_my_tags),
                 summary = stringResource(id = R.string.settings_my_tags_summary),

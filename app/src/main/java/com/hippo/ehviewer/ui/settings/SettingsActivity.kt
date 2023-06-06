@@ -51,6 +51,9 @@ class SettingsActivity : EhActivity() {
                     composable(EH_SETTINGS_SCREEN) {
                         EhScreen()
                     }
+                    composable(UCONFIG_SCREEN) {
+                        UConfigScreen()
+                    }
                 }
             }
         }
@@ -64,3 +67,4 @@ const val SECURITY_SETTINGS_SCREEN = "Security"
 const val ADVANCED_SETTINGS_SCREEN = "Advanced"
 const val ABOUT_SETTINGS_SCREEN = "About"
 const val LICENSE_SCREEN = "License"
+const val UCONFIG_SCREEN = "UConfig"
