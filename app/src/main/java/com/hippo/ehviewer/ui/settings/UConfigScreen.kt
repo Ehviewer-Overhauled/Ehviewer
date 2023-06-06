@@ -2,7 +2,6 @@ package com.hippo.ehviewer.ui.settings
 
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import arrow.atomic.Atomic
-import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.hippo.ehviewer.R
@@ -62,14 +60,6 @@ fun UConfigScreen() {
         },
     ) { paddingValues ->
         val state = rememberWebViewState(url = url)
-        val webViewClient = remember {
-            object : AccompanistWebViewClient() {
-                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                    // Never load other urls
-                    return true
-                }
-            }
-        }
         WebView(
             state = state,
             modifier = Modifier.padding(paddingValues),
@@ -80,7 +70,6 @@ fun UConfigScreen() {
                     javaScriptEnabled = true
                 }
             },
-            client = webViewClient,
             factory = { WebView(it).apply { webview.set(this) } },
         )
         DisposableEffect(Unit) {
