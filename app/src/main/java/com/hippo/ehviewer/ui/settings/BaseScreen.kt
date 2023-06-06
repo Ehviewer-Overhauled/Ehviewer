@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.settings
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,7 +17,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
@@ -26,18 +24,20 @@ import com.hippo.ehviewer.ui.ABOUT_SETTINGS_SCREEN
 import com.hippo.ehviewer.ui.ADVANCED_SETTINGS_SCREEN
 import com.hippo.ehviewer.ui.DOWNLOAD_SETTINGS_SCREEN
 import com.hippo.ehviewer.ui.EH_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
+import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SECURITY_SETTINGS_SCREEN
 
 @Composable
 fun BaseScreen() {
-    val activity = LocalContext.current as Activity
+    val navController = LocalNavController.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
-                    IconButton(onClick = { activity.finish() }) {
+                    IconButton(onClick = { navController.navigate(FINISH_ROUTE_NAME) }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
