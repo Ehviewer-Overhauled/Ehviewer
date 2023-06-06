@@ -116,7 +116,6 @@ object EhUtils {
         Settings.displayName = null
         Settings.gallerySite = EhUrl.SITE_E
         Settings.needSignIn = true
-        Settings.selectSite = true
     }
 
     fun needSignedIn(): Boolean {

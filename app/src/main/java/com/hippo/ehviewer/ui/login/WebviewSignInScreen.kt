@@ -13,6 +13,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.ui.legacy.DialogWebChromeClient
@@ -101,16 +102,14 @@ fun WebviewSignInScreen() {
                     if (getId && getHash) {
                         present = true
                         coroutineScope.launchIO {
-                            withNonCancellableContext {
+                            val canEx = withNonCancellableContext {
                                 cookies.forEach {
                                     addCookie(EhUrl.DOMAIN_EX, it)
                                     addCookie(EhUrl.DOMAIN_E, it)
                                 }
                                 postLogin()
                             }
-                            withUIContext {
-                                navController.navigate(SELECT_SITE_ROUTE_NAME)
-                            }
+                            withUIContext { navController.navigate(if (canEx) SELECT_SITE_ROUTE_NAME else FINISH_ROUTE_NAME) }
                         }
                     }
                 }

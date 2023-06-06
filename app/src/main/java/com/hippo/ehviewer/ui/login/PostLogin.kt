@@ -18,25 +18,22 @@ suspend fun postLogin() = coroutineScope {
             it.printStackTrace()
         }
     }
-    launch {
-        runCatching {
-            // For the `star` cookie
-            EhEngine.getNews(false)
-            EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
+    runCatching {
+        // For the `star` cookie
+        EhEngine.getNews(false)
+        EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
 
-            // Sad panda check
-            Settings.gallerySite = EhUrl.SITE_EX
-            EhEngine.getUConfig()
-        }.onFailure {
-            Settings.selectSite = false
-            Settings.gallerySite = EhUrl.SITE_E
-            launch {
-                runCatching {
-                    EhEngine.getUConfig()
-                }.onFailure {
-                    it.printStackTrace()
-                }
+        // Sad panda check
+        Settings.gallerySite = EhUrl.SITE_EX
+        EhEngine.getUConfig()
+    }.onFailure {
+        Settings.gallerySite = EhUrl.SITE_E
+        launch {
+            runCatching {
+                EhEngine.getUConfig()
+            }.onFailure {
+                it.printStackTrace()
             }
         }
-    }.join()
+    }.isSuccess
 }

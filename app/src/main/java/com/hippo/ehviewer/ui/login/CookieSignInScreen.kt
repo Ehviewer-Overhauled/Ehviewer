@@ -56,6 +56,7 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.ui.compose.rememberDialogState
@@ -128,12 +129,8 @@ fun CookieSignInScene(windowSizeClass: WindowSizeClass) {
                 storeCookie(ipbMemberId, ipbPassHash, igneous)
                 EhEngine.getProfile()
             }.onSuccess {
-                withNonCancellableContext {
-                    postLogin()
-                }
-                withUIContext {
-                    navController.navigate(SELECT_SITE_ROUTE_NAME)
-                }
+                val canEx = withNonCancellableContext { postLogin() }
+                withUIContext { navController.navigate(if (canEx) SELECT_SITE_ROUTE_NAME else FINISH_ROUTE_NAME) }
             }.onFailure {
                 EhCookieStore.signOut()
                 dialogState.show(

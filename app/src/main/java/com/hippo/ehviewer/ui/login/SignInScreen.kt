@@ -62,6 +62,7 @@ import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.COOKIE_SIGN_IN_ROUTE_NAME
+import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.ui.WEBVIEW_SIGN_IN_ROUTE_NAME
@@ -134,12 +135,8 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                     isProgressIndicatorVisible = false
                 }
             }.onSuccess {
-                withNonCancellableContext {
-                    postLogin()
-                }
-                withUIContext {
-                    navController.navigate(SELECT_SITE_ROUTE_NAME)
-                }
+                val canEx = withNonCancellableContext { postLogin() }
+                withUIContext { navController.navigate(if (canEx) SELECT_SITE_ROUTE_NAME else FINISH_ROUTE_NAME) }
             }
         }
     }
@@ -246,9 +243,9 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                     }
                     TextButton(
                         onClick = {
-                            Settings.selectSite = false
+                            Settings.needSignIn = false
                             Settings.gallerySite = EhUrl.SITE_E
-                            navController.navigate(SELECT_SITE_ROUTE_NAME)
+                            navController.navigate(FINISH_ROUTE_NAME)
                         },
                     ) {
                         Text(
@@ -337,9 +334,9 @@ fun SignInScreen(windowSizeClass: WindowSizeClass) {
                         }
                         TextButton(
                             onClick = {
-                                Settings.selectSite = false
+                                Settings.needSignIn = false
                                 Settings.gallerySite = EhUrl.SITE_E
-                                navController.navigate(SELECT_SITE_ROUTE_NAME)
+                                navController.navigate(FINISH_ROUTE_NAME)
                             },
                             modifier = Modifier.padding(horizontal = 4.dp),
                         ) {

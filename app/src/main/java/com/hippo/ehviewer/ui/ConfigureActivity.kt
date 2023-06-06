@@ -7,6 +7,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
@@ -49,15 +50,12 @@ class ConfigureActivity : EhActivity() {
                     composable(SIGN_IN_ROUTE_NAME) {
                         SignInScreen(windowSizeClass)
                     }
-
                     composable(WEBVIEW_SIGN_IN_ROUTE_NAME) {
                         WebviewSignInScreen()
                     }
-
                     composable(COOKIE_SIGN_IN_ROUTE_NAME) {
                         CookieSignInScene(windowSizeClass)
                     }
-
                     composable(SELECT_SITE_ROUTE_NAME) {
                         SelectSiteScreen()
                     }
@@ -91,6 +89,11 @@ class ConfigureActivity : EhActivity() {
                     composable(FILTER_SCREEN) {
                         FilterScreen()
                     }
+                    composable(FINISH_ROUTE_NAME) {
+                        SideEffect {
+                            finish()
+                        }
+                    }
                 }
             }
         }
@@ -113,3 +116,4 @@ const val SIGN_IN_ROUTE_NAME = "SignIn"
 const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
 const val COOKIE_SIGN_IN_ROUTE_NAME = "CookieSignIn"
 const val SELECT_SITE_ROUTE_NAME = "SelectSite"
+const val FINISH_ROUTE_NAME = "Finish"

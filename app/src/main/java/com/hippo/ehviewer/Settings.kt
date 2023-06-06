@@ -74,7 +74,6 @@ object Settings : DataStorePreferences(null) {
     var builtInHosts by boolPref(KEY_BUILT_IN_HOSTS, false)
     var removeImageFiles by boolPref("include_pic", true)
     var needSignIn by boolPref("need_sign_in", true)
-    var selectSite by boolPref("select_site", true)
     var blackDarkTheme by boolPref("black_dark_theme", false).observed { updateWhenThemeChanges() }
     var preloadThumbAggressively by boolPref("preload_thumb_aggressively", false)
     var dF by boolPref(KEY_DOMAIN_FRONTING, false)

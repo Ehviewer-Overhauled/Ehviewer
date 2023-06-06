@@ -1,6 +1,5 @@
 package com.hippo.ehviewer.ui.login
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,7 +24,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,20 +39,15 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhUrl
+import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
+import com.hippo.ehviewer.ui.LocalNavController
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 
 @Composable
 fun SelectSiteScreen() {
-    val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
     var siteEx by remember { mutableStateOf(true) }
-
-    if (!Settings.selectSite) {
-        SideEffect {
-            Settings.needSignIn = false
-            activity.finish()
-        }
-    }
+    val navController = LocalNavController.current
 
     Column(
         modifier = Modifier.padding(WindowInsets.systemBars.asPaddingValues()).padding(horizontal = dimensionResource(R.dimen.keyline_margin)).padding(top = dimensionResource(R.dimen.keyline_margin)).fillMaxSize(),
@@ -109,7 +101,6 @@ fun SelectSiteScreen() {
         Box(modifier = Modifier.padding(horizontal = 12.dp).padding(top = 4.dp, bottom = 20.dp).fillMaxWidth()) {
             Button(
                 onClick = {
-                    Settings.selectSite = false
                     Settings.needSignIn = false
                     coroutineScope.launchNonCancellable {
                         runCatching {
@@ -124,7 +115,7 @@ fun SelectSiteScreen() {
                             it.printStackTrace()
                         }
                     }
-                    activity.finish()
+                    navController.navigate(FINISH_ROUTE_NAME)
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
