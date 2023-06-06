@@ -46,6 +46,7 @@ import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import com.hippo.ehviewer.ui.FILTER_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.MYTAGS_SCREEN
+import com.hippo.ehviewer.ui.SIGN_IN_ROUTE_NAME
 import com.hippo.ehviewer.ui.UCONFIG_SCREEN
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.compose.rememberedAccessor
@@ -80,7 +81,6 @@ fun EhScreen() {
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
-        val signOutMessage = stringResource(id = R.string.settings_eh_sign_out_tip)
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
@@ -115,7 +115,7 @@ fun EhScreen() {
                     }
                     setPositiveButton(R.string.settings_eh_sign_out) { _, _ ->
                         EhUtils.signOut()
-                        launchSnackBar(signOutMessage)
+                        navController.navigate(SIGN_IN_ROUTE_NAME)
                     }
                 }.show()
             }
