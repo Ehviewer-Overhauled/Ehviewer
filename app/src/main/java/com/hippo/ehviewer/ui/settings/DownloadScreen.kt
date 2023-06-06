@@ -36,11 +36,11 @@ import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.readCompatFromUniFile
+import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.Dispatchers

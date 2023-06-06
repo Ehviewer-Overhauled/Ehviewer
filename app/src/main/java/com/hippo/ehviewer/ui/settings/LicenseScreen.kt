@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.ui.login.LocalNavController
+import com.hippo.ehviewer.ui.LocalNavController
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 
 @Composable

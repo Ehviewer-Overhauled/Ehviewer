@@ -34,7 +34,7 @@
         android:theme="@style/AppTheme"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".ui.ConfigureActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize" />
@@ -126,10 +126,6 @@
                 <data android:mimeType="application/x-xz-compressed-tar" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:configChanges="screenSize"
-            android:label="@string/settings" />
         <activity
             android:name=".ui.SecurityActivity"
             android:configChanges="screenSize"

@@ -120,6 +120,7 @@ fun SelectSiteScreen() {
         ) {
             Button(onClick = {
                 Settings.selectSite = false
+                Settings.needSignIn = false
                 coroutineScope.launchNonCancellable {
                     runCatching {
                         if (!siteEx) {

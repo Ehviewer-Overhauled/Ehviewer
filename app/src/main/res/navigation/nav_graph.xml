@@ -70,7 +70,7 @@
         android:label="DownloadsScene" />
     <activity
         android:id="@+id/nav_settings"
-        android:name="com.hippo.ehviewer.ui.settings.SettingsActivity"
+        android:name="com.hippo.ehviewer.ui.ConfigureActivity"
         android:label="SettingsActivity" />
     <fragment
         android:id="@+id/progressScene"

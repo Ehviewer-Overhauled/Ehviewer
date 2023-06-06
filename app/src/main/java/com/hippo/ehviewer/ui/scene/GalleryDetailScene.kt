@@ -148,6 +148,7 @@ import com.hippo.ehviewer.spider.SpiderQueen
 import com.hippo.ehviewer.spider.SpiderQueen.Companion.MODE_READ
 import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
+import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
 import com.hippo.ehviewer.ui.compose.CrystalCard
@@ -163,7 +164,6 @@ import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.recyclerview.calculateSuitableSpanCount
-import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites

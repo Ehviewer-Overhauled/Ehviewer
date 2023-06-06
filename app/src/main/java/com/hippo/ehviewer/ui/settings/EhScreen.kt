@@ -43,10 +43,13 @@ import com.hippo.ehviewer.client.parser.HomeParser
 import com.hippo.ehviewer.dailycheck.schedHour
 import com.hippo.ehviewer.dailycheck.schedMinute
 import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
+import com.hippo.ehviewer.ui.FILTER_SCREEN
+import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.ui.MYTAGS_SCREEN
+import com.hippo.ehviewer.ui.UCONFIG_SCREEN
 import com.hippo.ehviewer.ui.compose.observed
 import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.util.whisperClipboard
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers

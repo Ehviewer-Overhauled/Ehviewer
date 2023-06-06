@@ -13,6 +13,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
+import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
 import com.hippo.ehviewer.ui.legacy.DialogWebChromeClient
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext

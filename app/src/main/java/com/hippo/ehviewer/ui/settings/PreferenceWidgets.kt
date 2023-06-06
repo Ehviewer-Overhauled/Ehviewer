@@ -35,8 +35,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import arrow.atomic.Atomic
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.login.LocalNavController
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.settings.PreferenceTokens.PreferenceTextPadding
 import com.jamal.composeprefs3.ui.prefs.DropDownPref

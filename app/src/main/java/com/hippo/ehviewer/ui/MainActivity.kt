@@ -63,7 +63,6 @@ import com.hippo.ehviewer.download.downloadLocation
 import com.hippo.ehviewer.image.Image
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.login.LoginActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.GalleryDetailScene
 import com.hippo.ehviewer.ui.scene.GalleryListScene
@@ -351,7 +350,7 @@ class MainActivity : EhActivity() {
     override fun onResume() {
         if (EhUtils.needSignedIn()) {
             connectivityManager.bindProcessToNetwork(null)
-            loginLauncher.launch(Intent(this, LoginActivity::class.java))
+            loginLauncher.launch(Intent(this, ConfigureActivity::class.java))
         }
         super.onResume()
         lifecycleScope.launch {

@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.login
+package com.hippo.ehviewer.ui
 
 import android.os.Bundle
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -12,30 +12,41 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
-import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.client.EhUrl
-import com.hippo.ehviewer.ui.EhActivity
 import com.hippo.ehviewer.ui.compose.setMD3Content
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import com.hippo.ehviewer.ui.login.CookieSignInScene
+import com.hippo.ehviewer.ui.login.SelectSiteScreen
+import com.hippo.ehviewer.ui.login.SignInScreen
+import com.hippo.ehviewer.ui.login.WebviewSignInScreen
+import com.hippo.ehviewer.ui.settings.AboutScreen
+import com.hippo.ehviewer.ui.settings.AdvancedScreen
+import com.hippo.ehviewer.ui.settings.BaseScreen
+import com.hippo.ehviewer.ui.settings.DownloadScreen
+import com.hippo.ehviewer.ui.settings.EhScreen
+import com.hippo.ehviewer.ui.settings.FilterScreen
+import com.hippo.ehviewer.ui.settings.LicenseScreen
+import com.hippo.ehviewer.ui.settings.MyTagsScreen
+import com.hippo.ehviewer.ui.settings.SecurityScreen
+import com.hippo.ehviewer.ui.settings.UConfigScreen
 
-class LoginActivity : EhActivity() {
+class ConfigureActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setMD3Content {
-            val windowSizeClass = calculateWindowSizeClass(this)
             val navController = rememberNavController()
-
+            val windowSizeClass = calculateWindowSizeClass(this)
+            val login = EhCookieStore.hasSignedIn()
             CompositionLocalProvider(LocalNavController provides navController) {
                 NavHost(
                     navController = navController,
-                    startDestination = SIGN_IN_ROUTE_NAME,
+                    startDestination = if (login) BASE_SETTINGS_SCREEN else SIGN_IN_ROUTE_NAME,
                     enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(200)) },
                     exitTransition = { ExitTransition.None },
                     popEnterTransition = { EnterTransition.None },
@@ -63,53 +74,54 @@ class LoginActivity : EhActivity() {
                             }
                         }
                     }
+                    composable(BASE_SETTINGS_SCREEN) {
+                        BaseScreen()
+                    }
+                    composable(ABOUT_SETTINGS_SCREEN) {
+                        AboutScreen()
+                    }
+                    composable(LICENSE_SCREEN) {
+                        LicenseScreen()
+                    }
+                    composable(SECURITY_SETTINGS_SCREEN) {
+                        SecurityScreen()
+                    }
+                    composable(ADVANCED_SETTINGS_SCREEN) {
+                        AdvancedScreen()
+                    }
+                    composable(DOWNLOAD_SETTINGS_SCREEN) {
+                        DownloadScreen()
+                    }
+                    composable(EH_SETTINGS_SCREEN) {
+                        EhScreen()
+                    }
+                    composable(UCONFIG_SCREEN) {
+                        UConfigScreen()
+                    }
+                    composable(MYTAGS_SCREEN) {
+                        MyTagsScreen()
+                    }
+                    composable(FILTER_SCREEN) {
+                        FilterScreen()
+                    }
                 }
             }
         }
     }
-
-    override fun finish() {
-        super.finish()
-        Settings.needSignIn = false
-    }
-}
-
-suspend fun postLogin() = coroutineScope {
-    launch {
-        runCatching {
-            EhEngine.getProfile().run {
-                Settings.displayName = displayName
-                Settings.avatar = avatar
-            }
-        }.onFailure {
-            it.printStackTrace()
-        }
-    }
-    launch {
-        runCatching {
-            // For the `star` cookie
-            EhEngine.getNews(false)
-            EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
-
-            // Sad panda check
-            Settings.gallerySite = EhUrl.SITE_EX
-            EhEngine.getUConfig()
-        }.onFailure {
-            Settings.selectSite = false
-            Settings.gallerySite = EhUrl.SITE_E
-            launch {
-                runCatching {
-                    EhEngine.getUConfig()
-                }.onFailure {
-                    it.printStackTrace()
-                }
-            }
-        }
-    }.join()
 }
 
 val LocalNavController = compositionLocalOf<NavController> { error("CompositionLocal LocalNavController not present!") }
 
+const val BASE_SETTINGS_SCREEN = "Base"
+const val EH_SETTINGS_SCREEN = "Eh"
+const val DOWNLOAD_SETTINGS_SCREEN = "Download"
+const val SECURITY_SETTINGS_SCREEN = "Security"
+const val ADVANCED_SETTINGS_SCREEN = "Advanced"
+const val ABOUT_SETTINGS_SCREEN = "About"
+const val LICENSE_SCREEN = "License"
+const val UCONFIG_SCREEN = "UConfig"
+const val MYTAGS_SCREEN = "Mytags"
+const val FILTER_SCREEN = "Filter"
 const val SIGN_IN_ROUTE_NAME = "SignIn"
 const val WEBVIEW_SIGN_IN_ROUTE_NAME = "WebViewSignIn"
 const val COOKIE_SIGN_IN_ROUTE_NAME = "CookieSignIn"

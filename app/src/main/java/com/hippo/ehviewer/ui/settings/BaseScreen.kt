@@ -22,6 +22,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
+import com.hippo.ehviewer.ui.ABOUT_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.ADVANCED_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.DOWNLOAD_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.EH_SETTINGS_SCREEN
+import com.hippo.ehviewer.ui.SECURITY_SETTINGS_SCREEN
 
 @Composable
 fun BaseScreen() {
