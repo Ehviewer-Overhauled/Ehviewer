@@ -28,10 +28,10 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings.detailSize
 import com.hippo.ehviewer.Settings.thumbSizeDp
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.MarginItemDecoration
-import com.hippo.ehviewer.ui.legacy.recyclerview.AutoStaggeredGridLayoutManager
-import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_MIN_SIZE
-import com.hippo.ehviewer.ui.legacy.recyclerview.STRATEGY_SUITABLE_SIZE
+import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
+import com.hippo.ehviewer.ui.legacy.MarginItemDecoration
+import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
+import com.hippo.ehviewer.ui.legacy.STRATEGY_SUITABLE_SIZE
 import com.hippo.ehviewer.yorozuya.LayoutUtils.dp2pix
 import splitties.init.appCtx
 

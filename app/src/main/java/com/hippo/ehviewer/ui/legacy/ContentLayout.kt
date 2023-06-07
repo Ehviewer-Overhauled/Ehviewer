@@ -30,10 +30,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.databinding.WidgetContentLayoutBinding
+import com.hippo.ehviewer.ui.legacy.LayoutManagerUtils.OnScrollToPositionListener
 import com.hippo.ehviewer.ui.legacy.ViewTransition.OnShowViewListener
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.HandlerDrawable
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.LayoutManagerUtils
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.LayoutManagerUtils.OnScrollToPositionListener
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.IntIdGenerator

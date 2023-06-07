@@ -53,14 +53,14 @@ import com.hippo.ehviewer.ui.CommonOperations
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.ContentLayout
+import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
+import com.hippo.ehviewer.ui.legacy.EasyRecyclerView.CustomChoiceListener
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnClickFabListener
 import com.hippo.ehviewer.ui.legacy.FabLayout.OnExpandListener
+import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.ObjectUtils
 import com.hippo.ehviewer.yorozuya.SimpleHandler

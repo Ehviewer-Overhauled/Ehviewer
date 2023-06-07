@@ -59,7 +59,7 @@ import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
 import com.hippo.ehviewer.ui.compose.rememberDialogState
 import com.hippo.ehviewer.ui.compose.rememberMemorized
 import com.hippo.ehviewer.ui.compose.setMD3Content
-import com.hippo.ehviewer.ui.legacy.recyclerview.calculateSuitableSpanCount
+import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.util.getParcelableCompat
 import kotlinx.coroutines.Dispatchers

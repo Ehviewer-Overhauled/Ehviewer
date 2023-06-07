@@ -72,6 +72,7 @@ import com.hippo.ehviewer.client.parser.VoteCommentParser
 import com.hippo.ehviewer.dao.Filter
 import com.hippo.ehviewer.ui.jumpToReaderByPage
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
+import com.hippo.ehviewer.ui.legacy.EasyRecyclerView
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
 import com.hippo.ehviewer.ui.legacy.FabLayout
 import com.hippo.ehviewer.ui.legacy.LinkifyTextView
@@ -79,7 +80,6 @@ import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
 import com.hippo.ehviewer.ui.navWithUrl
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs

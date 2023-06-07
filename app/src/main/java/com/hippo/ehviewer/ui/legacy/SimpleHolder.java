@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hippo.ehviewer.ui.legacy.easyrecyclerview;
+package com.hippo.ehviewer.ui.legacy;
 
 import android.view.View;
 

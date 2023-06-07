@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
+        <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -33,7 +33,7 @@
             android:paddingVertical="@dimen/gallery_list_margin_v"
             app:fitsSystemWindowsInsets="bottom" />
 
-        <com.hippo.ehviewer.ui.legacy.easyrecyclerview.FastScroller
+        <com.hippo.ehviewer.ui.legacy.FastScroller
             android:id="@+id/fast_scroller"
             android:layout_width="30dp"
             android:layout_height="match_parent"

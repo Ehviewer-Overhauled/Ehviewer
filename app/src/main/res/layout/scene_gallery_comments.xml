@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
+        <com.hippo.ehviewer.ui.legacy.EasyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

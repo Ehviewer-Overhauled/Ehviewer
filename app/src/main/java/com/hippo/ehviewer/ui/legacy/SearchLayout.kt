@@ -44,9 +44,6 @@ import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.ListUrlBuilder
 import com.hippo.ehviewer.client.exception.EhException
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.EasyRecyclerView
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.MarginItemDecoration
-import com.hippo.ehviewer.ui.legacy.easyrecyclerview.SimpleHolder
 import com.hippo.ehviewer.yorozuya.NumberUtils
 import com.hippo.ehviewer.yorozuya.ViewUtils
 
