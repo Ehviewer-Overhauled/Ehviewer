@@ -4,16 +4,21 @@ import android.content.DialogInterface
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
@@ -116,71 +121,78 @@ fun FilterScreen() {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentPadding = paddingValues,
         ) {
-            fun filterItems(list: List<Filter>) = items(list) { filter ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val filterCheckBoxRecomposeScope = currentRecomposeScope
-                    Checkbox(
-                        checked = filter.enable ?: false,
-                        onCheckedChange = {
-                            coroutineScope.launch {
-                                EhFilter.triggerFilter(filter)
-                                filterCheckBoxRecomposeScope.invalidate()
-                            }
-                        },
+            var showTip = true
+            fun filterType(list: List<Filter>, @StringRes title: Int) = list.takeIf { it.isNotEmpty() }?.let {
+                stickyHeader {
+                    Text(
+                        text = stringResource(id = title),
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.titleMedium,
                     )
-                    Text(text = filter.text.orEmpty())
-                    Spacer(modifier = Modifier.weight(1F))
-                    IconButton(
-                        onClick = {
-                            BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text))
-                                .setPositiveButton(R.string.delete) { _, which ->
-                                    if (DialogInterface.BUTTON_POSITIVE == which) {
-                                        coroutineScope.launch {
-                                            EhFilter.deleteFilter(filter)
-                                            lazyListRecomposeScope.invalidate()
-                                        }
-                                    }
-                                }.setNegativeButton(android.R.string.cancel, null).show()
-                        },
+                }
+                items(list) { filter ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                        val filterCheckBoxRecomposeScope = currentRecomposeScope
+                        Checkbox(
+                            checked = filter.enable ?: false,
+                            onCheckedChange = {
+                                coroutineScope.launch {
+                                    EhFilter.triggerFilter(filter)
+                                    filterCheckBoxRecomposeScope.invalidate()
+                                }
+                            },
+                        )
+                        Text(text = filter.text.orEmpty())
+                        Spacer(modifier = Modifier.weight(1F))
+                        IconButton(
+                            onClick = {
+                                BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text))
+                                    .setPositiveButton(R.string.delete) { _, which ->
+                                        if (DialogInterface.BUTTON_POSITIVE == which) {
+                                            coroutineScope.launch {
+                                                EhFilter.deleteFilter(filter)
+                                                lazyListRecomposeScope.invalidate()
+                                            }
+                                        }
+                                    }.setNegativeButton(android.R.string.cancel, null).show()
+                            },
+                        ) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                        }
                     }
                 }
+                showTip = false
             }
-            fun header(@StringRes title: Int) = stickyHeader {
-                Text(
-                    text = stringResource(id = title),
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-            EhFilter.titleFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_title)
-                filterItems(it)
-            }
-            EhFilter.tagFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_tag)
-                filterItems(it)
-            }
-            EhFilter.commentFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_comment)
-                filterItems(it)
-            }
-            EhFilter.commenterFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_commenter)
-                filterItems(it)
-            }
-            EhFilter.uploaderFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_uploader)
-                filterItems(it)
-            }
-            EhFilter.tagNamespaceFilterList.takeIf { it.isNotEmpty() }?.let {
-                header(R.string.filter_tag_namespace)
-                filterItems(it)
+            filterType(EhFilter.titleFilterList, R.string.filter_title)
+            filterType(EhFilter.tagFilterList, R.string.filter_tag)
+            filterType(EhFilter.commentFilterList, R.string.filter_comment)
+            filterType(EhFilter.commenterFilterList, R.string.filter_commenter)
+            filterType(EhFilter.uploaderFilterList, R.string.filter_uploader)
+            filterType(EhFilter.tagNamespaceFilterList, R.string.filter_tag_namespace)
+            if (showTip) {
+                item {
+                    Column(
+                        modifier = Modifier.padding(paddingValues).fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Spacer(modifier = Modifier.size(80.dp))
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = null,
+                            modifier = Modifier.padding(16.dp).size(120.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.filter),
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
+                    }
+                }
             }
         }
     }
