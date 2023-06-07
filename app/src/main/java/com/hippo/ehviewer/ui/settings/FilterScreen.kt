@@ -1,7 +1,9 @@
 package com.hippo.ehviewer.ui.settings
 
 import android.content.DialogInterface
+import android.view.View
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhFilter
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.databinding.DialogAddFilterBinding
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +48,41 @@ fun FilterScreen() {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scaffoldRecomposeScope = currentRecomposeScope
+    class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
+        private val mArray: Array<String> = dialog.context.resources.getStringArray(R.array.filter_entries)
+        private val binding = DialogAddFilterBinding.bind(dialog.findViewById(R.id.base)!!)
+        init { dialog.getButton(DialogInterface.BUTTON_POSITIVE)!!.setOnClickListener(this) }
+        override fun onClick(v: View) {
+            val text1 = binding.spinner.editText!!.text.toString()
+            if (text1.isEmpty()) {
+                binding.spinner.error = dialog.context.getString(R.string.text_is_empty)
+                return
+            } else {
+                binding.spinner.error = null
+            }
+            val text = binding.textInputLayout.editText!!.text.toString().trim { it <= ' ' }
+            if (text.isBlank()) {
+                binding.textInputLayout.error = dialog.context.getString(R.string.text_is_empty)
+                return
+            } else {
+                binding.textInputLayout.error = null
+            }
+            val mode = mArray.indexOf(text1)
+            val filter = Filter()
+            filter.mode = mode
+            filter.text = text
+            if (!EhFilter.addFilter(filter)) {
+                binding.textInputLayout.error = dialog.context.getString(R.string.label_text_exist)
+                return
+            } else {
+                binding.textInputLayout.error = null
+            }
+            scaffoldRecomposeScope.invalidate()
+            dialog.dismiss()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -63,7 +101,7 @@ fun FilterScreen() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { }) {
+            FloatingActionButton(onClick = { AddFilterDialogHelper(BaseDialogBuilder(context).setTitle(R.string.add_filter).setView(R.layout.dialog_add_filter).setPositiveButton(R.string.add, null).setNegativeButton(android.R.string.cancel, null).show()) }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         },
