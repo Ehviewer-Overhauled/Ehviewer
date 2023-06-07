@@ -1,6 +1,7 @@
 package com.hippo.ehviewer
 
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.core.os.LocaleListCompat
 import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.client.EhTagDatabase
@@ -39,6 +40,14 @@ fun updateWhenKeepMediaStatusChanges() {
 fun updateWhenThemeChanges() {
     collectScope.launch {
         delay(100) // Avoid recompose being cancelled
+        AppCompatDelegate.setDefaultNightMode(Settings.theme)
+    }
+}
+
+fun updateWhenAmoledModeChanges() {
+    collectScope.launch {
+        delay(100) // Avoid recompose being cancelled
+        AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
         AppCompatDelegate.setDefaultNightMode(Settings.theme)
     }
 }
