@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main
+package com.hippo.ehviewer.ui.tools
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

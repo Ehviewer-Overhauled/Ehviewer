@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.download.DownloadManager
-import com.hippo.ehviewer.ui.main.CrystalCard
-import com.hippo.ehviewer.ui.main.ElevatedCard
-import com.hippo.ehviewer.ui.main.GalleryListCardRating
+import com.hippo.ehviewer.ui.tools.CrystalCard
+import com.hippo.ehviewer.ui.tools.ElevatedCard
+import com.hippo.ehviewer.ui.tools.GalleryListCardRating
 
 @Composable
 fun GalleryInfoListItem(

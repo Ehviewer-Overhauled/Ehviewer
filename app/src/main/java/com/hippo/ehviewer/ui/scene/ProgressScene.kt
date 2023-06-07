@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.findNavController
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhEngine
-import com.hippo.ehviewer.ui.main.setMD3Content
+import com.hippo.ehviewer.ui.tools.setMD3Content
 import com.hippo.ehviewer.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import moe.tarsin.coroutines.runSuspendCatching

@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main
+package com.hippo.ehviewer.ui.tools
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.ColumnScope

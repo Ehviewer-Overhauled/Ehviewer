@@ -19,7 +19,6 @@ import com.hippo.ehviewer.ui.login.CookieSignInScene
 import com.hippo.ehviewer.ui.login.SelectSiteScreen
 import com.hippo.ehviewer.ui.login.SignInScreen
 import com.hippo.ehviewer.ui.login.WebviewSignInScreen
-import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.settings.AboutScreen
 import com.hippo.ehviewer.ui.settings.AdvancedScreen
 import com.hippo.ehviewer.ui.settings.BaseScreen
@@ -30,6 +29,7 @@ import com.hippo.ehviewer.ui.settings.LicenseScreen
 import com.hippo.ehviewer.ui.settings.MyTagsScreen
 import com.hippo.ehviewer.ui.settings.SecurityScreen
 import com.hippo.ehviewer.ui.settings.UConfigScreen
+import com.hippo.ehviewer.ui.tools.setMD3Content
 
 class ConfigureActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

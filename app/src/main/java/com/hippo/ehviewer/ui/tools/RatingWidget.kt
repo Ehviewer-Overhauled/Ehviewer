@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main
+package com.hippo.ehviewer.ui.tools
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

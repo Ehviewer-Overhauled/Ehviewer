@@ -14,7 +14,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.ui.main.CropDefaults
+import com.hippo.ehviewer.ui.tools.CropDefaults
 
 @Composable
 @ReadOnlyComposable

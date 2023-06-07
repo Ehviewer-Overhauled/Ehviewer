@@ -41,7 +41,7 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import com.hippo.ehviewer.client.systemDns
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
-import com.hippo.ehviewer.ui.main.observed
+import com.hippo.ehviewer.ui.tools.observed
 import com.hippo.ehviewer.util.LogCat
 import com.hippo.ehviewer.util.ReadableTime
 import kotlinx.coroutines.Dispatchers

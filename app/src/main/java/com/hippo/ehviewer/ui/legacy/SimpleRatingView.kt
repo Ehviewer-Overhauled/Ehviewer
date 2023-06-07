@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
-import com.hippo.ehviewer.ui.main.GalleryListCardRating
+import com.hippo.ehviewer.ui.tools.GalleryListCardRating
 
 class SimpleRatingView @JvmOverloads constructor(
     context: Context,

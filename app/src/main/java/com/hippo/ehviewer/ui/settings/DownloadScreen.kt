@@ -39,8 +39,8 @@ import com.hippo.ehviewer.spider.readCompatFromUniFile
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.main.observed
-import com.hippo.ehviewer.ui.main.rememberedAccessor
+import com.hippo.ehviewer.ui.tools.observed
+import com.hippo.ehviewer.ui.tools.rememberedAccessor
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.lang.launchNonCancellable
 import kotlinx.coroutines.Dispatchers

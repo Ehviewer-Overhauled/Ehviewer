@@ -59,7 +59,7 @@ import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.FINISH_ROUTE_NAME
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.SELECT_SITE_ROUTE_NAME
-import com.hippo.ehviewer.ui.main.rememberDialogState
+import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.util.ExceptionUtils
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withNonCancellableContext

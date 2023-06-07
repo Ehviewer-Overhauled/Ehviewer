@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main
+package com.hippo.ehviewer.ui.tools
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable

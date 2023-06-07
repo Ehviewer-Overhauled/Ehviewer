@@ -22,6 +22,7 @@ import android.app.Dialog
 import android.app.DownloadManager
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -159,15 +160,15 @@ import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
-import com.hippo.ehviewer.ui.main.CrystalCard
-import com.hippo.ehviewer.ui.main.GalleryDetailRating
 import com.hippo.ehviewer.ui.main.data.EhPreviewItem
 import com.hippo.ehviewer.ui.main.data.GalleryDetailHeaderCard
-import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites
 import com.hippo.ehviewer.ui.scene.GalleryListScene.Companion.toStartArgs
+import com.hippo.ehviewer.ui.tools.CrystalCard
+import com.hippo.ehviewer.ui.tools.GalleryDetailRating
+import com.hippo.ehviewer.ui.tools.setMD3Content
 import com.hippo.ehviewer.util.AppHelper
 import com.hippo.ehviewer.util.ExceptionUtils
 import com.hippo.ehviewer.util.ReadableTime
@@ -1136,7 +1137,7 @@ class GalleryDetailScene : BaseScene(), DownloadInfoListener {
                             .apply {
                                 val user = findViewById<TextView>(R.id.user)
                                 user.text = comment.user
-                                user.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                                user.setBackgroundColor(Color.TRANSPARENT)
                                 val time = findViewById<TextView>(R.id.time)
                                 time.text = ReadableTime.getTimeAgo(comment.time)
                                 val c = findViewById<ObservedTextView>(R.id.comment)

@@ -20,6 +20,7 @@ import com.hippo.ehviewer.BuildConfig
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.ui.LICENSE_SCREEN
 import com.hippo.ehviewer.ui.LocalNavController
+import com.hippo.ehviewer.ui.tools.toAnnotatedString
 
 private const val REPO_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer"
 private const val RELEASE_URL = "https://github.com/Ehviewer-Overhauled/Ehviewer/releases"

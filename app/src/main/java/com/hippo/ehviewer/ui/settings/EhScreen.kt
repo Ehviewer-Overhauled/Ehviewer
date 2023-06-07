@@ -51,8 +51,8 @@ import com.hippo.ehviewer.ui.MYTAGS_SCREEN
 import com.hippo.ehviewer.ui.SIGN_IN_ROUTE_NAME
 import com.hippo.ehviewer.ui.UCONFIG_SCREEN
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
-import com.hippo.ehviewer.ui.main.observed
-import com.hippo.ehviewer.ui.main.rememberedAccessor
+import com.hippo.ehviewer.ui.tools.observed
+import com.hippo.ehviewer.ui.tools.rememberedAccessor
 import com.hippo.ehviewer.util.whisperClipboard
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.Dispatchers

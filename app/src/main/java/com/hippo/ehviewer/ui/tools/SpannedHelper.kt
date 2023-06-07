@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.settings
+package com.hippo.ehviewer.ui.tools
 
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
