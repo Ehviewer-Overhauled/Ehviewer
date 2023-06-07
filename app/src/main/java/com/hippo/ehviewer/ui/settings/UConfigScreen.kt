@@ -11,10 +11,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -38,6 +41,7 @@ fun UConfigScreen() {
     val navController = LocalNavController.current
     val url = EhUrl.uConfigUrl
     val webview = remember { Atomic<WebView?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -59,6 +63,7 @@ fun UConfigScreen() {
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         val state = rememberWebViewState(url = url)
         WebView(
@@ -73,6 +78,8 @@ fun UConfigScreen() {
             },
             factory = { WebView(it).apply { webview.set(this) } },
         )
+        val applyTip = stringResource(id = R.string.apply_tip)
+        LaunchedEffect(Unit) { snackbarHostState.showSnackbar(applyTip) }
         DisposableEffect(Unit) {
             CookieManager.getInstance().apply {
                 flush()
