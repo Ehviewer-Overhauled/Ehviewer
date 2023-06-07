@@ -275,14 +275,12 @@
     <string name="filter_uploader">ผู้อัพโหลด</string>
     <string name="filter_tag">แท็ก</string>
     <string name="filter_tag_namespace">ชื่อของแท็ก</string>
-    <string name="tip">คำแนะนำ</string>
     <string name="show_definition">แสดงความหมาย</string>
 
     <!-- Set Security -->
 
     <!-- UConfig Activity -->
     <string name="u_config">การตั้งค่า EHentai</string>
-    <string name="apply">ยืนยัน</string>
     <string name="apply_tip">แตะเครื่องหมายถูกเพื่อบันทึกการตั้งค่าแล้ว</string>
 
     <!-- Hosts Activity -->
@@ -293,7 +291,6 @@
 
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">ออกจากระบบ</string>
-    <string name="settings_eh_sign_out_tip">คุณได้ลงชื่อออกจากระบบแล้ว เริ่มแอปพลิเคชั่นใหม่เพื่อลงชื่อเข้าสู่ระบบอีกครั้ง</string>
     <string name="settings_eh_identity_cookies_signed">คุกกี๊ยืนยันตัวตนสามารถใช้ลงชื่อเข้าสู่ระบบสำหรับบัญชีนี้เท่านั้น&lt;br&gt;&lt;b&gt;เก็บ รักษา ให้ ปลอดภัย&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">ยังไม่ลงชื่อเข้าสู่ระบบ</string>
     <string name="settings_eh_identity_cookies_copy">คัดลอก</string>
@@ -353,9 +350,6 @@
     <string name="settings_advanced_dump_logcat_to">Logcat ถูกสร้างอยู่ที่ %s</string>
     <string name="settings_advanced_read_cache_size">ขนาดในการเก็บไฟล์ชั่วคราวเพื่ออ่าน</string>
     <string name="settings_advanced_app_language_title">ภาษาของแอป</string>
-    <string name="settings_advanced_proxy">พร็อกซี่</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">ใช้ hosts.txt ของตัวแอป</string>
     <string name="settings_advanced_export_data">สำเนาข้อมูล</string>
     <string name="settings_advanced_export_data_summary">บันทึกข้อมูลต่างๆเช่นรายการดาวน์โหลด และค้นหาอย่างด่วนลงพื้นที่จัดเก็บภายนอก</string>
@@ -371,12 +365,6 @@
     <string name="settings_about_source">ซอร์สโค้ด</string>
     <string name="settings_about_version">เวอร์ชั่นแอป</string>
     <string name="settings_about_check_for_updates">ตรวจสอบการอัพเดต</string>
-
-    <string name="proxy_direct">โดยตรง</string>
-    <string name="proxy_system">พร็อกซี่ของระบบ</string>
-    <string name="proxy_host_or_ip">โฮสต์ หรือ ไอพี</string>
-    <string name="proxy_port">พอร์ต</string>
-    <string name="proxy_invalid_port">เลขพอร์ตไม่ถูกต้อง</string>
 
     <string name="cant_read_the_file">ไม่สามารถอ่านไฟล์ได้</string>
 

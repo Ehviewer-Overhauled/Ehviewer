@@ -229,7 +229,6 @@
     <string name="filter_uploader">Uploader</string>
     <string name="filter_tag">Etikett</string>
     <string name="filter_tag_namespace">Etikettsnamensraum</string>
-    <string name="tip">Hinweis</string>
     <string name="delete_filter">Blocker \"%s\" entfernen?</string>
     <string name="show_definition">Definition anzeigen</string>
     <string name="add_filter">Blocker erstellen</string>
@@ -237,13 +236,11 @@
     <string name="filter_tip">Die blockierten Galerien wurde in EHentai nicht angezeigt.\n\nTitel-Blocker: die Galerien, deren Titel das Wort enthalten, ausschließen.\n\nUploader-Blocker: Die vom Uploader hochgeladen Galerien ausschließen.\n\nEtikett-Blocker: Die Galerien, die die Etikett haben, ausschließen. Es wird länger dauern, Galerieliste zu laden.\n\nEtikettnamensraum-Blocker: Die Galerien, die den Etikettnamensraum haben, ausschließen. Es wird länger dauern, Galerieliste zu laden.</string>
     <string name="search_tip">Normale Suche: Nur durchsuchen.\n\nSuche in gefolgten Etiketten: Nur die Galerien, die die gefolgten Etiketten haben, durchsuchen.\n\nUploader spezifizieren: Die Galerien, die vom Uploader hochgeladen sind, auflisten. Andere Optionen werden ignoriert.\n\nEtikett spezifizieren: Die Galerien, die das Etikett haben, auflisten. Nur ein Etikett kann eingegeben werden. Andere Optionen werden ignoriert.</string>
     <string name="u_config">EHentai-Einstellungen</string>
-    <string name="apply">Übernehmen</string>
     <string name="apply_tip">Zum Speichern der Einstellungen auf Häkchen tippen</string>
     <string name="share_image">Das Bild teilen</string>
     <string name="image_saved">Das Bild wurde zu %s gespeichert</string>
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">Abmelden</string>
-    <string name="settings_eh_sign_out_tip">Du wurdest abgemeldet. Starte die App neu, um weiter anzumelden</string>
     <string name="settings_u_config">EHentai-Einstellungen</string>
     <string name="settings_u_config_summary">Einstellung auf der Webseite EHentais</string>
     <string name="settings_my_tags">Gefolgte Etiketten</string>
@@ -296,9 +293,6 @@
     <string name="settings_advanced_dump_logcat_summary">Logcat-Protokolldatei auf externem Speicher speichern</string>
     <string name="settings_advanced_dump_logcat_failed">Speichern gescheitert</string>
     <string name="settings_advanced_dump_logcat_to">Protokolldatei wurde auf %s gespeichert.</string>
-    <string name="settings_advanced_proxy">Proxy</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="cloud_favorites">Cloud-Favoriten</string>
     <string name="local_favorites">Lokale Favoriten</string>
     <string name="favorites_search_bar_hint">%s durchsuchen</string>
@@ -337,11 +331,6 @@
     <string name="settings_about_source">Quellcode</string>
     <string name="settings_about_version">Versionnummer</string>
     <string name="settings_about_check_for_updates">Auf Update überprüfen</string>
-    <string name="proxy_direct">Direkt</string>
-    <string name="proxy_system">Vom System festgelegt</string>
-    <string name="proxy_host_or_ip">Hostname oder IP</string>
-    <string name="proxy_port">Port</string>
-    <string name="proxy_invalid_port">Ungültiger Port</string>
     <string name="cant_read_the_file">Datei kann nicht gelesen werden</string>
     <string name="app_language_system">Sprache des Systems (Standard)</string>
     <string name="please_wait">Bitte warte</string>

@@ -260,14 +260,12 @@
     <string name="filter_uploader">업로더</string>
     <string name="filter_tag">태그</string>
     <string name="filter_tag_namespace">태그 네임스페이스</string>
-    <string name="tip">팁</string>
     <string name="show_definition">정의 표시</string>
 
     <!-- Set Security -->
 
     <!-- UConfig Activity -->
     <string name="u_config">E-Hentai 설정</string>
-    <string name="apply">적용</string>
     <string name="apply_tip">설정을 저장하려면 체크 표시를 누르세요.</string>
 
     <!-- Hosts Activity -->
@@ -283,7 +281,6 @@
     <string name="settings_eh_identity_cookies_copy">복사</string>
     <string name="settings_u_config">E-Hentai 설정</string>
     <string name="settings_u_config_summary">E-Hentai 사이트의 설정 페이지를 엽니다.</string>
-    <string name="settings_eh_sign_out_tip">로그아웃했습니다. 다시 로그인하려면 앱을 재시작하세요.</string>
     <string name="settings_eh_gallery_site">갤러리 사이트</string>
     <string name="settings_eh_list_mode">목록 모드</string>
     <string name="settings_eh_list_mode_detail">자세히</string>
@@ -338,9 +335,6 @@
     <string name="settings_advanced_dump_logcat_to">%s 경로에 로그캣을 저장했습니다.</string>
     <string name="settings_advanced_read_cache_size">읽기 캐시 크기</string>
     <string name="settings_advanced_app_language_title">앱 언어 (Language)</string>
-    <string name="settings_advanced_proxy">프록시</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">앱 내장 hosts.txt</string>
     <string name="settings_advanced_export_data">데이터 내보내기</string>
     <string name="settings_advanced_export_data_summary">다운로드 목록, 빠른 검색 목록 등의 데이터를 외부 저장소에 저장</string>
@@ -356,12 +350,6 @@
     <string name="settings_about_source">소스 코드</string>
     <string name="settings_about_version">빌드 버전</string>
     <string name="settings_about_check_for_updates">업데이트 확인</string>
-
-    <string name="proxy_direct">다이렉트</string>
-    <string name="proxy_system">시스템 프록시</string>
-    <string name="proxy_host_or_ip">호스트 또는 IP</string>
-    <string name="proxy_port">포트</string>
-    <string name="proxy_invalid_port">잘못된 포트입니다.</string>
 
     <string name="cant_read_the_file">파일을 읽을 수 없습니다.</string>
 

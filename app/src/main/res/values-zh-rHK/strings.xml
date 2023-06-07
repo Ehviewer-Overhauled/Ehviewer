@@ -301,7 +301,6 @@
     <string name="filter_tag">標籤</string>
     <string name="filter_tag_namespace">標籤組</string>
     <string name="delete_filter">刪除屏蔽項“%s”？</string>
-    <string name="tip">提示</string>
     <string name="add_filter">添加屏蔽項</string>
     <string name="show_definition">查看定義</string>
     <string name="filter_text">屏蔽項文本</string>
@@ -311,7 +310,6 @@
 
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 設置</string>
-    <string name="apply">應用</string>
     <string name="apply_tip">點擊右上角的對勾來保存設置</string>
 
     <!-- My Tags Activity -->
@@ -326,7 +324,6 @@
     <!-- Settings -->
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">退出登錄</string>
-    <string name="settings_eh_sign_out_tip">已退出登錄，重啟應用以便再次登錄</string>
     <string name="settings_eh_identity_cookies_signed">身份 Cookie 可用於登錄該賬號。&lt;br&gt;&lt;b&gt;注意數據安全&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">未登錄</string>
     <string name="settings_eh_identity_cookies_copy">複製</string>
@@ -391,9 +388,6 @@
     <string name="settings_advanced_dump_logcat_failed">導出日誌失敗</string>
     <string name="settings_advanced_dump_logcat_to">已保存日誌至 %s</string>
     <string name="settings_advanced_read_cache_size">閲讀緩存大小</string>
-    <string name="settings_advanced_proxy">代理</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_app_language_title">App 界面語言</string>
     <string name="settings_advanced_built_in_hosts_title">內置 hosts.txt</string>
     <string name="settings_advanced_export_data">導出數據</string>
@@ -415,12 +409,6 @@
     <!-- ExcludedLanguagesScene -->
 
     <string name="please_wait">請稍候</string>
-
-    <string name="proxy_direct">直接連接</string>
-    <string name="proxy_system">系統代理</string>
-    <string name="proxy_host_or_ip">主機或 IP</string>
-    <string name="proxy_port">端口</string>
-    <string name="proxy_invalid_port">無效的端口</string>
 
     <string name="cant_read_the_file">無法讀取文件</string>
 

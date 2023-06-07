@@ -287,7 +287,6 @@
     <string name="filter_commenter">评论者</string>
     <string name="filter_comment">评论</string>
     <string name="delete_filter">删除屏蔽项“%s”？</string>
-    <string name="tip">提示</string>
     <string name="add_filter">添加屏蔽项</string>
     <string name="show_definition">查看定义</string>
     <string name="filter_text">屏蔽项文本</string>
@@ -295,7 +294,6 @@
     <!-- Set Security -->
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 设置</string>
-    <string name="apply">应用</string>
     <string name="apply_tip">点击右上角的对勾来保存设置</string>
     <!-- My Tags Activity -->
     <string name="my_tags">我的标签</string>
@@ -306,7 +304,6 @@
     <!-- Settings -->
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">退出登录</string>
-    <string name="settings_eh_sign_out_tip">已退出登录，重启应用以便再次登录</string>
     <string name="settings_eh_identity_cookies_signed">身份 Cookie 可用于登录该账号。&lt;br&gt;&lt;b&gt;注意数据安全&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">游客模式</string>
     <string name="settings_eh_identity_cookies_copy">复制 Cookies</string>
@@ -374,9 +371,6 @@
     <string name="settings_advanced_dump_logcat_to">已保存日志至 %s</string>
     <string name="settings_advanced_read_cache_size">阅读缓存大小</string>
     <string name="settings_advanced_app_language_title">App 界面语言</string>
-    <string name="settings_advanced_proxy">代理</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">内置 hosts.txt</string>
     <string name="settings_advanced_domain_fronting_title">域名前置（重启应用后生效）</string>
     <string name="settings_advanced_domain_fronting_summary">绕过 SNI 封锁\n启用时会禁用代理设置</string>
@@ -406,11 +400,6 @@
     <string name="settings_about_check_for_updates">检查更新</string>
     <!-- ExcludedLanguagesScene -->
     <string name="please_wait">请稍候</string>
-    <string name="proxy_direct">直接连接</string>
-    <string name="proxy_system">系统代理</string>
-    <string name="proxy_host_or_ip">主机或 IP</string>
-    <string name="proxy_port">端口</string>
-    <string name="proxy_invalid_port">无效的端口</string>
     <string name="cant_read_the_file">无法读取文件</string>
     <string name="app_language_system">系统语言（默认）</string>
     <!-- License -->
@@ -515,7 +504,6 @@
     <string name="settings_privacy_require_unlock_delay">锁定延迟</string>
     <string name="settings_privacy_require_unlock_delay_summary">离开应用并在 %s 分钟内返回时不需要解锁</string>
     <string name="settings_privacy_require_unlock_delay_summary_immediately">无论何时回到应用均要求解锁</string>
-    <string name="proxy_type_name">代理类型</string>
     <string name="filter_label">屏蔽项类型</string>
     <string name="archive_passwd">归档文件密码</string>
     <string name="archive_need_passwd">归档文件需要密码</string>

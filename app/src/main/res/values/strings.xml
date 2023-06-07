@@ -330,7 +330,6 @@
     <string name="filter_commenter">Commenter</string>
     <string name="filter_comment">Comment Regex</string>
     <string name="delete_filter">Delete blocker \"%s\"?</string>
-    <string name="tip">Tip</string>
     <string name="add_filter">Add blocker</string>
     <string name="show_definition">Show definition</string>
     <string name="filter_text">Blocker text</string>
@@ -338,7 +337,6 @@
     <!-- Set Security -->
     <!-- UConfig Activity -->
     <string name="u_config">EHentai settings</string>
-    <string name="apply">Apply</string>
     <string name="apply_tip">Tap the check mark to save the settings</string>
     <!-- My Tags Activity -->
     <string name="my_tags">My tags</string>
@@ -348,7 +346,6 @@
     <string name="image_saved">Image saved to %s</string>
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">Sign out</string>
-    <string name="settings_eh_sign_out_tip">You have signed out. Restart the application to sign in again</string>
     <string name="settings_eh_identity_cookies_signed">Identity cookies can be used to sign in to this account.&lt;br&gt;&lt;b&gt;KEEP IT SAFE&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">Tourist mode</string>
     <string name="settings_eh_identity_cookies_copy">Copy Cookies</string>
@@ -418,9 +415,6 @@
     <string name="settings_advanced_dump_logcat_to">Logcat dumped to %s</string>
     <string name="settings_advanced_read_cache_size">Read cache size</string>
     <string name="settings_advanced_app_language_title">App language</string>
-    <string name="settings_advanced_proxy">Proxy</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">Built-in hosts.txt</string>
     <string name="settings_advanced_dns_over_http_title">DNS Over HTTPS</string>
     <string name="settings_advanced_dns_over_http_hint">Server URL, blank: disable</string>
@@ -452,11 +446,6 @@
     <string name="settings_about_build_time">Built at %s</string>
     <string name="settings_about_check_for_updates">Check for updates</string>
     <string name="license">License</string>
-    <string name="proxy_direct">Direct</string>
-    <string name="proxy_system">System Proxy</string>
-    <string name="proxy_host_or_ip">Host or IP</string>
-    <string name="proxy_port">Port</string>
-    <string name="proxy_invalid_port">Invalid port</string>
     <string name="cant_read_the_file">Can\'t read the file</string>
     <string name="app_language_system">System Language (Default)</string>
     <string name="app_language_de" translatable="false">Deutsch</string>
@@ -580,7 +569,6 @@
     <string name="settings_privacy_require_unlock_delay">Lock Delay</string>
     <string name="settings_privacy_require_unlock_delay_summary">No unlock is required when leaving App and returning within %s minute(s)</string>
     <string name="settings_privacy_require_unlock_delay_summary_immediately">Unlock is required whenever you return to this App</string>
-    <string name="proxy_type_name">Proxy Type</string>
     <string name="filter_label">Blocker Type</string>
     <string name="archive_passwd">password</string>
     <string name="archive_need_passwd">Archive need password</string>

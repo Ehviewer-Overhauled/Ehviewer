@@ -106,15 +106,10 @@
     <string name="settings_eh_show_gallery_pages">Vis gallerisider</string>
     <string name="settings_advanced">Avansert</string>
     <string name="settings_about">Om</string>
-    <string name="proxy_host_or_ip">Vert eller IP</string>
     <string name="settings_advanced_export_data">Eksporter data</string>
     <string name="settings_advanced_export_data_to">Data eksportert til %s</string>
     <string name="settings_advanced_import_data">Importer data</string>
-    <string name="proxy_system">System-mellomtjener</string>
     <string name="settings_about_source">Kildekode</string>
-    <string name="proxy_direct">Direkte</string>
-    <string name="proxy_port">Port</string>
-    <string name="proxy_invalid_port">Ugyldig port</string>
     <string name="rating1">Utolererbar</string>
     <string name="rating0">Katastrofe</string>
     <string name="gallery_info">Galleri-info</string>
@@ -157,7 +152,6 @@
     <string name="settings_download_download_origin_image">Last ned opprinnelig bilde</string>
     <string name="settings_privacy_secure">Forhindre skjermavbildninger</string>
     <string name="download_service">Nedlastingstjeneste</string>
-    <string name="proxy_type_name">Mellomtjenertype</string>
     <string name="action_copy">Kopier</string>
     <string name="toplist">Toppliste</string>
     <string name="toplist_pastyear">Forrige år</string>

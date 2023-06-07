@@ -287,7 +287,6 @@
     <string name="filter_uploader">Uploader</string>
     <string name="filter_tag">Tag</string>
     <string name="filter_tag_namespace">Espace de nom de tag</string>
-    <string name="tip">Astuce</string>
     <string name="delete_filter">Supprimer le bloqueur bloqueur \"%s\" ?</string>
     <string name="show_definition">Montrer les expliques</string>
     <string name="add_filter">Ajouter un bloqueur</string>
@@ -299,7 +298,6 @@
 
     <!-- UConfig Activity -->
     <string name="u_config">Paramètres EHentai</string>
-    <string name="apply">Appliquer</string>
     <string name="apply_tip">Appuyez sur la coche pour sauvegarder les changements</string>
 
     <!-- Gallery Activity -->
@@ -308,7 +306,6 @@
 
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">Se déconnecter</string>
-    <string name="settings_eh_sign_out_tip">Vous vous êtes déconnecté. Redémarrez l\'application pour vous connecter</string>
     <string name="settings_u_config">Paramètres EHentai</string>
     <string name="settings_u_config_summary">Paramètres sur le site Web EHentai</string>
     <string name="settings_my_tags">Tags suivis</string>
@@ -384,12 +381,6 @@
     <string name="settings_about_version">Numéro de version</string>
     <string name="settings_about_check_for_updates">Chercher mise à jour</string>
 
-    <string name="proxy_direct">Directement</string>
-    <string name="proxy_system">Déterminé par le systéme</string>
-    <string name="proxy_host_or_ip">Nom d\'hôte ou IP</string>
-    <string name="proxy_port">Port</string>
-    <string name="proxy_invalid_port">Port invalide</string>
-
     <string name="cant_read_the_file">Impossible de lire le fiche</string>
 
     <!-- ExcludedLanguagesScene -->
@@ -462,9 +453,6 @@
     <string name="settings_privacy_secure_summary">Quand cette option est activée, vous ne pouvez prendre aucune capture d\'écran de l\'application, et le systéme n\'affiche pas le contenu d\'écran dans le sélecteur de tâches.\n\nRedémarrage de l\'application est nécessaire pour appliquer le changement</string>
     <string name="settings_advanced_app_language_title">Langue de l\'app (Language)</string>
     <string name="settings_advanced_built_in_hosts_title">hosts.txt integré</string>
-    <string name="settings_advanced_proxy">Serveur proxy</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s：%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="app_language_system">Langue du système (défaut)</string>
     <string name="settings_eh_identity_cookies_signed">Tout le monde peut utiliser les cookies de ce compte pour s\'y connecter.&lt;br&gt;&lt;b&gt;GARDEZ-LES BIEN !&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">Vous ne vous êtes pas connecté.</string>

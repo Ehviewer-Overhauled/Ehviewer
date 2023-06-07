@@ -285,7 +285,6 @@
     <string name="filter_uploader">アップローダ</string>
     <string name="filter_tag">タグ</string>
     <string name="filter_tag_namespace">タグの名前空間</string>
-    <string name="tip">ヒント</string>
     <string name="delete_filter">ブロックアイテム「%s」を削除しますか？</string>
     <string name="show_definition">ヘルプを表示</string>
     <string name="add_filter">ブロックアイテムを追加</string>
@@ -296,7 +295,6 @@
 
     <!-- UConfig Activity -->
     <string name="u_config">EHentaiの設定</string>
-    <string name="apply">適用</string>
     <string name="apply_tip">右上隅のチェックマークをタップして設定を保存します。</string>
 
     <!-- Gallery Activity -->
@@ -306,7 +304,6 @@
     <!-- Settings -->
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">ログアウト</string>
-    <string name="settings_eh_sign_out_tip">ログアウトしました。アプリを再起動することで再度ログインします。</string>
     <string name="settings_u_config">EHentaiの設定</string>
     <string name="settings_u_config_summary">EHentaiサイト上の設定</string>
     <string name="settings_my_tags">マイ タグ</string>
@@ -380,12 +377,6 @@
     <string name="settings_about_version">バージョン番号</string>
     <string name="settings_about_check_for_updates">更新を確認</string>
 
-    <string name="proxy_direct">ダイレクト</string>
-    <string name="proxy_system">システムプロキシ</string>
-    <string name="proxy_host_or_ip">ホスト名又はIP</string>
-    <string name="proxy_port">ポート</string>
-    <string name="proxy_invalid_port">入力したポートは無効です</string>
-
 
     <!-- ExcludedLanguagesScene -->
 
@@ -457,9 +448,6 @@
     <string name="clipboard_gallery_url_snack_message">クリップボードにはギャラリーURLが検出されました。</string>
     <string name="clipboard_gallery_url_snack_action">移動</string>
     <string name="settings_advanced_app_language_title">アプリ言語（Language）</string>
-    <string name="settings_advanced_proxy">プロキシ</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s：%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">既定hosts.txt</string>
     <string name="app_language_system">システム言語（既定）</string>
     <string name="download_service">ダウンロードサービス</string>

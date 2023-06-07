@@ -287,7 +287,6 @@
     <string name="filter_commenter">評論者</string>
     <string name="filter_comment">評論</string>
     <string name="delete_filter">刪除隱藏項“%s”？</string>
-    <string name="tip">提示</string>
     <string name="add_filter">新增隱藏項</string>
     <string name="show_definition">檢視定義</string>
     <string name="filter_text">隱藏項文字</string>
@@ -295,7 +294,6 @@
     <!-- Set Security -->
     <!-- UConfig Activity -->
     <string name="u_config">EHentai 設定</string>
-    <string name="apply">套用</string>
     <string name="apply_tip">點選右上角的勾勾以儲存設定</string>
     <!-- My Tags Activity -->
     <string name="my_tags">我的標籤</string>
@@ -306,7 +304,6 @@
     <!-- Settings -->
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">登出</string>
-    <string name="settings_eh_sign_out_tip">已登出，重新啟動程式以再次登入</string>
     <string name="settings_eh_identity_cookies_signed">身份 Cookie 可用於登入該帳號。&lt;br&gt;&lt;b&gt;請注意資料安全&lt;/b&gt;&lt;br&gt;&lt;br&gt;%s</string>
     <string name="settings_eh_identity_cookies_tourist">訪客模式</string>
     <string name="settings_eh_identity_cookies_copy">複製 Cookies</string>
@@ -374,9 +371,6 @@
     <string name="settings_advanced_dump_logcat_to">已將紀錄檔儲存至 %s</string>
     <string name="settings_advanced_read_cache_size">閱讀快取大小</string>
     <string name="settings_advanced_app_language_title">應用程式介面語言</string>
-    <string name="settings_advanced_proxy">Proxy</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_built_in_hosts_title">內建 hosts.txt</string>
     <string name="settings_advanced_domain_fronting_title">域名前綴</string>
     <string name="settings_advanced_domain_fronting_summary">繞過 SNI 封鎖</string>
@@ -405,11 +399,6 @@
     <string name="settings_about_check_for_updates">檢查更新</string>
     <!-- ExcludedLanguagesScene -->
     <string name="please_wait">請稍候</string>
-    <string name="proxy_direct">直接連線</string>
-    <string name="proxy_system">系統 Proxy</string>
-    <string name="proxy_host_or_ip">主機或 IP</string>
-    <string name="proxy_port">通訊埠</string>
-    <string name="proxy_invalid_port">無效的通訊埠</string>
     <string name="cant_read_the_file">無法讀取檔案</string>
     <string name="app_language_system">系統語言（預設）</string>
     <!-- License -->
@@ -514,7 +503,6 @@
     <string name="settings_privacy_require_unlock_delay">鎖定延遲</string>
     <string name="settings_privacy_require_unlock_delay_summary">離開程式並在 %s 分鐘內返回時不需要解鎖</string>
     <string name="settings_privacy_require_unlock_delay_summary_immediately">無論何時回到程式均要求解鎖</string>
-    <string name="proxy_type_name">Proxy 類型</string>
     <string name="filter_label">隱藏項類型</string>
     <string name="archive_passwd">壓縮檔密碼</string>
     <string name="archive_need_passwd">壓縮檔需要密碼</string>

@@ -271,7 +271,6 @@
 
     <string name="settings_eh">EH</string>
     <string name="settings_eh_sign_out">Cerrar sesión</string>
-    <string name="settings_eh_sign_out_tip">Sesión cerrada. Reinicie la aplicación para volver iniciar sesión</string>
     <string name="settings_u_config">Configuración de EHentai</string>
     <string name="settings_u_config_summary">Configurar en la página de EHentai</string>
     <string name="settings_my_tags">Mis etiquetas</string>
@@ -328,9 +327,6 @@
     <string name="settings_advanced_dump_logcat_to">Logcat guardado en %s</string>
     <string name="settings_advanced_read_cache_size">Tamaño del caché (archivos temporales)</string>
     <string name="settings_advanced_app_language_title">Idioma de la aplicación</string>
-    <string name="settings_advanced_proxy">Proxy</string>
-    <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
-    <string name="settings_advanced_proxy_summary_2">%1$s</string>
     <string name="settings_advanced_export_data">Exportar datos</string>
     <string name="settings_advanced_export_data_summary">Guardar datos en almacenamiento externo, tales como la lista de descarga, lista de búsqueda rápida, entre otros</string>
     <string name="settings_advanced_export_data_to">Datos exportados en %s</string>
@@ -344,9 +340,6 @@
     <string name="settings_about_source">Código fuente</string>
     <string name="settings_about_version">Versión de compilación</string>
     <string name="settings_about_check_for_updates">Verificar actualizaciones</string>
-
-    <string name="proxy_port">Puerto</string>
-    <string name="proxy_invalid_port">Puerto Invalido</string>
 
     <string name="cant_read_the_file">No se puede leer el archivo</string>
     <string name="app_language_system">Lenguaje del sistema (Defecto)</string>
@@ -432,7 +425,6 @@
     <string name="filter_tag">Etiqueta</string>
     <string name="filter_tag_namespace">Etiqueta namespace</string>
     <string name="delete_filter">¿Borrar \"%s\"?</string>
-    <string name="tip">Tip</string>
     <string name="add_filter">Bloquear etiqueta</string>
     <string name="filter_the_tag">¿Deseas bloquear la etiqueta \"%s\"?</string>
     <string name="show_definition">Ver definición de la etiqueta</string>
@@ -443,7 +435,6 @@
     <string name="settings_privacy_secure">Impedir capturas de pantalla</string>
     <string name="settings_privacy_secure_summary">Si habilitas esta opción no podrás hacer captura de pantalla y el sistema no mostrará una previsualización en el multitareas.\n\nDeberás reiniciar la aplicación para activar esta función.</string>
     <string name="u_config">Ajustes EHentai</string>
-    <string name="apply">Aplicar</string>
     <string name="apply_tip">Toca la marca de verificación para guardar los cambios</string>
 
 </resources>
