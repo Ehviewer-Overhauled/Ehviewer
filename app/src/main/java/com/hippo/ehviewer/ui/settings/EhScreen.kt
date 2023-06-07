@@ -153,7 +153,7 @@ fun EhScreen() {
                             val result = deferredResult.await().getOrNull() ?: getImageLimits()
                             withUIContext { bind(result) }
                         }.onFailure {
-                            dialog.setMessage(it.localizedMessage)
+                            withUIContext { dialog.setMessage(it.localizedMessage) }
                         }
                     }
                     resetButton.isEnabled = false
@@ -168,7 +168,7 @@ fun EhScreen() {
                                 launchSnackBar(resetImageLimitSucceed)
                                 withUIContext { bind(it) }
                             }.onFailure {
-                                dialog.setMessage(it.localizedMessage)
+                                withUIContext { dialog.setMessage(it.localizedMessage) }
                             }
                         }
                     }
