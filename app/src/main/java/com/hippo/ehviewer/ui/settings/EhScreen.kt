@@ -38,6 +38,7 @@ import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.parser.HomeParser
@@ -248,15 +249,17 @@ fun EhScreen() {
                 summary = stringResource(id = R.string.settings_eh_show_gallery_comments_summary),
                 value = Settings::showComments,
             )
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_eh_show_tag_translations),
-                summary = stringResource(id = R.string.settings_eh_show_tag_translations_summary),
-                value = Settings::showTagTranslations,
-            )
-            UrlPreference(
-                title = stringResource(id = R.string.settings_eh_tag_translations_source),
-                url = stringResource(id = R.string.settings_eh_tag_translations_source_url),
-            )
+            if (EhTagDatabase.isTranslatable(context)) {
+                SwitchPreference(
+                    title = stringResource(id = R.string.settings_eh_show_tag_translations),
+                    summary = stringResource(id = R.string.settings_eh_show_tag_translations_summary),
+                    value = Settings::showTagTranslations,
+                )
+                UrlPreference(
+                    title = stringResource(id = R.string.settings_eh_tag_translations_source),
+                    url = stringResource(id = R.string.settings_eh_tag_translations_source_url),
+                )
+            }
             Preference(
                 title = stringResource(id = R.string.settings_eh_filter),
                 summary = stringResource(id = R.string.settings_eh_filter_summary),
