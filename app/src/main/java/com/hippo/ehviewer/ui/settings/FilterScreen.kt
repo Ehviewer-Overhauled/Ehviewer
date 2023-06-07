@@ -50,33 +50,38 @@ fun FilterScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scaffoldRecomposeScope = currentRecomposeScope
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
-        private val mArray: Array<String> = dialog.context.resources.getStringArray(R.array.filter_entries)
+        private val mArray = dialog.context.resources.getStringArray(R.array.filter_entries)
         private val binding = DialogAddFilterBinding.bind(dialog.findViewById(R.id.base)!!)
         init { dialog.getButton(DialogInterface.BUTTON_POSITIVE)!!.setOnClickListener(this) }
         override fun onClick(v: View) {
-            val text1 = binding.spinner.editText!!.text.toString()
-            if (text1.isEmpty()) {
-                binding.spinner.error = dialog.context.getString(R.string.text_is_empty)
-                return
-            } else {
-                binding.spinner.error = null
+            val emptyError = context.getString(R.string.text_is_empty)
+            val text1: String?
+            binding.spinner.run {
+                text1 = editText?.text?.toString()
+                if (text1.isNullOrBlank()) {
+                    error = emptyError
+                    return
+                } else {
+                    error = null
+                }
             }
-            val text = binding.textInputLayout.editText!!.text.toString().trim { it <= ' ' }
-            if (text.isBlank()) {
-                binding.textInputLayout.error = dialog.context.getString(R.string.text_is_empty)
-                return
-            } else {
-                binding.textInputLayout.error = null
+            val text: String?
+            binding.textInputLayout.run {
+                text = editText?.text?.toString()?.trim()
+                if (text.isNullOrBlank()) {
+                    error = emptyError
+                    return
+                } else {
+                    error = null
+                }
             }
-            val mode = mArray.indexOf(text1)
-            val filter = Filter()
-            filter.mode = mode
-            filter.text = text
-            if (!EhFilter.addFilter(filter)) {
-                binding.textInputLayout.error = dialog.context.getString(R.string.label_text_exist)
-                return
-            } else {
-                binding.textInputLayout.error = null
+            binding.textInputLayout.run {
+                if (!EhFilter.addFilter(Filter(mArray.indexOf(text1), text))) {
+                    error = context.getString(R.string.label_text_exist)
+                    return
+                } else {
+                    error = null
+                }
             }
             scaffoldRecomposeScope.invalidate()
             dialog.dismiss()
