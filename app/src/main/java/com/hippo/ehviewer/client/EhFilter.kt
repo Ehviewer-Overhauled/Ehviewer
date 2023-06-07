@@ -16,6 +16,7 @@
 package com.hippo.ehviewer.client
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import arrow.core.memoize
 import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -24,12 +25,12 @@ import com.hippo.ehviewer.dao.Filter
 private val regex = { p: Filter -> Regex(p.text!!) }.memoize()
 
 object EhFilter {
-    val titleFilterList = mutableListOf<Filter>()
-    val uploaderFilterList = mutableListOf<Filter>()
-    val tagFilterList = mutableListOf<Filter>()
-    val tagNamespaceFilterList = mutableListOf<Filter>()
-    val commenterFilterList = mutableListOf<Filter>()
-    val commentFilterList = mutableListOf<Filter>()
+    val titleFilterList = mutableStateListOf<Filter>()
+    val uploaderFilterList = mutableStateListOf<Filter>()
+    val tagFilterList = mutableStateListOf<Filter>()
+    val tagNamespaceFilterList = mutableStateListOf<Filter>()
+    val commenterFilterList = mutableStateListOf<Filter>()
+    val commentFilterList = mutableStateListOf<Filter>()
 
     const val MODE_TITLE = 0
     const val MODE_UPLOADER = 1

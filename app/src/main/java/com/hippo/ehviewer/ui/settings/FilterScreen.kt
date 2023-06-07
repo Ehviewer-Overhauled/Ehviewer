@@ -53,7 +53,6 @@ fun FilterScreen() {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val scaffoldRecomposeScope = currentRecomposeScope
     class AddFilterDialogHelper(private val dialog: AlertDialog) : View.OnClickListener {
         private val mArray = dialog.context.resources.getStringArray(R.array.filter_entries)
         private val binding = DialogAddFilterBinding.bind(dialog.findViewById(R.id.base)!!)
@@ -88,7 +87,6 @@ fun FilterScreen() {
                     error = null
                 }
             }
-            scaffoldRecomposeScope.invalidate()
             dialog.dismiss()
         }
     }
@@ -116,7 +114,6 @@ fun FilterScreen() {
             }
         },
     ) { paddingValues ->
-        val lazyListRecomposeScope = currentRecomposeScope
         LazyColumn(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentPadding = paddingValues,
@@ -149,17 +146,7 @@ fun FilterScreen() {
                         Text(text = filter.text.orEmpty())
                         Spacer(modifier = Modifier.weight(1F))
                         IconButton(
-                            onClick = {
-                                BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text))
-                                    .setPositiveButton(R.string.delete) { _, which ->
-                                        if (DialogInterface.BUTTON_POSITIVE == which) {
-                                            coroutineScope.launch {
-                                                EhFilter.deleteFilter(filter)
-                                                lazyListRecomposeScope.invalidate()
-                                            }
-                                        }
-                                    }.setNegativeButton(android.R.string.cancel, null).show()
-                            },
+                            onClick = { BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text)).setPositiveButton(R.string.delete) { _, which -> if (DialogInterface.BUTTON_POSITIVE == which) { coroutineScope.launch { EhFilter.deleteFilter(filter) } } }.setNegativeButton(android.R.string.cancel, null).show() },
                         ) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                         }
