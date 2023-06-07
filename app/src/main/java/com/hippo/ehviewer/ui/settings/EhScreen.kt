@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
@@ -83,7 +84,12 @@ fun EhScreen() {
     ) { paddingValues ->
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
-        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .padding(top = paddingValues.calculateTopPadding())
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .verticalScroll(rememberScrollState()),
+        ) {
             Preference(
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: touristMode,
@@ -225,11 +231,14 @@ fun EhScreen() {
                 title = stringResource(id = R.string.settings_eh_thumb_size),
                 value = Settings::thumbSizeDp,
             )
+            val thumbResolution = Settings::thumbResolution.observed
+            val summary2 = stringResource(id = R.string.settings_eh_thumb_resolution_summary, stringArrayResource(id = R.array.thumb_resolution_entries)[thumbResolution.value])
             SimpleMenuPreferenceInt(
                 title = stringResource(id = R.string.settings_eh_thumb_resolution),
+                summary = summary2,
                 entry = R.array.thumb_resolution_entries,
                 entryValueRes = R.array.thumb_resolution_entry_values,
-                value = Settings::thumbResolution.observed,
+                value = thumbResolution,
             )
             SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_show_jpn_title),
