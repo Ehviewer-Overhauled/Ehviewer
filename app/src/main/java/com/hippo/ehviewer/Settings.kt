@@ -41,7 +41,7 @@ object Settings : DataStorePreferences(null) {
     var hideHvEvents by boolPref("hide_hv_events", false)
     var showJpnTitle by boolPref("show_jpn_title", false)
     var showGalleryPages by boolPref("show_gallery_pages", false)
-    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, false)
+    var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, false).observed { updateWhenTagTranslationChanges() }
     var meteredNetworkWarning by boolPref("cellular_network_warning", false)
     var appLinkVerifyTip by boolPref("app_link_verify_tip", false)
     var enabledSecurity by boolPref("enable_secure", false)

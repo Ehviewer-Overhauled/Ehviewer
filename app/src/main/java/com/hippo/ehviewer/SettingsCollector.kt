@@ -3,6 +3,7 @@ package com.hippo.ehviewer
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.hippo.ehviewer.client.EhEngine
+import com.hippo.ehviewer.client.EhTagDatabase
 import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -50,6 +51,16 @@ fun updateWhenGallerySiteChanges() {
     collectScope.launchIO {
         runCatching {
             EhEngine.getUConfig()
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+}
+
+fun updateWhenTagTranslationChanges() {
+    collectScope.launchIO {
+        runCatching {
+            EhTagDatabase.update()
         }.onFailure {
             it.printStackTrace()
         }
