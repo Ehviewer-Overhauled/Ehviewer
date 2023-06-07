@@ -55,11 +55,11 @@ import com.hippo.ehviewer.client.data.GalleryDetail
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
-import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
-import com.hippo.ehviewer.ui.compose.rememberDialogState
-import com.hippo.ehviewer.ui.compose.rememberMemorized
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
+import com.hippo.ehviewer.ui.main.data.EhPreviewItem
+import com.hippo.ehviewer.ui.main.rememberDialogState
+import com.hippo.ehviewer.ui.main.rememberMemorized
+import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.util.getParcelableCompat
 import kotlinx.coroutines.Dispatchers

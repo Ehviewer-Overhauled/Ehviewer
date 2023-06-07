@@ -78,8 +78,6 @@ import com.hippo.ehviewer.databinding.ItemDrawerListBinding
 import com.hippo.ehviewer.databinding.SceneGalleryListBinding
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.download.DownloadManager.DownloadInfoListener
-import com.hippo.ehviewer.ui.compose.DialogState
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.doGalleryInfoAction
 import com.hippo.ehviewer.ui.legacy.AddDeleteDrawable
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
@@ -94,6 +92,8 @@ import com.hippo.ehviewer.ui.legacy.GalleryInfoContentHelper
 import com.hippo.ehviewer.ui.legacy.SearchLayout
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.legacy.WindowInsetsAnimationHelper
+import com.hippo.ehviewer.ui.main.DialogState
+import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.util.getParcelableCompat
 import com.hippo.ehviewer.yorozuya.AnimationUtils
 import com.hippo.ehviewer.yorozuya.SimpleAnimatorListener

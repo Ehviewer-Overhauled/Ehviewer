@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose.data
+package com.hippo.ehviewer.ui.main.data
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

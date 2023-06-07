@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose.data
+package com.hippo.ehviewer.ui.main.data
 
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.layout.Box
@@ -27,8 +27,8 @@ import coil.request.ImageRequest
 import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.client.data.NormalGalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
-import com.hippo.ehviewer.ui.compose.CropDefaults
-import com.hippo.ehviewer.ui.compose.CrystalCard
+import com.hippo.ehviewer.ui.main.CropDefaults
+import com.hippo.ehviewer.ui.main.CrystalCard
 
 @Composable
 @ReadOnlyComposable

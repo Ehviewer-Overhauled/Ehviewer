@@ -36,8 +36,8 @@ import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.compose.data.GalleryInfoGridItem
-import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
+import com.hippo.ehviewer.ui.main.data.GalleryInfoGridItem
+import com.hippo.ehviewer.ui.main.data.GalleryInfoListItem
 import eu.kanade.tachiyomi.util.system.pxToDp
 
 abstract class GalleryHolder(composeView: CheckableComposeView) : RecyclerView.ViewHolder(composeView) {

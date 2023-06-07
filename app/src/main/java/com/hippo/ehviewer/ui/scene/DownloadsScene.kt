@@ -77,9 +77,6 @@ import com.hippo.ehviewer.download.DownloadService
 import com.hippo.ehviewer.download.DownloadService.Companion.clear
 import com.hippo.ehviewer.spider.SpiderDen
 import com.hippo.ehviewer.spider.putToDownloadDir
-import com.hippo.ehviewer.ui.compose.CropDefaults
-import com.hippo.ehviewer.ui.compose.data.requestOf
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.AutoStaggeredGridLayoutManager
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
@@ -93,6 +90,9 @@ import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.ViewTransition
+import com.hippo.ehviewer.ui.main.CropDefaults
+import com.hippo.ehviewer.ui.main.data.requestOf
+import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils

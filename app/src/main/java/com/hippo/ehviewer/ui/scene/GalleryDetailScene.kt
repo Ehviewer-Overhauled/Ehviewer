@@ -151,11 +151,6 @@ import com.hippo.ehviewer.ui.GalleryInfoBottomSheet
 import com.hippo.ehviewer.ui.LocalNavController
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.addToFavorites
-import com.hippo.ehviewer.ui.compose.CrystalCard
-import com.hippo.ehviewer.ui.compose.GalleryDetailRating
-import com.hippo.ehviewer.ui.compose.data.EhPreviewItem
-import com.hippo.ehviewer.ui.compose.data.GalleryDetailHeaderCard
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.legacy.BaseDialogBuilder
 import com.hippo.ehviewer.ui.legacy.CheckBoxDialogBuilder
 import com.hippo.ehviewer.ui.legacy.EditTextDialogBuilder
@@ -164,6 +159,11 @@ import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
+import com.hippo.ehviewer.ui.main.CrystalCard
+import com.hippo.ehviewer.ui.main.GalleryDetailRating
+import com.hippo.ehviewer.ui.main.data.EhPreviewItem
+import com.hippo.ehviewer.ui.main.data.GalleryDetailHeaderCard
+import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites

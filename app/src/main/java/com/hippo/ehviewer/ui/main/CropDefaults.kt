@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.main
 
 object CropDefaults {
     private const val CROP_MIN_ASPECT = 0.5F

@@ -65,11 +65,11 @@ import com.hippo.ehviewer.EhDB
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings.listThumbSize
 import com.hippo.ehviewer.client.data.GalleryInfo
-import com.hippo.ehviewer.ui.compose.Deferred
-import com.hippo.ehviewer.ui.compose.data.GalleryInfoListItem
-import com.hippo.ehviewer.ui.compose.rememberDialogState
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.doGalleryInfoAction
+import com.hippo.ehviewer.ui.main.Deferred
+import com.hippo.ehviewer.ui.main.data.GalleryInfoListItem
+import com.hippo.ehviewer.ui.main.rememberDialogState
+import com.hippo.ehviewer.ui.main.setMD3Content
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.system.pxToDp
 import kotlinx.coroutines.delay

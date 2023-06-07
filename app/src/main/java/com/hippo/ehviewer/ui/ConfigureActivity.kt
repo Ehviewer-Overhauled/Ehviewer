@@ -15,11 +15,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hippo.ehviewer.Settings
-import com.hippo.ehviewer.ui.compose.setMD3Content
 import com.hippo.ehviewer.ui.login.CookieSignInScene
 import com.hippo.ehviewer.ui.login.SelectSiteScreen
 import com.hippo.ehviewer.ui.login.SignInScreen
 import com.hippo.ehviewer.ui.login.WebviewSignInScreen
+import com.hippo.ehviewer.ui.main.setMD3Content
 import com.hippo.ehviewer.ui.settings.AboutScreen
 import com.hippo.ehviewer.ui.settings.AdvancedScreen
 import com.hippo.ehviewer.ui.settings.BaseScreen

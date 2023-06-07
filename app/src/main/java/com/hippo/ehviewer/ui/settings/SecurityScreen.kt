@@ -18,9 +18,9 @@ import androidx.compose.ui.res.stringResource
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.LocalNavController
-import com.hippo.ehviewer.ui.compose.observed
-import com.hippo.ehviewer.ui.compose.rememberedAccessor
 import com.hippo.ehviewer.ui.isAuthenticationSupported
+import com.hippo.ehviewer.ui.main.observed
+import com.hippo.ehviewer.ui.main.rememberedAccessor
 
 @Composable
 fun SecurityScreen() {

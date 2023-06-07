@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

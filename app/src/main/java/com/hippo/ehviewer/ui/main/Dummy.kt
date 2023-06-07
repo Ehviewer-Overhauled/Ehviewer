@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.compose
+package com.hippo.ehviewer.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
