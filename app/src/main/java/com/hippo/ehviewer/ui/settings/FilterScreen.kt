@@ -1,5 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
+import android.content.DialogInterface
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -91,10 +92,15 @@ fun FilterScreen() {
                     Spacer(modifier = Modifier.weight(1F))
                     IconButton(
                         onClick = {
-                            coroutineScope.launch {
-                                EhFilter.deleteFilter(filter)
-                                lazyListRecomposeScope.invalidate()
-                            }
+                            BaseDialogBuilder(context).setMessage(context.getString(R.string.delete_filter, filter.text))
+                                .setPositiveButton(R.string.delete) { _, which ->
+                                    if (DialogInterface.BUTTON_POSITIVE == which) {
+                                        coroutineScope.launch {
+                                            EhFilter.deleteFilter(filter)
+                                            lazyListRecomposeScope.invalidate()
+                                        }
+                                    }
+                                }.setNegativeButton(android.R.string.cancel, null).show()
                         },
                     ) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
