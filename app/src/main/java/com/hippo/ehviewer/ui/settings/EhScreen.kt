@@ -68,6 +68,7 @@ fun EhScreen() {
     val coroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val context = LocalContext.current
     fun launchSnackBar(content: String) = coroutineScope.launch { snackbarHostState.showSnackbar(content) }
+    val signin = EhCookieStore.hasSignedIn()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,12 +85,7 @@ fun EhScreen() {
     ) { paddingValues ->
         val touristMode = stringResource(id = R.string.settings_eh_identity_cookies_tourist)
         val copiedToClipboard = stringResource(id = R.string.copied_to_clipboard)
-        Column(
-            modifier = Modifier
-                .padding(top = paddingValues.calculateTopPadding())
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState()),
-        ) {
+        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(rememberScrollState())) {
             Preference(
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: touristMode,
@@ -125,70 +121,72 @@ fun EhScreen() {
                     }
                 }.show()
             }
-            val placeholder = stringResource(id = R.string.please_wait)
-            val resetImageLimitSucceed = stringResource(id = R.string.reset_limits_succeed)
-            val noImageLimits = stringResource(id = R.string.image_limits_summary, 0, 0)
-            var summary by rememberSaveable { mutableStateOf(noImageLimits) }
-            suspend fun getImageLimits() = EhEngine.getImageLimits().also {
-                summary = context.getString(R.string.image_limits_summary, it.limits.current, it.limits.maximum)
-            }
-            val deferredResult = remember { coroutineScope.async { runSuspendCatching { getImageLimits() } } }
-            Preference(
-                title = stringResource(id = R.string.image_limits),
-                summary = summary,
-            ) {
-                val builder = BaseDialogBuilder(context).setMessage(placeholder)
-                    .setPositiveButton(R.string.reset, null)
-                    .setNegativeButton(android.R.string.cancel, null)
-                val dialog = builder.show()
-                val resetButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                fun bind(result: HomeParser.Result) {
-                    val (current, maximum, resetCost) = result.limits
-                    val (fundsGP, fundsC) = result.funds
-                    val cost = if (fundsGP >= resetCost) "$resetCost GP" else "$resetCost Credits"
-                    val message = context.getString(R.string.current_limits, "$current / $maximum", cost) + "\n" + context.getString(R.string.current_funds, "$fundsGP+", fundsC)
-                    dialog.setMessage(message)
-                    resetButton.isEnabled = resetCost in 1..maxOf(fundsGP, fundsC)
+            if (signin) {
+                val placeholder = stringResource(id = R.string.please_wait)
+                val resetImageLimitSucceed = stringResource(id = R.string.reset_limits_succeed)
+                val noImageLimits = stringResource(id = R.string.image_limits_summary, 0, 0)
+                var summary by rememberSaveable { mutableStateOf(noImageLimits) }
+                suspend fun getImageLimits() = EhEngine.getImageLimits().also {
+                    summary = context.getString(R.string.image_limits_summary, it.limits.current, it.limits.maximum)
                 }
-                coroutineScope.launch {
-                    runSuspendCatching {
-                        val result = deferredResult.await().getOrNull() ?: getImageLimits()
-                        withUIContext { bind(result) }
-                    }.onFailure {
-                        dialog.setMessage(it.localizedMessage)
+                val deferredResult = remember { coroutineScope.async { runSuspendCatching { getImageLimits() } } }
+                Preference(
+                    title = stringResource(id = R.string.image_limits),
+                    summary = summary,
+                ) {
+                    val builder = BaseDialogBuilder(context).setMessage(placeholder)
+                        .setPositiveButton(R.string.reset, null)
+                        .setNegativeButton(android.R.string.cancel, null)
+                    val dialog = builder.show()
+                    val resetButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    fun bind(result: HomeParser.Result) {
+                        val (current, maximum, resetCost) = result.limits
+                        val (fundsGP, fundsC) = result.funds
+                        val cost = if (fundsGP >= resetCost) "$resetCost GP" else "$resetCost Credits"
+                        val message = context.getString(R.string.current_limits, "$current / $maximum", cost) + "\n" + context.getString(R.string.current_funds, "$fundsGP+", fundsC)
+                        dialog.setMessage(message)
+                        resetButton.isEnabled = resetCost in 1..maxOf(fundsGP, fundsC)
                     }
-                }
-                resetButton.isEnabled = false
-                resetButton.setOnClickListener { button ->
-                    button.isEnabled = false
-                    dialog.setMessage(placeholder)
                     coroutineScope.launch {
                         runSuspendCatching {
-                            EhEngine.resetImageLimits()
-                            getImageLimits()
-                        }.onSuccess {
-                            launchSnackBar(resetImageLimitSucceed)
-                            withUIContext { bind(it) }
+                            val result = deferredResult.await().getOrNull() ?: getImageLimits()
+                            withUIContext { bind(result) }
                         }.onFailure {
                             dialog.setMessage(it.localizedMessage)
                         }
                     }
+                    resetButton.isEnabled = false
+                    resetButton.setOnClickListener { button ->
+                        button.isEnabled = false
+                        dialog.setMessage(placeholder)
+                        coroutineScope.launch {
+                            runSuspendCatching {
+                                EhEngine.resetImageLimits()
+                                getImageLimits()
+                            }.onSuccess {
+                                launchSnackBar(resetImageLimitSucceed)
+                                withUIContext { bind(it) }
+                            }.onFailure {
+                                dialog.setMessage(it.localizedMessage)
+                            }
+                        }
+                    }
                 }
+                SimpleMenuPreferenceInt(
+                    title = stringResource(id = R.string.settings_eh_gallery_site),
+                    entry = R.array.gallery_site_entries,
+                    entryValueRes = R.array.gallery_site_entry_values,
+                    value = Settings::gallerySite.observed,
+                )
+                Preference(
+                    title = stringResource(id = R.string.settings_u_config),
+                    summary = stringResource(id = R.string.settings_u_config_summary),
+                ) { navController.navigate(UCONFIG_SCREEN) }
+                Preference(
+                    title = stringResource(id = R.string.settings_my_tags),
+                    summary = stringResource(id = R.string.settings_my_tags_summary),
+                ) { navController.navigate(MYTAGS_SCREEN) }
             }
-            SimpleMenuPreferenceInt(
-                title = stringResource(id = R.string.settings_eh_gallery_site),
-                entry = R.array.gallery_site_entries,
-                entryValueRes = R.array.gallery_site_entry_values,
-                value = Settings::gallerySite.observed,
-            )
-            Preference(
-                title = stringResource(id = R.string.settings_u_config),
-                summary = stringResource(id = R.string.settings_u_config_summary),
-            ) { navController.navigate(UCONFIG_SCREEN) }
-            Preference(
-                title = stringResource(id = R.string.settings_my_tags),
-                summary = stringResource(id = R.string.settings_my_tags_summary),
-            ) { navController.navigate(MYTAGS_SCREEN) }
             SimpleMenuPreferenceInt(
                 title = stringResource(id = rikka.core.R.string.dark_theme),
                 entry = R.array.night_mode_entries,
@@ -241,11 +239,6 @@ fun EhScreen() {
                 value = thumbResolution,
             )
             SwitchPreference(
-                title = stringResource(id = R.string.settings_eh_show_jpn_title),
-                summary = stringResource(id = R.string.settings_eh_show_jpn_title_summary),
-                value = Settings::showJpnTitle,
-            )
-            SwitchPreference(
                 title = stringResource(id = R.string.settings_eh_show_gallery_pages),
                 summary = stringResource(id = R.string.settings_eh_show_gallery_pages_summary),
                 value = Settings::showGalleryPages,
@@ -272,38 +265,45 @@ fun EhScreen() {
                 title = stringResource(id = R.string.settings_eh_metered_network_warning),
                 value = Settings::meteredNetworkWarning,
             )
-            val reqNews = Settings::requestNews.observed
-            SwitchPreference(
-                title = stringResource(id = R.string.settings_eh_request_news),
-                value = reqNews.rememberedAccessor,
-            )
-            AnimatedVisibility(visible = reqNews.value) {
-                val pickerTitle = stringResource(id = R.string.settings_eh_request_news_timepicker)
-                var showPicker by rememberSaveable { mutableStateOf(false) }
-                val state = rememberTimePickerState(schedHour, schedMinute)
-                if (showPicker) {
-                    TimePickerDialog(
-                        title = pickerTitle,
-                        onCancel = { showPicker = false },
-                        onConfirm = {
-                            showPicker = false
-                            Settings.requestNewsTimerHour = state.hour
-                            Settings.requestNewsTimerMinute = state.minute
-                            updateDailyCheckWork(context)
-                        },
-                    ) {
-                        TimePicker(state = state)
+            if (signin) {
+                SwitchPreference(
+                    title = stringResource(id = R.string.settings_eh_show_jpn_title),
+                    summary = stringResource(id = R.string.settings_eh_show_jpn_title_summary),
+                    value = Settings::showJpnTitle,
+                )
+                val reqNews = Settings::requestNews.observed
+                SwitchPreference(
+                    title = stringResource(id = R.string.settings_eh_request_news),
+                    value = reqNews.rememberedAccessor,
+                )
+                AnimatedVisibility(visible = reqNews.value) {
+                    val pickerTitle = stringResource(id = R.string.settings_eh_request_news_timepicker)
+                    var showPicker by rememberSaveable { mutableStateOf(false) }
+                    val state = rememberTimePickerState(schedHour, schedMinute)
+                    if (showPicker) {
+                        TimePickerDialog(
+                            title = pickerTitle,
+                            onCancel = { showPicker = false },
+                            onConfirm = {
+                                showPicker = false
+                                Settings.requestNewsTimerHour = state.hour
+                                Settings.requestNewsTimerMinute = state.minute
+                                updateDailyCheckWork(context)
+                            },
+                        ) {
+                            TimePicker(state = state)
+                        }
+                    }
+                    Preference(title = pickerTitle) {
+                        showPicker = true
                     }
                 }
-                Preference(title = pickerTitle) {
-                    showPicker = true
+                AnimatedVisibility(visible = reqNews.value) {
+                    SwitchPreference(
+                        title = stringResource(id = R.string.settings_eh_hide_hv_events),
+                        value = Settings::requestNews,
+                    )
                 }
-            }
-            AnimatedVisibility(visible = reqNews.value) {
-                SwitchPreference(
-                    title = stringResource(id = R.string.settings_eh_hide_hv_events),
-                    value = Settings::requestNews,
-                )
             }
             Spacer(modifier = Modifier.size(paddingValues.calculateBottomPadding()))
         }

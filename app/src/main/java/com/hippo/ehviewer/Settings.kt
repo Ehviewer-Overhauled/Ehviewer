@@ -13,30 +13,10 @@ import kotlin.reflect.KProperty
 
 @OptIn(DataStorePreferencesPreview::class)
 object Settings : DataStorePreferences(null) {
-    const val KEY_ACCOUNT = "account"
-    const val KEY_IMAGE_LIMITS = "image_limits"
-    const val KEY_U_CONFIG = "uconfig"
-    const val KEY_MY_TAGS = "mytags"
-    const val KEY_GALLERY_SITE = "gallery_site"
-    const val KEY_SHOW_JPN_TITLE = "show_jpn_title"
     const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
-    const val KEY_TAG_TRANSLATIONS_SOURCE = "tag_translations_source"
-    const val KEY_REQUEST_NEWS = "request_news"
-    const val KEY_REQUEST_NEWS_TIMER = "request_news_timer"
-    const val KEY_HIDE_HV_EVENTS = "hide_hv_events"
     const val INVALID_DEFAULT_FAV_SLOT = -2
     const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
     const val KEY_DOMAIN_FRONTING = "domain_fronting"
-    val SIGN_IN_REQUIRED = arrayOf(
-        KEY_IMAGE_LIMITS,
-        KEY_GALLERY_SITE,
-        KEY_U_CONFIG,
-        KEY_MY_TAGS,
-        KEY_SHOW_JPN_TITLE,
-        KEY_REQUEST_NEWS,
-        KEY_REQUEST_NEWS_TIMER,
-        KEY_HIDE_HV_EVENTS,
-    )
 
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)
@@ -47,7 +27,7 @@ object Settings : DataStorePreferences(null) {
     var favCount by intArrayPref("fav_count", 10)
     var archivePasswds by stringSetOrNullPref("archive_passwds")
     var downloadDelay by intFromStrPref("download_delay", 0)
-    var gallerySite by intFromStrPref(KEY_GALLERY_SITE, 0)
+    var gallerySite by intFromStrPref("gallery_site", 0)
     var multiThreadDownload by intFromStrPref("download_thread", 3)
     var preloadImage by intFromStrPref("preload_image", 5)
     var theme by intFromStrPref("theme", -1).observed { updateWhenThemeChanges() }
@@ -57,9 +37,9 @@ object Settings : DataStorePreferences(null) {
     var readCacheSize by intFromStrPref("read_cache_size", 640)
     var launchPage by intFromStrPref("launch_page", 0)
     var showComments by boolPref("show_gallery_comments", true)
-    var requestNews by boolPref(KEY_REQUEST_NEWS, false).observed { updateWhenRequestNewsChanges() }
-    var hideHvEvents by boolPref(KEY_HIDE_HV_EVENTS, false)
-    var showJpnTitle by boolPref(KEY_SHOW_JPN_TITLE, false)
+    var requestNews by boolPref("request_news", false).observed { updateWhenRequestNewsChanges() }
+    var hideHvEvents by boolPref("hide_hv_events", false)
+    var showJpnTitle by boolPref("show_jpn_title", false)
     var showGalleryPages by boolPref("show_gallery_pages", false)
     var showTagTranslations by boolPref(KEY_SHOW_TAG_TRANSLATIONS, false)
     var meteredNetworkWarning by boolPref("cellular_network_warning", false)
