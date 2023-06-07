@@ -2,6 +2,7 @@ package com.hippo.ehviewer
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.hippo.ehviewer.client.EhEngine
 import com.hippo.ehviewer.dailycheck.updateDailyCheckWork
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import eu.kanade.tachiyomi.util.lang.launchIO
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import splitties.init.appCtx
 import splitties.preferences.PrefDelegate
 
-val collectScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+private val collectScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 fun <T, R : PrefDelegate<T>> R.observed(func: (Unit) -> Unit) = apply { collectScope.launch { changesFlow().collect(func) } }
 fun <T, R : Settings.Delegate<T>> R.observed(func: (Unit) -> Unit) = apply { collectScope.launch { flowGetter().collect(func) } }
 
@@ -43,4 +44,14 @@ fun updateWhenThemeChanges() {
 
 fun updateWhenRequestNewsChanges() {
     updateDailyCheckWork(appCtx)
+}
+
+fun updateWhenGallerySiteChanges() {
+    collectScope.launchIO {
+        runCatching {
+            EhEngine.getUConfig()
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
 }

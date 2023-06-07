@@ -27,7 +27,7 @@ object Settings : DataStorePreferences(null) {
     var favCount by intArrayPref("fav_count", 10)
     var archivePasswds by stringSetOrNullPref("archive_passwds")
     var downloadDelay by intFromStrPref("download_delay", 0)
-    var gallerySite by intFromStrPref("gallery_site", 0)
+    var gallerySite by intFromStrPref("gallery_site", 0).observed { updateWhenGallerySiteChanges() }
     var multiThreadDownload by intFromStrPref("download_thread", 3)
     var preloadImage by intFromStrPref("preload_image", 5)
     var theme by intFromStrPref("theme", -1).observed { updateWhenThemeChanges() }
