@@ -177,7 +177,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-window-size-class")
 
-    implementation("androidx.core:core-ktx:1.11.0-beta01")
+    implementation("androidx.core:core-ktx:1.11.0-beta02")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha10")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
