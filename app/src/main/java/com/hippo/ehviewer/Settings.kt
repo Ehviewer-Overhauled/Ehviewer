@@ -6,17 +6,14 @@ import com.hippo.ehviewer.client.data.FavListUrlBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import splitties.preferences.DataStorePreferences
-import splitties.preferences.DataStorePreferencesPreview
 import splitties.preferences.edit
 import java.util.Locale
 import kotlin.reflect.KProperty
 
-@OptIn(DataStorePreferencesPreview::class)
 object Settings : DataStorePreferences(null) {
-    const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
-    const val INVALID_DEFAULT_FAV_SLOT = -2
-    const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
-    const val KEY_DOMAIN_FRONTING = "domain_fronting"
+    private const val KEY_SHOW_TAG_TRANSLATIONS = "show_tag_translations"
+    private const val KEY_BUILT_IN_HOSTS = "built_in_hosts_2"
+    private const val KEY_DOMAIN_FRONTING = "domain_fronting"
 
     var downloadScheme by stringOrNullPref("image_scheme", null)
     var downloadAuthority by stringOrNullPref("image_authority", null)
@@ -63,7 +60,7 @@ object Settings : DataStorePreferences(null) {
     var favLocalCount by intPref("fav_local", 0)
     var favCloudCount by intPref("fav_cloud", 0)
     var recentFavCat by intPref("recent_fav_cat", FavListUrlBuilder.FAV_CAT_ALL)
-    var defaultFavSlot by intPref("default_favorite_2", INVALID_DEFAULT_FAV_SLOT) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
+    var defaultFavSlot by intPref("default_favorite_2", -2) // -1 for local, 0 - 9 for cloud favorite, other for no default fav slot
     var securityDelay by intPref("require_unlock_delay", 0)
     var clipboardTextHashCode by intPref("clipboard_text_hash_code", 0)
     var listThumbSize by intPref("list_tile_size", 40)

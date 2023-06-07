@@ -116,6 +116,7 @@ android {
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=splitties.experimental.ExperimentalSplittiesApi",
+            "-opt-in=splitties.preferences.DataStorePreferencesPreview",
         )
     }
 

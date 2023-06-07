@@ -235,7 +235,7 @@ suspend fun Context.addToFavorites(galleryInfo: GalleryInfo, select: Boolean = f
         if (checked) {
             Settings.defaultFavSlot = slot1
         } else {
-            Settings.defaultFavSlot = Settings.INVALID_DEFAULT_FAV_SLOT
+            Settings.defaultFavSlot = -2
         }
     }
 }
