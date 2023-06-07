@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.tools
+package com.hippo.ehviewer.ui
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

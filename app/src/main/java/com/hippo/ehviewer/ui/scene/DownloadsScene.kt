@@ -92,8 +92,8 @@ import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.ViewTransition
 import com.hippo.ehviewer.ui.main.requestOf
 import com.hippo.ehviewer.ui.navToReader
+import com.hippo.ehviewer.ui.setMD3Content
 import com.hippo.ehviewer.ui.tools.CropDefaults
-import com.hippo.ehviewer.ui.tools.setMD3Content
 import com.hippo.ehviewer.util.sendTo
 import com.hippo.ehviewer.yorozuya.FileUtils
 import com.hippo.ehviewer.yorozuya.ObjectUtils

@@ -29,7 +29,6 @@ import com.hippo.ehviewer.ui.settings.LicenseScreen
 import com.hippo.ehviewer.ui.settings.MyTagsScreen
 import com.hippo.ehviewer.ui.settings.SecurityScreen
 import com.hippo.ehviewer.ui.settings.UConfigScreen
-import com.hippo.ehviewer.ui.tools.setMD3Content
 
 class ConfigureActivity : EhActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
