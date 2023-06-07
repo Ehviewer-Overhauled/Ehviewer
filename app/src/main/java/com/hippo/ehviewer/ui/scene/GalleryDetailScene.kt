@@ -160,8 +160,8 @@ import com.hippo.ehviewer.ui.legacy.GalleryRatingBar.OnUserRateListener
 import com.hippo.ehviewer.ui.legacy.ObservedTextView
 import com.hippo.ehviewer.ui.legacy.URLImageGetter
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
-import com.hippo.ehviewer.ui.main.data.EhPreviewItem
-import com.hippo.ehviewer.ui.main.data.GalleryDetailHeaderCard
+import com.hippo.ehviewer.ui.main.EhPreviewItem
+import com.hippo.ehviewer.ui.main.GalleryDetailHeaderCard
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.openBrowser
 import com.hippo.ehviewer.ui.removeFromFavorites

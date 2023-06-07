@@ -90,7 +90,7 @@ import com.hippo.ehviewer.ui.legacy.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.ui.legacy.HandlerDrawable
 import com.hippo.ehviewer.ui.legacy.STRATEGY_MIN_SIZE
 import com.hippo.ehviewer.ui.legacy.ViewTransition
-import com.hippo.ehviewer.ui.main.data.requestOf
+import com.hippo.ehviewer.ui.main.requestOf
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.tools.CropDefaults
 import com.hippo.ehviewer.ui.tools.setMD3Content

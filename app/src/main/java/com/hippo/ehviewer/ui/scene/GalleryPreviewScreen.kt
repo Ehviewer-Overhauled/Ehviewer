@@ -56,7 +56,7 @@ import com.hippo.ehviewer.client.data.GalleryPreview
 import com.hippo.ehviewer.coil.imageRequest
 import com.hippo.ehviewer.coil.justDownload
 import com.hippo.ehviewer.ui.legacy.calculateSuitableSpanCount
-import com.hippo.ehviewer.ui.main.data.EhPreviewItem
+import com.hippo.ehviewer.ui.main.EhPreviewItem
 import com.hippo.ehviewer.ui.navToReader
 import com.hippo.ehviewer.ui.tools.rememberDialogState
 import com.hippo.ehviewer.ui.tools.rememberMemorized

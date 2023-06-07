@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main.data
+package com.hippo.ehviewer.ui.main
 
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.layout.Box

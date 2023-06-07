@@ -1,4 +1,4 @@
-package com.hippo.ehviewer.ui.main.data
+package com.hippo.ehviewer.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
