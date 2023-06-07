@@ -24,6 +24,7 @@ import kotlin.math.roundToInt
 fun SliderPref(
     title: String,
     modifier: Modifier = Modifier,
+    summary: String? = null,
     defaultValue: Float = 0f,
     onValueChangeFinished: ((Float) -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
@@ -41,6 +42,7 @@ fun SliderPref(
         TextPref(
             title = title,
             modifier = modifier,
+            summary = summary,
             textColor = textColor,
             minimalHeight = true,
             leadingIcon = leadingIcon,
