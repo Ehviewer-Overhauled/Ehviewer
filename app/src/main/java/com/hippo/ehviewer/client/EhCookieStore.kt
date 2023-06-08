@@ -50,39 +50,13 @@ object EhCookieStore : CookieJar {
     private const val KEY_CONTENT_WARNING = "nw"
     private const val CONTENT_WARNING_NOT_SHOW = "1"
     private const val KEY_UTMP_NAME = "__utmp"
-    private val sTipsCookie: Cookie = Cookie.Builder().name(KEY_CONTENT_WARNING).value(CONTENT_WARNING_NOT_SHOW).domain(EhUrl.DOMAIN_E).path("/").expiresAt(Long.MAX_VALUE).build()
-
-    fun newCookie(
-        cookie: Cookie,
-        newDomain: String,
-        forcePersistent: Boolean = false,
-        forceLongLive: Boolean = false,
-        forceNotHostOnly: Boolean = false,
-    ): Cookie {
-        val builder = Cookie.Builder()
-        builder.name(cookie.name)
-        builder.value(cookie.value)
-        if (forceLongLive) {
-            builder.expiresAt(Long.MAX_VALUE)
-        } else if (cookie.persistent) {
-            builder.expiresAt(cookie.expiresAt)
-        } else if (forcePersistent) {
-            builder.expiresAt(Long.MAX_VALUE)
-        }
-        if (cookie.hostOnly && !forceNotHostOnly) {
-            builder.hostOnlyDomain(newDomain)
-        } else {
-            builder.domain(newDomain)
-        }
-        builder.path(cookie.path)
-        if (cookie.secure) {
-            builder.secure()
-        }
-        if (cookie.httpOnly) {
-            builder.httpOnly()
-        }
-        return builder.build()
-    }
+    private val sTipsCookie = Cookie.Builder().apply {
+        name(KEY_CONTENT_WARNING)
+        value(CONTENT_WARNING_NOT_SHOW)
+        domain(EhUrl.DOMAIN_E)
+        path("/")
+        expiresAt(Long.MAX_VALUE)
+    }.build()
 
     fun copyNecessaryCookies() {
         val cookie = get(EhUrl.HOST_E.toHttpUrl()).filter { it.name == KEY_STAR || it.name == KEY_IPB_MEMBER_ID || it.name == KEY_IPB_PASS_HASH || it.name == KEY_IGNEOUS }
