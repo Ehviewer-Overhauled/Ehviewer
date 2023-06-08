@@ -20,7 +20,6 @@ import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import java.util.regex.Pattern
 
 object EhCookieStore : CookieJar {
     private val manager = CookieManager.getInstance()
@@ -91,40 +90,8 @@ object EhCookieStore : CookieJar {
     // See https://github.com/Ehviewer-Overhauled/Ehviewer/issues/873
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = cookies.filterNot { it.name == KEY_UTMP_NAME }.forEach { manager.setCookie(url.toString(), it.toString()) }
 
-    /**
-     * Quick and dirty pattern to differentiate IP addresses from hostnames. This is an approximation
-     * of Android's private InetAddress#isNumeric API.
-     *
-     *
-     * This matches IPv6 addresses as a hex string containing at least one colon, and possibly
-     * including dots after the first colon. It matches IPv4 addresses as strings containing only
-     * decimal digits and dots. This pattern matches strings like "a:.23" and "54" that are neither IP
-     * addresses nor hostnames; they will be verified as IP addresses (which is a more strict
-     * verification).
-     */
-    private val VERIFY_AS_IP_ADDRESS = Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)")
-
-    /**
-     * Returns true if `host` is not a host name and might be an IP address.
-     */
-    private fun verifyAsIpAddress(host: String): Boolean {
-        return VERIFY_AS_IP_ADDRESS.matcher(host).matches()
-    }
-
-    // okhttp3.Cookie.domainMatch(HttpUrl, String)
-    @JvmStatic
-    fun domainMatch(url: HttpUrl, domain: String?): Boolean {
-        val urlHost = url.host
-        return if (urlHost == domain) {
-            true // As in 'example.com' matching 'example.com'.
-        } else {
-            urlHost.endsWith(domain!!) && urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(urlHost)
-        }
-        // As in 'example.com' matching 'www.example.com'.
-    }
-
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        val checkTips = domainMatch(url, EhUrl.DOMAIN_E)
+        val checkTips = EhUrl.DOMAIN_E in url.host
         return get(url).run {
             if (checkTips) {
                 filterNot { it.name == KEY_CONTENT_WARNING }.toMutableList().apply { add(sTipsCookie) }
