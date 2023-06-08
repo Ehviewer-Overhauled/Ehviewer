@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
 import android.annotation.SuppressLint
-import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,8 +28,6 @@ import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhCookieStore.KEY_SETTINGS_PROFILE
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.LocalNavController
-import eu.kanade.tachiyomi.util.lang.launchIO
-import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 private const val applyJs = "javascript:(function(){var apply = document.getElementById(\"apply\").children[0];apply.click();})();"
@@ -81,33 +78,9 @@ fun UConfigScreen() {
         val applyTip = stringResource(id = R.string.apply_tip)
         LaunchedEffect(Unit) { snackbarHostState.showSnackbar(applyTip) }
         DisposableEffect(Unit) {
-            CookieManager.getInstance().apply {
-                flush()
-                removeAllCookies(null)
-                removeSessionCookies(null)
-                // Copy cookies from okhttp cookie store to CookieManager
-                EhCookieStore.getCookies(url.toHttpUrl()).forEach {
-                    setCookie(url, it.toString())
-                }
-            }
             onDispose {
-                // Put cookies back to okhttp cookie store
-                val cookiesString = CookieManager.getInstance().getCookie(url)
-                if (cookiesString.isNotBlank()) {
-                    val hostUrl = EhUrl.host.toHttpUrl()
-                    launchIO {
-                        EhCookieStore.deleteCookie(hostUrl, KEY_SETTINGS_PROFILE)
-                        // The cookies saved in the uconfig page should not be shared between e and ex
-                        for (header in cookiesString.split(";".toRegex()).dropLastWhile { it.isEmpty() }) {
-                            Cookie.parse(hostUrl, header)?.let {
-                                EhCookieStore.addCookie(longLive(it))
-                            }
-                        }
-                    }
-                }
+                EhCookieStore.deleteCookie(EhUrl.host.toHttpUrl(), KEY_SETTINGS_PROFILE)
             }
         }
     }
 }
-
-private fun longLive(cookie: Cookie) = Cookie.Builder().name(cookie.name).value(cookie.value).domain(cookie.domain).path(cookie.path).expiresAt(Long.MAX_VALUE).build()

@@ -21,7 +21,7 @@ suspend fun postLogin() = coroutineScope {
     runCatching {
         // For the `star` cookie
         EhEngine.getNews(false)
-        EhCookieStore.copyCookie(EhUrl.DOMAIN_E, EhUrl.DOMAIN_EX, EhCookieStore.KEY_STAR)
+        EhCookieStore.copyNecessaryCookies()
 
         // Sad panda check
         Settings.gallerySite = EhUrl.SITE_EX

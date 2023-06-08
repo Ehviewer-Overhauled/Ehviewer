@@ -1,7 +1,6 @@
 package com.hippo.ehviewer.ui.settings
 
 import android.annotation.SuppressLint
-import android.webkit.CookieManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,16 +11,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.hippo.ehviewer.R
-import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.ui.LocalNavController
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -52,16 +48,5 @@ fun MyTagsScreen() {
                 }
             },
         )
-        SideEffect {
-            CookieManager.getInstance().apply {
-                flush()
-                removeAllCookies(null)
-                removeSessionCookies(null)
-                // Copy cookies from okhttp cookie store to CookieManager
-                EhCookieStore.getCookies(url.toHttpUrl()).forEach {
-                    setCookie(url, it.toString())
-                }
-            }
-        }
     }
 }

@@ -15,45 +15,42 @@
  */
 package com.hippo.ehviewer.client
 
-import com.hippo.ehviewer.network.CookieDatabase
-import com.hippo.ehviewer.network.CookieSet
-import eu.kanade.tachiyomi.util.lang.launchIO
+import android.webkit.CookieManager
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import splitties.init.appCtx
-import java.util.Collections
 import java.util.regex.Pattern
 
 object EhCookieStore : CookieJar {
-    private val db: CookieDatabase = CookieDatabase(appCtx)
-    private val map: MutableMap<String, CookieSet> = db.allCookies
+    private val manager = CookieManager.getInstance()
+    fun signOut() = manager.removeAllCookies(null)
+    fun contains(url: HttpUrl, name: String) = get(url).any { it.name == name }
 
-    fun signOut() {
-        clear()
+    fun get(url: HttpUrl): List<Cookie> {
+        val cookies = manager.getCookie(url.toString())
+
+        return if (cookies != null && cookies.isNotEmpty()) {
+            cookies.split(";").mapNotNull { Cookie.parse(url, it) }.filterNot { it.name == KEY_UTMP_NAME }
+        } else {
+            emptyList()
+        }
     }
 
     fun hasSignedIn(): Boolean {
         val url = EhUrl.HOST_E.toHttpUrl()
-        return contains(url, KEY_IPB_MEMBER_ID) &&
-            contains(url, KEY_IPB_PASS_HASH)
+        return contains(url, KEY_IPB_MEMBER_ID) && contains(url, KEY_IPB_PASS_HASH)
     }
 
     const val KEY_IPB_MEMBER_ID = "ipb_member_id"
     const val KEY_IPB_PASS_HASH = "ipb_pass_hash"
     const val KEY_IGNEOUS = "igneous"
     const val KEY_SETTINGS_PROFILE = "sp"
-    const val KEY_STAR = "star"
+    private const val KEY_STAR = "star"
     private const val KEY_CONTENT_WARNING = "nw"
     private const val CONTENT_WARNING_NOT_SHOW = "1"
-    private val sTipsCookie: Cookie = Cookie.Builder()
-        .name(KEY_CONTENT_WARNING)
-        .value(CONTENT_WARNING_NOT_SHOW)
-        .domain(EhUrl.DOMAIN_E)
-        .path("/")
-        .expiresAt(Long.MAX_VALUE)
-        .build()
+    private const val KEY_UTMP_NAME = "__utmp"
+    private val sTipsCookie: Cookie = Cookie.Builder().name(KEY_CONTENT_WARNING).value(CONTENT_WARNING_NOT_SHOW).domain(EhUrl.DOMAIN_E).path("/").expiresAt(Long.MAX_VALUE).build()
 
     fun newCookie(
         cookie: Cookie,
@@ -87,64 +84,22 @@ object EhCookieStore : CookieJar {
         return builder.build()
     }
 
-    fun copyCookie(domain: String, newDomain: String, name: String, path: String = "/") {
-        val cookie = map[domain]?.get(name, domain, path)
-        cookie?.let { addCookie(newCookie(it, newDomain)) }
+    fun copyNecessaryCookies() {
+        val cookie = get(EhUrl.HOST_E.toHttpUrl()).filter { it.name == KEY_STAR || it.name == KEY_IPB_MEMBER_ID || it.name == KEY_IPB_PASS_HASH || it.name == KEY_IGNEOUS }
+        cookie.forEach { manager.setCookie(EhUrl.HOST_EX, it.toString()) }
     }
 
     fun deleteCookie(url: HttpUrl, name: String) {
-        val deletedCookie = Cookie.Builder()
-            .name(name)
-            .value("deleted")
-            .domain(url.host)
-            .expiresAt(0)
-            .build()
-        addCookie(deletedCookie)
+        val deletedCookie = Cookie.Builder().name(name).value("deleted").domain(url.host).expiresAt(0).build()
+        manager.setCookie(url.toString(), deletedCookie.toString())
     }
 
-    @Synchronized
     fun addCookie(cookie: Cookie) {
-        // For cookie database
-        var toAdd: Cookie? = null
-        var toUpdate: Cookie? = null
-        var toRemove: Cookie? = null
-        var set = map[cookie.domain]
-        if (set == null) {
-            set = CookieSet()
-            map[cookie.domain] = set
-        }
-        if (cookie.expiresAt <= System.currentTimeMillis()) {
-            toRemove = set.remove(cookie)
-            // If the cookie is not persistent, it's not in database
-            if (toRemove != null && !toRemove.persistent) {
-                toRemove = null
-            }
-        } else {
-            toAdd = cookie
-            toUpdate = set.add(cookie)
-            // If the cookie is not persistent, it's not in database
-            if (!toAdd.persistent) toAdd = null
-            if (toUpdate != null && !toUpdate.persistent) toUpdate = null
-            // Remove the cookie if it updates to null
-            if (toAdd == null && toUpdate != null) {
-                toRemove = toUpdate
-                toUpdate = null
-            }
-        }
-        if (toRemove != null) {
-            db.remove(toRemove)
-        }
-        if (toAdd != null) {
-            if (toUpdate != null) {
-                db.update(toUpdate, toAdd)
-            } else {
-                db.add(toAdd)
-            }
-        }
+        if (EhUrl.DOMAIN_E in cookie.domain) manager.setCookie(EhUrl.HOST_E, cookie.toString()) else manager.setCookie(EhUrl.DOMAIN_EX, cookie.toString())
     }
 
     fun getCookieHeader(url: HttpUrl): String {
-        val cookies = getCookies(url)
+        val cookies = get(url)
         val cookieHeader = StringBuilder()
         var i = 0
         val size = cookies.size
@@ -159,56 +114,8 @@ object EhCookieStore : CookieJar {
         return cookieHeader.toString()
     }
 
-    @Synchronized
-    fun getCookies(url: HttpUrl): List<Cookie> {
-        val accepted: MutableList<Cookie> = ArrayList()
-        val expired: MutableList<Cookie> = ArrayList()
-        for ((domain, cookieSet) in map) {
-            if (domainMatch(url, domain)) {
-                cookieSet[url, accepted, expired]
-            }
-        }
-        for (cookie in expired) {
-            if (cookie.persistent) {
-                db.remove(cookie)
-            }
-        }
-
-        // RFC 6265 Section-5.4 step 2, sort the cookie-list
-        // Cookies with longer paths are listed before cookies with shorter paths.
-        // Ignore creation-time, we don't store them.
-        accepted.sortWith { o1: Cookie, o2: Cookie -> o2.path.length - o1.path.length }
-        return accepted
-    }
-
-    fun contains(url: HttpUrl, name: String?): Boolean {
-        for (cookie in getCookies(url)) {
-            if (cookie.name == name) {
-                return true
-            }
-        }
-        return false
-    }
-
-    /**
-     * Remove all cookies in this `CookieRepository`.
-     */
-    @Synchronized
-    fun clear() {
-        map.clear()
-        launchIO {
-            db.clear()
-        }
-    }
-
-    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-        for (cookie in cookies) {
-            // See https://github.com/Ehviewer-Overhauled/Ehviewer/issues/873
-            if (cookie.name != "__utmp") {
-                addCookie(cookie)
-            }
-        }
-    }
+    // See https://github.com/Ehviewer-Overhauled/Ehviewer/issues/873
+    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) = cookies.filterNot { it.name == KEY_UTMP_NAME }.forEach { manager.setCookie(url.toString(), it.toString()) }
 
     /**
      * Quick and dirty pattern to differentiate IP addresses from hostnames. This is an approximation
@@ -221,8 +128,7 @@ object EhCookieStore : CookieJar {
      * addresses nor hostnames; they will be verified as IP addresses (which is a more strict
      * verification).
      */
-    private val VERIFY_AS_IP_ADDRESS =
-        Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)")
+    private val VERIFY_AS_IP_ADDRESS = Pattern.compile("([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)")
 
     /**
      * Returns true if `host` is not a host name and might be an IP address.
@@ -238,32 +144,19 @@ object EhCookieStore : CookieJar {
         return if (urlHost == domain) {
             true // As in 'example.com' matching 'example.com'.
         } else {
-            urlHost.endsWith(domain!!) &&
-                urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(
-                    urlHost,
-                )
+            urlHost.endsWith(domain!!) && urlHost[urlHost.length - domain.length - 1] == '.' && !verifyAsIpAddress(urlHost)
         }
         // As in 'example.com' matching 'www.example.com'.
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        val cookies = getCookies(url)
         val checkTips = domainMatch(url, EhUrl.DOMAIN_E)
-        return if (checkTips) {
-            val result: MutableList<Cookie> = ArrayList(cookies.size + 1)
-            // Add all but skip some
-            for (cookie in cookies) {
-                val name = cookie.name
-                if (KEY_CONTENT_WARNING == name) {
-                    continue
-                }
-                result.add(cookie)
+        return get(url).run {
+            if (checkTips) {
+                filterNot { it.name == KEY_CONTENT_WARNING }.toMutableList().apply { add(sTipsCookie) }
+            } else {
+                this
             }
-            // Add some
-            result.add(sTipsCookie)
-            Collections.unmodifiableList(result)
-        } else {
-            cookies
         }
     }
 }

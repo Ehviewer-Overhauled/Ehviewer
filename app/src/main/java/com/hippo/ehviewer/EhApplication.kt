@@ -37,6 +37,7 @@ import com.hippo.ehviewer.dailycheck.checkDawn
 import com.hippo.ehviewer.dao.EhDatabase
 import com.hippo.ehviewer.download.DownloadManager
 import com.hippo.ehviewer.legacy.cleanObsoleteCache
+import com.hippo.ehviewer.legacy.migrateCookies
 import com.hippo.ehviewer.okhttp.cache
 import com.hippo.ehviewer.okhttp.httpClient
 import com.hippo.ehviewer.ui.keepNoMediaFileStatus
@@ -76,6 +77,9 @@ class EhApplication : Application(), ImageLoaderFactory {
             }
         }
         launchIO {
+            launchIO {
+                migrateCookies()
+            }
             launchIO {
                 EhTagDatabase.update()
             }

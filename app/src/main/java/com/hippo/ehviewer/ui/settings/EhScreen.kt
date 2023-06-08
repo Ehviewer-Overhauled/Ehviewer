@@ -91,8 +91,8 @@ fun EhScreen() {
                 title = stringResource(id = R.string.account_name),
                 summary = Settings.displayName ?: touristMode,
             ) {
-                val eCookies = EhCookieStore.getCookies(EhUrl.HOST_E.toHttpUrl())
-                val exCookies = EhCookieStore.getCookies(EhUrl.HOST_EX.toHttpUrl())
+                val eCookies = EhCookieStore.loadForRequest(EhUrl.HOST_E.toHttpUrl())
+                val exCookies = EhCookieStore.loadForRequest(EhUrl.HOST_EX.toHttpUrl())
                 var ipbMemberId: String? = null
                 var ipbPassHash: String? = null
                 var igneous: String? = null
