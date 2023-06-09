@@ -24,6 +24,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoaderFactory
 import coil.decode.ImageDecoderDecoder
 import coil.util.DebugLogger
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.hippo.ehviewer.client.EhCookieStore
 import com.hippo.ehviewer.client.EhDns
 import com.hippo.ehviewer.client.EhSSLSocketFactory
@@ -149,6 +150,11 @@ class EhApplication : Application(), ImageLoaderFactory {
             httpClient {
                 cookieJar(EhCookieStore)
                 dns(EhDns)
+                addInterceptor(
+                    ChuckerInterceptor.Builder(appCtx).apply {
+                        alwaysReadResponseBody(false)
+                    }.build(),
+                )
                 if (Settings.dF) install(EhSSLSocketFactory)
             }
         }
