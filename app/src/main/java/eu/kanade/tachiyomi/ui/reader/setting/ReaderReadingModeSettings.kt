@@ -25,7 +25,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
 ) :
     NestedScrollView(context, attrs) {
 
-    private val readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences
+    private val readerPreferences: ReaderPreferences = ReaderPreferences
 
     private val binding =
         ReaderReadingModeSettingsBinding.inflate(LayoutInflater.from(context), this, false)
@@ -47,10 +47,10 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
     private fun initGeneralPreferences() {
         binding.viewer.onItemSelectedListener = { position ->
             val readingModeType = ReadingModeType.fromSpinner(position)
-            ReaderActivity.readerPreferences.defaultReadingMode().set(readingModeType.flagValue)
+            ReaderPreferences.defaultReadingMode().set(readingModeType.flagValue)
             (context as ReaderActivity).setGallery()
 
-            val mangaViewer = ReaderActivity.readerPreferences.defaultReadingMode().get()
+            val mangaViewer = ReaderPreferences.defaultReadingMode().get()
             if (mangaViewer == ReadingModeType.WEBTOON.flagValue || mangaViewer == ReadingModeType.CONTINUOUS_VERTICAL.flagValue) {
                 initWebtoonPreferences()
             } else {
@@ -58,7 +58,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
             }
         }
         binding.viewer.setSelection(
-            ReaderActivity.readerPreferences.defaultReadingMode().get()
+            ReaderPreferences.defaultReadingMode().get()
                 .let { ReadingModeType.fromPreference(it).prefValue },
         )
 
@@ -68,7 +68,7 @@ class ReaderReadingModeSettings @JvmOverloads constructor(
             (context as ReaderActivity).setGallery()
         }
         binding.rotationMode.setSelection(
-            ReaderActivity.readerPreferences.defaultOrientationType().get()
+            ReaderPreferences.defaultOrientationType().get()
                 .let { OrientationType.fromPreference(it).prefValue },
         )
     }

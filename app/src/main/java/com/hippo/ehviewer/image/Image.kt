@@ -25,8 +25,8 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import splitties.init.appCtx
 import java.nio.ByteBuffer
 import kotlin.math.min
@@ -80,7 +80,7 @@ class Image private constructor(private val src: CloseableSource) {
         val screenHeight = appCtx.resources.displayMetrics.heightPixels
         val isWideColorGamut = appCtx.resources.configuration.isScreenWideColorGamut
         var colorSpace = ColorSpace.get(
-            if (isWideColorGamut && EhApplication.readerPreferences.wideColorGamut().get()) {
+            if (isWideColorGamut && ReaderPreferences.wideColorGamut().get()) {
                 ColorSpace.Named.DISPLAY_P3
             } else {
                 ColorSpace.Named.SRGB

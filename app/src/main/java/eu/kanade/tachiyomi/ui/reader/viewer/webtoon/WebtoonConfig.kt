@@ -1,6 +1,5 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerConfig
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation
@@ -20,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
  */
 class WebtoonConfig(
     scope: CoroutineScope,
-    readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences,
+    readerPreferences: ReaderPreferences = ReaderPreferences,
 ) : ViewerConfig(readerPreferences, scope) {
 
     var themeChangedListener: (() -> Unit)? = null

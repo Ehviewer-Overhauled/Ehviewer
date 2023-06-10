@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 class ReaderGeneralSettings @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     NestedScrollView(context, attrs) {
 
-    private val readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences
+    private val readerPreferences: ReaderPreferences = ReaderPreferences
 
     private val binding = ReaderGeneralSettingsBinding.inflate(LayoutInflater.from(context), this, false)
 

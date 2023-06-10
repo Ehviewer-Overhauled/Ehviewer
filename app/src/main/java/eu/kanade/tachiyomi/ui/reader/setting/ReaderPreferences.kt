@@ -1,10 +1,11 @@
 package eu.kanade.tachiyomi.ui.reader.setting
 
-import eu.kanade.tachiyomi.core.preference.PreferenceStore
+import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.core.preference.getEnum
 import eu.kanade.tachiyomi.data.preference.PreferenceValues
 
-class ReaderPreferences(private val preferenceStore: PreferenceStore) {
+object ReaderPreferences {
+    private val preferenceStore = AndroidPreferenceStore
 
     // region General
 

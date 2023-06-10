@@ -45,8 +45,6 @@ import com.hippo.ehviewer.ui.keepNoMediaFileStatus
 import com.hippo.ehviewer.ui.lockObserver
 import com.hippo.ehviewer.util.ReadableTime
 import com.hippo.ehviewer.yorozuya.FileUtils
-import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
-import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -176,8 +174,6 @@ class EhApplication : Application(), ImageLoaderFactory {
                 }
             }
         }
-
-        val readerPreferences by lazy { ReaderPreferences(AndroidPreferenceStore) }
 
         val ehDatabase by lazy { roomDb<EhDatabase>("eh.db") { allowMainThreadQueries() } }
 

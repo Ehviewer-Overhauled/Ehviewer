@@ -1,6 +1,5 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
-import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerConfig
@@ -21,7 +20,7 @@ import kotlinx.coroutines.flow.onEach
 class PagerConfig(
     private val viewer: PagerViewer,
     scope: CoroutineScope,
-    readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences,
+    readerPreferences: ReaderPreferences = ReaderPreferences,
 ) : ViewerConfig(readerPreferences, scope) {
 
     var theme = readerPreferences.readerTheme().get()

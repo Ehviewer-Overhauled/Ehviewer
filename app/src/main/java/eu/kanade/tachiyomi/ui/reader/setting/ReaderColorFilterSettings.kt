@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.sample
 class ReaderColorFilterSettings @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     NestedScrollView(context, attrs) {
 
-    private val readerPreferences: ReaderPreferences = ReaderActivity.readerPreferences
+    private val readerPreferences: ReaderPreferences = ReaderPreferences
 
     private val binding = ReaderColorFilterSettingsBinding.inflate(LayoutInflater.from(context), this, false)
 

@@ -61,7 +61,6 @@ import com.google.android.material.slider.Slider
 import com.google.android.material.transition.MaterialContainerTransform
 import com.hippo.ehviewer.AppConfig
 import com.hippo.ehviewer.BuildConfig
-import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.GalleryInfo
@@ -81,6 +80,7 @@ import com.hippo.unifile.UniFile
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
@@ -300,7 +300,7 @@ class ReaderActivity : EhActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.colorMode = if (Image.isWideColorGamut && readerPreferences.wideColorGamut()
+        window.colorMode = if (Image.isWideColorGamut && ReaderPreferences.wideColorGamut()
                 .get()
         ) {
             ActivityInfo.COLOR_MODE_WIDE_COLOR_GAMUT
@@ -345,14 +345,14 @@ class ReaderActivity : EhActivity() {
             mCurrentIndex = if (mPage >= 0) mPage else mGalleryProvider!!.startPage
         }
         val viewerMode =
-            ReadingModeType.fromPreference(readerPreferences.defaultReadingMode().get())
+            ReadingModeType.fromPreference(ReaderPreferences.defaultReadingMode().get())
         binding.actionReadingMode.setImageResource(viewerMode.iconRes)
         viewer?.destroy()
-        viewer = ReadingModeType.toViewer(readerPreferences.defaultReadingMode().get(), this)
+        viewer = ReadingModeType.toViewer(ReaderPreferences.defaultReadingMode().get(), this)
         binding.pageSlider.isRTL = viewer is R2LPagerViewer
-        updateViewerInset(readerPreferences.fullscreen().get())
+        updateViewerInset(ReaderPreferences.fullscreen().get())
         binding.viewerContainer.removeAllViews()
-        setOrientation(readerPreferences.defaultOrientationType().get())
+        setOrientation(ReaderPreferences.defaultOrientationType().get())
         binding.viewerContainer.addView(viewer?.getView())
         viewer?.setGalleryProvider(mGalleryProvider!!)
         moveToPageIndex(mCurrentIndex)
@@ -587,8 +587,6 @@ class ReaderActivity : EhActivity() {
         const val KEY_GALLERY_INFO = "gallery_info"
         const val KEY_PAGE = "page"
         const val KEY_CURRENT_INDEX = "current_index"
-
-        val readerPreferences = EhApplication.readerPreferences
     }
 
     // Tachiyomi funcs
@@ -629,11 +627,11 @@ class ReaderActivity : EhActivity() {
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
 
-            if (readerPreferences.showPageNumber().get()) {
+            if (ReaderPreferences.showPageNumber().get()) {
                 config?.setPageNumberVisibility(false)
             }
         } else {
-            if (readerPreferences.fullscreen().get()) {
+            if (ReaderPreferences.fullscreen().get()) {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
                 windowInsetsController.systemBarsBehavior =
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -652,7 +650,7 @@ class ReaderActivity : EhActivity() {
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
 
-            if (readerPreferences.showPageNumber().get()) {
+            if (ReaderPreferences.showPageNumber().get()) {
                 config?.setPageNumberVisibility(true)
             }
         }
@@ -722,11 +720,11 @@ class ReaderActivity : EhActivity() {
             setOnClickListener {
                 popupMenu(
                     items = ReadingModeType.values().map { it.flagValue to it.stringRes },
-                    selectedItemId = readerPreferences.defaultReadingMode().get(),
+                    selectedItemId = ReaderPreferences.defaultReadingMode().get(),
                 ) {
                     val newReadingMode = ReadingModeType.fromPreference(itemId)
 
-                    readerPreferences.defaultReadingMode().set(newReadingMode.flagValue)
+                    ReaderPreferences.defaultReadingMode().set(newReadingMode.flagValue)
                     setGallery()
 
                     // updateCropBordersShortcut()
@@ -765,11 +763,11 @@ class ReaderActivity : EhActivity() {
             setOnClickListener {
                 popupMenu(
                     items = OrientationType.values().map { it.flagValue to it.stringRes },
-                    selectedItemId = readerPreferences.defaultOrientationType().get(),
+                    selectedItemId = ReaderPreferences.defaultOrientationType().get(),
                 ) {
                     val newOrientation = OrientationType.fromPreference(itemId)
 
-                    readerPreferences.defaultOrientationType().set(newOrientation.flagValue)
+                    ReaderPreferences.defaultOrientationType().set(newOrientation.flagValue)
                     setGallery()
                 }
             }
@@ -921,7 +919,7 @@ class ReaderActivity : EhActivity() {
         if (newOrientation.flag != requestedOrientation) {
             requestedOrientation = newOrientation.flag
         }
-        updateOrientationShortcut(readerPreferences.defaultOrientationType().get())
+        updateOrientationShortcut(ReaderPreferences.defaultOrientationType().get())
     }
 
     /**
@@ -970,7 +968,7 @@ class ReaderActivity : EhActivity() {
          * Initializes the reader subscriptions.
          */
         init {
-            readerPreferences.readerTheme().changes()
+            ReaderPreferences.readerTheme().changes()
                 .onEach { theme ->
                     binding.readerContainer.setBackgroundResource(
                         when (theme) {
@@ -983,51 +981,51 @@ class ReaderActivity : EhActivity() {
                 }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.showPageNumber().changes()
+            ReaderPreferences.showPageNumber().changes()
                 .onEach { setPageNumberVisibility(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.showReaderSeekbar().changes()
+            ReaderPreferences.showReaderSeekbar().changes()
                 .onEach { setReaderSeekbarVisibility(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.trueColor().changes()
+            ReaderPreferences.trueColor().changes()
                 .onEach { setTrueColor(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.cutoutShort().changes()
+            ReaderPreferences.cutoutShort().changes()
                 .onEach { setCutoutShort(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.keepScreenOn().changes()
+            ReaderPreferences.keepScreenOn().changes()
                 .onEach { setKeepScreenOn(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.customBrightness().changes()
+            ReaderPreferences.customBrightness().changes()
                 .onEach { setCustomBrightness(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.colorFilter().changes()
+            ReaderPreferences.colorFilter().changes()
                 .onEach { setColorFilter(it) }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.colorFilterMode().changes()
-                .onEach { setColorFilter(readerPreferences.colorFilter().get()) }
+            ReaderPreferences.colorFilterMode().changes()
+                .onEach { setColorFilter(ReaderPreferences.colorFilter().get()) }
                 .launchIn(lifecycleScope)
 
             merge(
-                readerPreferences.grayscale().changes(),
-                readerPreferences.invertedColors().changes(),
+                ReaderPreferences.grayscale().changes(),
+                ReaderPreferences.invertedColors().changes(),
             )
                 .onEach {
                     setLayerPaint(
-                        readerPreferences.grayscale().get(),
-                        readerPreferences.invertedColors().get(),
+                        ReaderPreferences.grayscale().get(),
+                        ReaderPreferences.invertedColors().get(),
                     )
                 }
                 .launchIn(lifecycleScope)
 
-            readerPreferences.fullscreen().changes()
+            ReaderPreferences.fullscreen().changes()
                 .onEach {
                     WindowCompat.setDecorFitsSystemWindows(window, !it)
                     updateViewerInset(it)
@@ -1091,7 +1089,7 @@ class ReaderActivity : EhActivity() {
         @OptIn(FlowPreview::class)
         private fun setCustomBrightness(enabled: Boolean) {
             if (enabled) {
-                readerPreferences.customBrightnessValue().changes()
+                ReaderPreferences.customBrightnessValue().changes()
                     .sample(100)
                     .onEach { setCustomBrightnessValue(it) }
                     .launchIn(lifecycleScope)
@@ -1106,7 +1104,7 @@ class ReaderActivity : EhActivity() {
         @OptIn(FlowPreview::class)
         private fun setColorFilter(enabled: Boolean) {
             if (enabled) {
-                readerPreferences.colorFilterValue().changes()
+                ReaderPreferences.colorFilterValue().changes()
                     .sample(100)
                     .onEach { setColorFilterValue(it) }
                     .launchIn(lifecycleScope)
@@ -1152,7 +1150,7 @@ class ReaderActivity : EhActivity() {
          */
         private fun setColorFilterValue(value: Int) {
             binding.colorOverlay.isVisible = true
-            binding.colorOverlay.setFilterColor(value, readerPreferences.colorFilterMode().get())
+            binding.colorOverlay.setFilterColor(value, ReaderPreferences.colorFilterMode().get())
         }
 
         private fun setLayerPaint(grayscale: Boolean, invertedColors: Boolean) {
