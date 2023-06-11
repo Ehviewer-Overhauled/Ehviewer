@@ -73,7 +73,7 @@ fun GalleryInfoListItem(
                         Column {
                             if (!isInFavScene) {
                                 Text(
-                                    text = info.uploader ?: "(DISOWNED)",
+                                    text = info.uploader ?: if (info.disowned) "(DISOWNED)" else "",
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
