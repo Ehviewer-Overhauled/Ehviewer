@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.0-Beta" apply false
     id("com.google.devtools.ksp") version "1.9.0-Beta-1.0.11" apply false
     id("com.mikepenz.aboutlibraries.plugin") version "10.7.0" apply false
+    id("org.mozilla.rust-android-gradle.rust-android") version "0.9.3" apply false
 }
 
 allprojects {
@@ -17,6 +18,5 @@ tasks.register("Delete", Delete::class) {
 buildscript {
     dependencies {
         classpath("com.android.tools:r8:8.2.12-dev")
-        classpath("org.mozilla.rust-android-gradle:plugin:0.9.3")
     }
 }

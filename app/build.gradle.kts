@@ -273,9 +273,9 @@ cargo {
 }
 
 tasks.whenObjectAdded {
-    if ((this.name == "mergeDebugJniLibFolders" || this.name == "mergeReleaseJniLibFolders")) {
-        this.dependsOn("cargoBuild")
+    if ((name == "mergeDebugJniLibFolders" || name == "mergeReleaseJniLibFolders")) {
+        dependsOn("cargoBuild")
         // fix mergeDebugJniLibFolders  UP-TO-DATE
-        this.inputs.dir(buildDir.resolve("rustJniLibs/android"))
+        inputs.dir(buildDir.resolve("rustJniLibs/android"))
     }
 }
