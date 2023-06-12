@@ -1,12 +1,8 @@
-extern crate android_logger;
 extern crate jni;
-extern crate log;
 
-use android_logger::Config;
 use jni::JNIEnv;
 use jni::objects::{JClass, JString};
 use jni::sys::jintArray;
-use log::LevelFilter;
 
 fn parse_limit(body: &str) -> Option<Vec<i32>> {
     let dom = tl::parse(body, tl::ParserOptions::default()).ok()?;
@@ -24,7 +20,6 @@ fn parse_limit(body: &str) -> Option<Vec<i32>> {
 
 #[no_mangle]
 pub extern "system" fn Java_com_hippo_ehviewer_client_parser_HomeParserKt_parseLimit<'local>(mut env: JNIEnv<'local>, _class: JClass<'local>, input: JString<'local>) -> jintArray {
-    android_logger::init_once(Config::default().with_max_level(LevelFilter::Trace));
     let html = env.get_string(input.as_ref()).unwrap();
     let vec = parse_limit(html.to_str().unwrap());
     let jir = env.new_int_array(3).unwrap();

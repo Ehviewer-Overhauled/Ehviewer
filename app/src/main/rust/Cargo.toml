@@ -8,6 +8,3 @@ crate_type = ["cdylib"]
 [dependencies]
 jni = "*"
 tl = "*"
-regex = "*"
-android_logger = "*"
-log = "*"
