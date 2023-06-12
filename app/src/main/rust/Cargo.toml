@@ -3,6 +3,6 @@ name = "ehviewer_rust"
 version = "0.1.0"
 
 [lib]
-crate_type = ["staticlib", "dylib"]
+crate_type = ["cdylib"]
 
 [dependencies]

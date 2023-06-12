@@ -269,6 +269,7 @@ cargo {
     module = "src/main/rust"
     libname = "ehviewer_rust"
     targets = listOf("arm", "x86", "arm64", "x86_64")
+    profile = "release"
 }
 
 tasks.whenObjectAdded {
