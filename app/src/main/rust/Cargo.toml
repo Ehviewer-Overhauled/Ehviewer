@@ -1,0 +1,8 @@
+[package]
+name = "ehviewer_rust"
+version = "0.1.0"
+
+[lib]
+crate_type = ["staticlib", "dylib"]
+
+[dependencies]

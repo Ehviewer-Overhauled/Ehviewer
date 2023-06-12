@@ -14,6 +14,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
     id("com.mikepenz.aboutlibraries.plugin")
+    id("org.mozilla.rust-android-gradle.rust-android")
 }
 
 android {
@@ -262,4 +263,18 @@ tasks.withType<KspTaskJvm>().configureEach {
 aboutLibraries {
     duplicationMode = MERGE
     duplicationRule = GROUP
+}
+
+cargo {
+    module = "src/main/rust"
+    libname = "ehviewer_rust"
+    targets = listOf("arm", "x86", "arm64", "x86_64")
+}
+
+tasks.whenObjectAdded {
+    if ((this.name == "mergeDebugJniLibFolders" || this.name == "mergeReleaseJniLibFolders")) {
+        this.dependsOn("cargoBuild")
+        // fix mergeDebugJniLibFolders  UP-TO-DATE
+        this.inputs.dir(buildDir.resolve("rustJniLibs/android"))
+    }
 }

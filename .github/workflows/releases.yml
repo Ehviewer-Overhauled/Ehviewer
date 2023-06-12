@@ -25,6 +25,9 @@ jobs:
         run: |
           echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;25.2.9519653" --sdk_root=${ANDROID_SDK_ROOT} &> /dev/null
 
+      - name: Install Rust Toolchain
+        run: rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
         with:
@@ -60,7 +63,7 @@ jobs:
       - name: Push Apks
         uses: Ehviewer-Overhauled/github-action-push-to-another-repository@main
         env:
-         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
           source-directory: app/build/outputs/apk/release/fdroid
           destination-github-username: Ehviewer-Overhauled
