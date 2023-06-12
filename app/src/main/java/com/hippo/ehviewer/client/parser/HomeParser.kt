@@ -3,24 +3,16 @@ package com.hippo.ehviewer.client.parser
 import android.os.Parcelable
 import com.hippo.ehviewer.client.exception.ParseException
 import kotlinx.parcelize.Parcelize
-import org.jsoup.Jsoup
 
 object HomeParser {
-    private val PATTERN_FUNDS =
-        Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
+    private val PATTERN_FUNDS = Regex("Available: ([\\d,]+) Credits.*Available: ([\\d,]+) kGP", RegexOption.DOT_MATCHES_ALL)
     private const val RESET_SUCCEED = "Image limit was successfully reset."
 
     fun parse(body: String): Limits {
-        Jsoup.parse(body).selectFirst("div.homebox")?.let {
-            val es = it.select("p > strong")
-            if (es.size == 3) {
-                val current = ParserUtils.parseInt(es[0].text(), 0)
-                val maximum = ParserUtils.parseInt(es[1].text(), 0)
-                val resetCost = ParserUtils.parseInt(es[2].text(), 0)
-                return Limits(current, maximum, resetCost)
-            }
-        }
-        throw ParseException("Parse image limits error", body)
+        val value = parseLimit(body)
+        check(value.size == 3)
+        if (value[0] == -1) throw ParseException("Parse image limits error", body)
+        return Limits(value[0], value[1], value[2])
     }
 
     fun parseResetLimits(body: String): Limits? {
@@ -41,9 +33,11 @@ object HomeParser {
     }
 
     @Parcelize
-    data class Limits(val current: Int = 0, val maximum: Int, val resetCost: Int = 0) : Parcelable
+    data class Limits(val current: Int = 0, val maximum: Int = 0, val resetCost: Int = 0) : Parcelable
 
     @Parcelize
     data class Funds(val fundsGP: Int, val fundsC: Int) : Parcelable
     class Result(val limits: Limits, val funds: Funds)
 }
+
+private external fun parseLimit(body: String): IntArray

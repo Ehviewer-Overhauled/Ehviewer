@@ -1,8 +1,13 @@
 [package]
 name = "ehviewer_rust"
-version = "0.1.0"
+version = "0.0.0"
 
 [lib]
 crate_type = ["cdylib"]
 
 [dependencies]
+jni = "*"
+tl = "*"
+regex = "*"
+android_logger = "*"
+log = "*"

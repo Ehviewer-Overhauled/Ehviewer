@@ -68,6 +68,7 @@ class EhApplication : Application(), ImageLoaderFactory {
         }
         super.onCreate()
         System.loadLibrary("ehviewer")
+        System.loadLibrary("ehviewer_rust")
         ReadableTime.initialize(this)
         launchIO {
             val theme = Settings.theme
