@@ -18,9 +18,6 @@ package com.hippo.ehviewer.client.parser
 import com.hippo.ehviewer.R
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.ehviewer.client.exception.ParseException
-import com.hippo.ehviewer.util.ExceptionUtils
-import com.hippo.ehviewer.util.JsoupUtils
-import org.jsoup.Jsoup
 import splitties.init.appCtx
 
 object FavoritesParser {
@@ -29,24 +26,9 @@ object FavoritesParser {
             throw EhException(appCtx.getString(R.string.need_sign_in))
         }
         val catArray = arrayOfNulls<String>(10)
-        val countArray = IntArray(10)
-        val d = Jsoup.parse(body)
-        runCatching {
-            val ido = JsoupUtils.getElementByClass(d, "ido")
-            val fps = ido!!.getElementsByClass("fp")
-            // Last one is "fp fps"
-            check(fps.size == 11)
-            for (i in 0..9) {
-                val fp = fps[i]
-                countArray[i] = ParserUtils.parseInt(fp.child(0).text(), 0)
-                catArray[i] = ParserUtils.trim(fp.child(2).text())
-            }
-        }.onFailure {
-            ExceptionUtils.throwIfFatal(it)
-            it.printStackTrace()
-            throw ParseException("Parse favorites error", body)
-        }
-        val result = GalleryListParser.parse(d, body)
+        val countArray = parseFav(body, catArray)
+        if (countArray.isEmpty()) throw ParseException("Parse favorites error", body)
+        val result = GalleryListParser.parse(body)
         return Result(catArray.requireNoNulls(), countArray, result)
     }
 
@@ -60,3 +42,5 @@ object FavoritesParser {
         val galleryInfoList = galleryListResult.galleryInfoList
     }
 }
+
+private external fun parseFav(body: String, favCat: Array<String?>): IntArray
